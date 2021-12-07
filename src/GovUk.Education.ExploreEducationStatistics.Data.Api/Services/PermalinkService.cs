@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 property.ShouldSerialize = property.PropertyName switch
                 {
                     "Locations" => _ => !_tableResultLocationHierarchiesEnabled,
-                    "HierarchicalLocations" => _ => _tableResultLocationHierarchiesEnabled,
+                    "LocationsHierarchical" => _ => _tableResultLocationHierarchiesEnabled,
                     _ => property.ShouldSerialize
                 };
             }
