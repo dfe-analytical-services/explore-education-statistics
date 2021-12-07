@@ -18,6 +18,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -124,19 +125,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IUserRepository? userRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             IHttpContextAccessor? httpContextAccessor = null)
         {
             return new(
-                context ?? Mock.Of<ContentDbContext>(MockBehavior.Strict),
+                context ?? Mock.Of<ContentDbContext>(Strict),
                 usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
-                configuration ?? Mock.Of<IConfiguration>(MockBehavior.Strict),
-                emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
-                preReleaseService ?? Mock.Of<IPreReleaseService>(MockBehavior.Strict),
+                configuration ?? Mock.Of<IConfiguration>(Strict),
+                emailService ?? Mock.Of<IEmailService>(Strict),
+                preReleaseService ?? Mock.Of<IPreReleaseService>(Strict),
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
-                userRepository ?? Mock.Of<IUserRepository>(MockBehavior.Strict),
-                userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(MockBehavior.Strict),
-                httpContextAccessor ?? Mock.Of<IHttpContextAccessor>(MockBehavior.Strict)
+                userService ?? Mock.Of<IUserService>(Strict),
+                userRepository ?? Mock.Of<IUserRepository>(Strict),
+                userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
+                userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict),
+                httpContextAccessor ?? Mock.Of<IHttpContextAccessor>(Strict)
             );
         }
     }

@@ -1855,6 +1855,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IUserRepository? userRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             IHttpContextAccessor? httpContextAccessor = null)
         {
             return new(
@@ -1867,6 +1868,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 userRepository ?? new UserRepository(context),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(context),
+                userReleaseInviteRepository ?? new UserReleaseInviteRepository(context),
                 httpContextAccessor ?? DefaultHttpContextAccessorMock().Object
             );
         }

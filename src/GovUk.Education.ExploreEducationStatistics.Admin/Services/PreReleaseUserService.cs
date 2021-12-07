@@ -24,6 +24,7 @@ using Microsoft.Extensions.Configuration;
 using static System.DateTime;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -38,6 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IUserRepository _userRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
+        private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public PreReleaseUserService(ContentDbContext context,
@@ -49,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IUserRepository userRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
+            IUserReleaseInviteRepository userReleaseInviteRepository,
             IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
@@ -60,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _userRepository = userRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
+            _userReleaseInviteRepository = userReleaseInviteRepository;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -74,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         var activePrereleaseContacts = await _context
                             .UserReleaseRoles
                             .Include(r => r.User)
-                            .Where(r => r.Role == ReleaseRole.PrereleaseViewer && r.ReleaseId == releaseId)
+                            .Where(r => r.Role == PrereleaseViewer && r.ReleaseId == releaseId)
                             .Select(r => r.User.Email.ToLower())
                             .Distinct()
                             .Select(email => new PreReleaseUserViewModel(email))
@@ -84,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .UserReleaseInvites
                             .AsQueryable()
                             .Where(
-                                r => r.Role == ReleaseRole.PrereleaseViewer && !r.Accepted && r.ReleaseId == releaseId
+                                r => r.Role == PrereleaseViewer && !r.Accepted && r.ReleaseId == releaseId
                             )
                             .Select(i => i.Email.ToLower())
                             .Distinct()
@@ -120,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             }
                             else
                             {
-                                if (await UserHasPreReleaseInvite(releaseId, email))
+                                if (await _userReleaseInviteRepository.UserHasInvite(releaseId, email, PrereleaseViewer))
                                 {
                                     plan.AlreadyInvited.Add(email);
                                 }
@@ -190,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     r =>
                                         r.ReleaseId == releaseId
                                         && r.User.Email.ToLower().Equals(email.ToLower())
-                                        && r.Role == ReleaseRole.PrereleaseViewer
+                                        && r.Role == PrereleaseViewer
                                 )
                         );
                         _context.RemoveRange(
@@ -201,7 +205,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     i =>
                                         i.ReleaseId == releaseId
                                         && i.Email.ToLower().Equals(email.ToLower())
-                                        && i.Role == ReleaseRole.PrereleaseViewer
+                                        && i.Role == PrereleaseViewer
                                 )
                         );
                         await _context.SaveChangesAsync();
@@ -215,7 +219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .Where(
                                 i =>
                                     i.Email.ToLower().Equals(email.ToLower())
-                                    && i.Role == ReleaseRole.PrereleaseViewer
+                                    && i.Role == PrereleaseViewer
                             )
                             .CountAsync();
 
@@ -248,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .AsQueryable()
                         .Where(i =>
                             i.ReleaseId == releaseId
-                            && i.Role == ReleaseRole.PrereleaseViewer
+                            && i.Role == PrereleaseViewer
                             && !i.EmailSent)
                         .ToListAsync();
 
@@ -261,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     release,
                                     invite.Email.ToLower(),
                                     isNewUser: user == null)
-                                .OnSuccessDo(async () => await MarkInviteEmailAsSent(invite));
+                                .OnSuccessDo(async () => await _userReleaseInviteRepository.MarkInviteEmailAsSent(invite));
                         })
                         .ToListAsync();
 
@@ -293,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> CreateUserReleaseInvite(Release release, string email)
         {
-            if (!await UserHasPreReleaseInvite(release.Id, email))
+            if (!await _userReleaseInviteRepository.UserHasInvite(release.Id, email, PrereleaseViewer))
             {
                 var sendEmail = release.ApprovalStatus == ReleaseApprovalStatus.Approved;
                 await _context.AddAsync(
@@ -301,7 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         Email = email.ToLower(),
                         ReleaseId = release.Id,
-                        Role = ReleaseRole.PrereleaseViewer,
+                        Role = PrereleaseViewer,
                         EmailSent = sendEmail,
                         Created = UtcNow,
                         CreatedById = _userService.GetUserId()
@@ -322,7 +326,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, Unit>> CreateExistingUserReleaseInvite(Release release, string email,
             User user)
         {
-            if (!await UserHasPreReleaseInvite(release.Id, email))
+            if (!await _userReleaseInviteRepository.UserHasInvite(release.Id, email, PrereleaseViewer))
             {
                 var sendEmail = release.ApprovalStatus == ReleaseApprovalStatus.Approved;
 
@@ -332,7 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         Email = email.ToLower(),
                         ReleaseId = release.Id,
-                        Role = ReleaseRole.PrereleaseViewer,
+                        Role = PrereleaseViewer,
                         Accepted = true,
                         EmailSent = sendEmail,
                         Created = UtcNow,
@@ -352,30 +356,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _userReleaseRoleRepository.Create(
                             userId: user.Id,
                             releaseId: release.Id,
-                            role: ReleaseRole.PrereleaseViewer,
+                            role: PrereleaseViewer,
                             createdById: _userService.GetUserId());
                     });
             }
 
             return Unit.Instance;
-        }
-
-        private async Task MarkInviteEmailAsSent(UserReleaseInvite invite)
-        {
-            invite.EmailSent = true;
-            _context.Update(invite);
-            await _context.SaveChangesAsync();
-        }
-
-        private async Task<bool> UserHasPreReleaseInvite(Guid releaseId, string email)
-        {
-            return await _context
-                .UserReleaseInvites
-                .AsQueryable()
-                .AnyAsync(i =>
-                    i.ReleaseId == releaseId
-                    && i.Email.ToLower().Equals(email.ToLower())
-                    && i.Role == ReleaseRole.PrereleaseViewer);
         }
 
         private async Task<bool> UserHasPreReleaseRole(Guid releaseId, string email)
@@ -386,7 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AnyAsync(r =>
                     r.ReleaseId == releaseId
                     && r.User.Email.ToLower().Equals(email.ToLower())
-                    && r.Role == ReleaseRole.PrereleaseViewer);
+                    && r.Role == PrereleaseViewer);
         }
 
         private async Task CreateUserInvite(string email)
