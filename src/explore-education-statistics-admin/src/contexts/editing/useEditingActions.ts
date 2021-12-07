@@ -19,6 +19,18 @@ export default function useCommentsActions() {
     [dispatch],
   );
 
+  const removeUnsavedDeletionsForBlock = useCallback(
+    async (blockId: string) => {
+      dispatch?.({
+        type: 'REMOVE_UNSAVED_DELETIONS_FOR_BLOCK',
+        payload: {
+          blockId,
+        },
+      });
+    },
+    [dispatch],
+  );
+
   const removeUnsavedBlock = useCallback(
     async (blockId: string) => {
       dispatch?.({
@@ -63,6 +75,13 @@ export default function useCommentsActions() {
           commentId,
         },
       });
+      dispatch?.({
+        type: 'UPDATE_UNRESOLVED_COMMENTS',
+        payload: {
+          blockId,
+          commentId,
+        },
+      });
     },
     [dispatch],
   );
@@ -70,6 +89,7 @@ export default function useCommentsActions() {
   return useMemo(
     () => ({
       addUnsavedBlock,
+      removeUnsavedDeletionsForBlock,
       removeUnsavedBlock,
       setEditingMode,
       updateUnresolvedComments,
@@ -77,6 +97,7 @@ export default function useCommentsActions() {
     }),
     [
       addUnsavedBlock,
+      removeUnsavedDeletionsForBlock,
       removeUnsavedBlock,
       setEditingMode,
       updateUnresolvedComments,

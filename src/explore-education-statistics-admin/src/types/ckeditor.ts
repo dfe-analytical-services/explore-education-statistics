@@ -19,6 +19,19 @@ export interface Editor {
   getData(): string;
 }
 
+export interface CommentsPluginConfig {
+  addComment: () => void;
+  commentCancelled: () => void;
+  commentRemoved: (markerId: string) => void;
+  commentSelected: (markerId?: string) => void;
+  undoRedoComment: (type: CommentUndoRedoActions, markerId: string) => void;
+}
+
+export interface AutoSavePluginConfig {
+  save: () => void;
+  waitingTime: number;
+}
+
 export interface EditorConfig {
   toolbar: string[];
   extraPlugins?: Plugin[];
@@ -35,17 +48,8 @@ export interface EditorConfig {
   link?: {
     decorators: Dictionary<LinkDecoratorAutomatic | LinkDecoratorManual>;
   };
-  comments?: {
-    addComment: () => void;
-    commentCancelled: () => void;
-    commentRemoved: (markerId: string) => void;
-    commentSelected: (markerId?: string) => void;
-    undoRedoComment: (type: CommentUndoRedoActions, markerId: string) => void;
-  };
-  autosave?: {
-    save: () => void;
-    waitingTime: number;
-  };
+  comments?: CommentsPluginConfig;
+  autosave?: AutoSavePluginConfig;
 }
 
 export interface PluginCollection {

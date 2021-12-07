@@ -1,5 +1,7 @@
 import styles from '@admin/components/comments/Comment.module.scss';
 import CommentEditForm from '@admin/components/comments/CommentEditForm';
+import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
+import useEditingActions from '@admin/contexts/editing/useEditingActions';
 import { Comment as CommentType } from '@admin/services/types/content';
 import FormattedDate from '@common/components/FormattedDate';
 import { useAuthContext } from '@admin/contexts/AuthContext';
@@ -10,28 +12,11 @@ import ButtonText from '@common/components/ButtonText';
 import useToggle from '@common/hooks/useToggle';
 import React, { useEffect, useRef } from 'react';
 
-export interface ResolveCommentEvent {
-  comment: CommentType;
-  resolve?: boolean;
-  updateMarker?: boolean;
-}
-
 interface Props {
-  active: boolean;
+  blockId: string;
   comment: CommentType;
-  onRemove: (commentId: string) => void;
-  onResolve: (event: ResolveCommentEvent) => void;
-  onSelect: (id: string) => void;
-  onUpdate: (comment: CommentType) => void;
 }
-const Comment = ({
-  active,
-  comment,
-  onRemove,
-  onResolve,
-  onSelect,
-  onUpdate,
-}: Props) => {
+const Comment = ({ blockId, comment }: Props) => {
   const {
     content,
     created,
@@ -41,23 +26,31 @@ const Comment = ({
     resolvedBy,
     updated,
   } = comment;
+  const {
+    selectedComment,
+    onDeleteComment,
+    onResolveComment,
+    onUnresolveComment,
+    setSelectedComment,
+  } = useCommentsContext();
+  const editingActions = useEditingActions();
   const [isEditingComment, toggleIsEditingComment] = useToggle(false);
   const ref = useRef<HTMLDivElement>(null);
   const { user } = useAuthContext();
 
   useEffect(() => {
-    if (active) {
+    if (selectedComment.commentId === id) {
       ref.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'nearest',
         inline: 'start',
       });
     }
-  }, [active]);
+  }, [id, selectedComment]);
 
   const handleCommentSelection = () => {
     if (!comment.resolved) {
-      onSelect(comment.id);
+      setSelectedComment({ commentId: comment.id });
     }
   };
 
@@ -69,8 +62,7 @@ const Comment = ({
             comment={comment}
             id={id}
             onCancel={toggleIsEditingComment.off}
-            onSubmit={updatedComment => {
-              onUpdate(updatedComment);
+            onSubmit={() => {
               toggleIsEditingComment.off();
             }}
           />
@@ -80,7 +72,7 @@ const Comment = ({
           <div
             aria-label="Comment"
             className={classNames(styles.comment, {
-              [styles.active]: active,
+              [styles.active]: selectedComment.commentId === id,
             })}
             ref={ref}
             role={!comment.resolved ? 'button' : undefined}
@@ -134,7 +126,11 @@ const Comment = ({
             {resolved ? (
               <ButtonText
                 onClick={async () => {
-                  await onResolve({ comment });
+                  await onUnresolveComment?.(comment.id, true);
+                  editingActions.updateUnresolvedComments(
+                    blockId.replace('block-', ''),
+                    comment.id,
+                  );
                 }}
               >
                 Unresolve
@@ -143,7 +139,11 @@ const Comment = ({
               <ButtonGroup className="govuk-!-margin-bottom-0">
                 <Button
                   onClick={async () => {
-                    await onResolve({ comment });
+                    editingActions.updateUnresolvedComments(
+                      blockId.replace('block-', ''),
+                      comment.id,
+                    );
+                    await onResolveComment?.(comment.id, true);
                   }}
                 >
                   Resolve
@@ -156,7 +156,11 @@ const Comment = ({
 
                     <ButtonText
                       onClick={async () => {
-                        onRemove(comment.id);
+                        onDeleteComment?.(comment.id);
+                        editingActions.updateUnsavedCommentDeletions(
+                          blockId.replace('block-', ''),
+                          comment.id,
+                        );
                       }}
                     >
                       Delete

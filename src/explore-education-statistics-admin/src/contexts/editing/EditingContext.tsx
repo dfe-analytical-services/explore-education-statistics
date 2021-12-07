@@ -37,6 +37,11 @@ export const editingReducer: Reducer<
       }
       return draft;
     }
+    case 'REMOVE_UNSAVED_DELETIONS_FOR_BLOCK': {
+      const { blockId } = action.payload;
+      delete draft.unsavedCommentDeletions[blockId];
+      return draft;
+    }
     case 'REMOVE_UNSAVED_BLOCK': {
       const { blockId } = action.payload;
       const index = draft.unsavedBlocks.findIndex(block => block === blockId);

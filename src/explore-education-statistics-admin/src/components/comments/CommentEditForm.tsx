@@ -20,7 +20,7 @@ interface Props {
   comment: Comment;
   id: string;
   onCancel: () => void;
-  onSubmit: (comment: Comment) => void;
+  onSubmit: () => void;
 }
 
 const CommentEditForm = ({ comment, id, onCancel, onSubmit }: Props) => {
@@ -30,14 +30,12 @@ const CommentEditForm = ({ comment, id, onCancel, onSubmit }: Props) => {
 
   const handleSubmit = useFormSubmit(async (values: FormValues) => {
     toggleSubmitting.on();
-    const editedComment: UpdateComment = {
+    const updatedComment: UpdateComment = {
       ...comment,
       content: values.content,
     };
-    const updatedComment = await onUpdateComment?.(editedComment);
-    if (updatedComment) {
-      onSubmit(updatedComment);
-    }
+    await onUpdateComment?.(updatedComment);
+    onSubmit();
   });
 
   return (

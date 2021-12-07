@@ -1,27 +1,17 @@
 import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
 import styles from '@admin/components/form/FormEditor.module.scss';
-import { SelectedComment } from '@admin/components/editable/EditableContentForm';
 import {
   CommentsPlugin,
-  CommentUndoRedoActions,
   Editor as EditorType,
-  EditorConfig,
   Element,
-  Marker,
 } from '@admin/types/ckeditor';
-import {
-  defaultAllowedHeadings,
-  headingOptions,
-  imageToolbar,
-  resizeOptions,
-  tableContentToolbar,
-  toolbarConfigs,
-} from '@admin/config/ckEditorConfig';
+import { defaultAllowedHeadings } from '@admin/config/ckEditorConfig';
+import useCKEditorConfig from '@admin/hooks/useCKEditorConfig';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
-import customUploadAdapterPlugin from '@admin/utils/ckeditor/customUploadAdapterPlugin';
+import getMarkersOrder from '@admin/utils/ckeditor/getMarkersOrder';
 import { CKEditor, CKEditorProps } from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
 import FormLabel from '@common/components/form/FormLabel';
@@ -30,13 +20,7 @@ import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
 import Editor from 'explore-education-statistics-ckeditor';
-import React, {
-  MutableRefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
+import React, { MutableRefObject, useCallback, useEffect, useRef } from 'react';
 
 export type EditorChangeHandler = (value: string) => void;
 export type EditorElementsHandler = (elements: Element[]) => void;
@@ -50,7 +34,6 @@ export interface FormEditorProps {
   hint?: string;
   id: string;
   label: string;
-  selectedComment?: SelectedComment;
   testId?: string;
   toolbarConfig?: string[];
   value: string;
@@ -59,14 +42,10 @@ export interface FormEditorProps {
   onCancelComment?: () => void;
   onChange: EditorChangeHandler;
   onClickAddComment?: () => void;
-  onClickCommentMarker?: (commentId: string) => void;
   onElementsChange?: EditorElementsHandler;
   onElementsReady?: EditorElementsHandler;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
-  onRemoveCommentMarker?: (commentId: string) => void;
-  onUndoRedo?: (type: CommentUndoRedoActions, commentId: string) => void;
-  onUpdateMarkersOrder?: (markerIds: string[]) => void;
 }
 
 const FormEditor = ({
@@ -78,165 +57,41 @@ const FormEditor = ({
   hint,
   id,
   label,
-  selectedComment,
   testId,
-  toolbarConfig = toolbarConfigs.full,
+  toolbarConfig,
   value,
   onAutoSave,
   onBlur,
   onCancelComment,
   onChange,
   onClickAddComment,
-  onClickCommentMarker,
   onElementsChange,
   onElementsReady,
   onImageUpload,
   onImageUploadCancel,
-  onRemoveCommentMarker,
-  onUndoRedo,
-  onUpdateMarkersOrder,
 }: FormEditorProps) => {
-  const { currentInteraction } = useCommentsContext();
-
   const editorInstance = useRef<EditorType>();
   const commentsPlugin = useRef<CommentsPlugin>();
-
   const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
-  const [isFocused, toggleFocused] = useToggle(false);
-
-  // Get the order of the markers based on their position in the editor.
-  // Used to order the comments list.
-  const getMarkersOrder = (markers: Marker[]) => {
-    return [...markers]
-      .sort((a, b) => {
-        if (a.getStart().isAfter(b.getStart())) {
-          return 1;
-        }
-        if (a.getStart().isBefore(b.getStart())) {
-          return -1;
-        }
-        return 0;
-      })
-      .map(marker =>
-        marker.name.startsWith('comment:')
-          ? marker.name.replace('comment:', '')
-          : marker.name.replace('resolvedcomment:', ''),
-      );
-  };
-
-  const config = useMemo<EditorConfig>(() => {
-    const toolbar = toolbarConfig?.filter(tool => {
-      // Disable image upload if no callback provided
-      if (tool === 'imageUpload' && !onImageUpload) {
-        return false;
-      }
-      // Disable comments if not allowed.
-      if (tool === 'comment' && !allowComments) {
-        return false;
-      }
-
-      return true;
-    });
-
-    const hasImageUpload = toolbar.includes('imageUpload');
-
-    return {
-      toolbar,
-      heading: toolbar.includes('heading')
-        ? {
-            options: [
-              {
-                model: 'paragraph',
-                title: 'Paragraph',
-                class: 'ck-heading_paragraph',
-              },
-              ...headingOptions.filter(option =>
-                allowedHeadings?.includes(option.view ?? ''),
-              ),
-            ],
-          }
-        : undefined,
-      image: hasImageUpload
-        ? {
-            toolbar: imageToolbar,
-            resizeOptions,
-          }
-        : undefined,
-      table: {
-        contentToolbar: tableContentToolbar,
-      },
-      link: {
-        decorators: {
-          addDataGlossaryAttributeToGlossaryLinks: {
-            mode: 'automatic',
-            callback: (url: string) =>
-              url.startsWith(process.env.PUBLIC_URL) &&
-              url.match(/\/glossary#[a-zA-Z-0-9-]+$/),
-            attributes: { 'data-glossary': '' },
-          },
-        },
-      },
-      extraPlugins:
-        hasImageUpload && onImageUpload
-          ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]
-          : undefined,
-      comments: allowComments
-        ? {
-            addComment() {
-              // Add comment button in editor clicked
-              onClickAddComment?.();
-            },
-            commentSelected(markerId) {
-              // Comment marker selected in the editor
-              const commentId = markerId
-                ? markerId.replace('comment:', '')
-                : '';
-              onClickCommentMarker?.(commentId);
-            },
-            commentRemoved(markerId) {
-              // Comment marker removed in the editor
-              if (editorInstance.current) {
-                onRemoveCommentMarker?.(markerId.replace('comment:', ''));
-                onAutoSave?.(editorInstance.current.getData());
-              }
-            },
-            commentCancelled() {
-              // if adding a comment is cancelled from within the editor (by clicking outside the placeholder marker)
-              onCancelComment?.();
-            },
-            undoRedoComment(type, markerId) {
-              const commentId = markerId.startsWith('comment:')
-                ? markerId.replace('comment:', '')
-                : markerId.replace('resolvedcomment:', '');
-              onUndoRedo?.(type, commentId);
-            },
-          }
-        : undefined,
-      autosave: onAutoSave
-        ? {
-            save() {
-              if (editorInstance.current) {
-                onAutoSave(editorInstance.current.getData());
-              }
-            },
-            waitingTime: 5000,
-          }
-        : undefined,
-    };
-  }, [
+  const {
+    currentInteraction,
+    selectedComment,
+    setMarkersOrder,
+  } = useCommentsContext();
+  const config = useCKEditorConfig({
     allowComments,
     allowedHeadings,
+    blockId: id.replace('block-', ''),
     editorInstance,
-    onClickAddComment,
+    toolbarConfig,
     onAutoSave,
     onCancelComment,
-    onClickCommentMarker,
-    onRemoveCommentMarker,
+    onClickAddComment,
     onImageUpload,
     onImageUploadCancel,
-    onUndoRedo,
-    toolbarConfig,
-  ]);
+  });
+
+  const [isFocused, toggleFocused] = useToggle(false);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'test') {
@@ -303,9 +158,9 @@ const FormEditor = ({
       );
       editorInstance.current = editor;
       commentsPlugin.current = editor.plugins.get<CommentsPlugin>('Comments');
-      onUpdateMarkersOrder?.(getMarkersOrder([...editor.model.markers]));
+      setMarkersOrder(getMarkersOrder([...editor.model.markers]));
     },
-    [focusOnInit, onElementsReady, onUpdateMarkersOrder],
+    [focusOnInit, onElementsReady, setMarkersOrder],
   );
 
   useEffect(() => {
@@ -326,7 +181,7 @@ const FormEditor = ({
       if (currentInteraction?.type === 'adding') {
         commentsPlugin.current.addCommentMarker(currentInteraction.id);
         if (editorInstance.current) {
-          onUpdateMarkersOrder?.(
+          setMarkersOrder(
             getMarkersOrder([...editorInstance.current.model.markers]),
           );
         }

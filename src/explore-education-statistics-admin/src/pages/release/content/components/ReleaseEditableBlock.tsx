@@ -4,7 +4,7 @@ import EditableContentBlock from '@admin/components/editable/EditableContentBloc
 import useEditingActions from '@admin/contexts/editing/useEditingActions';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
-import { Comment, EditableBlock } from '@admin/services/types/content';
+import { EditableBlock } from '@admin/services/types/content';
 import releaseContentCommentService, {
   AddComment,
   UpdateComment,
@@ -55,10 +55,15 @@ const ReleaseEditableBlock = ({
   });
 
   const handleSave = useCallback(
-    async (content: string) => {
+    async (content: string, isAutoSave?: boolean) => {
       toggleIsSaving.on();
       const contentWithPlaceholders = insertReleaseIdPlaceholders(content);
       await onSave(block.id, contentWithPlaceholders);
+
+      if (!isAutoSave) {
+        editingActions.removeUnsavedDeletionsForBlock(block.id);
+      }
+
       toggleIsSaving.off();
       editingActions.removeUnsavedBlock(block.id);
     },
@@ -79,14 +84,7 @@ const ReleaseEditableBlock = ({
     editingActions.removeUnsavedBlock(block.id);
   };
 
-  const handleToggleResolveComment = async (comment: UpdateComment) => {
-    const updatedComment = await releaseContentCommentService.updateContentSectionComment(
-      comment,
-    );
-    return updatedComment;
-  };
-
-  const handleAddComment = async (comment: AddComment) => {
+  const handleSaveComment = async (comment: AddComment) => {
     const addedComment = await releaseContentCommentService.addContentSectionComment(
       releaseId,
       sectionId,
@@ -96,24 +94,11 @@ const ReleaseEditableBlock = ({
     return addedComment;
   };
 
-  const handleDeletePendingComments = async (pendingDeletions: Comment[]) => {
-    const promises: Promise<void>[] = [];
-    pendingDeletions.forEach(commentToBeDeleted => {
-      promises.push(
-        releaseContentCommentService.deleteContentSectionComment(
-          commentToBeDeleted.id,
-        ),
-      );
-
-      editingActions.updateUnsavedCommentDeletions(
-        block.id,
-        commentToBeDeleted.id,
-      );
-    });
-    await Promise.all(promises);
+  const handleDeletePendingComment = async (commentId: string) => {
+    await releaseContentCommentService.deleteContentSectionComment(commentId);
   };
 
-  const handleUpdateComment = async (comment: UpdateComment) => {
+  const handleSaveUpdatedComment = async (comment: UpdateComment) => {
     const updatedComment = await releaseContentCommentService.updateContentSectionComment(
       comment,
     );
@@ -142,11 +127,9 @@ const ReleaseEditableBlock = ({
         <CommentsProvider
           value={{
             comments: block.comments,
-            pendingDeletions: [],
-            onAddComment: handleAddComment,
-            onDeletePendingComments: handleDeletePendingComments,
-            onToggleResolveComment: handleToggleResolveComment,
-            onUpdateComment: handleUpdateComment,
+            onSaveComment: handleSaveComment,
+            onDeletePendingComment: handleDeletePendingComment,
+            onSaveUpdatedComment: handleSaveUpdatedComment,
           }}
         >
           <EditableContentBlock

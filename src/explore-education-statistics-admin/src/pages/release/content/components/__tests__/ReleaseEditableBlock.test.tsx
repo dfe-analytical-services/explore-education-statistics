@@ -19,9 +19,7 @@ describe('ReleaseEditableBlock', () => {
   const testValue = {
     release: testEditableRelease,
     canUpdateRelease: true,
-    commentsPendingDeletion: {},
     availableDataBlocks: [],
-    unresolvedComments: [],
   };
 
   test('renders HTML block', () => {
@@ -31,7 +29,6 @@ describe('ReleaseEditableBlock', () => {
           releaseId="release-1"
           sectionId="section-1"
           block={testHtmlBlock}
-          onBlockCommentsChange={noop}
           onSave={noop}
           onDelete={noop}
         />
@@ -72,7 +69,6 @@ describe('ReleaseEditableBlock', () => {
           <img alt="Test image 2" src="https://test/some-image-url.jpg" srcset="${image2SrcSet}" />
           `,
           }}
-          onBlockCommentsChange={noop}
           onSave={noop}
           onDelete={noop}
         />

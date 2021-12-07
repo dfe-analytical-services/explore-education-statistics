@@ -1,7 +1,6 @@
 import { ReleaseDispatchAction } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import { EditableBlock } from '@admin/services/types/content';
-import { Dictionary } from '@admin/types';
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import { ContentSection } from '@common/services/publicationService';
 import { BaseBlock, DataBlock } from '@common/services/types/blocks';
@@ -10,7 +9,6 @@ import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer } from 'use-immer';
 
 export type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
-export type CommentsPendingDeletion = Dictionary<string[]>;
 
 export type ReleaseContextState = {
   release: EditableRelease;

@@ -6,6 +6,12 @@ export type AddUnsavedBlock = {
     blockId: string;
   };
 };
+export type RemoveUnsavedDeletionsForBlock = {
+  type: 'REMOVE_UNSAVED_DELETIONS_FOR_BLOCK';
+  payload: {
+    blockId: string;
+  };
+};
 export type RemoveUnsavedBlock = {
   type: 'REMOVE_UNSAVED_BLOCK';
   payload: {
@@ -35,6 +41,7 @@ export type UpdateUnsavedCommentDeletions = {
 
 export type EditingDispatchAction =
   | AddUnsavedBlock
+  | RemoveUnsavedDeletionsForBlock
   | RemoveUnsavedBlock
   | SetEditingMode
   | UpdateUnresolvedComments

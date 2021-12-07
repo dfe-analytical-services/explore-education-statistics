@@ -1,7 +1,7 @@
 import styles from '@admin/components/comments/CommentAddForm.module.scss';
 import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
+import useEditingActions from '@admin/contexts/editing/useEditingActions';
 import { AddComment } from '@admin/services/releaseContentCommentService';
-import { Comment } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -24,11 +24,12 @@ interface Props {
   blockId: string;
   containerRef?: RefObject<HTMLDivElement>;
   onCancel: () => void;
-  onSave: (comment: Comment) => void;
+  onSave: () => void;
 }
 
 const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
-  const { onAddComment } = useCommentsContext();
+  const { onAddComment, setCurrentInteraction } = useCommentsContext();
+  const editingActions = useEditingActions();
   const [isSubmitting, toggleSubmitting] = useToggle(false);
   const [fixPosition, toggleFixPosition] = useToggle(false);
   const [focus, toggleFocus] = useToggle(false);
@@ -65,7 +66,11 @@ const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
     toggleSubmitting.on();
     const newComment = await onAddComment?.(additionalComment);
     if (newComment) {
-      return onSave(newComment);
+      editingActions.updateUnresolvedComments(
+        blockId.replace('block-', ''),
+        newComment.id,
+      );
+      return onSave();
     }
     return toggleSubmitting.off();
   });
@@ -99,7 +104,17 @@ const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
             <Button type="submit" disabled={isSubmitting}>
               Add comment
             </Button>
-            <ButtonText onClick={onCancel}>Cancel</ButtonText>
+            <ButtonText
+              onClick={() => {
+                setCurrentInteraction?.({
+                  type: 'removing',
+                  id: 'commentplaceholder',
+                });
+                onCancel();
+              }}
+            >
+              Cancel
+            </ButtonText>
           </ButtonGroup>
         </Form>
       </Formik>
