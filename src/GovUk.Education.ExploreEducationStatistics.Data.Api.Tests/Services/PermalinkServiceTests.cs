@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task Create_LatestPublishedReleaseForSubjectNotFound()
         {
-            var request = new CreatePermalinkViewModel
+            var request = new PermalinkCreateViewModel
             {
                 Query =
                 {
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = new Guid()
             };
 
-            var request = new CreatePermalinkViewModel
+            var request = new PermalinkCreateViewModel
             {
                 Query =
                 {
@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = new Guid()
             };
 
-            var request = new CreatePermalinkViewModel
+            var request = new PermalinkCreateViewModel
             {
                 Query =
                 {

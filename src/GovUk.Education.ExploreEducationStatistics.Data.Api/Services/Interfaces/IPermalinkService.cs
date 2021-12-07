@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
     public interface IPermalinkService
     {
         Task<Either<ActionResult, PermalinkViewModel>> Get(Guid id);
-        Task<Either<ActionResult, PermalinkViewModel>> Create(CreatePermalinkViewModel viewModel);
-        Task<Either<ActionResult, PermalinkViewModel>> Create(Guid releaseId, CreatePermalinkViewModel request);
+        Task<Either<ActionResult, PermalinkViewModel>> Create(PermalinkCreateViewModel viewModel);
+        Task<Either<ActionResult, PermalinkViewModel>> Create(Guid releaseId, PermalinkCreateViewModel request);
     }
 }

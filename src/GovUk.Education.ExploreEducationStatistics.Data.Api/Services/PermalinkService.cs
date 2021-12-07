@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
         }
 
-        public async Task<Either<ActionResult, PermalinkViewModel>> Create(CreatePermalinkViewModel request)
+        public async Task<Either<ActionResult, PermalinkViewModel>> Create(PermalinkCreateViewModel request)
         {
             var publicationId = await _subjectRepository.GetPublicationIdForSubject(request.Query.SubjectId);
             var release = _releaseRepository.GetLatestPublishedRelease(publicationId);
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         }
 
         public async Task<Either<ActionResult, PermalinkViewModel>> Create(Guid releaseId,
-            CreatePermalinkViewModel request)
+            PermalinkCreateViewModel request)
         {
             return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
             {

@@ -31,14 +31,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<PermalinkViewModel>> Create([FromBody] CreatePermalinkViewModel request)
+        public async Task<ActionResult<PermalinkViewModel>> Create([FromBody] PermalinkCreateViewModel request)
         {
             return await _permalinkService.Create(request).HandleFailuresOrOk();
         }
 
         [HttpPost("release/{releaseId}")]
         public async Task<ActionResult<PermalinkViewModel>> Create(Guid releaseId,
-            [FromBody] CreatePermalinkViewModel request)
+            [FromBody] PermalinkCreateViewModel request)
         {
             return await _permalinkService.Create(releaseId, request).HandleFailuresOrOk();
         }
