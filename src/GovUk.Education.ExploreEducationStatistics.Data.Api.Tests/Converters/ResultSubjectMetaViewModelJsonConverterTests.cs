@@ -12,8 +12,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
         [Fact]
         public void ReadJson_LegacyLocationsFieldIsTransformed()
         {
-            var jsonText =
-                @"{""Locations"":[{""Level"":""localAuthority"",""GeoJson"":[{""properties"":{""code"":""E06000009""}}],""Label"":""Blackpool"",""Value"":""E06000009""},{""Level"":""localAuthority"",""GeoJson"":[{""properties"":{""code"":""E06000015""}}],""Label"":""Derby"",""Value"":""E06000015""},{""Level"":""localAuthority"",""GeoJson"":[{""properties"":{""code"":""E06000018""}}],""Label"":""Nottingham"",""Value"":""E06000018""}]}";
+            const string jsonText = @"
+            {
+                ""Locations"": [
+                {
+                    ""Level"": ""localAuthority"",
+                    ""GeoJson"": [{ ""properties"": { ""code"": ""E06000009"" } }],
+                    ""Label"": ""Blackpool"",
+                    ""Value"": ""E06000009""
+                },
+                {
+                    ""Level"": ""localAuthority"",
+                    ""GeoJson"": [{ ""properties"": { ""code"": ""E06000015"" } }],
+                    ""Label"": ""Derby"",
+                    ""Value"": ""E06000015""
+                },
+                {
+                    ""Level"": ""localAuthority"",
+                    ""GeoJson"": [{ ""properties"": { ""code"": ""E06000018"" } }],
+                    ""Label"": ""Nottingham"",
+                    ""Value"": ""E06000018""
+                }
+                ]
+            }";
 
             var subjectMeta = JsonConvert.DeserializeObject<ResultSubjectMetaViewModel>(jsonText, BuildSettings());
 
@@ -42,8 +63,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
         [Fact]
         public void ReadJson_LocationsHierarchicalIsUntouched()
         {
-            const string jsonText =
-                @"{""LocationsHierarchical"":{""country"":[{""GeoJson"":[{""properties"":{""code"":""E92000001""}}],""Label"":""England"",""Value"":""E92000001""}]}}";
+            const string jsonText = @"
+            {
+                ""LocationsHierarchical"": {
+                    ""country"": [
+                    {
+                        ""GeoJson"": [{ ""properties"": { ""code"": ""E92000001"" } }],
+                        ""Label"": ""England"",
+                        ""Value"": ""E92000001""
+                    }
+                    ]
+                }
+            }";
 
             var subjectMeta = JsonConvert.DeserializeObject<ResultSubjectMetaViewModel>(jsonText, BuildSettings());
 
@@ -63,8 +94,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
         {
             // Should never happen but presence of elements in 'LocationsHierarchical' means 'Locations' is ignored  
 
-            const string jsonText =
-                @"{""Locations"":[{""Level"":""localAuthority"",""GeoJson"":[{""properties"":{""code"":""E06000009""}}],""Label"":""Blackpool"",""Value"":""E06000009""}],""LocationsHierarchical"":{""country"":[{""GeoJson"":[{""properties"":{""code"":""E92000001""}}],""Label"":""England"",""Value"":""E92000001""}]}}";
+            const string jsonText = @"
+            {
+                ""Locations"": [
+                {
+                    ""Level"": ""localAuthority"",
+                    ""GeoJson"": [{ ""properties"": { ""code"": ""E06000009"" } }],
+                    ""Label"": ""Blackpool"",
+                    ""Value"": ""E06000009""
+                }
+                ],
+                ""LocationsHierarchical"": {
+                    ""country"": [
+                    {
+                        ""GeoJson"": [{ ""properties"": { ""code"": ""E92000001"" } }],
+                        ""Label"": ""England"",
+                        ""Value"": ""E92000001""
+                    }
+                    ]
+                }
+            }";
 
             var subjectMeta = JsonConvert.DeserializeObject<ResultSubjectMetaViewModel>(jsonText, BuildSettings());
 
