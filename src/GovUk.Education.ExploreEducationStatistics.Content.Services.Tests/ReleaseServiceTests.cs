@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             fileStorageService
                 .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(releasePath))
-                .ReturnsAsync(new CachedReleaseViewModel { Id = releaseId });
+                .ReturnsAsync(new CachedReleaseViewModel(releaseId));
 
             methodologyService.Setup(mock => mock.GetSummariesByPublication(publicationId))
                 .ReturnsAsync(AsList(methodology));
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             fileStorageService
                 .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(releasePath))
-                .ReturnsAsync(new CachedReleaseViewModel { Id = releaseId });
+                .ReturnsAsync(new CachedReleaseViewModel(releaseId));
 
             var service = SetupReleaseService(
                 fileStorageService: fileStorageService.Object,

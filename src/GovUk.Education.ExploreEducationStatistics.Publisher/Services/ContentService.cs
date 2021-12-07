@@ -50,14 +50,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             foreach (var release in releases)
             {
                 var previousRelease = release.PreviousVersion;
-                
+
                 if (previousRelease == null)
                 {
                     break;
                 }
 
                 await _fastTrackService.DeleteAllFastTracksByRelease(previousRelease.Id);
-                
+
                 // Delete any lazily-cached results that are owned by the previous Release
                 await DeleteLazilyCachedReleaseResults(release.Publication.Slug, previousRelease.Slug);
 
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var releases = (await _releaseService
                 .List(releaseIds))
                 .ToList();
-            
+
             var publications = releases
                 .Select(release => release.Publication)
                 .DistinctByProperty(publication => publication.Id)
@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 ContractResolver = new DefaultContractResolver
                 {
-                    NamingStrategy = namingStrategy
+                    NamingStrategy = namingStrategy,
                 },
                 NullValueHandling = NullValueHandling.Ignore,
                 TypeNameHandling = TypeNameHandling.Auto
@@ -217,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var blobName = pathFunction.Invoke(pathPrefix);
             await _publicBlobStorageService.UploadAsJson(PublicContent, blobName, value, settings);
         }
-        
+
         private record ReleaseDataBlockResultsFolderCacheKey : IBlobCacheKey
         {
             private string PublicationSlug { get; }
@@ -234,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             public IBlobContainer Container => PublicContent;
         }
-        
+
         private record ReleaseSubjectsCacheKey : IBlobCacheKey
         {
             private string PublicationSlug { get; }
@@ -268,7 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             public IBlobContainer Container => PublicContent;
         }
-        
+
         private record ReleaseSubjectMetaFolderCacheKey : IBlobCacheKey
         {
             private string PublicationSlug { get; }
