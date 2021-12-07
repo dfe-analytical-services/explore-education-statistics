@@ -209,7 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             mocks.cacheService
                 .Setup(s => s.GetItem(
-                    IsMatchingDataBlockCacheKey(releaseContentBlock), 
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)), 
                     typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
@@ -228,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             mocks.cacheService
                 .Setup(s => s.SetItem<object>(
-                    IsMatchingDataBlockCacheKey(releaseContentBlock),
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
                     _tableBuilderResults))
                 .Returns(Task.CompletedTask);
             
@@ -276,7 +276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             
             mocks.cacheService
                 .Setup(s => s.GetItem(
-                    IsMatchingDataBlockCacheKey(releaseContentBlock), 
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)), 
                     typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
             
@@ -296,7 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             mocks.cacheService
                 .Setup(s => s.SetItem<object>(
-                    IsMatchingDataBlockCacheKey(releaseContentBlock),
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
                     _tableBuilderResults))
                 .Returns(Task.CompletedTask);
             
@@ -352,12 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public void TableBuilderResultViewModel_SerialiseAndDeserialise()
         {
             var converted = DeserializeObject<TableBuilderResultViewModel>(SerializeObject(_tableBuilderResults));
-            converted.AssertDeepEquals(_tableBuilderResults);
-        }
-
-        private static DataBlockTableResultCacheKey IsMatchingDataBlockCacheKey(ReleaseContentBlock releaseContentBlock)
-        {
-            return It.Is<DataBlockTableResultCacheKey>(cacheKey => cacheKey.AssertDeepEquals(new DataBlockTableResultCacheKey(releaseContentBlock)));
+            converted.AssertDeepEqualTo(_tableBuilderResults);
         }
 
         private (TableBuilderController controller, 

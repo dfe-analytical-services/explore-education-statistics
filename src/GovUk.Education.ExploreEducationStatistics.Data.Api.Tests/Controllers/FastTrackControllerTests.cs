@@ -294,7 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             };
 
             var converted = DeserializeObject<FastTrackViewModel>(SerializeObject(original));
-            converted.AssertDeepEquals(original);
+            converted.AssertDeepEqualTo(original);
         }
 
         private static (

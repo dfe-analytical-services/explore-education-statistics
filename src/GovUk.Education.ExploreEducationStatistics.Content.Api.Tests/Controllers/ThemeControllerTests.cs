@@ -134,14 +134,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         public void ThemeTree_SerialiseAndDeserialise()
         {
             var converted = DeserializeObject<ThemeTree<PublicationTreeNode>>(SerializeObject(Themes[0]));
-            converted.AssertDeepEquals(Themes[0]);
+            converted.AssertDeepEqualTo(Themes[0]);
         }
         
         [Fact]
         public void AllMethodologiesThemeViewModel_SerialiseAndDeserialise()
         {
             var converted = DeserializeObject<AllMethodologiesThemeViewModel>(SerializeObject(MethodologyThemes[0]));
-            converted.AssertDeepEquals(MethodologyThemes[0]);
+            converted.AssertDeepEqualTo(MethodologyThemes[0]);
         }
 
         private static (ThemeController controller, (

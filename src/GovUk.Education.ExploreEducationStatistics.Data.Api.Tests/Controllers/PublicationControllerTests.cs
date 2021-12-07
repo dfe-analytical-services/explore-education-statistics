@@ -127,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 });
 
             var converted = DeserializeObject<SubjectViewModel>(SerializeObject(original));
-            converted.AssertDeepEquals(original);
+            converted.AssertDeepEqualTo(original);
         }
         
         private (PublicationController controller,

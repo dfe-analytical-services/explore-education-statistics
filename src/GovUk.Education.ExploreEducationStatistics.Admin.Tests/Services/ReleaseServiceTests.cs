@@ -1159,8 +1159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             cacheService
                 .Setup(mock => mock.DeleteCacheFolder(
-                    It.Is<ReleaseContentFolderCacheKey>(key =>
-                        key.AssertDeepEquals(new ReleaseContentFolderCacheKey(publication.Id, release.Id)))))
+                    ItIs.DeepEqualTo(new ReleaseContentFolderCacheKey(publication.Id, release.Id))))
                 .Returns(Task.CompletedTask);
 
             await using (var context = InMemoryApplicationDbContext(contextId))

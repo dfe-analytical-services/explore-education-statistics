@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             };
 
             var converted = DeserializeObject<GlossaryCategoryViewModel>(SerializeObject(original));
-            converted.AssertDeepEquals(original);
+            converted.AssertDeepEqualTo(original);
         }
 
         private static (
