@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Model
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -105,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
-                .OnSuccess(release => ValidateEmailAddresses(emails))
+                .OnSuccess(release => EmailValidator.ValidateEmailAddresses(emails))
                 .OnSuccess<ActionResult, List<string>, PreReleaseUserInvitePlan>(async validEmails =>
                 {
                     var plan = new PreReleaseUserInvitePlan();
@@ -467,23 +468,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private static string? FormatDayForEmail(DateTime? dateTime)
         {
             return dateTime?.ToString("dddd dd MMMM yyyy");
-        }
-
-        private static Either<ActionResult, List<string>> ValidateEmailAddresses(IEnumerable<string> input)
-        {
-            var emails = input
-                .Where(email => !email.IsNullOrWhitespace())
-                .Select(line => line.Trim())
-                .Distinct()
-                .ToList();
-
-            var emailAddressAttribute = new EmailAddressAttribute();
-            if (emails.Any(email => !emailAddressAttribute.IsValid(email)))
-            {
-                return ValidationActionResult(InvalidEmailAddress);
-            }
-
-            return emails;
         }
     }
 }
