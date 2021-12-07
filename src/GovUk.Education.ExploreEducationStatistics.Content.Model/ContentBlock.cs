@@ -29,18 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? Created { get; set; }
 
-        public List<Comment> Comments { get; set; }
+        public List<Comment> Comments { get; set; } = new();
 
-        public ContentBlock Clone(Release.CloneContext context, ContentSection? newContentSection)
+        public ContentBlock Clone(Release.CloneContext context, ContentSection? newContentSection = null)
         {
             var copy = MemberwiseClone() as ContentBlock;
             copy.Id = Guid.NewGuid();
 
-            if (newContentSection != null)
-            {
-                copy.ContentSection = newContentSection;
-                copy.ContentSectionId = newContentSection.Id;
-            }
+            copy.ContentSection = newContentSection;
+            copy.ContentSectionId = newContentSection?.Id;
 
             // start a new amendment with no comments
             copy.Comments = new List<Comment>();
@@ -49,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
             return copy;
         }
-        
+
         public ContentBlock Clone(DateTime createdDate)
         {
             var copy = MemberwiseClone() as ContentBlock;
