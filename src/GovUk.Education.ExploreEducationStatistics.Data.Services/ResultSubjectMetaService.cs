@@ -21,14 +21,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Microsoft.FeatureManagement;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class ResultSubjectMetaService : AbstractSubjectMetaService, IResultSubjectMetaService
     {
-        private readonly IFeatureManager _featureManager;
         private readonly ContentDbContext _contentDbContext;
         private readonly IBoundaryLevelRepository _boundaryLevelRepository;
         private readonly IFootnoteRepository _footnoteRepository;
@@ -44,7 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ILogger _logger;
 
         public ResultSubjectMetaService(
-            IFeatureManager featureManager,
             ContentDbContext contentDbContext,
             IFilterItemRepository filterItemRepository,
             IBoundaryLevelRepository boundaryLevelRepository,
@@ -60,7 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IOptions<LocationsOptions> locationOptions,
             ILogger<ResultSubjectMetaService> logger) : base(filterItemRepository)
         {
-            _featureManager = featureManager;
             _contentDbContext = contentDbContext;
             _boundaryLevelRepository = boundaryLevelRepository;
             _footnoteRepository = footnoteRepository;
@@ -89,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     stopwatch.Start();
 
                     // TODO EES-2902 Remove the location hierarchies feature toggle after EES-2777
-                    var locationHierarchiesEnabled = await _featureManager.IsEnabledAsync("LocationHierarchies");
+                    var locationHierarchiesEnabled = _locationOptions.TableResultLocationHierarchiesEnabled;
 
                     // Uses the new GetLocationAttributesHierarchical to get the locations regardless of whether the
                     // feature is enabled or not.  If the feature is disabled, requests the locations without a hierarchy.
@@ -119,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId)).Title;
 
                     var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id);
-                    var subjectName = releaseFile.Name ?? "";
+                    var subjectName = releaseFile.Name!;
 
                     var locationsHelper =
                         new LocationsQueryHelper(locationAttributes, query, _boundaryLevelRepository,
@@ -238,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .ToList();
             }
 
-            [ObsoleteAttribute("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
+            [Obsolete("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
             public List<ObservationalUnitMetaViewModel> GetLegacyLocationViewModels()
             {
                 var viewModels = _locationAttributes.SelectMany(pair =>
@@ -271,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .ToList();
             }
 
-            [ObsoleteAttribute("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
+            [Obsolete("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
             private IEnumerable<ObservationalUnitMetaViewModel> GetLegacyLocationAttributeViewModels(
                 GeographicLevel geographicLevel,
                 IReadOnlyList<ILocationAttribute> locationAttributes)

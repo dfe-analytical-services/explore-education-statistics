@@ -37,7 +37,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Microsoft.FeatureManagement;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
@@ -94,8 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
-            services.AddFeatureManagement();
-
             // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing
             services.AddResponseCompression();
@@ -145,7 +142,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
-            services.AddTransient<IPermalinkMigrationService, PermalinkMigrationService>();
             services.AddTransient<IFastTrackService, FastTrackService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
