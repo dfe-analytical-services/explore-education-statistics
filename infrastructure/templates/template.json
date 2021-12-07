@@ -495,7 +495,7 @@
     },
     "requestTimeoutsTableBuilderQuery": {
       "type": "int",
-      "defaultValue": 60000,
+      "defaultValue": 210000,
       "metadata": {
         "description": "Timeout in milliseconds for a table builder query to return results before cancelling the request in the API"
       }
