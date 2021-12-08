@@ -1,16 +1,18 @@
 from robot.libraries.BuiltIn import BuiltIn
-
-sl = BuiltIn().get_library_instance('SeleniumLibrary')
 import os
 import requests
 import zipfile
 
+sl = BuiltIn().get_library_instance('SeleniumLibrary')
+
+
 requests.sessions.HTTPAdapter(
-        pool_connections=50,
-        pool_maxsize=50,
-        max_retries=3
-    )
+    pool_connections=50,
+    pool_maxsize=50,
+    max_retries=3
+)
 session = requests.Session()
+
 
 def download_file(link_locator, file_name):
     if not os.path.exists('test-results/downloads'):
@@ -32,7 +34,8 @@ def downloaded_file_should_have_first_line(filename, expected_first_line):
 def zip_should_contains_x_files(zipfilename, num_files):
     zip = zipfile.ZipFile(f'test-results/downloads/{zipfilename}')
     files_in_zip = zip.namelist()
-    assert len(files_in_zip) == int(num_files), f'Number of files in zip {zipfilename} was {len(files_in_zip)}. The test expected {num_files}!)'
+    assert len(files_in_zip) == int(
+        num_files), f'Number of files in zip {zipfilename} was {len(files_in_zip)}. The test expected {num_files}!)'
 
 
 def zip_should_contain_file(zipfilename, filename):

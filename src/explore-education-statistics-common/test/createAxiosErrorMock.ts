@@ -33,10 +33,10 @@ export default function createAxiosErrorMock<T>(
   };
 }
 
-export function createServerValidationErrorMock(
-  globalErrors: string[],
-  fieldErrors: Dictionary<string[]> = {},
-): AxiosError<ServerValidationErrorResponse> {
+export function createServerValidationErrorMock<T extends string = string>(
+  globalErrors: T[],
+  fieldErrors: Dictionary<T[]> = {},
+): AxiosError<ServerValidationErrorResponse<T>> {
   return createAxiosErrorMock({
     status: 400,
     data: {

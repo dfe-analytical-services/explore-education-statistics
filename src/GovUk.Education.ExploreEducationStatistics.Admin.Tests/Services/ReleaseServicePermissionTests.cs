@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -266,7 +267,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock.Of<StatisticsDbContext>(),
                 Mock.Of<IDataBlockService>(),
                 Mock.Of<IReleaseSubjectRepository>(),
-                new SequentialGuidGenerator()
+                new SequentialGuidGenerator(),
+                Mock.Of<IBlobCacheService>()
             );
         }
 

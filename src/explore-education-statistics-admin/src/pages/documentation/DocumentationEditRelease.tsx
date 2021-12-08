@@ -229,9 +229,8 @@ const DocumentationCreateNewRelease = ({ location: _ }: RouteChildrenProps) => {
               </ul>
               <h3>Do</h3>
               <h4>
-                To create and edit any content and add comments to your release
-                - under the main ‘Manage content’ tab across the top of the
-                page, select the ‘Add / view comments and edit content’ radio
+                To create and edit any content - under the main ‘Manage content’
+                tab across the top of the page, select the ‘Edit content’ radio
                 button.
               </h4>
               <img

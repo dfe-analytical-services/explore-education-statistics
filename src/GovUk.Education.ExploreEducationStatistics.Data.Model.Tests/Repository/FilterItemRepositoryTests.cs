@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 {
     public class FilterItemRepositoryTests
     {

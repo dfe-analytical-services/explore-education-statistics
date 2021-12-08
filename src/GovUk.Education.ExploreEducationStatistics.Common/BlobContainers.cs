@@ -10,7 +10,8 @@
     {
         public static readonly IBlobContainer PrivateReleaseFiles = new BlobContainer("releases");
         public static readonly IBlobContainer PublicReleaseFiles = new BlobContainer("downloads");
-        public static readonly IBlobContainer PublicContent = new BlobContainer("cache");
+        public static readonly IBlobContainer PrivateContent = new PrivateBlobContainer("cache");
+        public static readonly IBlobContainer PublicContent = new PublicBlobContainer("cache");
         public static readonly IBlobContainer Permalinks = new BlobContainer("permalinks");
         public static readonly IBlobContainer PermalinkMigrations = new BlobContainer("permalink-migrations");
         public static readonly IBlobContainer PublisherLeases = new BlobContainer("leases");

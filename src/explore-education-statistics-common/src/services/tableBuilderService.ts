@@ -58,7 +58,8 @@ export type GeoJsonFeature = Feature<Geometry, GeoJsonFeatureProperties>;
 export interface LocationOption {
   label: string;
   value: string;
-  level: string;
+  level?: string;
+  options?: LocationOption[];
   geoJson?: GeoJsonFeature[];
 }
 
@@ -79,6 +80,7 @@ export interface FeaturedTable {
   name: string;
   description?: string;
 }
+
 export interface SubjectMeta {
   filters: Dictionary<{
     legend: string;
@@ -93,8 +95,7 @@ export interface SubjectMeta {
   }>;
   locations: Dictionary<{
     legend: string;
-    hint?: string;
-    options: FilterOption[];
+    options: LocationOption[];
   }>;
   timePeriod: {
     hint?: string;
@@ -126,10 +127,22 @@ export interface ReleaseTableDataQuery extends TableDataQuery {
   releaseId?: string;
 }
 
+/**
+ * This type must be maintained for backwards compatibility
+ * with older permalinks where we still return a 'flat' list
+ * of location options in the {@see TableDataSubjectMeta}.
+ */
+export interface FlatLocationOption {
+  label: string;
+  value: string;
+  level: string;
+  geoJson?: GeoJsonFeature[];
+}
+
 export interface TableDataSubjectMeta {
   publicationName: string;
   subjectName: string;
-  locations: LocationOption[];
+  locations: FlatLocationOption[];
   boundaryLevels: BoundaryLevel[];
   timePeriodRange: TimePeriodOption[];
   filters: Dictionary<{
@@ -301,7 +314,7 @@ const tableBuilderService = {
       );
     }
     return mergeDuplicateLocationsInTableDataResponse(
-      await dataApi.post(`/tablebuilder`, query),
+      await dataApi.post('/tablebuilder', query),
     );
   },
   async getDataBlockTableData(

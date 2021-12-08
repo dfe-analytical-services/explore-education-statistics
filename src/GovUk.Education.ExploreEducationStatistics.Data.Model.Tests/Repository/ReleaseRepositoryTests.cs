@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 {
     public class ReleaseRepositoryTests
     {

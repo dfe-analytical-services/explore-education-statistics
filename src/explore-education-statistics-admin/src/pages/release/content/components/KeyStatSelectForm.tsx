@@ -71,8 +71,8 @@ const KeyStatSelectForm = ({
     <>
       <FormSelect
         className="govuk-!-margin-right-1"
-        id="id"
-        name="key_indicator_select"
+        id="keyIndicatorSelect"
+        name="selectedDataBlock"
         label={label}
         value={selectedDataBlockId}
         onChange={e => setSelectedDataBlockId(e.target.value)}

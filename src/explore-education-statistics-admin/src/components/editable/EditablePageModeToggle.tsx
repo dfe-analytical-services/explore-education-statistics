@@ -18,7 +18,7 @@ const EditablePageModeToggle = ({
 
   const options = [
     {
-      label: 'Add / view comments and edit content',
+      label: 'Edit content',
       value: 'edit',
     },
     {

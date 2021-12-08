@@ -13,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {
     public interface IBlobStorageService
     {
-        public Task<IEnumerable<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path = null);
+        public Task<List<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path = null);
 
         public Task<bool> CheckBlobExists(IBlobContainer containerName, string path);
 

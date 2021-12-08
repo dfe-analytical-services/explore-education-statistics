@@ -1,21 +1,31 @@
 import Gate from '@common/components/Gate';
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 describe('Gate', () => {
   test('renders children immediately if `condition` is true', () => {
-    const { queryByText } = render(
+    render(
       // eslint-disable-next-line react/jsx-boolean-value
       <Gate condition={true}>
         <p>children</p>
       </Gate>,
     );
 
-    expect(queryByText('children')).toBeInTheDocument();
+    expect(screen.getByText('children')).toBeInTheDocument();
+  });
+
+  test('renders children immediately if `condition` function resolve to true', () => {
+    render(
+      <Gate condition={() => true}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    expect(screen.getByText('children')).toBeInTheDocument();
   });
 
   test('does not render children immediately if `condition` is async', () => {
-    const { queryByText } = render(
+    render(
       <Gate
         condition={async () => {
           return true;
@@ -25,11 +35,11 @@ describe('Gate', () => {
       </Gate>,
     );
 
-    expect(queryByText('children')).not.toBeInTheDocument();
+    expect(screen.queryByText('children')).not.toBeInTheDocument();
   });
 
   test('renders children when async `condition` resolves to true', async () => {
-    const { queryByText } = render(
+    render(
       <Gate
         condition={async () => {
           return true;
@@ -40,12 +50,12 @@ describe('Gate', () => {
     );
 
     await waitFor(() => {
-      expect(queryByText('children')).toBeInTheDocument();
+      expect(screen.getByText('children')).toBeInTheDocument();
     });
   });
 
   test('renders `loading` whilst async `condition` is resolving', async () => {
-    const { queryByText } = render(
+    render(
       <Gate
         condition={async () => {
           return true;
@@ -56,12 +66,12 @@ describe('Gate', () => {
       </Gate>,
     );
 
-    expect(queryByText('children')).not.toBeInTheDocument();
-    expect(queryByText('loading')).toBeInTheDocument();
+    expect(screen.queryByText('children')).not.toBeInTheDocument();
+    expect(screen.getByText('loading')).toBeInTheDocument();
   });
 
   test('does not render `loading` when async `condition` resolves to true', async () => {
-    const { queryByText } = render(
+    render(
       <Gate
         condition={async () => {
           return true;
@@ -73,13 +83,13 @@ describe('Gate', () => {
     );
 
     await waitFor(() => {
-      expect(queryByText('children')).toBeInTheDocument();
-      expect(queryByText('loading')).not.toBeInTheDocument();
+      expect(screen.getByText('children')).toBeInTheDocument();
+      expect(screen.queryByText('loading')).not.toBeInTheDocument();
     });
   });
 
   test('does not render `loading` when async `condition` resolves to false', async () => {
-    const { queryByText } = render(
+    render(
       <Gate
         condition={async () => {
           return false;
@@ -91,24 +101,24 @@ describe('Gate', () => {
     );
 
     await waitFor(() => {
-      expect(queryByText('children')).not.toBeInTheDocument();
-      expect(queryByText('loading')).not.toBeInTheDocument();
+      expect(screen.queryByText('children')).not.toBeInTheDocument();
+      expect(screen.queryByText('loading')).not.toBeInTheDocument();
     });
   });
 
   test('renders `fallback` when `condition` is false', () => {
-    const { queryByText } = render(
+    render(
       <Gate condition={false} fallback={<p>fallback</p>}>
         <p>children</p>
       </Gate>,
     );
 
-    expect(queryByText('children')).not.toBeInTheDocument();
-    expect(queryByText('fallback')).toBeInTheDocument();
+    expect(screen.queryByText('children')).not.toBeInTheDocument();
+    expect(screen.getByText('fallback')).toBeInTheDocument();
   });
 
   test('renders `fallback` when async `condition` resolves to false', async () => {
-    const { queryByText } = render(
+    render(
       <Gate
         condition={async () => {
           return false;
@@ -120,13 +130,13 @@ describe('Gate', () => {
     );
 
     await waitFor(() => {
-      expect(queryByText('children')).not.toBeInTheDocument();
-      expect(queryByText('fallback')).toBeInTheDocument();
+      expect(screen.queryByText('children')).not.toBeInTheDocument();
+      expect(screen.getByText('fallback')).toBeInTheDocument();
     });
   });
 
   test('renders `fallback` with `condition` error', async () => {
-    const { queryByText } = render(
+    render(
       <Gate
         condition={async () => {
           throw new Error('something went wrong');
@@ -138,8 +148,125 @@ describe('Gate', () => {
     );
 
     await waitFor(() => {
-      expect(queryByText('children')).not.toBeInTheDocument();
-      expect(queryByText('something went wrong')).toBeInTheDocument();
+      expect(screen.queryByText('children')).not.toBeInTheDocument();
+      expect(screen.getByText('something went wrong')).toBeInTheDocument();
     });
+  });
+
+  test('does not unmount children if `condition` switches back to false', () => {
+    const { rerender } = render(
+      // eslint-disable-next-line react/jsx-boolean-value
+      <Gate condition={true}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    expect(screen.getByText('children')).toBeInTheDocument();
+
+    rerender(
+      <Gate condition={false}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    expect(screen.getByText('children')).toBeInTheDocument();
+  });
+
+  test('does not unmount children if `condition` function resolves back to false', () => {
+    const { rerender } = render(
+      // eslint-disable-next-line react/jsx-boolean-value
+      <Gate condition={() => true}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    expect(screen.getByText('children')).toBeInTheDocument();
+
+    rerender(
+      <Gate condition={() => false}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    expect(screen.getByText('children')).toBeInTheDocument();
+  });
+
+  test('does not unmount children if async `condition` resolves back to false', async () => {
+    const { rerender } = render(
+      <Gate condition={() => Promise.resolve(true)}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('children')).toBeInTheDocument();
+    });
+
+    rerender(
+      <Gate condition={() => Promise.resolve(false)}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    expect(screen.getByText('children')).toBeInTheDocument();
+  });
+
+  test('unmounts children if `condition` switches back to false and `passOnce = false`', () => {
+    const { rerender } = render(
+      // eslint-disable-next-line react/jsx-boolean-value
+      <Gate condition={true} passOnce={false}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    expect(screen.getByText('children')).toBeInTheDocument();
+
+    rerender(
+      <Gate condition={false} passOnce={false}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    expect(screen.queryByText('children')).not.toBeInTheDocument();
+  });
+
+  test('unmounts children if `condition` function resolves back to false and `passOnce = false`', () => {
+    const { rerender } = render(
+      // eslint-disable-next-line react/jsx-boolean-value
+      <Gate condition={() => true} passOnce={false}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    expect(screen.getByText('children')).toBeInTheDocument();
+
+    rerender(
+      <Gate condition={() => false} passOnce={false}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    expect(screen.queryByText('children')).not.toBeInTheDocument();
+  });
+
+  test('unmounts children if async `condition` resolves back to false and `passOnce = false`', async () => {
+    const { rerender } = render(
+      // eslint-disable-next-line react/jsx-boolean-value
+      <Gate condition={() => Promise.resolve(true)} passOnce={false}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText('children')).toBeInTheDocument();
+    });
+
+    rerender(
+      <Gate condition={() => Promise.resolve(false)} passOnce={false}>
+        <p>children</p>
+      </Gate>,
+    );
+
+    expect(screen.queryByText('children')).not.toBeInTheDocument();
   });
 });
