@@ -27,7 +27,6 @@ if not utilities_init.initialised:
 
         return parent_locator
 
-
     def _find_by_label(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
         parent_locator = _normalize_parent_locator(parent_locator)
 
@@ -39,12 +38,10 @@ if not utilities_init.initialised:
         for_id = labels[0].get_attribute('for')
         return get_child_elements(parent_locator, f'id:{for_id}')
 
-
     def _find_by_testid(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
         parent_locator = _normalize_parent_locator(parent_locator)
 
         return get_child_elements(parent_locator, f'css:[data-testid="{criteria}"]')
-
 
     # Register locator strategies
 
@@ -289,7 +286,7 @@ def user_gets_row_with_group_and_indicator(group: str, indicator: str,
         try:
             elem.find_element_by_xpath(f'.//th[text()="{indicator}"]/..')
             return elem
-        except:
+        except BaseException:
             continue
     raise_assertion_error(f'Indicator "{indicator}" not found!')
 
@@ -297,7 +294,7 @@ def user_gets_row_with_group_and_indicator(group: str, indicator: str,
 def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
     try:
         elem = get_child_element(row_elem, f'xpath:.//td[{cell_num}]')
-    except:
+    except BaseException:
         raise_assertion_error(f'Couldn\'t find TD tag num "{cell_num}" for provided row element')
 
     if expected_text not in elem.text:

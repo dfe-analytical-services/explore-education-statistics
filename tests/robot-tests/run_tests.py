@@ -41,13 +41,19 @@ else:
     os.environ['PYTHONPATH'] = str(current_dir)
 
 # Parse arguments
-parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
-                                 description="Use this script to run the UI tests, locally or as part of the CI pipeline, against the environment of your choosing")
-parser.add_argument("-b", "--browser",
-                    dest="browser",
-                    default="chrome",
-                    choices=["chrome", "firefox", "ie"],
-                    help="name of the browser you wish to run the tests with (NOTE: Only chromedriver is automatically installed!)")
+parser = argparse.ArgumentParser(
+    prog="pipenv run python run_tests.py",
+    description="Use this script to run the UI tests, locally or as part of the CI pipeline, against the environment of your choosing")
+parser.add_argument(
+    "-b",
+    "--browser",
+    dest="browser",
+    default="chrome",
+    choices=[
+        "chrome",
+        "firefox",
+        "ie"],
+    help="name of the browser you wish to run the tests with (NOTE: Only chromedriver is automatically installed!)")
 parser.add_argument("-i", "--interp",
                     dest="interp",
                     default="pabot",
@@ -128,8 +134,8 @@ parser.add_argument("--custom-env",
                     default=None,
                     help="load a custom .env file (must be in ~/robot-tests directory)")
 """
-NOTE(mark): The slack webhook url, and admin and analyst passwords to access to Admin app are 
-stored in the CI pipeline as secret variables, which means they cannot be accessed as normal 
+NOTE(mark): The slack webhook url, and admin and analyst passwords to access to Admin app are
+stored in the CI pipeline as secret variables, which means they cannot be accessed as normal
 environment variables, and instead must be passed as an argument to this script.
 """
 parser.add_argument("--slack-webhook-url",

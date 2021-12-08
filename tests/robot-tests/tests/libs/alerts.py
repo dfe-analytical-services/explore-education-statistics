@@ -9,4 +9,3 @@ def send_slack_alert(err_msg):
     response = slack_webhook.send(text=err_msg)
     assert response.status_code == 200
     assert response.body == "ok"
-

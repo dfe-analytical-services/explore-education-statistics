@@ -13,7 +13,7 @@ def wait_until_page_contains_xpath(context, selector):
     while time.time() < max_time:
         try:
             elem = context.find_element_by_xpath(selector)
-        except:
+        except BaseException:
             pass
         if elem is not None:
             return
@@ -52,7 +52,7 @@ def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADM
         try:
             wait_until_page_contains_xpath(driver, '//div[text()="Sign in"]')
             time.sleep(1)
-        except:
+        except BaseException:
             raise AssertionError('Sign in page didn\'t appear?')
 
         try:
@@ -62,7 +62,7 @@ def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADM
 
             wait_until_page_contains_xpath(driver, '//div[text()="Enter password"]')
             time.sleep(1)
-        except:
+        except BaseException:
             raise AssertionError('Error when entering/submitting email!')
 
         try:
@@ -72,7 +72,7 @@ def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADM
 
             wait_until_page_contains_xpath(driver, '//div[text()="Stay signed in?"]')
             wait_until_page_contains_xpath(driver, '//input[@value="No"]')
-        except:
+        except BaseException:
             raise AssertionError('Error when entering/submitting password')
 
         time.sleep(1)
@@ -94,7 +94,7 @@ def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADM
         try:
             wait_until_page_contains_xpath(driver,
                                            '//h1[text()="Dashboard"]')  # Should be Admin dashboard for user
-        except:
+        except BaseException:
             raise AssertionError(
                 f'Couldn\'t find \'//h1[text()="Dashboard"]\' on page. Incorrect user details used? Found page source: \n{driver.page_source}')
 
