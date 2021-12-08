@@ -124,6 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IUserService? userService = null,
             IUserRepository? userRepository = null,
+            IUserInviteRepository? userInviteRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             IHttpContextAccessor? httpContextAccessor = null)
@@ -137,6 +138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 userService ?? Mock.Of<IUserService>(Strict),
                 userRepository ?? Mock.Of<IUserRepository>(Strict),
+                userInviteRepository ?? Mock.Of<IUserInviteRepository>(Strict),
                 userReleaseRoleRepository ?? Mock.Of<IUserReleaseRoleRepository>(Strict),
                 userReleaseInviteRepository ?? Mock.Of<IUserReleaseInviteRepository>(Strict),
                 httpContextAccessor ?? Mock.Of<IHttpContextAccessor>(Strict)

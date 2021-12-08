@@ -1,9 +1,12 @@
+#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,6 +37,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         {
             return await _userManagementService
                 .InviteUser(userInviteRequest.Email, userInviteRequest.RoleId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("user-management/publications/{publicationId}/invites/contributor")]
+        public async Task<ActionResult<Unit>> InviteContributor(Guid publicationId,
+            ContributorInviteRequest contributorInviteRequest)
+        {
+            return await _userManagementService
+                .InviteContributor(contributorInviteRequest.Email, publicationId,
+                    contributorInviteRequest.ReleaseIds)
                 .HandleFailuresOrOk();
         }
 

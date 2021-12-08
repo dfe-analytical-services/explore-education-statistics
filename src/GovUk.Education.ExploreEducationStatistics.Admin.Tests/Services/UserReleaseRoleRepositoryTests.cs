@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.CreateMany(ListOf(user1.Id, user2.Id, user3.Id, user4.Id),
+                var result = await service.CreateManyIfNotExists(ListOf(user1.Id, user2.Id, user3.Id, user4.Id),
                     release.Id, Contributor, createdByUser.Id);
 
                 Assert.Equal(Unit.Instance, result);
@@ -160,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.CreateMany(new List<Guid>(),
+                var result = await service.CreateManyIfNotExists(new List<Guid>(),
                     release.Id, Contributor, createdByUser.Id);
                 Assert.Equal(Unit.Instance, result);
             }
@@ -858,7 +858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                Assert.True(await service.UserHasReleaseRole(
+                Assert.True(await service.GetReleaseRole(
                     userReleaseRole.UserId,
                     userReleaseRole.ReleaseId,
                     Contributor));
@@ -903,7 +903,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                Assert.False(await service.UserHasReleaseRole(
+                Assert.False(await service.GetReleaseRole(
                     user.Id,
                     release.Id,
                     Contributor));

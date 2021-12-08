@@ -14,8 +14,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             ReleaseRole role,
             Guid createdById);
 
-        Task<Unit> CreateMany(List<Guid> userIds,
+        Task<UserReleaseRole> CreateIfNotExists(Guid userId,
             Guid releaseId,
+            ReleaseRole role,
+            Guid createdById);
+
+        Task<Unit> CreateManyIfNotExists(List<Guid> userIds,
+            Guid releaseId,
+            ReleaseRole role,
+            Guid createdById);
+
+        Task<Unit> CreateManyIfNotExists(Guid userId,
+            List<Guid> releaseIds,
             ReleaseRole role,
             Guid createdById);
 
@@ -34,7 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<bool> IsUserEditorOrApproverOnLatestRelease(Guid userId, Guid publicationId);
 
-        Task<bool> UserHasReleaseRole(Guid userId,
+        Task<UserReleaseRole?> GetReleaseRole(Guid userId,
+            Guid releaseId,
+            ReleaseRole role);
+
+        Task<UserReleaseRole?> GetReleaseRole(string email,
             Guid releaseId,
             ReleaseRole role);
 
