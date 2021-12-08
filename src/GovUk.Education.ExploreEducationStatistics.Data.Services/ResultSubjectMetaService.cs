@@ -75,8 +75,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public async Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(
             Guid releaseId,
             SubjectMetaQueryContext query,
-            IQueryable<Observation> observations)
+            IList<Observation> observations)
         {
+            var queryableObservations = observations.AsQueryable();
+            
             return await _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(async subject =>
@@ -90,16 +92,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     // Uses the new GetLocationAttributesHierarchical to get the locations regardless of whether the
                     // feature is enabled or not.  If the feature is disabled, requests the locations without a hierarchy.
                     var locationAttributes = await _locationRepository.GetLocationAttributesHierarchical(
-                        observations,
+                        queryableObservations,
                         hierarchies: locationHierarchiesEnabled ? _locationOptions.Hierarchies : null);
                     _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var filterViewModels = GetFilters(query.SubjectId, observations, true);
+                    var filterItems = 
+                        _filterItemRepository.GetFilterItemsFromObservationList(observations);
+                    var filterViewModels = BuildFilterHierarchy(filterItems);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var footnoteViewModels = GetFilteredFootnoteViewModels(releaseId, observations, query);
+                    var footnoteViewModels = 
+                        GetFilteredFootnoteViewModels(releaseId, queryableObservations, query);
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -107,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var timePeriodViewModels = GetTimePeriodViewModels(observations);
+                    var timePeriodViewModels = GetTimePeriodViewModels(queryableObservations);
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 

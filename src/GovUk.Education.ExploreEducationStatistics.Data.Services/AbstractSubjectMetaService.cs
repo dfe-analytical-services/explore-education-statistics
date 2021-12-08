@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public abstract class AbstractSubjectMetaService
     {
-        private readonly IFilterItemRepository _filterItemRepository;
+        protected readonly IFilterItemRepository _filterItemRepository;
         protected static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
         protected AbstractSubjectMetaService(IFilterItemRepository filterItemRepository)
@@ -20,12 +20,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _filterItemRepository = filterItemRepository;
         }
 
-        protected Dictionary<string, FilterMetaViewModel> GetFilters(
-            Guid subjectId,
-            IQueryable<Observation> observations,
-            bool listFilterItems)
+        protected Dictionary<string, FilterMetaViewModel> BuildFilterHierarchy(IEnumerable<FilterItem> filterItems)
         {
-            return _filterItemRepository.GetFilterItems(subjectId, observations, listFilterItems)
+            return filterItems
                 .GroupBy(item => item.FilterGroup.Filter, item => item, Filter.IdComparer)
                 .ToDictionary(
                     itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),

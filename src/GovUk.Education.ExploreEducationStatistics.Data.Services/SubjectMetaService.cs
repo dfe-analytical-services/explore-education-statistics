@@ -128,7 +128,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             if (query.TimePeriod != null)
             {
-                filters = GetFilters(query.SubjectId, observations, false);
+                var filterItems = _filterItemRepository.GetFilterItemsFromObservationQuery(query.SubjectId, observations);
+                filters = BuildFilterHierarchy(filterItems);
 
                 _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();

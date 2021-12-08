@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<Observation>> FindObservations(
+        public async Task<IList<Observation>> FindObservations(
             ObservationQueryContext query,
             CancellationToken cancellationToken = default)
         {
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return observations;
         }
 
-        public IEnumerable<Observation> FindObservations(SubjectMetaQueryContext query)
+        public IQueryable<Observation> FindObservations(SubjectMetaQueryContext query)
         {
             return DbSet()
                 .AsNoTracking()
