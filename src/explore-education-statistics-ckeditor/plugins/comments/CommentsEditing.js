@@ -175,9 +175,9 @@ export default class CommentsEditing extends Plugin {
 
             // Marker has been deleted
             if (
-              changedMarker.data.newRange.start.root.rootName ===
+              changedMarker.data.newRange?.start.root.rootName ===
                 '$graveyard' &&
-              changedMarker.data.newRange.end.root.rootName === '$graveyard'
+              changedMarker.data.newRange?.end.root.rootName === '$graveyard'
             ) {
               this.removedMarkers.push(changedMarker.name);
               this.config.commentRemoved(changedMarker.name);
@@ -186,7 +186,7 @@ export default class CommentsEditing extends Plugin {
 
             // All the content of the marker has been deleted
             const marker = editor.model.markers.get(changedMarker.name);
-            if (marker.getRange().isCollapsed) {
+            if (marker?.getRange().isCollapsed) {
               this.removedMarkers.push(marker.name);
               this.config.commentRemoved(marker.name);
               editor.model.change(writer => {
