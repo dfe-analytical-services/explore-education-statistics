@@ -313,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId,
             ReleaseRole role)
         {
-            if (await _userReleaseRoleRepository.UserHasRoleOnRelease(userId, releaseId, role))
+            if (await _userReleaseRoleRepository.UserHasReleaseRole(userId, releaseId, role))
             {
                 return ValidationActionResult(UserAlreadyHasResourceRole);
             }

@@ -858,7 +858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                Assert.True(await service.UserHasRoleOnRelease(
+                Assert.True(await service.UserHasReleaseRole(
                     userReleaseRole.UserId,
                     userReleaseRole.ReleaseId,
                     Contributor));
@@ -903,7 +903,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                Assert.False(await service.UserHasRoleOnRelease(
+                Assert.False(await service.UserHasReleaseRole(
                     user.Id,
                     release.Id,
                     Contributor));

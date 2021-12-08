@@ -135,12 +135,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 EditorAndApproverRoles);
         }
 
-        public async Task<bool> UserHasRoleOnRelease(Guid userId, Guid releaseId, ReleaseRole role)
+        public async Task<bool> UserHasReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
             return await _contentDbContext.UserReleaseRoles
                 .AsQueryable()
                 .AnyAsync(r =>
                     r.UserId == userId &&
+                    r.ReleaseId == releaseId &&
+                    r.Role == role);
+        }
+
+        public async Task<bool> UserHasReleaseRole(string email, Guid releaseId, ReleaseRole role)
+        {
+            return await _contentDbContext.UserReleaseRoles
+                .AsQueryable()
+                .AnyAsync(r =>
+                    r.User.Email.ToLower().Equals(email.ToLower()) &&
                     r.ReleaseId == releaseId &&
                     r.Role == role);
         }

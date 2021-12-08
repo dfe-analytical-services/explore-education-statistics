@@ -118,7 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToAsyncEnumerable()
                         .ForEachAwaitAsync(async email =>
                         {
-                            if (await UserHasPreReleaseRole(releaseId, email))
+                            if (await _userReleaseRoleRepository.UserHasReleaseRole(email, releaseId, PrereleaseViewer))
                             {
                                 plan.AlreadyAccepted.Add(email);
                             }
@@ -362,17 +362,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             return Unit.Instance;
-        }
-
-        private async Task<bool> UserHasPreReleaseRole(Guid releaseId, string email)
-        {
-            return await _context
-                .UserReleaseRoles
-                .Include(r => r.User)
-                .AnyAsync(r =>
-                    r.ReleaseId == releaseId
-                    && r.User.Email.ToLower().Equals(email.ToLower())
-                    && r.Role == PrereleaseViewer);
         }
 
         private async Task CreateUserInvite(string email)
