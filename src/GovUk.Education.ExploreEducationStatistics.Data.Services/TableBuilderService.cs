@@ -103,8 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     }
 
                     var observations = 
-                        (await _observationService.FindObservations(queryContext, cancellationToken))
-                        .AsQueryable();
+                        await _observationService.FindObservations(queryContext, cancellationToken);
 
                     if (!observations.Any())
                     {

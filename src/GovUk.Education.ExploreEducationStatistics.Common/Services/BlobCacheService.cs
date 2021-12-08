@@ -112,10 +112,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {
                 return await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType);
             }
-            catch (JsonException)
+            catch (JsonException e)
             {
                 // If there's an error deserializing the blob, we should
                 // assume it's not salvageable and delete it so that it's re-built.
+                _logger.LogWarning(e, $"Error deserializing JSON for blobContainer {blobContainer} and cache " +
+                                   $"key {key} - deleting cached JSON");
                 await _blobStorageService.DeleteBlob(blobContainer, key);
             }
             catch (FileNotFoundException)

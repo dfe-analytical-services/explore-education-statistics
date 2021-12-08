@@ -25,7 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public class SubjectMetaService : AbstractSubjectMetaService, ISubjectMetaService
     {
         private readonly IFilterRepository _filterRepository;
-        private readonly IFilterItemRepository _filterItemRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
         private readonly ILocationRepository _locationRepository;
         private readonly ILogger _logger;
@@ -49,7 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             base(filterItemRepository)
         {
             _filterRepository = filterRepository;
-            _filterItemRepository = filterItemRepository;
             _indicatorGroupRepository = indicatorGroupRepository;
             _locationRepository = locationRepository;
             _logger = logger;
@@ -128,7 +126,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             if (query.TimePeriod != null)
             {
-                filters = GetFilters(query.SubjectId, observations, false);
+                var filterItems = _filterItemRepository.GetFilterItemsFromObservationQuery(query.SubjectId, observations);
+                filters = BuildFilterHierarchy(filterItems);
 
                 _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                 stopwatch.Restart();
