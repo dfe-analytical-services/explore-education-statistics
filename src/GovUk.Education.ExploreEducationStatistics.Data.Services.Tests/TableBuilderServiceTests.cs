@@ -121,8 +121,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var observationService = new Mock<IObservationService>(MockBehavior.Strict);
 
                 observationService
-                    .Setup(s => s.FindObservations(query))
-                    .Returns(observations);
+                    .Setup(s => s.FindObservations(query, default))
+                    .ReturnsAsync(observations);
 
                 var resultSubjectMetaService = new Mock<IResultSubjectMetaService>(MockBehavior.Strict);
 
@@ -463,8 +463,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var observationService = new Mock<IObservationService>(MockBehavior.Strict);
 
                 observationService
-                    .Setup(s => s.FindObservations(query))
-                    .Returns(observations);
+                    .Setup(s => s.FindObservations(query, default))
+                    .ReturnsAsync(observations);
 
                 var resultSubjectMetaService = new Mock<IResultSubjectMetaService>(MockBehavior.Strict);
 

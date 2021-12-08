@@ -7,11 +7,10 @@ import {
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
-import useToggle from '@common/hooks/useToggle';
 import FormCheckboxSelectedCount from '@common/modules/table-tool/components/FormCheckboxSelectedCount';
 import FormFieldCheckboxGroupsMenu from '@common/modules/table-tool/components/FormFieldCheckboxGroupsMenu';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
-import TableSizeError from '@common/modules/table-tool/components/TableSizeError';
+import TableQueryError from '@common/modules/table-tool/components/TableQueryError';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
@@ -23,7 +22,11 @@ import {
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
 import createErrorHelper from '@common/validation/createErrorHelper';
-import { isServerValidationError } from '@common/validation/serverValidations';
+import {
+  getErrorMessage,
+  hasErrorMessage,
+  isServerValidationError,
+} from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import isEqual from 'lodash/isEqual';
@@ -43,14 +46,25 @@ interface Props {
     filters: string[];
   };
   selectedPublication?: SelectedPublication;
+  showTableQueryErrorDownload?: boolean;
   subject: Subject;
   subjectMeta: SubjectMeta;
-  showTableSizeErrorDownload?: boolean;
-  onTableSizeError?: (publicationTitle: string, subjectName: string) => void;
   onSubmit: FilterFormSubmitHandler;
+  onTableQueryError?: (
+    errorCode: TableQueryErrorCode,
+    publicationTitle: string,
+    subjectName: string,
+  ) => void;
 }
 
 const formId = 'filtersForm';
+
+const TableQueryErrorCodes = [
+  'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE',
+  'REQUEST_CANCELLED',
+] as const;
+
+export type TableQueryErrorCode = typeof TableQueryErrorCodes[number];
 
 const FiltersForm = (props: Props & InjectedWizardProps) => {
   const {
@@ -63,11 +77,11 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     stepNumber,
     initialValues,
     isActive,
-    showTableSizeErrorDownload = true,
-    onTableSizeError,
+    showTableQueryErrorDownload = true,
+    onTableQueryError,
   } = props;
 
-  const [hasTableSizeError, toggleTableSizeError] = useToggle(false);
+  const [tableQueryError, setTableQueryError] = useState<TableQueryErrorCode>();
   const [previousValues, setPreviousValues] = useState<FormValues>();
 
   const initialFormValues = useMemo(() => {
@@ -115,21 +129,30 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
   const handleSubmit = async (values: FormValues) => {
     setPreviousValues(values);
     try {
+      setTableQueryError(undefined);
       await onSubmit(values);
-      toggleTableSizeError.off();
       goToNextStep();
     } catch (error) {
       if (
-        isServerValidationError(error, 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE')
+        !isServerValidationError<TableQueryErrorCode>(error) ||
+        !hasErrorMessage(error, TableQueryErrorCodes)
       ) {
-        if (onTableSizeError) {
-          onTableSizeError(
+        throw error;
+      }
+
+      const errorCode = getErrorMessage(error);
+
+      if (onTableQueryError) {
+        if (errorCode) {
+          onTableQueryError(
+            errorCode,
             selectedPublication?.title || '',
             subject?.name || '',
           );
         }
-        toggleTableSizeError.on();
       }
+
+      setTableQueryError(errorCode);
     }
   };
 
@@ -161,14 +184,15 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         if (isActive) {
           return (
             <Form {...form} id={formId} showSubmitError>
-              {hasTableSizeError &&
+              {tableQueryError &&
                 form.submitCount > 0 &&
                 isEqual(form.values, previousValues) && (
-                  <TableSizeError
-                    id={`${formId}-tableSizeError`}
+                  <TableQueryError
+                    id={`${formId}-tableQueryError`}
+                    errorCode={tableQueryError}
                     releaseId={selectedPublication?.selectedRelease.id}
+                    showDownloadOption={showTableQueryErrorDownload}
                     subject={subject}
-                    showDownloadOption={showTableSizeErrorDownload}
                   />
                 )}
 

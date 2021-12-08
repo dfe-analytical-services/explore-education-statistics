@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using Moq;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 {
     public class SubjectRepositoryTests
     {

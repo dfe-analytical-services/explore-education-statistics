@@ -17,6 +17,8 @@ pytz = "~=2021.3"
 beautifulsoup4 = "~=4.10.0"
 robotframework-tidy = "~=1.4.0"
 slack-sdk = "~=3.11.2"
+lxml = "~=4.6.4"
+azure-storage-blob = "~=12.9.0"
 
 [requires]
 python_version = "3.8"

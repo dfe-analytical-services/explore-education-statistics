@@ -121,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 
         public static async Task<List<TResult>> ForEachAsync<T, TResult>(this IEnumerable<T> source, Func<T, Task<TResult>> func)
         {
-            List<TResult> results = new List<TResult>();
+            var results = new List<TResult>();
 
             foreach (var item in source)
             {
@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         public static async Task<Either<TLeft, List<TRight>>> ForEachAsync<T, TLeft, TRight>(this IEnumerable<T> source,
             Func<T, Task<Either<TLeft, TRight>>> func)
         {
-            List<TRight> rightResults = new List<TRight>();
+            var rightResults = new List<TRight>();
 
             foreach (var item in source)
             {

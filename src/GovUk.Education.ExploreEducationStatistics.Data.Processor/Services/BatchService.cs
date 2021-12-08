@@ -1,5 +1,5 @@
+#nullable enable
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -27,11 +27,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public async Task<List<BlobInfo>> GetBatchFilesForDataFile(File dataFile)
         {
-            var blobs = await _blobStorageService.ListBlobs(
+            return await _blobStorageService.ListBlobs(
                 PrivateReleaseFiles,
                 dataFile.BatchesPath());
-
-            return blobs.ToList();
         }
     }
 }

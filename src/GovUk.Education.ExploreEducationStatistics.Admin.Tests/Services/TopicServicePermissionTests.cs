@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -121,7 +122,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(),
                 releaseFileService ?? Mock.Of<IReleaseFileService>(),
                 publishingService ?? Mock.Of<IPublishingService>(),
-                methodologyService ?? Mock.Of<IMethodologyService>()
+                methodologyService ?? Mock.Of<IMethodologyService>(),
+                Mock.Of<IBlobCacheService>()
             );
         }
     }

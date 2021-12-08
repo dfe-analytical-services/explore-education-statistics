@@ -21,9 +21,8 @@ describe('LocationFiltersForm', () => {
     shouldScroll: false,
   };
 
-  const testLocations: SubjectMeta['locations'] = {
+  const testLocationsFlat: SubjectMeta['locations'] = {
     Country: {
-      hint: '',
       legend: 'Country',
       options: [
         {
@@ -33,7 +32,6 @@ describe('LocationFiltersForm', () => {
       ],
     },
     LocalAuthority: {
-      hint: '',
       legend: 'Local authority',
       options: [
         {
@@ -51,7 +49,6 @@ describe('LocationFiltersForm', () => {
       ],
     },
     Region: {
-      hint: '',
       legend: 'Region',
       options: [
         {
@@ -66,9 +63,55 @@ describe('LocationFiltersForm', () => {
     },
   };
 
+  const testLocationsNested: SubjectMeta['locations'] = {
+    Country: {
+      legend: 'Country',
+      options: [
+        {
+          label: 'Country 1',
+          value: 'country-1',
+        },
+      ],
+    },
+    LocalAuthority: {
+      legend: 'Local authority',
+      options: [
+        {
+          label: 'Region 1',
+          value: 'region-1',
+          level: 'Region',
+          options: [
+            {
+              label: 'Local authority 1',
+              value: 'local-authority-1',
+            },
+            {
+              label: 'Local authority 2',
+              value: 'local-authority-2',
+            },
+          ],
+        },
+        {
+          label: 'Region 2',
+          value: 'region-2',
+          level: 'Region',
+          options: [
+            {
+              label: 'Local authority 3',
+              value: 'local-authority-3',
+            },
+            {
+              label: 'Local authority 4',
+              value: 'local-authority-4',
+            },
+          ],
+        },
+      ],
+    },
+  };
+
   const testSingleLocation: SubjectMeta['locations'] = {
     Country: {
-      hint: '',
       legend: 'Country',
       options: [
         {
@@ -79,11 +122,30 @@ describe('LocationFiltersForm', () => {
     },
   };
 
-  test('renders location group options correctly', () => {
+  const testSingleLocationNested: SubjectMeta['locations'] = {
+    LocalAuthority: {
+      legend: 'Local authority',
+      options: [
+        {
+          label: 'Region 1',
+          value: 'region-1',
+          level: 'Region',
+          options: [
+            {
+              label: 'Local authority 1',
+              value: 'local-authority-1',
+            },
+          ],
+        },
+      ],
+    },
+  };
+
+  test('renders flat location group options correctly', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
-        options={testLocations}
+        options={testLocationsFlat}
         onSubmit={noop}
       />,
     );
@@ -158,11 +220,87 @@ describe('LocationFiltersForm', () => {
     expect(regionCheckboxes[1]).not.toBeChecked();
   });
 
+  test('renders nested location group options correctly', () => {
+    render(
+      <LocationFiltersForm
+        {...testWizardStepProps}
+        options={testLocationsNested}
+        onSubmit={noop}
+      />,
+    );
+
+    const countryGroup = screen.getByRole('group', {
+      name: 'Country',
+      hidden: true,
+    });
+    const countryCheckboxes = within(countryGroup).getAllByRole('checkbox', {
+      hidden: true,
+    });
+    expect(countryCheckboxes).toHaveLength(1);
+    expect(countryCheckboxes[0]).toHaveAttribute('value', 'country-1');
+    expect(countryCheckboxes[0]).toEqual(
+      within(countryGroup).getByLabelText('Country 1'),
+    );
+    expect(countryCheckboxes[0]).not.toBeChecked();
+
+    const localAuthorityGroup = within(
+      screen.getByRole('group', {
+        name: 'Local authority',
+        hidden: true,
+      }),
+    );
+
+    const region1Group = within(
+      localAuthorityGroup.getByRole('group', {
+        name: 'Region 1',
+        hidden: true,
+      }),
+    );
+
+    const region1Checkboxes = region1Group.getAllByRole('checkbox', {
+      hidden: true,
+    });
+    expect(region1Checkboxes).toHaveLength(2);
+    expect(region1Checkboxes[0]).toHaveAttribute('value', 'local-authority-1');
+    expect(region1Checkboxes[0]).toEqual(
+      region1Group.getByLabelText('Local authority 1'),
+    );
+    expect(region1Checkboxes[0]).not.toBeChecked();
+
+    expect(region1Checkboxes[1]).toHaveAttribute('value', 'local-authority-2');
+    expect(region1Checkboxes[1]).toEqual(
+      region1Group.getByLabelText('Local authority 2'),
+    );
+    expect(region1Checkboxes[1]).not.toBeChecked();
+
+    const region2Group = within(
+      localAuthorityGroup.getByRole('group', {
+        name: 'Region 2',
+        hidden: true,
+      }),
+    );
+
+    const region2Checkboxes = region2Group.getAllByRole('checkbox', {
+      hidden: true,
+    });
+    expect(region2Checkboxes).toHaveLength(2);
+    expect(region2Checkboxes[0]).toHaveAttribute('value', 'local-authority-3');
+    expect(region2Checkboxes[0]).toEqual(
+      region2Group.getByLabelText('Local authority 3'),
+    );
+    expect(region2Checkboxes[0]).not.toBeChecked();
+
+    expect(region2Checkboxes[1]).toHaveAttribute('value', 'local-authority-4');
+    expect(region2Checkboxes[1]).toEqual(
+      region2Group.getByLabelText('Local authority 4'),
+    );
+  });
+
   test('selecting options shows the number of selected options for each location group', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
-        options={testLocations}
+        options={testLocationsFlat}
         onSubmit={noop}
       />,
     );
@@ -198,11 +336,44 @@ describe('LocationFiltersForm', () => {
     ).toBeInTheDocument();
   });
 
+  test('selecting options shows the number of selected options for each location group (with nested groups)', () => {
+    render(
+      <LocationFiltersForm
+        {...testWizardStepProps}
+        options={testLocationsNested}
+        onSubmit={noop}
+      />,
+    );
+
+    userEvent.click(screen.getByLabelText('Local authority 2'));
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Local authority - 1 selected',
+      }),
+    ).toBeInTheDocument();
+
+    userEvent.click(screen.getByLabelText('Local authority 3'));
+    userEvent.click(screen.getByLabelText('Country 1'));
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Local authority - 2 selected',
+      }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Country - 1 selected',
+      }),
+    ).toBeInTheDocument();
+  });
+
   test('shows validation errors if no location is selected', async () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
-        options={testLocations}
+        options={testLocationsFlat}
         onSubmit={noop}
       />,
     );
@@ -226,7 +397,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
-        options={testLocations}
+        options={testLocationsFlat}
         onSubmit={noop}
         initialValues={{
           LocalAuthority: ['local-authority-1', 'local-authority-3'],
@@ -244,6 +415,26 @@ describe('LocationFiltersForm', () => {
     expect(screen.getByLabelText('Region 1')).not.toBeChecked();
   });
 
+  test('only the correct checkboxes (in nested groups) are selected from initial values', () => {
+    render(
+      <LocationFiltersForm
+        {...testWizardStepProps}
+        options={testLocationsNested}
+        onSubmit={noop}
+        initialValues={{
+          LocalAuthority: ['local-authority-1', 'local-authority-3'],
+        }}
+      />,
+    );
+
+    expect(screen.getByLabelText('Local authority 1')).toBeChecked();
+    expect(screen.getByLabelText('Local authority 3')).toBeChecked();
+
+    expect(screen.getByLabelText('Country 1')).not.toBeChecked();
+    expect(screen.getByLabelText('Local authority 2')).not.toBeChecked();
+    expect(screen.getByLabelText('Local authority 4')).not.toBeChecked();
+  });
+
   test('automatically selects the option and expands the group if only one location available', () => {
     render(
       <LocationFiltersForm
@@ -259,43 +450,125 @@ describe('LocationFiltersForm', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(
-      within(
-        screen.getByRole('group', {
-          name: 'Country',
-        }),
-      ).getAllByRole('checkbox'),
-    ).toHaveLength(1);
+    const country = within(screen.getByRole('group', { name: 'Country' }));
 
-    expect(screen.getByLabelText('Country 1')).toBeVisible();
+    const checkboxes = country.getAllByRole('checkbox');
 
-    expect(screen.getByLabelText('Country 1')).toBeChecked();
+    expect(checkboxes).toHaveLength(1);
+
+    expect(country.getByLabelText('Country 1')).toEqual(checkboxes[0]);
+    expect(country.getByLabelText('Country 1')).toBeVisible();
+    expect(country.getByLabelText('Country 1')).toBeChecked();
   });
 
-  test('renders a read-only view of selected options when no longer the current step', async () => {
-    const { container, rerender } = render(
+  test('automatically selects the option and expands the nested group if only one location available', () => {
+    render(
       <LocationFiltersForm
         {...testWizardStepProps}
-        options={testLocations}
+        options={testSingleLocationNested}
         onSubmit={noop}
       />,
     );
 
+    expect(
+      screen.getByRole('button', {
+        name: 'Local authority - 1 selected',
+      }),
+    ).toBeInTheDocument();
+
+    const localAuthority = within(
+      screen.getByRole('group', { name: 'Local authority' }),
+    );
+
+    const checkboxes = localAuthority.getAllByRole('checkbox');
+
+    expect(checkboxes).toHaveLength(1);
+
+    expect(localAuthority.getByLabelText('Local authority 1')).toEqual(
+      checkboxes[0],
+    );
+    expect(localAuthority.getByLabelText('Local authority 1')).toBeVisible();
+    expect(localAuthority.getByLabelText('Local authority 1')).toBeChecked();
+  });
+
+  test('renders a read-only view of selected options when no longer the current step', async () => {
+    const { rerender } = render(
+      <LocationFiltersForm
+        {...testWizardStepProps}
+        options={testLocationsFlat}
+        onSubmit={noop}
+      />,
+    );
+
+    userEvent.click(screen.getByLabelText('Country 1'));
     userEvent.click(screen.getByLabelText('Region 1'));
     userEvent.click(screen.getByLabelText('Region 2'));
-    userEvent.click(screen.getByLabelText('Country 1'));
 
     await rerender(
       <LocationFiltersForm
         {...testWizardStepProps}
         isActive={false}
-        options={testLocations}
+        options={testLocationsFlat}
         onSubmit={noop}
       />,
     );
 
     expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
-    expect(container.querySelector('dl')).toMatchSnapshot();
+
+    const countryChoices = within(screen.getByTestId('Country')).getAllByRole(
+      'listitem',
+    );
+
+    expect(countryChoices).toHaveLength(1);
+    expect(countryChoices[0]).toHaveTextContent('Country 1');
+
+    const regionChoices = within(screen.getByTestId('Region')).getAllByRole(
+      'listitem',
+    );
+
+    expect(regionChoices).toHaveLength(2);
+    expect(regionChoices[0]).toHaveTextContent('Region 1');
+    expect(regionChoices[1]).toHaveTextContent('Region 2');
+  });
+
+  test('renders a read-only view of selected options (from nested groups) when no longer the current step', async () => {
+    const { rerender } = render(
+      <LocationFiltersForm
+        {...testWizardStepProps}
+        options={testLocationsNested}
+        onSubmit={noop}
+      />,
+    );
+
+    userEvent.click(screen.getByLabelText('Country 1'));
+    userEvent.click(screen.getByLabelText('Local authority 1'));
+    userEvent.click(screen.getByLabelText('Local authority 3'));
+
+    await rerender(
+      <LocationFiltersForm
+        {...testWizardStepProps}
+        isActive={false}
+        options={testLocationsNested}
+        onSubmit={noop}
+      />,
+    );
+
+    expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+
+    const countryChoices = within(screen.getByTestId('Country')).getAllByRole(
+      'listitem',
+    );
+
+    expect(countryChoices).toHaveLength(1);
+    expect(countryChoices[0]).toHaveTextContent('Country 1');
+
+    const localAuthorityChoices = within(
+      screen.getByTestId('Local authority'),
+    ).getAllByRole('listitem');
+
+    expect(localAuthorityChoices).toHaveLength(2);
+    expect(localAuthorityChoices[0]).toHaveTextContent('Local authority 1');
+    expect(localAuthorityChoices[1]).toHaveTextContent('Local authority 3');
   });
 
   test('clicking `Next step` calls `onSubmit` with correct values', async () => {
@@ -303,7 +576,7 @@ describe('LocationFiltersForm', () => {
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
-        options={testLocations}
+        options={testLocationsFlat}
         onSubmit={handleSubmit}
       />,
     );
@@ -317,6 +590,35 @@ describe('LocationFiltersForm', () => {
       locations: {
         LocalAuthority: ['local-authority-3'],
         Region: ['region-1'],
+      },
+    };
+
+    await waitFor(() => {
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
+      expect(handleSubmit).toHaveBeenCalledWith(expected);
+    });
+  });
+
+  test('clicking `Next step` calls `onSubmit` with correct values for nested groups', async () => {
+    const handleSubmit = jest.fn();
+    render(
+      <LocationFiltersForm
+        {...testWizardStepProps}
+        options={testLocationsNested}
+        onSubmit={handleSubmit}
+      />,
+    );
+
+    userEvent.click(screen.getByLabelText('Local authority 1'));
+    userEvent.click(screen.getByLabelText('Local authority 3'));
+    userEvent.click(screen.getByLabelText('Country 1'));
+
+    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    const expected: LocationFormValues = {
+      locations: {
+        LocalAuthority: ['local-authority-1', 'local-authority-3'],
+        Country: ['country-1'],
       },
     };
 

@@ -29,7 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         
         public Task<Either<ActionResult, FastTrackResultsCacheKey>> CreateCacheKeyForFastTrackResults(Guid fastTrackId)
         {
-            return _fastTrackService.GetReleaseFastTrack(fastTrackId)
+            return _fastTrackService
+                .GetReleaseFastTrack(fastTrackId)
                 .OnSuccess(async fastTrack =>
                 {
                     var owningRelease = await _contentDbContext

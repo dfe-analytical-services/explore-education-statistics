@@ -662,7 +662,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 statisticsDbContext,
                 dataBlockService ?? Mock.Of<IDataBlockService>(),
                 releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(),
-                guidGenerator ?? new SequentialGuidGenerator()
+                guidGenerator ?? new SequentialGuidGenerator(),
+                Mock.Of<IBlobCacheService>()
             );
         }
     }

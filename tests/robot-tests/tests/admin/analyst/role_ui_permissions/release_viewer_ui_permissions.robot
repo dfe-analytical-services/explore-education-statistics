@@ -33,7 +33,7 @@ Navigate back to admin dashboard for publication
 
 Check cannot create an amendment of a published release
     ${details}=    user gets details content element    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)
-    ...    ${publication_accordion}    30
+    ...    ${publication_accordion}    %{WAIT_SMALL}
     user cannot see the create amendment controls for release    ${details}
 
 Check cannot edit the release status of a Draft Release
