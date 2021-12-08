@@ -1,11 +1,8 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
@@ -46,15 +43,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         }
 
         [HttpPost("release/{releaseId}")]
-        public Task<ActionResult<TableBuilderResultViewModel>> Query(
-            Guid releaseId, 
-            [FromBody] ObservationQueryContext query,
-            CancellationToken cancellationToken = default)
+        public Task<ActionResult<TableBuilderResultViewModel>> Query(Guid releaseId, [FromBody] ObservationQueryContext query)
         {
             var stopwatch = Stopwatch.StartNew();
             stopwatch.Start();
 
-            var tableBuilderResultViewModel = _tableBuilderService.Query(releaseId, query, cancellationToken);
+            var tableBuilderResultViewModel = _tableBuilderService.Query(releaseId, query);
 
             stopwatch.Stop();
             _logger.LogDebug("Query {Query} executed in {Time} ms", query, stopwatch.Elapsed.TotalMilliseconds);
@@ -65,11 +59,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("release/{releaseId}/data-block/{dataBlockId}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
-            Guid dataBlockId,
-            CancellationToken cancellationToken = default)
+            Guid dataBlockId)
         {
-            return await _contentPersistenceHelper
-                .CheckEntityExists<ReleaseContentBlock>(
+            return await _contentPersistenceHelper.CheckEntityExists<ReleaseContentBlock>(
                     query => query
                         .Include(rcb => rcb.ContentBlock)
                         .Include(rcb => rcb.Release)
@@ -78,26 +70,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                    && rcb.ContentBlockId == dataBlockId
                         )
                 )
-                .OnSuccess(block => GetReleaseDataBlockResults(block, cancellationToken))
+                .OnSuccess(
+                    async block =>
+                    {
+                        if (block.ContentBlock is DataBlock dataBlock)
+                        {
+                            var query = dataBlock.Query.Clone();
+                            query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
+
+                            return await _userService.CheckCanViewRelease(block.Release)
+                                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, query));
+                        }
+
+                        return new NotFoundResult();
+                    }
+                )
                 .HandleFailuresOrOk();
-        }
-
-        [BlobCache(typeof(DataBlockTableResultCacheKey))]
-        private async Task<Either<ActionResult, TableBuilderResultViewModel>> GetReleaseDataBlockResults(
-            ReleaseContentBlock block, 
-            CancellationToken cancellationToken)
-        {
-            if (!(block.ContentBlock is DataBlock dataBlock))
-            {
-                return new NotFoundResult();
-            }
-            
-            var query = dataBlock.Query.Clone();
-            query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
-
-            return await _userService
-                .CheckCanViewRelease(block.Release)
-                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, query, cancellationToken));
         }
     }
 }

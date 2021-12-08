@@ -1,7 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import {
   FilterOption,
-  FlatLocationOption,
   GeoJsonFeature,
   IndicatorOption,
   LocationOption,
@@ -73,7 +72,7 @@ export class LocationFilter extends Filter {
     level,
     geoJson,
     group,
-  }: GroupedFilterOption & FlatLocationOption) {
+  }: GroupedFilterOption & LocationOption) {
     super({ value, label, group });
 
     this.level = level;

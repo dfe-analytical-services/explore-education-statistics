@@ -68,7 +68,7 @@ Select Characteristics
 
 Create table
     user clicks element    id:filtersForm-submit
-    user waits until results table appears    %{WAIT_SMALL}
+    user waits until results table appears    60
 
 Validate results table column headings
     user checks table column heading contains    1    1    2012/13

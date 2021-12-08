@@ -36,7 +36,6 @@ src/explore-education-statistics-frontend/*.xml
 /tests/robot-tests/backup-data
 /tests/robot-tests/webdriver
 /tests/robot-tests/.env.*
-/tests/robot-tests/UI-test-report.zip
 !/tests/robot-tests/.env.example
 /tests/robot-tests/IDENTITY_*
 /tests/robot-tests/.pabotsuitenames

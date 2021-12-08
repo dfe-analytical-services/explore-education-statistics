@@ -31,6 +31,7 @@ Verify release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 Upload subject
+    user clicks link    Data and files
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
 
 Add data guidance
@@ -71,7 +72,54 @@ Add ancillary file
     user checks there are x accordion sections    1    id:file-uploads
 
 Create data block table
-    user creates data block for dates csv    Dates test subject    ${DATABLOCK_NAME}    Dates table title
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks
+
+    user clicks link    Create data block
+    user waits until h2 is visible    Create data block
+
+    user waits until table tool wizard step is available    1    Choose a subject
+    user waits until page contains    Dates test subject
+    user clicks radio    Dates test subject
+    user clicks element    id:publicationSubjectForm-submit
+
+    user waits until table tool wizard step is available    2    Choose locations
+    user opens details dropdown    National
+    user checks location checkbox is checked    England
+
+    user clicks element    id:locationFiltersForm-submit
+
+    user waits until table tool wizard step is available    3    Choose time period
+    user chooses select option    id:timePeriodForm-start    2020 Week 13
+    user chooses select option    id:timePeriodForm-end    2020 Week 16
+    user clicks element    id:timePeriodForm-submit
+
+    user waits until table tool wizard step is available    4    Choose your filters
+    user clicks subheaded indicator checkbox    Open settings    Number of open settings
+    user checks subheaded indicator checkbox is checked    Open settings    Number of open settings
+    user clicks subheaded indicator checkbox    Open settings    Proportion of settings open
+    user checks subheaded indicator checkbox is checked    Open settings    Proportion of settings open
+
+    user opens details dropdown    Date
+    user clicks category checkbox    Date    23/03/2020
+    user checks category checkbox is checked    Date    23/03/2020
+
+    user clicks element    id:filtersForm-submit
+    user waits until results table appears    %{WAIT_LONG}
+
+    user checks table column heading contains    1    1    2020 Week 13
+    user checks headed table body row cell contains    Number of open settings    1    22,900
+    user checks headed table body row cell contains    Proportion of settings open    1    1%
+
+Save data block
+    user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
+    user enters text into element    id:dataBlockDetailsForm-heading    Dates table title
+    user enters text into element    id:dataBlockDetailsForm-source    Dates source
+
+    user clicks button    Save data block
+
+    user waits until h2 is visible    Edit data block
+    user waits until page contains button    Delete this data block
 
 Create chart for data block
     user waits until page contains link    Chart
@@ -91,7 +139,7 @@ Create chart for data block
 Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
+    user waits until page contains button    Add a summary text block    60
 
 Add two accordion sections to release
     user waits for page to finish loading
@@ -105,7 +153,7 @@ Add data block to first accordion section
     user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
     ...    css:#releaseMainContent
     ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
-    user waits until page contains element    ${datablock}    %{WAIT_SMALL}
+    user waits until page contains element    ${datablock}    60
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text
@@ -147,7 +195,7 @@ Verify newly published release is on Find Statistics page
 
 Navigate to newly published release page
     user clicks element    testid:View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    90
 
 Verify release URL and page caption
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}
@@ -167,10 +215,10 @@ Verify publish and update dates
 Verify release associated files
     user opens accordion section    Explore data and files
     ${downloads}=    user gets accordion section content element    Explore data and files
-    user waits until page contains element    ${downloads}    %{WAIT_SMALL}
+    user waits until page contains element    ${downloads}    60
 
     user checks element should contain    ${downloads}    Download all files
-    ...    %{WAIT_SMALL}
+    ...    60
     user checks element should contain    ${downloads}
     ...    All data used to create this release is published as open data and is available for download.
     user checks element should contain    ${downloads}
@@ -388,11 +436,10 @@ Add ancillary file to amendment
 
 User navigates to Data blocks page
     user clicks link    Data blocks
-    user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
+    user waits until h2 is visible    Data blocks
 
 Edit data block for amendment
     user waits until table is visible
-
     user checks table body has x rows    1
     user checks results table cell contains    1    1    ${DATABLOCK_NAME}
     user checks results table cell contains    1    2    Yes
@@ -491,7 +538,7 @@ Verify amendment is on Find Statistics page again
 
 Navigate to amendment release page
     user clicks element    testid:View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    90
     user waits until page contains title caption    ${RELEASE_NAME}
 
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}

@@ -1,12 +1,10 @@
 #nullable enable
 using System.IO;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using Microsoft.Azure.Storage;
 using Moq;
 using Moq.Language.Flow;
 
@@ -66,28 +64,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                     }
                 )
                 .ReturnsAsync(blobText.ToStream());
-        }
-
-        public static IReturnsResult<IBlobStorageService> SetupDownloadBlobText(
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string path,
-            string blobText)
-        {
-            return service.Setup(s => s.DownloadBlobText(container, path))
-                .ReturnsAsync(blobText);
-        }
-
-        public static IReturnsResult<IBlobStorageService> SetupDownloadBlobTextNotFound(
-            this Mock<IBlobStorageService> service,
-            IBlobContainer container,
-            string path)
-        {
-            return service.Setup(s => s.DownloadBlobText(container, path))
-                .ThrowsAsync(new StorageException(new RequestResult
-                {
-                    HttpStatusCode = (int) HttpStatusCode.NotFound
-                }, null, null));
         }
     }
 }

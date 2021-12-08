@@ -1,11 +1,9 @@
 using System;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -14,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Data.Api.Cancellation.RequestTimeoutConfigurationKeys;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -41,26 +38,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [HttpPost]
-        [CancellationTokenTimeout(TableBuilderQuery)]
-        public Task<ActionResult<TableBuilderResultViewModel>> Query(
-            [FromBody] ObservationQueryContext query, 
-            CancellationToken cancellationToken = default)
+        public Task<ActionResult<TableBuilderResultViewModel>> Query([FromBody] ObservationQueryContext query)
         {
-            return _tableBuilderService
-                .Query(query, cancellationToken)
-                .HandleFailuresOrOk();
+            return _tableBuilderService.Query(query).HandleFailuresOrOk();
         }
 
         [HttpPost("release/{releaseId}")]
-        [CancellationTokenTimeout(TableBuilderQuery)]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             Guid releaseId,
-            [FromBody] ObservationQueryContext query, 
-            CancellationToken cancellationToken = default)
+            [FromBody] ObservationQueryContext query)
         {
-            return _tableBuilderService
-                .Query(releaseId, query, cancellationToken)
-                .HandleFailuresOrOk();
+            return _tableBuilderService.Query(releaseId, query).HandleFailuresOrOk();
         }
 
         [ResponseCache(Duration = 300)]

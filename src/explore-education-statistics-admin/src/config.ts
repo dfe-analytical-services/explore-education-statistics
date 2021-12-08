@@ -15,10 +15,7 @@ export async function getConfig(): Promise<Config> {
 
   const configResponse = await client.get<Config>('/config');
 
-  config = produce<Config>(
-    (undefined as unknown) as Config,
-    () => configResponse,
-  );
+  config = produce(undefined, () => configResponse);
 
   return config;
 }

@@ -446,13 +446,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           {release.content.map(({ heading, caption, order, content }) => {
             return (
               <AccordionSection heading={heading} caption={caption} key={order}>
-                {({ open }) => (
-                  <PublicationSectionBlocks
-                    blocks={content}
-                    release={release}
-                    visible={open}
-                  />
-                )}
+                <PublicationSectionBlocks blocks={content} release={release} />
               </AccordionSection>
             );
           })}

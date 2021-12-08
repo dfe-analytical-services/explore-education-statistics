@@ -61,7 +61,7 @@ Go to public release page
     user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME_UPDATED}
     ...    %{WAIT_MEDIUM}
     user clicks element    testid:View stats link for ${PUBLICATION_NAME_UPDATED}
-    user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}    %{WAIT_MEDIUM}
+    user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}    90
 
 Validate publication details are updated on public page
     ${section}=    user opens accordion section    Contact us    css:#help-and-support

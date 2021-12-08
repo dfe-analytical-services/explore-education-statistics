@@ -2,31 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
-using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -98,18 +94,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.Get(dataBlock.Id);
 
-                var retrievedResult = result.AssertRight();
+                Assert.True(result.IsRight);
 
-                Assert.Equal(dataBlock.Heading, retrievedResult.Heading);
-                Assert.Equal(dataBlock.Name, retrievedResult.Name);
-                Assert.Equal(dataBlock.HighlightName, retrievedResult.HighlightName);
-                Assert.Equal(dataBlock.HighlightDescription, retrievedResult.HighlightDescription);
-                Assert.Equal(dataBlock.Source, retrievedResult.Source);
-                Assert.Equal(dataBlock.Order, retrievedResult.Order);
+                Assert.Equal(dataBlock.Heading, result.Right.Heading);
+                Assert.Equal(dataBlock.Name, result.Right.Name);
+                Assert.Equal(dataBlock.HighlightName, result.Right.HighlightName);
+                Assert.Equal(dataBlock.HighlightDescription, result.Right.HighlightDescription);
+                Assert.Equal(dataBlock.Source, result.Right.Source);
+                Assert.Equal(dataBlock.Order, result.Right.Order);
 
-                Assert.Equal(dataBlock.Query, retrievedResult.Query);
-                Assert.Equal(dataBlock.Table, retrievedResult.Table);
-                Assert.Equal(dataBlock.Charts, retrievedResult.Charts);
+                Assert.Equal(dataBlock.Query, result.Right.Query);
+                Assert.Equal(dataBlock.Table, result.Right.Table);
+                Assert.Equal(dataBlock.Charts, result.Right.Charts);
             }
         }
 
@@ -309,27 +305,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.List(release.Id);
 
-                var listResult = result.AssertRight();
+                Assert.True(result.IsRight);
 
-                Assert.Equal(2, listResult.Count);
+                Assert.Equal(2, result.Right.Count);
 
-                Assert.Equal(dataBlock1.Heading, listResult[0].Heading);
-                Assert.Equal(dataBlock1.Name, listResult[0].Name);
-                Assert.Equal(dataBlock1.Created, listResult[0].Created);
-                Assert.Equal(dataBlock1.HighlightName, listResult[0].HighlightName);
-                Assert.Equal(dataBlock1.HighlightDescription, listResult[0].HighlightDescription);
-                Assert.Equal(dataBlock1.Source, listResult[0].Source);
-                Assert.Equal(1, listResult[0].ChartsCount);
-                Assert.Equal(dataBlock1.ContentSectionId, listResult[0].ContentSectionId);
+                Assert.Equal(dataBlock1.Heading, result.Right[0].Heading);
+                Assert.Equal(dataBlock1.Name, result.Right[0].Name);
+                Assert.Equal(dataBlock1.Created, result.Right[0].Created);
+                Assert.Equal(dataBlock1.HighlightName, result.Right[0].HighlightName);
+                Assert.Equal(dataBlock1.HighlightDescription, result.Right[0].HighlightDescription);
+                Assert.Equal(dataBlock1.Source, result.Right[0].Source);
+                Assert.Equal(1, result.Right[0].ChartsCount);
+                Assert.Equal(dataBlock1.ContentSectionId, result.Right[0].ContentSectionId);
 
-                Assert.Equal(dataBlock2.Heading, listResult[1].Heading);
-                Assert.Equal(dataBlock2.Name, listResult[1].Name);
-                Assert.Equal(dataBlock2.Created, listResult[1].Created);
-                Assert.Equal(dataBlock2.HighlightName, listResult[1].HighlightName);
-                Assert.Equal(dataBlock2.HighlightDescription, listResult[1].HighlightDescription);
-                Assert.Equal(dataBlock2.Source, listResult[1].Source);
-                Assert.Equal(0, listResult[1].ChartsCount);
-                Assert.Null(listResult[1].ContentSectionId);
+                Assert.Equal(dataBlock2.Heading, result.Right[1].Heading);
+                Assert.Equal(dataBlock2.Name, result.Right[1].Name);
+                Assert.Equal(dataBlock2.Created, result.Right[1].Created);
+                Assert.Equal(dataBlock2.HighlightName, result.Right[1].HighlightName);
+                Assert.Equal(dataBlock2.HighlightDescription, result.Right[1].HighlightDescription);
+                Assert.Equal(dataBlock2.Source, result.Right[1].Source);
+                Assert.Equal(0, result.Right[1].ChartsCount);
+                Assert.Null(result.Right[1].ContentSectionId);
             }
         }
 
@@ -413,16 +409,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.List(release.Id);
 
-                var listResult = Assert.Single(result.AssertRight());
+                Assert.True(result.IsRight);
 
-                Assert.Equal(dataBlock1.Heading, listResult.Heading);
-                Assert.Equal(dataBlock1.Name, listResult.Name);
-                Assert.Equal(dataBlock1.Created, listResult.Created);
-                Assert.Equal(dataBlock1.HighlightName, listResult.HighlightName);
-                Assert.Equal(dataBlock1.HighlightDescription, listResult.HighlightDescription);
-                Assert.Equal(dataBlock1.Source, listResult.Source);
-                Assert.Equal(1, listResult.ChartsCount);
-                Assert.Equal(dataBlock1.ContentSectionId, listResult.ContentSectionId);
+                Assert.Single(result.Right);
+
+                Assert.Equal(dataBlock1.Heading, result.Right[0].Heading);
+                Assert.Equal(dataBlock1.Name, result.Right[0].Name);
+                Assert.Equal(dataBlock1.Created, result.Right[0].Created);
+                Assert.Equal(dataBlock1.HighlightName, result.Right[0].HighlightName);
+                Assert.Equal(dataBlock1.HighlightDescription, result.Right[0].HighlightDescription);
+                Assert.Equal(dataBlock1.Source, result.Right[0].Source);
+                Assert.Equal(1, result.Right[0].ChartsCount);
+                Assert.Equal(dataBlock1.ContentSectionId, result.Right[0].ContentSectionId);
             }
         }
 
@@ -476,11 +474,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataBlockService(context);
                 var result = await service.GetDeletePlan(release.Id, dataBlock.Id);
 
-                var deletePlan = result.AssertRight();
-                
-                Assert.Equal(release.Id, deletePlan.ReleaseId);
+                Assert.True(result.IsRight);
+                Assert.Equal(release.Id, result.Right.ReleaseId);
 
-                var dependentBlocks = deletePlan.DependentDataBlocks;
+                var dependentBlocks = result.Right.DependentDataBlocks;
 
                 Assert.Single(dependentBlocks);
 
@@ -574,20 +571,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Delete()
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication    = new Publication
-                {
-                    Id = Guid.NewGuid(),
-                }
-            };
-            
+            var release = new Release();
             var fileId = Guid.NewGuid();
 
             var dataBlock = new DataBlock
             {
-                Id = Guid.NewGuid(),
                 Name = "Test name",
                 Charts = new List<IChart>
                 {
@@ -604,13 +592,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Heading = "Test heading"
                 }
             };
-            
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = release,
-                ContentBlock = dataBlock
-            };
-
             var file = new File
             {
                 Id = fileId,
@@ -621,14 +602,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(releaseContentBlock);
+                await context.AddAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = release,
+                        ContentBlock = dataBlock
+                    }
+                );
                 await context.AddAsync(file);
                 await context.SaveChangesAsync();
             }
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var releaseFileService = new Mock<IReleaseFileService>(Strict);
+                var releaseFileService = new Mock<IReleaseFileService>();
 
                 releaseFileService
                     .Setup(
@@ -637,31 +624,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     )
                     .ReturnsAsync(Unit.Instance);
 
-                var cacheKeyService = new Mock<ICacheKeyService>(Strict);
-
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
-                
-                cacheKeyService
-                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
-                    .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
-
-                var cacheService = new Mock<IBlobCacheService>(Strict);
-
-                cacheService
-                    .Setup(s => s.DeleteItem(dataBlockCacheKey))
-                    .Returns(Task.CompletedTask);
-
-                var service = BuildDataBlockService(
-                    context, 
-                    releaseFileService: releaseFileService.Object,
-                    cacheKeyService: cacheKeyService.Object,
-                    cacheService: cacheService.Object);
-                
+                var service = BuildDataBlockService(context, releaseFileService: releaseFileService.Object);
                 var result = await service.Delete(release.Id, dataBlock.Id);
 
-                VerifyAllMocks(releaseFileService, cacheKeyService, cacheService);
+                Assert.True(result.IsRight);
 
-                result.AssertRight();
+                MockUtils.VerifyAllMocks(releaseFileService);
             }
 
             await using (var context = InMemoryContentDbContext(contextId))
@@ -913,14 +881,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Update()
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            var release = new Release();
 
             var dataBlock = new DataBlock
             {
@@ -965,19 +926,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 },
             };
-            
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = release,
-                ContentBlock = dataBlock
-            };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(
-                    releaseContentBlock
+                    new ReleaseContentBlock
+                    {
+                        Release = release,
+                        ContentBlock = dataBlock
+                    }
                 );
                 await context.SaveChangesAsync();
             }
@@ -1002,42 +961,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var cacheKeyService = new Mock<ICacheKeyService>(Strict);
-
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
-                
-                cacheKeyService
-                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
-                    .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
-
-                var cacheService = new Mock<IBlobCacheService>(Strict);
-
-                cacheService
-                    .Setup(s => s.DeleteItem(dataBlockCacheKey))
-                    .Returns(Task.CompletedTask);
-
-                var service = BuildDataBlockService(
-                    context, 
-                    cacheKeyService: cacheKeyService.Object, 
-                    cacheService: cacheService.Object);
-                
+                var service = BuildDataBlockService(context);
                 var result = await service.Update(dataBlock.Id, updateRequest);
-                
-                VerifyAllMocks(cacheKeyService, cacheService);
-                
-                var updateResult = result.AssertRight();
 
-                Assert.Equal(dataBlock.Id, updateResult.Id);
-                Assert.Equal(updateRequest.Heading, updateResult.Heading);
-                Assert.Equal(updateRequest.Name, updateResult.Name);
-                Assert.Equal(updateRequest.HighlightName, updateResult.HighlightName);
-                Assert.Equal(updateRequest.HighlightDescription, updateResult.HighlightDescription);
-                Assert.Equal(updateRequest.Source, updateResult.Source);
-                Assert.Equal(dataBlock.Order, updateResult.Order);
+                Assert.True(result.IsRight);
 
-                Assert.Equal(updateRequest.Query, updateResult.Query);
-                Assert.Equal(updateRequest.Table, updateResult.Table);
-                Assert.Equal(updateRequest.Charts, updateResult.Charts);
+                Assert.Equal(dataBlock.Id, result.Right.Id);
+                Assert.Equal(updateRequest.Heading, result.Right.Heading);
+                Assert.Equal(updateRequest.Name, result.Right.Name);
+                Assert.Equal(updateRequest.HighlightName, result.Right.HighlightName);
+                Assert.Equal(updateRequest.HighlightDescription, result.Right.HighlightDescription);
+                Assert.Equal(updateRequest.Source, result.Right.Source);
+                Assert.Equal(dataBlock.Order, result.Right.Order);
+
+                Assert.Equal(updateRequest.Query, result.Right.Query);
+                Assert.Equal(updateRequest.Table, result.Right.Table);
+                Assert.Equal(updateRequest.Charts, result.Right.Charts);
             }
 
             await using (var context = InMemoryContentDbContext(contextId))
@@ -1059,14 +998,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Update_HeadingUpdateAlsoChangesChartTitle()
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
+            var release = new Release();
 
             var dataBlock = new DataBlock
             {
@@ -1081,17 +1013,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 },
             };
-            
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = release,
-                ContentBlock = dataBlock
-            };
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(releaseContentBlock);
+                await context.AddAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = release,
+                        ContentBlock = dataBlock
+                    }
+                );
                 await context.SaveChangesAsync();
             }
 
@@ -1111,28 +1043,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var cacheKeyService = new Mock<ICacheKeyService>(Strict);
-
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
-                
-                cacheKeyService
-                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
-                    .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
-
-                var cacheService = new Mock<IBlobCacheService>(Strict);
-
-                cacheService
-                    .Setup(s => s.DeleteItem(dataBlockCacheKey))
-                    .Returns(Task.CompletedTask);
-
-                var service = BuildDataBlockService(
-                    context, 
-                    cacheKeyService: cacheKeyService.Object, 
-                    cacheService: cacheService.Object);
-                
+                var service = BuildDataBlockService(context);
                 var result = await service.Update(dataBlock.Id, updateRequest);
-                
-                VerifyAllMocks(cacheKeyService, cacheService);
 
                 var viewModel = result.AssertRight();
 
@@ -1172,15 +1084,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Update_RemoveOldInfographic()
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication = new Publication
-                {
-                    Id = Guid.NewGuid()
-                }
-            };
-            
+            var release = new Release();
             var fileId = Guid.NewGuid();
 
             var dataBlock = new DataBlock
@@ -1196,12 +1100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 },
             };
-            
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                Release = release,
-                ContentBlock = dataBlock
-            };
 
             var file = new File
             {
@@ -1213,7 +1111,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                await context.AddAsync(releaseContentBlock);
+                await context.AddAsync(
+                    new ReleaseContentBlock
+                    {
+                        Release = release,
+                        ContentBlock = dataBlock
+                    }
+                );
                 await context.AddAsync(file);
                 await context.SaveChangesAsync();
             }
@@ -1233,63 +1137,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryContentDbContext(contextId))
             {
-                var releaseFileService = new Mock<IReleaseFileService>(Strict);
+                var releaseFileService = new Mock<IReleaseFileService>();
 
                 releaseFileService
                     .Setup(s => s.Delete(release.Id, fileId, false))
                     .ReturnsAsync(Unit.Instance);
-                
-                var cacheKeyService = new Mock<ICacheKeyService>(Strict);
 
-                var dataBlockCacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
-                
-                cacheKeyService
-                    .Setup(s => s.CreateCacheKeyForDataBlock(release.Id, dataBlock.Id))
-                    .ReturnsAsync(new Either<ActionResult, DataBlockTableResultCacheKey>(dataBlockCacheKey));
-
-                var cacheService = new Mock<IBlobCacheService>(Strict);
-
-                cacheService
-                    .Setup(s => s.DeleteItem(dataBlockCacheKey))
-                    .Returns(Task.CompletedTask);
-
-                var service = BuildDataBlockService(
-                    context, 
-                    releaseFileService: releaseFileService.Object,
-                    cacheKeyService: cacheKeyService.Object, 
-                    cacheService: cacheService.Object);
-
+                var service = BuildDataBlockService(context, releaseFileService: releaseFileService.Object);
                 var result = await service.Update(dataBlock.Id, updateRequest);
-                
-                VerifyAllMocks(releaseFileService, cacheKeyService, cacheService);
 
-                var updateResult = result.AssertRight();
+                Assert.True(result.IsRight);
 
-                Assert.Equal(updateRequest.Charts, updateResult.Charts);
+                Assert.Equal(updateRequest.Charts, result.Right.Charts);
+
+                MockUtils.VerifyAllMocks(releaseFileService);
             }
         }
 
-        private DataBlockService BuildDataBlockService(
-            ContentDbContext contentDbContext = null,
+        private static DataBlockService BuildDataBlockService(
+            ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             IReleaseFileService releaseFileService = null,
             IReleaseContentBlockRepository releaseContentBlockRepository = null,
             IUserService userService = null,
-            IBlobCacheService cacheService = null,
-            ICacheKeyService cacheKeyService = null)
+            IMapper mapper = null)
         {
-            var service = new DataBlockService(
-                contentDbContext ?? Mock.Of<ContentDbContext>(Strict),
+            return new DataBlockService(
+                contentDbContext,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
+                releaseFileService ?? new Mock<IReleaseFileService>().Object,
                 releaseContentBlockRepository ?? new ReleaseContentBlockRepository(contentDbContext),
-                userService ?? AlwaysTrueUserService().Object,
-                AdminMapper(),
-                cacheService ?? Mock.Of<IBlobCacheService>(Strict),
-                cacheKeyService ?? Mock.Of<ICacheKeyService>(Strict)
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                mapper ?? AdminMapper()
             );
-
-            return service;
         }
     }
 }

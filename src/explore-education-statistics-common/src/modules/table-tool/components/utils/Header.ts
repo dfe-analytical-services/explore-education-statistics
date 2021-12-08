@@ -13,7 +13,7 @@ export default class Header {
 
   public span = 1;
 
-  public readonly children: Header[] = [];
+  public children: Header[] = [];
 
   public parent?: Header;
 
@@ -22,39 +22,16 @@ export default class Header {
     this.text = text;
   }
 
-  public get depth(): number {
-    if (!this.parent) {
-      return 0;
+  private updateSpan(): void {
+    this.span = sum(this.children.map(child => child.span));
+
+    if (this.parent) {
+      this.parent.updateSpan();
     }
-
-    return this.parent?.depth + 1;
-  }
-
-  public get crossSpan(): number {
-    if (this.children.length > 1) {
-      return 1;
-    }
-
-    let crossSpan = 1;
-    let child = this.getFirstChild();
-
-    while (child) {
-      if (child.text === this.text && child.span === this.span) {
-        crossSpan += 1;
-      }
-
-      if (child.children.length === 1) {
-        child = child.getFirstChild();
-      } else {
-        child = undefined;
-      }
-    }
-
-    return crossSpan;
   }
 
   public addChild(child: Header): this {
-    const lastChild = this.getLastChild();
+    const lastChild = last(this.children);
 
     if (lastChild?.id === child.id) {
       lastChild.span += child.span;
@@ -64,20 +41,9 @@ export default class Header {
       this.children.push(child);
     }
 
-    this.span = sum(this.children.map(c => c.span));
-
-    this.updateParent();
+    this.updateSpan();
 
     return this;
-  }
-
-  private updateParent(): void {
-    let { parent } = this;
-
-    while (parent) {
-      parent.span = sum(parent.children.map(child => child.span));
-      parent = parent.parent;
-    }
   }
 
   public addChildToLastParent(child: Header, depth: number) {
@@ -92,36 +58,20 @@ export default class Header {
     return parent.addChild(child);
   }
 
+  public get depth(): number {
+    if (!this.parent) {
+      return 0;
+    }
+
+    return this.parent?.depth + 1;
+  }
+
   public hasChildren(): boolean {
     return this.children.length > 0;
   }
 
-  public getFirstChild(): Header | undefined {
-    return this.children[0];
-  }
-
   public getLastChild(): Header | undefined {
     return last(this.children);
-  }
-
-  public getPrevSibling(): Header | undefined {
-    if (!this.parent) {
-      return undefined;
-    }
-
-    const index = this.parent.children.indexOf(this);
-
-    return this.parent.children[index - 1];
-  }
-
-  public getNextSibling(): Header | undefined {
-    if (!this.parent) {
-      return undefined;
-    }
-
-    const index = this.parent.children.indexOf(this);
-
-    return this.parent.children[index + 1];
   }
 
   public getLastParent(depth = 0): Header | undefined {

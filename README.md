@@ -523,10 +523,12 @@ docker exec -it ees-idp /opt/jboss/keycloak/bin/standalone.sh -Djboss.socket.bin
 Then simply copy the file from the `/tmp/new-ees-realm.json` file in the `ees-idp` container to `src/keycloak-ees-realm.json` in order for future restarts of the IdP to use this new 
 realm configuration.
 
-Aside from unit tests for each project, we maintain suites of Robot Framework tests that can be found in `tests`.
+Aside from unit tests for each project, we maintain suites of Robot Framework and Postman/Newman 
+tests that can be found in `tests`.
 
-See the relevant README:
+See the relevant READMEs:
 
+- [Postman/Newman tests](./tests/newman/README.md)
 - [Robot Framework tests](./tests/robot-tests/README.md)
 
 ## Contributing

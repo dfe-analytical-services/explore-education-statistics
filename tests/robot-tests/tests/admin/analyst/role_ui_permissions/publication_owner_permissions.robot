@@ -49,7 +49,7 @@ Check can create an amendment of a published release
     user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
     ${details}=    user gets details content element    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)
-    ...    ${publication_accordion}    %{WAIT_SMALL}
+    ...    ${publication_accordion}    30
     user can see the create amendment controls for release    ${details}
 
 Check cannot approve a draft release

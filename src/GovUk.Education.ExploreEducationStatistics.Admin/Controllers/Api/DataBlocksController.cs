@@ -27,40 +27,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             Guid releaseId,
             DataBlockCreateViewModel dataBlock)
         {
-            return await _dataBlockService
-                .Create(releaseId, dataBlock)
+            return await _dataBlockService.Create(releaseId, dataBlock)
                 .HandleFailuresOrOk();
         }
 
         [HttpDelete("releases/{releaseId}/data-blocks/{id}")]
         public async Task<ActionResult> DeleteDataBlock(Guid releaseId, Guid id)
         {
-            return await _dataBlockService
-                .Delete(releaseId, id)
+            return await _dataBlockService.Delete(releaseId, id)
                 .HandleFailuresOrNoContent();
         }
 
         [HttpGet("releases/{releaseId}/data-blocks/{id}/delete-plan")]
         public async Task<ActionResult<DeleteDataBlockPlan>> GetDeletePlan(Guid releaseId, Guid id)
         {
-            return await _dataBlockService
-                .GetDeletePlan(releaseId, id)
+            return await _dataBlockService.GetDeletePlan(releaseId, id)
                 .HandleFailuresOrOk();
         }
 
         [HttpGet("releases/{releaseId}/data-blocks")]
         public async Task<ActionResult<List<DataBlockSummaryViewModel>>> List(Guid releaseId)
         {
-            return await _dataBlockService
-                .List(releaseId)
+            return await _dataBlockService.List(releaseId)
                 .HandleFailuresOrOk();
         }
 
         [HttpGet("data-blocks/{id}")]
         public async Task<ActionResult<DataBlockViewModel>> GetDataBlock(Guid id)
         {
-            return await _dataBlockService
-                .Get(id)
+            return await _dataBlockService.Get(id)
                 .HandleFailuresOrOk();
         }
 
@@ -68,8 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         public async Task<ActionResult<DataBlockViewModel>> UpdateDataBlock(Guid id,
             DataBlockUpdateViewModel dataBlock)
         {
-            return await _dataBlockService
-                .Update(id, dataBlock)
+            return await _dataBlockService.Update(id, dataBlock)
                 .HandleFailuresOrOk();
         }
     }

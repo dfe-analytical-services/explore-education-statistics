@@ -25,16 +25,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
         [HttpGet("releases/{releaseId}/subjects")]
         public async Task<ActionResult<List<SubjectViewModel>>> ListSubjects(Guid releaseId)
         {
-            return await _releaseService
-                .ListSubjects(releaseId)
+            return await _releaseService.ListSubjects(releaseId)
                 .HandleFailuresOrOk();
         }
 
         [HttpGet("releases/{releaseId}/featured-tables")]
         public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
-            return await _releaseService
-                .ListFeaturedTables(releaseId)
+            return await _releaseService.ListFeaturedTables(releaseId)
                 .HandleFailuresOrOk();
         }
     }

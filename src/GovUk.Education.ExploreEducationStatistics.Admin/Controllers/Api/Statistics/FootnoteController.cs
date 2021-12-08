@@ -182,7 +182,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 Label = filterGroup.Label,
                 Options = filterItems
                     .OrderBy(item => item.Label, LabelComparer)
-                    .Select(item => new LabelValue(item.Label, item.Id.ToString()))
+                    .Select(
+                        item => new LabelValue
+                        {
+                            Label = item.Label,
+                            Value = item.Id.ToString()
+                        }
+                    )
                     .ToList()
             };
         }

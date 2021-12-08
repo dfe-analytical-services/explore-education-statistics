@@ -6,9 +6,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 {
@@ -90,9 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             Assert.IsType<TestValue>(result);
             Assert.Equal(expectedResult, result);
 
-            _blobCacheService.Verify(
-                s => s.GetItem(cacheKey, typeof(TestValue)), 
-                Times.Once);
+            MockUtils.VerifyAllMocks(_blobCacheService);
         }
 
         [Fact]
@@ -115,13 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             Assert.IsType<TestValue>(result);
             Assert.Equal(args[0], result);
 
-            _blobCacheService.Verify(
-                s => s.GetItem(cacheKey, typeof(TestValue)), 
-                Times.Once);
-
-            _blobCacheService.Verify(
-                s => s.SetItem(cacheKey, Capture.In(args)), 
-                Times.Once);
+            MockUtils.VerifyAllMocks(_blobCacheService);
         }
 
         [Fact]
@@ -145,10 +137,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             var result = TestMethods.SpecificCacheService("test");
 
-            VerifyAllMocks(_blobCacheService, targetBlobCacheService);
-
             Assert.IsType<TestValue>(result);
             Assert.Equal(args[0], result);
+
+            MockUtils.VerifyAllMocks(_blobCacheService, targetBlobCacheService);
         }
 
         [Fact]
@@ -158,9 +150,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             var result = TestMethods.SingleParam("test");
 
-            VerifyAllMocks(_blobCacheService);
-
             Assert.IsType<TestValue>(result);
+
+            MockUtils.VerifyAllMocks(_blobCacheService);
         }
 
         [Fact]

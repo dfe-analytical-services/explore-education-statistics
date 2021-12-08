@@ -1,5 +1,4 @@
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -106,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Ward ward,
             PlanningArea planningArea)
         {
-            var locationAttributes = new ILocationAttribute[]
+            var observationalUnits = new ObservationalUnit[]
             {
                 country,
                 englishDevolvedArea,
@@ -129,10 +128,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             const string separator = "_";
 
-            return string.Join(separator, locationAttributes
-                .WhereNotNull()
-                .Select(attribute =>
-                    $"{attribute.GetType()}:{(attribute is LocalAuthority la ? la.GetCodeOrOldCodeIfEmpty() : attribute.Code)}:{attribute.Name}"));
+            return string.Join(separator, observationalUnits
+                .Where(unit => unit != null)
+                .Select(unit =>
+                    $"{unit.GetType()}:{(unit is LocalAuthority la ? la.GetCodeOrOldCodeIfEmpty() : unit.Code)}:{unit.Name}"));
         }
 
         private Location LookupOrCreate(

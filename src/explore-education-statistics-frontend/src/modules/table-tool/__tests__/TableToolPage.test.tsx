@@ -267,6 +267,7 @@ describe('TableToolPage', () => {
     },
     locations: {
       country: {
+        hint: '',
         legend: 'National',
         options: [{ label: 'Great Britain', value: 'K03000001' }],
       },

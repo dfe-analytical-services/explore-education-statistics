@@ -1,18 +1,19 @@
-#nullable enable
+using Newtonsoft.Json;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    /// <summary>
-    /// Regional School Commissioner Region
-    /// </summary>
-    public class RscRegion : ObservationalUnit, ILocationAttribute
+    /**
+     * Regional School Commissioner Region
+     */
+    public class RscRegion : ObservationalUnit
     {
-        public RscRegion(string? code) : base(code, code)
+        public RscRegion(string code) : base(code, code)
         {
         }
-
+        
         public static RscRegion Empty()
         {
-            return new(null);
+            return new RscRegion(null);
         }
     }
 }

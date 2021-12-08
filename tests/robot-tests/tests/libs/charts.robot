@@ -165,7 +165,7 @@ user configures basic chart
     ${CHART_TYPE_LIST}=    create list    Line    Horizontal bar    Vertical bar    Geographic
     should contain    ${CHART_TYPE_LIST}    ${CHART_TYPE}
 
-    user waits until h3 is visible    Choose chart type    %{WAIT_SMALL}
+    user waits until h3 is visible    Choose chart type    60
     user clicks button    ${CHART_TYPE}
 
     user waits until page does not contain loading spinner

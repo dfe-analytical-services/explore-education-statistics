@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Cache
 {
     public record DataBlockTableResultCacheKey : IBlobCacheKey
     {
@@ -18,8 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache
             if (releaseContentBlock.ContentBlock is not DataBlock)
             {
                 throw new ArgumentException(
-                    $"Attempting to build key with incorrect type of content block - " +
-                    $"{releaseContentBlock.ContentBlock.GetType()}");            
+                    "Attempting to build key with incorrect type of content block");
             }
 
             var release = releaseContentBlock.Release;

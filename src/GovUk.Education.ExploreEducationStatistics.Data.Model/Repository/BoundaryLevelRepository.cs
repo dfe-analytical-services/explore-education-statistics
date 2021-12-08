@@ -1,4 +1,3 @@
-#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .OrderByDescending(level => level.Published);
         }
 
-        public BoundaryLevel? FindLatestByGeographicLevel(GeographicLevel geographicLevel)
+        public BoundaryLevel FindLatestByGeographicLevel(GeographicLevel geographicLevel)
         {
             var boundaryLevel = FindMany(level => level.Level == geographicLevel)
                 .OrderByDescending(level => level.Published)

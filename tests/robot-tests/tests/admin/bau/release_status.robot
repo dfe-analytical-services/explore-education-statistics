@@ -157,12 +157,12 @@ user navigates to this release
 
 user navigates to sign off page
     user clicks link    Sign off
-    user waits until h2 is visible    Sign off    %{WAIT_SMALL}
+    user waits until h2 is visible    Sign off    60
 
 user edits release status
     user navigates to sign off page
     user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
+    user waits until h2 is visible    Edit release status    60
 
 user checks checklist errors contains
     [Arguments]    ${text}

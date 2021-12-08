@@ -7,7 +7,6 @@ import Details from '@common/components/Details';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import ProgressBar from '@common/components/ProgressBar';
 import Tag, { TagProps } from '@common/components/Tag';
-import WarningMessage from '@common/components/WarningMessage';
 import useInterval from '@common/hooks/useInterval';
 import useMounted from '@common/hooks/useMounted';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -162,28 +161,17 @@ const ImporterStatus = ({
         />
       )}
 
-      {currentStatus.status === 'FAILED' && (
-        <>
-          {currentStatus.errors && currentStatus.errors.length > 0 && (
-            <Details
-              className="govuk-!-margin-top-1 govuk-!-margin-bottom-0"
-              summary="See errors"
-            >
-              <ul className="govuk-!-margin-top-0">
-                {currentStatus.errors.map((error, index) => (
-                  <li key={index.toString()}>{error}</li>
-                ))}
-              </ul>
-            </Details>
-          )}
-          <WarningMessage>
-            Try running the file through the{' '}
-            <a href="https://rsconnect/rsc/dfe-published-data-qa/">
-              data screener
-            </a>{' '}
-            to check for potential causes of this failure before trying again.
-          </WarningMessage>
-        </>
+      {currentStatus.errors && currentStatus.errors.length > 0 && (
+        <Details
+          className="govuk-!-margin-top-1 govuk-!-margin-bottom-0"
+          summary="See errors"
+        >
+          <ul className="govuk-!-margin-top-0">
+            {currentStatus.errors.map((error, index) => (
+              <li key={index.toString()}>{error}</li>
+            ))}
+          </ul>
+        </Details>
       )}
     </div>
   );

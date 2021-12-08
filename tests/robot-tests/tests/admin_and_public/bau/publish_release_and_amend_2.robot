@@ -27,6 +27,7 @@ Create new release
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user clicks link    Create new release
     user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
+    user clicks link    Data and files
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Upload another subject (for deletion later)
@@ -35,7 +36,7 @@ Upload another subject (for deletion later)
 
 Add data guidance to subject
     user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance    %{WAIT_MEDIUM}
+    user waits until h2 is visible    Public data guidance    90
     user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
     user enters text into data guidance data file content editor    ${SUBJECT_NAME}
@@ -227,7 +228,7 @@ Validate table cells
 
 Generate the permalink
     [Documentation]    EES-214
-    user waits until page contains button    Generate shareable link    %{WAIT_SMALL}
+    user waits until page contains button    Generate shareable link    60
     user clicks button    Generate shareable link
     user waits until page contains testid    permalink-generated-url
     ${PERMA_LOCATION_URL}    Get Value    testid:permalink-generated-url
@@ -385,6 +386,7 @@ Create amendment to modify release
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
 
 Add subject to release
+    user clicks link    Data and files
     user uploads subject    ${THIRD_SUBJECT}    upload-file-test-with-filter.csv
     ...    upload-file-test-with-filter.meta.csv
 
@@ -488,7 +490,7 @@ Reduce the number of selected Dates and generate a smaller table
     user clicks category checkbox    Date    24/03/2020
     user clicks category checkbox    Date    25/03/2020
     user clicks element    id:filtersForm-submit
-    user waits until page contains    Generate shareable link    %{WAIT_SMALL}
+    user waits until page contains    Generate shareable link    60
 
 Validate generated table
     user checks page contains    Updating ${SUBJECT_NAME} footnote

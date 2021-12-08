@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures
 {

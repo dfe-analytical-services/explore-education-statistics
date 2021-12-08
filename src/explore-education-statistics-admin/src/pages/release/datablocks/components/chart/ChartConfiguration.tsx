@@ -253,7 +253,7 @@ const ChartConfiguration = ({
             {validationSchema.fields.height && (
               <FormFieldNumberInput<FormValues>
                 name="height"
-                label="Height (pixels)"
+                label="Height (px)"
                 width={5}
               />
             )}
@@ -261,7 +261,7 @@ const ChartConfiguration = ({
             {validationSchema.fields.width && (
               <FormFieldNumberInput<FormValues>
                 name="width"
-                label="Width (pixels)"
+                label="Width (px)"
                 hint="Leave blank to set as full width"
                 width={5}
               />
@@ -270,7 +270,7 @@ const ChartConfiguration = ({
             {validationSchema.fields.barThickness && (
               <FormFieldNumberInput<FormValues>
                 name="barThickness"
-                label="Bar thickness (pixels)"
+                label="Bar thickness (px)"
                 width={5}
               />
             )}

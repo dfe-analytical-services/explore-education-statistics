@@ -72,6 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OnSuccess(publication => BuildMethodologiesForPublication(publication.Id));
         }
 
+        [BlobCache(typeof(AllMethodologiesCacheKey))]
         public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetTree()
         {
             var themes = await _contentDbContext.Themes

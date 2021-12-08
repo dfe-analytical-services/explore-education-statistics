@@ -27,7 +27,6 @@ if not utilities_init.initialised:
 
         return parent_locator
 
-
     def _find_by_label(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
         parent_locator = _normalize_parent_locator(parent_locator)
 
@@ -44,7 +43,6 @@ if not utilities_init.initialised:
         parent_locator = _normalize_parent_locator(parent_locator)
 
         return get_child_elements(parent_locator, f'css:[data-testid="{criteria}"]')
-
 
     # Register locator strategies
 
@@ -129,7 +127,7 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
             return waiting._wait_until(
                 parent_does_not_contain_matching_element,
                 "Parent '%s' should not have contained '%s' in <TIMEOUT>." % (
-                    parent_locator, child_locator),
+                parent_locator, child_locator),
                 timeout, error
             )
 
@@ -266,7 +264,7 @@ def capture_large_screenshot():
 
 def capture_html():
     html = sl.get_source()
-    current_time_millis = round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
+    current_time_millis=round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
     html_file = open(f"test-results/captured-html-{current_time_millis}.html", "w")
     html_file.write(html)
     html_file.close()
@@ -369,3 +367,4 @@ def _get_parent_webelement_from_locator(parent_locator: object, timeout: int = N
         return parent_locator
     else:
         raise_assertion_error(f"Parent locator was neither a str or a WebElement - {parent_locator}")
+
