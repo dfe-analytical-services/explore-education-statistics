@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
@@ -9,6 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
     public class Location
     {
         public Guid Id { get; set; }
+
+        // TODO EES-2776 SOW8 Make this non nullable when values have been migrated
+        public GeographicLevel? GeographicLevel { get; set; }
 
         public string? Country_Code { get; set; }
         public string? Country_Name { get; set; }

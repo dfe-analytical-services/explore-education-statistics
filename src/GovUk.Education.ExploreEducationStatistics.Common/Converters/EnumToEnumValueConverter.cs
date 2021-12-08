@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -7,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
 {
     public class EnumToEnumValueConverter<TEnum> : ValueConverter<TEnum, string> where TEnum : Enum
     {
-        public EnumToEnumValueConverter(ConverterMappingHints mappingHints = null) :
+        public EnumToEnumValueConverter(ConverterMappingHints? mappingHints = null) :
             base(x => ToProvider(x),
                 x => FromProvider(x),
                 mappingHints)
@@ -16,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Converters
 
         private static string ToProvider(TEnum value)
         {
-            return ((Enum) value).GetEnumValue();
+            return value.GetEnumValue();
         }
 
         private static TEnum FromProvider(string value)
