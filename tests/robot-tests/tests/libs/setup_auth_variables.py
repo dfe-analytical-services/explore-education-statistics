@@ -83,4 +83,3 @@ def setup_auth_variables(user, email, password, clear_existing=False, driver=Non
     assert cookie_token, f'{cookie_name} env variable was not set'
 
     return local_storage_token, cookie_token
-

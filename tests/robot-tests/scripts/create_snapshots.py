@@ -126,7 +126,7 @@ def create_all_methodologies_snapshot(public_url) -> str:
     methodologies_accordion = parsed_html.find(id="themes")
     if methodologies_accordion is None:
         return []
-    
+
     theme_sections = methodologies_accordion.select('[data-testid="accordionSection"]') or []
 
     result = []
@@ -145,17 +145,17 @@ def create_all_methodologies_snapshot(public_url) -> str:
             }
 
             methodologies = topic_html.select('[id^="methodology-heading-"]') or []
-                
+
             for methodology_heading in methodologies:
                 topic['methodologies'].append(methodology_heading.string)
-            
+
             theme['topics'].append(topic)
-        
+
         result.append(theme)
-    
+
     return json.dumps(result, sort_keys=True, indent=2)
 
-        
+
 def _write_to_file(file_name, snapshot):
     snapshots_path = 'tests/snapshots'
     if not os.path.exists(snapshots_path):

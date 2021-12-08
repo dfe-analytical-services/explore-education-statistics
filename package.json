@@ -39,6 +39,7 @@
     "format:check": "prettier --list-different \"src/**/*.{js,jsx,ts,tsx,css,scss,html}\"",
     "format:robot": "python3 -m pipenv run robotidy --config tests/robot-tests/robotidy.toml tests/robot-tests",
     "format:robot:check": "npm run format:robot -- --check --diff",
+    "format:python": "python3 -m pipenv run autopep8 tests",
     "lint": "npm run lint:js && npm run lint:style",
     "lint:js": "eslint --ext .ts,.tsx,.js,.jsx src",
     "lint:style": "stylelint src/**/*.{scss,css}",
@@ -66,6 +67,9 @@
     ],
     "*.robot": [
       "python3 -m pipenv run robotidy --config tests/robot-tests/robotidy.toml"
+    ],
+    "*.py": [
+      "python3 -m pipenv run autopep8"
     ]
   },
   "dependencies": {}

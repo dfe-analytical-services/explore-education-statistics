@@ -19,6 +19,7 @@ robotframework-tidy = "~=1.4.0"
 slack-sdk = "~=3.11.2"
 lxml = "~=4.6.4"
 azure-storage-blob = "~=12.9.0"
+autopep8 = "~=1.6.0"
 
 [requires]
 python_version = "3.8"
