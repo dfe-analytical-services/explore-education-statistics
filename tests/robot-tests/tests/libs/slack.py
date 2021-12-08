@@ -12,7 +12,7 @@ PATH = f'{os.getcwd()}{os.sep}test-results'
 def _generate_slack_attachments(env: str):
     with open(f'{PATH}{os.sep}output.xml', 'rb') as report:
         contents = report.read()
-    
+
     soup = BeautifulSoup(contents, 'lxml')
     test = soup.find('total').find('stat')
 
