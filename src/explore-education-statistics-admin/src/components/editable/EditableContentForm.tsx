@@ -1,4 +1,4 @@
-import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
+import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import styles from '@admin/components/editable/EditableContentForm.module.scss';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import { Element } from '@admin/types/ckeditor';
@@ -51,7 +51,7 @@ const EditableContentForm = ({
   onImageUploadCancel,
   onSubmit,
 }: Props) => {
-  const { comments, onDeletePendingComments } = useCommentsContext();
+  const { comments, deletePendingComments } = useCommentsContext();
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
 
@@ -102,7 +102,7 @@ const EditableContentForm = ({
             content: Yup.string().required('Enter content'),
           })}
           onSubmit={async values => {
-            await onDeletePendingComments?.();
+            await deletePendingComments?.();
             onSubmit(values.content);
           }}
         >

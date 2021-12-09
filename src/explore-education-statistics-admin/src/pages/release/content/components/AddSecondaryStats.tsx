@@ -1,4 +1,4 @@
-import { useEditingContext } from '@admin/contexts/editing/EditingContext';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import DataBlockSelectForm from '@admin/pages/release/content/components/DataBlockSelectForm';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import { EditableRelease } from '@admin/services/releaseContentService';

@@ -1,6 +1,6 @@
 import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
-import { EditingProvider } from '@admin/contexts/editing/EditingContext';
+import { EditingProvider } from '@admin/contexts/EditingContext';
 import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
 import {
   ReleaseContentProvider,
@@ -30,8 +30,6 @@ const ReleaseContentPageLoaded = () => {
       value={{
         editingMode: canUpdateRelease ? 'edit' : 'preview',
         unresolvedComments: getUnresolvedComments(release),
-        unsavedBlocks: [],
-        unsavedCommentDeletions: {},
       }}
     >
       {({

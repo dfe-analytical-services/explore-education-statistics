@@ -1,6 +1,6 @@
 import CommentAddForm from '@admin/components/comments/CommentAddForm';
 import { testComments } from '@admin/components/comments/__data__/testComments';
-import { CommentsProvider } from '@admin/contexts/comments/CommentsContext';
+import { CommentsProvider } from '@admin/contexts/CommentsContext';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -40,8 +40,9 @@ describe('CommentAddForm', () => {
       <CommentsProvider
         value={{
           comments: [],
-          pendingDeletions: [],
-          onAddComment: handleOnAddComment,
+          onDeletePendingComment: jest.fn(),
+          onSaveComment: handleOnAddComment,
+          onSaveUpdatedComment: jest.fn(),
         }}
       >
         <CommentAddForm
@@ -70,7 +71,7 @@ describe('CommentAddForm', () => {
         content: 'I am a comment',
       });
 
-      expect(handleOnSave).toHaveBeenCalledWith(testComments[1]);
+      expect(handleOnSave).toHaveBeenCalled();
     });
   });
 

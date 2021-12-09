@@ -1,4 +1,4 @@
-import { useEditingContext } from '@admin/contexts/editing/EditingContext';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import methodologyNoteService, {
   MethodologyNote,
 } from '@admin/services/methodologyNoteService';

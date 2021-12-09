@@ -1,7 +1,7 @@
-import { CommentsProvider } from '@admin/contexts/comments/CommentsContext';
+import { CommentsProvider } from '@admin/contexts/CommentsContext';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
-import useEditingActions from '@admin/contexts/editing/useEditingActions';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
 import { EditableBlock } from '@admin/services/types/content';
@@ -40,7 +40,11 @@ const ReleaseEditableBlock = ({
   onDelete,
   onSave,
 }: Props) => {
-  const editingActions = useEditingActions();
+  const {
+    addUnsavedBlock,
+    removeUnsavedDeletionsForBlock,
+    removeUnsavedBlock,
+  } = useEditingContext();
   const blockId = `block-${block.id}`;
   const [isSaving, toggleIsSaving] = useToggle(false);
 
@@ -61,13 +65,19 @@ const ReleaseEditableBlock = ({
       await onSave(block.id, contentWithPlaceholders);
 
       if (!isAutoSave) {
-        editingActions.removeUnsavedDeletionsForBlock(block.id);
+        removeUnsavedDeletionsForBlock(block.id);
       }
 
       toggleIsSaving.off();
-      editingActions.removeUnsavedBlock(block.id);
+      removeUnsavedBlock(block.id);
     },
-    [block.id, editingActions, onSave, toggleIsSaving],
+    [
+      block.id,
+      removeUnsavedDeletionsForBlock,
+      removeUnsavedBlock,
+      onSave,
+      toggleIsSaving,
+    ],
   );
 
   const handleDelete = useCallback(() => {
@@ -76,12 +86,12 @@ const ReleaseEditableBlock = ({
 
   const handleBlur = (isDirty: boolean) => {
     if (isDirty) {
-      editingActions.addUnsavedBlock(block.id);
+      addUnsavedBlock(block.id);
     }
   };
 
   const handleCancel = () => {
-    editingActions.removeUnsavedBlock(block.id);
+    removeUnsavedBlock(block.id);
   };
 
   const handleSaveComment = async (comment: AddComment) => {

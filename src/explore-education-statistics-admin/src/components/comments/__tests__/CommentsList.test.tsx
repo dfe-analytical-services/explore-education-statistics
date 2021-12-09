@@ -1,29 +1,27 @@
 import CommentsList from '@admin/components/comments/CommentsList';
 import { testComments } from '@admin/components/comments/__data__/testComments';
-import { SelectedComment } from '@admin/components/editable/EditableContentForm';
+import { CommentsProvider } from '@admin/contexts/CommentsContext';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import noop from 'lodash/noop';
 import React from 'react';
 
 describe('CommentsList', () => {
   const testMarkersOrder: string[] = ['comment-4', 'comment-2', 'comment-3'];
-  const testSelectedComment: SelectedComment = {
-    commentId: '',
-    fromEditor: false,
-  };
+  const blockId = 'block-id';
 
   test('displays unresolved comments ordered by marker position', () => {
     render(
-      <CommentsList
-        comments={testComments}
-        markersOrder={testMarkersOrder}
-        selectedComment={testSelectedComment}
-        onRemove={noop}
-        onResolve={noop}
-        onSelect={noop}
-        onUpdate={noop}
-      />,
+      <CommentsProvider
+        value={{
+          comments: testComments,
+          markersOrder: testMarkersOrder,
+          onDeletePendingComment: jest.fn(),
+          onSaveComment: jest.fn(),
+          onSaveUpdatedComment: jest.fn(),
+        }}
+      >
+        <CommentsList blockId={blockId} />
+      </CommentsProvider>,
     );
 
     const unresolvedComments = within(
@@ -37,15 +35,17 @@ describe('CommentsList', () => {
 
   test('displays resolved comments', () => {
     render(
-      <CommentsList
-        comments={testComments}
-        markersOrder={testMarkersOrder}
-        selectedComment={testSelectedComment}
-        onRemove={noop}
-        onResolve={noop}
-        onSelect={noop}
-        onUpdate={noop}
-      />,
+      <CommentsProvider
+        value={{
+          comments: testComments,
+          markersOrder: testMarkersOrder,
+          onDeletePendingComment: jest.fn(),
+          onSaveComment: jest.fn(),
+          onSaveUpdatedComment: jest.fn(),
+        }}
+      >
+        <CommentsList blockId={blockId} />
+      </CommentsProvider>,
     );
 
     userEvent.click(

@@ -1,8 +1,4 @@
-import {
-  useEditingContext,
-  EditingMode,
-} from '@admin/contexts/editing/EditingContext';
-import useEditingActions from '@admin/contexts/editing/useEditingActions';
+import { EditingMode, useEditingContext } from '@admin/contexts/EditingContext';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';
@@ -17,8 +13,7 @@ const EditablePageModeToggle = ({
   previewLabel = 'Preview content',
   showTablePreviewOption = false,
 }: Props) => {
-  const { editingMode } = useEditingContext();
-  const actions = useEditingActions();
+  const { editingMode, setEditingMode } = useEditingContext();
   const [isOpen, toggleOpen] = useToggle(true);
 
   const options = [
@@ -65,7 +60,7 @@ const EditablePageModeToggle = ({
           small
           options={options}
           onChange={event => {
-            actions.setEditingMode(event.target.value as EditingMode);
+            setEditingMode(event.target.value as EditingMode);
           }}
         />
       </div>

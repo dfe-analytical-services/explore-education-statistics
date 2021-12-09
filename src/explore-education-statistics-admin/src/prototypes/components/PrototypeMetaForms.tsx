@@ -61,6 +61,7 @@ const PrototypeCreateMetaForms = ({
         </legend>
         <div className="govuk-!-margin-bottom-7">
           <FormEditor
+            blockId="1"
             id="description"
             label="Public metadata introduction"
             value={formExample.descriptionPlaceholder.text}

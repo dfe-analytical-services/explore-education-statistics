@@ -6,8 +6,8 @@ import {
   toolbarConfigs,
 } from '@admin/config/ckEditorConfig';
 import { Editor, EditorConfig } from '@admin/types/ckeditor';
-import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
-import useEditingActions from '@admin/contexts/editing/useEditingActions';
+import { useCommentsContext } from '@admin/contexts/CommentsContext';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -40,14 +40,17 @@ const useCKEditorConfig = ({
   onRemoveCommentMarker?: (commentId: string) => void;
 }) => {
   const {
-    onDeleteComment,
-    onResolveComment,
-    onUndeleteComment,
-    onUnresolveComment,
+    removeComment,
+    resolveComment,
+    reAddComment,
+    unresolveComment,
     setCurrentInteraction,
     setSelectedComment,
   } = useCommentsContext();
-  const editingActions = useEditingActions();
+  const {
+    updateUnresolvedComments,
+    updateUnsavedCommentDeletions,
+  } = useEditingContext();
 
   const toolbar = toolbarConfig?.filter(tool => {
     // Disable image upload if no callback provided
@@ -119,8 +122,8 @@ const useCKEditorConfig = ({
           commentRemoved(markerId) {
             if (editorInstance?.current) {
               const commentId = markerId.replace('comment:', '');
-              onDeleteComment(commentId);
-              editingActions.updateUnsavedCommentDeletions(blockId, commentId);
+              removeComment?.current(commentId);
+              updateUnsavedCommentDeletions.current(blockId, commentId);
               onAutoSave?.(editorInstance?.current.getData());
             }
           },
@@ -135,13 +138,13 @@ const useCKEditorConfig = ({
               : markerId.replace('resolvedcomment:', '');
 
             if (type === 'undoRemoveComment' || type === 'redoAddComment') {
-              onUndeleteComment(commentId);
-              editingActions.updateUnsavedCommentDeletions(blockId, commentId);
+              reAddComment.current(commentId);
+              updateUnsavedCommentDeletions.current(blockId, commentId);
               return;
             }
             if (type === 'undoAddComment' || type === 'redoRemoveComment') {
-              onDeleteComment(commentId);
-              editingActions.updateUnsavedCommentDeletions(blockId, commentId);
+              removeComment.current(commentId);
+              updateUnsavedCommentDeletions.current(blockId, commentId);
               return;
             }
 
@@ -149,16 +152,16 @@ const useCKEditorConfig = ({
               type === 'undoResolveComment' ||
               type === 'redoUnresolveComment'
             ) {
-              onUnresolveComment(commentId);
-              editingActions.updateUnresolvedComments(blockId, commentId);
+              unresolveComment.current(commentId);
+              updateUnresolvedComments.current(blockId, commentId);
               return;
             }
             if (
               type === 'undoUnresolveComment' ||
               type === 'redoResolveComment'
             ) {
-              onResolveComment(commentId);
-              editingActions.updateUnresolvedComments(blockId, commentId);
+              resolveComment.current(commentId);
+              updateUnresolvedComments.current(blockId, commentId);
             }
           },
         }

@@ -1,4 +1,4 @@
-import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
+import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentForm from '@admin/components/editable/EditableContentForm';
 import styles from '@admin/components/editable/EditableContentBlock.module.scss';

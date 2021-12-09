@@ -1,6 +1,6 @@
 import CommentEditForm from '@admin/components/comments/CommentEditForm';
 import { testComments } from '@admin/components/comments/__data__/testComments';
-import { CommentsProvider } from '@admin/contexts/comments/CommentsContext';
+import { CommentsProvider } from '@admin/contexts/CommentsContext';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -11,7 +11,7 @@ describe('CommentEditForm', () => {
     render(
       <CommentEditForm
         comment={testComments[2]}
-        id="block-id"
+        id="comment-id"
         onCancel={noop}
         onSubmit={noop}
       />,
@@ -72,8 +72,9 @@ describe('CommentEditForm', () => {
       <CommentsProvider
         value={{
           comments: [],
-          pendingDeletions: [],
-          onUpdateComment: handleUpdateComment,
+          onDeletePendingComment: jest.fn(),
+          onSaveComment: jest.fn(),
+          onSaveUpdatedComment: handleUpdateComment,
         }}
       >
         <CommentEditForm
@@ -100,11 +101,7 @@ describe('CommentEditForm', () => {
 
     await waitFor(() => {
       expect(handleUpdateComment).toHaveBeenCalledWith(updatedComment);
-
-      expect(handleSubmit).toHaveBeenCalledWith({
-        ...updatedComment,
-        updated: '2021-11-29T14:00',
-      });
+      expect(handleSubmit).toHaveBeenCalled();
     });
   });
 });

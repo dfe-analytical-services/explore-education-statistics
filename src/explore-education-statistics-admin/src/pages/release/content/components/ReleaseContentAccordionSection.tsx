@@ -1,6 +1,6 @@
 import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import { useEditingContext } from '@admin/contexts/editing/EditingContext';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import DataBlockSelectForm from '@admin/pages/release/content/components/DataBlockSelectForm';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';

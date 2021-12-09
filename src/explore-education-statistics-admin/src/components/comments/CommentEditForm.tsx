@@ -1,4 +1,4 @@
-import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
+import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import { Comment } from '@admin/services/types/content';
 import { UpdateComment } from '@admin/services/releaseContentCommentService';
 import Button from '@common/components/Button';
@@ -24,7 +24,7 @@ interface Props {
 }
 
 const CommentEditForm = ({ comment, id, onCancel, onSubmit }: Props) => {
-  const { onUpdateComment } = useCommentsContext();
+  const { updateComment } = useCommentsContext();
   const { content } = comment;
   const [isSubmitting, toggleSubmitting] = useToggle(false);
 
@@ -34,7 +34,7 @@ const CommentEditForm = ({ comment, id, onCancel, onSubmit }: Props) => {
       ...comment,
       content: values.content,
     };
-    await onUpdateComment?.(updatedComment);
+    await updateComment(updatedComment);
     onSubmit();
   });
 

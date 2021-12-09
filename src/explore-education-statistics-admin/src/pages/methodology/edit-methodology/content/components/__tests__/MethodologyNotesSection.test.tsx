@@ -1,6 +1,6 @@
 import MethodologyNotesSection from '@admin/pages/methodology/edit-methodology/content/components/MethodologyNotesSection';
 import { MethodologyContent } from '@admin/services/methodologyContentService';
-import { EditingProvider } from '@admin/contexts/editing/EditingContext';
+import { EditingProvider } from '@admin/contexts/EditingContext';
 import _methodologyNoteService, {
   MethodologyNote,
 } from '@admin/services/methodologyNoteService';

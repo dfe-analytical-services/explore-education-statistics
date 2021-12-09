@@ -1,7 +1,7 @@
 import styles from '@admin/components/comments/Comment.module.scss';
 import CommentEditForm from '@admin/components/comments/CommentEditForm';
-import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
-import useEditingActions from '@admin/contexts/editing/useEditingActions';
+import { useCommentsContext } from '@admin/contexts/CommentsContext';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import { Comment as CommentType } from '@admin/services/types/content';
 import FormattedDate from '@common/components/FormattedDate';
 import { useAuthContext } from '@admin/contexts/AuthContext';
@@ -28,12 +28,15 @@ const Comment = ({ blockId, comment }: Props) => {
   } = comment;
   const {
     selectedComment,
-    onDeleteComment,
-    onResolveComment,
-    onUnresolveComment,
+    removeComment,
+    resolveComment,
+    unresolveComment,
     setSelectedComment,
   } = useCommentsContext();
-  const editingActions = useEditingActions();
+  const {
+    updateUnresolvedComments,
+    updateUnsavedCommentDeletions,
+  } = useEditingContext();
   const [isEditingComment, toggleIsEditingComment] = useToggle(false);
   const ref = useRef<HTMLDivElement>(null);
   const { user } = useAuthContext();
@@ -126,8 +129,8 @@ const Comment = ({ blockId, comment }: Props) => {
             {resolved ? (
               <ButtonText
                 onClick={async () => {
-                  await onUnresolveComment?.(comment.id, true);
-                  editingActions.updateUnresolvedComments(
+                  await unresolveComment.current(comment.id, true);
+                  updateUnresolvedComments.current(
                     blockId.replace('block-', ''),
                     comment.id,
                   );
@@ -139,11 +142,11 @@ const Comment = ({ blockId, comment }: Props) => {
               <ButtonGroup className="govuk-!-margin-bottom-0">
                 <Button
                   onClick={async () => {
-                    editingActions.updateUnresolvedComments(
+                    await resolveComment.current(comment.id, true);
+                    updateUnresolvedComments.current(
                       blockId.replace('block-', ''),
                       comment.id,
                     );
-                    await onResolveComment?.(comment.id, true);
                   }}
                 >
                   Resolve
@@ -156,8 +159,8 @@ const Comment = ({ blockId, comment }: Props) => {
 
                     <ButtonText
                       onClick={async () => {
-                        onDeleteComment?.(comment.id);
-                        editingActions.updateUnsavedCommentDeletions(
+                        removeComment.current(comment.id);
+                        updateUnsavedCommentDeletions.current(
                           blockId.replace('block-', ''),
                           comment.id,
                         );

@@ -1,6 +1,6 @@
 import { EditableRelease } from '@admin/services/releaseContentService';
 import { EditableBlock } from '@admin/services/types/content';
-import { BlockCommentIds } from '@admin/contexts/editing/EditingContext';
+import { BlockCommentIds } from '@admin/contexts/EditingContext';
 
 export const getTotalUnresolvedComments = (
   unresolvedComments: BlockCommentIds,

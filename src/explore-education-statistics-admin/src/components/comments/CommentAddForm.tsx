@@ -1,6 +1,6 @@
 import styles from '@admin/components/comments/CommentAddForm.module.scss';
-import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
-import useEditingActions from '@admin/contexts/editing/useEditingActions';
+import { useCommentsContext } from '@admin/contexts/CommentsContext';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import { AddComment } from '@admin/services/releaseContentCommentService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -28,8 +28,8 @@ interface Props {
 }
 
 const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
-  const { onAddComment, setCurrentInteraction } = useCommentsContext();
-  const editingActions = useEditingActions();
+  const { addComment, setCurrentInteraction } = useCommentsContext();
+  const { updateUnresolvedComments } = useEditingContext();
   const [isSubmitting, toggleSubmitting] = useToggle(false);
   const [fixPosition, toggleFixPosition] = useToggle(false);
   const [focus, toggleFocus] = useToggle(false);
@@ -64,9 +64,9 @@ const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
       content: values.content,
     };
     toggleSubmitting.on();
-    const newComment = await onAddComment?.(additionalComment);
+    const newComment = await addComment(additionalComment);
     if (newComment) {
-      editingActions.updateUnresolvedComments(
+      updateUnresolvedComments.current(
         blockId.replace('block-', ''),
         newComment.id,
       );

@@ -1,5 +1,5 @@
 import Link, { LinkProps } from '@admin/components/Link';
-import { useEditingContext } from '@admin/contexts/editing/EditingContext';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import Button from '@common/components/Button';
 import React from 'react';
 

@@ -1,5 +1,5 @@
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
-import { useEditingContext } from '@admin/contexts/editing/EditingContext';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import KeyStatistics from '@admin/pages/release/content/components/KeyStatistics';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';

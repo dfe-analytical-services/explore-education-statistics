@@ -1,4 +1,4 @@
-import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
+import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import styles from '@admin/components/form/FormEditor.module.scss';
 import {
   CommentsPlugin,
@@ -28,6 +28,7 @@ export type EditorElementsHandler = (elements: Element[]) => void;
 export interface FormEditorProps {
   allowComments?: boolean;
   allowedHeadings?: string[];
+  blockId: string;
   error?: string;
   focusOnInit?: boolean;
   hideLabel?: boolean;
@@ -51,6 +52,7 @@ export interface FormEditorProps {
 const FormEditor = ({
   allowComments = false,
   allowedHeadings = defaultAllowedHeadings,
+  blockId,
   error,
   focusOnInit,
   hideLabel,
@@ -81,7 +83,7 @@ const FormEditor = ({
   const config = useCKEditorConfig({
     allowComments,
     allowedHeadings,
-    blockId: id.replace('block-', ''),
+    blockId: blockId.replace('block-', ''),
     editorInstance,
     toolbarConfig,
     onAutoSave,

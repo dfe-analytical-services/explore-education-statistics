@@ -1,6 +1,6 @@
 import { testComments } from '@admin/components/comments/__data__/testComments';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
-import { CommentsProvider } from '@admin/contexts/comments/CommentsContext';
+import { CommentsProvider } from '@admin/contexts/CommentsContext';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -183,7 +183,9 @@ Test paragraph
         <CommentsProvider
           value={{
             comments: testComments,
-            pendingDeletions: [],
+            onDeletePendingComment: jest.fn(),
+            onSaveComment: jest.fn(),
+            onSaveUpdatedComment: jest.fn(),
           }}
         >
           <EditableContentBlock
@@ -207,7 +209,9 @@ Test paragraph
         <CommentsProvider
           value={{
             comments: testComments,
-            pendingDeletions: [],
+            onDeletePendingComment: jest.fn(),
+            onSaveComment: jest.fn(),
+            onSaveUpdatedComment: jest.fn(),
           }}
         >
           <EditableContentBlock

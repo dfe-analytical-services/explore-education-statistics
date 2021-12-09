@@ -22,7 +22,7 @@ type Props<FormValues> = {
   validateElements?: (
     elements: Element[],
   ) => string | undefined | Promise<string | undefined>;
-} & OmitStrict<FormEditorProps, 'id' | 'value' | 'onChange'>;
+} & OmitStrict<FormEditorProps, 'blockId' | 'id' | 'value' | 'onChange'>;
 
 function FormFieldEditor<T>({
   error,
@@ -64,6 +64,7 @@ function FormFieldEditor<T>({
               testId={testId}
               {...props}
               {...field}
+              blockId={id || fieldId(name as string)}
               id={id ? prefixFormId(id) : fieldId(name as string)}
               onBlur={() => {
                 form.setFieldTouched(name as string, true);

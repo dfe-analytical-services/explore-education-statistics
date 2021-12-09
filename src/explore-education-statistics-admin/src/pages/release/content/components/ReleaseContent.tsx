@@ -3,7 +3,7 @@ import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlo
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import { useEditingContext } from '@admin/contexts/editing/EditingContext';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import BasicReleaseSummary from '@admin/pages/release/content/components/BasicReleaseSummary';
 import RelatedPagesSection from '@admin/pages/release/content/components/RelatedPagesSection';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';

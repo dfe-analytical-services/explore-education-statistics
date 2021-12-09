@@ -78,6 +78,7 @@ const PrototypeCreatePreRelease = () => {
             </legend>
             <div className="govuk-!-margin-bottom-7">
               <FormEditor
+                blockId="1"
                 id="description"
                 label="Public access list details"
                 value={editPreRelease ? formText : formIntro}

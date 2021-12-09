@@ -1,6 +1,6 @@
 import Comment from '@admin/components/comments/Comment';
 import styles from '@admin/components/comments/CommentsList.module.scss';
-import { useCommentsContext } from '@admin/contexts/comments/CommentsContext';
+import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import { Comment as CommentType } from '@admin/services/types/content';
 import Details from '@common/components/Details';
 import sortBy from 'lodash/sortBy';

@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import { useEditingContext } from '@admin/contexts/editing/EditingContext';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';

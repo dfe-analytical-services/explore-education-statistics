@@ -7,8 +7,6 @@ import {
 import { AuthContext, User } from '@admin/contexts/AuthContext';
 import { GlobalPermissions } from '@admin/services/permissionService';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import noop from 'lodash/noop';
 import React from 'react';
 
 describe('Comment', () => {
@@ -23,17 +21,10 @@ describe('Comment', () => {
     permissions: {} as GlobalPermissions,
   };
 
+  const blockId = 'block-id';
+
   test('renders an unresolved comment correctly', () => {
-    render(
-      <Comment
-        active={false}
-        comment={testComments[2]}
-        onRemove={noop}
-        onResolve={noop}
-        onSelect={noop}
-        onUpdate={noop}
-      />,
-    );
+    render(<Comment blockId={blockId} comment={testComments[2]} />);
 
     const comment = screen.getByRole('button', {
       name: 'Comment',
@@ -56,15 +47,7 @@ describe('Comment', () => {
           user: testUser2,
         }}
       >
-        <Comment
-          active={false}
-          comment={testComments[2]}
-          onRemove={noop}
-          onResolve={noop}
-          onSelect={noop}
-          onUpdate={noop}
-        />
-        ,
+        <Comment blockId={blockId} comment={testComments[2]} />,
       </AuthContext.Provider>,
     );
 
@@ -79,15 +62,7 @@ describe('Comment', () => {
           user: testUser1,
         }}
       >
-        <Comment
-          active={false}
-          comment={testComments[2]}
-          onRemove={noop}
-          onResolve={noop}
-          onSelect={noop}
-          onUpdate={noop}
-        />
-        ,
+        <Comment blockId={blockId} comment={testComments[2]} />,
       </AuthContext.Provider>,
     );
 
@@ -104,16 +79,7 @@ describe('Comment', () => {
       ...testComments[2],
       updated: '2021-11-30T14:00',
     };
-    render(
-      <Comment
-        active={false}
-        comment={updatedComment}
-        onRemove={noop}
-        onResolve={noop}
-        onSelect={noop}
-        onUpdate={noop}
-      />,
-    );
+    render(<Comment blockId={blockId} comment={updatedComment} />);
 
     const comment = screen.getByRole('button', {
       name: 'Comment',
@@ -132,14 +98,7 @@ describe('Comment', () => {
           user: testUser1,
         }}
       >
-        <Comment
-          active={false}
-          comment={testComments[0]}
-          onRemove={noop}
-          onResolve={noop}
-          onSelect={noop}
-          onUpdate={noop}
-        />
+        <Comment blockId={blockId} comment={testComments[0]} />
       </AuthContext.Provider>,
     );
 
@@ -162,166 +121,6 @@ describe('Comment', () => {
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Delete' }),
-    ).not.toBeInTheDocument();
-  });
-
-  test('resolving a comment', () => {
-    const handleCommentResolved = jest.fn();
-
-    render(
-      <AuthContext.Provider
-        value={{
-          user: testUser2,
-        }}
-      >
-        <Comment
-          active={false}
-          comment={testComments[2]}
-          onRemove={noop}
-          onResolve={handleCommentResolved}
-          onSelect={noop}
-          onUpdate={noop}
-        />
-        ,
-      </AuthContext.Provider>,
-    );
-
-    userEvent.click(
-      screen.getByRole('button', {
-        name: 'Resolve',
-      }),
-    );
-
-    expect(handleCommentResolved).toHaveBeenCalledWith({
-      comment: testComments[2],
-    });
-  });
-
-  test('unresolving a comment', () => {
-    const handleCommentResolved = jest.fn();
-
-    render(
-      <AuthContext.Provider
-        value={{
-          user: testUser2,
-        }}
-      >
-        <Comment
-          active={false}
-          comment={testComments[0]}
-          onRemove={noop}
-          onResolve={handleCommentResolved}
-          onSelect={noop}
-          onUpdate={noop}
-        />
-        ,
-      </AuthContext.Provider>,
-    );
-
-    userEvent.click(
-      screen.getByRole('button', {
-        name: 'Unresolve',
-      }),
-    );
-
-    expect(handleCommentResolved).toHaveBeenCalledWith({
-      comment: testComments[0],
-    });
-  });
-
-  test('deleting a comment', () => {
-    const handleCommentRemoved = jest.fn();
-    render(
-      <AuthContext.Provider
-        value={{
-          user: testUser2,
-        }}
-      >
-        <Comment
-          active={false}
-          comment={testComments[2]}
-          onRemove={handleCommentRemoved}
-          onResolve={noop}
-          onSelect={noop}
-          onUpdate={noop}
-        />
-        ,
-      </AuthContext.Provider>,
-    );
-
-    userEvent.click(
-      screen.getByRole('button', {
-        name: 'Delete',
-      }),
-    );
-
-    expect(handleCommentRemoved).toHaveBeenCalledWith(testComments[2].id);
-  });
-
-  test('selecting a comment', () => {
-    const handleCommentSelected = jest.fn();
-    render(
-      <AuthContext.Provider
-        value={{
-          user: testUser2,
-        }}
-      >
-        <Comment
-          active={false}
-          comment={testComments[2]}
-          onRemove={noop}
-          onResolve={noop}
-          onSelect={handleCommentSelected}
-          onUpdate={noop}
-        />
-        ,
-      </AuthContext.Provider>,
-    );
-
-    userEvent.click(
-      screen.getByRole('button', {
-        name: 'Comment',
-      }),
-    );
-
-    expect(handleCommentSelected).toHaveBeenCalledWith(testComments[2].id);
-  });
-
-  test('clicking `Edit` button shows the edit form and hides `Edit` button', () => {
-    render(
-      <AuthContext.Provider
-        value={{
-          user: testUser2,
-        }}
-      >
-        <Comment
-          active={false}
-          comment={testComments[2]}
-          onRemove={noop}
-          onResolve={noop}
-          onSelect={noop}
-          onUpdate={noop}
-        />
-        ,
-      </AuthContext.Provider>,
-    );
-
-    userEvent.click(
-      screen.getByRole('button', {
-        name: 'Edit',
-      }),
-    );
-
-    expect(
-      screen.getByRole('textbox', {
-        name: 'Edit comment',
-      }),
-    ).toBeInTheDocument();
-
-    expect(
-      screen.queryByRole('button', {
-        name: 'Edit',
-      }),
     ).not.toBeInTheDocument();
   });
 });
