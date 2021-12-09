@@ -8,24 +8,24 @@ Run 'python run_tests.py -h' to see argument options
 
 import argparse
 import cProfile
+import datetime
 import json
 import os
 import platform
 import pstats
 import shutil
-import datetime
 from pathlib import Path
 
 import pyderman
 import requests
 from dotenv import load_dotenv
 from pabot.pabot import main as pabot_run_cli
-from robot import run_cli as robot_run_cli
 from robot import rebot_cli as robot_rebot_cli
+from robot import run_cli as robot_run_cli
 import scripts.keyword_profile as kp
-from tests.libs.slack import send_slack_report
 from tests.libs.setup_auth_variables import setup_auth_variables
-
+from tests.libs.slack import send_slack_report
+from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
 
@@ -39,6 +39,7 @@ if pythonpath:
     os.environ['PYTHONPATH'] += f':{str(current_dir)}'
 else:
     os.environ['PYTHONPATH'] = str(current_dir)
+
 
 # Parse arguments
 parser = argparse.ArgumentParser(
@@ -215,6 +216,13 @@ assert os.getenv('PUBLIC_URL') is not None
 assert os.getenv('ADMIN_URL') is not None
 assert os.getenv('ADMIN_EMAIL') is not None
 assert os.getenv('ADMIN_PASSWORD') is not None
+
+
+# seed Azure storage emulator release files
+if (args.env == 'local'):
+    generator = ReleaseFilesGenerator()
+    generator.create_public_release_files()
+    generator.create_private_release_files()
 
 
 def admin_request(method, endpoint, body=None):
