@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -12,7 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 {
     [ApiController]
     [Route("api/user-management")]
-    [Authorize(Policy = "CanManageUsersOnSystem")]
+    [Authorize]
     public class UserManagementController : ControllerBase
     {
         private readonly IUserManagementService _userManagementService;

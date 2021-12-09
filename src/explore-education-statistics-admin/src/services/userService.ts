@@ -70,10 +70,7 @@ export interface UsersService {
     userId: string,
     userReleaseRole: UserReleaseRoleSubmission,
   ) => Promise<boolean>;
-  removeUserReleaseRole: (
-    userId: string,
-    userReleaseRole: UserReleaseRole,
-  ) => Promise<boolean>;
+  removeUserReleaseRole: (userReleaseRoleId: string) => Promise<boolean>;
 
   addUserPublicationRole: (
     userId: string,
@@ -127,12 +124,9 @@ const userService: UsersService = {
       userReleaseRole,
     );
   },
-  removeUserReleaseRole(
-    userId: string,
-    userReleaseRole: UserReleaseRole,
-  ): Promise<boolean> {
+  removeUserReleaseRole(userReleaseRoleId: string): Promise<boolean> {
     return client.delete(
-      `/user-management/users/release-role/${userReleaseRole.id}`,
+      `/user-management/users/release-role/${userReleaseRoleId}`,
     );
   },
 

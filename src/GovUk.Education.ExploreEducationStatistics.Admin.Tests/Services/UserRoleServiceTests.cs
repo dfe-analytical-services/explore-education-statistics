@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
@@ -412,6 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userId, userReleaseRoles[0].UserId);
                 Assert.Equal(release.Id, userReleaseRoles[0].ReleaseId);
                 Assert.Equal(Contributor, userReleaseRoles[0].Role);
+                Assert.Equal(_user.Id, userReleaseRoles[0].CreatedById);
             }
 
             VerifyAllMocks(emailTemplateService);
@@ -1047,7 +1049,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userReleaseRole = new UserReleaseRole
             {
                 User = new User(),
-                Release = new Release(),
+                Release = new Release
+                {
+                    Publication = new Publication(),
+                },
                 Role = Contributor
             };
 
@@ -1065,7 +1070,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1091,15 +1096,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private UserRoleService SetupUserRoleService(
-            ContentDbContext contentDbContext = null,
-            UsersAndRolesDbContext usersAndRolesDbContext = null,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper = null,
-            IEmailTemplateService emailTemplateService = null,
-            IUserPublicationRoleRepository userPublicationRoleRepository = null,
-            IUserReleaseRoleRepository userReleaseRoleRepository = null,
-            UserManager<ApplicationUser> userManager = null,
-            IUserService userService = null)
+            ContentDbContext? contentDbContext = null,
+            UsersAndRolesDbContext? usersAndRolesDbContext = null,
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
+            IEmailTemplateService? emailTemplateService = null,
+            IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            UserManager<ApplicationUser>? userManager = null,
+            IUserService? userService = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();

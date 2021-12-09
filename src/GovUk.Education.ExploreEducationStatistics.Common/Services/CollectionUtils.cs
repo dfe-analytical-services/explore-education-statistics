@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
@@ -18,6 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static T[] AsArray<T>(params T[] objects)
         {
             return objects;
+        }
+
+        public static Tuple<T1, T2> TupleOf<T1, T2>(T1 obj1, T2 obj2)
+        {
+            return new Tuple<T1, T2>(obj1, obj2);
         }
     }
 }

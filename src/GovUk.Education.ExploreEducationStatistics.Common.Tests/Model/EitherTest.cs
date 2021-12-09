@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions.AssertExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
@@ -265,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 });
 
             Assert.True(either.IsRight);
-            Assert.Equal(new Tuple<string, string>("Success number one!", "Success number two!"), either.Right);
+            Assert.Equal(TupleOf("Success number one!", "Success number two!"), either.Right);
         }
 
         [Fact]
@@ -279,7 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 });
 
             Assert.True(either.IsRight);
-            Assert.Equal(new Tuple<string, char>("Success number one!", '2'), either.Right);
+            Assert.Equal(TupleOf("Success number one!", '2'), either.Right);
         }
 
         [Fact]

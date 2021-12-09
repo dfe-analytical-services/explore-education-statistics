@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -20,18 +21,91 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<UserReleaseRole> Create(Guid userId, Guid releaseId, ReleaseRole role)
+        public async Task<UserReleaseRole> Create(Guid userId, Guid releaseId, ReleaseRole role, Guid createdById)
         {
             var userReleaseRole = new UserReleaseRole
             {
                 UserId = userId,
                 ReleaseId = releaseId,
-                Role = role
+                Role = role,
+                Created = DateTime.UtcNow,
+                CreatedById = createdById,
             };
 
-            var created = (await _contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole)).Entity;
+            var created =
+                (await _contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole)).Entity;
             await _contentDbContext.SaveChangesAsync();
             return created;
+        }
+
+        public async Task<Unit> CreateMany(List<Guid> userIds, Guid releaseId, ReleaseRole role,
+            Guid createdById)
+        {
+            var userIdsAlreadyHaveRole = await _contentDbContext.UserReleaseRoles
+                .AsQueryable()
+                .Where(urr =>
+                    urr.ReleaseId == releaseId
+                    && urr.Role == role
+                    && userIds.Contains(urr.UserId))
+                .Select(urr => urr.UserId)
+                .ToListAsync();
+
+            var newUserReleaseRoles = userIds
+                .Except(userIdsAlreadyHaveRole)
+                .Select(userId =>
+                    new UserReleaseRole
+                    {
+                        UserId = userId,
+                        ReleaseId = releaseId,
+                        Role = role,
+                        Created = DateTime.UtcNow,
+                        CreatedById = createdById,
+                    }
+                ).ToList();
+
+            await _contentDbContext.UserReleaseRoles.AddRangeAsync(newUserReleaseRoles);
+            await _contentDbContext.SaveChangesAsync();
+            return Unit.Instance;
+        }
+
+        public async Task Remove(UserReleaseRole userReleaseRole, Guid deletedById)
+        {
+            userReleaseRole.Deleted = DateTime.UtcNow;
+            userReleaseRole.DeletedById = deletedById;
+            _contentDbContext.Update(userReleaseRole);
+            await _contentDbContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveMany(List<UserReleaseRole> userReleaseRoles, Guid deletedById)
+        {
+            userReleaseRoles.ForEach(userReleaseRole =>
+            {
+                userReleaseRole.Deleted = DateTime.UtcNow;
+                userReleaseRole.DeletedById = deletedById;
+            });
+            _contentDbContext.UpdateRange(userReleaseRoles);
+            await _contentDbContext.SaveChangesAsync();
+        }
+
+        public async Task RemoveAllForPublication(Guid userId, Publication publication, ReleaseRole role, Guid deletedById)
+        {
+            _contentDbContext.Update(publication);
+            await _contentDbContext
+                .Entry(publication)
+                .Collection(p => p.Releases)
+                .LoadAsync();
+            var allReleaseIds = publication
+                .Releases // Remove on previous release versions as well
+                .Select(r => r.Id)
+                .ToList();
+            var userReleaseRoles = await _contentDbContext.UserReleaseRoles
+                .AsQueryable()
+                .Where(urr =>
+                    urr.UserId == userId
+                    && allReleaseIds.Contains(urr.ReleaseId)
+                    && urr.Role == role)
+                .ToListAsync();
+            await RemoveMany(userReleaseRoles, deletedById);
         }
 
         public async Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId, Guid releaseId)

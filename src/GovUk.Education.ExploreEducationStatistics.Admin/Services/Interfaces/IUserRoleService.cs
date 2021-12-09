@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -28,8 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> RemoveGlobalRole(string userId, string roleId);
 
-        Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid id);
+        Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId);
 
-        Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid id);
+        Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId);
     }
 }

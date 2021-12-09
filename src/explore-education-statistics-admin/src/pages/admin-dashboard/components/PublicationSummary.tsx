@@ -1,6 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import {
   publicationEditRoute,
+  publicationManageTeamAccessRoute,
   PublicationRouteParams,
   releaseCreateRoute,
 } from '@admin/routes/routes';
@@ -16,12 +17,14 @@ export interface Props {
   publication: MyPublication;
   topicId: string;
   onChangePublication: () => void;
+  showManageTeamAccessButton?: boolean;
 }
 
 const PublicationSummary = ({
   publication,
   topicId,
   onChangePublication,
+  showManageTeamAccessButton = true,
 }: Props) => {
   const { contact, permissions, releases, id, title } = publication;
 
@@ -101,6 +104,19 @@ const PublicationSummary = ({
                   >
                     Manage this publication
                   </ButtonLink>
+                  {showManageTeamAccessButton && (
+                    <ButtonLink
+                      data-testid={`Manage team access for publication ${publication.title}`}
+                      to={generatePath<PublicationRouteParams>(
+                        publicationManageTeamAccessRoute.path,
+                        {
+                          publicationId: publication.id,
+                        },
+                      )}
+                    >
+                      Manage team access
+                    </ButtonLink>
+                  )}
                 </ButtonGroup>
               </td>
             </tr>

@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 CreatedById = createdById,
                 ReleaseStatuses = new List<ReleaseStatus>
                 {
-                    new ReleaseStatus
+                    new()
                     {
                         ReleaseId = releaseId,
                         InternalReleaseNote = latestInternalReleaseNote,
@@ -111,13 +111,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 RelatedInformation = new List<Link>
                 {
-                    new Link
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Description = "Link 1",
                         Url = "URL 1"
                     },
-                    new Link
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Description = "Link 2",
@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 Updates = new List<Update>
                 {
-                    new Update
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         On = DateTime.UtcNow.Subtract(TimeSpan.FromDays(4)),
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Created = createdDate.AddDays(1),
                         CreatedById = Guid.NewGuid(),
                     },
-                    new Update
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         On = DateTime.UtcNow.Subtract(TimeSpan.FromDays(5)),
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 },
                 Content = new List<ReleaseContentSection>
                 {
-                    new ReleaseContentSection
+                    new()
                     {
                         ReleaseId = Guid.NewGuid(),
                         ContentSection = new ContentSection
@@ -166,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     Order = 1,
                                     Comments = new List<Comment>
                                     {
-                                        new Comment
+                                        new()
                                         {
                                             Id = Guid.NewGuid(),
                                             Content = "Comment 1 Text"
@@ -244,13 +244,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 ContentBlocks = new List<ReleaseContentBlock>
                 {
-                    new ReleaseContentBlock
+                    new()
                     {
                         ReleaseId = releaseId,
                         ContentBlock = dataBlock1,
                         ContentBlockId = dataBlock1.Id,
                     },
-                    new ReleaseContentBlock
+                    new()
                     {
                         ReleaseId = releaseId,
                         ContentBlock = dataBlock2,
@@ -277,10 +277,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ReleaseId = releaseId
             };
 
+            var deletedReleaseRole = new UserReleaseRole
+            {
+                Id = Guid.NewGuid(),
+                UserId = Guid.NewGuid(),
+                Role = ReleaseRole.Lead,
+                Release = release,
+                ReleaseId = releaseId,
+                Deleted = DateTime.UtcNow,
+                DeletedById = Guid.NewGuid(),
+            };
+
             var userReleaseRoles = new List<UserReleaseRole>
             {
                 approverReleaseRole,
-                contributorReleaseRole
+                contributorReleaseRole,
+                deletedReleaseRole,
             };
 
             var dataFile1 = new File
@@ -299,7 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var releaseFiles = new List<ReleaseFile>
             {
-                new ReleaseFile
+                new()
                 {
                     Id = Guid.NewGuid(),
                     Release = release,
@@ -307,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     File = dataFile1,
                     FileId = dataFile1.Id
                 },
-                new ReleaseFile
+                new()
                 {
                     Id = Guid.NewGuid(),
                     Release = release,
@@ -495,6 +507,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var amendmentReleaseRoles = contentDbContext
                     .UserReleaseRoles
                     .AsQueryable()
+                    .IgnoreQueryFilters() // See if deletedAmendmentRole is also copied
                     .Where(r => r.ReleaseId == amendment.Id)
                     .ToList();
 
@@ -505,6 +518,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var contributorAmendmentRole = amendmentReleaseRoles.First(r => r.Role == ReleaseRole.Contributor);
                 Assert.NotEqual(contributorReleaseRole.Id, contributorAmendmentRole.Id);
                 AssertAmendedReleaseRoleCorrect(contributorReleaseRole, contributorAmendmentRole, amendment);
+
+                var deletedAmendmentRole = amendmentReleaseRoles.First(r => r.Deleted != null);
+                Assert.NotEqual(deletedReleaseRole.Id, deletedAmendmentRole.Id);
+                AssertAmendedReleaseRoleCorrect(deletedReleaseRole, deletedAmendmentRole, amendment);
 
                 var amendmentDataFiles = contentDbContext
                     .ReleaseFiles
@@ -605,6 +622,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(amendment.Id, amended.ReleaseId);
             Assert.Equal(previous.UserId, amended.UserId);
             Assert.Equal(previous.Role, amended.Role);
+            Assert.Equal(previous.Created, amended.Created);
+            Assert.Equal(previous.CreatedById, amended.CreatedById);
+            Assert.Equal(previous.Deleted, amended.Deleted);
+            Assert.Equal(previous.DeletedById, amended.DeletedById);
         }
 
         private static void AssertAmendedReleaseFileCorrect(ReleaseFile originalFile, ReleaseFile amendmentDataFile,
@@ -614,6 +635,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.NotEqual(originalFile.Id, amendmentDataFile.Id);
             Assert.Equal(amendment, amendmentDataFile.Release);
             Assert.Equal(amendment.Id, amendmentDataFile.ReleaseId);
+            Assert.Equal(originalFile.Name, amendmentDataFile.Name);
 
             // and assert that the file referenced is the SAME file reference as linked from the original Release's
             // link table entry
