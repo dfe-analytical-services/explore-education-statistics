@@ -1,4 +1,4 @@
--- Used by Down method of migration 20211209114908 to recreate dropped types
+-- Used by the Down method of migration 20211209114908 to recreate dropped table types.
 create type ObservationRowFilterItemType as table
 (
     CsvRow           bigint           not null,
