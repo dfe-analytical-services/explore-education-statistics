@@ -2,7 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 {
@@ -52,51 +54,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
         private static void UpdateAmendmentContent(Release.CloneContext context)
         {
+            var replacements = new Dictionary<string, MatchEvaluator>();
+
             // Bit cheeky to re-use the clone context, but it's a nice
             // easy way to access and modify all of the content blocks
             // that we used during the clone.
-            var dataBlocks = context.ContentBlocks
-                .Where(pair => pair.Key is DataBlock && pair.Value is DataBlock)
-                .ToDictionary(
-                    pair => pair.Key as DataBlock,
-                    pair => pair.Value as DataBlock
-                ) as Dictionary<DataBlock, DataBlock>;
+            context.ContentBlocks
+                .ForEach(
+                    pair =>
+                    {
+                        switch (pair)
+                        {
+                            case { Key: DataBlock oldDataBlock, Value: DataBlock newDataBlock }:
+                                replacements[$"/fast-track/{oldDataBlock.Id}"] = _ => $"/fast-track/{newDataBlock.Id}";
+                                break;
+                        }
+                    }
+                );
+
+            var regex = new Regex(
+                string.Join('|', replacements.Keys.Append(ContentFilterUtils.CommentsFilterPattern)),
+                RegexOptions.Compiled
+            );
 
             foreach (var contentBlock in context.ContentBlocks.Values)
             {
                 switch (contentBlock)
                 {
                     case HtmlBlock block:
-                        block.Body = UpdateFastTrackLinks(block.Body, dataBlocks);
+                        block.Body = ReplaceContent(block.Body, regex, replacements);
                         break;
+
                     case MarkDownBlock block:
-                        block.Body = UpdateFastTrackLinks(block.Body, dataBlocks);
+                        block.Body = ReplaceContent(block.Body, regex, replacements);
                         break;
                 }
             }
         }
 
-        private static string UpdateFastTrackLinks(string content, Dictionary<DataBlock, DataBlock> dataBlocks)
+        private static string ReplaceContent(
+            string content,
+            Regex regex,
+            Dictionary<string, MatchEvaluator> replacements)
         {
             if (content.IsNullOrEmpty())
             {
                 return content;
             }
 
-            var nextContent = content;
+            return regex.Replace(
+                content,
+                match =>
+                {
+                    if (replacements.ContainsKey(match.Value))
+                    {
+                        return replacements[match.Value](match);
+                    }
 
-            foreach (var (oldDataBlock, newDataBlock) in dataBlocks)
-            {
-                // Not a particularly fast way to replace fast tracks
-                // if there's a lot of content. Could be improved
-                // using something like a parallel substring approach.
-                nextContent = nextContent.Replace(
-                    $"/fast-track/{oldDataBlock.Id}",
-                    $"/fast-track/{newDataBlock.Id}"
-                );
-            }
-
-            return nextContent;
+                    // Assume that it is a filtered match and we should remove it.
+                    return string.Empty;
+                }
+            );
         }
 
         public static void CreateGenericContentFromTemplate(this Release release, Release newRelease)

@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Xunit;
 
@@ -531,13 +532,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var contentBlock3 = new HtmlBlock
             {
                 Id = Guid.NewGuid(),
-                Order = 1,
+                Order = 3,
                 Body = $"<p>Content block 3 <a href=\"http://localhost/fast-track/{dataBlock1.Id}\">link text</a></p>"
             };
             var contentBlock4 = new HtmlBlock
             {
                 Id = Guid.NewGuid(),
-                Order = 2,
+                Order = 4,
                 Body = $@"
                     <p>Content block 4 http://localhost/fast-track/{dataBlock1.Id} http://localhost/fast-track/{dataBlock2.Id}</p>
                     <p><a href=""http://localhost/fast-track/{dataBlock1.Id}"">link 1 text</a></p>
@@ -592,6 +593,154 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             };
 
             var section1Id = Guid.NewGuid();
+
+            release.Content = new List<ReleaseContentSection>
+            {
+                new()
+                {
+                    Release = release,
+                    ReleaseId = release.Id,
+                    ContentSectionId = section1Id,
+                    ContentSection = new ContentSection
+                    {
+                        Id = section1Id,
+                        Heading = "Section 1",
+                        Content = new List<ContentBlock>
+                        {
+                            contentBlock1,
+                            contentBlock2,
+                            contentBlock3,
+                            contentBlock4
+                        },
+                    }
+                },
+            };
+
+            var createdDate = DateTime.Now;
+            var createdById = Guid.NewGuid();
+
+            var amendment = release.CreateAmendment(createdDate, createdById);
+
+            var amendmentDataBlock1 = Assert.IsType<DataBlock>(amendment.ContentBlocks[0].ContentBlock);
+            var amendmentDataBlock2 = Assert.IsType<DataBlock>(amendment.ContentBlocks[1].ContentBlock);
+
+            Assert.NotEqual(dataBlock1.Id, amendmentDataBlock1.Id);
+            Assert.NotEqual(dataBlock2.Id, amendmentDataBlock2.Id);
+
+            var section1 = amendment.Content[0].ContentSection;
+
+            var amendmentContentBlock1 = Assert.IsType<HtmlBlock>(section1.Content[0]);
+            var amendmentContentBlock2 = Assert.IsType<HtmlBlock>(section1.Content[1]);
+            var amendmentContentBlock3 = Assert.IsType<HtmlBlock>(section1.Content[2]);
+            var amendmentContentBlock4 = Assert.IsType<HtmlBlock>(section1.Content[3]);
+
+            Assert.Equal(
+                $"Content block 1 http://localhost/fast-track/{amendmentDataBlock1.Id}",
+                amendmentContentBlock1.Body
+            );
+            Assert.Equal(
+                $"Content block 2 http://localhost/fast-track/{amendmentDataBlock2.Id}/ some other text",
+                amendmentContentBlock2.Body
+            );
+
+            Assert.Equal(
+                $"<p>Content block 3 <a href=\"http://localhost/fast-track/{amendmentDataBlock1.Id}\">link text</a></p>",
+                amendmentContentBlock3.Body
+            );
+            Assert.Equal(
+                $@"
+                    <p>Content block 4 http://localhost/fast-track/{amendmentDataBlock1.Id} http://localhost/fast-track/{amendmentDataBlock2.Id}</p>
+                    <p><a href=""http://localhost/fast-track/{amendmentDataBlock1.Id}"">link 1 text</a></p>
+                    <p><a href=""http://localhost/fast-track/{amendmentDataBlock2.Id}/"">link 2 text</a></p>
+                    ",
+                amendmentContentBlock4.Body
+            );
+        }
+
+        [Fact]
+        public void CreateAmendment_FiltersContent()
+        {
+              var release = new Release
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            var dataBlock1 = new DataBlock
+            {
+                Id = Guid.NewGuid(),
+                Order = 1,
+                Heading = "Data block 1",
+            };
+            var contentBlock1 = new HtmlBlock
+            {
+                Id = Guid.NewGuid(),
+                Order = 1,
+                Body = $"<p>Content block 1 <a href=\"http://localhost/fast-track/{dataBlock1.Id}\">link</a></p>"
+            };
+
+            var contentBlock2 = new HtmlBlock
+            {
+                Id = Guid.NewGuid(),
+                Order = 1,
+                Body = @"
+                <p>
+                    Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
+                </p>
+                <ul>
+                    <li><comment-start name=""comment-2""/>Content 2<comment-end name=""comment-2""/></li>
+                    <li><commentplaceholder-start name=""comment-3""/>Content 3<commentplaceholder-end name=""comment-3""/></li>
+                    <li><resolvedcomment-start name=""comment-4""/>Content 4<resolvedcomment-end name=""comment-4""/></li>
+                </ul>".TrimIndent()
+            };
+            var contentBlock3 = new HtmlBlock
+            {
+                Id = Guid.NewGuid(),
+                Order = 2,
+                Body = $@"
+                    <p>
+                        Content block 3
+                        <comment-start name=""comment-1""></comment-start>
+                            <a href=""http://localhost/fast-track/{dataBlock1.Id}"">link</a>
+                        <comment-end name=""comment-1""></comment-end>
+
+                        <a href=""http://localhost/fast-track/{dataBlock1.Id}"">Another link</a>
+                    </p>".TrimIndent()
+            };
+
+            release.ContentBlocks = new List<ReleaseContentBlock>
+            {
+                new()
+                {
+                    ReleaseId = release.Id,
+                    Release = release,
+                    ContentBlockId = dataBlock1.Id,
+                    ContentBlock = dataBlock1
+                },
+                new()
+                {
+                    ReleaseId = release.Id,
+                    Release = release,
+                    ContentBlockId = contentBlock1.Id,
+                    ContentBlock = contentBlock1
+                },
+                new()
+                {
+                    ReleaseId = release.Id,
+                    Release = release,
+                    ContentBlockId = contentBlock2.Id,
+                    ContentBlock = contentBlock2
+                },
+                new()
+                {
+                    ReleaseId = release.Id,
+                    Release = release,
+                    ContentBlockId = contentBlock3.Id,
+                    ContentBlock = contentBlock3
+                },
+            };
+
+            // Test that we are amending content across multiple sections too
+            var section1Id = Guid.NewGuid();
             var section2Id = Guid.NewGuid();
 
             release.Content = new List<ReleaseContentSection>
@@ -624,10 +773,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                         Content = new List<ContentBlock>
                         {
                             contentBlock3,
-                            contentBlock4
                         },
                     }
-                }
+                },
             };
 
             var createdDate = DateTime.Now;
@@ -636,46 +784,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var amendment = release.CreateAmendment(createdDate, createdById);
 
             var amendmentDataBlock1 = Assert.IsType<DataBlock>(amendment.ContentBlocks[0].ContentBlock);
-            var amendmentDataBlock2 = Assert.IsType<DataBlock>(amendment.ContentBlocks[1].ContentBlock);
 
             Assert.NotEqual(dataBlock1.Id, amendmentDataBlock1.Id);
-            Assert.NotEqual(dataBlock2.Id, amendmentDataBlock2.Id);
 
             var section1 = amendment.Content[0].ContentSection;
+            var section2 = amendment.Content[1].ContentSection;
 
             var amendmentContentBlock1 = Assert.IsType<HtmlBlock>(section1.Content[0]);
             var amendmentContentBlock2 = Assert.IsType<HtmlBlock>(section1.Content[1]);
+            var amendmentContentBlock3 = Assert.IsType<HtmlBlock>(section2.Content[0]);
 
             Assert.Equal(
-                $"Content block 1 http://localhost/fast-track/{amendmentDataBlock1.Id}",
+                $"<p>Content block 1 <a href=\"http://localhost/fast-track/{amendmentDataBlock1.Id}\">link</a></p>",
                 amendmentContentBlock1.Body
             );
             Assert.Equal(
-                $"Content block 2 http://localhost/fast-track/{amendmentDataBlock2.Id}/ some other text",
+                @"
+                    <p>
+                        Content 1 goes here
+                    </p>
+                    <ul>
+                        <li>Content 2</li>
+                        <li>Content 3</li>
+                        <li>Content 4</li>
+                    </ul>".TrimIndent(),
                 amendmentContentBlock2.Body
-            );
-
-            var section2 = amendment.Content[1].ContentSection;
-
-            var amendmentContentBlock3 = Assert.IsType<HtmlBlock>(section2.Content[0]);
-            var amendmentContentBlock4 = Assert.IsType<HtmlBlock>(section2.Content[1]);
-
-            Assert.Equal(
-                $"<p>Content block 3 <a href=\"http://localhost/fast-track/{amendmentDataBlock1.Id}\">link text</a></p>",
-                amendmentContentBlock3.Body
             );
             Assert.Equal(
                 $@"
-                    <p>Content block 4 http://localhost/fast-track/{amendmentDataBlock1.Id} http://localhost/fast-track/{amendmentDataBlock2.Id}</p>
-                    <p><a href=""http://localhost/fast-track/{amendmentDataBlock1.Id}"">link 1 text</a></p>
-                    <p><a href=""http://localhost/fast-track/{amendmentDataBlock2.Id}/"">link 2 text</a></p>
-                    ",
-                amendmentContentBlock4.Body
+                    <p>
+                        Content block 3
+                        
+                            <a href=""http://localhost/fast-track/{amendmentDataBlock1.Id}"">link</a>
+                        
+
+                        <a href=""http://localhost/fast-track/{amendmentDataBlock1.Id}"">Another link</a>
+                    </p>".TrimIndent(),
+                amendmentContentBlock3.Body
             );
         }
 
         [Fact]
-        public void CreateAmendment_UpdatesFastTrackLinkIds_NullHtmlBlockBody()
+        public void CreateAmendment_NullHtmlBlockBody()
         {
             var release = new Release
             {
