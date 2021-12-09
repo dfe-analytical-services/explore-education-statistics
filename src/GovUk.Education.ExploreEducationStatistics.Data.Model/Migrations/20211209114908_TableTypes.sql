@@ -1,3 +1,11 @@
+-- Used by Down method of migration 20211209114908 to recreate dropped types
+create type ObservationRowFilterItemType as table
+(
+    CsvRow           bigint           not null,
+    OldObservationId uniqueidentifier not null,
+    FilterItemId     uniqueidentifier not null
+);
+
 create type ObservationRowType as table
 (
     ObservationId   uniqueidentifier not null,
