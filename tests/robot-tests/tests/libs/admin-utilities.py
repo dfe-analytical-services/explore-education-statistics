@@ -27,13 +27,13 @@ def user_signs_in_as(user: str):
 
         set_to_local_storage(
             f'GovUk.Education.ExploreEducationStatistics.Adminuser:{admin_url}:GovUk.Education.ExploreEducationStatistics.Admin',
-            local_storage_token
-        )
+            local_storage_token)
         set_cookie_from_json(cookie_token)
 
         sl.go_to(admin_url)
     except Exception as e:
         raise_assertion_error(e)
+
 
 def get_theme_id_from_url():
     url = sl.get_location()
@@ -52,22 +52,22 @@ def get_release_guid_from_release_status_page_url(url):
 def data_csv_number_contains_xpath(num, xpath):
     try:
         elem = sl.driver.find_element_by_xpath(f'//*[@id="dataFileUploadForm"]/dl[{num}]')
-    except:
+    except BaseException:
         raise_assertion_error(f'Cannot find data file number "{num}"')
     try:
         elem.find_element_by_xpath(xpath)
-    except:
+    except BaseException:
         raise_assertion_error(f'Cannot find data file number "{num} with xpath {xpath}')
 
 
 def data_file_number_contains_xpath(num, xpath):
     try:
         elem = sl.driver.find_element_by_xpath(f'//*[@id="fileUploadForm"]/dl[{num}]')
-    except:
+    except BaseException:
         raise_assertion_error(f'Cannot find data file number "{num}"')
     try:
         elem.find_element_by_xpath(xpath)
-    except:
+    except BaseException:
         raise_assertion_error(f'Cannot find data file number "{num} with xpath {xpath}')
 
 
@@ -78,12 +78,12 @@ def user_waits_for_release_process_status_to_be(status, timeout):
             sl.driver.find_element_by_css_selector(f'#release-process-status-Failed')
             raise_assertion_error('Release process status FAILED!')
             return
-        except:
+        except BaseException:
             pass
         try:
             sl.driver.find_element_by_css_selector(f'#release-process-status-{status}')
             return
-        except:
+        except BaseException:
             sl.reload_page()  # Necessary if release previously scheduled
             time.sleep(3)
     raise_assertion_error(f'Release process status wasn\'t {status} after {timeout} seconds!')

@@ -38,7 +38,6 @@ if not utilities_init.initialised:
         for_id = labels[0].get_attribute('for')
         return get_child_elements(parent_locator, f'id:{for_id}')
 
-
     def _find_by_testid(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
         parent_locator = _normalize_parent_locator(parent_locator)
 
@@ -127,7 +126,7 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
             return waiting._wait_until(
                 parent_does_not_contain_matching_element,
                 "Parent '%s' should not have contained '%s' in <TIMEOUT>." % (
-                parent_locator, child_locator),
+                    parent_locator, child_locator),
                 timeout, error
             )
 
@@ -264,7 +263,7 @@ def capture_large_screenshot():
 
 def capture_html():
     html = sl.get_source()
-    current_time_millis=round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
+    current_time_millis = round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
     html_file = open(f"test-results/captured-html-{current_time_millis}.html", "w")
     html_file.write(html)
     html_file.close()
@@ -287,7 +286,7 @@ def user_gets_row_with_group_and_indicator(group: str, indicator: str,
         try:
             elem.find_element_by_xpath(f'.//th[text()="{indicator}"]/..')
             return elem
-        except:
+        except BaseException:
             continue
     raise_assertion_error(f'Indicator "{indicator}" not found!')
 
@@ -295,7 +294,7 @@ def user_gets_row_with_group_and_indicator(group: str, indicator: str,
 def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
     try:
         elem = get_child_element(row_elem, f'xpath:.//td[{cell_num}]')
-    except:
+    except BaseException:
         raise_assertion_error(f'Couldn\'t find TD tag num "{cell_num}" for provided row element')
 
     if expected_text not in elem.text:
@@ -367,4 +366,3 @@ def _get_parent_webelement_from_locator(parent_locator: object, timeout: int = N
         return parent_locator
     else:
         raise_assertion_error(f"Parent locator was neither a str or a WebElement - {parent_locator}")
-

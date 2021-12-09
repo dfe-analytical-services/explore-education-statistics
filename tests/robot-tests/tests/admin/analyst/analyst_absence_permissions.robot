@@ -10,7 +10,7 @@ Force Tags          Admin    Local    Dev
 *** Test Cases ***
 Validate Analyst1 can see correct themes and topics
     user selects theme and topic from admin dashboard    Pupils and schools    Pupil absence
-    user waits until page contains accordion section    Pupil absence in schools in England    60
+    user waits until page contains accordion section    Pupil absence in schools in England    %{WAIT_SMALL}
 
     user checks select contains option    id:publicationsReleases-themeTopic-themeId    Pupils and schools
     user checks select contains x options    id:publicationsReleases-themeTopic-topicId    2

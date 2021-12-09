@@ -4,13 +4,14 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -23,7 +24,9 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
+using static Moq.MockBehavior;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -329,17 +332,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var releaseDataFileService = new Mock<IReleaseDataFileService>(MockBehavior.Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
+            var subjectRepository = new Mock<ISubjectRepository>(Strict);
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
 
             dataBlockService.Setup(service => service.GetDeletePlan(release.Id, subject))
                 .ReturnsAsync(new DeleteDataBlockPlan());
 
             dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(Unit.Instance);
 
             dataImportService.Setup(service => service.GetStatus(file.Id))
                 .ReturnsAsync(DataImportStatus.COMPLETE);
@@ -412,11 +415,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var fileStorageService = new Mock<IReleaseFileService>(MockBehavior.Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
+            var subjectRepository = new Mock<ISubjectRepository>(Strict);
+            var fileStorageService = new Mock<IReleaseFileService>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
 
             dataImportService.Setup(service =>
                     service.GetStatus(file.Id))
@@ -487,18 +490,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var releaseDataFileService = new Mock<IReleaseDataFileService>(MockBehavior.Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
+            var subjectRepository = new Mock<ISubjectRepository>(Strict);
+            var releaseDataFileService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
 
             dataBlockService.Setup(service =>
                     service.GetDeletePlan(release.Id, It.IsIn(subject, replacementSubject)))
                 .ReturnsAsync(new DeleteDataBlockPlan());
 
             dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
-                .Returns(Task.CompletedTask);
+                .ReturnsAsync(Unit.Instance);
 
             dataImportService.Setup(service =>
                     service.GetStatus(It.IsIn(file.Id, replacementFile.Id)))
@@ -595,11 +598,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataBlockService = new Mock<IDataBlockService>(MockBehavior.Strict);
-            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var fileStorageService = new Mock<IReleaseFileService>(MockBehavior.Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+            var dataImportService = new Mock<IDataImportService>(Strict);
+            var subjectRepository = new Mock<ISubjectRepository>(Strict);
+            var fileStorageService = new Mock<IReleaseFileService>(Strict);
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
 
             dataImportService.Setup(service => service.GetStatus(file.Id))
                 .ReturnsAsync(DataImportStatus.COMPLETE);
@@ -1144,8 +1147,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            var releaseDataFilesService = new Mock<IReleaseDataFileService>(MockBehavior.Strict);
-            var releaseFileService = new Mock<IReleaseFileService>(MockBehavior.Strict);
+            var releaseDataFilesService = new Mock<IReleaseDataFileService>(Strict);
+            var releaseFileService = new Mock<IReleaseFileService>(Strict);
+            var cacheService = new Mock<IBlobCacheService>(Strict);
 
             releaseDataFilesService.Setup(mock =>
                 mock.DeleteAll(release.Id, false)).ReturnsAsync(Unit.Instance);
@@ -1153,11 +1157,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             releaseFileService.Setup(mock =>
                 mock.DeleteAll(release.Id, false)).ReturnsAsync(Unit.Instance);
 
+            cacheService
+                .Setup(mock => mock.DeleteCacheFolder(
+                    ItIs.DeepEqualTo(new ReleaseContentFolderCacheKey(publication.Id, release.Id))))
+                .Returns(Task.CompletedTask);
+
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var releaseService = BuildReleaseService(context,
                     releaseDataFileService: releaseDataFilesService.Object,
-                    releaseFileService: releaseFileService.Object);
+                    releaseFileService: releaseFileService.Object,
+                    cacheService: cacheService.Object);
 
                 var result = await releaseService.DeleteRelease(release.Id);
 
@@ -1166,6 +1176,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 releaseFileService.Verify(mock =>
                     mock.DeleteAll(release.Id, false), Times.Once);
+                
+                VerifyAllMocks(cacheService);
 
                 result.AssertRight();
 
@@ -1276,9 +1288,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IDataImportService? dataImportService = null,
             IFootnoteService? footnoteService = null,
             IDataBlockService? dataBlockService = null,
-            IReleaseSubjectRepository? releaseSubjectRepository = null)
+            IReleaseSubjectRepository? releaseSubjectRepository = null,
+            IBlobCacheService? cacheService = null)
         {
-            var userService = MockUtils.AlwaysTrueUserService();
+            var userService = AlwaysTrueUserService();
 
             userService
                 .Setup(s => s.GetUserId())
@@ -1289,17 +1302,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 AdminMapper(),
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService.Object,
-                releaseRepository ?? new Mock<IReleaseRepository>().Object,
+                releaseRepository ?? Mock.Of<IReleaseRepository>(),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                subjectRepository ?? new Mock<ISubjectRepository>().Object,
-                releaseDataFileService ?? new Mock<IReleaseDataFileService>().Object,
-                releaseFileService ?? new Mock<IReleaseFileService>().Object,
-                dataImportService ?? new Mock<IDataImportService>().Object,
-                footnoteService ?? new Mock<IFootnoteService>().Object,
-                statisticsDbContext ?? new Mock<StatisticsDbContext>().Object,
-                dataBlockService ?? new Mock<IDataBlockService>().Object,
-                releaseSubjectRepository ?? new Mock<IReleaseSubjectRepository>().Object,
-                new SequentialGuidGenerator()
+                subjectRepository ?? Mock.Of<ISubjectRepository>(),
+                releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(),
+                releaseFileService ?? Mock.Of<IReleaseFileService>(),
+                dataImportService ?? Mock.Of<IDataImportService>(),
+                footnoteService ?? Mock.Of<IFootnoteService>(),
+                statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
+                dataBlockService ?? Mock.Of<IDataBlockService>(),
+                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(),
+                new SequentialGuidGenerator(),
+                cacheService ?? Mock.Of<IBlobCacheService>()
             );
         }
     }

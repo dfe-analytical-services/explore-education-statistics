@@ -1,35 +1,23 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
-using Newtonsoft.Json;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public abstract class AbstractSubjectMetaService
     {
-        private readonly IBoundaryLevelRepository _boundaryLevelRepository;
         protected readonly IFilterItemRepository _filterItemRepository;
-        private readonly IGeoJsonRepository _geoJsonRepository;
         protected static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
-        protected AbstractSubjectMetaService(IBoundaryLevelRepository boundaryLevelRepository,
-            IFilterItemRepository filterItemRepository,
-            IGeoJsonRepository geoJsonRepository)
+        protected AbstractSubjectMetaService(IFilterItemRepository filterItemRepository)
         {
-            _boundaryLevelRepository = boundaryLevelRepository;
             _filterItemRepository = filterItemRepository;
-            _geoJsonRepository = geoJsonRepository;
-        }
-
-        private BoundaryLevel GetBoundaryLevel(GeographicLevel geographicLevel)
-        {
-            return _boundaryLevelRepository.FindLatestByGeographicLevel(geographicLevel);
         }
 
         protected Dictionary<string, FilterMetaViewModel> BuildFilterHierarchy(IEnumerable<FilterItem> filterItems)
@@ -56,53 +44,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     });
         }
 
-        protected IEnumerable<ObservationalUnitMetaViewModel> BuildObservationalUnitMetaViewModelsWithGeoJsonIfAvailable(
-            GeographicLevel geographicLevel,
-            ICollection<ObservationalUnit> observationalUnits,
-            bool geoJsonRequested,
-            long? boundaryLevelId)
+        protected static List<IndicatorMetaViewModel> BuildIndicatorViewModels(IEnumerable<Indicator> indicators)
         {
-            var geoJsonByCode = new Dictionary<string, GeoJson>();
-
-            if (geoJsonRequested)
-            {
-                var boundaryLevel = boundaryLevelId ?? GetBoundaryLevel(geographicLevel)?.Id;
-                if (boundaryLevel.HasValue)
-                {
-                    var codes = observationalUnits.Select(unit =>
-                        unit is LocalAuthority localAuthority ? localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code);
-                    geoJsonByCode = _geoJsonRepository.Find(boundaryLevel.Value, codes).ToDictionary(g => g.Code);
-                }
-            }
-
-            return observationalUnits.Select(observationalUnit =>
-            {
-                var value = observationalUnit is LocalAuthority localAuthority
-                    ? localAuthority.GetCodeOrOldCodeIfEmpty()
-                    : observationalUnit.Code;
-
-                var serializedGeoJson = geoJsonByCode.GetValueOrDefault(value);
-                var geoJson = DeserializeGeoJson(serializedGeoJson);
-
-                return new ObservationalUnitMetaViewModel
-                {
-                    GeoJson = geoJson,
-                    Label = observationalUnit.Name,
-                    Level = geographicLevel,
-                    Value = value
-                };
-            });
-        }
-
-        protected bool HasBoundaryLevelDataForAnyObservationalUnits(
-            Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> observationalUnits)
-        {
-            return observationalUnits.Any(pair => HasBoundaryLevelForGeographicLevel(pair.Key));
-        }
-
-        protected static IEnumerable<IndicatorMetaViewModel> BuildIndicatorViewModels(IEnumerable<Indicator> indicators)
-        {
-            return indicators.OrderBy(indicator => indicator.Label, LabelComparer)
+            return indicators
+                .OrderBy(indicator => indicator.Label, LabelComparer)
                 .Select(indicator => new IndicatorMetaViewModel
                 {
                     Label = indicator.Label,
@@ -110,34 +55,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     Unit = indicator.Unit.GetEnumValue(),
                     Value = indicator.Id.ToString(),
                     DecimalPlaces = indicator.DecimalPlaces
-                });
+                })
+                .ToList();
         }
 
         protected static FilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
             IEnumerable<FilterItem> filterItems)
         {
-            return new FilterItemsMetaViewModel
+            return new()
             {
                 Label = filterGroup.Label,
                 Options = filterItems
                     .OrderBy(item => item.Label.ToLower() != "total")
                     .ThenBy(item => item.Label, LabelComparer)
-                    .Select(item => new LabelValue
-                {
-                    Label = item.Label,
-                    Value = item.Id.ToString()
-                })
+                    .Select(item => new LabelValue(item.Label, item.Id.ToString()))
             };
         }
 
-        protected static IEnumerable<T> TransformDuplicateObservationalUnitsWithUniqueLabels<T>(
+        protected static IEnumerable<T> DeduplicateLocationViewModels<T>(
             IEnumerable<T> viewModels) where T : LabelValue
         {
+            var list = viewModels.ToList();
+
             /*
-             The list of Observational Units should in theory already be unique.
+             The list of Location attributes should in theory already be unique.
              If they are not, there's three possibilities:
               * Duplicates exist where the label-value pairs are distinct but the Level attribute is different
-                i.e. where the same Observational Unit is reused across multiple Geographic Levels e.g. LA and LAD.
+                i.e. where the same Location attribute is reused across multiple Geographic Levels e.g. LA and LAD.
                 These need transforming to give them distinct labels.
               * Duplicates where the labels are the same but the values are different.
                 These need transforming to give them distinct labels.
@@ -145,13 +89,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 These don't need any action.
             */
 
-            var case1 = viewModels
+            var case1 = list
                 .GroupBy(model => (model.Value, model.Label))
                 .Where(grouping => grouping.Count() > 1)
                 .SelectMany(grouping => grouping)
                 .ToList();
 
-            var case2 = viewModels.Except(case1)
+            var case2 = list.Except(case1)
                 .GroupBy(model => model.Label)
                 .Where(grouping => grouping.Count() > 1)
                 .SelectMany(grouping => grouping)
@@ -159,18 +103,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             if (!(case1.Any() || case2.Any()))
             {
-                return viewModels;
+                return list;
             }
 
-            return viewModels.Select(value =>
+            return list.Select(value =>
             {
                 if (case1.Contains(value))
                 {
-                    if (value is ObservationalUnitMetaViewModel observationalUnitMetaViewModel)
+                    switch (value)
                     {
-                        observationalUnitMetaViewModel.Label +=
-                            $" ({observationalUnitMetaViewModel.Level.GetEnumLabel()})";
+                        case ObservationalUnitMetaViewModel viewModel:
+                            viewModel.Label += $" ({viewModel.Level.GetEnumLabel()})";
+                            break;
+                        case LocationAttributeViewModel viewModel:
+                            viewModel.Label += $" ({viewModel.Level})";
+                            break;
                     }
+
                 }
 
                 if (case2.Contains(value))
@@ -181,20 +130,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return value;
             });
         }
-        
-        private static dynamic DeserializeGeoJson(GeoJson geoJson)
-        {
-            return geoJson == null ? null : JsonConvert.DeserializeObject(geoJson.Value);
-        }
 
         private string GetTotalValue(IEnumerable<FilterItem> filterItems)
         {
             return _filterItemRepository.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
-        }
-        
-        private bool HasBoundaryLevelForGeographicLevel(GeographicLevel geographicLevel)
-        {
-            return _boundaryLevelRepository.FindLatestByGeographicLevel(geographicLevel) != null;
         }
     }
 }

@@ -47,4 +47,4 @@ google-chrome-stable --version
 python -m pip install --upgrade pip
 pip install pipenv
 pipenv install
-pipenv run python run_tests.py --admin-pass $admin_pass --analyst-pass $analyst_pass --slack-webhook-url "$slack_webhook_url" -e $env --ci --file $file --processes 4
+pipenv run python run_tests.py --admin-pass $admin_pass --analyst-pass $analyst_pass --slack-webhook-url "$slack_webhook_url" -e $env --ci --file $file --processes 4 --enable-slack

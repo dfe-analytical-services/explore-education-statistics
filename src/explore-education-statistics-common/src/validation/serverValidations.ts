@@ -6,8 +6,8 @@ import camelCase from 'lodash/camelCase';
 import set from 'lodash/set';
 import toPath from 'lodash/toPath';
 
-export interface ServerValidationErrorResponse {
-  errors: Dictionary<string[]>;
+export interface ServerValidationErrorResponse<T extends string = string> {
+  errors: Dictionary<T[]>;
   title: string;
   status: number;
 }
@@ -132,44 +132,67 @@ export function convertServerFieldErrors<FormValues>(
   );
 }
 
-export function isServerValidationError(
+/**
+ * Asserts whether the given error object is an
+ * {@link AxiosError<ServerValidationErrorResponse<T>>}.
+ *
+ * @param error - the error object to check the type of.
+ */
+export function isServerValidationError<T extends string = string>(
   error: unknown,
-  errorMessage?: string,
-): error is AxiosError<ServerValidationErrorResponse> {
+): error is AxiosError<ServerValidationErrorResponse<T>> {
   if (!isAxiosError(error) || !error.response?.data) {
     return false;
   }
 
   const errorDataAsValidationError = error.response
-    .data as ServerValidationErrorResponse;
+    .data as ServerValidationErrorResponse<T>;
 
-  const isServerError =
+  return (
     errorDataAsValidationError.errors !== undefined &&
     errorDataAsValidationError.status !== undefined &&
-    errorDataAsValidationError.title !== undefined;
-
-  if (!errorMessage) {
-    return isServerError;
-  }
-
-  if (isServerError && error.response?.data) {
-    const errors = Object.values(error.response?.data.errors);
-    if (errors.flat().includes(errorMessage)) {
-      return true;
-    }
-  }
-  return false;
+    errorDataAsValidationError.title !== undefined
+  );
 }
 
-export function hasServerValidationError(
-  error: Error,
-  errorMessage: string,
+/**
+ * This method checks whether or not the error contains any of the error
+ * messages provided, using {@param fieldName} to determine field
+ * validation, or global validation if {@param fieldName} is omitted.
+ *
+ * If any are included in this error, this method will return true.
+ *
+ * @param error - the error to check the messages of.
+ * @param errorMessages - array of error messages, any of which can appear
+ * in this error in order for this method to return true.
+ * @param fieldName - optional fieldName that, if omitted, will be treated
+ * as checking for global errors.
+ */
+export function hasErrorMessage<T extends string = string>(
+  error: AxiosError<ServerValidationErrorResponse<T>>,
+  errorMessages: readonly T[],
+  fieldName = '',
 ): boolean {
-  if (isServerValidationError(error) && error.response?.data) {
-    const errors = Object.values(error.response?.data.errors);
-    if (errors.flat().includes(errorMessage)) {
-      return true;
-    }
+  if (!errorMessages.length) {
+    return true;
   }
-  return false;
+
+  return errorMessages.some(errorMessage =>
+    error.response?.data.errors[fieldName].includes(errorMessage),
+  );
+}
+
+/**
+ * Retrieves the first error message for the given {@param fieldName}, or the
+ * first global error message if {@param fieldName} is omitted.
+ *
+ * @param error - the error containing messages.
+ * @param fieldName - optional fieldName that, if omitted, will be treated as
+ * checking for global errors.
+ */
+export function getErrorMessage<T extends string = string>(
+  error: AxiosError<ServerValidationErrorResponse<T>>,
+  fieldName = '',
+): T | undefined {
+  return error.response?.data?.errors[fieldName]?.[0];
 }

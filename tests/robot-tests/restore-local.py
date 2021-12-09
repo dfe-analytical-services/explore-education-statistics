@@ -5,7 +5,7 @@ import json
 from azure.storage.blob import BlockBlobService
 
 # Variables for AzCopy
-AzCopy = 'C:\Program Files (x86)\Microsoft SDKs\Azure\AzCopy\AzCopy.exe'
+AzCopy = 'C:\\Program Files (x86)\\Microsoft SDKs\\Azure\\AzCopy\\AzCopy.exe'
 storage_table_url = 'http://127.0.0.1:10002/devstoreaccount1'
 storage_key = 'Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=='
 
@@ -21,16 +21,16 @@ for cmd in copy_to_container_cmds:
     print(subprocess.run(cmd.split()))
 
 restore_cmds = [
-    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''', # To drop the db
+    # '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''', # To drop the db
     #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "DROP DATABASE [content]"''',
-    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE FILELISTONLY FROM DISK = N'/tmp/content.bak'"''',  # Use to verify "MOVE N'<name>' TO N'<location>'" of next statement
+    # '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE FILELISTONLY FROM DISK = N'/tmp/content.bak'"''',  # Use to verify "MOVE N'<name>' TO N'<location>'" of next statement
     '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE DATABASE [content] FROM DISK = N'/tmp/content.bak' WITH REPLACE, FILE = 1, MOVE N'content' TO N'/var/opt/mssql/data/content.mdf', MOVE N'content_log' TO N'/var/opt/mssql/data/content_log.ldf',  NOUNLOAD,  STATS = 5"''',
-    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''', # Because backup is saved in single_user mode
-    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''', # To drop the db
+    # '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [content] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''', # Because backup is saved in single_user mode
+    # '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET SINGLE_USER WITH ROLLBACK IMMEDIATE"''', # To drop the db
     #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "DROP DATABASE [statistics]"''',
-    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE FILELISTONLY FROM DISK = N'/tmp/statistics.bak'"''',  # Use to verify "MOVE N'<name>' TO N'<location>'" of next statement
+    # '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE FILELISTONLY FROM DISK = N'/tmp/statistics.bak'"''',  # Use to verify "MOVE N'<name>' TO N'<location>'" of next statement
     '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "RESTORE DATABASE [statistics] FROM DISK = N'/tmp/statistics.bak' WITH REPLACE, FILE = 1, MOVE N'statistics' TO N'/var/opt/mssql/data/statistics.mdf', MOVE N'statistics_log' TO N'/var/opt/mssql/data/statistics_log.ldf',  NOUNLOAD,  STATS = 5"''',
-    #'''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''', # Because backup is saved in single_user mode
+    # '''/opt/mssql-tools/bin/sqlcmd -S localhost -U SA -P Your_Password123 -Q "ALTER DATABASE [statistics] SET MULTI_USER WITH ROLLBACK IMMEDIATE"''', # Because backup is saved in single_user mode
     '''rm -rf tmp/*''',
 ]
 for cmd in restore_cmds:
@@ -88,9 +88,23 @@ for (dirpath, _, filenames) in os.walk(os.path.join(os.getcwd(), 'backup-data', 
         block_blob_service.create_blob_from_path('downloads', blob_name, file_path, metadata=metadata)
 
 # Restore imports table
-restore_table_cmd = [AzCopy, f'/Source:{os.path.join(os.getcwd(), "backup-data", "imports")}', '/destType:table', f'/Dest:{storage_table_url}/imports', f'/DestKey:{storage_key}', '/Manifest:table-backup.manifest', '/EntityOperation:InsertOrReplace']
+restore_table_cmd = [
+    AzCopy,
+    f'/Source:{os.path.join(os.getcwd(), "backup-data", "imports")}',
+    '/destType:table',
+    f'/Dest:{storage_table_url}/imports',
+    f'/DestKey:{storage_key}',
+    '/Manifest:table-backup.manifest',
+    '/EntityOperation:InsertOrReplace']
 print(subprocess.run(restore_table_cmd))
 
 # Restore ReleaseStatus table
-restore_table_cmd = [AzCopy, f'/Source:{os.path.join(os.getcwd(), "backup-data", "ReleaseStatus")}', '/destType:table', f'/Dest:{storage_table_url}/ReleaseStatus', f'/DestKey:{storage_key}', '/Manifest:table-backup.manifest', '/EntityOperation:InsertOrReplace']
+restore_table_cmd = [
+    AzCopy,
+    f'/Source:{os.path.join(os.getcwd(), "backup-data", "ReleaseStatus")}',
+    '/destType:table',
+    f'/Dest:{storage_table_url}/ReleaseStatus',
+    f'/DestKey:{storage_key}',
+    '/Manifest:table-backup.manifest',
+    '/EntityOperation:InsertOrReplace']
 print(subprocess.run(restore_table_cmd))

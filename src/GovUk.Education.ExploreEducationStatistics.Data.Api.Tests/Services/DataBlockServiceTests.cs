@@ -1,23 +1,28 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 {
-    public class DataBlockServiceTests
+    [Collection(BlobCacheServiceTests)]
+    public class DataBlockServiceTests : BlobCacheServiceTestFixture
     {
         private readonly Guid _releaseId = Guid.NewGuid();
         private readonly Guid _dataBlockId = Guid.NewGuid();
@@ -59,36 +64,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await contentDbContext.AddAsync(releaseContentBlock);
             await contentDbContext.SaveChangesAsync();
 
-            var tableResult = new TableBuilderResultViewModel
+            var tableBuilderResults = new TableBuilderResultViewModel
             {
                 Results = new List<ObservationViewModel>
                 {
-                    new ObservationViewModel()
+                    new()
                 }
             };
 
-            var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
+            var (service, mocks) = BuildServiceAndDependencies(contentDbContext);
 
-            tableBuilderService
+            CacheService
+                .Setup(s => s.GetItem(
+                    It.IsAny<DataBlockTableResultCacheKey>(), typeof(TableBuilderResultViewModel)))
+                .ReturnsAsync(null);
+            
+            mocks.tableBuilderService
                 .Setup(
                     s =>
                         s.Query(
                             _releaseId,
-                            It.Is<ObservationQueryContext>(q => q.SubjectId == subjectId)
+                            It.Is<ObservationQueryContext>(q => q.SubjectId == subjectId),
+                            default
                         )
                 )
-                .ReturnsAsync(tableResult);
+                .ReturnsAsync(tableBuilderResults);
 
-            var service = BuildDataBlockService(
-                contentDbContext,
-                tableBuilderService: tableBuilderService.Object
-            );
+            CacheService
+                .Setup(s => s.SetItem<object>(
+                    It.IsAny<DataBlockTableResultCacheKey>(),
+                    tableBuilderResults))
+                .Returns(Task.CompletedTask);
+            
+            var result = await service.GetDataBlockTableResult(releaseContentBlock);
+            VerifyAllMocks(mocks);
 
-            var result = (await service.GetDataBlockTableResult(releaseContentBlock)).AssertRight();
-
-            Assert.Single(result.Results);
-
-            VerifyAllMocks(tableBuilderService);
+            result.AssertRight(tableBuilderResults);
         }
 
         [Fact]
@@ -132,17 +143,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await contentDbContext.AddAsync(releaseContentBlock);
             await contentDbContext.SaveChangesAsync();
 
-            var tableResult = new TableBuilderResultViewModel
+            var tableBuilderResults = new TableBuilderResultViewModel
             {
                 Results = new List<ObservationViewModel>
                 {
-                    new ObservationViewModel()
+                    new()
                 }
             };
 
-            var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
-
-            tableBuilderService
+            var (service, mocks) = BuildServiceAndDependencies(contentDbContext);
+    
+            CacheService
+                .Setup(s => s.GetItem(
+                    It.IsAny<DataBlockTableResultCacheKey>(), typeof(TableBuilderResultViewModel)))
+                .ReturnsAsync(null);
+            
+            mocks.tableBuilderService
                 .Setup(
                     s =>
                         s.Query(
@@ -150,25 +166,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                             It.Is<ObservationQueryContext>(
                                 q =>
                                     q.SubjectId == subjectId && q.IncludeGeoJson == true
-                            )
+                            ),
+                            default
                         )
                 )
-                .ReturnsAsync(tableResult);
+                .ReturnsAsync(tableBuilderResults);
 
-            var service = BuildDataBlockService(
-                contentDbContext,
-                tableBuilderService: tableBuilderService.Object
-            );
+            CacheService
+                .Setup(s => s.SetItem<object>(
+                    It.IsAny<DataBlockTableResultCacheKey>(),
+                    tableBuilderResults))
+                .Returns(Task.CompletedTask);
 
-            var result = (await service.GetDataBlockTableResult(releaseContentBlock)).AssertRight();
+            var result = await service.GetDataBlockTableResult(releaseContentBlock);
+            VerifyAllMocks(mocks);
 
-            Assert.Single(result.Results);
-
-            VerifyAllMocks(tableBuilderService);
+            result.AssertRight(tableBuilderResults);
         }
 
         [Fact]
-        public async Task QueryForDataBlock_NotDataBlockType()
+        public async Task GetDataBlockTableResult_NotDataBlockType()
         {
             var releaseContentBlock = new ReleaseContentBlock
             {
@@ -191,23 +208,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             await contentDbContext.AddAsync(releaseContentBlock);
             await contentDbContext.SaveChangesAsync();
 
-            var service = BuildDataBlockService(contentDbContext);
+            var (service, _) = BuildServiceAndDependencies(contentDbContext);
 
-            var result = await service.GetDataBlockTableResult(releaseContentBlock);
+            var exception = await Assert.ThrowsAsync<TargetInvocationException>(() => 
+                service.GetDataBlockTableResult(releaseContentBlock));
 
-            result.AssertNotFound();
+            Assert.IsType<ArgumentException>(exception.InnerException);
         }
 
-        private static DataBlockService BuildDataBlockService(
-            ContentDbContext contentDbContext,
-            ITableBuilderService? tableBuilderService = null,
-            IUserService? userService = null)
+        private static (
+            DataBlockService service, 
+            (
+                Mock<ITableBuilderService> tableBuilderService,
+                Mock<IBlobCacheService> cacheService) mocks) 
+            BuildServiceAndDependencies(ContentDbContext contentDbContext)
         {
-            return new (
+            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
+            var userService = AlwaysTrueUserService();
+            
+            var controller = new DataBlockService(
                 contentDbContext,
-                tableBuilderService ?? new Mock<ITableBuilderService>().Object,
-                userService ?? AlwaysTrueUserService().Object
+                tableBuilderService.Object,
+                userService.Object
             );
+
+            return (controller, (tableBuilderService, CacheService));
         }
     }
 }

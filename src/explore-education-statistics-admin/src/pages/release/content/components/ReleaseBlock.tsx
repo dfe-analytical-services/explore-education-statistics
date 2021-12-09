@@ -5,13 +5,15 @@ import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockT
 import { Block } from '@common/services/types/blocks';
 import React from 'react';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
+import Gate from '@common/components/Gate';
 
 interface Props {
   block: Block;
   releaseId: string;
+  visible?: boolean;
 }
 
-const ReleaseBlock = ({ block, releaseId }: Props) => {
+const ReleaseBlock = ({ block, releaseId, visible }: Props) => {
   const getChartFile = useGetChartFile(releaseId);
 
   const transformImageAttributes = useReleaseImageAttributeTransformer({
@@ -20,12 +22,14 @@ const ReleaseBlock = ({ block, releaseId }: Props) => {
 
   if (block.type === 'DataBlock') {
     return (
-      <DataBlockTabs
-        key={block.id}
-        dataBlock={block}
-        releaseId={releaseId}
-        getInfographic={getChartFile}
-      />
+      <Gate condition={!!visible}>
+        <DataBlockTabs
+          key={block.id}
+          dataBlock={block}
+          releaseId={releaseId}
+          getInfographic={getChartFile}
+        />
+      </Gate>
     );
   }
 

@@ -493,6 +493,13 @@
       "type": "bool",
       "defaultValue": false
     },
+    "requestTimeoutsTableBuilderQuery": {
+      "type": "int",
+      "defaultValue": 210000,
+      "metadata": {
+        "description": "Timeout in milliseconds for a table builder query to return results before cancelling the request in the API"
+      }
+    },
     "tableBuilderMaxTableCellsAllowed": {
       "type": "int",
       "defaultValue": 25000,
@@ -797,7 +804,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
-        "threshold": 75,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -841,7 +848,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
-        "threshold": 75,
+        "threshold": 90,
         "operator": "GreaterThan",
         "timeAggregation": "Maximum",
         "criterionType": "StaticThresholdCriterion"
@@ -863,7 +870,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
-        "threshold": 75,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -907,7 +914,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
-        "threshold": 75,
+        "threshold": 90,
         "operator": "GreaterThan",
         "timeAggregation": "Maximum",
         "criterionType": "StaticThresholdCriterion"
@@ -929,7 +936,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "cpu_percent",
-        "threshold": 75,
+        "threshold": 85,
         "operator": "GreaterThan",
         "timeAggregation": "Average",
         "criterionType": "StaticThresholdCriterion"
@@ -973,7 +980,7 @@
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
-        "threshold": 75,
+        "threshold": 90,
         "operator": "GreaterThan",
         "timeAggregation": "Maximum",
         "criterionType": "StaticThresholdCriterion"
@@ -1204,6 +1211,7 @@
         "WEBSITE_RUN_FROM_PACKAGE": "1",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public'), '2018-02-14').secretUriWithVersion, ')')]",
         "enableSwagger": "[parameters('enableSwagger')]",
+        "RequestTimeouts:TableBuilderQuery": "[parameters('requestTimeoutsTableBuilderQuery')]",
         "TableBuilder:MaxTableCellsAllowed": "[parameters('tableBuilderMaxTableCellsAllowed')]"
       }
     },

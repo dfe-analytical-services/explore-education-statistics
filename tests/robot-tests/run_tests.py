@@ -22,8 +22,8 @@ from dotenv import load_dotenv
 from pabot.pabot import main as pabot_run_cli
 from robot import run_cli as robot_run_cli
 from robot import rebot_cli as robot_rebot_cli
-
 import scripts.keyword_profile as kp
+from tests.libs.slack import send_slack_report
 from tests.libs.setup_auth_variables import setup_auth_variables
 
 current_dir = Path(__file__).absolute().parent
@@ -41,13 +41,19 @@ else:
     os.environ['PYTHONPATH'] = str(current_dir)
 
 # Parse arguments
-parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
-                                 description="Use this script to run the UI tests, locally or as part of the CI pipeline, against the environment of your choosing")
-parser.add_argument("-b", "--browser",
-                    dest="browser",
-                    default="chrome",
-                    choices=["chrome", "firefox", "ie"],
-                    help="name of the browser you wish to run the tests with (NOTE: Only chromedriver is automatically installed!)")
+parser = argparse.ArgumentParser(
+    prog="pipenv run python run_tests.py",
+    description="Use this script to run the UI tests, locally or as part of the CI pipeline, against the environment of your choosing")
+parser.add_argument(
+    "-b",
+    "--browser",
+    dest="browser",
+    default="chrome",
+    choices=[
+        "chrome",
+        "firefox",
+        "ie"],
+    help="name of the browser you wish to run the tests with (NOTE: Only chromedriver is automatically installed!)")
 parser.add_argument("-i", "--interp",
                     dest="interp",
                     default="pabot",
@@ -111,6 +117,10 @@ parser.add_argument("--print-keywords",
                     dest="print_keywords",
                     action='store_true',
                     help="choose to print out keywords as they are started")
+parser.add_argument("--enable-slack",
+                    dest="enable_slack",
+                    action='store_true'
+                    )
 parser.add_argument("--prompt-to-continue",
                     dest="prompt_to_continue",
                     action='store_true',
@@ -124,8 +134,8 @@ parser.add_argument("--custom-env",
                     default=None,
                     help="load a custom .env file (must be in ~/robot-tests directory)")
 """
-NOTE(mark): The slack webhook url, and admin and analyst passwords to access to Admin app are 
-stored in the CI pipeline as secret variables, which means they cannot be accessed as normal 
+NOTE(mark): The slack webhook url, and admin and analyst passwords to access to Admin app are
+stored in the CI pipeline as secret variables, which means they cannot be accessed as normal
 environment variables, and instead must be passed as an argument to this script.
 """
 parser.add_argument("--slack-webhook-url",
@@ -162,12 +172,11 @@ pyderman.install(file_directory='./webdriver/',
 
 os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
 
-output_file="rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
+output_file = "rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
              "--output", output_file,
-             # "--exitonfailure",
              "--exclude", "Failing",
              "--exclude", "UnderConstruction",
              "--exclude", "BootstrapData"]
@@ -196,7 +205,7 @@ if args.ci:
     robotArgs += ['--removekeywords',
                   'name:common.user goes to url']  # To hide basic auth credentials
 else:
-    if args.custom_env: 
+    if args.custom_env:
         load_dotenv(args.custom_env)
 
     else:
@@ -206,6 +215,7 @@ assert os.getenv('PUBLIC_URL') is not None
 assert os.getenv('ADMIN_URL') is not None
 assert os.getenv('ADMIN_EMAIL') is not None
 assert os.getenv('ADMIN_PASSWORD') is not None
+
 
 def admin_request(method, endpoint, body=None):
     assert method and endpoint
@@ -429,15 +439,17 @@ finally:
         delete_test_topic()
 
     if args.rerun_failed_tests or args.rerun_failed_suites:
-        print("Combining rerun test results with original test results") 
-        merge_options=[
-            "--outputdir","test-results/",
-            "-o","output.xml",
+        print("Combining rerun test results with original test results")
+        merge_options = [
+            "--outputdir", "test-results/",
+            "-o", "output.xml",
             "--prerebotmodifier", "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
-            "--merge","test-results/output.xml","test-results/rerun.xml"
+            "--merge", "test-results/output.xml", "test-results/rerun.xml"
         ]
         robot_rebot_cli(merge_options, exit=False)
 
     print(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
     print(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
     print("\nTests finished!")
+    if args.enable_slack:
+        send_slack_report(args.env)
