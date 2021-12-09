@@ -43,6 +43,8 @@ Check publication owner cannot approve methodology for publication
 Check publication owner can upload subject file
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_TYPE} (not Live)
+    user clicks link    Data and files
+    user waits until page does not contain loading spinner
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Check publication owner can add data guidance to ${SUBJECT_NAME}
@@ -67,7 +69,7 @@ Check publication owner can add a footnote to ${SUBJECT_NAME}
     user clicks element    id:footnoteForm-content
     user enters text into element    id:footnoteForm-content    test footnote from the publication owner! (analyst)
     user clicks button    Save footnote
-    user waits until h2 is visible    Footnotes    %{WAIT_SMALL}
+    user waits until h2 is visible    Footnotes    60
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -98,7 +100,7 @@ Validates Release status table is correct
 
 Check publication owner can edit release status to "In draft"
     user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
+    user waits until h2 is visible    Edit release status    30
     user clicks radio    In draft
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote
     ...    Moving back to Draft state (publication owner)
@@ -131,6 +133,7 @@ Check that a publication owner can make a new release
     user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
 
 Check publication owner can upload subject file on new release
+    user clicks link    Data and files
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Check publication owner can add data guidance to ${SUBJECT_NAME} on new release

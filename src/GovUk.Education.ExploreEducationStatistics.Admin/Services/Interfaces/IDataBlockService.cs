@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, DataBlockViewModel>> Update(DataBlockId id, DataBlockUpdateViewModel dataBlockUpdate);
 
-        Task<Either<ActionResult, Unit>> DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
+        Task DeleteDataBlocks(DeleteDataBlockPlan deletePlan);
 
         Task<Either<ActionResult, DeleteDataBlockPlan>> GetDeletePlan(Guid releaseId, Guid id);
 

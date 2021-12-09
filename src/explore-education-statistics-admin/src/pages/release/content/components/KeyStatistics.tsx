@@ -223,8 +223,8 @@ const AddKeyStatistics = ({ release }: KeyStatisticsProps) => {
           }}
         >
           {`Add ${
-            keyStatisticsSection.content.length > 0 ? 'another ' : ''
-          }key statistic`}
+            keyStatisticsSection.content.length > 0 ? ' another ' : ''
+          } key statistic`}
         </Button>
       )}
     </>

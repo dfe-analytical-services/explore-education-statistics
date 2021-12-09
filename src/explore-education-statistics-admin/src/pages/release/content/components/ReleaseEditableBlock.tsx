@@ -3,7 +3,6 @@ import EditableContentBlock from '@admin/components/editable/EditableContentBloc
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
 import { EditableBlock } from '@admin/services/types/content';
-import Gate from '@common/components/Gate';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import isBrowser from '@common/utils/isBrowser';
@@ -21,7 +20,6 @@ interface Props {
   block: EditableBlock;
   sectionId: string;
   editable?: boolean;
-  visible?: boolean;
   onSave: (blockId: string, content: string) => void;
   onDelete: (blockId: string) => void;
 }
@@ -32,7 +30,6 @@ const ReleaseEditableBlock = ({
   block,
   sectionId,
   editable = true,
-  visible,
   onSave,
   onDelete,
 }: Props) => {
@@ -78,14 +75,12 @@ const ReleaseEditableBlock = ({
       return (
         <div className="dfe-content-overflow">
           <EditableBlockWrapper onDelete={editable ? handleDelete : undefined}>
-            <Gate condition={!!visible}>
-              <DataBlockTabs
-                releaseId={releaseId}
-                id={blockId}
-                dataBlock={block}
-                getInfographic={getChartFile}
-              />
-            </Gate>
+            <DataBlockTabs
+              releaseId={releaseId}
+              id={blockId}
+              dataBlock={block}
+              getInfographic={getChartFile}
+            />
           </EditableBlockWrapper>
         </div>
       );

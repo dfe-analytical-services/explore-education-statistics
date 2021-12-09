@@ -85,18 +85,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     PublicReleaseFastTrackTableName, It.IsAny<TableQuery<ReleaseFastTrack>>()))
                 .ReturnsAsync(new List<ReleaseFastTrack>
                 {
-                    new()
+                    new ReleaseFastTrack
                     {
                         PartitionKey = releaseId.ToString()
                     }
                 });
 
             tableBuilderService
-                .Setup(s => s
-                    .Query(
-                        releaseId, 
-                        It.Is<ObservationQueryContext>(query => query.SubjectId == fastTrackAsBlob.Query.SubjectId),
-                        default))
+                .Setup(s => s.Query(releaseId, It.Is<ObservationQueryContext>(query => query.SubjectId == fastTrackAsBlob.Query.SubjectId)))
                 .ReturnsAsync(tableBuilderResult);
 
             blobStorageService
@@ -181,11 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 });
 
             tableBuilderService
-                .Setup(s => s
-                    .Query(
-                        releaseId, 
-                        It.Is<ObservationQueryContext>(query => query.SubjectId == fastTrackAsBlob.Query.SubjectId),
-                        default))
+                .Setup(s => s.Query(releaseId, It.Is<ObservationQueryContext>(query => query.SubjectId == fastTrackAsBlob.Query.SubjectId)))
                 .ReturnsAsync(tableBuilderResult);
 
             blobStorageService

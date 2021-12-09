@@ -53,7 +53,7 @@ Select Indicators
 
 Create table
     user clicks element    id:filtersForm-submit
-    user waits until results table appears    %{WAIT_SMALL}
+    user waits until results table appears    60
     user waits until page contains element
     ...    xpath://*[@data-testid="dataTableCaption" and text()="Number of schools for 'Absence in prus' in England between 2013/14 and 2016/17"]
 
@@ -123,7 +123,7 @@ Verify indicator Number of schools is still selected
 
 Create table again
     user clicks element    id:filtersForm-submit
-    user waits until results table appears    %{WAIT_SMALL}
+    user waits until results table appears    60
     user waits until page contains element
     ...    xpath://*[@data-testid="dataTableCaption" and text()="'Absence in prus' in Barnet, Barnsley and Bedford between 2014/15 and 2015/16"]
 

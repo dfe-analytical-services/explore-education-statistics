@@ -1,0 +1,57 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`LocationFiltersForm renders a read-only view of selected options when no longer the current step 1`] = `
+<dl
+  class="govuk-summary-list govuk-summary-list--no-border"
+>
+  <div
+    class="govuk-summary-list__row"
+    data-testid="Country"
+  >
+    <dt
+      class="govuk-summary-list__key"
+      data-testid="Country-key"
+    >
+      Country
+    </dt>
+    <dd
+      class="govuk-summary-list__value"
+      data-testid="Country-value"
+    >
+      <ul
+        class="govuk-list listContainer"
+      >
+        <li>
+          Country 1
+        </li>
+      </ul>
+    </dd>
+  </div>
+  <div
+    class="govuk-summary-list__row"
+    data-testid="Region"
+  >
+    <dt
+      class="govuk-summary-list__key"
+      data-testid="Region-key"
+    >
+      Region
+    </dt>
+    <dd
+      class="govuk-summary-list__value"
+      data-testid="Region-value"
+    >
+      <ul
+        class="govuk-list listContainer"
+      >
+        <li>
+          Region 1
+        </li>
+        <li>
+          Region 2
+        </li>
+      </ul>
+    </dd>
+  </div>
+</dl>
+`;

@@ -12,15 +12,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
     {
         public static ActionResult ValidationResult(params Enum[] errors)
         {
-            return ValidationResult(errors.Select(error => error.ToString()).ToArray());
-        }
-        
-        public static ActionResult ValidationResult(params string[] errors)
-        {
             var problemDetails = new ValidationProblemDetails(
                 errors.ToDictionary(
                     _ => string.Empty,
-                    error => new[] {error.ScreamingSnakeCase()}))
+                    error => new[] {error.ToString().ScreamingSnakeCase()}))
             {
                 Status = (int) HttpStatusCode.BadRequest,
                 Detail = "Please refer to the errors property for additional details"

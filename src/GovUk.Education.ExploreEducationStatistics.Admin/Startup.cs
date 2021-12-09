@@ -11,15 +11,11 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -212,7 +208,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
 
             services.Configure<PreReleaseOptions>(Configuration);
-            services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
             // here we configure our security policies
@@ -233,7 +228,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddMvc(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
-                    options.Filters.Add(new OperationCancelledExceptionFilter());
                     options.EnableEndpointRouting = false;
                     options.AllowEmptyInputInBodyModelBinding = true;
                 })
@@ -398,8 +392,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddSingleton<IFileTypeService, FileTypeService>();
             services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
-            services.AddTransient<IBlobCacheService, BlobCacheService>();
-            services.AddTransient<ICacheKeyService, CacheKeyService>();
 
             services.AddSwaggerGen(c =>
             {
@@ -429,10 +421,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Enable caching and register any caching services.
-            CacheAspect.Enabled = true;
-            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
-
             UpdateDatabase(app, env);
 
             if (env.IsDevelopment())

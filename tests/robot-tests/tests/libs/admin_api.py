@@ -16,9 +16,9 @@ class AdminClient:
         assert os.getenv('ADMIN_URL') is not None
 
         requests.sessions.HTTPAdapter(
-            pool_connections=50,
-            pool_maxsize=50,
-            max_retries=3
+        pool_connections=50,
+        pool_maxsize=50,
+        max_retries=3
         )
         session = requests.Session()
 
@@ -54,7 +54,6 @@ class AdminClient:
 
 
 admin_client = AdminClient()
-
 
 def user_creates_theme_via_api(title: str, summary: str = '') -> str:
     assert title

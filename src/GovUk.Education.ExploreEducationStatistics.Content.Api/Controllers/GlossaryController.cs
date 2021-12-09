@@ -1,10 +1,8 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("glossary-entries")]
-        [BlobCache(typeof(GlossaryCacheKey))]
         public async Task<List<GlossaryCategoryViewModel>> GetAllGlossaryEntries()
         {
             return await _glossaryService.GetAllGlossaryEntries();

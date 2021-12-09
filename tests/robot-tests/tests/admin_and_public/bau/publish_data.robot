@@ -66,6 +66,7 @@ Verify new release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 Upload subjects to release
+    user clicks link    Data and files
     user uploads subject    ${SUBJECT_1_NAME}    tiny-two-filters.csv    tiny-two-filters.meta.csv
     user uploads subject    ${SUBJECT_2_NAME}    upload-file-test.csv    upload-file-test-with-filter.meta.csv
 
@@ -385,7 +386,7 @@ Edit footnote
 
 Check footnote was updated on data block
     user clicks link    Data blocks
-    user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
+    user waits until h2 is visible    Data blocks
 
     user clicks link    Edit block    css:tbody > tr:first-child
     user waits until table is visible
@@ -419,10 +420,10 @@ Verify newly published release is on Find Statistics page
 
 Navigate to published release page
     user clicks element    testid:View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    90
 
 Check latest release is correct
-    user waits until page contains title caption    ${RELEASE_2_NAME}    %{WAIT_MEDIUM}
+    user waits until page contains title caption    ${RELEASE_2_NAME}    90
     user checks page contains    This is the latest data
     user checks page contains    See other releases (1)
 
@@ -597,7 +598,7 @@ Go to release page
     user opens accordion section    Related information
     user clicks link    ${PUBLICATION_NAME}, ${RELEASE_2_NAME}
 
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
+    user waits until h1 is visible    ${PUBLICATION_NAME}    90
     user waits until page contains title caption    ${RELEASE_2_NAME}
 
 Go to data guidance document

@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using Xunit;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests
 {
     public class FootnoteRepositoryTests
     {

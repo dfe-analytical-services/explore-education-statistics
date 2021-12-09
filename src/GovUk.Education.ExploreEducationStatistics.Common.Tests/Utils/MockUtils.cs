@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
             return helper;
         }
 
-        public static Mock<IPersistenceHelper<TDbContext>> MockPersistenceHelper<TDbContext, TEntity>(TEntity? entity)
+        public static Mock<IPersistenceHelper<TDbContext>> MockPersistenceHelper<TDbContext, TEntity>(TEntity entity)
             where TDbContext : DbContext where TEntity : class
         {
             var helper = new Mock<IPersistenceHelper<TDbContext>>();
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
 
         public static void SetupCall<TDbContext, TEntity>(
             Mock<IPersistenceHelper<TDbContext>> helper,
-            TEntity? entity)
+            TEntity entity)
             where TDbContext : DbContext
             where TEntity : class
         {
@@ -85,8 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
                 .ReturnsAsync(new Either<ActionResult, TEntity>(Activator.CreateInstance<TEntity>()));
         }
 
-        private static Func<Either<ActionResult, TEntity>> EntityOrNotFoundResult<TEntity>(TEntity? entity)
-            where TEntity : class
+        private static Func<Either<ActionResult, TEntity>> EntityOrNotFoundResult<TEntity>(TEntity entity)
         {
             return () =>
             {

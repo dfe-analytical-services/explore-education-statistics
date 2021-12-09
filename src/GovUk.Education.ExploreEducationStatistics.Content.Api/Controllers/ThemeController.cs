@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -28,7 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("themes")]
-        [BlobCache(typeof(PublicationTreeCacheKey))]
         public async Task<IList<ThemeTree<PublicationTreeNode>>> GetThemes(
             [FromQuery(Name = "publicationFilter")] PublicationTreeFilter? filter = null)
         {
@@ -36,7 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("methodology-themes")]
-        [BlobCache(typeof(AllMethodologiesCacheKey))]
         public async Task<ActionResult<List<AllMethodologiesThemeViewModel>>> GetMethodologyThemes()
         {
             return await _methodologyService.GetTree()

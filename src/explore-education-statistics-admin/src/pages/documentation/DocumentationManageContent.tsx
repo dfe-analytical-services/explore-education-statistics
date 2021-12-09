@@ -78,14 +78,14 @@ const DocumentationManageContent = () => {
               </p>
               <h3>Do</h3>
               <p>
-                To create and edit any content - click the 'Edit content' radio
-                button.
+                To create and edit any content and add comments to your release
+                - click the 'Add / view comments' radio button.
               </p>
               <ul className="govuk-list govuk-list--number dfe-guidance-list">
                 <li>
                   <h4>
-                    Click the 'Edit content' radio button located in the bottom
-                    left of the screen.
+                    Click the 'Add / view comments and edit content' radio
+                    button located in the bottom left of the screen.
                   </h4>
                   <p>
                     This will be selected by default when you enter this page.

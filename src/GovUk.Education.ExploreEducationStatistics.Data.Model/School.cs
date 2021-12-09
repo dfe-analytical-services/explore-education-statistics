@@ -1,15 +1,17 @@
-#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using Newtonsoft.Json;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public class School : ObservationalUnit, ILocationAttribute
+    public class School : ObservationalUnit
     {
-        public School(string? urn, string? name) : base(urn, name)
+        public School(string urn, string name) : base(urn, name)
         {
         }
-
+        
         public static School Empty()
         {
-            return new(null, null);
+            return new School(null, null);
         }
     }
 }

@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger = logger;
         }
 
-        public async Task<List<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path)
+        public async Task<IEnumerable<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blobInfos = new List<BlobInfo>();

@@ -1,91 +1,61 @@
-import usePrevious from '@common/hooks/usePrevious';
+import useAsyncCallback, {
+  AsyncStateSetterParam,
+} from '@common/hooks/useAsyncCallback';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode, useEffect } from 'react';
 
 interface GateProps {
-  condition: boolean | (() => Promise<boolean>) | (() => boolean);
+  condition: boolean | (() => Promise<boolean>);
   children: ReactNode;
-  /**
-   * Fallback to render if the {@property condition}
-   * has not passed yet.
-   */
   fallback?: ReactNode | ((error?: unknown) => ReactNode);
-  /**
-   * Loading state to render if the {@property condition}
-   * is dependent on an asynchronous task.
-   */
   loading?: ReactNode;
-  /**
-   * If the {@property condition} passes once, then we
-   * consider the gate 'closed' and will not try to
-   * re-run the condition and will not unmount the
-   * children if the condition changes back to false.
-   */
-  passOnce?: boolean;
 }
 
 /**
- * Conditionally render its children based on a condition
- * that must be passed. This may be an asynchronous task
- * or just any boolean.
+ * Conditionally render {@param children} based on a
+ * {@param condition} that must be passed. This may be
+ * an asynchronous task or just any boolean.
+ *
+ * @param loading state can be rendered if it is asynchronous.
+ * @param fallback will be rendered if the condition
+ * fails or there is an error.
  */
 const Gate = ({
   children,
   condition,
   fallback = null,
   loading = null,
-  passOnce = true,
 }: GateProps) => {
-  const previousCondition = usePrevious(condition);
-
-  const [passed, setPassed] = useState(false);
-  const [isLoading, setLoading] = useState(false);
-  const [error, setError] = useState<unknown>();
-
-  useEffect(() => {
-    const checkCondition = async () => {
-      if (previousCondition === condition) {
-        return;
-      }
-
-      if (passed && passOnce) {
-        return;
-      }
-
-      if (isLoading) {
-        return;
-      }
+  const [{ isLoading, value, error }, checkCondition] = useAsyncCallback(
+    async () => (typeof condition === 'boolean' ? condition : condition()),
+    [condition],
+    () => {
+      let initialState: AsyncStateSetterParam<boolean> = {
+        isLoading: true,
+      };
 
       if (typeof condition === 'boolean') {
-        setPassed(condition);
-        return;
+        initialState = {
+          isLoading: false,
+          value: condition,
+        };
       }
 
-      const task = condition();
+      return initialState;
+    },
+  );
 
-      if (task instanceof Promise) {
-        setLoading(true);
-
-        try {
-          setPassed(await task);
-        } catch (err) {
-          setError(err);
-        } finally {
-          setLoading(false);
-        }
-      } else {
-        setPassed(task);
-      }
-    };
-
-    checkCondition();
-  }, [condition, isLoading, passOnce, passed, previousCondition]);
+  useEffect(() => {
+    if (isLoading && !value && !error) {
+      checkCondition();
+    }
+  }, [isLoading, value, error, checkCondition]);
 
   if (isLoading) {
     return loading;
   }
 
-  if (passed) {
+  if (value) {
     return children;
   }
 

@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -12,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -45,8 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ITimePeriodService _timePeriodService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IUserService _userService;
-        private readonly ICacheKeyService _cacheKeyService;
-        private readonly IBlobCacheService _cacheService;
 
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
@@ -59,9 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseService releaseService,
             ITimePeriodService timePeriodService,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            IUserService userService, 
-            ICacheKeyService cacheKeyService,
-            IBlobCacheService cacheService)
+            IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -73,8 +66,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _timePeriodService = timePeriodService;
             _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
-            _cacheKeyService = cacheKeyService;
-            _cacheService = cacheService;
         }
 
         public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
@@ -89,12 +80,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async originalFile =>
                 {
                     return await CheckFileExists(releaseId, replacementFileId)
-                        .OnSuccess(async replacementFile =>
+                        .OnSuccess(replacementFile =>
                         {
-                            var originalSubjectId = originalFile.SubjectId!.Value;
-                            var replacementSubjectId = replacementFile.SubjectId!.Value;
+                            var originalSubjectId = originalFile.SubjectId.Value;
+                            var replacementSubjectId = replacementFile.SubjectId.Value;
 
-                            var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
+                            var replacementSubjectMeta = GetReplacementSubjectMeta(replacementSubjectId);
 
                             var dataBlocks = ValidateDataBlocks(releaseId, originalSubjectId, replacementSubjectMeta);
                             var footnotes = ValidateFootnotes(releaseId, originalSubjectId, replacementSubjectMeta);
@@ -121,8 +112,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReplacementMustBeValid);
                     }
 
-                    await replacementPlan.DataBlocks.ForEachAsync(plan =>
-                        InvalidateDataBlockCachedResults(plan, releaseId));
                     await replacementPlan.DataBlocks.ForEachAsync(plan =>
                         ReplaceLinksForDataBlock(plan, replacementPlan.ReplacementSubjectId));
                     await replacementPlan.Footnotes.ForEachAsync(plan =>
@@ -156,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
+        private ReplacementSubjectMeta GetReplacementSubjectMeta(Guid subjectId)
         {
             var filtersIncludingItems = _filterRepository.GetFiltersIncludingItems(subjectId)
                 .ToList();
@@ -167,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var indicators = _indicatorRepository.GetIndicators(subjectId)
                 .ToDictionary(filterItem => filterItem.Name, filterItem => filterItem);
 
-            var locations = await _locationRepository.GetLocationAttributes(subjectId);
+            var observationalUnits = _locationRepository.GetObservationalUnits(subjectId);
 
             var timePeriods = _timePeriodService.GetTimePeriods(subjectId);
 
@@ -175,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Filters = filters,
                 Indicators = indicators,
-                ObservationalUnits = locations,
+                ObservationalUnits = observationalUnits,
                 TimePeriods = timePeriods
             };
         }
@@ -520,10 +509,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
             }
 
-            var locations = _locationRepository.GetLocationAttributes(geographicLevel, originalCodes);
+            var locations = _locationRepository.GetObservationalUnits(geographicLevel, originalCodes);
             var replacementLocations = replacementSubjectMeta.ObservationalUnits
                 .GetValueOrDefault(geographicLevel)
-                ?.ToDictionary(location => location.Code) ?? new Dictionary<string, ILocationAttribute>();
+                ?.ToDictionary(location => location.Code) ?? new Dictionary<string, ObservationalUnit>();
 
             return new LocationReplacementViewModel(
                 label: geographicLevel.GetEnumLabel(),
@@ -534,8 +523,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private static ObservationalUnitReplacementViewModel ValidateLocationForReplacement(
-            ILocationAttribute location,
-            IReadOnlyDictionary<string, ILocationAttribute> replacementLocations)
+            ObservationalUnit location,
+            Dictionary<string, ObservationalUnit> replacementLocations)
         {
             return new ObservationalUnitReplacementViewModel(
                 label: location.Name,
@@ -950,19 +939,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await _releaseService.RemoveDataFiles(releaseId, originalFileId));
         }
 
-        private Task<Either<ActionResult, Unit>> InvalidateDataBlockCachedResults(
-            DataBlockReplacementPlanViewModel plan, Guid releaseId)
-        {
-            return _cacheKeyService
-                .CreateCacheKeyForDataBlock(releaseId, plan.Id)
-                .OnSuccessVoid(_cacheService.DeleteItem);
-        }
-
         private class ReplacementSubjectMeta
         {
             public Dictionary<string, Filter> Filters { get; set; }
             public Dictionary<string, Indicator> Indicators { get; set; }
-            public Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>> ObservationalUnits { get; set; }
+            public Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> ObservationalUnits { get; set; }
             public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; }
         }
     }

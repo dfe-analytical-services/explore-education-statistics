@@ -31,5 +31,5 @@ Navigate back to admin dashboard for publication
 
 Check cannot create an amendment of a published release
     ${details}=    user gets details content element    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)
-    ...    ${publication_accordion}    %{WAIT_SMALL}
+    ...    ${publication_accordion}    30
     user cannot see the create amendment controls for release    ${details}

@@ -84,9 +84,7 @@ describe('ChartAxisConfiguration', () => {
     const generalSection = within(
       screen.getByRole('group', { name: 'General' }),
     );
-    expect(generalSection.getByLabelText('Size of axis (pixels)')).toHaveValue(
-      50,
-    );
+    expect(generalSection.getByLabelText('Size of axis (px)')).toHaveValue(50);
     expect(generalSection.getByLabelText('Show grid lines')).toBeChecked();
     expect(generalSection.getByLabelText('Show axis')).toBeChecked();
     expect(generalSection.getByLabelText('Displayed unit')).toHaveValue('');
@@ -121,7 +119,7 @@ describe('ChartAxisConfiguration', () => {
 
     const labelsSection = within(screen.getByRole('group', { name: 'Labels' }));
     expect(labelsSection.getByLabelText('Label')).toHaveValue('');
-    expect(labelsSection.getByLabelText('Width (pixels)')).toHaveValue(null);
+    expect(labelsSection.getByLabelText('Width (px)')).toHaveValue(null);
 
     const sortingSection = within(
       screen.getByRole('group', { name: 'Sorting' }),
@@ -214,7 +212,7 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.type(screen.getByLabelText('Width (pixels)'), '-1');
+    await userEvent.type(screen.getByLabelText('Width (px)'), '-1');
     userEvent.tab();
 
     await waitFor(() => {
@@ -240,7 +238,7 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.type(screen.getByLabelText('Size of axis (pixels)'), '-1');
+    await userEvent.type(screen.getByLabelText('Size of axis (px)'), '-1');
     userEvent.tab();
 
     await waitFor(() => {
@@ -268,7 +266,7 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    await userEvent.type(screen.getByLabelText('Width (pixels)'), '-1');
+    await userEvent.type(screen.getByLabelText('Width (px)'), '-1');
 
     expect(handleSubmit).not.toHaveBeenCalled();
 
@@ -297,8 +295,8 @@ describe('ChartAxisConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    userEvent.clear(screen.getByLabelText('Size of axis (pixels)'));
-    await userEvent.type(screen.getByLabelText('Size of axis (pixels)'), '100');
+    userEvent.clear(screen.getByLabelText('Size of axis (px)'));
+    await userEvent.type(screen.getByLabelText('Size of axis (px)'), '100');
 
     userEvent.click(screen.getByRole('checkbox', { name: 'Sort ascending' }));
 

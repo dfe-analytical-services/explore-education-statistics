@@ -1,162 +1,31 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static Moq.MockBehavior;
-using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
 {
-    [Collection(BlobCacheServiceTests)]
-    public class TableBuilderControllerTests : BlobCacheServiceTestFixture
+    public class TableBuilderControllerTests
     {
         private readonly Guid _releaseId = Guid.NewGuid();
         private readonly Guid _dataBlockId = Guid.NewGuid();
 
-        private readonly TableBuilderResultViewModel _tableBuilderResults = new()
-        {
-            Results = new List<ObservationViewModel>
-            {
-                new()
-                {
-                    Filters = new List<string>
-                    {
-                        "filter1"
-                    },
-                    Location = new LocationViewModel
-                    {
-                        Country = new CodeNameViewModel
-                        {
-                            Code = "code",
-                            Name = "name"
-                        }
-                    },
-                    Measures = new Dictionary<string, string>
-                    {
-                        { "key", "value" }
-                    },
-                    GeographicLevel = GeographicLevel.Country,
-                    TimePeriod = "2017/18"
-                }
-            },
-            SubjectMeta = new ResultSubjectMetaViewModel
-            {
-                Filters = new Dictionary<string, FilterMetaViewModel>
-                {
-                    {
-                        "filter1", new FilterMetaViewModel
-                        {
-                            Hint = "A hint",
-                            Legend = "A legend",
-                            Name = "A name",
-                            Options = new Dictionary<string, FilterItemsMetaViewModel>
-                            {
-                                {
-                                    "option1", new FilterItemsMetaViewModel
-                                    {
-                                        Label = "filter",
-                                        Options = new List<LabelValue>
-                                        {
-                                            new("label", "value")
-                                        }
-                                    }
-                                }
-                            },
-                            TotalValue = "1234"
-                        }
-                    }
-                },
-                Footnotes = new List<FootnoteViewModel>
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        Label = "footnote"
-                    }
-                },
-                Indicators = new List<IndicatorMetaViewModel>
-                {
-                    new()
-                    {
-                        Label = "A label",
-                        Name = "A name",
-                        Unit = "cm",
-                        Value = "1234",
-                        DecimalPlaces = 2
-                    }
-                },
-                Locations = new List<ObservationalUnitMetaViewModel>
-                {
-                    new()
-                    {
-                        Label = "A label",
-                        Level = GeographicLevel.Institution,
-                        Value = "1234",
-                        GeoJson = true
-                    }
-                },
-                BoundaryLevels = new List<BoundaryLevelViewModel>
-                {
-                    new(1234, "boundary")
-                },
-                LocationsHierarchical = new Dictionary<string, List<LocationAttributeViewModel>>
-                {
-                    {
-                        "location", new List<LocationAttributeViewModel>
-                        {
-                            new()
-                            {
-                                Label = "A label",
-                                Level = "Level",
-                                Options = new List<LocationAttributeViewModel>
-                                {
-                                    new()
-                                    {
-                                        Label = "A label",
-                                        Level = "Level",
-                                        Options = new List<LocationAttributeViewModel>()
-                                    }
-                                },
-                                Value = "A value",
-                                GeoJson = true
-                            }
-                        }
-                    }
-                },
-                PublicationName = "Publication name",
-                SubjectName = "Subject name",
-                GeoJsonAvailable = true,
-                TimePeriodRange = new List<TimePeriodMetaViewModel>
-                {
-                    new(1234, TimeIdentifier.April)
-                    {
-                        Label = "A label"
-                    }
-                }
-            }
-        };
-
-        private readonly ObservationQueryContext _query = new()
+        private readonly ObservationQueryContext _query = new ObservationQueryContext
         {
             SubjectId = Guid.NewGuid()
         };
@@ -164,78 +33,86 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         [Fact]
         public async Task Query()
         {
-            var cancellationToken = new CancellationToken();
+            var tableBuilderService = new Mock<ITableBuilderService>();
 
-            var (controller, mocks) = BuildControllerAndDependencies();
+            tableBuilderService.Setup(s => s.Query(_releaseId, _query)).ReturnsAsync(
+                new TableBuilderResultViewModel
+                {
+                    Results = new List<ObservationViewModel>
+                    {
+                        new ObservationViewModel()
+                    }
+                }
+            );
 
-            mocks.tableBuilderService
-                .Setup(s => s.Query(_releaseId, _query, cancellationToken))
-                .ReturnsAsync(_tableBuilderResults);
+            var controller = BuildTableBuilderController(tableBuilderService: tableBuilderService.Object);
+            var result = await controller.Query(_releaseId, _query);
 
-            var result = await controller.Query(_releaseId, _query, cancellationToken);
-            VerifyAllMocks(mocks);
-            
-            result.AssertOkResult();
+            Assert.IsAssignableFrom<TableBuilderResultViewModel>(result.Value);
+            Assert.Single(result.Value.Results);
         }
+
 
         [Fact]
         public async Task QueryForDataBlock()
         {
-            var cancellationToken = new CancellationToken();
-            
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                ReleaseId = _releaseId,
-                Release = new Release
-                {
-                    Id = _releaseId,
-                    Publication = new Publication
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                },
-                ContentBlockId = _dataBlockId,
-                ContentBlock = new DataBlock
-                {
-                    Id = _dataBlockId,
-                    Query = _query,
-                    Charts = new List<IChart>()
-                }
-            };
-            
-            var (controller, mocks) = BuildControllerAndDependencies();
+            var tableBuilderService = new Mock<ITableBuilderService>();
 
-            SetupCall(mocks.persistenceHelper, releaseContentBlock);
-            
-            mocks.cacheService
-                .Setup(s => s.GetItem(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)), 
-                    typeof(TableBuilderResultViewModel)))
-                .ReturnsAsync(null);
-
-            mocks.tableBuilderService
+            tableBuilderService
                 .Setup(
                     s =>
                         s.Query(
                             _releaseId,
                             It.Is<ObservationQueryContext>(
                                 q => q.SubjectId == _query.SubjectId
-                            ),
-                            cancellationToken
+                            )
                         )
                 )
-                .ReturnsAsync(_tableBuilderResults);
+                .ReturnsAsync(
+                    new TableBuilderResultViewModel
+                    {
+                        Results = new List<ObservationViewModel>
+                        {
+                            new ObservationViewModel()
+                        }
+                    }
+                );
 
-            mocks.cacheService
-                .Setup(s => s.SetItem<object>(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
-                    _tableBuilderResults))
-                .Returns(Task.CompletedTask);
-            
-            var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId, cancellationToken);
-            VerifyAllMocks(mocks);
+            var contentPersistenceHelper =
+                MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseContentBlock>(
+                    new ReleaseContentBlock
+                    {
+                        ReleaseId = _releaseId,
+                        Release = new Release
+                        {
+                            Id = _releaseId,
+                        },
+                        ContentBlockId = _dataBlockId,
+                        ContentBlock = new DataBlock
+                        {
+                            Id = _dataBlockId,
+                            Query = _query,
+                            Charts = new List<IChart>()
+                        }
+                    }
+                );
 
-            result.AssertOkResult(_tableBuilderResults);
+            var controller = BuildTableBuilderController(
+                tableBuilderService: tableBuilderService.Object,
+                contentPersistenceHelper: contentPersistenceHelper.Object
+            );
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            };
+
+            var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId);
+
+            Assert.IsType<TableBuilderResultViewModel>(result.Value);
+            Assert.Single(result.Value.Results);
+
+            MockUtils.VerifyAllMocks(tableBuilderService, contentPersistenceHelper);
         }
 
         [Fact]
@@ -243,44 +120,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         {
             var subjectId = Guid.NewGuid();
 
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                ReleaseId = _releaseId,
-                Release = new Release
-                {
-                    Id = _releaseId,
-                    Publication = new Publication
-                    {
-                        Id = Guid.NewGuid()
-                    }
-                },
-                ContentBlockId = _dataBlockId,
-                ContentBlock = new DataBlock
-                {
-                    Id = _dataBlockId,
-                    Query = new ObservationQueryContext
-                    {
-                        SubjectId = subjectId,
-                        IncludeGeoJson = false
-                    },
-                    Charts = new List<IChart>
-                    {
-                        new MapChart()
-                    }
-                }
-            };
-            
-            var (controller, mocks) = BuildControllerAndDependencies();
+            var tableBuilderService = new Mock<ITableBuilderService>();
 
-            SetupCall(mocks.persistenceHelper, releaseContentBlock);
-            
-            mocks.cacheService
-                .Setup(s => s.GetItem(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)), 
-                    typeof(TableBuilderResultViewModel)))
-                .ReturnsAsync(null);
-            
-            mocks.tableBuilderService
+            tableBuilderService
                 .Setup(
                     s =>
                         s.Query(
@@ -288,93 +130,129 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             It.Is<ObservationQueryContext>(
                                 q =>
                                     q.SubjectId == subjectId && q.IncludeGeoJson == true
-                            ),
-                            default
+                            )
                         )
                 )
-                .ReturnsAsync(_tableBuilderResults);
+                .ReturnsAsync(
+                    new TableBuilderResultViewModel
+                    {
+                        Results = new List<ObservationViewModel>
+                        {
+                            new ObservationViewModel()
+                        }
+                    }
+                );
 
-            mocks.cacheService
-                .Setup(s => s.SetItem<object>(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
-                    _tableBuilderResults))
-                .Returns(Task.CompletedTask);
-            
+            var contentPersistenceHelper =
+                MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseContentBlock>(
+                    new ReleaseContentBlock
+                    {
+                        ReleaseId = _releaseId,
+                        Release = new Release
+                        {
+                            Id = _releaseId,
+                        },
+                        ContentBlockId = _dataBlockId,
+                        ContentBlock = new DataBlock
+                        {
+                            Id = _dataBlockId,
+                            Query = new ObservationQueryContext
+                            {
+                                SubjectId = subjectId,
+                                IncludeGeoJson = false
+                            },
+                            Charts = new List<IChart>
+                            {
+                                new MapChart()
+                            }
+                        }
+                    }
+                );
+
+            var controller = BuildTableBuilderController(
+                tableBuilderService: tableBuilderService.Object,
+                contentPersistenceHelper: contentPersistenceHelper.Object
+            );
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            };
+
             var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId);
-            VerifyAllMocks(mocks);
 
-            result.AssertOkResult(_tableBuilderResults);
+            Assert.IsType<TableBuilderResultViewModel>(result.Value);
+            Assert.Single(result.Value.Results);
+
+            MockUtils.VerifyAllMocks(tableBuilderService, contentPersistenceHelper);
         }
 
         [Fact]
         public async Task QueryForDataBlock_NotFound()
         {
-            var (controller, mocks) = BuildControllerAndDependencies();
-            
-            SetupCall<ContentDbContext, ReleaseContentBlock>(mocks.persistenceHelper, null);
+            var contentPersistenceHelper =
+                MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseContentBlock>(null);
+
+            var controller = BuildTableBuilderController(
+                contentPersistenceHelper: contentPersistenceHelper.Object
+            );
+
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            };
 
             var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId);
-            VerifyAllMocks(mocks);
 
-            result.AssertNotFoundResult();
+            Assert.IsType<NotFoundResult>(result.Result);
         }
 
         [Fact]
         public async Task QueryForDataBlock_NotDataBlockType()
         {
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                ReleaseId = _releaseId,
-                Release = new Release
-                {
-                    Id = _releaseId,
-                    Publication = new Publication
+            var contentPersistenceHelper =
+                MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseContentBlock>(
+                    new ReleaseContentBlock
                     {
-                        Id = Guid.NewGuid()
+                        ReleaseId = _releaseId,
+                        Release = new Release
+                        {
+                            Id = _releaseId,
+                        },
+                        ContentBlockId = _dataBlockId,
+                        ContentBlock = new HtmlBlock
+                        {
+                            Id = _dataBlockId,
+                        }
                     }
-                },
-                ContentBlockId = _dataBlockId,
-                ContentBlock = new HtmlBlock
-                {
-                    Id = _dataBlockId,
-                }
-            };
-            
-            var (controller, mocks) = BuildControllerAndDependencies();
+                );
 
-            SetupCall(mocks.persistenceHelper, releaseContentBlock);
-
-            var exception = await Assert.ThrowsAsync<TargetInvocationException>(() => controller.QueryForDataBlock(_releaseId, _dataBlockId));
-            Assert.IsType<ArgumentException>(exception.InnerException);
-        }
-
-        [Fact]
-        public void TableBuilderResultViewModel_SerialiseAndDeserialise()
-        {
-            var converted = DeserializeObject<TableBuilderResultViewModel>(SerializeObject(_tableBuilderResults));
-            converted.AssertDeepEqualTo(_tableBuilderResults);
-        }
-
-        private (TableBuilderController controller, 
-            (
-                Mock<ITableBuilderService> tableBuilderService, 
-                Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,
-                Mock<IBlobCacheService> cacheService) mocks) 
-            BuildControllerAndDependencies()
-        {
-            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-            var persistenceHelper = MockPersistenceHelper<ContentDbContext>();
-            var userService = AlwaysTrueUserService();
-            var logger = new Mock<ILogger<TableBuilderController>>();
-
-            var controller = new TableBuilderController(
-                tableBuilderService.Object,
-                persistenceHelper.Object,
-                userService.Object,
-                logger.Object
+            var controller = BuildTableBuilderController(
+                contentPersistenceHelper: contentPersistenceHelper.Object
             );
 
-            return (controller, (tableBuilderService, persistenceHelper, CacheService));
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext()
+            };
+
+            var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId);
+
+            Assert.IsType<NotFoundResult>(result.Result);
+        }
+
+        private TableBuilderController BuildTableBuilderController(
+            ITableBuilderService tableBuilderService = null,
+            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
+            IUserService userService = null,
+            ILogger<TableBuilderController> logger = null)
+        {
+            return new TableBuilderController(
+                tableBuilderService ?? new Mock<ITableBuilderService>().Object,
+                contentPersistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext>().Object,
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                logger ?? new Mock<ILogger<TableBuilderController>>().Object
+            );
         }
     }
 }
