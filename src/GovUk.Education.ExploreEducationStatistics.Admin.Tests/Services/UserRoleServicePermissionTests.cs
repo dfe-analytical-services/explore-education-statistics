@@ -1,4 +1,6 @@
-﻿using System;
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -7,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
 using Moq;
@@ -49,12 +52,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task AddReleaseRole()
         {
+            var userId = Guid.NewGuid();
+            var release = new Release();
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Releases = new List<Release>
+                {
+                    release,
+                }
+            };
+
             await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
+                .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
+                    tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == Contributor,
+                    CanUpdateSpecificReleaseRole)
                 .AssertForbidden(async userService =>
                 {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.AddReleaseRole(Guid.NewGuid(), Guid.NewGuid(), Contributor);
+                    var contentDbContextId = Guid.NewGuid().ToString();
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        await contentDbContext.AddRangeAsync(publication);
+                        await contentDbContext.SaveChangesAsync();
+                    }
+
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        var service = SetupUserRoleService(contentDbContext: contentDbContext,
+                            userService: userService.Object);
+                        return await service.AddReleaseRole(userId, release.Id, Contributor);
+                    }
                 });
         }
 
@@ -145,25 +172,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole()
         {
+            var release = new Release();
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Releases = new List<Release>
+                {
+                    release,
+                }
+            };
+            var userReleaseRole = new UserReleaseRole
+            {
+                Release = release,
+                Role = Contributor,
+            };
+
             await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
+                .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
+                    tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == Contributor,
+                    CanUpdateSpecificReleaseRole)
                 .AssertForbidden(async userService =>
                 {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.RemoveUserReleaseRole(Guid.NewGuid());
+                    var contentDbContextId = Guid.NewGuid().ToString();
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        await contentDbContext.AddRangeAsync(publication, userReleaseRole);
+                        await contentDbContext.SaveChangesAsync();
+                    }
+
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        var service = SetupUserRoleService(contentDbContext: contentDbContext,
+                            userService: userService.Object);
+                        return await service.RemoveUserReleaseRole(userReleaseRole.Id);
+                    }
                 });
         }
 
         private static UserRoleService SetupUserRoleService(
-            ContentDbContext contentDbContext = null,
-            UsersAndRolesDbContext usersAndRolesDbContext = null,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper = null,
-            IEmailTemplateService emailTemplateService = null,
-            IUserPublicationRoleRepository userPublicationRoleRepository = null,
-            IUserReleaseRoleRepository userReleaseRoleRepository = null,
-            UserManager<ApplicationUser> userManager = null,
-            IUserService userService = null)
+            ContentDbContext? contentDbContext = null,
+            UsersAndRolesDbContext? usersAndRolesDbContext = null,
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
+            IEmailTemplateService? emailTemplateService = null,
+            IUserPublicationRoleRepository? userPublicationRoleRepository = null,
+            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            UserManager<ApplicationUser>? userManager = null,
+            IUserService? userService = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -172,7 +227,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
+                usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext!),
                 emailTemplateService ?? new Mock<IEmailTemplateService>().Object,
                 userService ?? new Mock<IUserService>().Object,
                 userPublicationRoleRepository ?? new Mock<IUserPublicationRoleRepository>().Object,

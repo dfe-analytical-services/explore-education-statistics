@@ -910,7 +910,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             bool enableThemeDeletion = true)
         {
             var configuration =
-                CreateMockConfiguration(new Tuple<string, string>("enableThemeDeletion", enableThemeDeletion.ToString()));
+                CreateMockConfiguration(TupleOf("enableThemeDeletion", enableThemeDeletion.ToString()));
 
             return new TopicService(
                 configuration.Object,

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using Xunit;
@@ -125,7 +126,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 
             var result = publication.LatestPublishedRelease();
             Assert.Null(result);
-
         }
 
         [Fact]
@@ -195,6 +195,101 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 
             var result = publication.LatestRelease();
             Assert.Null(result);
+        }
+
+        [Fact]
+        public void IsLatestVersionOfRelease_SingleRelease()
+        {
+            var publicationId = Guid.NewGuid();
+            var release2000OriginalId = Guid.NewGuid();
+            var release2000Original = new Release
+            {
+                Id = release2000OriginalId,
+                PublicationId = publicationId,
+                ReleaseName = "2000",
+                PreviousVersionId = release2000OriginalId,
+            };
+            var publication = new Publication
+            {
+                Id = publicationId,
+                Releases = new List<Release>
+                {
+                    release2000Original,
+                },
+            };
+
+            Assert.True(publication.IsLatestVersionOfRelease(release2000OriginalId));
+        }
+
+        [Fact]
+        public void IsLatestVersionOfRelease_Amendments()
+        {
+            var publicationId = Guid.NewGuid();
+
+            var release2000OriginalId = Guid.NewGuid();
+            var release2000Original = new Release
+            {
+                Id = release2000OriginalId,
+                PublicationId = publicationId,
+                ReleaseName = "2000",
+                PreviousVersionId = release2000OriginalId,
+            };
+            var release2000Latest = new Release
+            {
+                PublicationId = publicationId,
+                ReleaseName = "2000",
+                PreviousVersionId = release2000OriginalId,
+            };
+
+            var release2001OriginalId = Guid.NewGuid();
+            var release2001Original = new Release
+            {
+                Id = release2001OriginalId,
+                PublicationId = publicationId,
+                ReleaseName = "2001",
+                PreviousVersionId = release2000OriginalId,
+            };
+            var release2001Amendment = new Release
+            {
+                Id = Guid.NewGuid(),
+                PublicationId = publicationId,
+                ReleaseName = "2001",
+                PreviousVersionId = release2001OriginalId,
+            };
+            var release2001Latest = new Release
+            {
+                PublicationId = publicationId,
+                ReleaseName = "2001",
+                PreviousVersionId = release2001Amendment.Id,
+            };
+            var release2002LatestId = Guid.NewGuid();
+            var release2002Latest = new Release
+            {
+                Id = release2002LatestId,
+                PublicationId = publicationId,
+                ReleaseName = "2002",
+                PreviousVersionId = release2002LatestId,
+            };
+            var publication = new Publication
+            {
+                Id = publicationId,
+                Releases =
+                {
+                    release2000Original,
+                    release2000Latest,
+                    release2001Original,
+                    release2001Amendment,
+                    release2001Latest,
+                    release2002Latest,
+                }
+            };
+
+            Assert.False(publication.IsLatestVersionOfRelease(release2000Original.Id));
+            Assert.True(publication.IsLatestVersionOfRelease(release2000Latest.Id));
+            Assert.False(publication.IsLatestVersionOfRelease(release2001Original.Id));
+            Assert.False(publication.IsLatestVersionOfRelease(release2001Amendment.Id));
+            Assert.True(publication.IsLatestVersionOfRelease(release2001Latest.Id));
+            Assert.True(publication.IsLatestVersionOfRelease(release2002Latest.Id));
         }
     }
 }

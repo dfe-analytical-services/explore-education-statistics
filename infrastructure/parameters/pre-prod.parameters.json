@@ -46,6 +46,9 @@
     },
     "enableThemeDeletion": {
       "value": true
+    },
+    "tableBuilderMaxTableCellsAllowed": {
+      "value": 1000000
     }
   }
 }

@@ -44,6 +44,7 @@ export interface ReleaseSummary {
     value: string;
     label: string;
   };
+  title: string;
   releaseName: string;
   type: IdTitlePair;
   publishScheduled: string;

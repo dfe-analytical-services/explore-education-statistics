@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlockUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
@@ -401,7 +402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     }
 
                     return new Either<ActionResult, Tuple<MethodologyVersion, ContentSection>>(
-                        new Tuple<MethodologyVersion, ContentSection>(methodology, section));
+                        TupleOf(methodology, section));
                 });
         }
 
@@ -476,12 +477,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         {
             if (ContentListContainsAllSectionIds(methodologyVersion.Content, contentSectionIds))
             {
-                return new Tuple<MethodologyVersion, List<ContentSection>>(methodologyVersion, methodologyVersion.Content);
+                return TupleOf(methodologyVersion, methodologyVersion.Content);
             }
 
             if (ContentListContainsAllSectionIds(methodologyVersion.Annexes, contentSectionIds))
             {
-                return new Tuple<MethodologyVersion, List<ContentSection>>(methodologyVersion, methodologyVersion.Annexes);
+                return TupleOf(methodologyVersion, methodologyVersion.Annexes);
             }
 
             return new NotFoundResult();

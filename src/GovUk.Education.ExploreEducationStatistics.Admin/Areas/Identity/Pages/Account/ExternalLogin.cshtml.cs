@@ -207,6 +207,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                                 ReleaseId = invite.ReleaseId,
                                 Role = invite.Role,
                                 UserId = newInternalUser.Id,
+                                Created = DateTime.UtcNow,
+                                CreatedById = invite.CreatedById,
                             });
 
                             invite.Accepted = true;

@@ -255,6 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseImageService, ReleaseImageService>();
+            services.AddTransient<IReleasePermissionService, ReleasePermissionService>();
             services.AddTransient<IDataImportService, DataImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
 
@@ -320,6 +321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
             services.AddTransient<IUserRoleService, UserRoleService>();
+            services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
             services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
             services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
 

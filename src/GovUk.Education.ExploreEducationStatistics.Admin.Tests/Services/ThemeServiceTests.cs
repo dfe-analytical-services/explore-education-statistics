@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -462,15 +463,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private static ThemeService SetupThemeService(
             ContentDbContext context,
-            IMapper mapper = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IUserService userService = null,
-            ITopicService topicService = null,
-            IPublishingService publishingService = null,
+            IMapper? mapper = null,
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            IUserService? userService = null,
+            ITopicService? topicService = null,
+            IPublishingService? publishingService = null,
             bool enableThemeDeletion = true)
         {
             var configuration =
-                CreateMockConfiguration(new Tuple<string, string>("enableThemeDeletion", enableThemeDeletion.ToString()));
+                CreateMockConfiguration(TupleOf("enableThemeDeletion", enableThemeDeletion.ToString()));
 
             return new ThemeService(
                 configuration.Object,

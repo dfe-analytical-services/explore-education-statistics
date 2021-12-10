@@ -213,6 +213,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
         }
 
+        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListActiveReleases(Guid publicationId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId, query => query
+                        .Include(p => p.Releases)
+                        .ThenInclude(r => r.ReleaseStatuses))
+                .OnSuccess(_userService.CheckCanViewPublication)
+                .OnSuccess(publication =>
+                    publication.ListActiveReleases()
+                        .OrderByDescending(r => r.Year)
+                        .ThenByDescending(r => r.TimePeriodCoverage)
+                        .Select(r => _mapper.Map<ReleaseViewModel>(r))
+                        .ToList()
+                );
+        }
+
         public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
             Guid publicationId,
             List<LegacyReleasePartialUpdateViewModel> updatedLegacyReleases)

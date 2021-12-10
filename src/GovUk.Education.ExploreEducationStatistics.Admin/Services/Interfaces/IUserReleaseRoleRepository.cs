@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
@@ -10,7 +11,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<UserReleaseRole> Create(Guid userId,
             Guid releaseId,
-            ReleaseRole role);
+            ReleaseRole role,
+            Guid createdById);
+
+        Task<Unit> CreateMany(List<Guid> userIds,
+            Guid releaseId,
+            ReleaseRole role,
+            Guid createdById);
+
+        Task Remove(UserReleaseRole userReleaseRole, Guid deletedById);
+
+        Task RemoveMany(List<UserReleaseRole> userReleaseRoles, Guid deletedById);
+
+        Task RemoveAllForPublication(
+            Guid userId, Publication publication,
+            ReleaseRole role, Guid deletedById);
 
         Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId,
             Guid releaseId);

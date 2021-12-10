@@ -1047,6 +1047,74 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task ListActiveReleases()
+        {
+            var release2000Original = new Release
+            {
+                ReleaseName = "2000",
+                PreviousVersionId = null,
+            };
+            var release2000Latest = new Release
+            {
+                ReleaseName = "2000",
+                PreviousVersion = release2000Original,
+            };
+
+            var release2001Original = new Release
+            {
+                ReleaseName = "2001",
+                PreviousVersion = release2000Original,
+            };
+            var release2001Amendment = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                PreviousVersion = release2001Original,
+            };
+            var release2001Latest = new Release
+            {
+                ReleaseName = "2001",
+                PreviousVersion = release2001Amendment,
+            };
+
+            var release2002Latest = new Release
+            {
+                ReleaseName = "2002",
+                PreviousVersionId = null,
+            };
+            var publication = new Publication
+            {
+                Releases =
+                {
+                    release2000Original,
+                    release2000Latest,
+                    release2001Original,
+                    release2001Amendment,
+                    release2001Latest,
+                    release2002Latest,
+                }
+            };
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var service = new PublicationRepository(context, AdminMapper());
+                var latestReleases = await service.ListActiveReleases(publication.Id);
+
+                Assert.Equal(3, latestReleases.Count);
+
+                Assert.Equal(release2000Latest.Id, latestReleases[0].Id);
+                Assert.Equal(release2001Latest.Id, latestReleases[1].Id);
+                Assert.Equal(release2002Latest.Id, latestReleases[2].Id);
+            }
+        }
+
         private static PublicationRepository SetupPublicationRepository(ContentDbContext contentDbContext)
         {
             return new(contentDbContext, AdminMapper());

@@ -393,11 +393,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(new EnumToStringConverter<PublicationRole>());
 
             modelBuilder.Entity<UserReleaseRole>()
+                .Property(userReleaseRole => userReleaseRole.Created)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
+            modelBuilder.Entity<UserReleaseRole>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<ReleaseRole>());
 
             modelBuilder.Entity<UserReleaseRole>()
-                .HasQueryFilter(r => !r.SoftDeleted);
+                .HasQueryFilter(r =>
+                    !r.SoftDeleted
+                    && r.Deleted == null);
 
             modelBuilder.Entity<UserReleaseInvite>()
                 .Property(r => r.Role)
