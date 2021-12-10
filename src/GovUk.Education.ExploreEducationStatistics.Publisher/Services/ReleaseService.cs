@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -9,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
@@ -25,6 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class ReleaseService : IReleaseService
     {
+        private static readonly Regex FilterRegex = new(ContentFilterUtils.CommentsFilterPattern, RegexOptions.Compiled);
+
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly PublicStatisticsDbContext _publicStatisticsDbContext;
@@ -105,6 +109,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .Single(r => r.Id == id);
 
             var releaseViewModel = _mapper.Map<CachedReleaseViewModel>(release);
+
+            // Filter content blocks to remove any unnecessary information
+            releaseViewModel.HeadlinesSection?.Content.ForEach(FilterContentBlock);
+            releaseViewModel.SummarySection?.Content.ForEach(FilterContentBlock);
+            releaseViewModel.KeyStatisticsSection?.Content.ForEach(FilterContentBlock);
+            releaseViewModel.KeyStatisticsSecondarySection?.Content.ForEach(FilterContentBlock);
+            releaseViewModel.Content.ForEach(section => section.Content.ForEach(FilterContentBlock));
+
             releaseViewModel.DownloadFiles = await GetDownloadFiles(release);
 
             // If the release has no published date yet because it's not live, set the published date in the view model.
@@ -134,6 +146,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
 
             return releaseViewModel;
+        }
+
+        private static void FilterContentBlock(IContentBlockViewModel block)
+        {
+            switch (block)
+            {
+                case HtmlBlockViewModel htmlBlock:
+                    htmlBlock.Body = FilterRegex.Replace(htmlBlock.Body, string.Empty);
+                    break;
+
+                case MarkDownBlockViewModel markdownBlock:
+                    markdownBlock.Body = FilterRegex.Replace(markdownBlock.Body, string.Empty);
+                    break;
+            }
         }
 
         public async Task<Release> GetLatestRelease(Guid publicationId, IEnumerable<Guid> includedReleaseIds)
