@@ -307,17 +307,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!await _userReleaseInviteRepository.UserHasInvite(release.Id, email, PrereleaseViewer))
             {
                 var sendEmail = release.ApprovalStatus == ReleaseApprovalStatus.Approved;
+                if (sendEmail)
+                {
+                    var emailResult = await SendPreReleaseInviteEmail(release, email, isNewUser: true);
+                    if (emailResult.IsLeft)
+                    {
+                        return emailResult;
+                    }
+                }
+
                 await _userReleaseInviteRepository.Create(
                     releaseId: release.Id,
                     email: email,
                     releaseRole: PrereleaseViewer,
                     emailSent: sendEmail,
                     createdById: _userService.GetUserId());
-
-                if (sendEmail)
-                {
-                    return await SendPreReleaseInviteEmail(release, email, isNewUser: true);
-                }
             }
 
             return Unit.Instance;
@@ -329,6 +333,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (!await _userReleaseInviteRepository.UserHasInvite(release.Id, email, PrereleaseViewer))
             {
                 var sendEmail = release.ApprovalStatus == ReleaseApprovalStatus.Approved;
+
+                if (sendEmail)
+                {
+                    var emailResult = await SendPreReleaseInviteEmail(release, email, isNewUser: false);
+                    if (emailResult.IsLeft)
+                    {
+                        return emailResult;
+                    }
+                }
 
                 await _userReleaseInviteRepository.Create(
                     releaseId: release.Id,
@@ -343,11 +356,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     releaseId: release.Id,
                     role: PrereleaseViewer,
                     createdById: _userService.GetUserId());
-
-                if (sendEmail)
-                {
-                    return await SendPreReleaseInviteEmail(release, email, isNewUser: false);
-                }
             }
 
             return Unit.Instance;
