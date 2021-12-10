@@ -64,7 +64,11 @@ class ReleaseFilesGenerator(object):
 
         # Instantiate a new ContainerClient for the emulator
         self.blob_service_client = BlobServiceClient.from_connection_string(
-            "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://data-storage:10000/devstoreaccount1")
+            "DefaultEndpointsProtocol=http;" +
+            "AccountName=devstoreaccount1;" +
+            "AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;" +
+            "BlobEndpoint=http://data-storage:10000/devstoreaccount1"
+        )
 
         exclusions_release = Release("e7774a74-1f62-4b76-b9b5-84f14dac7278")
         pupil_absence_release = Release("4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5")
@@ -161,20 +165,24 @@ class ReleaseFilesGenerator(object):
         try:
             container_client = self.blob_service_client.create_container(
                 "downloads")
-        except ResourceExistsError:
+        except ResourceExistsError as e:
+            print(e)
+
             container_client = self.blob_service_client.get_container_client(
                 "downloads")
 
-        self.upload_files(container_client,
-                          self.all_files_zip_files)
-        self.upload_files(container_client,
-                          self.data_files)
+            self.upload_files(container_client,
+                              self.all_files_zip_files)
+
+            self.upload_files(container_client,
+                              self.data_files)
 
     def create_private_release_files(self):
         try:
             container_client = self.blob_service_client.create_container(
                 "releases")
-        except ResourceExistsError:
+        except ResourceExistsError as e:
+            print(e)
             container_client = self.blob_service_client.get_container_client(
                 "releases")
 
@@ -183,13 +191,18 @@ class ReleaseFilesGenerator(object):
         self.upload_files(container_client,
                           self.metadata_files)
 
-    def upload_files(self, container_client, files):
-        data = b'abcd'*128
+    @staticmethod
+    def upload_files(container_client, files):
+        data = b'abcd' * 128
         for file in files:
             path = file.path()
+
             blob_client = container_client.get_blob_client(path)
-            blob_client.upload_blob(
-                data, blob_type="BlockBlob", metadata=file.metadata())
+            try:
+                blob_client.upload_blob(
+                    data, blob_type="BlockBlob", metadata=file.metadata())
+            except ResourceExistsError as e:
+                print(e)
 
 
 if __name__ == '__main__':
