@@ -69,48 +69,44 @@ describe('ReleaseFileUploadsSection', () => {
         releaseAncillaryFileService.getAncillaryFiles,
       ).toHaveBeenCalledWith('release-1');
 
-      const sections = screen.getAllByTestId('accordionSection');
-
-      expect(sections).toHaveLength(2);
-
-      const section1 = within(sections[0]);
-
-      expect(
-        section1.getByRole('button', { name: 'Test file 1' }),
-      ).toBeInTheDocument();
-
-      expect(section1.getByTestId('Title')).toHaveTextContent('Test file 1');
-      expect(section1.getByTestId('File')).toHaveTextContent('file-1.docx');
-      expect(section1.getByTestId('File size')).toHaveTextContent('50 Kb');
-      expect(section1.getByTestId('Summary')).toHaveTextContent(
-        'Test summary 1',
-      );
-      expect(section1.getByTestId('Uploaded by')).toHaveTextContent(
-        'test@test.com',
-      );
-      expect(section1.getByTestId('Date uploaded')).toHaveTextContent(
-        '26 May 2021 00:00',
-      );
-
-      const section2 = within(sections[1]);
-
-      expect(
-        section2.getByRole('button', { name: 'Test file 2' }),
-      ).toBeInTheDocument();
-
-      expect(section2.getByTestId('Title')).toHaveTextContent('Test file 2');
-      expect(section2.getByTestId('File')).toHaveTextContent('file-2.docx');
-      expect(section2.getByTestId('File size')).toHaveTextContent('100 Kb');
-      expect(section2.getByTestId('Summary')).toHaveTextContent(
-        'Test summary 2',
-      );
-      expect(section2.getByTestId('Uploaded by')).toHaveTextContent(
-        'test@test.com',
-      );
-      expect(section2.getByTestId('Date uploaded')).toHaveTextContent(
-        '27 May 2021 00:00',
-      );
+      expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
     });
+
+    const sections = screen.getAllByTestId('accordionSection');
+
+    const section1 = within(sections[0]);
+
+    expect(
+      section1.getByRole('button', { name: 'Test file 1' }),
+    ).toBeInTheDocument();
+
+    expect(section1.getByTestId('Title')).toHaveTextContent('Test file 1');
+    expect(section1.getByTestId('File')).toHaveTextContent('file-1.docx');
+    expect(section1.getByTestId('File size')).toHaveTextContent('50 Kb');
+    expect(section1.getByTestId('Summary')).toHaveTextContent('Test summary 1');
+    expect(section1.getByTestId('Uploaded by')).toHaveTextContent(
+      'test@test.com',
+    );
+    expect(section1.getByTestId('Date uploaded')).toHaveTextContent(
+      '26 May 2021 00:00',
+    );
+
+    const section2 = within(sections[1]);
+
+    expect(
+      section2.getByRole('button', { name: 'Test file 2' }),
+    ).toBeInTheDocument();
+
+    expect(section2.getByTestId('Title')).toHaveTextContent('Test file 2');
+    expect(section2.getByTestId('File')).toHaveTextContent('file-2.docx');
+    expect(section2.getByTestId('File size')).toHaveTextContent('100 Kb');
+    expect(section2.getByTestId('Summary')).toHaveTextContent('Test summary 2');
+    expect(section2.getByTestId('Uploaded by')).toHaveTextContent(
+      'test@test.com',
+    );
+    expect(section2.getByTestId('Date uploaded')).toHaveTextContent(
+      '27 May 2021 00:00',
+    );
   });
 
   test('renders empty message when there are no files', async () => {
@@ -119,13 +115,12 @@ describe('ReleaseFileUploadsSection', () => {
     renderPage();
 
     await waitFor(() => {
-      const sections = screen.queryAllByTestId('accordionSection');
-
-      expect(sections).toHaveLength(0);
-      expect(
-        screen.getByText('No files have been uploaded.'),
-      ).toBeInTheDocument();
+      expect(screen.queryAllByTestId('accordionSection')).toHaveLength(0);
     });
+
+    expect(
+      screen.getByText('No files have been uploaded.'),
+    ).toBeInTheDocument();
   });
 
   describe('deleting file', () => {
@@ -136,18 +131,18 @@ describe('ReleaseFileUploadsSection', () => {
 
       renderPage();
 
-      let sections: HTMLElement[] = [];
-
       await waitFor(() => {
-        sections = screen.getAllByTestId('accordionSection');
-        expect(sections).toHaveLength(2);
-
-        expect(
-          within(sections[1]).getByRole('button', {
-            name: 'Delete file',
-          }),
-        ).toBeInTheDocument();
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
       });
+
+      const sections = screen.getAllByTestId('accordionSection');
+      expect(sections).toHaveLength(2);
+
+      expect(
+        within(sections[1]).getByRole('button', {
+          name: 'Delete file',
+        }),
+      ).toBeInTheDocument();
 
       userEvent.click(
         within(sections[1]).getByRole('button', {
@@ -156,12 +151,14 @@ describe('ReleaseFileUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
-
-        const modal = within(screen.getByRole('dialog'));
-
-        expect(modal.getByText('Confirm deletion of file')).toBeInTheDocument();
+        expect(
+          screen.getByText('Confirm deletion of file'),
+        ).toBeInTheDocument();
       });
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(modal.getByText('Confirm deletion of file')).toBeInTheDocument();
     });
 
     test('confirming deletion removes the file section', async () => {
@@ -171,18 +168,17 @@ describe('ReleaseFileUploadsSection', () => {
 
       renderPage();
 
-      let sections: HTMLElement[] = [];
-
       await waitFor(() => {
-        sections = screen.getAllByTestId('accordionSection');
-        expect(sections).toHaveLength(2);
-
-        expect(
-          within(sections[1]).getByRole('button', {
-            name: 'Delete file',
-          }),
-        ).toBeInTheDocument();
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
       });
+
+      const sections = screen.getAllByTestId('accordionSection');
+
+      expect(
+        within(sections[1]).getByRole('button', {
+          name: 'Delete file',
+        }),
+      ).toBeInTheDocument();
 
       userEvent.click(
         within(sections[1]).getByRole('button', {
@@ -191,8 +187,12 @@ describe('ReleaseFileUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(
+          screen.getByText('Confirm deletion of file'),
+        ).toBeInTheDocument();
       });
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
 
       userEvent.click(
         within(screen.getByRole('dialog')).getByRole('button', {
@@ -202,12 +202,13 @@ describe('ReleaseFileUploadsSection', () => {
 
       await waitFor(() => {
         expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
-        expect(
-          within(screen.getByTestId('accordionSection')).getByRole('button', {
-            name: 'Test file 1',
-          }),
-        ).toBeInTheDocument();
       });
+
+      expect(
+        within(screen.getByTestId('accordionSection')).getByRole('button', {
+          name: 'Test file 1',
+        }),
+      ).toBeInTheDocument();
     });
   });
 

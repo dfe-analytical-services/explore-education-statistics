@@ -64,7 +64,6 @@ const getImportStatusColour = (
     case 'FAILED':
     case 'CANCELLED':
       return 'red';
-      return 'red';
     default:
       return undefined;
   }

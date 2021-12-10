@@ -143,59 +143,56 @@ describe('ReleaseDataUploadsSection', () => {
         'release-1',
       );
 
-      const sections = screen.getAllByTestId('accordionSection');
-
-      expect(sections).toHaveLength(2);
-
-      const section1 = within(sections[0]);
-
-      expect(
-        section1.getByRole('button', { name: 'Test data 1' }),
-      ).toBeInTheDocument();
-
-      expect(section1.getByTestId('Subject title')).toHaveTextContent(
-        'Test data 1',
-      );
-      expect(section1.getByTestId('Data file')).toHaveTextContent('data-1.csv');
-      expect(section1.getByTestId('Metadata file')).toHaveTextContent(
-        'data-1.meta.csv',
-      );
-      expect(section1.getByTestId('Data file size')).toHaveTextContent('50 Kb');
-      expect(section1.getByTestId('Number of rows')).toHaveTextContent('100');
-      expect(section1.getByTestId('Status')).toHaveTextContent('Complete');
-      expect(section1.getByTestId('Uploaded by')).toHaveTextContent(
-        'user1@test.com',
-      );
-      expect(section1.getByTestId('Date uploaded')).toHaveTextContent(
-        '12 June 2020 12:00',
-      );
-
-      const section2 = within(sections[1]);
-
-      expect(
-        section2.getByRole('button', { name: 'Test data 2' }),
-      ).toBeInTheDocument();
-
-      expect(section2.getByTestId('Subject title')).toHaveTextContent(
-        'Test data 2',
-      );
-
-      expect(section2.getByTestId('Data file')).toHaveTextContent('data-2.csv');
-      expect(section2.getByTestId('Metadata file')).toHaveTextContent(
-        'data-2.meta.csv',
-      );
-      expect(section2.getByTestId('Data file size')).toHaveTextContent(
-        '100 Kb',
-      );
-      expect(section2.getByTestId('Number of rows')).toHaveTextContent('200');
-      expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
-      expect(section2.getByTestId('Uploaded by')).toHaveTextContent(
-        'user2@test.com',
-      );
-      expect(section2.getByTestId('Date uploaded')).toHaveTextContent(
-        '1 July 2020 12:00',
-      );
+      expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
     });
+
+    const sections = screen.getAllByTestId('accordionSection');
+    const section1 = within(sections[0]);
+
+    expect(
+      section1.getByRole('button', { name: 'Test data 1' }),
+    ).toBeInTheDocument();
+
+    expect(section1.getByTestId('Subject title')).toHaveTextContent(
+      'Test data 1',
+    );
+    expect(section1.getByTestId('Data file')).toHaveTextContent('data-1.csv');
+    expect(section1.getByTestId('Metadata file')).toHaveTextContent(
+      'data-1.meta.csv',
+    );
+    expect(section1.getByTestId('Data file size')).toHaveTextContent('50 Kb');
+    expect(section1.getByTestId('Number of rows')).toHaveTextContent('100');
+    expect(section1.getByTestId('Status')).toHaveTextContent('Complete');
+    expect(section1.getByTestId('Uploaded by')).toHaveTextContent(
+      'user1@test.com',
+    );
+    expect(section1.getByTestId('Date uploaded')).toHaveTextContent(
+      '12 June 2020 12:00',
+    );
+
+    const section2 = within(sections[1]);
+
+    expect(
+      section2.getByRole('button', { name: 'Test data 2' }),
+    ).toBeInTheDocument();
+
+    expect(section2.getByTestId('Subject title')).toHaveTextContent(
+      'Test data 2',
+    );
+
+    expect(section2.getByTestId('Data file')).toHaveTextContent('data-2.csv');
+    expect(section2.getByTestId('Metadata file')).toHaveTextContent(
+      'data-2.meta.csv',
+    );
+    expect(section2.getByTestId('Data file size')).toHaveTextContent('100 Kb');
+    expect(section2.getByTestId('Number of rows')).toHaveTextContent('200');
+    expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
+    expect(section2.getByTestId('Uploaded by')).toHaveTextContent(
+      'user2@test.com',
+    );
+    expect(section2.getByTestId('Date uploaded')).toHaveTextContent(
+      '1 July 2020 12:00',
+    );
   });
 
   test("renders data file details with status of 'Replacement in progress' if being replaced", async () => {
@@ -224,20 +221,18 @@ describe('ReleaseDataUploadsSection', () => {
         'release-1',
       );
 
-      const sections = screen.getAllByTestId('accordionSection');
-
-      expect(sections).toHaveLength(1);
-
-      const section1 = within(sections[0]);
-
-      expect(
-        section1.getByRole('button', { name: 'Test data 1' }),
-      ).toBeInTheDocument();
-
-      expect(section1.getByTestId('Status')).toHaveTextContent(
-        'Data replacement in progress',
-      );
+      expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
     });
+
+    const section1 = getAccordionSection(0);
+
+    expect(
+      section1.getByRole('button', { name: 'Test data 1' }),
+    ).toBeInTheDocument();
+
+    expect(section1.getByTestId('Status')).toHaveTextContent(
+      'Data replacement in progress',
+    );
   });
 
   test('renders empty message when there are no data files', async () => {
@@ -254,13 +249,12 @@ describe('ReleaseDataUploadsSection', () => {
     );
 
     await waitFor(() => {
-      const sections = screen.queryAllByTestId('accordionSection');
-
-      expect(sections).toHaveLength(0);
-      expect(
-        screen.getByText('No data files have been uploaded.'),
-      ).toBeInTheDocument();
+      expect(screen.queryAllByTestId('accordionSection')).toHaveLength(0);
     });
+
+    expect(
+      screen.getByText('No data files have been uploaded.'),
+    ).toBeInTheDocument();
   });
 
   describe('deleting data file', () => {
@@ -284,21 +278,22 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        const sections = screen.getAllByTestId('accordionSection');
-        expect(sections).toHaveLength(2);
-
-        const section1 = within(sections[0]);
-        expect(section1.getByTestId('Status')).toHaveTextContent('Queued');
-        expect(
-          section1.queryByRole('button', { name: 'Delete files' }),
-        ).not.toBeInTheDocument();
-
-        const section2 = within(sections[1]);
-        expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
-        expect(
-          section2.getByRole('button', { name: 'Delete files' }),
-        ).toBeInTheDocument();
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
       });
+
+      const sections = screen.getAllByTestId('accordionSection');
+
+      const section1 = within(sections[0]);
+      expect(section1.getByTestId('Status')).toHaveTextContent('Queued');
+      expect(
+        section1.queryByRole('button', { name: 'Delete files' }),
+      ).not.toBeInTheDocument();
+
+      const section2 = within(sections[1]);
+      expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
+      expect(
+        section2.getByRole('button', { name: 'Delete files' }),
+      ).toBeInTheDocument();
     });
 
     test('clicking delete files button shows modal to confirm deletion plan', async () => {
@@ -334,18 +329,17 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      let sections: HTMLElement[] = [];
-
       await waitFor(() => {
-        sections = screen.getAllByTestId('accordionSection');
-        expect(sections).toHaveLength(2);
-
-        expect(
-          within(sections[1]).getByRole('button', {
-            name: 'Delete files',
-          }),
-        ).toBeInTheDocument();
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
       });
+
+      const sections = screen.getAllByTestId('accordionSection');
+
+      expect(
+        within(sections[1]).getByRole('button', {
+          name: 'Delete files',
+        }),
+      ).toBeInTheDocument();
 
       userEvent.click(
         within(sections[1]).getByRole('button', {
@@ -354,34 +348,36 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
-
-        const modal = within(screen.getByRole('dialog'));
-
         expect(
-          modal.getByText('Confirm deletion of selected data files'),
-        ).toBeInTheDocument();
-
-        expect(
-          modal.getByText('The following data blocks will also be deleted:'),
-        ).toBeInTheDocument();
-
-        const dataBlocks = modal.getAllByRole('listitem');
-
-        expect(dataBlocks[0]).toHaveTextContent('Test data block 1');
-        expect(dataBlocks[0]).toHaveTextContent(
-          'It will also be removed from the "Test section 1" content section.',
-        );
-
-        expect(dataBlocks[1]).toHaveTextContent('Test data block 2');
-        expect(dataBlocks[1]).toHaveTextContent(
-          'It will also be removed from the "Test section 2" content section.',
-        );
-
-        expect(
-          modal.getByText('1 footnote will be removed or updated.'),
+          screen.getByText('Confirm deletion of selected data files'),
         ).toBeInTheDocument();
       });
+
+      const modal = within(screen.getByRole('dialog'));
+
+      expect(
+        modal.getByText('Confirm deletion of selected data files'),
+      ).toBeInTheDocument();
+
+      expect(
+        modal.getByText('The following data blocks will also be deleted:'),
+      ).toBeInTheDocument();
+
+      const dataBlocks = modal.getAllByRole('listitem');
+
+      expect(dataBlocks[0]).toHaveTextContent('Test data block 1');
+      expect(dataBlocks[0]).toHaveTextContent(
+        'It will also be removed from the "Test section 1" content section.',
+      );
+
+      expect(dataBlocks[1]).toHaveTextContent('Test data block 2');
+      expect(dataBlocks[1]).toHaveTextContent(
+        'It will also be removed from the "Test section 2" content section.',
+      );
+
+      expect(
+        modal.getByText('1 footnote will be removed or updated.'),
+      ).toBeInTheDocument();
     });
 
     test('confirming deletion removes the data file section', async () => {
@@ -407,18 +403,17 @@ describe('ReleaseDataUploadsSection', () => {
         </MemoryRouter>,
       );
 
-      let sections: HTMLElement[] = [];
-
       await waitFor(() => {
-        sections = screen.getAllByTestId('accordionSection');
-        expect(sections).toHaveLength(2);
-
-        expect(
-          within(sections[1]).getByRole('button', {
-            name: 'Delete files',
-          }),
-        ).toBeInTheDocument();
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
       });
+
+      const sections = screen.getAllByTestId('accordionSection');
+
+      expect(
+        within(sections[1]).getByRole('button', {
+          name: 'Delete files',
+        }),
+      ).toBeInTheDocument();
 
       userEvent.click(
         within(sections[1]).getByRole('button', {
@@ -427,7 +422,9 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(
+          screen.getByText('Confirm deletion of selected data files'),
+        ).toBeInTheDocument();
       });
 
       userEvent.click(
@@ -438,12 +435,13 @@ describe('ReleaseDataUploadsSection', () => {
 
       await waitFor(() => {
         expect(screen.getAllByTestId('accordionSection')).toHaveLength(1);
-        expect(
-          within(screen.getByTestId('accordionSection')).getByRole('button', {
-            name: 'Test data 1',
-          }),
-        ).toBeInTheDocument();
       });
+
+      expect(
+        within(screen.getByTestId('accordionSection')).getByRole('button', {
+          name: 'Test data 1',
+        }),
+      ).toBeInTheDocument();
     });
   });
 
@@ -468,21 +466,23 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        const sections = screen.getAllByTestId('accordionSection');
-        expect(sections).toHaveLength(2);
-
-        const section1 = within(sections[0]);
-        expect(section1.getByTestId('Status')).toHaveTextContent('Queued');
-        expect(
-          section1.queryByRole('link', { name: 'Replace data' }),
-        ).not.toBeInTheDocument();
-
-        const section2 = within(sections[1]);
-        expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
-        expect(
-          section2.getByRole('link', { name: 'Replace data' }),
-        ).toBeInTheDocument();
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
       });
+
+      const sections = screen.getAllByTestId('accordionSection');
+      expect(sections).toHaveLength(2);
+
+      const section1 = within(sections[0]);
+      expect(section1.getByTestId('Status')).toHaveTextContent('Queued');
+      expect(
+        section1.queryByRole('link', { name: 'Replace data' }),
+      ).not.toBeInTheDocument();
+
+      const section2 = within(sections[1]);
+      expect(section2.getByTestId('Status')).toHaveTextContent('Complete');
+      expect(
+        section2.getByRole('link', { name: 'Replace data' }),
+      ).toBeInTheDocument();
     });
 
     test('renders replace data button with correct link', async () => {
@@ -505,15 +505,18 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() => {
-        const sections = screen.getAllByTestId('accordionSection');
-        const section2 = within(sections[1]);
-        expect(
-          section2.getByRole('link', { name: 'Replace data' }),
-        ).toHaveAttribute(
-          'href',
-          '/publication/publication-1/release/release-1/data/data-2/replace',
-        );
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(2);
       });
+
+      const sections = screen.getAllByTestId('accordionSection');
+
+      const section2 = within(sections[1]);
+      expect(
+        section2.getByRole('link', { name: 'Replace data' }),
+      ).toHaveAttribute(
+        'href',
+        '/publication/publication-1/release/release-1/data/data-2/replace',
+      );
     });
   });
 
@@ -711,54 +714,54 @@ describe('ReleaseDataUploadsSection', () => {
           } as UploadDataFilesRequest,
         );
 
-        const sections = screen.getAllByTestId('accordionSection');
-
-        expect(sections).toHaveLength(3);
-
-        const section1 = within(sections[0]);
-
-        expect(
-          section1.getByRole('button', { name: 'Test data 1' }),
-        ).toBeInTheDocument();
-
-        const section2 = within(sections[1]);
-
-        expect(
-          section2.getByRole('button', { name: 'Test data 2' }),
-        ).toBeInTheDocument();
-
-        expect(section2.getByTestId('Subject title')).toHaveTextContent(
-          'Test data 2',
-        );
-
-        const section3 = within(sections[2]);
-
-        expect(
-          section3.getByRole('button', { name: 'Test title' }),
-        ).toBeInTheDocument();
-
-        expect(section3.getByTestId('Subject title')).toHaveTextContent(
-          'Test title',
-        );
-
-        expect(section3.getByTestId('Data file')).toHaveTextContent(
-          'test-data.csv',
-        );
-        expect(section3.getByTestId('Metadata file')).toHaveTextContent(
-          'test-data.meta.csv',
-        );
-        expect(section3.getByTestId('Data file size')).toHaveTextContent(
-          '150 Kb',
-        );
-        expect(section3.getByTestId('Number of rows')).toHaveTextContent('300');
-        expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
-        expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
-          'user1@test.com',
-        );
-        expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
-          '18 August 2020 12:00',
-        );
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(3);
       });
+
+      const sections = screen.getAllByTestId('accordionSection');
+
+      const section1 = within(sections[0]);
+
+      expect(
+        section1.getByRole('button', { name: 'Test data 1' }),
+      ).toBeInTheDocument();
+
+      const section2 = within(sections[1]);
+
+      expect(
+        section2.getByRole('button', { name: 'Test data 2' }),
+      ).toBeInTheDocument();
+
+      expect(section2.getByTestId('Subject title')).toHaveTextContent(
+        'Test data 2',
+      );
+
+      const section3 = within(sections[2]);
+
+      expect(
+        section3.getByRole('button', { name: 'Test title' }),
+      ).toBeInTheDocument();
+
+      expect(section3.getByTestId('Subject title')).toHaveTextContent(
+        'Test title',
+      );
+
+      expect(section3.getByTestId('Data file')).toHaveTextContent(
+        'test-data.csv',
+      );
+      expect(section3.getByTestId('Metadata file')).toHaveTextContent(
+        'test-data.meta.csv',
+      );
+      expect(section3.getByTestId('Data file size')).toHaveTextContent(
+        '150 Kb',
+      );
+      expect(section3.getByTestId('Number of rows')).toHaveTextContent('300');
+      expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
+      expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
+        'user1@test.com',
+      );
+      expect(section3.getByTestId('Date uploaded')).toHaveTextContent(
+        '18 August 2020 12:00',
+      );
     });
 
     test('successful submit with ZIP file renders with uploaded data file appended to list', async () => {
@@ -952,13 +955,13 @@ describe('ReleaseDataUploadsSection', () => {
         );
 
         await waitFor(() =>
-          expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+          expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
         );
 
         const section = getAccordionSection(0);
 
         expect(
-          section.queryByRole('button', { name: 'Cancel' }),
+          section.getByRole('button', { name: 'Cancel' }),
         ).toBeInTheDocument();
       });
 
@@ -986,7 +989,7 @@ describe('ReleaseDataUploadsSection', () => {
         );
 
         await waitFor(() =>
-          expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+          expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
         );
 
         const section = getAccordionSection(0);
@@ -1021,7 +1024,7 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() =>
-        expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
       );
 
       const section = getAccordionSection(0);
@@ -1029,7 +1032,9 @@ describe('ReleaseDataUploadsSection', () => {
       userEvent.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(
+          screen.getByText('Confirm cancellation of selected data file'),
+        ).toBeInTheDocument();
       });
 
       const modal = within(screen.getByRole('dialog'));
@@ -1044,16 +1049,14 @@ describe('ReleaseDataUploadsSection', () => {
         ),
       ).toBeInTheDocument();
 
-      expect(
-        modal.queryByRole('button', { name: 'Cancel' }),
-      ).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
 
       expect(
-        modal.queryByRole('button', { name: 'Confirm' }),
+        modal.getByRole('button', { name: 'Confirm' }),
       ).toBeInTheDocument();
     });
 
-    test('confirming the cancellation modal initiates cancellation and removes the Cancel link', async () => {
+    test('confirming the cancellation modal initiates cancellation and removes the Cancel button', async () => {
       releaseDataFileService.getDataFiles.mockResolvedValue([
         testUploadedDataFile,
       ]);
@@ -1069,7 +1072,7 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() =>
-        expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
       );
 
       const section = getAccordionSection(0);
@@ -1077,7 +1080,9 @@ describe('ReleaseDataUploadsSection', () => {
       userEvent.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(
+          screen.getByText('Confirm cancellation of selected data file'),
+        ).toBeInTheDocument();
       });
 
       const modal = within(screen.getByRole('dialog'));
@@ -1091,14 +1096,15 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       await waitFor(() => {
-        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-      });
-
-      await waitFor(() => {
         expect(
-          section.queryByRole('button', { name: 'Cancel' }),
+          screen.queryByText('Confirm cancellation of selected data file'),
         ).not.toBeInTheDocument();
       });
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(
+        section.queryByRole('button', { name: 'Cancel' }),
+      ).not.toBeInTheDocument();
     });
 
     test('cancelling the cancellation modal calls off the import cancellation', async () => {
@@ -1117,7 +1123,7 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() =>
-        expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
       );
 
       const section = getAccordionSection(0);
@@ -1125,7 +1131,9 @@ describe('ReleaseDataUploadsSection', () => {
       userEvent.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(
+          screen.getByText('Confirm cancellation of selected data file'),
+        ).toBeInTheDocument();
       });
 
       const modal = within(screen.getByRole('dialog'));
@@ -1133,17 +1141,16 @@ describe('ReleaseDataUploadsSection', () => {
 
       await waitFor(() => {
         expect(releaseDataFileService.cancelImport).not.toHaveBeenCalled();
-      });
 
-      await waitFor(() => {
-        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-      });
-
-      await waitFor(() => {
         expect(
-          section.queryByRole('button', { name: 'Cancel' }),
-        ).toBeInTheDocument();
+          screen.queryByText('Confirm cancellation of selected data file'),
+        ).not.toBeInTheDocument();
       });
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(
+        section.getByRole('button', { name: 'Cancel' }),
+      ).toBeInTheDocument();
     });
 
     test('show error message and close modal if cancellation fails', async () => {
@@ -1164,7 +1171,7 @@ describe('ReleaseDataUploadsSection', () => {
       );
 
       await waitFor(() =>
-        expect(screen.queryAllByTestId('accordionSection')).toHaveLength(1),
+        expect(screen.getAllByTestId('accordionSection')).toHaveLength(1),
       );
 
       const section = getAccordionSection(0);
@@ -1172,7 +1179,9 @@ describe('ReleaseDataUploadsSection', () => {
       userEvent.click(section.getByRole('button', { name: 'Cancel' }));
 
       await waitFor(() => {
-        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        expect(
+          screen.getByText('Confirm cancellation of selected data file'),
+        ).toBeInTheDocument();
       });
 
       const modal = within(screen.getByRole('dialog'));
@@ -1186,16 +1195,18 @@ describe('ReleaseDataUploadsSection', () => {
       });
 
       await waitFor(() => {
-        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-      });
-
-      await waitFor(() => {
         expect(
-          section.queryByRole('button', { name: 'Cancel' }),
+          screen.queryByText('Confirm cancellation of selected data file'),
         ).not.toBeInTheDocument();
-
-        expect(screen.getByText('Cancellation failed')).toBeInTheDocument();
       });
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+      expect(
+        section.queryByRole('button', { name: 'Cancel' }),
+      ).not.toBeInTheDocument();
+
+      expect(screen.getByText('Cancellation failed')).toBeInTheDocument();
     });
   });
 
