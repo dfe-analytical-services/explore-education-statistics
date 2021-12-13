@@ -213,7 +213,7 @@ export const CommentsProvider = ({
       if (updatedComment) {
         const index = comments.findIndex(c => c.id === updatedComment.id);
         const updatedComments = [...comments];
-        updatedComments.splice(index, index, updatedComment);
+        updatedComments.splice(index, 1, updatedComment);
         setComments(updatedComments);
       }
     };
