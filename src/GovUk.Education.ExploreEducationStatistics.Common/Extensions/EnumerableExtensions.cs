@@ -178,22 +178,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return !list.Any();
         }
 
-        public static string JoinToString(this IEnumerable<char> source)
+        public static string JoinToString<T>(this IEnumerable<T> source)
         {
             return string.Join(string.Empty, source);
         }
 
-        public static string JoinToString(this IEnumerable<string> source)
-        {
-            return string.Join(string.Empty, source);
-        }
-
-        public static string JoinToString(this IEnumerable<string> source, char delimiter)
+        public static string JoinToString<T>(this IEnumerable<T> source, char delimiter)
         {
             return string.Join(delimiter, source);
         }
 
-        public static string JoinToString(this IEnumerable<string> source, string delimiter)
+        public static string JoinToString<T>(this IEnumerable<T> source, string delimiter)
         {
             return string.Join(delimiter, source);
         }

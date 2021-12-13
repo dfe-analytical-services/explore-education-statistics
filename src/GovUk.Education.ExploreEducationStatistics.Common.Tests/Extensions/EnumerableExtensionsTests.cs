@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,9 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         {
             var list = new List<TestClass>
             {
-                new TestClass(1),
-                new TestClass(1),
-                new TestClass(2),
+                new(1),
+                new(1),
+                new(2),
             };
 
             var distinct = list.DistinctByProperty(x => x.Value).ToList();
@@ -47,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         [Fact]
         public async Task ForEachAsync()
         {
-            List<int> results = new List<int>();
+            List<int> results = new();
 
             await new List<int> {1, 2}.ForEachAsync(async value =>
             {
@@ -105,14 +106,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         [Fact]
         public void SelectNullSafe_Null()
         {
-            var results = ((List<int>) null).SelectNullSafe(value => value * 2).ToList();
+            var results = ((List<int>?) null).SelectNullSafe(value => value * 2).ToList();
             Assert.Equal(new List<int>(), results);
         }
 
         [Fact]
         public void IsNullOrEmpty_Null()
         {
-            Assert.True(((List<string>) null).IsNullOrEmpty());
+            Assert.True(((List<string>?) null).IsNullOrEmpty());
         }
 
         [Fact]
@@ -124,14 +125,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         [Fact]
         public void IsNullOrEmpty_NeitherNullNorEmpty()
         {
-            var list = new List<string> { "foo", "bar" };
+            var list = new List<string> {"foo", "bar"};
             Assert.False(list.IsNullOrEmpty());
         }
 
         [Fact]
         public void JoinToString()
         {
-            var list = new List<string>() { "foo", "bar", "baz" };
+            var list = new List<string> {"foo", "bar", "baz"};
 
             Assert.Equal("foo-bar-baz", list.JoinToString('-'));
             Assert.Equal("foo - bar - baz", list.JoinToString(" - "));
