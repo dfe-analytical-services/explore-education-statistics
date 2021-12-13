@@ -119,7 +119,9 @@ export const EditingProvider = ({
 
   const state = useMemo<EditingContextState>(() => {
     const addUnsavedBlock = (blockId: string) => {
-      setUnsavedBlocks([...unsavedBlocks, blockId]);
+      if (!unsavedBlocks.includes(blockId)) {
+        setUnsavedBlocks([...unsavedBlocks, blockId]);
+      }
     };
 
     const removeUnsavedDeletionsForBlock = (blockId: string) => {

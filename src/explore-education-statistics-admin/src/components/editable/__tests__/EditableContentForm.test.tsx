@@ -318,11 +318,7 @@ describe('EditableContentForm', () => {
       );
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('button', {
-            name: 'Resolved comments (1)',
-          }),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Resolved comments (1)')).toBeInTheDocument();
       });
 
       expect(

@@ -12,12 +12,12 @@ import React from 'react';
 describe('Comment', () => {
   const testUser1: User = {
     id: testCommentUser1.id,
-    name: `testCommentUser1.firstName testCommentUser1.lastName`,
+    name: `${testCommentUser1.firstName} ${testCommentUser1.lastName}`,
     permissions: {} as GlobalPermissions,
   };
   const testUser2: User = {
     id: testCommentUser2.id,
-    name: `testCommentUser2.firstName testCommentUser2.lastName`,
+    name: `${testCommentUser2.firstName} ${testCommentUser2.lastName}`,
     permissions: {} as GlobalPermissions,
   };
 
