@@ -76,6 +76,9 @@ export const EditingProvider = ({
 
   const updateUnresolvedComments = useCallbackRef(
     (blockId: string, commentId: string) => {
+      if (commentId === 'commentPlaceholder') {
+        return;
+      }
       const updated = { ...unresolvedComments };
       if (!unresolvedComments[blockId]) {
         updated[blockId] = [commentId];
