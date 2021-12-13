@@ -26,8 +26,8 @@ import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
-import React, { useCallback, useMemo } from 'react';
-import { generatePath, useLocation } from 'react-router';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { generatePath, Prompt, useLocation } from 'react-router';
 
 interface MethodologyLink {
   key: string;
@@ -35,13 +35,41 @@ interface MethodologyLink {
   url: string;
 }
 
+const handleBeforeUnload = (showPrompt: boolean) => {
+  window.onbeforeunload = event => {
+    if (showPrompt) {
+      event.preventDefault();
+      // eslint-disable-next-line no-param-reassign
+      event.returnValue = '';
+    }
+  };
+};
+
 const ReleaseContent = () => {
   const config = useConfig();
   const location = useLocation();
-
-  const { editingMode } = useEditingContext();
+  const {
+    editingMode,
+    unsavedBlocks,
+    unsavedCommentDeletions,
+  } = useEditingContext();
   const { release } = useReleaseContentState();
   const actions = useReleaseContentActions();
+
+  const [showPrompt, setShowPrompt] = useState<boolean>(false);
+
+  useEffect(() => {
+    const blocksWithCommentDeletions = Object.entries(unsavedCommentDeletions)
+      .filter(blockWithDeletions => blockWithDeletions[1].length)
+      .map(blockWithDeletions => blockWithDeletions[0]);
+    setShowPrompt(
+      unsavedBlocks.length > 0 || blocksWithCommentDeletions.length > 0,
+    );
+  }, [setShowPrompt, unsavedBlocks, unsavedCommentDeletions]);
+
+  useEffect(() => {
+    handleBeforeUnload(showPrompt);
+  }, [showPrompt]);
 
   const releaseCount = useMemo(() => {
     if (release) {
@@ -124,6 +152,12 @@ const ReleaseContent = () => {
 
   return (
     <>
+      <Prompt
+        when={showPrompt}
+        message={() =>
+          'There are unsaved changes.  Clicking away from this tab will result in the changes being lost.'
+        }
+      />
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <BasicReleaseSummary release={release} />
