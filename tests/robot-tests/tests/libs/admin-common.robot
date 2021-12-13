@@ -420,7 +420,7 @@ user adds basic release content
     # To ensure Save button gets clicked
     user sets focus to element    xpath://button[.="Save & close"]    id:releaseSummary
     user clicks button    Save & close    id:releaseSummary
-    user waits until element contains    id:releaseSummary    Test summary text for ${publication}     %{WAIT_SMALL}
+    user waits until element contains    id:releaseSummary    Test summary text for ${publication}    %{WAIT_SMALL}
 
     user clicks button    Add a headlines text block    id:releaseHeadlines
     user waits until element contains    id:releaseHeadlines    This section is empty    %{WAIT_SMALL}
@@ -435,8 +435,8 @@ user adds basic release content
 
     user changes accordion section title    1    Test section one    css:#releaseMainContent
     user adds text block to editable accordion section    Test section one    css:#releaseMainContent
-    user adds content to accordion section text block    Test section one    1    Test content block for ${publication}
-    ...    css:#releaseMainContent
+    user adds content to autosaving accordion section text block    Test section one    1
+    ...    Test content block for ${publication}    css:#releaseMainContent
 
 user creates public prerelease access list
     [Arguments]    ${content}

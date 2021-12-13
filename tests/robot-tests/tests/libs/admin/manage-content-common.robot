@@ -220,13 +220,26 @@ user adds content to accordion section text block
     ...    ${block_num}
     ...    ${content}
     ...    ${parent}=[data-testid="accordion"]
-    ...    ${save_button}=Save & close
 
     ${block}=    user edits accordion section text block    ${section_name}    ${block_num}    ${parent}
     user presses keys    CTRL+a
     user presses keys    BACKSPACE
     user presses keys    ${content}
-    user clicks button    ${save_button}    ${block}
+    user clicks button    Save    ${block}
+    user waits until element contains    ${block}    ${content}
+
+user adds content to autosaving accordion section text block
+    [Arguments]
+    ...    ${section_name}
+    ...    ${block_num}
+    ...    ${content}
+    ...    ${parent}=[data-testid="accordion"]
+
+    ${block}=    user edits accordion section text block    ${section_name}    ${block_num}    ${parent}
+    user presses keys    CTRL+a
+    user presses keys    BACKSPACE
+    user presses keys    ${content}
+    user clicks button    Save & close    ${block}
     user waits until element contains    ${block}    ${content}
 
 user adds image to accordion section text block

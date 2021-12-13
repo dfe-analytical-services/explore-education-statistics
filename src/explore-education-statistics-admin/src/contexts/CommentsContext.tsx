@@ -23,25 +23,25 @@ export interface SelectedComment {
 }
 
 export type CommentsContextState = {
+  addComment: (comment: AddComment) => Promise<Comment | null>;
   comments: Comment[];
   currentInteraction: CurrentInteraction;
+  deletePendingComments: () => void;
   markersOrder: string[];
   pendingDeletions: Comment[];
-  selectedComment: SelectedComment;
-  addComment: (comment: AddComment) => Promise<Comment | null>;
+  reAddComment: MutableRefObject<(commentId: string) => void>;
   removeComment: MutableRefObject<(commentId: string) => void>;
-  deletePendingComments: () => void;
   resolveComment: MutableRefObject<
     (commentId: string, updateMarker?: boolean) => void
   >;
-  reAddComment: MutableRefObject<(commentId: string) => void>;
+  selectedComment: SelectedComment;
+  setCurrentInteraction: (currentInteraction: CurrentInteraction) => void;
+  setMarkersOrder: (order: string[]) => void;
+  setSelectedComment: (selectedComment: SelectedComment) => void;
   unresolveComment: MutableRefObject<
     (commentId: string, updateMarker?: boolean) => void
   >;
   updateComment: (comment: UpdateComment) => void;
-  setCurrentInteraction: (currentInteraction: CurrentInteraction) => void;
-  setMarkersOrder: (order: string[]) => void;
-  setSelectedComment: (selectedComment: SelectedComment) => void;
 };
 
 export type CommentsContextInitialValues = {

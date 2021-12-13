@@ -187,15 +187,15 @@ Add accordion sections to release
 
 Add content blocks to Test section one
     user adds text block to editable accordion section    Test section one    id:releaseMainContent
-    user adds content to accordion section text block    Test section one    1    block one test text
+    user adds content to autosaving accordion section text block    Test section one    1    block one test text
     ...    id:releaseMainContent
 
     user adds text block to editable accordion section    Test section one    id:releaseMainContent
-    user adds content to accordion section text block    Test section one    2    block two test text
+    user adds content to autosaving accordion section text block    Test section one    2    block two test text
     ...    id:releaseMainContent
 
     user adds text block to editable accordion section    Test section one    id:releaseMainContent
-    user adds content to accordion section text block    Test section one    3    block three test text
+    user adds content to autosaving accordion section text block    Test section one    3    block three test text
     ...    id:releaseMainContent
 
     user checks accordion section contains X blocks    Test section one    3    id:releaseMainContent

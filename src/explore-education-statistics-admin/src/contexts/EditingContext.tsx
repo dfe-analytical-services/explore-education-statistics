@@ -14,14 +14,14 @@ export type EditingMode = 'preview' | 'table-preview' | 'edit';
 export type BlockCommentIds = Dictionary<string[]>;
 
 export interface EditingContextState {
+  addUnsavedBlock: (blockId: string) => void;
   editingMode: EditingMode;
+  removeUnsavedBlock: (blockId: string) => void;
+  removeUnsavedDeletionsForBlock: (blockId: string) => void;
   setEditingMode: (mode: EditingMode) => void;
   unresolvedComments: BlockCommentIds;
   unsavedCommentDeletions: BlockCommentIds;
   unsavedBlocks: string[];
-  addUnsavedBlock: (blockId: string) => void;
-  removeUnsavedBlock: (blockId: string) => void;
-  removeUnsavedDeletionsForBlock: (blockId: string) => void;
   updateUnresolvedComments: MutableRefObject<
     (blockId: string, commentId: string) => void
   >;
@@ -31,14 +31,14 @@ export interface EditingContextState {
 }
 
 export const EditingContext = createContext<EditingContextState>({
+  addUnsavedBlock: noop,
   editingMode: 'preview',
+  removeUnsavedBlock: noop,
+  removeUnsavedDeletionsForBlock: noop,
   setEditingMode: noop,
   unresolvedComments: {},
   unsavedCommentDeletions: {},
   unsavedBlocks: [],
-  addUnsavedBlock: noop,
-  removeUnsavedBlock: noop,
-  removeUnsavedDeletionsForBlock: noop,
   updateUnresolvedComments: { current: noop },
   updateUnsavedCommentDeletions: { current: noop },
 });

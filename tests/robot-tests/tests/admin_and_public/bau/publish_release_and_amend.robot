@@ -112,7 +112,8 @@ Add data block to first accordion section
 
 Add test text to second accordion section
     user adds text block to editable accordion section    Test text    css:#releaseMainContent
-    user adds content to accordion section text block    Test text    1    Some test text!    css:#releaseMainContent
+    user adds content to autosaving accordion section text block    Test text    1    Some test text!
+    ...    css:#releaseMainContent
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -454,7 +455,7 @@ Navigate to 'Content' page for amendment
 
 Update second accordion section text for amendment
     user opens accordion section    Test text    css:#releaseMainContent
-    user adds content to accordion section text block    Test text    1    Updated test text!
+    user adds content to autosaving accordion section text block    Test text    1    Updated test text!
     ...    css:#releaseMainContent
 
 Add release note to amendment

@@ -58,8 +58,8 @@ Add first content section
 
 Add first text block
     user adds text block to editable accordion section    ${CONTENT_BLOCK_TITLE_1}    css:#releaseMainContent
-    user adds content to accordion section text block    ${CONTENT_BLOCK_TITLE_1}    1    ${CONTENT_BLOCK_BODY_1}
-    ...    css:#releaseMainContent
+    user adds content to autosaving accordion section text block    ${CONTENT_BLOCK_TITLE_1}    1
+    ...    ${CONTENT_BLOCK_BODY_1}    css:#releaseMainContent
 
 Switch to bau1 to add review comments
     [Tags]    HappyPath
