@@ -31,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PreReleaseUserServiceTests
     {
+        private static readonly Guid _userId = Guid.NewGuid();
         private const string PreReleaseTemplateId = "prerelease-template-id";
 
         private static readonly DateTime PublishedScheduledStartOfDay =
@@ -1854,6 +1855,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             IUserService? userService = null,
             IUserRepository? userRepository = null,
+            IUserInviteRepository? userInviteRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             IHttpContextAccessor? httpContextAccessor = null)
@@ -1865,8 +1867,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
                 preReleaseService ?? Mock.Of<IPreReleaseService>(MockBehavior.Strict),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
-                userService ?? AlwaysTrueUserService().Object,
+                userService ?? AlwaysTrueUserService(_userId).Object,
                 userRepository ?? new UserRepository(context),
+                userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(context),
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(context),
                 httpContextAccessor ?? DefaultHttpContextAccessorMock().Object

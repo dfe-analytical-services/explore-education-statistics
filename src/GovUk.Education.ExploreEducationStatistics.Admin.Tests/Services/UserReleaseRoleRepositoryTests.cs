@@ -858,10 +858,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                Assert.True(await service.GetReleaseRole(
+                var result = await service.GetReleaseRole(
                     userReleaseRole.UserId,
                     userReleaseRole.ReleaseId,
-                    Contributor));
+                    Contributor);
+                Assert.NotNull(result);
+                Assert.Equal(userReleaseRole.UserId, result!.UserId);
+                Assert.Equal(userReleaseRole.ReleaseId, result.ReleaseId);
+                Assert.Equal(userReleaseRole.Role, result.Role);
             }
         }
 
@@ -903,7 +907,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                Assert.False(await service.GetReleaseRole(
+                Assert.Null(await service.GetReleaseRole(
                     user.Id,
                     release.Id,
                     Contributor));

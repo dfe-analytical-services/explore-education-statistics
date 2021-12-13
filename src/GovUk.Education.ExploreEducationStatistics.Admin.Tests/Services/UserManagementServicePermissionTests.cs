@@ -8,10 +8,13 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
 
@@ -134,10 +137,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static UserManagementService SetupUserManagementService(
             ContentDbContext? contentDbContext = null,
             UsersAndRolesDbContext? usersAndRolesDbContext = null,
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
             IEmailTemplateService? emailTemplateService = null,
+            IUserRoleService? userRoleService = null,
+            IUserRepository? userRepository = null,
             IUserService? userService = null,
-            IUserRoleService? userRoleService = null)
+            IUserInviteRepository? userInviteRepository = null,
+            IUserReleaseInviteRepository? userReleaseInviteRepository = null,
+            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            IConfiguration? configuration = null,
+            IEmailService? emailService = null,
+            IHttpContextAccessor? httpContextAccessor = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -145,10 +156,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new UserManagementService(
                 usersAndRolesDbContext,
                 contentDbContext,
+                contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
-                userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-                userService ?? Mock.Of<IUserService>(Strict)
+                emailTemplateService ?? new Mock<IEmailTemplateService>(Strict).Object,
+                userRoleService ?? new Mock<IUserRoleService>(Strict).Object,
+                userRepository ?? new UserRepository(contentDbContext),
+                userService ?? AlwaysTrueUserService().Object,
+                userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
+                userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
+                userReleaseRoleRepository ?? new UserReleaseRoleRepository(contentDbContext),
+                configuration ?? CreateMockConfiguration().Object,
+                emailService ?? new Mock<IEmailService>(Strict).Object,
+                httpContextAccessor ?? new Mock<IHttpContextAccessor>(Strict).Object
             );
         }
     }

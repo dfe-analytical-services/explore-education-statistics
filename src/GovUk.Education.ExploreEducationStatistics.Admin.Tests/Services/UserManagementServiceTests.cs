@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
@@ -9,16 +10,20 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -95,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
-            var userRoleService = new Mock<IUserRoleService>(MockBehavior.Strict);
+            var userRoleService = new Mock<IUserRoleService>(Strict);
 
             userRoleService.Setup(mock =>
                 mock.GetGlobalRoles(user.Id)).ReturnsAsync(globalRoles);
@@ -136,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetUser_NoUser()
         {
-            var userRoleService = new Mock<IUserRoleService>(MockBehavior.Strict);
+            var userRoleService = new Mock<IUserRoleService>(Strict);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
             {
@@ -230,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
-            var userRoleService = new Mock<IUserRoleService>(MockBehavior.Strict);
+            var userRoleService = new Mock<IUserRoleService>(Strict);
 
             userRoleService.Setup(mock =>
                 mock.RemoveGlobalRole(user.Id, role1.Id)).ReturnsAsync(Unit.Instance);
@@ -284,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
-            var userRoleService = new Mock<IUserRoleService>(MockBehavior.Strict);
+            var userRoleService = new Mock<IUserRoleService>(Strict);
 
             userRoleService.Setup(mock =>
                 mock.AddGlobalRole(user.Id, role.Id)).ReturnsAsync(Unit.Instance);
@@ -308,23 +313,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static UserManagementService SetupUserManagementService(
-            ContentDbContext contentDbContext = null,
-            UsersAndRolesDbContext usersAndRolesDbContext = null,
-            IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper = null,
-            IEmailTemplateService emailTemplateService = null,
-            IUserRoleService userRoleService = null,
-            IUserService userService = null)
+            ContentDbContext? contentDbContext = null,
+            UsersAndRolesDbContext? usersAndRolesDbContext = null,
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
+            IEmailTemplateService? emailTemplateService = null,
+            IUserRoleService? userRoleService = null,
+            IUserRepository? userRepository = null,
+            IUserService? userService = null,
+            IUserInviteRepository? userInviteRepository = null,
+            IUserReleaseInviteRepository? userReleaseInviteRepository = null,
+            IUserReleaseRoleRepository? userReleaseRoleRepository = null,
+            IConfiguration? configuration = null,
+            IEmailService? emailService = null,
+            IHttpContextAccessor? httpContextAccessor = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
 
             return new UserManagementService(
-                usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
+                usersAndRolesDbContext,
                 contentDbContext,
+                contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-                emailTemplateService ?? new Mock<IEmailTemplateService>().Object,
-                userRoleService ?? new Mock<IUserRoleService>().Object,
-                userService ?? AlwaysTrueUserService().Object
+                emailTemplateService ?? new Mock<IEmailTemplateService>(Strict).Object,
+                userRoleService ?? new Mock<IUserRoleService>(Strict).Object,
+                userRepository ?? new UserRepository(contentDbContext),
+                userService ?? AlwaysTrueUserService().Object,
+                userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
+                userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
+                userReleaseRoleRepository ?? new UserReleaseRoleRepository(contentDbContext),
+                configuration ?? CreateMockConfiguration().Object,
+                emailService ?? new Mock<IEmailService>(Strict).Object,
+                httpContextAccessor ?? new Mock<IHttpContextAccessor>(Strict).Object
             );
         }
     }
