@@ -1,9 +1,8 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -20,11 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Observations = new List<Observation>
                 {
-                    new Observation {Year = 2001, TimeIdentifier = Week1},
-                    new Observation {Year = 2000, TimeIdentifier = Week20},
-                    new Observation {Year = 2000, TimeIdentifier = Week2},
-                    new Observation {Year = 2000, TimeIdentifier = Week1},
-                    new Observation {Year = 2000, TimeIdentifier = Week10},
+                    new() {Year = 2001, TimeIdentifier = Week1},
+                    new() {Year = 2000, TimeIdentifier = Week20},
+                    new() {Year = 2000, TimeIdentifier = Week2},
+                    new() {Year = 2000, TimeIdentifier = Week1},
+                    new() {Year = 2000, TimeIdentifier = Week10},
                 }
             };
 
@@ -56,11 +55,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Observations = new List<Observation>
                 {
-                    new Observation {Year = 2001, TimeIdentifier = January},
-                    new Observation {Year = 2000, TimeIdentifier = February},
-                    new Observation {Year = 2000, TimeIdentifier = December},
-                    new Observation {Year = 2000, TimeIdentifier = October},
-                    new Observation {Year = 2000, TimeIdentifier = March},
+                    new() {Year = 2001, TimeIdentifier = January},
+                    new() {Year = 2000, TimeIdentifier = February},
+                    new() {Year = 2000, TimeIdentifier = December},
+                    new() {Year = 2000, TimeIdentifier = October},
+                    new() {Year = 2000, TimeIdentifier = March},
                 }
             };
 
@@ -132,26 +131,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subjectObservation1 = new Observation
             {
-                GeographicLevel = GeographicLevel.Country,
                 Subject = subject,
                 Year = 2030,
-                TimeIdentifier = TimeIdentifier.AcademicYearQ3
+                TimeIdentifier = AcademicYearQ3
             };
 
             var subjectObservation2 = new Observation
             {
-                GeographicLevel = GeographicLevel.LocalAuthority,
                 Subject = subject,
                 Year = 2020,
-                TimeIdentifier = TimeIdentifier.AcademicYearQ4
+                TimeIdentifier = AcademicYearQ4
             };
 
             var subjectObservation3 = new Observation
             {
-                GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
                 Subject = subject,
                 Year = 2021,
-                TimeIdentifier = TimeIdentifier.AcademicYearQ1
+                TimeIdentifier = AcademicYearQ1
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -195,26 +191,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subjectObservation1 = new Observation
             {
-                GeographicLevel = GeographicLevel.Country,
                 Subject = subject,
                 Year = 2020,
-                TimeIdentifier = TimeIdentifier.Week9,
+                TimeIdentifier = Week9,
             };
 
             var subjectObservation2 = new Observation
             {
-                GeographicLevel = GeographicLevel.Country,
                 Subject = subject,
                 Year = 2020,
-                TimeIdentifier = TimeIdentifier.Week37,
+                TimeIdentifier = Week37,
             };
 
             var subjectObservation3 = new Observation
             {
-                GeographicLevel = GeographicLevel.Country,
                 Subject = subject,
                 Year = 2020,
-                TimeIdentifier = TimeIdentifier.Week8,
+                TimeIdentifier = Week8,
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -275,6 +268,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Empty(result.To);
             }
         }
-
     }
 }

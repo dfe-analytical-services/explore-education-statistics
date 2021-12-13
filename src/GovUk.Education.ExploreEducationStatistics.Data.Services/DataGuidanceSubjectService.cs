@@ -95,8 +95,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return await _context
                 .Observation
-                .Where(observation => observation.SubjectId == subjectId)
-                .Select(observation => observation.GeographicLevel.GetEnumLabel())
+                .AsNoTracking()
+                .Include(o => o.Location)
+                .Where(o => o.SubjectId == subjectId)
+                .Select(observation => observation.Location.GeographicLevel.GetEnumLabel())
                 .Distinct()
                 .ToListAsync();
         }

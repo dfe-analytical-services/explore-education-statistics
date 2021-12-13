@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IList<Observation> observations)
         {
             var queryableObservations = observations.AsQueryable();
-            
+
             return await _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(async subject =>
@@ -122,9 +122,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id);
                     var subjectName = releaseFile.Name!;
 
-                    var locationsHelper =
-                        new LocationsQueryHelper(locationAttributes, query, _boundaryLevelRepository,
-                            _geoJsonRepository);
+                    var locationsHelper = new LocationsQueryHelper(
+                        locationAttributes,
+                        query,
+                        _boundaryLevelRepository,
+                        _geoJsonRepository);
 
                     if (locationHierarchiesEnabled)
                     {
