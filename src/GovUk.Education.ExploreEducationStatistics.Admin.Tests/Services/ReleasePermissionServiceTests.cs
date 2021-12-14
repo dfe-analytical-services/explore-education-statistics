@@ -564,11 +564,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Role = Contributor,
             };
 
+            var user1Release1Invite = new UserReleaseInvite
+            {
+                Email = user1.Email,
+                Release = release1,
+                Role = Contributor,
+            };
+            var user2Release2Invite = new UserReleaseInvite
+            {
+                Email = user2.Email,
+                Release = release2Original,
+                Role = Contributor,
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
-                    user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2, user3ReleaseRole1);
+                    user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2, user3ReleaseRole1,
+                    user1Release1Invite, user2Release2Invite);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -591,6 +605,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, userReleaseRoles.Count);
                 Assert.Equal(user1.Id, userReleaseRoles[0].UserId);
                 Assert.Equal(user3.Id, userReleaseRoles[1].UserId);
+
+                var userReleaseInvites = await contentDbContext.UserReleaseInvites
+                    .ToListAsync();
+
+                Assert.Single(userReleaseInvites); // user1's invite remains
+                Assert.Equal(user1Release1Invite.Id, userReleaseInvites[0].Id);
             }
         }
 

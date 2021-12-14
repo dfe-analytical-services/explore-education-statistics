@@ -44,11 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<bool> IsUserEditorOrApproverOnLatestRelease(Guid userId, Guid publicationId);
 
-        Task<UserReleaseRole?> GetReleaseRole(Guid userId,
+        Task<UserReleaseRole?> GetUserReleaseRole(Guid userId,
             Guid releaseId,
             ReleaseRole role);
 
-        Task<UserReleaseRole?> GetReleaseRole(string email,
+        Task<UserReleaseRole?> GetUserReleaseRole(string email,
             Guid releaseId,
             ReleaseRole role);
 

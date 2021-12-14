@@ -69,7 +69,96 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task CreateMany()
+        public async Task CreateIfNotExists_DoesNotExist()
+        {
+            var userId = Guid.NewGuid();
+            var createdById = Guid.NewGuid();
+            var releaseId = Guid.NewGuid();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                var result = await service.CreateIfNotExists(userId, releaseId, Contributor, createdById);
+
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(userId, result.UserId);
+                Assert.Equal(releaseId, result.ReleaseId);
+                Assert.Equal(Contributor, result.Role);
+                Assert.Equal(createdById, result.CreatedById);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Created!.Value).Milliseconds, 0, 1500);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Single(userReleaseRoles);
+
+                Assert.NotEqual(Guid.Empty, userReleaseRoles[0].Id);
+                Assert.Equal(userId, userReleaseRoles[0].UserId);
+                Assert.Equal(releaseId, userReleaseRoles[0].ReleaseId);
+                Assert.Equal(Contributor, userReleaseRoles[0].Role);
+                Assert.Equal(createdById, userReleaseRoles[0].CreatedById);
+                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[0].Created!.Value).Milliseconds,
+                    0, 1500);
+            }
+        }
+
+        [Fact]
+        public async Task CreateIfNotExists_AlreadyExists()
+        {
+            var userReleaseRole = new UserReleaseRole
+            {
+                UserId = Guid.NewGuid(),
+                ReleaseId = Guid.NewGuid(),
+                Role = Lead,
+                CreatedById = Guid.NewGuid(),
+                Created = new DateTime(2021, 12, 25),
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                var result = await service.CreateIfNotExists(userReleaseRole.UserId,
+                    userReleaseRole.ReleaseId, userReleaseRole.Role, userReleaseRole.CreatedById.Value);
+
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(userReleaseRole.UserId, result.UserId);
+                Assert.Equal(userReleaseRole.ReleaseId, result.ReleaseId);
+                Assert.Equal(userReleaseRole.Role, result.Role);
+                Assert.Equal(userReleaseRole.CreatedById, result.CreatedById);
+                Assert.Equal(userReleaseRole.Created, result.Created);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Single(userReleaseRoles);
+
+                Assert.NotEqual(Guid.Empty, userReleaseRoles[0].Id);
+                Assert.Equal(userReleaseRole.UserId, userReleaseRoles[0].UserId);
+                Assert.Equal(userReleaseRole.ReleaseId, userReleaseRoles[0].ReleaseId);
+                Assert.Equal(userReleaseRole.Role, userReleaseRoles[0].Role);
+                Assert.Equal(userReleaseRole.CreatedById, userReleaseRoles[0].CreatedById);
+                Assert.Equal(userReleaseRole.Created, userReleaseRoles[0].Created);
+            }
+        }
+
+        [Fact]
+        public async Task CreateManyIfNotExists_Users()
         {
             var release = new Release();
 
@@ -101,8 +190,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.CreateManyIfNotExists(ListOf(user1.Id, user2.Id, user3.Id, user4.Id),
-                    release.Id, Contributor, createdByUser.Id);
+                var result = await service.CreateManyIfNotExists(
+                    userIds: ListOf(user1.Id, user2.Id, user3.Id, user4.Id),
+                    releaseId: release.Id,
+                    role: Contributor,
+                    createdById: createdByUser.Id);
 
                 Assert.Equal(Unit.Instance, result);
             }
@@ -136,6 +228,84 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(user4.Id, userReleaseRoles[3].UserId);
                 Assert.Equal(release.Id, userReleaseRoles[3].ReleaseId);
+                Assert.Equal(Contributor, userReleaseRoles[3].Role);
+                Assert.Equal(createdByUser.Id, userReleaseRoles[3].CreatedById);
+                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[3].Created!.Value).Milliseconds,
+                    0, 1500);
+            }
+        }
+
+        [Fact]
+        public async Task CreateManyIfNotExists_Releases()
+        {
+            var release1 = new Release();
+
+            var user = new User();
+            var createdByUser = new User();
+
+            var userRelease1Role = new UserReleaseRole
+            {
+                Release = release1,
+                User = user,
+                Role = Contributor,
+                CreatedBy = createdByUser,
+                Created = new DateTime(2000, 12, 25),
+            };
+            var release2 = new Release();
+            var release3 = new Release();
+            var release4 = new Release();
+
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(
+                    userRelease1Role, release2, release3, release4, createdByUser);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                var result = await service.CreateManyIfNotExists(
+                    userId: user.Id,
+                    releaseIds: ListOf(release1.Id, release2.Id, release3.Id, release4.Id),
+                    role: Contributor,
+                    createdById: createdByUser.Id);
+
+                Assert.Equal(Unit.Instance, result);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Equal(4, userReleaseRoles.Count);
+
+                Assert.Equal(userRelease1Role.UserId, userReleaseRoles[0].UserId);
+                Assert.Equal(userRelease1Role.ReleaseId, userReleaseRoles[0].ReleaseId);
+                Assert.Equal(userRelease1Role.Role, userReleaseRoles[0].Role);
+                Assert.Equal(userRelease1Role.CreatedById, userReleaseRoles[0].CreatedById);
+                Assert.Equal(userRelease1Role.Created, userReleaseRoles[0].Created);
+
+                Assert.Equal(user.Id, userReleaseRoles[1].UserId);
+                Assert.Equal(release2.Id, userReleaseRoles[1].ReleaseId);
+                Assert.Equal(Contributor, userReleaseRoles[1].Role);
+                Assert.Equal(createdByUser.Id, userReleaseRoles[1].CreatedById);
+                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[1].Created!.Value).Milliseconds,
+                    0, 1500);
+
+                Assert.Equal(user.Id, userReleaseRoles[2].UserId);
+                Assert.Equal(release3.Id, userReleaseRoles[2].ReleaseId);
+                Assert.Equal(Contributor, userReleaseRoles[2].Role);
+                Assert.Equal(createdByUser.Id, userReleaseRoles[2].CreatedById);
+                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[2].Created!.Value).Milliseconds,
+                    0, 1500);
+
+                Assert.Equal(user.Id, userReleaseRoles[3].UserId);
+                Assert.Equal(release4.Id, userReleaseRoles[3].ReleaseId);
                 Assert.Equal(Contributor, userReleaseRoles[3].Role);
                 Assert.Equal(createdByUser.Id, userReleaseRoles[3].CreatedById);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[3].Created!.Value).Milliseconds,
@@ -837,7 +1007,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UserHasRoleOnRelease_TrueIfRoleExists()
+        public async Task GetUserReleaseRole_ReturnRoleIfExists()
         {
             var userReleaseRole = new UserReleaseRole
             {
@@ -858,10 +1028,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.GetReleaseRole(
+                var result = await service.GetUserReleaseRole(
                     userReleaseRole.UserId,
                     userReleaseRole.ReleaseId,
                     Contributor);
+
                 Assert.NotNull(result);
                 Assert.Equal(userReleaseRole.UserId, result!.UserId);
                 Assert.Equal(userReleaseRole.ReleaseId, result.ReleaseId);
@@ -870,7 +1041,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UserHasRoleOnRelease_FalseIfRoleDoesNotExist()
+        public async Task GetUserReleaseRole_NullIfRoleDoesNotExist()
         {
             var user = new User();
             var release = new Release();
@@ -907,10 +1078,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                Assert.Null(await service.GetReleaseRole(
+                var result = await service.GetUserReleaseRole(
                     user.Id,
                     release.Id,
-                    Contributor));
+                    Contributor);
+
+                Assert.Null(result);
             }
         }
 

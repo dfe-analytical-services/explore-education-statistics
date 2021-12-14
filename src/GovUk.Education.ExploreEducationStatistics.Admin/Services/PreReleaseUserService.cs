@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ForEachAwaitAsync(async email =>
                         {
                             if (await _userReleaseRoleRepository
-                                    .GetReleaseRole(email, releaseId, PrereleaseViewer) != null)
+                                    .GetUserReleaseRole(email, releaseId, PrereleaseViewer) != null)
                             {
                                 plan.AlreadyAccepted.Add(email);
                             }

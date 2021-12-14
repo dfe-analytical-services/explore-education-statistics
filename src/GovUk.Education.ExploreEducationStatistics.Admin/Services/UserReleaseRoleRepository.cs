@@ -41,7 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<UserReleaseRole> CreateIfNotExists(Guid userId, Guid releaseId, ReleaseRole role,
             Guid createdById)
         {
-            var userReleaseRole = await GetReleaseRole(userId, releaseId, role);
+            var userReleaseRole = await GetUserReleaseRole(userId, releaseId, role);
             if (userReleaseRole == null)
             {
                 return await Create(userId, releaseId, role, createdById);
@@ -179,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 EditorAndApproverRoles);
         }
 
-        public async Task<UserReleaseRole?> GetReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
+        public async Task<UserReleaseRole?> GetUserReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
             return await _contentDbContext.UserReleaseRoles
                 .AsQueryable()
@@ -189,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     r.Role == role);
         }
 
-        public async Task<UserReleaseRole?> GetReleaseRole(string email, Guid releaseId, ReleaseRole role)
+        public async Task<UserReleaseRole?> GetUserReleaseRole(string email, Guid releaseId, ReleaseRole role)
         {
             return await _contentDbContext.UserReleaseRoles
                 .AsQueryable()
