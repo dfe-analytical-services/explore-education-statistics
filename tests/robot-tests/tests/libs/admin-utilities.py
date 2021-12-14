@@ -26,7 +26,8 @@ def user_signs_in_as(user: str):
         assert admin_url
 
         set_to_local_storage(
-            f'GovUk.Education.ExploreEducationStatistics.Adminuser:{admin_url}:GovUk.Education.ExploreEducationStatistics.Admin',
+            f'GovUk.Education.ExploreEducationStatistics.Adminuser:{admin_url}:GovUk.Education'
+            f'.ExploreEducationStatistics.Admin',
             local_storage_token)
         set_cookie_from_json(cookie_token)
 
