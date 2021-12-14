@@ -68,7 +68,7 @@ export const headingOptions: HeadingOption[] = [
   },
 ];
 
-export const imageToolbar: string[] = [
+export const imageToolbar = [
   'imageTextAlternative',
   '|',
   'imageResize:50',
