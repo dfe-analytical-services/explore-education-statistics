@@ -76,17 +76,23 @@ describe('ReleaseContributorPermissions', () => {
     const rows = screen.getAllByRole('row');
     expect(rows.length).toBe(3);
 
-    expect(within(rows[0]).getByText('User Name 1')).toBeInTheDocument();
+    expect(
+      within(rows[0]).getByText('User Name 1 (user1@test.com)'),
+    ).toBeInTheDocument();
     expect(
       within(rows[0]).getByRole('button', { name: 'Remove user' }),
     ).toBeInTheDocument();
 
-    expect(within(rows[1]).getByText('User Name 2')).toBeInTheDocument();
+    expect(
+      within(rows[1]).getByText('User Name 2 (user2@test.com)'),
+    ).toBeInTheDocument();
     expect(
       within(rows[1]).getByRole('button', { name: 'Remove user' }),
     ).toBeInTheDocument();
 
-    expect(within(rows[2]).getByText('User Name 3')).toBeInTheDocument();
+    expect(
+      within(rows[2]).getByText('User Name 3 (user3@test.com)'),
+    ).toBeInTheDocument();
     expect(
       within(rows[2]).getByRole('button', { name: 'Remove user' }),
     ).toBeInTheDocument();
