@@ -1,21 +1,27 @@
 import {
   CommentsProvider,
+  CommentsContextProviderProps,
   useCommentsContext,
 } from '@admin/contexts/CommentsContext';
-import {
-  AddComment,
-  UpdateComment,
-} from '@admin/services/releaseContentCommentService';
+import { AddComment } from '@admin/services/releaseContentCommentService';
+import { OmitStrict } from '@common/types';
 import {
   testComments,
   testCommentUser1,
 } from '@admin/components/comments/__data__/testComments';
 import { Comment } from '@admin/services/types/content';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import React from 'react';
+import React, { FC } from 'react';
+import { act, renderHook } from '@testing-library/react-hooks';
 
 describe('CommentsContext', () => {
+  type Props = OmitStrict<CommentsContextProviderProps, 'children'>;
+
+  const wrapper: FC<Props> = ({ ...props }) => (
+    <CommentsProvider {...props}>{props.children}</CommentsProvider>
+  );
+
+  const blockId = 'block-id';
+
   const commentToAdd: AddComment = {
     content: 'Added Comment content',
   };
@@ -25,9 +31,9 @@ describe('CommentsContext', () => {
     createdBy: testCommentUser1,
     created: '2021-11-30T10:00',
   };
-  const commentToUpdate: UpdateComment = {
+  const commentToUpdate: Comment = {
+    ...testComments[2],
     content: 'Updated content',
-    id: testComments[2].id,
   };
   const updatedComment: Comment = {
     ...testComments[2],
@@ -45,251 +51,243 @@ describe('CommentsContext', () => {
   const handleSaveComment = jest.fn();
   const handleDeletePendingComment = jest.fn();
   const handleSaveUpdatedComment = jest.fn();
-
-  const setUp = ({
-    initialComments = testComments,
-    initialPendingDeletions = [],
-    returnedUpdatedComment = updatedComment,
-  }: {
-    initialComments?: Comment[];
-    initialPendingDeletions?: Comment[];
-    returnedUpdatedComment?: Comment;
-  }) => {
-    handleSaveComment.mockResolvedValue(addedComment);
-    handleSaveUpdatedComment.mockResolvedValue(returnedUpdatedComment);
-
-    const TestComponent = () => {
-      const {
-        comments,
-        currentInteraction,
-        pendingDeletions,
-        addComment,
-        removeComment,
-        clearPendingDeletions,
-        resolveComment,
-        reAddComment,
-        unresolveComment,
-        updateComment,
-      } = useCommentsContext();
-
-      return (
-        <>
-          <button type="button" onClick={() => addComment(commentToAdd)}>
-            Add comment
-          </button>
-          <button
-            type="button"
-            onClick={() => removeComment.current(testComments[2].id)}
-          >
-            Delete comment
-          </button>
-          <button type="button" onClick={() => clearPendingDeletions()}>
-            Delete pendingDeletions
-          </button>
-          <button
-            type="button"
-            onClick={() => resolveComment.current(testComments[1].id, true)}
-          >
-            Resolve comment
-          </button>
-          <button
-            type="button"
-            onClick={() => reAddComment.current(testComments[2].id)}
-          >
-            Undelete comment
-          </button>
-          <button
-            type="button"
-            onClick={() => unresolveComment.current(testComments[0].id, true)}
-          >
-            Unresolve comment
-          </button>
-          <button type="button" onClick={() => updateComment(commentToUpdate)}>
-            Update comment
-          </button>
-          <ul data-testid="comments">
-            {comments.map(comment => (
-              <li key={comment.id} id={comment.id}>
-                {comment.content}
-                {comment.resolved && <span>Resolved</span>}
-              </li>
-            ))}
-          </ul>
-          <ul data-testid="pendingDeletions">
-            {pendingDeletions.map(comment => (
-              <li key={comment.id} id={comment.id}>
-                {comment.content}
-              </li>
-            ))}
-          </ul>
-          <div data-testid="currentInteraction">
-            {currentInteraction?.type} {currentInteraction?.id}
-          </div>
-        </>
-      );
-    };
-
-    return render(
-      <CommentsProvider
-        value={{
-          comments: initialComments,
-          pendingDeletions: initialPendingDeletions,
-          onSaveComment: handleSaveComment,
-          onDeletePendingComment: handleDeletePendingComment,
-          onSaveUpdatedComment: handleSaveUpdatedComment,
-        }}
-      >
-        <TestComponent />
-      </CommentsProvider>,
-    );
-  };
+  const handleUpdateUnresolvedComments = jest.fn();
+  const handleUnsavedCommentDeletion = jest.fn();
 
   test('addComment calls the save method and adds the new comment to the comments array', async () => {
-    setUp({});
-    userEvent.click(screen.getByRole('button', { name: 'Add comment' }));
+    handleSaveComment.mockResolvedValue(addedComment);
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        comments: [],
+        onDeleteComment: jest.fn(),
+        onSaveComment: handleSaveComment,
+        onSaveUpdatedComment: jest.fn(),
+        onUpdateUnresolvedComments: { current: handleUpdateUnresolvedComments },
+        onUpdateUnsavedCommentDeletions: {
+          current: jest.fn(),
+        },
+      },
+    });
+    expect(result.current.comments).toEqual([]);
 
-    await waitFor(() => {
-      expect(handleSaveComment).toHaveBeenCalledWith(commentToAdd);
-      const comments = within(screen.getByTestId('comments')).getAllByRole(
-        'listitem',
-      );
-      expect(comments).toHaveLength(6);
-      expect(comments[5]).toHaveAttribute('id', addedComment.id);
-      expect(comments[5]).toHaveTextContent(addedComment.content);
-      expect(screen.getByTestId('currentInteraction')).toHaveTextContent(
-        `adding ${addedComment.id}`,
-      );
+    await act(async () => {
+      await result.current.addComment(blockId, commentToAdd);
+    });
+    expect(handleSaveComment).toHaveBeenCalledWith(commentToAdd);
+    expect(handleUpdateUnresolvedComments).toHaveBeenCalledWith(
+      blockId,
+      addedComment.id,
+    );
+    expect(result.current.comments).toEqual([addedComment]);
+    expect(result.current.currentInteraction).toEqual({
+      type: 'adding',
+      id: addedComment.id,
     });
   });
 
   test('removeComment removes comment from the comments array and adds it to pendingDeletions', async () => {
-    setUp({});
-    userEvent.click(screen.getByRole('button', { name: 'Delete comment' }));
-
-    await waitFor(() => {
-      const comments = within(screen.getByTestId('comments')).getAllByRole(
-        'listitem',
-      );
-      const pendingDeletions = within(
-        screen.getByTestId('pendingDeletions'),
-      ).getAllByRole('listitem');
-      expect(comments).toHaveLength(4);
-      expect(pendingDeletions).toHaveLength(1);
-      expect(pendingDeletions[0]).toHaveAttribute('id', testComments[2].id);
-      expect(pendingDeletions[0]).toHaveTextContent(testComments[2].content);
-      expect(screen.getByTestId('currentInteraction')).toHaveTextContent(
-        `removing ${testComments[2].id}`,
-      );
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        comments: testComments,
+        onDeleteComment: jest.fn(),
+        onSaveComment: jest.fn(),
+        onSaveUpdatedComment: jest.fn(),
+        onUpdateUnresolvedComments: { current: jest.fn() },
+        onUpdateUnsavedCommentDeletions: {
+          current: handleUnsavedCommentDeletion,
+        },
+      },
     });
+    expect(result.current.comments).toEqual(testComments);
+    expect(result.current.pendingDeletions).toEqual([]);
+
+    await act(async () => {
+      await result.current.removeComment.current(blockId, testComments[1].id);
+    });
+
+    expect(result.current.comments).toEqual([
+      testComments[0],
+      testComments[2],
+      testComments[3],
+      testComments[4],
+    ]);
+    expect(result.current.pendingDeletions).toEqual([testComments[1]]);
+    expect(result.current.currentInteraction).toEqual({
+      type: 'removing',
+      id: testComments[1].id,
+    });
+    expect(handleUnsavedCommentDeletion).toHaveBeenCalledWith(
+      blockId,
+      testComments[1].id,
+    );
   });
 
   test('clearPendingDeletions calls the delete comment method for each pending and removes them from the pending array', async () => {
-    setUp({
-      initialComments: [testComments[0], testComments[1]],
-      initialPendingDeletions: [
-        testComments[2],
-        testComments[3],
-        testComments[4],
-      ],
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        comments: [testComments[0], testComments[1]],
+        pendingDeletions: [testComments[2], testComments[3], testComments[4]],
+        onDeleteComment: handleDeletePendingComment,
+        onSaveComment: jest.fn(),
+        onSaveUpdatedComment: jest.fn(),
+        onUpdateUnresolvedComments: { current: jest.fn() },
+        onUpdateUnsavedCommentDeletions: {
+          current: jest.fn(),
+        },
+      },
     });
-    userEvent.click(
-      screen.getByRole('button', { name: 'Delete pendingDeletions' }),
-    );
-
-    await waitFor(() => {
-      expect(handleDeletePendingComment).toHaveBeenCalledTimes(3);
-      expect(handleDeletePendingComment).toHaveBeenCalledWith(
-        testComments[2].id,
-      );
-      expect(handleDeletePendingComment).toHaveBeenCalledWith(
-        testComments[3].id,
-      );
-      expect(handleDeletePendingComment).toHaveBeenCalledWith(
-        testComments[4].id,
-      );
+    expect(result.current.comments).toEqual([testComments[0], testComments[1]]);
+    expect(result.current.pendingDeletions).toEqual([
+      testComments[2],
+      testComments[3],
+      testComments[4],
+    ]);
+    await act(async () => {
+      await result.current.clearPendingDeletions();
     });
-    const pendingDeletions = within(
-      screen.getByTestId('pendingDeletions'),
-    ).queryAllByRole('listitem');
-    expect(pendingDeletions).toHaveLength(0);
 
-    const comments = within(screen.getByTestId('comments')).getAllByRole(
-      'listitem',
-    );
-    expect(comments).toHaveLength(2);
+    expect(handleDeletePendingComment).toHaveBeenCalledTimes(3);
+    expect(handleDeletePendingComment).toHaveBeenCalledWith(testComments[2].id);
+    expect(handleDeletePendingComment).toHaveBeenCalledWith(testComments[3].id);
+    expect(handleDeletePendingComment).toHaveBeenCalledWith(testComments[4].id);
+
+    expect(result.current.comments).toEqual([testComments[0], testComments[1]]);
+    expect(result.current.pendingDeletions).toEqual([]);
   });
 
   test('resolveComment calls the update method and updates the comment in the array', async () => {
-    setUp({ returnedUpdatedComment: resolvedComment });
-    userEvent.click(screen.getByRole('button', { name: 'Resolve comment' }));
-    await waitFor(() => {
-      expect(handleSaveUpdatedComment).toHaveBeenCalledWith({
-        ...testComments[1],
-        setResolved: true,
-      });
+    handleSaveUpdatedComment.mockResolvedValue(resolvedComment);
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        comments: testComments,
+        onDeleteComment: jest.fn(),
+        onSaveComment: jest.fn(),
+        onSaveUpdatedComment: handleSaveUpdatedComment,
+        onUpdateUnresolvedComments: { current: handleUpdateUnresolvedComments },
+        onUpdateUnsavedCommentDeletions: {
+          current: jest.fn(),
+        },
+      },
     });
-    const comments = within(screen.getByTestId('comments')).getAllByRole(
-      'listitem',
+    expect(result.current.comments[1].resolved).toBeUndefined();
+
+    await act(async () => {
+      await result.current.resolveComment.current(
+        blockId,
+        testComments[1].id,
+        true,
+      );
+    });
+
+    expect(result.current.comments[1]).toEqual(resolvedComment);
+    expect(handleUpdateUnresolvedComments).toHaveBeenCalledWith(
+      blockId,
+      resolvedComment.id,
     );
-    expect(comments[1]).toHaveAttribute('id', resolvedComment.id);
-    expect(comments[1]).toHaveTextContent(resolvedComment.content);
-    expect(comments[1]).toHaveTextContent('Resolved');
-    expect(screen.getByTestId('currentInteraction')).toHaveTextContent(
-      `resolving ${resolvedComment.id}`,
-    );
+    expect(result.current.currentInteraction).toEqual({
+      type: 'resolving',
+      id: resolvedComment.id,
+    });
   });
 
   test('unresolveComment calls the update method and updates the comment in the array', async () => {
-    setUp({ returnedUpdatedComment: unresolvedComment });
-    userEvent.click(screen.getByRole('button', { name: 'Unresolve comment' }));
-    await waitFor(() => {
-      expect(handleSaveUpdatedComment).toHaveBeenCalledWith({
-        ...testComments[0],
-        setResolved: false,
-      });
+    handleSaveUpdatedComment.mockResolvedValue(unresolvedComment);
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        comments: testComments,
+        onDeleteComment: jest.fn(),
+        onSaveComment: jest.fn(),
+        onSaveUpdatedComment: handleSaveUpdatedComment,
+        onUpdateUnresolvedComments: { current: handleUpdateUnresolvedComments },
+        onUpdateUnsavedCommentDeletions: {
+          current: jest.fn(),
+        },
+      },
     });
-    const comments = within(screen.getByTestId('comments')).getAllByRole(
-      'listitem',
+    expect(result.current.comments[0].resolved).toEqual('2021-11-30T13:55');
+
+    await act(async () => {
+      await result.current.unresolveComment.current(
+        blockId,
+        testComments[0].id,
+        true,
+      );
+    });
+
+    expect(result.current.comments[0]).toEqual(unresolvedComment);
+    expect(handleUpdateUnresolvedComments).toHaveBeenCalledWith(
+      blockId,
+      unresolvedComment.id,
     );
-    expect(comments[0]).toHaveAttribute('id', unresolvedComment.id);
-    expect(comments[0]).toHaveTextContent(unresolvedComment.content);
-    expect(comments[0]).not.toHaveTextContent('Resolved');
-    expect(screen.getByTestId('currentInteraction')).toHaveTextContent(
-      `unresolving ${unresolvedComment.id}`,
-    );
+    expect(result.current.currentInteraction).toEqual({
+      type: 'unresolving',
+      id: unresolvedComment.id,
+    });
   });
 
   test('updateComment calls the update method and updates the comment in the array', async () => {
-    setUp({});
-    userEvent.click(screen.getByRole('button', { name: 'Update comment' }));
-    await waitFor(() => {
-      expect(handleSaveUpdatedComment).toHaveBeenCalledWith(commentToUpdate);
+    handleSaveUpdatedComment.mockResolvedValue(updatedComment);
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        comments: testComments,
+        onDeleteComment: jest.fn(),
+        onSaveComment: jest.fn(),
+        onSaveUpdatedComment: handleSaveUpdatedComment,
+        onUpdateUnresolvedComments: { current: jest.fn() },
+        onUpdateUnsavedCommentDeletions: {
+          current: jest.fn(),
+        },
+      },
     });
-    const comments = within(screen.getByTestId('comments')).getAllByRole(
-      'listitem',
-    );
-    expect(comments[2]).toHaveAttribute('id', updatedComment.id);
-    expect(comments[2]).toHaveTextContent(updatedComment.content);
+    expect(result.current.comments[2].content).toEqual(testComments[2].content);
+
+    await act(async () => {
+      await result.current.updateComment(commentToUpdate);
+    });
+
+    expect(handleSaveUpdatedComment).toHaveBeenCalledWith(commentToUpdate);
+    expect(result.current.comments[2].content).toEqual(updatedComment.content);
   });
 
   test('reAddComment removes comment from the pendingDeletions array and adds it to comments', async () => {
-    setUp({
-      initialComments: [testComments[0], testComments[1]],
-      initialPendingDeletions: [testComments[2], testComments[3]],
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        comments: [testComments[0], testComments[1]],
+        pendingDeletions: [testComments[2], testComments[3], testComments[4]],
+        onDeleteComment: jest.fn(),
+        onSaveComment: jest.fn(),
+        onSaveUpdatedComment: jest.fn(),
+        onUpdateUnresolvedComments: { current: jest.fn() },
+        onUpdateUnsavedCommentDeletions: {
+          current: handleUnsavedCommentDeletion,
+        },
+      },
     });
-    userEvent.click(screen.getByRole('button', { name: 'Undelete comment' }));
 
-    await waitFor(() => {
-      const comments = within(screen.getByTestId('comments')).getAllByRole(
-        'listitem',
-      );
-      const pendingDeletions = within(
-        screen.getByTestId('pendingDeletions'),
-      ).getAllByRole('listitem');
-      expect(comments).toHaveLength(3);
-      expect(comments[2]).toHaveAttribute('id', testComments[2].id);
-      expect(comments[2]).toHaveTextContent(testComments[2].content);
-      expect(pendingDeletions).toHaveLength(1);
+    await act(async () => {
+      await result.current.reAddComment.current(blockId, testComments[3].id);
     });
+
+    expect(result.current.pendingDeletions).toEqual([
+      testComments[2],
+      testComments[4],
+    ]);
+    expect(result.current.comments).toEqual([
+      testComments[0],
+      testComments[1],
+      testComments[3],
+    ]);
+
+    expect(handleUnsavedCommentDeletion).toHaveBeenLastCalledWith(
+      blockId,
+      testComments[3].id,
+    );
   });
 });
