@@ -203,7 +203,7 @@ Verify public metadata guidance document
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
     user checks nth breadcrumb contains    4    Data guidance
-    user waits until h2 is visible    Data guidance    30
+    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
 
     user waits until page contains title caption    ${RELEASE_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
@@ -516,7 +516,7 @@ Verify amendment files
     user opens accordion section    Explore data and files
     ${downloads}=    user gets accordion section content element    Explore data and files
     user checks element should contain    ${downloads}    Download all files
-    ...    30
+    ...    %{WAIT_SMALL}
 
     user opens details dropdown    List of other files
     ${other_files}=    user gets details content element    List of other files
