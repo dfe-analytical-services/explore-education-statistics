@@ -37,9 +37,8 @@ const PublicationSectionBlocks = ({
       {blocks.map(block => {
         if (block.type === 'DataBlock') {
           return (
-            <Gate condition={!!visible}>
+            <Gate condition={!!visible} key={block.id}>
               <DataBlockTabs
-                key={block.id}
                 dataBlock={block}
                 releaseId={release.id}
                 getInfographic={getReleaseFile}
