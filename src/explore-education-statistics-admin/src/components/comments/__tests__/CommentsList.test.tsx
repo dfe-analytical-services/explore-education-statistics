@@ -12,13 +12,13 @@ describe('CommentsList', () => {
   test('displays unresolved comments ordered by marker position', () => {
     render(
       <CommentsProvider
-        value={{
-          comments: testComments,
-          markersOrder: testMarkersOrder,
-          onDeletePendingComment: jest.fn(),
-          onSaveComment: jest.fn(),
-          onSaveUpdatedComment: jest.fn(),
-        }}
+        comments={testComments}
+        markersOrder={testMarkersOrder}
+        onDeletePendingComment={jest.fn()}
+        onSaveComment={jest.fn()}
+        onSaveUpdatedComment={jest.fn()}
+        onUpdateUnresolvedComments={{ current: jest.fn() }}
+        onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
       >
         <CommentsList blockId={blockId} />
       </CommentsProvider>,
@@ -36,13 +36,13 @@ describe('CommentsList', () => {
   test('displays resolved comments', () => {
     render(
       <CommentsProvider
-        value={{
-          comments: testComments,
-          markersOrder: testMarkersOrder,
-          onDeletePendingComment: jest.fn(),
-          onSaveComment: jest.fn(),
-          onSaveUpdatedComment: jest.fn(),
-        }}
+        comments={testComments}
+        markersOrder={testMarkersOrder}
+        onDeletePendingComment={jest.fn()}
+        onSaveComment={jest.fn()}
+        onSaveUpdatedComment={jest.fn()}
+        onUpdateUnresolvedComments={{ current: jest.fn() }}
+        onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
       >
         <CommentsList blockId={blockId} />
       </CommentsProvider>,

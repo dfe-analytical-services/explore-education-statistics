@@ -1,3 +1,4 @@
+import { getTotalUnresolvedComments } from '@admin/pages/release/content/utils/getUnresolvedComments';
 import { Dictionary } from '@admin/types';
 import useCallbackRef from '@common/hooks/useCallbackRef';
 import React, {
@@ -9,16 +10,19 @@ import React, {
   useState,
 } from 'react';
 import noop from 'lodash/noop';
+import uniq from 'lodash/uniq';
 
 export type EditingMode = 'preview' | 'table-preview' | 'edit';
 export type BlockCommentIds = Dictionary<string[]>;
 
 export interface EditingContextState {
   addUnsavedBlock: (blockId: string) => void;
+  clearUnsavedCommentDeletions: (blockId: string) => void;
   editingMode: EditingMode;
   removeUnsavedBlock: (blockId: string) => void;
-  removeUnsavedDeletionsForBlock: (blockId: string) => void;
   setEditingMode: (mode: EditingMode) => void;
+  totalUnresolvedComments: number;
+  totalUnsavedBlocks: number;
   unresolvedComments: BlockCommentIds;
   unsavedCommentDeletions: BlockCommentIds;
   unsavedBlocks: string[];
@@ -32,10 +36,12 @@ export interface EditingContextState {
 
 export const EditingContext = createContext<EditingContextState>({
   addUnsavedBlock: noop,
+  clearUnsavedCommentDeletions: noop,
   editingMode: 'preview',
   removeUnsavedBlock: noop,
-  removeUnsavedDeletionsForBlock: noop,
   setEditingMode: noop,
+  totalUnsavedBlocks: 0,
+  totalUnresolvedComments: 0,
   unresolvedComments: {},
   unsavedCommentDeletions: {},
   unsavedBlocks: [],
@@ -49,68 +55,91 @@ export function useEditingContext() {
 
 export interface EditingContextProviderProps {
   children: ReactNode | ((state: EditingContextState) => ReactNode);
-  value: {
-    editingMode: EditingMode;
-    unresolvedComments?: BlockCommentIds;
-    unsavedCommentDeletions?: BlockCommentIds;
-    unsavedBlocks?: string[];
-  };
+  editingMode: EditingMode;
+  unresolvedComments?: BlockCommentIds;
+  unsavedCommentDeletions?: BlockCommentIds;
+  unsavedBlocks?: string[];
 }
 
 export const EditingProvider = ({
   children,
-  value,
+  editingMode: initialEditingMode,
+  unresolvedComments: initialUnresolvedComments = {},
+  unsavedCommentDeletions: initialUnsavedCommentDeletions = {},
+  unsavedBlocks: initialUnsavedBlocks = [],
 }: EditingContextProviderProps) => {
   const [editingMode, setEditingMode] = useState<EditingMode>(
-    value.editingMode,
+    initialEditingMode,
   );
   const [unresolvedComments, setUnresolvedComments] = useState<BlockCommentIds>(
-    value.unresolvedComments ?? {},
+    initialUnresolvedComments,
   );
   const [unsavedCommentDeletions, setUnsavedCommentDeletions] = useState<
     BlockCommentIds
-  >(value.unsavedCommentDeletions ?? {});
+  >(initialUnsavedCommentDeletions);
   const [unsavedBlocks, setUnsavedBlocks] = useState<string[]>(
-    value.unsavedBlocks ?? [],
+    initialUnsavedBlocks,
   );
 
-  const updateUnresolvedComments = useCallbackRef(
-    (blockId: string, commentId: string) => {
+  const blocksWithCommentDeletions = Object.entries(unsavedCommentDeletions)
+    .filter(([, deletions]) => deletions.length)
+    .map(([blockId]) => blockId);
+  const totalUnsavedBlocks = uniq([
+    ...unsavedBlocks,
+    ...blocksWithCommentDeletions,
+  ]).length;
+
+  const totalUnresolvedComments = getTotalUnresolvedComments(
+    unresolvedComments,
+    unsavedCommentDeletions,
+  );
+
+  const updateUnresolvedComments: EditingContextState['updateUnresolvedComments'] = useCallbackRef(
+    (blockId, commentId) => {
       if (commentId === 'commentPlaceholder') {
         return;
       }
+
       const updated = { ...unresolvedComments };
-      if (!unresolvedComments[blockId]) {
+      if (!updated[blockId]) {
         updated[blockId] = [commentId];
         setUnresolvedComments(updated);
         return;
       }
+
       const index = updated[blockId].indexOf(commentId);
       if (index !== -1) {
-        updated[blockId].splice(index, 1);
+        const nextBlockComments = [...updated[blockId]];
+        nextBlockComments.splice(index, 1);
+        updated[blockId] = nextBlockComments;
       } else {
-        updated[blockId].push(commentId);
+        updated[blockId] = [...updated[blockId], commentId];
       }
+
       setUnresolvedComments(updated);
     },
     [unresolvedComments],
   );
 
-  const updateUnsavedCommentDeletions = useCallbackRef(
-    (blockId: string, commentId: string) => {
+  const updateUnsavedCommentDeletions: EditingContextState['updateUnsavedCommentDeletions'] = useCallbackRef(
+    (blockId, commentId) => {
       const updated = { ...unsavedCommentDeletions };
-      if (!unsavedCommentDeletions[blockId]) {
+      if (!updated[blockId]) {
         updated[blockId] = [commentId];
         setUnsavedCommentDeletions(updated);
         updateUnresolvedComments.current(blockId, commentId);
         return;
       }
+
       const index = updated[blockId].indexOf(commentId);
       if (index !== -1) {
-        updated[blockId].splice(index, 1);
+        const nextBlockComments = [...updated[blockId]];
+        nextBlockComments.splice(index, 1);
+        updated[blockId] = nextBlockComments;
       } else {
-        updated[blockId].push(commentId);
+        updated[blockId] = [...updated[blockId], commentId];
       }
+
       setUnsavedCommentDeletions(updated);
       updateUnresolvedComments.current(blockId, commentId);
     },
@@ -118,19 +147,19 @@ export const EditingProvider = ({
   );
 
   const state = useMemo<EditingContextState>(() => {
-    const addUnsavedBlock = (blockId: string) => {
+    const addUnsavedBlock: EditingContextState['addUnsavedBlock'] = blockId => {
       if (!unsavedBlocks.includes(blockId)) {
         setUnsavedBlocks([...unsavedBlocks, blockId]);
       }
     };
 
-    const removeUnsavedDeletionsForBlock = (blockId: string) => {
+    const clearUnsavedCommentDeletions: EditingContextState['clearUnsavedCommentDeletions'] = blockId => {
       const updated = { ...unsavedCommentDeletions };
       delete updated[blockId];
       setUnsavedCommentDeletions(updated);
     };
 
-    const removeUnsavedBlock = (blockId: string) => {
+    const removeUnsavedBlock: EditingContextState['removeUnsavedBlock'] = blockId => {
       const updated = unsavedBlocks.filter(block => block !== blockId);
       setUnsavedBlocks(updated);
     };
@@ -139,8 +168,10 @@ export const EditingProvider = ({
       addUnsavedBlock,
       editingMode,
       removeUnsavedBlock,
-      removeUnsavedDeletionsForBlock,
+      clearUnsavedCommentDeletions,
       setEditingMode,
+      totalUnresolvedComments,
+      totalUnsavedBlocks,
       unresolvedComments,
       unsavedBlocks,
       unsavedCommentDeletions,
@@ -149,6 +180,8 @@ export const EditingProvider = ({
     };
   }, [
     editingMode,
+    totalUnsavedBlocks,
+    totalUnresolvedComments,
     unresolvedComments,
     unsavedBlocks,
     unsavedCommentDeletions,

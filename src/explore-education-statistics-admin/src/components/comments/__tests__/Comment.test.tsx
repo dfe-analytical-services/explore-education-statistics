@@ -26,10 +26,7 @@ describe('Comment', () => {
   test('renders an unresolved comment correctly', () => {
     render(<Comment blockId={blockId} comment={testComments[2]} />);
 
-    const comment = screen.getByRole('button', {
-      name: 'Comment',
-    });
-
+    const comment = screen.getByRole('listitem');
     expect(comment).toHaveTextContent('Comment 3');
     expect(comment).toHaveTextContent('User Two');
     expect(comment).toHaveTextContent('30 Nov 2021, 13:55');
@@ -81,10 +78,7 @@ describe('Comment', () => {
     };
     render(<Comment blockId={blockId} comment={updatedComment} />);
 
-    const comment = screen.getByRole('button', {
-      name: 'Comment',
-    });
-
+    const comment = screen.getByRole('listitem');
     expect(comment).toHaveTextContent('Comment 3');
     expect(comment).toHaveTextContent(
       '30 Nov 2021, 13:55(Updated 30 Nov 2021, 14:00)',

@@ -29,11 +29,7 @@ const MethodologyContentPageInternal = () => {
     canUpdateMethodology && methodology.status === 'Draft';
 
   return (
-    <EditingProvider
-      value={{
-        editingMode: canUpdateContent ? 'edit' : 'preview',
-      }}
-    >
+    <EditingProvider editingMode={canUpdateContent ? 'edit' : 'preview'}>
       {({ editingMode }) => (
         <>
           {canUpdateContent && <EditablePageModeToggle />}

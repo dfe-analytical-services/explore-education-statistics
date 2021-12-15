@@ -4,17 +4,25 @@ import { CommentsProvider } from '@admin/contexts/CommentsContext';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
-import React from 'react';
+import React, { createRef } from 'react';
 
 describe('CommentAddForm', () => {
   const blockId = 'block-id';
+  const containerRef = createRef<HTMLDivElement>();
 
   test('renders the add comment form correctly', () => {
-    render(<CommentAddForm blockId={blockId} onCancel={noop} onSave={noop} />);
+    render(
+      <CommentAddForm
+        blockId={blockId}
+        containerRef={containerRef}
+        onCancel={noop}
+        onSave={noop}
+      />,
+    );
 
     expect(
       screen.getByRole('textbox', {
-        name: 'Add comment',
+        name: 'Comment',
       }),
     ).toBeInTheDocument();
 
@@ -32,30 +40,31 @@ describe('CommentAddForm', () => {
   });
 
   test('adds the comment and calls the onSave handler when the form is submitted', async () => {
-    const handleOnSave = jest.fn();
-    const handleOnAddComment = jest.fn();
-    handleOnAddComment.mockResolvedValue(testComments[1]);
+    const handleSave = jest.fn();
+    const handleSaveComment = jest.fn();
+    handleSaveComment.mockResolvedValue(testComments[1]);
 
     render(
       <CommentsProvider
-        value={{
-          comments: [],
-          onDeletePendingComment: jest.fn(),
-          onSaveComment: handleOnAddComment,
-          onSaveUpdatedComment: jest.fn(),
-        }}
+        comments={[]}
+        onDeletePendingComment={jest.fn()}
+        onSaveComment={handleSaveComment}
+        onSaveUpdatedComment={jest.fn()}
+        onUpdateUnresolvedComments={{ current: jest.fn() }}
+        onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
       >
         <CommentAddForm
           blockId={blockId}
+          containerRef={containerRef}
           onCancel={noop}
-          onSave={handleOnSave}
+          onSave={handleSave}
         />
       </CommentsProvider>,
     );
 
     await userEvent.type(
       screen.getByRole('textbox', {
-        name: 'Add comment',
+        name: 'Comment',
       }),
       'I am a comment',
     );
@@ -67,22 +76,23 @@ describe('CommentAddForm', () => {
     );
 
     await waitFor(() => {
-      expect(handleOnAddComment).toHaveBeenCalledWith({
+      expect(handleSaveComment).toHaveBeenCalledWith({
         content: 'I am a comment',
       });
 
-      expect(handleOnSave).toHaveBeenCalled();
+      expect(handleSave).toHaveBeenCalled();
     });
   });
 
   test('shows validation error and does not submit if no comment given', async () => {
-    const handleOnSave = jest.fn();
+    const handleSave = jest.fn();
 
     render(
       <CommentAddForm
         blockId={blockId}
+        containerRef={containerRef}
         onCancel={noop}
-        onSave={handleOnSave}
+        onSave={handleSave}
       />,
     );
 
@@ -99,17 +109,18 @@ describe('CommentAddForm', () => {
         }),
       ).toBeInTheDocument();
 
-      expect(handleOnSave).not.toHaveBeenCalled();
+      expect(handleSave).not.toHaveBeenCalled();
     });
   });
 
   test('calls the onCancel handler when the cancel button is clicked', () => {
-    const handleOnCancel = jest.fn();
+    const handleCancel = jest.fn();
 
     render(
       <CommentAddForm
         blockId={blockId}
-        onCancel={handleOnCancel}
+        containerRef={containerRef}
+        onCancel={handleCancel}
         onSave={noop}
       />,
     );
@@ -120,6 +131,6 @@ describe('CommentAddForm', () => {
       }),
     );
 
-    expect(handleOnCancel).toHaveBeenCalled();
+    expect(handleCancel).toHaveBeenCalled();
   });
 });

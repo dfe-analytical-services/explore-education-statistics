@@ -181,12 +181,12 @@ Test paragraph
     test('renders the view comments button with the number of unresolved comments', () => {
       render(
         <CommentsProvider
-          value={{
-            comments: testComments,
-            onDeletePendingComment: jest.fn(),
-            onSaveComment: jest.fn(),
-            onSaveUpdatedComment: jest.fn(),
-          }}
+          comments={testComments}
+          onDeleteComment={jest.fn()}
+          onSaveComment={jest.fn()}
+          onSaveUpdatedComment={jest.fn()}
+          onUpdateUnresolvedComments={{ current: jest.fn() }}
+          onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
         >
           <EditableContentBlock
             allowComments
@@ -207,12 +207,12 @@ Test paragraph
     test('clicking the view comments button opens the editor', () => {
       render(
         <CommentsProvider
-          value={{
-            comments: testComments,
-            onDeletePendingComment: jest.fn(),
-            onSaveComment: jest.fn(),
-            onSaveUpdatedComment: jest.fn(),
-          }}
+          comments={testComments}
+          onDeleteComment={jest.fn()}
+          onSaveComment={jest.fn()}
+          onSaveUpdatedComment={jest.fn()}
+          onUpdateUnresolvedComments={{ current: jest.fn() }}
+          onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
         >
           <EditableContentBlock
             allowComments

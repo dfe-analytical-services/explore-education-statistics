@@ -28,7 +28,7 @@ export type EditorElementsHandler = (elements: Element[]) => void;
 export interface FormEditorProps {
   allowComments?: boolean;
   allowedHeadings?: string[];
-  blockId: string;
+  blockId?: string;
   error?: string;
   focusOnInit?: boolean;
   hideLabel?: boolean;
@@ -83,7 +83,7 @@ const FormEditor = ({
   const config = useCKEditorConfig({
     allowComments,
     allowedHeadings,
-    blockId: blockId.replace('block-', ''),
+    blockId,
     editorInstance,
     toolbarConfig,
     onAutoSave,
@@ -166,12 +166,8 @@ const FormEditor = ({
   );
 
   useEffect(() => {
-    if (
-      !selectedComment?.fromEditor &&
-      selectedComment?.commentId &&
-      commentsPlugin.current
-    ) {
-      commentsPlugin.current.selectCommentMarker(selectedComment.commentId);
+    if (!selectedComment?.fromEditor && selectedComment?.id) {
+      commentsPlugin.current?.selectCommentMarker(selectedComment.id);
     }
   }, [selectedComment]);
 
@@ -180,31 +176,32 @@ const FormEditor = ({
       if (!commentsPlugin.current || !currentInteraction) {
         return;
       }
-      if (currentInteraction?.type === 'adding') {
-        commentsPlugin.current.addCommentMarker(currentInteraction.id);
-        if (editorInstance.current) {
-          setMarkersOrder(
-            getMarkersOrder([...editorInstance.current.model.markers]),
+      switch (currentInteraction.type) {
+        case 'adding':
+          commentsPlugin.current.addCommentMarker(currentInteraction.id);
+          if (editorInstance.current) {
+            setMarkersOrder(
+              getMarkersOrder([...editorInstance.current.model.markers]),
+            );
+          }
+          break;
+        case 'removing':
+          commentsPlugin.current.removeCommentMarker(currentInteraction.id);
+          break;
+        case 'resolving':
+          commentsPlugin.current.resolveCommentMarker(
+            currentInteraction.id,
+            false,
           );
-        }
-        return;
-      }
-      if (currentInteraction?.type === 'removing') {
-        commentsPlugin.current.removeCommentMarker(currentInteraction.id);
-        return;
-      }
-      if (currentInteraction?.type === 'resolving') {
-        commentsPlugin.current.resolveCommentMarker(
-          currentInteraction.id,
-          false,
-        );
-        return;
-      }
-      if (currentInteraction?.type === 'unresolving') {
-        commentsPlugin.current.resolveCommentMarker(
-          currentInteraction.id,
-          true,
-        );
+          break;
+        case 'unresolving':
+          commentsPlugin.current.resolveCommentMarker(
+            currentInteraction.id,
+            true,
+          );
+          break;
+        default:
+          break;
       }
     }
 

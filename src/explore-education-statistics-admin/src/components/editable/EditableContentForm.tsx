@@ -51,9 +51,10 @@ const EditableContentForm = ({
   onImageUploadCancel,
   onSubmit,
 }: Props) => {
-  const { comments, deletePendingComments } = useCommentsContext();
+  const { comments, clearPendingDeletions } = useCommentsContext();
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
+  const blockId = id.replace('block-', '');
 
   const validateElements = useCallback((elements: Element[]) => {
     let error: string | undefined;
@@ -74,14 +75,10 @@ const EditableContentForm = ({
     <div className={styles.container} ref={containerRef}>
       {showCommentAddForm && (
         <CommentAddForm
-          blockId={id}
+          blockId={blockId}
           containerRef={containerRef}
-          onCancel={() => {
-            toggleCommentAddForm.off();
-          }}
-          onSave={() => {
-            toggleCommentAddForm.off();
-          }}
+          onCancel={toggleCommentAddForm.off}
+          onSave={toggleCommentAddForm.off}
         />
       )}
       <div
@@ -89,7 +86,9 @@ const EditableContentForm = ({
           [styles.showCommentAddForm]: showCommentAddForm,
         })}
       >
-        {allowComments && comments.length > 0 && <CommentsList blockId={id} />}
+        {allowComments && comments.length > 0 && (
+          <CommentsList blockId={blockId} />
+        )}
       </div>
 
       <div className={styles.form}>
@@ -102,7 +101,7 @@ const EditableContentForm = ({
             content: Yup.string().required('Enter content'),
           })}
           onSubmit={async values => {
-            await deletePendingComments?.();
+            await clearPendingDeletions?.();
             onSubmit(values.content);
           }}
         >
@@ -110,6 +109,7 @@ const EditableContentForm = ({
             <FormFieldEditor<FormValues>
               id={id}
               allowComments={allowComments}
+              blockId={blockId}
               focusOnInit
               handleBlur={handleBlur}
               hideLabel={hideLabel}

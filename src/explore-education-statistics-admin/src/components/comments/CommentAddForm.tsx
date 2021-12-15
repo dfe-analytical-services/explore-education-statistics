@@ -1,19 +1,15 @@
 import styles from '@admin/components/comments/CommentAddForm.module.scss';
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
-import { useEditingContext } from '@admin/contexts/EditingContext';
-import { AddComment } from '@admin/services/releaseContentCommentService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
 import { Form } from '@common/components/form';
-
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import useFormSubmit from '@common/hooks/useFormSubmit';
+import usePinElementToContainer from '@common/hooks/usePinElementToContainer';
 import Yup from '@common/validation/yup';
-import useMounted from '@common/hooks/useMounted';
 import { Formik } from 'formik';
 import React, { RefObject, useRef } from 'react';
-import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
 
 interface FormValues {
@@ -22,57 +18,23 @@ interface FormValues {
 
 interface Props {
   blockId: string;
-  containerRef?: RefObject<HTMLDivElement>;
+  containerRef: RefObject<HTMLDivElement>;
   onCancel: () => void;
   onSave: () => void;
 }
 
 const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
   const { addComment, setCurrentInteraction } = useCommentsContext();
-  const { updateUnresolvedComments } = useEditingContext();
-  const [isSubmitting, toggleSubmitting] = useToggle(false);
-  const [fixPosition, toggleFixPosition] = useToggle(false);
-  const [focus, toggleFocus] = useToggle(false);
   const ref = useRef<HTMLDivElement>(null);
-
-  useMounted(() => {
-    const setPosition = () => {
-      const formRect = ref.current?.getBoundingClientRect();
-      const containerRect = containerRef?.current?.getBoundingClientRect();
-
-      if (!formRect || !containerRect) {
-        return;
-      }
-
-      if (containerRect.top >= 0 || containerRect.bottom <= formRect.height) {
-        toggleFixPosition.off();
-        return;
-      }
-      toggleFixPosition.on();
-    };
-
-    setPosition();
-    toggleFocus.on();
-
-    window.addEventListener('scroll', setPosition);
-
-    return () => window.removeEventListener('scroll', setPosition);
-  });
+  const { fixPosition, focus } = usePinElementToContainer(ref, containerRef);
 
   const handleSubmit = useFormSubmit(async (values: FormValues) => {
-    const additionalComment: AddComment = {
+    const newComment = await addComment(blockId, {
       content: values.content,
-    };
-    toggleSubmitting.on();
-    const newComment = await addComment(additionalComment);
+    });
     if (newComment) {
-      updateUnresolvedComments.current(
-        blockId.replace('block-', ''),
-        newComment.id,
-      );
-      return onSave();
+      onSave();
     }
-    return toggleSubmitting.off();
   });
 
   return (
@@ -91,32 +53,34 @@ const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
         })}
         onSubmit={handleSubmit}
       >
-        <Form id={`${blockId}-addCommentForm`} showErrorSummary={false}>
-          <FormFieldTextArea<FormValues>
-            focus={focus}
-            label="Add comment"
-            hideLabel
-            name="content"
-            data-testid="comment-textarea"
-            rows={3}
-          />
-          <ButtonGroup className="govuk-!-margin-bottom-2">
-            <Button type="submit" disabled={isSubmitting}>
-              Add comment
-            </Button>
-            <ButtonText
-              onClick={() => {
-                setCurrentInteraction?.({
-                  type: 'removing',
-                  id: 'commentplaceholder',
-                });
-                onCancel();
-              }}
-            >
-              Cancel
-            </ButtonText>
-          </ButtonGroup>
-        </Form>
+        {form => (
+          <Form id={`${blockId}-addCommentForm`} showErrorSummary={false}>
+            <FormFieldTextArea<FormValues>
+              focus={focus}
+              label="Comment"
+              hideLabel
+              name="content"
+              data-testid="comment-textarea"
+              rows={3}
+            />
+            <ButtonGroup className="govuk-!-margin-bottom-2">
+              <Button type="submit" disabled={form.isSubmitting}>
+                Add comment
+              </Button>
+              <ButtonText
+                onClick={() => {
+                  setCurrentInteraction?.({
+                    type: 'removing',
+                    id: 'commentplaceholder',
+                  });
+                  onCancel();
+                }}
+              >
+                Cancel
+              </ButtonText>
+            </ButtonGroup>
+          </Form>
+        )}
       </Formik>
     </div>
   );

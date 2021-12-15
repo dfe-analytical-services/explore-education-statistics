@@ -1,10 +1,9 @@
 import Comment from '@admin/components/comments/Comment';
 import styles from '@admin/components/comments/CommentsList.module.scss';
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
-import { Comment as CommentType } from '@admin/services/types/content';
 import Details from '@common/components/Details';
 import sortBy from 'lodash/sortBy';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 interface Props {
   blockId: string;
@@ -12,18 +11,12 @@ interface Props {
 
 const CommentsList = ({ blockId }: Props) => {
   const { comments, markersOrder } = useCommentsContext();
-  const [unresolvedComments, setUnresolvedComments] = useState<CommentType[]>(
-    [],
-  );
-  const [resolvedComments, setResolvedComments] = useState<CommentType[]>([]);
 
-  useEffect(() => {
-    setResolvedComments(comments.filter(comment => comment.resolved));
-    const unresolved = comments.filter(comment => !comment.resolved);
-    setUnresolvedComments(
-      sortBy(unresolved, comment => markersOrder.indexOf(comment.id)),
-    );
-  }, [comments, markersOrder]);
+  const resolvedComments = comments.filter(comment => comment.resolved);
+  const unresolvedComments = sortBy(
+    comments.filter(comment => !comment.resolved),
+    comment => markersOrder.indexOf(comment.id),
+  );
 
   return (
     <>

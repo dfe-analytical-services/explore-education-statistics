@@ -1,6 +1,9 @@
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import { EditableBlock } from '@admin/services/types/content';
-import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
+import {
+  ReleaseContentProvider,
+  ReleaseContextState,
+} from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
@@ -16,7 +19,7 @@ describe('ReleaseEditableBlock', () => {
     order: 0,
   };
 
-  const testValue = {
+  const testValue: ReleaseContextState = {
     release: testEditableRelease,
     canUpdateRelease: true,
     availableDataBlocks: [],

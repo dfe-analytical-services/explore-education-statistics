@@ -149,8 +149,9 @@ const EditableContentBlock = ({
             View comments
             <br />
             <span className="govuk-!-margin-top-1 govuk-body-s">
-              ({comments.filter(comment => !comment.resolved).length}{' '}
-              unresolved)
+              {`(${
+                comments.filter(comment => !comment.resolved).length
+              } unresolved)`}
             </span>
           </Button>
         </div>
@@ -165,22 +166,8 @@ const EditableContentBlock = ({
           })}
         >
           {editable ? (
-            <div
-              className={styles.editButton}
-              role="button"
-              tabIndex={0}
-              onClick={toggleEditing.on}
-              onKeyPress={e => {
-                switch (e.key) {
-                  case 'Enter':
-                  case ' ':
-                    toggleEditing.on();
-                    break;
-                  default:
-                    break;
-                }
-              }}
-            >
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+            <div className={styles.editButton} onClick={toggleEditing.on}>
               <ContentHtml
                 html={content || '<p>This section is empty</p>'}
                 sanitizeOptions={sanitizeOptions}

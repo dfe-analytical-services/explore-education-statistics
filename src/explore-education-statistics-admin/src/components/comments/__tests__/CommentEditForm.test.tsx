@@ -1,6 +1,7 @@
 import CommentEditForm from '@admin/components/comments/CommentEditForm';
 import { testComments } from '@admin/components/comments/__data__/testComments';
 import { CommentsProvider } from '@admin/contexts/CommentsContext';
+import { Comment } from '@admin/services/types/content';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -19,7 +20,7 @@ describe('CommentEditForm', () => {
 
     expect(
       screen.getByRole('textbox', {
-        name: 'Edit comment',
+        name: 'Comment',
       }),
     ).toBeInTheDocument();
 
@@ -56,8 +57,43 @@ describe('CommentEditForm', () => {
     expect(handleCancel).toHaveBeenCalled();
   });
 
+  test('shows validation error and does not submit if the comment is deleted', async () => {
+    const handleSubmit = jest.fn();
+
+    render(
+      <CommentEditForm
+        comment={testComments[2]}
+        id="block-id"
+        onCancel={noop}
+        onSubmit={handleSubmit}
+      />,
+    );
+
+    await userEvent.clear(
+      screen.getByRole('textbox', {
+        name: 'Comment',
+      }),
+    );
+
+    userEvent.click(
+      screen.getByRole('button', {
+        name: 'Update',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Enter a comment', {
+          selector: '#block-id-editCommentForm-content-error',
+        }),
+      ).toBeInTheDocument();
+
+      expect(handleSubmit).not.toHaveBeenCalled();
+    });
+  });
+
   test('successfully submitting the for updates the comment and calls the onSubmit handler', async () => {
-    const updatedComment = {
+    const updatedComment: Comment = {
       ...testComments[2],
       content: 'Comment 3 content updated',
     };
@@ -70,12 +106,12 @@ describe('CommentEditForm', () => {
 
     render(
       <CommentsProvider
-        value={{
-          comments: [],
-          onDeletePendingComment: jest.fn(),
-          onSaveComment: jest.fn(),
-          onSaveUpdatedComment: handleUpdateComment,
-        }}
+        comments={[]}
+        onDeletePendingComment={jest.fn()}
+        onSaveComment={jest.fn()}
+        onSaveUpdatedComment={handleUpdateComment}
+        onUpdateUnresolvedComments={{ current: jest.fn() }}
+        onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
       >
         <CommentEditForm
           comment={testComments[2]}
@@ -88,7 +124,7 @@ describe('CommentEditForm', () => {
 
     await userEvent.type(
       screen.getByRole('textbox', {
-        name: 'Edit comment',
+        name: 'Comment',
       }),
       ' updated',
     );

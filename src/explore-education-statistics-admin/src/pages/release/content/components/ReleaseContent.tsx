@@ -137,18 +137,16 @@ const ReleaseContent = () => {
                   renderBlock={block => (
                     <ReleaseBlock block={block} releaseId={release.id} />
                   )}
-                  renderEditableBlock={block => {
-                    return (
-                      <ReleaseEditableBlock
-                        allowComments
-                        block={block}
-                        releaseId={release.id}
-                        sectionId={release.summarySection.id}
-                        onSave={updateBlock}
-                        onDelete={removeBlock}
-                      />
-                    );
-                  }}
+                  renderEditableBlock={block => (
+                    <ReleaseEditableBlock
+                      allowComments
+                      block={block}
+                      releaseId={release.id}
+                      sectionId={release.summarySection.id}
+                      onSave={updateBlock}
+                      onDelete={removeBlock}
+                    />
+                  )}
                 />
                 {editingMode === 'edit' &&
                   release.summarySection.content?.length === 0 && (

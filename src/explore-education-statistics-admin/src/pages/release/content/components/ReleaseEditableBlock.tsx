@@ -4,10 +4,9 @@ import EditableContentBlock from '@admin/components/editable/EditableContentBloc
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
-import { EditableBlock } from '@admin/services/types/content';
+import { Comment, EditableBlock } from '@admin/services/types/content';
 import releaseContentCommentService, {
   AddComment,
-  UpdateComment,
 } from '@admin/services/releaseContentCommentService';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import Gate from '@common/components/Gate';
@@ -42,8 +41,10 @@ const ReleaseEditableBlock = ({
 }: Props) => {
   const {
     addUnsavedBlock,
-    removeUnsavedDeletionsForBlock,
+    clearUnsavedCommentDeletions,
     removeUnsavedBlock,
+    updateUnresolvedComments,
+    updateUnsavedCommentDeletions,
   } = useEditingContext();
   const blockId = `block-${block.id}`;
   const [isSaving, toggleIsSaving] = useToggle(false);
@@ -65,7 +66,7 @@ const ReleaseEditableBlock = ({
       await onSave(block.id, contentWithPlaceholders);
 
       if (!isAutoSave) {
-        removeUnsavedDeletionsForBlock(block.id);
+        clearUnsavedCommentDeletions(block.id);
       }
 
       toggleIsSaving.off();
@@ -73,7 +74,7 @@ const ReleaseEditableBlock = ({
     },
     [
       block.id,
-      removeUnsavedDeletionsForBlock,
+      clearUnsavedCommentDeletions,
       removeUnsavedBlock,
       onSave,
       toggleIsSaving,
@@ -94,26 +95,19 @@ const ReleaseEditableBlock = ({
     removeUnsavedBlock(block.id);
   };
 
-  const handleSaveComment = async (comment: AddComment) => {
-    const addedComment = await releaseContentCommentService.addContentSectionComment(
+  const handleSaveComment = async (comment: AddComment) =>
+    releaseContentCommentService.addContentSectionComment(
       releaseId,
       sectionId,
       blockId.replace('block-', ''),
       comment,
     );
-    return addedComment;
-  };
 
-  const handleDeletePendingComment = async (commentId: string) => {
-    await releaseContentCommentService.deleteContentSectionComment(commentId);
-  };
+  const handleDeletePendingComment = async (commentId: string) =>
+    releaseContentCommentService.deleteContentSectionComment(commentId);
 
-  const handleSaveUpdatedComment = async (comment: UpdateComment) => {
-    const updatedComment = await releaseContentCommentService.updateContentSectionComment(
-      comment,
-    );
-    return updatedComment;
-  };
+  const handleSaveUpdatedComment = async (comment: Comment) =>
+    releaseContentCommentService.updateContentSectionComment(comment);
 
   switch (block.type) {
     case 'DataBlock':
@@ -135,12 +129,12 @@ const ReleaseEditableBlock = ({
     case 'MarkDownBlock':
       return (
         <CommentsProvider
-          value={{
-            comments: block.comments,
-            onSaveComment: handleSaveComment,
-            onDeletePendingComment: handleDeletePendingComment,
-            onSaveUpdatedComment: handleSaveUpdatedComment,
-          }}
+          comments={block.comments}
+          onDeleteComment={handleDeletePendingComment}
+          onSaveComment={handleSaveComment}
+          onSaveUpdatedComment={handleSaveUpdatedComment}
+          onUpdateUnresolvedComments={updateUnresolvedComments}
+          onUpdateUnsavedCommentDeletions={updateUnsavedCommentDeletions}
         >
           <EditableContentBlock
             allowComments={allowComments}

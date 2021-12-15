@@ -1,6 +1,7 @@
 import { HeadingOption, ResizeOption } from '@admin/types/ckeditor';
+import { Dictionary } from '@admin/types';
 
-export const toolbarConfigs = {
+export const toolbarConfigs: Dictionary<string[]> = {
   full: [
     'heading',
     '|',
@@ -33,7 +34,7 @@ export const toolbarConfigs = {
   ],
 };
 
-export const defaultAllowedHeadings = ['h3', 'h4', 'h5'];
+export const defaultAllowedHeadings: string[] = ['h3', 'h4', 'h5'];
 
 export const headingOptions: HeadingOption[] = [
   {
@@ -68,7 +69,7 @@ export const headingOptions: HeadingOption[] = [
   },
 ];
 
-export const imageToolbar = [
+export const imageToolbar: string[] = [
   'imageTextAlternative',
   '|',
   'imageResize:50',
@@ -97,7 +98,7 @@ export const resizeOptions: ResizeOption[] = [
   },
 ];
 
-export const tableContentToolbar = [
+export const tableContentToolbar: string[] = [
   'tableColumn',
   'tableRow',
   'mergeTableCells',

@@ -65,7 +65,7 @@ describe('CommentsContext', () => {
         pendingDeletions,
         addComment,
         removeComment,
-        deletePendingComments,
+        clearPendingDeletions,
         resolveComment,
         reAddComment,
         unresolveComment,
@@ -83,7 +83,7 @@ describe('CommentsContext', () => {
           >
             Delete comment
           </button>
-          <button type="button" onClick={() => deletePendingComments()}>
+          <button type="button" onClick={() => clearPendingDeletions()}>
             Delete pendingDeletions
           </button>
           <button
@@ -183,7 +183,7 @@ describe('CommentsContext', () => {
     });
   });
 
-  test('deletePendingComments calls the delete comment method for each pending and removes them from the pending array', async () => {
+  test('clearPendingDeletions calls the delete comment method for each pending and removes them from the pending array', async () => {
     setUp({
       initialComments: [testComments[0], testComments[1]],
       initialPendingDeletions: [

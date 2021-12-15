@@ -45,7 +45,7 @@ const ReleaseContentAccordionSection = ({
         Object.keys(unsavedCommentDeletions).includes(block.id),
       )
     ) {
-      return `${heading} (Unsaved changes)`;
+      return `${heading} (unsaved changes)`;
     }
     return heading;
   };

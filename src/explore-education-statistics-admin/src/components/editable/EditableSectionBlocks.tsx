@@ -15,11 +15,7 @@ export interface EditableSectionBlockProps<
   sectionId: string;
   onBlocksChange?: (nextBlocks: T[]) => void;
   renderBlock: (block: T) => ReactNode;
-  renderEditableBlock: (
-    block: T,
-    isEditing?: boolean,
-    onToggleEditor?: (blockId: string) => void,
-  ) => ReactNode;
+  renderEditableBlock: (block: T) => ReactNode;
 }
 
 const EditableSectionBlocks = <T extends EditableBlock = EditableBlock>({

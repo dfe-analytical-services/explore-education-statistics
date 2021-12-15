@@ -85,7 +85,7 @@ Add review comment for first content block
     user presses keys    CTRL+a
     user clicks element    xpath://*[@aria-label="Editor toolbar"]//button[9]    # CKEditor comment button
     user waits until page contains element
-    ...    //*[@data-testid="comment-textarea"]    5
+    ...    testid:comment-textarea    5
     user presses keys    This section needs fixing    testid:comment-textarea
     user clicks button    Add comment
 
@@ -119,4 +119,4 @@ Resolve comments
     ${comment}=    user gets comment    This section needs fixing
     user clicks button    Resolve    ${comment}
     user waits until page contains element
-    ...    //*[@data-testid="Expand Details Section Resolved comments (1)"]    10
+    ...    testid:Expand Details Section Resolved comments (1)    10

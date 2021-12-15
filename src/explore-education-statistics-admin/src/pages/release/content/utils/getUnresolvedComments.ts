@@ -17,19 +17,20 @@ const getContentSectionComments = (
   if (!blocks || !blocks.length) {
     return {};
   }
-  const unresolvedComments: BlockCommentIds = {};
 
-  blocks.forEach(block => {
-    if (!unresolvedComments[block.id]) {
-      unresolvedComments[block.id] = [];
+  return blocks.reduce<BlockCommentIds>((acc, block) => {
+    if (!acc[block.id]) {
+      acc[block.id] = [];
     }
+
     block.comments.forEach(comment => {
       if (!comment.resolved) {
-        unresolvedComments[block.id].push(comment.id);
+        acc[block.id].push(comment.id);
       }
     });
-  });
-  return unresolvedComments;
+
+    return acc;
+  }, {});
 };
 
 const getUnresolvedComments = (release: EditableRelease) => {

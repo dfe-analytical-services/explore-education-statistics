@@ -14,11 +14,8 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
-import getUnresolvedComments, {
-  getTotalUnresolvedComments,
-} from '@admin/pages/release/content/utils/getUnresolvedComments';
+import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
 import classNames from 'classnames';
-import uniq from 'lodash/uniq';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -27,31 +24,10 @@ const ReleaseContentPageLoaded = () => {
 
   return (
     <EditingProvider
-      value={{
-        editingMode: canUpdateRelease ? 'edit' : 'preview',
-        unresolvedComments: getUnresolvedComments(release),
-      }}
+      editingMode={canUpdateRelease ? 'edit' : 'preview'}
+      unresolvedComments={getUnresolvedComments(release)}
     >
-      {({
-        editingMode,
-        unresolvedComments,
-        unsavedCommentDeletions,
-        unsavedBlocks,
-      }) => {
-        const blocksWithCommentDeletions = Object.entries(
-          unsavedCommentDeletions,
-        )
-          .filter(deletion => deletion[1].length)
-          .map(deletion => deletion[0]);
-        const totalUnsavedBlocks = uniq([
-          ...unsavedBlocks,
-          ...blocksWithCommentDeletions,
-        ]).length;
-        const totalUnresolvedComments = getTotalUnresolvedComments(
-          unresolvedComments,
-          unsavedCommentDeletions,
-        );
-
+      {({ editingMode, totalUnresolvedComments, totalUnsavedBlocks }) => {
         return (
           <>
             {editingMode === 'edit' && (
@@ -68,9 +44,9 @@ const ReleaseContentPageLoaded = () => {
               <div className="govuk-form-group">
                 {totalUnsavedBlocks > 0 && (
                   <WarningMessage>
-                    {totalUnsavedBlocks === 1
-                      ? 'One content block has unsaved changes. Clicking away from this tab will result in the changes being lost.'
-                      : `${totalUnsavedBlocks} content blocks have unsaved changes. Clicking away from this tab will result in the changes being lost.`}
+                    {`${totalUnsavedBlocks} content ${
+                      totalUnsavedBlocks === 1 ? 'block has' : 'blocks have'
+                    } unsaved changes. Clicking away from this tab will result in the changes being lost.`}
                   </WarningMessage>
                 )}
                 {totalUnresolvedComments > 0 && (

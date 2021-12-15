@@ -7,13 +7,12 @@ import {
 } from '@admin/config/ckEditorConfig';
 import { Editor, EditorConfig } from '@admin/types/ckeditor';
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
-import { useEditingContext } from '@admin/contexts/EditingContext';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
 import customUploadAdapterPlugin from '@admin/utils/ckeditor/customUploadAdapterPlugin';
-import { MutableRefObject } from 'react';
+import { MutableRefObject, useMemo } from 'react';
 
 const useCKEditorConfig = ({
   allowComments,
@@ -29,7 +28,7 @@ const useCKEditorConfig = ({
 }: {
   allowComments?: boolean;
   allowedHeadings?: string[];
-  blockId: string;
+  blockId?: string;
   editorInstance?: MutableRefObject<Editor | undefined>;
   toolbarConfig?: string[];
   onAutoSave?: (content: string) => void;
@@ -47,10 +46,6 @@ const useCKEditorConfig = ({
     setCurrentInteraction,
     setSelectedComment,
   } = useCommentsContext();
-  const {
-    updateUnresolvedComments,
-    updateUnsavedCommentDeletions,
-  } = useEditingContext();
 
   const toolbar = toolbarConfig?.filter(tool => {
     // Disable image upload if no callback provided
@@ -67,117 +62,135 @@ const useCKEditorConfig = ({
 
   const hasImageUpload = toolbar.includes('imageUpload');
 
-  const config: EditorConfig = {
-    toolbar,
-    heading: toolbar.includes('heading')
-      ? {
-          options: [
-            {
-              model: 'paragraph',
-              title: 'Paragraph',
-              class: 'ck-heading_paragraph',
-            },
-            ...headingOptions.filter(option =>
-              allowedHeadings?.includes(option.view ?? ''),
-            ),
-          ],
-        }
-      : undefined,
-    image: hasImageUpload
-      ? {
-          toolbar: imageToolbar,
-          resizeOptions,
-        }
-      : undefined,
-    table: {
-      contentToolbar: tableContentToolbar,
-    },
-    link: {
-      decorators: {
-        addDataGlossaryAttributeToGlossaryLinks: {
-          mode: 'automatic',
-          callback: (url: string) =>
-            url.startsWith(process.env.PUBLIC_URL) &&
-            url.match(/\/glossary#[a-zA-Z-0-9-]+$/),
-          attributes: { 'data-glossary': '' },
+  const config: EditorConfig = useMemo(() => {
+    return {
+      toolbar,
+      heading: toolbar.includes('heading')
+        ? {
+            options: [
+              {
+                model: 'paragraph',
+                title: 'Paragraph',
+                class: 'ck-heading_paragraph',
+              },
+              ...headingOptions.filter(option =>
+                allowedHeadings?.includes(option.view ?? ''),
+              ),
+            ],
+          }
+        : undefined,
+      image: hasImageUpload
+        ? {
+            toolbar: imageToolbar,
+            resizeOptions,
+          }
+        : undefined,
+      table: {
+        contentToolbar: tableContentToolbar,
+      },
+      link: {
+        decorators: {
+          addDataGlossaryAttributeToGlossaryLinks: {
+            mode: 'automatic',
+            callback: (url: string) =>
+              url.startsWith(process.env.PUBLIC_URL) &&
+              url.match(/\/glossary#[a-zA-Z-0-9-]+$/),
+            attributes: { 'data-glossary': '' },
+          },
         },
       },
-    },
-    extraPlugins:
-      hasImageUpload && onImageUpload
-        ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]
+      extraPlugins:
+        hasImageUpload && onImageUpload
+          ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]
+          : undefined,
+      comments: allowComments
+        ? {
+            // Add comment button in editor clicked
+            addComment() {
+              onClickAddComment?.();
+            },
+            // Comment marker selected in the editor
+            commentSelected(markerId) {
+              const id = markerId ? markerId.replace('comment:', '') : '';
+              setSelectedComment({ id, fromEditor: true });
+            },
+            // Comment marker removed in the editor
+            commentRemoved(markerId) {
+              if (editorInstance?.current && blockId) {
+                const commentId = markerId.replace('comment:', '');
+                removeComment?.current(blockId, commentId);
+                onAutoSave?.(editorInstance?.current.getData());
+              }
+            },
+            // Adding a comment is cancelled from within the editor (by clicking outside the placeholder marker)
+            commentCancelled() {
+              onCancelComment?.();
+            },
+            // Comment actions undone/redone in the editor
+            undoRedoComment(type, markerId) {
+              if (!blockId) {
+                return;
+              }
+              const commentId = markerId.startsWith('comment:')
+                ? markerId.replace('comment:', '')
+                : markerId.replace('resolvedcomment:', '');
+
+              if (type === 'undoRemoveComment' || type === 'redoAddComment') {
+                reAddComment.current(blockId, commentId);
+                return;
+              }
+              if (type === 'undoAddComment' || type === 'redoRemoveComment') {
+                removeComment.current(blockId, commentId);
+                return;
+              }
+
+              if (
+                type === 'undoResolveComment' ||
+                type === 'redoUnresolveComment'
+              ) {
+                unresolveComment.current(blockId, commentId);
+                return;
+              }
+              if (
+                type === 'undoUnresolveComment' ||
+                type === 'redoResolveComment'
+              ) {
+                resolveComment.current(blockId, commentId);
+              }
+            },
+          }
         : undefined,
-    comments: allowComments
-      ? {
-          // Add comment button in editor clicked
-          addComment() {
-            onClickAddComment?.();
-          },
-          // Comment marker selected in the editor
-          commentSelected(markerId) {
-            const commentId = markerId ? markerId.replace('comment:', '') : '';
-            setSelectedComment({ commentId, fromEditor: true });
-          },
-          // Comment marker removed in the editor
-          commentRemoved(markerId) {
-            if (editorInstance?.current) {
-              const commentId = markerId.replace('comment:', '');
-              removeComment?.current(commentId);
-              updateUnsavedCommentDeletions.current(blockId, commentId);
-              onAutoSave?.(editorInstance?.current.getData());
-            }
-          },
-          // Adding a comment is cancelled from within the editor (by clicking outside the placeholder marker)
-          commentCancelled() {
-            onCancelComment?.();
-          },
-          // Comment actions undone/redone in the editor
-          undoRedoComment(type, markerId) {
-            const commentId = markerId.startsWith('comment:')
-              ? markerId.replace('comment:', '')
-              : markerId.replace('resolvedcomment:', '');
-
-            if (type === 'undoRemoveComment' || type === 'redoAddComment') {
-              reAddComment.current(commentId);
-              updateUnsavedCommentDeletions.current(blockId, commentId);
-              return;
-            }
-            if (type === 'undoAddComment' || type === 'redoRemoveComment') {
-              removeComment.current(commentId);
-              updateUnsavedCommentDeletions.current(blockId, commentId);
-              return;
-            }
-
-            if (
-              type === 'undoResolveComment' ||
-              type === 'redoUnresolveComment'
-            ) {
-              unresolveComment.current(commentId);
-              updateUnresolvedComments.current(blockId, commentId);
-              return;
-            }
-            if (
-              type === 'undoUnresolveComment' ||
-              type === 'redoResolveComment'
-            ) {
-              resolveComment.current(commentId);
-              updateUnresolvedComments.current(blockId, commentId);
-            }
-          },
-        }
-      : undefined,
-    autosave: onAutoSave
-      ? {
-          save() {
-            if (editorInstance?.current) {
-              setCurrentInteraction(undefined);
-              onAutoSave(editorInstance.current.getData());
-            }
-          },
-          waitingTime: 5000,
-        }
-      : undefined,
-  };
+      autosave: onAutoSave
+        ? {
+            save() {
+              if (editorInstance?.current) {
+                setCurrentInteraction(undefined);
+                onAutoSave(editorInstance.current.getData());
+              }
+            },
+            waitingTime: 5000,
+          }
+        : undefined,
+    };
+  }, [
+    allowComments,
+    allowedHeadings,
+    blockId,
+    editorInstance,
+    hasImageUpload,
+    onAutoSave,
+    onCancelComment,
+    onClickAddComment,
+    onImageUpload,
+    onImageUploadCancel,
+    reAddComment,
+    removeComment,
+    resolveComment,
+    setCurrentInteraction,
+    setSelectedComment,
+    toolbar,
+    unresolveComment,
+  ]);
 
   return config;
 };

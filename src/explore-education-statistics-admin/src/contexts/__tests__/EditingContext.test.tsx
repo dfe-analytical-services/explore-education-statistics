@@ -26,7 +26,7 @@ describe('EditingContext', () => {
         unsavedCommentDeletions,
         addUnsavedBlock,
         removeUnsavedBlock,
-        removeUnsavedDeletionsForBlock,
+        clearUnsavedCommentDeletions,
         updateUnresolvedComments,
         updateUnsavedCommentDeletions,
       } = useEditingContext();
@@ -47,7 +47,7 @@ describe('EditingContext', () => {
 
           <button
             type="button"
-            onClick={() => removeUnsavedDeletionsForBlock('block-1')}
+            onClick={() => clearUnsavedCommentDeletions('block-1')}
           >
             Remove unsaved deletions for block
           </button>
@@ -113,12 +113,10 @@ describe('EditingContext', () => {
 
     return render(
       <EditingProvider
-        value={{
-          editingMode: 'edit',
-          unresolvedComments: initialUnresolvedComments,
-          unsavedBlocks: initialUnsavedBlocks,
-          unsavedCommentDeletions: initialUnsavedCommentDeletions,
-        }}
+        editingMode="edit"
+        unresolvedComments={initialUnresolvedComments}
+        unsavedBlocks={initialUnsavedBlocks}
+        unsavedCommentDeletions={initialUnsavedCommentDeletions}
       >
         <TestComponent />
       </EditingProvider>,

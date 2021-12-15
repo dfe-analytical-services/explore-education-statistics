@@ -83,9 +83,7 @@ export const releaseReducer: Reducer<
             contentBlock => contentBlock.id === blockId,
           );
 
-          matchingContentSection.content[blockIndex] = block ?? {
-            ...matchingContentSection.content[blockIndex],
-          };
+          matchingContentSection.content[blockIndex] = block;
         }
       } else {
         const blockIndex = matchingSection.content.findIndex(
@@ -93,9 +91,7 @@ export const releaseReducer: Reducer<
         );
 
         if (blockIndex !== -1) {
-          matchingSection.content[blockIndex] = block ?? {
-            ...matchingSection.content[blockIndex],
-          };
+          matchingSection.content[blockIndex] = block;
         }
       }
 
