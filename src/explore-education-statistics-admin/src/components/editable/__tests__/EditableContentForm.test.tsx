@@ -117,7 +117,7 @@ describe('EditableContentForm', () => {
       render(
         <CommentsProvider
           comments={testComments}
-          onDeletePendingComment={jest.fn()}
+          onDeleteComment={jest.fn()}
           onSaveComment={jest.fn()}
           onSaveUpdatedComment={jest.fn()}
           onUpdateUnresolvedComments={{ current: jest.fn() }}
@@ -148,7 +148,7 @@ describe('EditableContentForm', () => {
         >
           <CommentsProvider
             comments={testComments}
-            onDeletePendingComment={jest.fn()}
+            onDeleteComment={jest.fn()}
             onSaveComment={jest.fn()}
             onSaveUpdatedComment={jest.fn()}
             onUpdateUnresolvedComments={{ current: jest.fn() }}
@@ -210,7 +210,7 @@ describe('EditableContentForm', () => {
         >
           <CommentsProvider
             comments={testComments}
-            onDeletePendingComment={jest.fn()}
+            onDeleteComment={jest.fn()}
             onSaveComment={jest.fn()}
             onSaveUpdatedComment={handleUpdateComment}
             onUpdateUnresolvedComments={{ current: jest.fn() }}
@@ -279,7 +279,7 @@ describe('EditableContentForm', () => {
         >
           <CommentsProvider
             comments={testComments}
-            onDeletePendingComment={jest.fn()}
+            onDeleteComment={jest.fn()}
             onSaveComment={jest.fn()}
             onSaveUpdatedComment={handleUpdateComment}
             onUpdateUnresolvedComments={{ current: jest.fn() }}

@@ -47,7 +47,7 @@ describe('CommentAddForm', () => {
     render(
       <CommentsProvider
         comments={[]}
-        onDeletePendingComment={jest.fn()}
+        onDeleteComment={jest.fn()}
         onSaveComment={handleSaveComment}
         onSaveUpdatedComment={jest.fn()}
         onUpdateUnresolvedComments={{ current: jest.fn() }}

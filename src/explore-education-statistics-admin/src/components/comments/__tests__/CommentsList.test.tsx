@@ -14,7 +14,7 @@ describe('CommentsList', () => {
       <CommentsProvider
         comments={testComments}
         markersOrder={testMarkersOrder}
-        onDeletePendingComment={jest.fn()}
+        onDeleteComment={jest.fn()}
         onSaveComment={jest.fn()}
         onSaveUpdatedComment={jest.fn()}
         onUpdateUnresolvedComments={{ current: jest.fn() }}
@@ -38,7 +38,7 @@ describe('CommentsList', () => {
       <CommentsProvider
         comments={testComments}
         markersOrder={testMarkersOrder}
-        onDeletePendingComment={jest.fn()}
+        onDeleteComment={jest.fn()}
         onSaveComment={jest.fn()}
         onSaveUpdatedComment={jest.fn()}
         onUpdateUnresolvedComments={{ current: jest.fn() }}
