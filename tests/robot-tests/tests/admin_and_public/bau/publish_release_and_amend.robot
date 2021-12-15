@@ -169,20 +169,20 @@ Verify release associated files
     ${downloads}=    user gets accordion section content element    Explore data and files
     user waits until page contains element    ${downloads}    %{WAIT_SMALL}
 
-    user checks element should contain    ${downloads}    Download all files
+    user checks element should contain    ${downloads}    Download all data
     ...    %{WAIT_SMALL}
     user checks element should contain    ${downloads}
-    ...    All data used to create this release is published as open data and is available for download.
+    ...    All data used in this release is available as open data for download
     user checks element should contain    ${downloads}
-    ...    You can view featured tables that we have built for you, or create your own tables from the open data using our table tool.
+    ...    You can view featured tables that we have built for you, or create your own tables from the open data using our table tool
 
     user checks element should contain    ${downloads}
-    ...    The open data files contain all data used in this release in a machine readable format.
+    ...    Browse and download individual open data files from this release in our data catalogue
     user checks element should contain    ${downloads}
-    ...    Learn more about the data files used in this release using our data files guide.
+    ...    Learn more about the data files used in this release using our online guidance
 
-    user opens details dropdown    List of other files
-    ${other_files}=    user gets details content element    List of other files
+    user opens details dropdown    List of all supporting files
+    ${other_files}=    user gets details content element    List of all supporting files
     ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
 
     user waits until element contains link    ${other_files_1}    Test ancillary file 1
@@ -196,7 +196,7 @@ Verify release associated files
 Verify public metadata guidance document
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
-    user clicks link    data files guide
+    user clicks link    Data guidance
 
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
@@ -515,11 +515,11 @@ Verify amendment is published
 Verify amendment files
     user opens accordion section    Explore data and files
     ${downloads}=    user gets accordion section content element    Explore data and files
-    user checks element should contain    ${downloads}    Download all files
+    user checks element should contain    ${downloads}    Download all data
     ...    %{WAIT_SMALL}
 
-    user opens details dropdown    List of other files
-    ${other_files}=    user gets details content element    List of other files
+    user opens details dropdown    List of all supporting files
+    ${other_files}=    user gets details content element    List of all supporting files
     ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
     ${other_files_2}=    get child element    ${other_files}    css:li:nth-child(2)
 
@@ -542,7 +542,7 @@ Verify amendment files
 Verify amendment public metadata guidance document
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
-    user clicks link    data files guide
+    user clicks link    Data guidance
 
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home

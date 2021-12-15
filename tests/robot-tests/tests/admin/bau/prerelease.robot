@@ -281,7 +281,7 @@ Validate prerelease has started
 Validate metadata guidance page
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
-    user clicks link    data files guide
+    user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
@@ -378,7 +378,7 @@ Validate prerelease has started for Analyst user
 Validate public metdata guidance for Analyst user
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
-    user clicks link    data files guide
+    user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}

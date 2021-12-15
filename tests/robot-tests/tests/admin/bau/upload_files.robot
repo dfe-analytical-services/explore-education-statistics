@@ -132,18 +132,19 @@ Validate 'Explore data and files' accordion
     ${section}=    user gets accordion section content element    Explore data and files
 
     # All files zip
-    user checks element contains button    ${section}    Download all files
+    user checks element contains button    ${section}    Download all data
 
     # Data files
     user waits until h3 is visible    Open data
+    user opens details dropdown    Download files
     user checks list has x items    testid:data-files    1    ${section}
     ${data_files_1}=    user gets list item element    testid:data-files    1    ${section}
     user checks element contains button    ${data_files_1}    Updated Absence in PRUs
 
     # Ancillary files
-    user waits until h3 is visible    Other files
-    user opens details dropdown    List of other files
-    ${other_files}=    user gets details content element    List of other files    ${section}
+    user waits until h3 is visible    All supporting files
+    user opens details dropdown    List of all supporting files
+    ${other_files}=    user gets details content element    List of all supporting files    ${section}
     ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
 
     user checks element contains button    ${other_files_1}    Test 1
