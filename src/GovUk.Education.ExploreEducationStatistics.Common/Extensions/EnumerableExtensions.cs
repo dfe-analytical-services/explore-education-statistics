@@ -119,6 +119,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
         }
 
+        public static int IndexOfFirst<T>(this IEnumerable<T> source, Func<T, bool> predicate)
+        {
+            var index = 0;
+
+            foreach (var item in source)
+            {
+                if (predicate(item))
+                {
+                    return index;
+                }
+
+                index += 1;
+            }
+
+            return -1;
+        }
+
         public static async Task<List<TResult>> ForEachAsync<T, TResult>(this IEnumerable<T> source, Func<T, Task<TResult>> func)
         {
             var results = new List<TResult>();
@@ -159,6 +176,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
 
             return !list.Any();
+        }
+
+        public static string JoinToString(this IEnumerable<char> source)
+        {
+            return string.Join(string.Empty, source);
+        }
+
+        public static string JoinToString(this IEnumerable<string> source)
+        {
+            return string.Join(string.Empty, source);
         }
 
         public static string JoinToString(this IEnumerable<string> source, char delimiter)

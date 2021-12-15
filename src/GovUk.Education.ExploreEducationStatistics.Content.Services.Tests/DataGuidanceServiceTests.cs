@@ -72,9 +72,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath)
                 )
                 .ReturnsAsync(
-                    new CachedReleaseViewModel
+                    new CachedReleaseViewModel(releaseId)
                     {
-                        Id = releaseId,
                         Title = "2016-17",
                         Slug = "2016-17",
                         DataGuidance = "Release Guidance"
@@ -137,9 +136,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             fileStorageService.Setup(
                     mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath)
                 )
-                .ReturnsAsync(new CachedReleaseViewModel
+                .ReturnsAsync(new CachedReleaseViewModel(Guid.NewGuid())
                 {
-                    Id = Guid.NewGuid(),
                     Title = "2016-17",
                     Slug = "2016-17",
                     DataGuidance = "Release Guidance"

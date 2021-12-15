@@ -72,6 +72,88 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             }
         }
 
+        public class IndentWidth
+        {
+            [Fact]
+            public void WithCharacters()
+            {
+                Assert.Equal(4, "    Test".IndentWidth());
+                Assert.Equal(8, "        Test".IndentWidth());
+            }
+
+            [Fact]
+            public void NoCharacters()
+            {
+                Assert.Equal(4, "    ".IndentWidth());
+                Assert.Equal(8, "        ".IndentWidth());
+            }
+        }
+
+        public class TrimIndent
+        {
+            [Fact]
+            public void SingleLine()
+            {
+                Assert.Equal("Test", "    Test".TrimIndent());
+                Assert.Equal("Test", "        Test".TrimIndent());
+            }
+
+            [Fact]
+            public void SingleLine_Empty()
+            {
+                Assert.Equal("", "    ".TrimIndent());
+                Assert.Equal("", "        ".TrimIndent());
+            }
+
+            [Fact]
+            public void MultiLine_OneIndent()
+            {
+                Assert.Equal(
+                    @"Test
+                    Test",
+                    @"Test
+                    Test".TrimIndent()
+                );
+            }
+
+            [Fact]
+            public void MultiLine_EqualIndents()
+            {
+                Assert.Equal(
+                    @"
+Test
+Test",
+                    @"
+                    Test
+                    Test".TrimIndent()
+                );
+            }
+
+            [Fact]
+            public void MultiLine_DifferentIndents()
+            {
+                Assert.Equal(
+                    @"
+Test
+    Test",
+                    @"
+                    Test
+                        Test".TrimIndent()
+                );
+            }
+
+            [Fact]
+            public void MultiLine_Empty()
+            {
+                Assert.Equal(
+                    "\n\n",
+                    @"
+                    
+                    ".TrimIndent()
+                );
+            }
+        }
+
         public class CamelCaseTests
         {
             [Fact]
