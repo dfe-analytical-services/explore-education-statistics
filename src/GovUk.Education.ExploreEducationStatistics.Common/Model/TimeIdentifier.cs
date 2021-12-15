@@ -1,3 +1,4 @@
+#nullable enable
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using static GovUk.Education.ExploreEducationStatistics.Common.Database.TimePeriodLabelFormat;
@@ -40,10 +41,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         [TimeIdentifierMeta("Calendar Year Q4", "CYQ4", Category.CalendarYear, Default, ShortLabel, "Q4")]
         CalendarYearQ4,
 
-        [TimeIdentifierMeta("Part 1 (April to September)", "P1", FinancialYearPart, Fiscal, ShortLabel, "Part 1 (Apr to Sep)")]
+        [TimeIdentifierMeta("Part 1 (April to September)", "P1", FinancialYearPart, Fiscal, ShortLabel,
+            "Part 1 (Apr to Sep)")]
         FinancialYearPart1,
 
-        [TimeIdentifierMeta("Part 2 (October to March)", "P2", FinancialYearPart, Fiscal, ShortLabel, "Part 2 (Oct to Mar)")]
+        [TimeIdentifierMeta("Part 2 (October to March)", "P2", FinancialYearPart, Fiscal, ShortLabel,
+            "Part 2 (Oct to Mar)")]
         FinancialYearPart2,
 
         [TimeIdentifierMeta("Financial Year", "FY", Category.FinancialYear, Fiscal, NoLabel)]
@@ -90,42 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         [TimeIdentifierMeta("Summer Term", "T3", Term, Academic)]
         SummerTerm,
-
-        [TimeIdentifierMeta("January", "M1", Month)]
-        January,
-
-        [TimeIdentifierMeta("February", "M2", Month)]
-        February,
-
-        [TimeIdentifierMeta("March", "M3", Month)]
-        March,
-
-        [TimeIdentifierMeta("April", "M4", Month)]
-        April,
-
-        [TimeIdentifierMeta("May", "M5", Month)]
-        May,
-
-        [TimeIdentifierMeta("June", "M6", Month)]
-        June,
-
-        [TimeIdentifierMeta("July", "M7", Month)]
-        July,
-
-        [TimeIdentifierMeta("August", "M8", Month)]
-        August,
-
-        [TimeIdentifierMeta("September", "M9", Month)]
-        September,
-
-        [TimeIdentifierMeta("October", "M10", Month)]
-        October,
-
-        [TimeIdentifierMeta("November", "M11", Month)]
-        November,
-
-        [TimeIdentifierMeta("December", "M12", Month)]
-        December,
 
         [TimeIdentifierMeta("Week 1", "W1", Week)]
         Week1,
@@ -281,6 +248,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         Week51,
 
         [TimeIdentifierMeta("Week 52", "W52", Week)]
-        Week52
+        Week52,
+
+        [TimeIdentifierMeta("January", "M1", Month)]
+        January,
+
+        [TimeIdentifierMeta("February", "M2", Month)]
+        February,
+
+        [TimeIdentifierMeta("March", "M3", Month)]
+        March,
+
+        [TimeIdentifierMeta("April", "M4", Month)]
+        April,
+
+        [TimeIdentifierMeta("May", "M5", Month)]
+        May,
+
+        [TimeIdentifierMeta("June", "M6", Month)]
+        June,
+
+        [TimeIdentifierMeta("July", "M7", Month)]
+        July,
+
+        [TimeIdentifierMeta("August", "M8", Month)]
+        August,
+
+        [TimeIdentifierMeta("September", "M9", Month)]
+        September,
+
+        [TimeIdentifierMeta("October", "M10", Month)]
+        October,
+
+        [TimeIdentifierMeta("November", "M11", Month)]
+        November,
+
+        [TimeIdentifierMeta("December", "M12", Month)]
+        December,
     }
 }
