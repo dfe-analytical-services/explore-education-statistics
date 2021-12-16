@@ -194,15 +194,40 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
         <div className="govuk-grid-column-one-third">
           <RelatedAside>
-            <h2 className="govuk-heading-m" id="useful-information">
-              Useful information
+            <h2 className="govuk-heading-m" id="data-downloads">
+              Data downloads
             </h2>
-            <nav role="navigation" aria-labelledby="useful-information">
+            <nav role="navigation" aria-labelledby="data-downloads">
               <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
+                <li>
+                  <a
+                    href="#dataDownloads-1"
+                    onClick={() => {
+                      logEvent({
+                        category: `${release.publication.title} release page`,
+                        action: `View data and files clicked`,
+                        label: window.location.pathname,
+                      });
+                    }}
+                  >
+                    Explore data and files
+                  </a>
+                </li>
+                <li>
+                  <Link
+                    to={
+                      release.latestRelease
+                        ? `/find-statistics/${release.publication.slug}/meta-guidance`
+                        : `/find-statistics/${release.publication.slug}/${release.slug}/meta-guidance`
+                    }
+                  >
+                    Data guidance
+                  </Link>
+                </li>
                 {showAllFilesButton && (
                   <li>
                     <ButtonLink
-                      className="govuk-button govuk-!-margin-bottom-3"
+                      className="govuk-button govuk-!-width-full govuk-!-margin-bottom-3"
                       to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
                       onClick={() => {
                         logEvent({
@@ -216,80 +241,70 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     </ButtonLink>
                   </li>
                 )}
-                <li>
-                  <a
-                    href="#dataDownloads-1"
-                    onClick={() => {
-                      logEvent({
-                        category: `${release.publication.title} release page`,
-                        action: `View data and files clicked`,
-                        label: window.location.pathname,
-                      });
-                    }}
-                  >
-                    View data and files
-                  </a>
-                </li>
-                {release.hasPreReleaseAccessList && (
-                  <li>
-                    <Link
-                      to={
-                        release.latestRelease
-                          ? `/find-statistics/${release.publication.slug}/prerelease-access-list`
-                          : `/find-statistics/${release.publication.slug}/${release.slug}/prerelease-access-list`
-                      }
-                    >
-                      Pre-release access list
-                    </Link>
-                  </li>
-                )}
-                <li>
-                  <a href="#contact-us">Contact us</a>
-                </li>
-                {!!releaseCount && (
-                  <>
-                    <p className="govuk-!-margin-bottom-0">
-                      {release.coverageTitle}{' '}
-                      <strong>{release.yearTitle}</strong>
-                    </p>
-                    <Details
-                      summary={`See other releases (${releaseCount})`}
-                      onToggle={open =>
-                        open &&
-                        logEvent({
-                          category: 'Other Releases',
-                          action: 'Release page other releases dropdown opened',
-                          label: window.location.pathname,
-                        })
-                      }
-                    >
-                      <ul className="govuk-list">
-                        {[
-                          ...release.publication.otherReleases.map(
-                            ({ id, slug, title }) => (
-                              <li key={id} data-testid="other-release-item">
-                                <Link
-                                  to={`/find-statistics/${release.publication.slug}/${slug}`}
-                                >
-                                  {title}
-                                </Link>
-                              </li>
-                            ),
-                          ),
-                          ...release.publication.legacyReleases.map(
-                            ({ id, description, url }) => (
-                              <li key={id} data-testid="other-release-item">
-                                <a href={url}>{description}</a>
-                              </li>
-                            ),
-                          ),
-                        ]}
-                      </ul>
-                    </Details>
-                  </>
-                )}
               </ul>
             </nav>
+
+            <h2 className="govuk-heading-m">Supporting information</h2>
+            <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
+              {release.hasPreReleaseAccessList && (
+                <li>
+                  <Link
+                    to={
+                      release.latestRelease
+                        ? `/find-statistics/${release.publication.slug}/prerelease-access-list`
+                        : `/find-statistics/${release.publication.slug}/${release.slug}/prerelease-access-list`
+                    }
+                  >
+                    Pre-release access list
+                  </Link>
+                </li>
+              )}
+              <li>
+                <a href="#contact-us">Contact us</a>
+              </li>
+            </ul>
+            {!!releaseCount && (
+              <>
+                <p className="govuk-!-margin-bottom-0">
+                  {release.coverageTitle} <strong>{release.yearTitle}</strong>
+                </p>
+                <Details
+                  summary={`See other releases (${releaseCount})`}
+                  onToggle={open =>
+                    open &&
+                    logEvent({
+                      category: 'Other Releases',
+                      action: 'Release page other releases dropdown opened',
+                      label: window.location.pathname,
+                    })
+                  }
+                >
+                  <ul className="govuk-list">
+                    {[
+                      ...release.publication.otherReleases.map(
+                        ({ id, slug, title }) => (
+                          <li key={id} data-testid="other-release-item">
+                            <Link
+                              to={`/find-statistics/${release.publication.slug}/${slug}`}
+                            >
+                              {title}
+                            </Link>
+                          </li>
+                        ),
+                      ),
+                      ...release.publication.legacyReleases.map(
+                        ({ id, description, url }) => (
+                          <li key={id} data-testid="other-release-item">
+                            <a href={url}>{description}</a>
+                          </li>
+                        ),
+                      ),
+                    ]}
+                  </ul>
+                </Details>
+              </>
+            )}
+
             {(release.publication.methodologies.length > 0 ||
               release.publication.externalMethodology) && (
               <>
@@ -375,29 +390,23 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           }}
           renderAllFilesButton={
             <ButtonLink
-              className="govuk-!-width-full"
               to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
+              variant="secondary"
               onClick={() => {
                 logEvent({
                   category: 'Downloads',
-                  action: 'Release page all files downloaded',
-                  label: `Publication: ${release.publication.title}, Release: ${release.title}, File: All files`,
+                  action: `Release page all files downloads.title}, Release: ${release.title}, File: All files`,
                 });
               }}
             >
-              Download all files
+              Download all data
             </ButtonLink>
           }
-          renderCreateTablesButton={
-            <CreateTablesButton
-              className="govuk-!-width-full"
-              release={release}
-            />
-          }
+          renderCreateTablesButton={<CreateTablesButton release={release} />}
           renderDataCatalogueLink={
             <ButtonLink
-              className="govuk-!-width-full"
               to={`/data-catalogue/${release.publication.slug}/${release.slug}`}
+              variant="secondary"
             >
               Browse data files
             </ButtonLink>
@@ -419,15 +428,16 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             );
           }}
           renderDataGuidanceLink={
-            <Link
+            <ButtonLink
               to={
                 release.latestRelease
                   ? `/find-statistics/${release.publication.slug}/meta-guidance`
                   : `/find-statistics/${release.publication.slug}/${release.slug}/meta-guidance`
               }
+              variant="secondary"
             >
-              data files guide
-            </Link>
+              Data guidance
+            </ButtonLink>
           }
         />
       )}

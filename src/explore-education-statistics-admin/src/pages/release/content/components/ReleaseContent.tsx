@@ -1,3 +1,4 @@
+import ButtonLink from '@admin/components/ButtonLink';
 import { CommentsChangeHandler } from '@admin/components/editable/Comments';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
@@ -184,25 +185,50 @@ const ReleaseContent = () => {
 
         <div className="govuk-grid-column-one-third">
           <RelatedAside>
-            <h2 className="govuk-heading-m">Useful information</h2>
-
-            <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
-              {hasAllFilesButton && (
+            <h2 className="govuk-heading-m" id="data-downloads">
+              Data downloads
+            </h2>
+            <nav role="navigation" aria-labelledby="data-downloads">
+              <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
                 <li>
-                  <Button
-                    className="govuk-button govuk-!-margin-bottom-3"
-                    disableDoubleClick
-                    onClick={() =>
-                      releaseFileService.downloadAllFilesZip(release.id)
-                    }
-                  >
-                    Download all data
-                  </Button>
+                  <a href="#dataDownloads-1">Explore data and files</a>
                 </li>
-              )}
-              <li>
-                <a href="#dataDownloads-1">View data and files</a>
-              </li>
+                <li>
+                  <Link
+                    to={{
+                      pathname: generatePath<ReleaseRouteParams>(
+                        releaseDataGuidanceRoute.path,
+                        {
+                          publicationId: release.publication.id,
+                          releaseId: release.id,
+                        },
+                      ),
+                      state: {
+                        backLink: location.pathname,
+                      },
+                    }}
+                  >
+                    Data guidance
+                  </Link>
+                </li>
+                {hasAllFilesButton && (
+                  <li>
+                    <Button
+                      className="govuk-!-width-full govuk-!-margin-bottom-3"
+                      disableDoubleClick
+                      onClick={() =>
+                        releaseFileService.downloadAllFilesZip(release.id)
+                      }
+                    >
+                      Download all data
+                    </Button>
+                  </li>
+                )}
+              </ul>
+            </nav>
+
+            <h2 className="govuk-heading-m">Supporting information</h2>
+            <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
               {release.hasPreReleaseAccessList && (
                 <li>
                   <Link
@@ -228,39 +254,38 @@ const ReleaseContent = () => {
               </li>
             </ul>
 
-            <dl className="dfe-meta-content">
-              <dt className="govuk-caption-m">For {release.coverageTitle}: </dt>
-              <dd data-testid="release-name">
-                <strong>{release.yearTitle}</strong>
+            {!!releaseCount && (
+              <>
+                <p className="govuk-!-margin-bottom-0">
+                  {release.coverageTitle} <strong>{release.yearTitle}</strong>
+                </p>
+                <Details summary={`See other releases (${releaseCount})`}>
+                  <ul className="govuk-list">
+                    {[
+                      ...release.publication.otherReleases.map(
+                        ({ id, title, slug }) => (
+                          <li key={id} data-testid="other-release-item">
+                            <Link
+                              to={`${config?.PublicAppUrl}/find-statistics/${release.publication.slug}/${slug}`}
+                            >
+                              {title}
+                            </Link>
+                          </li>
+                        ),
+                      ),
+                      ...release.publication.legacyReleases.map(
+                        ({ id, description, url }) => (
+                          <li key={id} data-testid="other-release-item">
+                            <Link to={url}>{description}</Link>
+                          </li>
+                        ),
+                      ),
+                    ]}
+                  </ul>
+                </Details>
+              </>
+            )}
 
-                {releaseCount > 0 && (
-                  <Details summary={`See other releases (${releaseCount})`}>
-                    <ul className="govuk-list">
-                      {[
-                        ...release.publication.otherReleases.map(
-                          ({ id, title, slug }) => (
-                            <li key={id} data-testid="other-release-item">
-                              <Link
-                                to={`${config?.PublicAppUrl}/find-statistics/${release.publication.slug}/${slug}`}
-                              >
-                                {title}
-                              </Link>
-                            </li>
-                          ),
-                        ),
-                        ...release.publication.legacyReleases.map(
-                          ({ id, description, url }) => (
-                            <li key={id} data-testid="other-release-item">
-                              <Link to={url}>{description}</Link>
-                            </li>
-                          ),
-                        ),
-                      ]}
-                    </ul>
-                  </Details>
-                )}
-              </dd>
-            </dl>
             {allMethodologies.length > 0 && (
               <>
                 <h3
@@ -296,11 +321,11 @@ const ReleaseContent = () => {
           release={release}
           renderAllFilesButton={
             <Button
-              className="govuk-!-width-full"
               disableDoubleClick
+              variant="secondary"
               onClick={() => releaseFileService.downloadAllFilesZip(release.id)}
             >
-              Download all files
+              Download all data
             </Button>
           }
           renderDownloadLink={file => (
@@ -317,7 +342,7 @@ const ReleaseContent = () => {
             </ButtonText>
           )}
           renderDataGuidanceLink={
-            <Link
+            <ButtonLink
               to={{
                 pathname: generatePath<ReleaseRouteParams>(
                   releaseDataGuidanceRoute.path,
@@ -330,28 +355,24 @@ const ReleaseContent = () => {
                   backLink: location.pathname,
                 },
               }}
+              variant="secondary"
             >
-              data files guide
-            </Link>
+              Data guidance
+            </ButtonLink>
           }
-          renderPreReleaseAccessLink={
-            <Link
-              to={{
-                pathname: generatePath<ReleaseRouteParams>(
-                  preReleaseAccessListRoute.path,
-                  {
-                    publicationId: release.publication.id,
-                    releaseId: release.id,
-                  },
-                ),
-                state: {
-                  backLink: location.pathname,
-                },
-              }}
-            >
-              View pre-release access list
-            </Link>
+          renderDataCatalogueLink={
+            <Button disabled variant="secondary">
+              Browse data files
+              <br /> (public site only)
+            </Button>
           }
+          renderCreateTablesButton={
+            <Button disabled>
+              Create tables
+              <br /> (public site only)
+            </Button>
+          }
+          showDownloadFilesList
         />
       )}
 

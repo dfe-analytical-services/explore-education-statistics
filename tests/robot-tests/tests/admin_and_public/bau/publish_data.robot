@@ -603,7 +603,7 @@ Go to release page
 Go to data guidance document
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
-    user clicks link    data files guide
+    user clicks link    Data guidance
 
     user waits until page contains title caption    ${RELEASE_2_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}

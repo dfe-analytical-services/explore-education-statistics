@@ -14,3 +14,14 @@
     }
   }
 }
+
+.section {
+  p:last-of-type {
+    margin-bottom: 0;
+  }
+
+  :global(.govuk-button) {
+    margin-bottom: 0;
+    width: 100%;
+  }
+}
