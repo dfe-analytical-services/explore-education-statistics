@@ -1160,14 +1160,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.NotNull(laOption1);
                 Assert.Equal(_england.Name, laOption1!.Label);
                 Assert.Equal(_england.Code, laOption1.Value);
-                Assert.Equal("Country", laOption1.Level);
+                Assert.Equal("country", laOption1.Level);
                 Assert.NotNull(laOption1.Options);
 
                 var laOption1SubOption1 = Assert.Single(laOption1.Options!);
                 Assert.NotNull(laOption1SubOption1);
                 Assert.Equal(_eastMidlands.Name, laOption1SubOption1!.Label);
                 Assert.Equal(_eastMidlands.Code, laOption1SubOption1.Value);
-                Assert.Equal("Region", laOption1SubOption1.Level);
+                Assert.Equal("region", laOption1SubOption1.Level);
                 Assert.NotNull(laOption1SubOption1.Options);
                 Assert.Equal(2, laOption1SubOption1.Options!.Count);
 
@@ -1422,7 +1422,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(_england.Name, regionOption1!.Label);
                 Assert.Equal(_england.Code, regionOption1.Value);
                 Assert.Null(regionOption1.GeoJson);
-                Assert.Equal("Country", regionOption1.Level);
+                Assert.Equal("country", regionOption1.Level);
                 Assert.NotNull(regionOption1.Options);
                 Assert.Equal(3, regionOption1.Options!.Count);
 
@@ -1650,7 +1650,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(_england.Name, regionOption1!.Label);
                 Assert.Equal(_england.Code, regionOption1.Value);
                 Assert.Null(regionOption1.GeoJson);
-                Assert.Equal("Country", regionOption1.Level);
+                Assert.Equal("country", regionOption1.Level);
                 Assert.NotNull(regionOption1.Options);
                 Assert.Equal(3, regionOption1.Options!.Count);
 

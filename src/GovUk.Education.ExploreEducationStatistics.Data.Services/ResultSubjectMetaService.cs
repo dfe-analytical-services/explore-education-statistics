@@ -97,13 +97,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var filterItems = 
+                    var filterItems =
                         _filterItemRepository.GetFilterItemsFromObservationList(observations);
                     var filterViewModels = BuildFilterHierarchy(filterItems);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var footnoteViewModels = 
+                    var footnoteViewModels =
                         GetFilteredFootnoteViewModels(releaseId, queryableObservations, query);
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
@@ -339,7 +339,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return new LocationAttributeViewModel
                 {
                     Label = locationAttribute.Name ?? string.Empty,
-                    Level = locationAttribute.GetType().Name,
+                    Level = locationAttribute.GetType().Name.CamelCase(),
                     Value = code,
                     Options = locationAttributeNode.Children
                         .Select(child => GetLocationAttributeViewModel(child, geoJsonByCode))

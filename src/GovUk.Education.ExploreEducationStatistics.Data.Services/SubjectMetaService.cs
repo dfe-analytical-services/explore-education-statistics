@@ -259,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 : new LocationAttributeViewModel
                 {
                     Label = locationAttributeNode.Attribute.Name ?? string.Empty,
-                    Level = locationAttributeNode.Attribute.GetType().Name,
+                    Level = locationAttributeNode.Attribute.GetType().Name.CamelCase(),
                     Value = locationAttributeNode.Attribute.GetCodeOrFallback(),
                     Options = DeduplicateLocationViewModels(
                             locationAttributeNode.Children.Select(BuildLocationAttributeViewModel)
@@ -274,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return option switch
             {
                 // Regions should be ordered by their code
-                { Level: "Region" } => option.Value,
+                { Level: "region" } => option.Value,
                 _ => option.Label
             };
         }
