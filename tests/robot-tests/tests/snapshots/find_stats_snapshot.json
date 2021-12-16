@@ -273,6 +273,15 @@
         "publications": [
           {
             "on_ees": true,
+            "publication_heading": "UK revenue from education related exports and transnational education activity"
+          }
+        ],
+        "topic_heading": "Education exports"
+      },
+      {
+        "publications": [
+          {
+            "on_ees": true,
             "publication_heading": "Graduate labour market statistics"
           },
           {
