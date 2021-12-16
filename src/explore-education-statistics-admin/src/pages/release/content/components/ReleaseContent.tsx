@@ -214,7 +214,7 @@ const ReleaseContent = () => {
                 {hasAllFilesButton && (
                   <li>
                     <Button
-                      className="govuk-button govuk-!-width-full govuk-!-margin-bottom-3"
+                      className="govuk-!-width-full govuk-!-margin-bottom-3"
                       disableDoubleClick
                       onClick={() =>
                         releaseFileService.downloadAllFilesZip(release.id)
@@ -321,7 +321,6 @@ const ReleaseContent = () => {
           release={release}
           renderAllFilesButton={
             <Button
-              className="govuk-!-width-full govuk-!-margin-bottom-0"
               disableDoubleClick
               variant="secondary"
               onClick={() => releaseFileService.downloadAllFilesZip(release.id)}
@@ -344,7 +343,6 @@ const ReleaseContent = () => {
           )}
           renderDataGuidanceLink={
             <ButtonLink
-              className="govuk-!-width-full govuk-!-margin-bottom-0"
               to={{
                 pathname: generatePath<ReleaseRouteParams>(
                   releaseDataGuidanceRoute.path,
@@ -363,20 +361,13 @@ const ReleaseContent = () => {
             </ButtonLink>
           }
           renderDataCatalogueLink={
-            <Button
-              className="govuk-!-width-full govuk-!-margin-bottom-0"
-              disabled
-              variant="secondary"
-            >
+            <Button disabled variant="secondary">
               Browse data files
               <br /> (public site only)
             </Button>
           }
           renderCreateTablesButton={
-            <Button
-              className="govuk-!-width-full govuk-!-margin-bottom-0"
-              disabled
-            >
+            <Button disabled>
               Create tables
               <br /> (public site only)
             </Button>

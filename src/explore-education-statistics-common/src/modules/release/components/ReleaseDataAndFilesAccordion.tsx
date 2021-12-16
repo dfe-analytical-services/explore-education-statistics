@@ -1,6 +1,7 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
+import SectionBreak from '@common/components/SectionBreak';
 import { Release } from '@common/services/publicationService';
 import { FileInfo } from '@common/services/types/file';
 import classNames from 'classnames';
@@ -56,14 +57,16 @@ const ReleaseDataAndFilesAccordion = ({
         }}
       >
         <AccordionSection heading="Explore data and files">
-          <div className="govuk-grid-row dfe-flex dfe-align-items--center">
+          <div
+            className={`govuk-grid-row dfe-flex dfe-align-items--center ${styles.section}`}
+          >
             <div
               className={classNames({
                 'govuk-grid-column-three-quarters': hasAllFilesButton,
                 'govuk-grid-column-full': !hasAllFilesButton,
               })}
             >
-              <p className="govuk-!-margin-bottom-0">
+              <p>
                 All data used in this release is available as open data for
                 download
               </p>
@@ -76,12 +79,14 @@ const ReleaseDataAndFilesAccordion = ({
             )}
           </div>
 
-          <hr className="govuk-section-break govuk-section-break--m govuk-section-break--visible" />
+          <SectionBreak />
 
-          <div className="govuk-grid-row dfe-flex dfe-align-items--center">
+          <div
+            className={`govuk-grid-row dfe-flex dfe-align-items--center ${styles.section}`}
+          >
             <div className="govuk-grid-column-three-quarters">
               <h3>Open data</h3>
-              <p className="govuk-!-margin-bottom-0">
+              <p>
                 Browse and download individual open data files from this release
                 in our data catalogue
               </p>
@@ -106,14 +111,17 @@ const ReleaseDataAndFilesAccordion = ({
               {renderDataCatalogueLink}
             </div>
           </div>
-          <hr className="govuk-section-break govuk-section-break--m govuk-section-break--visible" />
+
+          <SectionBreak />
 
           {release.hasDataGuidance && (
             <>
-              <div className="govuk-grid-row dfe-flex dfe-align-items--center">
+              <div
+                className={`govuk-grid-row dfe-flex dfe-align-items--center ${styles.section}`}
+              >
                 <div className="govuk-grid-column-three-quarters">
                   <h3>Guidance</h3>
-                  <p className="govuk-!-margin-bottom-0">
+                  <p>
                     Learn more about the data files used in this release using
                     our online guidance
                   </p>
@@ -122,14 +130,17 @@ const ReleaseDataAndFilesAccordion = ({
                   {renderDataGuidanceLink}
                 </div>
               </div>
-              <hr className="govuk-section-break govuk-section-break--m govuk-section-break--visible" />
+
+              <SectionBreak />
             </>
           )}
 
-          <div className="govuk-grid-row dfe-flex dfe-align-items--center">
+          <div
+            className={`govuk-grid-row dfe-flex dfe-align-items--center ${styles.section}`}
+          >
             <div className="govuk-grid-column-three-quarters">
               <h3>Create your own tables</h3>
-              <p className="govuk-!-margin-bottom-0">
+              <p>
                 You can view featured tables that we have built for you, or
                 create your own tables from the open data using our table tool
               </p>
@@ -138,7 +149,8 @@ const ReleaseDataAndFilesAccordion = ({
               {renderCreateTablesButton}
             </div>
           </div>
-          <hr className="govuk-section-break govuk-section-break--m govuk-section-break--visible" />
+
+          <SectionBreak visible={ancillaryFiles.length > 0} />
 
           {ancillaryFiles.length > 0 && (
             <>

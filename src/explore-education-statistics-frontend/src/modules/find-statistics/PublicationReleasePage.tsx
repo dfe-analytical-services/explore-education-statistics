@@ -390,7 +390,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           }}
           renderAllFilesButton={
             <ButtonLink
-              className="govuk-!-width-full govuk-!-margin-bottom-0"
               to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
               variant="secondary"
               onClick={() => {
@@ -403,15 +402,9 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               Download all data
             </ButtonLink>
           }
-          renderCreateTablesButton={
-            <CreateTablesButton
-              className="govuk-!-width-full govuk-!-margin-bottom-0"
-              release={release}
-            />
-          }
+          renderCreateTablesButton={<CreateTablesButton release={release} />}
           renderDataCatalogueLink={
             <ButtonLink
-              className="govuk-!-width-full govuk-!-margin-bottom-0"
               to={`/data-catalogue/${release.publication.slug}/${release.slug}`}
               variant="secondary"
             >
@@ -436,7 +429,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           }}
           renderDataGuidanceLink={
             <ButtonLink
-              className="govuk-!-width-full govuk-!-margin-bottom-0"
               to={
                 release.latestRelease
                   ? `/find-statistics/${release.publication.slug}/meta-guidance`
