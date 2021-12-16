@@ -25,8 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, UserInvite>> InviteUser(string email, string roleId);
 
-        Task<Either<ActionResult, Unit>> InviteContributor(string email, Guid publicationId, List<Guid> releaseIds);
-
         Task<Either<ActionResult, Unit>> CancelInvite(string email);
 
         Task<Either<ActionResult, Unit>> UpdateUser(string userId, string roleId);

@@ -18,10 +18,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
     public class UserInvitesController : ControllerBase
     {
         private readonly IUserManagementService _userManagementService;
+        private readonly IReleaseInviteService _releaseInviteService;
 
-        public UserInvitesController(IUserManagementService userManagementService)
+        public UserInvitesController(IUserManagementService userManagementService,
+            IReleaseInviteService releaseInviteService)
         {
             _userManagementService = userManagementService;
+            _releaseInviteService = releaseInviteService;
         }
 
         [HttpGet("user-management/invites")]
@@ -44,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         public async Task<ActionResult<Unit>> InviteContributor(Guid publicationId,
             ContributorInviteRequest contributorInviteRequest)
         {
-            return await _userManagementService
+            return await _releaseInviteService
                 .InviteContributor(contributorInviteRequest.Email, publicationId,
                     contributorInviteRequest.ReleaseIds)
                 .HandleFailuresOrOk();

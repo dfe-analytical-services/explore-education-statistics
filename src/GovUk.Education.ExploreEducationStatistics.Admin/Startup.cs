@@ -375,6 +375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<IUserManagementService, UserManagementService>();
+            services.AddTransient<IReleaseInviteService, ReleaseInviteService>();
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
