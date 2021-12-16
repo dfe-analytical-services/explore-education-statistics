@@ -166,31 +166,27 @@ class ReleaseFilesGenerator(object):
             container_client = self.blob_service_client.create_container(
                 "downloads")
         except ResourceExistsError:
-            pass
-
             container_client = self.blob_service_client.get_container_client(
                 "downloads")
 
-            self.upload_files(container_client,
-                              self.all_files_zip_files)
+        assert container_client is not None
 
-            self.upload_files(container_client,
-                              self.data_files)
+        self.upload_files(container_client, self.all_files_zip_files)
+
+        self.upload_files(container_client, self.data_files)
 
     def create_private_release_files(self):
         try:
             container_client = self.blob_service_client.create_container(
                 "releases")
         except ResourceExistsError:
-            pass
-
             container_client = self.blob_service_client.get_container_client(
                 "releases")
 
-        self.upload_files(container_client,
-                          self.data_files)
-        self.upload_files(container_client,
-                          self.metadata_files)
+        assert container_client is not None
+
+        self.upload_files(container_client, self.data_files)
+        self.upload_files(container_client, self.metadata_files)
 
     @staticmethod
     def upload_files(container_client, files):
@@ -203,7 +199,9 @@ class ReleaseFilesGenerator(object):
                 blob_client.upload_blob(
                     data, blob_type="BlockBlob", metadata=file.metadata())
             except ResourceExistsError:
-                pass
+                pass  # file already exists, so no action required
+            except Exception as e:
+                print('Exception when uploading file: ', e)
 
 
 if __name__ == '__main__':
