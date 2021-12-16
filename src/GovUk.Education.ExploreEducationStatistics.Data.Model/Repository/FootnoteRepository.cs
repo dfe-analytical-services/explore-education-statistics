@@ -114,7 +114,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .Select(rs => rs.SubjectId)
                 .ToList();
 
-            return GetFootnotes(releaseId, subjectsIdsForRelease);
+            var footnotes = GetFootnotes(releaseId, subjectsIdsForRelease)
+                .ToList();
+
+            // Remove the below check as part of EES-2971
+            var releaseFootnotes = _context.ReleaseFootnote
+                .Where(rf => rf.ReleaseId == releaseId)
+                .ToList();
+            if (footnotes.Count != releaseFootnotes.Count)
+            {
+                throw new Exception(
+                    $"Number of footnotes different from number of ReleaseFootnotes for release {releaseId}");
+            }
+
+            return footnotes;
         }
 
         public IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId)
