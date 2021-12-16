@@ -165,8 +165,8 @@ class ReleaseFilesGenerator(object):
         try:
             container_client = self.blob_service_client.create_container(
                 "downloads")
-        except ResourceExistsError as e:
-            print(e)
+        except ResourceExistsError:
+            pass
 
             container_client = self.blob_service_client.get_container_client(
                 "downloads")
@@ -181,8 +181,9 @@ class ReleaseFilesGenerator(object):
         try:
             container_client = self.blob_service_client.create_container(
                 "releases")
-        except ResourceExistsError as e:
-            print(e)
+        except ResourceExistsError:
+            pass
+
             container_client = self.blob_service_client.get_container_client(
                 "releases")
 
@@ -201,8 +202,8 @@ class ReleaseFilesGenerator(object):
             try:
                 blob_client.upload_blob(
                     data, blob_type="BlockBlob", metadata=file.metadata())
-            except ResourceExistsError as e:
-                print(e)
+            except ResourceExistsError:
+                pass
 
 
 if __name__ == '__main__':
