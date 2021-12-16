@@ -62,9 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext? contentDbContext = null,
             UsersAndRolesDbContext? usersAndRolesDbContext = null,
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
-            IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
-            IEmailTemplateService? emailTemplateService = null,
-            IUserRoleService? userRoleService = null,
             IUserRepository? userRepository = null,
             IUserService? userService = null,
             IUserInviteRepository? userInviteRepository = null,
@@ -78,12 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
 
             return new ReleaseInviteService(
-                usersAndRolesDbContext,
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-                emailTemplateService ?? new Mock<IEmailTemplateService>(Strict).Object,
-                userRoleService ?? new Mock<IUserRoleService>(Strict).Object,
                 userRepository ?? new UserRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService().Object,
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
