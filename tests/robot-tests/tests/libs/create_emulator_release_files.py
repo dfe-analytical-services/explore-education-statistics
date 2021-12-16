@@ -168,6 +168,8 @@ class ReleaseFilesGenerator(object):
         except ResourceExistsError:
             container_client = self.blob_service_client.get_container_client(
                 "downloads")
+        except Exception as e:
+            print('Unexpected exception creating "downloads" container: ', e)
 
         assert container_client is not None
 
@@ -182,6 +184,8 @@ class ReleaseFilesGenerator(object):
         except ResourceExistsError:
             container_client = self.blob_service_client.get_container_client(
                 "releases")
+        except Exception as e:
+            print('Unexpected exception creating "releases" container: ', e)
 
         assert container_client is not None
 
@@ -201,7 +205,7 @@ class ReleaseFilesGenerator(object):
             except ResourceExistsError:
                 pass  # file already exists, so no action required
             except Exception as e:
-                print('Exception when uploading file: ', e)
+                print('Unexpected exception when uploading file: ', e)
 
 
 if __name__ == '__main__':
