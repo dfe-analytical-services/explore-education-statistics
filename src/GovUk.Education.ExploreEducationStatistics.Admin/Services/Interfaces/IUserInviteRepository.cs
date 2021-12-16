@@ -8,8 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IUserInviteRepository
     {
-        public Task<UserInvite> CreateIfNoOtherUserInvite(string email, Role role, Guid createdById);
+        Task<UserInvite> Create(string email, Role role, Guid createdById);
 
-        public Task<UserInvite> CreateIfNoOtherUserInvite(string email, string roleId, Guid createdById);
+        Task<UserInvite> Create(string email, string roleId, Guid createdById);
     }
 }

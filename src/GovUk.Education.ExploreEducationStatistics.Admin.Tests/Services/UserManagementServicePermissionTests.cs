@@ -148,8 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 usersAndRolesDbContext,
                 contentDbContext,
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-                emailTemplateService ?? new Mock<IEmailTemplateService>(Strict).Object,
-                userRoleService ?? new Mock<IUserRoleService>(Strict).Object,
+                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
+                userRoleService ?? Mock.Of<IUserRoleService>(Strict),
                 userService ?? AlwaysTrueUserService().Object,
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext)
             );

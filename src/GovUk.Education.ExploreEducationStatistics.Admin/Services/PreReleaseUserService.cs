@@ -120,7 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ForEachAwaitAsync(async email =>
                         {
                             if (await _userReleaseRoleRepository
-                                    .GetUserReleaseRole(email, releaseId, PrereleaseViewer) != null)
+                                    .HasUserReleaseRole(email, releaseId, PrereleaseViewer))
                             {
                                 plan.AlreadyAccepted.Add(email);
                             }
@@ -189,7 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessVoid(
                     async () =>
                     {
-                        var userReleaseRolesToRemove = _context
+                        var userReleaseRolesToRemove = await _context
                             .UserReleaseRoles
                             .Include(r => r.User)
                             .Where(
@@ -197,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     r.ReleaseId == releaseId
                                     && r.User.Email.ToLower().Equals(email.ToLower())
                                     && r.Role == PrereleaseViewer
-                            ).ToList();
+                            ).ToListAsync();
                         await _userReleaseRoleRepository.RemoveMany(userReleaseRolesToRemove, _userService.GetUserId());
 
                         _context.RemoveRange(
@@ -268,8 +268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     release,
                                     invite.Email.ToLower(),
                                     isNewUser: user == null)
-                                .OnSuccessDo(async () =>
-                                    await _userReleaseInviteRepository.MarkEmailAsSent(invite));
+                                .OnSuccessDo(() => MarkInviteEmailAsSent(invite));
                         })
                         .ToListAsync();
 
@@ -291,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (user == null)
             {
                 return await CreateUserReleaseInvite(release, email)
-                    .OnSuccessDo(() => _userInviteRepository.CreateIfNoOtherUserInvite(
+                    .OnSuccessDo(() => _userInviteRepository.Create(
                         email: email,
                         role: Role.PrereleaseUser,
                         createdById: _userService.GetUserId()))
@@ -402,6 +401,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
 
             return _emailService.SendEmail(email, template, emailValues);
+        }
+
+        private async Task MarkInviteEmailAsSent(UserReleaseInvite invite)
+        {
+            invite.EmailSent = true;
+            _context.Update(invite);
+            await _context.SaveChangesAsync();
         }
 
         private static string FormatTimeForEmail(DateTime dateTime)

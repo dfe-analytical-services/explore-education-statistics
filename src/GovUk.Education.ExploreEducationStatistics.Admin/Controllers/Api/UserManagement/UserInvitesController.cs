@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -36,20 +37,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         }
 
         [HttpPost("user-management/invites")]
-        public async Task<ActionResult<UserInvite>> InviteUser(UserInviteRequest userInviteRequest)
+        public async Task<ActionResult<UserInvite>> InviteUser(UserInviteViewModel userInviteViewModel)
         {
             return await _userManagementService
-                .InviteUser(userInviteRequest.Email, userInviteRequest.RoleId)
+                .InviteUser(userInviteViewModel.Email, userInviteViewModel.RoleId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("user-management/publications/{publicationId}/invites/contributor")]
+        [HttpPost("user-management/publications/{publicationId:guid}/invites/contributor")]
         public async Task<ActionResult<Unit>> InviteContributor(Guid publicationId,
-            ContributorInviteRequest contributorInviteRequest)
+            ContributorInviteViewModel contributorInviteViewModel)
         {
             return await _releaseInviteService
-                .InviteContributor(contributorInviteRequest.Email, publicationId,
-                    contributorInviteRequest.ReleaseIds)
+                .InviteContributor(contributorInviteViewModel.Email, publicationId,
+                    contributorInviteViewModel.ReleaseIds)
                 .HandleFailuresOrOk();
         }
 

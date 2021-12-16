@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
@@ -50,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return userReleaseRole;
         }
 
-        public async Task<Unit> CreateManyIfNotExists(List<Guid> userIds, Guid releaseId, ReleaseRole role,
+        public async Task CreateManyIfNotExists(List<Guid> userIds, Guid releaseId, ReleaseRole role,
             Guid createdById)
         {
             var userIdsAlreadyHaveRole = await _contentDbContext.UserReleaseRoles
@@ -77,10 +76,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             await _contentDbContext.UserReleaseRoles.AddRangeAsync(newUserReleaseRoles);
             await _contentDbContext.SaveChangesAsync();
-            return Unit.Instance;
         }
 
-        public async Task<Unit> CreateManyIfNotExists(Guid userId, List<Guid> releaseIds, ReleaseRole role,
+        public async Task CreateManyIfNotExists(Guid userId, List<Guid> releaseIds, ReleaseRole role,
             Guid createdById)
         {
             var alreadyExistingReleaseIds = await _contentDbContext.UserReleaseRoles
@@ -107,7 +105,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             await _contentDbContext.UserReleaseRoles.AddRangeAsync(newUserReleaseRoles);
             await _contentDbContext.SaveChangesAsync();
-            return Unit.Instance;
         }
 
         public async Task Remove(UserReleaseRole userReleaseRole, Guid deletedById)
@@ -189,11 +186,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     r.Role == role);
         }
 
-        public async Task<UserReleaseRole?> GetUserReleaseRole(string email, Guid releaseId, ReleaseRole role)
+        public async Task<bool> HasUserReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
             return await _contentDbContext.UserReleaseRoles
                 .AsQueryable()
-                .SingleOrDefaultAsync(r =>
+                .AnyAsync(r =>
+                    r.UserId == userId &&
+                    r.ReleaseId == releaseId &&
+                    r.Role == role);
+        }
+
+        public async Task<bool> HasUserReleaseRole(string email, Guid releaseId, ReleaseRole role)
+        {
+            return await _contentDbContext.UserReleaseRoles
+                .AsQueryable()
+                .AnyAsync(r =>
                     r.User.Email.ToLower().Equals(email.ToLower()) &&
                     r.ReleaseId == releaseId &&
                     r.Role == role);

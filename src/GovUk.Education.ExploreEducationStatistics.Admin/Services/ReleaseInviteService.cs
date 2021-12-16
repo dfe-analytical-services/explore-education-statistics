@@ -3,19 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -36,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
         private readonly IConfiguration _configuration;
         private readonly IEmailService _emailService;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public ReleaseInviteService(ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
@@ -46,8 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserReleaseInviteRepository userReleaseInviteRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
             IConfiguration configuration,
-            IEmailService emailService,
-            IHttpContextAccessor httpContextAccessor)
+            IEmailService emailService)
+
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
@@ -58,7 +53,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userReleaseRoleRepository = userReleaseRoleRepository;
             _configuration = configuration;
             _emailService = emailService;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<Either<ActionResult, Unit>> InviteContributor(string email, Guid publicationId,
@@ -68,11 +62,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Publication>(publicationId, query => query
                     .Include(p => p.Releases))
                 .OnSuccessDo(
-                    async publication => await _userService.CheckCanUpdateReleaseRole(publication, Contributor))
-                .OnSuccessDo(() => ValidateEmail(email))
+                    publication => _userService.CheckCanUpdateReleaseRole(publication, Contributor))
                 .OnSuccess(publication => ValidateReleaseIds(publication, releaseIds))
                 .OnSuccess(async publication =>
                 {
+                    email = email.Trim();
+
                     var user = await _userRepository.FindByEmail(email);
                     if (user == null)
                     {
@@ -83,7 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> CreateNewUserContributorInvite(List<Guid> releaseIds, string email, string publicationTitle)
+        private async Task<Either<ActionResult, Unit>> CreateNewUserContributorInvite(List<Guid> releaseIds,
+            string email, string publicationTitle)
         {
             if (await _userReleaseInviteRepository.UserHasInvites(
                     releaseIds: releaseIds,
@@ -104,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return emailResult;
             }
 
-            await _userInviteRepository.CreateIfNoOtherUserInvite(
+            await _userInviteRepository.Create(
                 email: email,
                 role: Role.Analyst,
                 createdById: _userService.GetUserId());
@@ -132,10 +128,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
 
             var missingReleaseRoleReleaseIds = releaseIds
-                .Where(releaseId => !existingReleaseRoleReleaseIds.Contains(releaseId))
+                .Except(existingReleaseRoleReleaseIds)
                 .ToList();
 
-            if (missingReleaseRoleReleaseIds.IsNullOrEmpty())
+            if (!missingReleaseRoleReleaseIds.Any())
             {
                 return ValidationActionResult(UserAlreadyHasReleaseRoles);
             }
@@ -149,7 +145,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return emailResult;
             }
 
-            // create user release roles and accepted invites for release roles the user doesn't already have
             await _userReleaseRoleRepository.CreateManyIfNotExists(
                 userId: userId,
                 releaseIds: missingReleaseRoleReleaseIds,
@@ -168,19 +163,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                return ValidationActionResult(InvalidEmailAddress);
-            }
-
-            return Unit.Instance;
-        }
-
         private async Task<Either<ActionResult, Publication>> ValidateReleaseIds(Publication publication,
             List<Guid> releaseIds)
         {
+            var distinctReleaseIds = releaseIds.Distinct().ToList();
+            if (distinctReleaseIds.Count != releaseIds.Count)
+            {
+                throw new ArgumentException($"{nameof(releaseIds)} should not contain duplicates",
+                    nameof(releaseIds));
+            }
+
             await _contentDbContext
                 .Entry(publication)
                 .Collection(p => p.Releases)
@@ -191,9 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Select(r => r.Id)
                 .ToList();
 
-            var intersectedReleaseIds = releaseIds.Intersect(publicationReleaseIds).ToList();
-
-            if (!intersectedReleaseIds.All(releaseIds.Contains)) // if lists don't contain same elements
+            if (!releaseIds.All(publicationReleaseIds.Contains))
             {
                 return ValidationActionResult(NotAllReleasesBelongToPublication);
             }
@@ -204,25 +194,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task<Either<ActionResult, Unit>> SendContributorInviteEmail(
             string publicationTitle, List<Guid> releaseIds, string email)
         {
+            if (releaseIds.IsNullOrEmpty())
+            {
+                throw new ArgumentException("List of releases cannot be empty");
+            }
+
+            var uri = _configuration.GetValue<string>("AdminUri");
             var template = _configuration.GetValue<string>("NotifyContributorTemplateId");
-            var scheme = _httpContextAccessor.HttpContext.Request.Scheme;
-            var host = _httpContextAccessor.HttpContext.Request.Host;
-            var url = $"{scheme}://{host}/";
 
             var releaseTitleBullets = await _contentDbContext.Releases
-                .AsAsyncEnumerable()
+                .AsQueryable()
                 .Where(r => releaseIds.Contains(r.Id))
                 .Select(r => $"* {r.Title}")
                 .ToListAsync();
-            var releaseList = string.Join("\n", releaseTitleBullets);
-            if (releaseList.IsNullOrEmpty())
-            {
-                releaseList = "* No specific release Contributor access granted\n";
-            }
+            var releaseList = releaseTitleBullets.JoinToString("\n");
 
             var emailValues = new Dictionary<string, dynamic>
             {
-                { "url", url },
+                { "url", $"https://{uri}/" },
                 { "publication name", publicationTitle },
                 { "release list", releaseList },
             };

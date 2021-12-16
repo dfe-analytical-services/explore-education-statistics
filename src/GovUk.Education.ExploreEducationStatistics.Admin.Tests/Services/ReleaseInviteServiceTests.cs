@@ -614,12 +614,87 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task InviteContributor_NotAllReleasesBelongToPublication()
+        {
+            var release1 = new Release()
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+            };
+            var publication1 = new Publication
+            {
+                Title = "Publication title",
+                Releases = ListOf(release1)
+            };
+
+            var release2 = new Release()
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2001",
+            };
+            var publication2 = new Publication
+            {
+                Title = "Publication title 2",
+                Releases = ListOf(release2)
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(publication1, publication2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseInviteService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: usersAndRolesDbContext);
+
+                var result = await service.InviteContributor(
+                    email: "test@test.com",
+                    publicationId: publication1.Id,
+                    releaseIds: ListOf(release1.Id, release2.Id));
+
+                var actionResult = result.AssertLeft();
+                Assert.IsType<BadRequestObjectResult>(actionResult);
+                var badRequestObjectResult = (BadRequestObjectResult)actionResult;
+                var validationProblemDetails = (ValidationProblemDetails)badRequestObjectResult.Value;
+                Assert.Equal("NOT_ALL_RELEASES_BELONG_TO_PUBLICATION", validationProblemDetails.Errors[""].First());
+            }
+
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var userInvites = await usersAndRolesDbContext.UserInvites
+                    .AsQueryable()
+                    .ToListAsync();
+
+                Assert.Empty(userInvites);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext.UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Empty(userReleaseRoles);
+
+                var userReleaseInvites = await contentDbContext.UserReleaseInvites
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Empty(userReleaseInvites);
+            }
+        }
+
         private static Dictionary<string, dynamic> GetExpectedContributorInviteTemplateValues(string publicationTitle,
             string releaseList)
         {
             return new()
             {
-                { "url", "http://localhost/" },
+                { "url", "https://localhost/" },
                 { "publication name", publicationTitle },
                 { "release list", releaseList },
             };
@@ -628,28 +703,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static Mock<IConfiguration> DefaultConfigurationMock()
         {
             return CreateMockConfiguration(
-                TupleOf("NotifyContributorTemplateId", NotifyContributorTemplateId));
+                TupleOf("NotifyContributorTemplateId", NotifyContributorTemplateId),
+                TupleOf("AdminUri", "localhost"));
         }
-
-        private static Mock<IHttpContextAccessor> DefaultHttpContextAccessorMock()
-        {
-            var httpContextAccessor = new Mock<IHttpContextAccessor>(Strict);
-            var context = new DefaultHttpContext
-            {
-                Request =
-                {
-                    Scheme = "http",
-                    Host = new HostString("localhost")
-                }
-            };
-
-            httpContextAccessor
-                .SetupGet(m => m.HttpContext)
-                .Returns(context);
-
-            return httpContextAccessor;
-        }
-
 
         private static ReleaseInviteService SetupReleaseInviteService(
             ContentDbContext? contentDbContext = null,
@@ -661,8 +717,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
             IConfiguration? configuration = null,
-            IEmailService? emailService = null,
-            IHttpContextAccessor? httpContextAccessor = null)
+            IEmailService? emailService = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -676,8 +731,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(contentDbContext),
                 configuration ?? DefaultConfigurationMock().Object,
-                emailService ?? new Mock<IEmailService>(Strict).Object,
-                httpContextAccessor ?? DefaultHttpContextAccessorMock().Object
+                emailService ?? Mock.Of<IEmailService>(Strict)
             );
         }
     }

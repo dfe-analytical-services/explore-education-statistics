@@ -226,7 +226,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccess(() => ValidateEmail(email))
                 .OnSuccess(() => ValidateUserDoesNotExist(email))
                 .OnSuccess<ActionResult, Unit, UserInvite>(async () =>
                 {
@@ -239,7 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(InvalidUserRole);
                     }
 
-                    return await _userInviteRepository.CreateIfNoOtherUserInvite(
+                    return await _userInviteRepository.Create(
                         email: email.ToLower(),
                         roleId: roleId,
                         createdById: _userService.GetUserId());
@@ -251,6 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(() => invite);
                 });
         }
+
         public async Task<Either<ActionResult, Unit>> CancelInvite(string email)
         {
             return await _userService
@@ -295,19 +295,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Unit>> ValidateEmail(string email)
-        {
-            if (string.IsNullOrWhiteSpace(email))
-            {
-                return ValidationActionResult(InvalidEmailAddress);
-            }
-
-            return Unit.Instance;
-        }
-
         private async Task<Either<ActionResult, Unit>> ValidateUserDoesNotExist(string email)
         {
-            if (_usersAndRolesDbContext.Users.Any(u => u.Email.ToLower() == email.ToLower()))
+            if (await _usersAndRolesDbContext.Users
+                    .AsQueryable()
+                    .AnyAsync(u => u.Email.ToLower() == email.ToLower()))
             {
                 return ValidationActionResult(UserAlreadyExists);
             }

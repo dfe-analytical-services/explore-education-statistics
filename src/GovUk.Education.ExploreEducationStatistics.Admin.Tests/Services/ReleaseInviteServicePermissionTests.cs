@@ -58,6 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 });
         }
+
         private static ReleaseInviteService SetupReleaseInviteService(
             ContentDbContext? contentDbContext = null,
             UsersAndRolesDbContext? usersAndRolesDbContext = null,
@@ -68,8 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
             IConfiguration? configuration = null,
-            IEmailService? emailService = null,
-            IHttpContextAccessor? httpContextAccessor = null)
+            IEmailService? emailService = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -83,8 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(contentDbContext),
                 configuration ?? CreateMockConfiguration().Object,
-                emailService ?? new Mock<IEmailService>(Strict).Object,
-                httpContextAccessor ?? new Mock<IHttpContextAccessor>(Strict).Object
+                emailService ?? Mock.Of<IEmailService>(Strict)
             );
         }
     }

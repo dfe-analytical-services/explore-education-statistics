@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
             Email = email;
         }
 
-        public string Email { get; }
+        [EmailAddress] public string Email { get; }
     }
 
     public class PreReleaseUserInvitePlan
@@ -23,13 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public List<string> Invitable { get; } = new List<string>();
     }
 
-    public class PreReleaseUserInviteRequest
+    public class PreReleaseUserInviteViewModel
     {
-        [Required] public List<string> Emails { get; set; } = new List<string>();
+        [MinLength(1, ErrorMessage = "Must have at least one email.")]
+        public List<string> Emails { get; set; } = new List<string>();
     }
 
     public class PreReleaseUserRemoveRequest
     {
-        [Required] public string Email { get; set; } = string.Empty;
+        [EmailAddress] public string Email { get; set; } = string.Empty;
     }
 }

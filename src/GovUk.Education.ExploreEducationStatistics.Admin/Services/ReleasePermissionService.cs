@@ -180,8 +180,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         role: Contributor,
                         deletedById: _userService.GetUserId());
 
-                    await _userReleaseInviteRepository.RemoveMany(
-                        releaseIds: publication.Releases.Select(r => r.Id).ToList(),
+                    await _userReleaseInviteRepository.RemoveByPublication(
+                        publication: publication,
                         email: user.Email,
                         role: Contributor);
                 });

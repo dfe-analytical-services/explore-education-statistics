@@ -1,10 +1,9 @@
 ﻿#nullable enable
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -24,21 +23,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = new UserReleaseInviteRepository(contentDbContext);
-                var result = await repository.Create(
+                await repository.Create(
                     releaseId: releaseId,
                     email: "test@test.com",
                     releaseRole: Contributor,
                     emailSent: true,
                     createdById: createdById);
-
-                result.AssertRight();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseInvite = contentDbContext.UserReleaseInvites
+                var userReleaseInvite = await contentDbContext.UserReleaseInvites
                     .AsQueryable()
-                    .SingleOrDefault();
+                    .SingleOrDefaultAsync();
 
                 Assert.NotNull(userReleaseInvite);
                 Assert.Equal(releaseId, userReleaseInvite.ReleaseId);
@@ -77,22 +74,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = new UserReleaseInviteRepository(contentDbContext);
-                var result = await repository.CreateManyIfNotExists(
+                await repository.CreateManyIfNotExists(
                     releaseIds: ListOf(releaseId1, releaseId2,
                         existingReleaseInvite.ReleaseId),
                     email: "test@test.com",
                     releaseRole: Contributor,
                     emailSent: false,
                     createdById: createdById);
-
-                result.AssertRight();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseInvites = contentDbContext.UserReleaseInvites
+                var userReleaseInvites = await contentDbContext.UserReleaseInvites
                     .AsQueryable()
-                    .ToList();
+                    .ToListAsync();
 
                 Assert.Equal(3, userReleaseInvites.Count);
 
@@ -120,47 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[2].Created).Milliseconds, 0, 1500);
                 Assert.Equal(createdById, userReleaseInvites[2].CreatedById);
                 Assert.False(userReleaseInvites[2].Accepted);
-            }
-        }
-
-        [Fact]
-        public async Task MarkEmailAsSent()
-        {
-            var userReleaseInvite = new UserReleaseInvite
-            {
-                Email = "test@test.com",
-                ReleaseId = Guid.NewGuid(),
-                Role = Contributor,
-                EmailSent = false,
-                Created = new DateTime(2000, 1, 1),
-                CreatedById = Guid.NewGuid(),
-                Accepted = false,
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(userReleaseInvite);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var repository = new UserReleaseInviteRepository(contentDbContext);
-                await repository.MarkEmailAsSent(userReleaseInvite);
-
-                var updatedInvite = contentDbContext
-                    .UserReleaseInvites
-                    .Single();
-
-                Assert.Equal(userReleaseInvite.Id, updatedInvite.Id);
-                Assert.Equal(userReleaseInvite.Email, updatedInvite.Email);
-                Assert.Equal(userReleaseInvite.Role, updatedInvite.Role);
-                Assert.Equal(userReleaseInvite.CreatedById, updatedInvite.CreatedById);
-                Assert.Equal(userReleaseInvite.Created, updatedInvite.Created);
-                Assert.Equal(userReleaseInvite.Accepted, updatedInvite.Accepted);
-
-                Assert.True(updatedInvite.EmailSent);
             }
         }
 
@@ -267,58 +221,70 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task RemoveMany()
+        public async Task RemoveByPublication()
         {
+            var release1 = new Release();
+            var release2 = new Release();
+            var release3 = new Release();
+            var publication = new Publication
+            {
+                Releases = ListOf(release1, release3),
+            };
             var invite1 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                ReleaseId = Guid.NewGuid(),
+                Release = release1,
                 Role = Contributor,
             };
 
+            // not attached to publication
             var invite2 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                ReleaseId = Guid.NewGuid(),
+                Release = release2,
                 Role = Contributor,
             };
 
             var invite3 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                ReleaseId = Guid.NewGuid(),
+                Release = release3,
                 Role = Contributor,
             };
 
+            // not Contributor
             var invite4 = new UserReleaseInvite
             {
                 Email = "test@test.com",
-                ReleaseId = invite1.ReleaseId,
+                Release = release1,
                 Role = Lead,
             };
 
+            // different email address
             var invite5 = new UserReleaseInvite
             {
                 Email = "test_different@test.com",
-                ReleaseId = invite1.ReleaseId,
+                Release = release1,
                 Role = Contributor,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(invite1, invite2, invite3, invite4, invite5);
+                await contentDbContext.AddRangeAsync(publication,
+                    invite1, invite2, invite3, invite4, invite5);
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var repository = new UserReleaseInviteRepository(contentDbContext);
-                await repository.RemoveMany(
-                    ListOf(invite1.ReleaseId, invite3.ReleaseId),
-                    "test@test.com", Contributor);
+                await repository.RemoveByPublication(
+                    publication, "test@test.com", Contributor);
 
-                var remainingInvites = contentDbContext.UserReleaseInvites.ToList();
+                var remainingInvites = await contentDbContext.UserReleaseInvites
+                    .AsQueryable()
+                    .ToListAsync();
 
                 Assert.Equal(3, remainingInvites.Count);
 

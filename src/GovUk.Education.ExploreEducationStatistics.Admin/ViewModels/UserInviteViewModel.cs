@@ -1,18 +1,13 @@
-using System;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using System.ComponentModel.DataAnnotations;
 
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
     public class UserInviteViewModel
     {
-        public string Email { get; set; }
-        
-        public bool Accepted { get; set; }
-        
-        public ReleaseRole Role { get; set; }
-        
-        public DateTime Created { get; set; }
-        
-        public string CreatedBy { get; set; }
+        [EmailAddress] public string Email { get; set; } = string.Empty;
+
+        [Required(AllowEmptyStrings = false)]
+        public string RoleId { get; set; } = string.Empty;
     }
 }

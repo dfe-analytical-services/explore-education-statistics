@@ -26,12 +26,6 @@ interface InviteContributorFormValues {
 
 export const errorMappings = [
   mapFieldErrors<InviteContributorFormValues>({
-    target: 'email',
-    messages: {
-      INVALID_EMAIL_ADDRESS: 'The email address is invalid',
-    },
-  }),
-  mapFieldErrors<InviteContributorFormValues>({
     target: 'releaseIds',
     messages: {
       NOT_ALL_RELEASES_BELONG_TO_PUBLICATION:

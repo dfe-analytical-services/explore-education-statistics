@@ -169,7 +169,7 @@ const userService: UsersService = {
     releaseIds: string[],
   ): Promise<boolean> {
     return client.post(
-      `user-management/publications/${publicationId}/invites/contributor`,
+      `/user-management/publications/${publicationId}/invites/contributor`,
       {
         email,
         releaseIds,

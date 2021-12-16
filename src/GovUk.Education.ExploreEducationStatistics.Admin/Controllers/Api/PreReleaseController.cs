@@ -43,19 +43,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpPost("release/{releaseId:guid}/prerelease-users-plan")]
         public async Task<ActionResult<PreReleaseUserInvitePlan>> GetPreReleaseUsersInvitePlan(
-            Guid releaseId, [FromBody] PreReleaseUserInviteRequest request)
+            Guid releaseId, [FromBody] PreReleaseUserInviteViewModel viewModel)
         {
             return await _preReleaseUserService
-                .GetPreReleaseUsersInvitePlan(releaseId, request.Emails)
+                .GetPreReleaseUsersInvitePlan(releaseId, viewModel.Emails)
                 .HandleFailuresOrOk();
         }
 
         [HttpPost("release/{releaseId:guid}/prerelease-users")]
         public async Task<ActionResult<List<PreReleaseUserViewModel>>> InvitePreReleaseUsers(
-            Guid releaseId, [FromBody] PreReleaseUserInviteRequest request)
+            Guid releaseId, [FromBody] PreReleaseUserInviteViewModel viewModel)
         {
             return await _preReleaseUserService
-                .InvitePreReleaseUsers(releaseId, request.Emails)
+                .InvitePreReleaseUsers(releaseId, viewModel.Emails)
                 .HandleFailuresOrOk();
         }
 

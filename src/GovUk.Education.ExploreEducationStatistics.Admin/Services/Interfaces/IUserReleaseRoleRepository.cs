@@ -19,12 +19,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             ReleaseRole role,
             Guid createdById);
 
-        Task<Unit> CreateManyIfNotExists(List<Guid> userIds,
+        Task CreateManyIfNotExists(List<Guid> userIds,
             Guid releaseId,
             ReleaseRole role,
             Guid createdById);
 
-        Task<Unit> CreateManyIfNotExists(Guid userId,
+        Task CreateManyIfNotExists(Guid userId,
             List<Guid> releaseIds,
             ReleaseRole role,
             Guid createdById);
@@ -48,7 +48,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseId,
             ReleaseRole role);
 
-        Task<UserReleaseRole?> GetUserReleaseRole(string email,
+        Task<bool> HasUserReleaseRole(Guid userId,
+            Guid releaseId,
+            ReleaseRole role);
+
+        Task<bool> HasUserReleaseRole(string email,
             Guid releaseId,
             ReleaseRole role);
 
