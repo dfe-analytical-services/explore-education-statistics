@@ -143,7 +143,9 @@ export const testChartTableData: TableDataResponse = {
         name: 'sess_overall_percent',
       },
     ],
-    locations: [{ level: 'country', label: 'England', value: 'england' }],
+    locationsHierarchical: {
+      country: [{ label: 'England', value: 'england' }],
+    },
     boundaryLevels: [
       {
         id: 1,

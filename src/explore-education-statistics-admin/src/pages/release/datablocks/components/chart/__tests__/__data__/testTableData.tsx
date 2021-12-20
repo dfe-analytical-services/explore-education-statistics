@@ -62,10 +62,12 @@ export const testTableData: TableDataResponse = {
         name: 'sess_overall',
       },
     ],
-    locations: [
-      { level: 'localAuthority', label: 'Barnet', value: 'barnet' },
-      { level: 'localAuthority', label: 'Barnsley', value: 'barnsley' },
-    ],
+    locationsHierarchical: {
+      localAuthority: [
+        { label: 'Barnet', value: 'barnet' },
+        { label: 'Barnsley', value: 'barnsley' },
+      ],
+    },
     boundaryLevels: [],
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',

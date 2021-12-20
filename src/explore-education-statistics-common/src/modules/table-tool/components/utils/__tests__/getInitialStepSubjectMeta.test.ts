@@ -166,7 +166,7 @@ describe('getInitialStepSubjectMeta', () => {
         geoJsonAvailable: false,
         footnotes: [],
         boundaryLevels: [],
-        locations: [],
+        locationsHierarchical: {},
         timePeriodRange: [],
         indicators: [],
         filters: {},
@@ -271,7 +271,9 @@ describe('getInitialStepSubjectMeta', () => {
         geoJsonAvailable: false,
         footnotes: [],
         boundaryLevels: [],
-        locations: [{ value: 'england', level: 'country', label: 'England' }],
+        locationsHierarchical: {
+          country: [{ value: 'england', label: 'England' }],
+        },
         timePeriodRange: [{ year: 2018, code: 'AY', label: '2018' }],
         indicators: [
           {

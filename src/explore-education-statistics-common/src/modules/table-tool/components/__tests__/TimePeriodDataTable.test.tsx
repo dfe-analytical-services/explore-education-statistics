@@ -254,7 +254,9 @@ describe('TimePeriodDataTable', () => {
             decimalPlaces: 1,
           },
         ],
-        locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+        locationsHierarchical: {
+          country: [{ value: 'E92000001', label: 'England' }],
+        },
         boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
         subjectName: 'Absence in prus',
@@ -347,7 +349,9 @@ describe('TimePeriodDataTable', () => {
             decimalPlaces: 1,
           },
         ],
-        locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+        locationsHierarchical: {
+          country: [{ value: 'E92000001', label: 'England' }],
+        },
         boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
         subjectName: 'Absence in prus',
@@ -432,7 +436,9 @@ describe('TimePeriodDataTable', () => {
             unit: '%',
           },
         ],
-        locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+        locationsHierarchical: {
+          country: [{ value: 'E92000001', label: 'England' }],
+        },
         boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
         subjectName: 'Absence in prus',

@@ -85,10 +85,12 @@ describe('getDefaultTableHeadersConfig', () => {
           decimalPlaces: 2,
         },
       ],
-      locations: [
-        { value: 'barnsley', label: 'Barnsley', level: 'localAuthority' },
-        { value: 'barnet', label: 'Barnet', level: 'localAuthority' },
-      ],
+      locationsHierarchical: {
+        localAuthority: [
+          { value: 'barnsley', label: 'Barnsley' },
+          { value: 'barnet', label: 'Barnet' },
+        ],
+      },
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
@@ -152,7 +154,7 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config using a larger number of time periods than indicators', () => {
-    const testTableDataTimePeriods = {
+    const testTableDataTimePeriods: TableDataResponse = {
       ...testTableData,
       subjectMeta: {
         ...testTableData.subjectMeta,
@@ -264,7 +266,7 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config when two options for every filter type', () => {
-    const testTableDataTwoOptions = {
+    const testTableDataTwoOptions: TableDataResponse = {
       ...testTableData,
       subjectMeta: {
         ...testTableData.subjectMeta,
@@ -341,7 +343,7 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config with siblingless filters removed when one option for every filter type', () => {
-    const testTableDataSiblingless = {
+    const testTableDataSiblingless: TableDataResponse = {
       ...testTableData,
       subjectMeta: {
         ...testTableData.subjectMeta,
@@ -385,9 +387,9 @@ describe('getDefaultTableHeadersConfig', () => {
             decimalPlaces: 2,
           },
         ],
-        locations: [
-          { value: 'barnsley', label: 'Barnsley', level: 'localAuthority' },
-        ],
+        locationsHierarchical: {
+          localAuthority: [{ value: 'barnsley', label: 'Barnsley' }],
+        },
       },
       results: [
         {

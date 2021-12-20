@@ -40,13 +40,14 @@ describe('PermalinkPage', () => {
         footnotes: [],
         subjectName: 'Subject 1',
         geoJsonAvailable: false,
-        locations: [
-          {
-            level: 'localAuthority',
-            label: 'Barnet',
-            value: 'barnet',
-          },
-        ],
+        locationsHierarchical: {
+          localAuthority: [
+            {
+              label: 'Barnet',
+              value: 'barnet',
+            },
+          ],
+        },
         timePeriodRange: [{ code: 'AY', year: 2020, label: '2020/21' }],
         indicators: [
           {

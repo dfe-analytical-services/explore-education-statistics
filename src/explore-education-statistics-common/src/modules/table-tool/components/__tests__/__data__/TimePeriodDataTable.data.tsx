@@ -67,10 +67,12 @@ export const testData1 = {
           decimalPlaces: 0,
         },
       ],
-      locations: [
-        { value: 'E09000003', label: 'Barnet', level: 'localAuthority' },
-        { value: 'E08000016', label: 'Barnsley', level: 'localAuthority' },
-      ],
+      locationsHierarchical: {
+        localAuthority: [
+          { value: 'E09000003', label: 'Barnet' },
+          { value: 'E08000016', label: 'Barnsley' },
+        ],
+      },
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
@@ -458,10 +460,12 @@ export const testData2 = {
           decimalPlaces: 1,
         },
       ],
-      locations: [
-        { value: 'E09000003', label: 'Barnet', level: 'localAuthority' },
-        { value: 'E08000016', label: 'Barnsley', level: 'localAuthority' },
-      ],
+      locationsHierarchical: {
+        localAuthority: [
+          { value: 'E09000003', label: 'Barnet' },
+          { value: 'E08000016', label: 'Barnsley' },
+        ],
+      },
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
@@ -797,10 +801,12 @@ export const testData3 = {
           decimalPlaces: 1,
         },
       ],
-      locations: [
-        { value: 'E09000003', label: 'Barnet', level: 'localAuthority' },
-        { value: 'E08000016', label: 'Barnsley', level: 'localAuthority' },
-      ],
+      locationsHierarchical: {
+        localAuthority: [
+          { value: 'E09000003', label: 'Barnet' },
+          { value: 'E08000016', label: 'Barnsley' },
+        ],
+      },
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
@@ -989,7 +995,9 @@ export const testDataNoFilters = {
           decimalPlaces: 1,
         },
       ],
-      locations: [{ value: 'E92000001', label: 'England', level: 'country' }],
+      locationsHierarchical: {
+        country: [{ value: 'E92000001', label: 'England' }],
+      },
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence in prus',
@@ -1122,10 +1130,12 @@ export const testDataFiltersWithNoResults = {
           decimalPlaces: 0,
         },
       ],
-      locations: [
-        { value: 'E08000026', label: 'Coventry', level: 'localAuthority' },
-        { value: 'E09000008', label: 'Croydon', level: 'localAuthority' },
-      ],
+      locationsHierarchical: {
+        localAuthority: [
+          { value: 'E08000026', label: 'Coventry' },
+          { value: 'E09000008', label: 'Croydon' },
+        ],
+      },
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',

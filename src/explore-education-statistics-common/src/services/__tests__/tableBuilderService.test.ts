@@ -39,7 +39,7 @@ describe('tableBuilderService', () => {
             },
           ],
         },
-        'level-2': {
+        level2: {
           legend: '',
           options: [
             {
@@ -48,7 +48,7 @@ describe('tableBuilderService', () => {
             },
           ],
         },
-        'level-3': {
+        level3: {
           legend: '',
           options: [
             {
@@ -85,7 +85,7 @@ describe('tableBuilderService', () => {
             },
           ],
         },
-        'level-2': {
+        level2: {
           legend: '',
           options: [
             {
@@ -94,7 +94,7 @@ describe('tableBuilderService', () => {
             },
           ],
         },
-        'level-3': {
+        level3: {
           legend: '',
           options: [
             {
@@ -132,38 +132,38 @@ describe('tableBuilderService', () => {
         subjectName: '',
         timePeriodRange: [],
         publicationName: '',
-        locations: [
-          {
-            level: 'provider',
-            value: 'unique-provider',
-            label: 'Unique Provider',
-          },
-          {
-            level: 'provider',
-            value: 'duplicate-provider',
-            label: 'Duplicate Provider 2',
-          },
-          {
-            level: 'provider',
-            value: 'unique-provider-2',
-            label: 'Unique Provider 2',
-          },
-          {
-            level: 'provider',
-            value: 'duplicate-provider',
-            label: 'Duplicate Provider 1',
-          },
-          {
-            level: 'level-2',
-            value: 'duplicate-code-across-levels',
-            label: 'Level 2 Location',
-          },
-          {
-            level: 'level-3',
-            value: 'duplicate-code-across-levels',
-            label: 'Level 3 Location',
-          },
-        ],
+        locationsHierarchical: {
+          provider: [
+            {
+              value: 'unique-provider',
+              label: 'Unique Provider',
+            },
+            {
+              value: 'duplicate-provider',
+              label: 'Duplicate Provider 2',
+            },
+            {
+              value: 'unique-provider-2',
+              label: 'Unique Provider 2',
+            },
+            {
+              value: 'duplicate-provider',
+              label: 'Duplicate Provider 1',
+            },
+          ],
+          level2: [
+            {
+              value: 'duplicate-code-across-levels',
+              label: 'Level 2 Location',
+            },
+          ],
+          level3: [
+            {
+              value: 'duplicate-code-across-levels',
+              label: 'Level 3 Location',
+            },
+          ],
+        },
       },
       results: [
         {
@@ -227,33 +227,34 @@ describe('tableBuilderService', () => {
         subjectName: '',
         timePeriodRange: [],
         publicationName: '',
-        locations: [
-          {
-            level: 'provider',
-            value: 'unique-provider',
-            label: 'Unique Provider',
-          },
-          {
-            level: 'provider',
-            value: 'duplicate-provider',
-            label: 'Duplicate Provider 1 / Duplicate Provider 2',
-          },
-          {
-            level: 'provider',
-            value: 'unique-provider-2',
-            label: 'Unique Provider 2',
-          },
-          {
-            level: 'level-2',
-            value: 'duplicate-code-across-levels',
-            label: 'Level 2 Location',
-          },
-          {
-            level: 'level-3',
-            value: 'duplicate-code-across-levels',
-            label: 'Level 3 Location',
-          },
-        ],
+        locationsHierarchical: {
+          provider: [
+            {
+              value: 'unique-provider',
+              label: 'Unique Provider',
+            },
+            {
+              value: 'duplicate-provider',
+              label: 'Duplicate Provider 1 / Duplicate Provider 2',
+            },
+            {
+              value: 'unique-provider-2',
+              label: 'Unique Provider 2',
+            },
+          ],
+          level2: [
+            {
+              value: 'duplicate-code-across-levels',
+              label: 'Level 2 Location',
+            },
+          ],
+          level3: [
+            {
+              value: 'duplicate-code-across-levels',
+              label: 'Level 3 Location',
+            },
+          ],
+        },
       },
       results: [
         {

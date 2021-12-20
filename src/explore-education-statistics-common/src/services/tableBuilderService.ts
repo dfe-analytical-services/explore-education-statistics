@@ -60,7 +60,13 @@ export interface LocationOption {
   label: string;
   value: string;
   level?: string;
-  options?: LocationOption[];
+  options?: LocationLeafOption[];
+  geoJson?: GeoJsonFeature[];
+}
+
+export interface LocationLeafOption {
+  label: string;
+  value: string;
   geoJson?: GeoJsonFeature[];
 }
 
@@ -128,22 +134,13 @@ export interface ReleaseTableDataQuery extends TableDataQuery {
   releaseId?: string;
 }
 
-/**
- * This type must be maintained for backwards compatibility
- * with older permalinks where we still return a 'flat' list
- * of location options in the {@see TableDataSubjectMeta}.
- */
-export interface FlatLocationOption {
-  label: string;
-  value: string;
-  level: string;
-  geoJson?: GeoJsonFeature[];
-}
-
 export interface TableDataSubjectMeta {
   publicationName: string;
   subjectName: string;
-  locations: FlatLocationOption[];
+  /**
+   * TODO: EES-2902 Change this key back to `locations`
+   */
+  locationsHierarchical: Dictionary<LocationOption[]>;
   boundaryLevels: BoundaryLevel[];
   timePeriodRange: TimePeriodOption[];
   filters: Dictionary<{

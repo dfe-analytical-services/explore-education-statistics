@@ -75,9 +75,9 @@ describe('TableToolPage', () => {
             decimalPlaces: 0,
           },
         ],
-        locations: [
-          { level: 'country', label: 'Great Britain', value: 'K03000001' },
-        ],
+        locationsHierarchical: {
+          country: [{ label: 'Great Britain', value: 'K03000001' }],
+        },
         boundaryLevels: [
           {
             id: 1,

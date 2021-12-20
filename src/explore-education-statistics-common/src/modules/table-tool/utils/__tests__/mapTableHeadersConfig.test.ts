@@ -139,10 +139,12 @@ describe('mapTableHeadersConfig', () => {
           decimalPlaces: 2,
         },
       ],
-      locations: [
-        { value: 'E09000003', label: 'Barnet', level: 'localAuthority' },
-        { value: 'E08000016', label: 'Barnsley', level: 'localAuthority' },
-      ],
+      locationsHierarchical: {
+        localAuthority: [
+          { value: 'E09000003', label: 'Barnet' },
+          { value: 'E08000016', label: 'Barnsley' },
+        ],
+      },
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
@@ -264,18 +266,20 @@ describe('mapTableHeadersConfig', () => {
         subjectName: '',
         filters: {},
         footnotes: [],
-        locations: [
-          {
-            level: 'localAuthority',
-            label: 'Barnet (local authority)',
-            value: 'barnet',
-          },
-          {
-            level: 'localAuthorityDistrict',
-            label: 'Barnet (local authority district)',
-            value: 'barnet',
-          },
-        ],
+        locationsHierarchical: {
+          localAuthority: [
+            {
+              label: 'Barnet (local authority)',
+              value: 'barnet',
+            },
+          ],
+          localAuthorityDistrict: [
+            {
+              label: 'Barnet (local authority district)',
+              value: 'barnet',
+            },
+          ],
+        },
         indicators: [],
         boundaryLevels: [],
         timePeriodRange: [],
