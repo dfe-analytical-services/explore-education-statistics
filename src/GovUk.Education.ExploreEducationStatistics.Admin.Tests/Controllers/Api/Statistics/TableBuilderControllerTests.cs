@@ -39,9 +39,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             {
                 new()
                 {
-                    Filters = new List<string>
+                    Filters = new List<Guid>
                     {
-                        "filter1"
+                        Guid.NewGuid()
                     },
                     Location = new LocationViewModel
                     {
@@ -51,9 +51,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             Name = "name"
                         }
                     },
-                    Measures = new Dictionary<string, string>
+                    Measures = new Dictionary<Guid, string>
                     {
-                        { "key", "value" }
+                        { Guid.NewGuid(), "value" }
                     },
                     GeographicLevel = GeographicLevel.Country,
                     TimePeriod = "2017/18"

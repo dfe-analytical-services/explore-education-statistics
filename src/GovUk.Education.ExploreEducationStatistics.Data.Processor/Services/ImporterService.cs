@@ -286,7 +286,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 Id = observationId,
                 FilterItems = GetFilterItems(context, rowValues, colValues, subjectMeta.Filters, observationId),
-                // TODO should be able to drop GeographicLevel in future once the migration to Location is complete
                 GeographicLevel = geographicLevel,
                 LocationId = GetLocationIdOrCreate(rowValues, colValues, context),
                 Measures = GetMeasures(rowValues, colValues, subjectMeta.Indicators),
@@ -512,7 +511,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 observationsTable.Rows.Add(
                     o.Id,
                     o.SubjectId,
-                    // TODO should be able to drop GeographicLevel in future once the migration to Location is complete
                     o.GeographicLevel.GetEnumValue(),
                     o.LocationId,
                     o.Year,

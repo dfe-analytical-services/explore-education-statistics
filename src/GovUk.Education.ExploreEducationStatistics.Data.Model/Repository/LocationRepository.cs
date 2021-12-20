@@ -22,12 +22,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
         public async Task<Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>> GetLocationAttributes(Guid subjectId)
         {
-            var locationIds = _context.Observation
+            var locationIds = await _context.Observation
                 .AsNoTracking()
                 .Where(o => o.SubjectId == subjectId)
                 .Select(observation => observation.LocationId)
                 .Distinct()
-                .ToList();
+                .ToListAsync();
 
             var locations = await _context
                 .Location
@@ -65,7 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             var locationIds = observations
                 .AsNoTracking()
                 .Select(observation => observation.LocationId)
-                .Distinct();
+                .Distinct()
+                .ToList();
 
             var locations = await _context
                 .Location
