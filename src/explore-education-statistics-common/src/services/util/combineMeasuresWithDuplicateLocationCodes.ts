@@ -2,15 +2,13 @@ import {
   LocationOption,
   TableDataResult,
 } from '@common/services/tableBuilderService';
-import {
-  groupBy,
-  isEqual,
-  mapValues,
-  partition,
-  sum,
-  uniq,
-  uniqWith,
-} from 'lodash';
+import groupBy from 'lodash/groupBy';
+import isEqual from 'lodash/isEqual';
+import mapValues from 'lodash/mapValues';
+import partition from 'lodash/partition';
+import sum from 'lodash/sum';
+import uniq from 'lodash/uniq';
+import uniqWith from 'lodash/uniqWith';
 
 type LocationGroupingKey = {
   level: string;

@@ -5,7 +5,9 @@ import {
   TableDataResponse,
 } from '@common/services/tableBuilderService';
 import combineMeasuresWithDuplicateLocationCodes from '@common/services/util/combineMeasuresWithDuplicateLocationCodes';
-import { groupBy, mapValues, uniq } from 'lodash';
+import groupBy from 'lodash/groupBy';
+import mapValues from 'lodash/mapValues';
+import uniq from 'lodash/uniq';
 
 /**
  * Given a set of {@param tableData}, this function will merge any Locations
