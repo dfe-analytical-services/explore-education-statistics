@@ -6,9 +6,10 @@ import ButtonText from '@common/components/ButtonText';
 import { Form } from '@common/components/form';
 import FormFieldTextArea from '@common/components/form/FormFieldTextArea';
 import useFormSubmit from '@common/hooks/useFormSubmit';
+import useMounted from '@common/hooks/useMounted';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React from 'react';
+import React, { useRef } from 'react';
 
 interface FormValues {
   content: string;
@@ -22,8 +23,15 @@ interface Props {
 }
 
 const CommentEditForm = ({ comment, id, onCancel, onSubmit }: Props) => {
-  const { updateComment } = useCommentsContext();
   const { content } = comment;
+
+  const { updateComment } = useCommentsContext();
+
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
+  useMounted(() => {
+    textAreaRef?.current?.focus();
+  });
 
   const handleSubmit = useFormSubmit(async (values: FormValues) => {
     await updateComment({
@@ -46,12 +54,12 @@ const CommentEditForm = ({ comment, id, onCancel, onSubmit }: Props) => {
       {form => (
         <Form id={`${id}-editCommentForm`} showErrorSummary={false}>
           <FormFieldTextArea<FormValues>
-            focus
             data-testid="comment-textarea"
             hideLabel
             label="Comment"
             name="content"
             rows={3}
+            textAreaRef={textAreaRef}
           />
           <ButtonGroup className="govuk-!-margin-bottom-0">
             <Button type="submit" disabled={form.isSubmitting}>

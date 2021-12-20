@@ -9,7 +9,7 @@ import useFormSubmit from '@common/hooks/useFormSubmit';
 import usePinElementToContainer from '@common/hooks/usePinElementToContainer';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React, { RefObject, useRef } from 'react';
+import React, { RefObject, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 
 interface FormValues {
@@ -25,8 +25,17 @@ interface Props {
 
 const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
   const { addComment, setCurrentInteraction } = useCommentsContext();
+
   const ref = useRef<HTMLDivElement>(null);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+
   const { fixPosition, focus } = usePinElementToContainer(ref, containerRef);
+
+  useEffect(() => {
+    if (focus) {
+      textAreaRef?.current?.focus();
+    }
+  }, [focus]);
 
   const handleSubmit = useFormSubmit(async (values: FormValues) => {
     const newComment = await addComment(blockId, {
@@ -56,12 +65,12 @@ const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
         {form => (
           <Form id={`${blockId}-addCommentForm`} showErrorSummary={false}>
             <FormFieldTextArea<FormValues>
-              focus={focus}
               label="Comment"
               hideLabel
               name="content"
               data-testid="comment-textarea"
               rows={3}
+              textAreaRef={textAreaRef}
             />
             <ButtonGroup className="govuk-!-margin-bottom-2">
               <Button type="submit" disabled={form.isSubmitting}>
