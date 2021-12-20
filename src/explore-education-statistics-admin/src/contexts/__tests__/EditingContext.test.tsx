@@ -1,5 +1,5 @@
 import {
-  EditingProvider,
+  EditingContextProvider,
   EditingContextProviderProps,
   useEditingContext,
 } from '@admin/contexts/EditingContext';
@@ -11,7 +11,7 @@ describe('EditingContext', () => {
   type Props = OmitStrict<EditingContextProviderProps, 'children'>;
 
   const wrapper: FC<Props> = ({ ...props }) => (
-    <EditingProvider {...props}>{props.children}</EditingProvider>
+    <EditingContextProvider {...props}>{props.children}</EditingContextProvider>
   );
 
   test('setEditingMode', () => {

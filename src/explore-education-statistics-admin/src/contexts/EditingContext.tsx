@@ -61,7 +61,7 @@ export interface EditingContextProviderProps {
   unsavedBlocks?: string[];
 }
 
-export const EditingProvider = ({
+export const EditingContextProvider = ({
   children,
   editingMode: initialEditingMode,
   unresolvedComments: initialUnresolvedComments = {},

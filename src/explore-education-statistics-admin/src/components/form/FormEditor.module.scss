@@ -1,6 +1,8 @@
 @import '~govuk-frontend/govuk/base';
 @import '~explore-education-statistics-common/src/styles/mixins';
 
+$active-colour: lighten(govuk-colour('orange'), 10);
+
 .editor {
   background: govuk-colour('light-grey');
   border: $govuk-border-width-form-element solid $govuk-input-border-colour;
@@ -34,12 +36,12 @@
     background: lighten(govuk-colour('yellow'), 20);
   }
   :global(.commentStyle--active) {
-    background: lighten(govuk-colour('orange'), 10);
+    background: $active-colour;
   }
 }
 
 :global(.commentStyle--active) {
-  background: lighten(govuk-colour('orange'), 10);
+  background: $active-colour;
 }
 
 :global(.commentPlaceholderStyle) {

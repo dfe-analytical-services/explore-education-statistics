@@ -135,27 +135,25 @@ const useCKEditorConfig = ({
                 ? markerId.replace('comment:', '')
                 : markerId.replace('resolvedcomment:', '');
 
-              if (type === 'undoRemoveComment' || type === 'redoAddComment') {
-                reAddComment.current(blockId, commentId);
-                return;
-              }
-              if (type === 'undoAddComment' || type === 'redoRemoveComment') {
-                removeComment.current(blockId, commentId);
-                return;
-              }
-
-              if (
-                type === 'undoResolveComment' ||
-                type === 'redoUnresolveComment'
-              ) {
-                unresolveComment.current(blockId, commentId);
-                return;
-              }
-              if (
-                type === 'undoUnresolveComment' ||
-                type === 'redoResolveComment'
-              ) {
-                resolveComment.current(blockId, commentId);
+              switch (type) {
+                case 'undoRemoveComment':
+                case 'redoAddComment':
+                  reAddComment.current(blockId, commentId);
+                  break;
+                case 'undoAddComment':
+                case 'redoRemoveComment':
+                  removeComment.current(blockId, commentId);
+                  break;
+                case 'undoResolveComment':
+                case 'redoUnresolveComment':
+                  unresolveComment.current(blockId, commentId);
+                  break;
+                case 'undoUnresolveComment':
+                case 'redoResolveComment':
+                  resolveComment.current(blockId, commentId);
+                  break;
+                default:
+                  break;
               }
             },
           }

@@ -1,6 +1,6 @@
 import CommentAddForm from '@admin/components/comments/CommentAddForm';
 import { testComments } from '@admin/components/comments/__data__/testComments';
-import { CommentsProvider } from '@admin/contexts/CommentsContext';
+import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -45,7 +45,7 @@ describe('CommentAddForm', () => {
     handleSaveComment.mockResolvedValue(testComments[1]);
 
     render(
-      <CommentsProvider
+      <CommentsContextProvider
         comments={[]}
         onDeleteComment={jest.fn()}
         onSaveComment={handleSaveComment}
@@ -59,7 +59,7 @@ describe('CommentAddForm', () => {
           onCancel={noop}
           onSave={handleSave}
         />
-      </CommentsProvider>,
+      </CommentsContextProvider>,
     );
 
     await userEvent.type(

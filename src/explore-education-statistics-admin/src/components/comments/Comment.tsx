@@ -111,6 +111,7 @@ const Comment = ({ blockId, comment }: Props) => {
           {!isEditingComment && (
             <>
               <button
+                aria-hidden
                 className="govuk-visually-hidden"
                 type="button"
                 onBlur={toggleIsFocused.off}

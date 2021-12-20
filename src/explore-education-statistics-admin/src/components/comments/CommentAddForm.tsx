@@ -29,7 +29,7 @@ const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
   const ref = useRef<HTMLDivElement>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
 
-  const { fixPosition, focus } = usePinElementToContainer(ref, containerRef);
+  const { focus, positionStyle } = usePinElementToContainer(ref, containerRef);
 
   useEffect(() => {
     if (focus) {
@@ -47,12 +47,7 @@ const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
   });
 
   return (
-    <div
-      className={classNames(styles.container, {
-        [styles.fixPosition]: fixPosition,
-      })}
-      ref={ref}
-    >
+    <div className={classNames(styles.container, positionStyle)} ref={ref}>
       <Formik<FormValues>
         initialValues={{
           content: '',

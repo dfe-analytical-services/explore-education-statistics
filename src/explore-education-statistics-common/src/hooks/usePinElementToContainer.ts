@@ -1,5 +1,6 @@
 import useMounted from '@common/hooks/useMounted';
 import useToggle from '@common/hooks/useToggle';
+import styles from '@common/hooks/usePinElementToContainer.module.scss';
 import { RefObject } from 'react';
 
 /**
@@ -8,7 +9,7 @@ import { RefObject } from 'react';
 const usePinElementToContainer = (
   elementRef: RefObject<HTMLElement>,
   containerRef: RefObject<HTMLElement>,
-) => {
+): { focus: boolean; positionStyle?: string } => {
   const [fixPosition, toggleFixPosition] = useToggle(false);
   const [focus, toggleFocus] = useToggle(false);
 
@@ -36,7 +37,10 @@ const usePinElementToContainer = (
     return () => window.removeEventListener('scroll', setPosition);
   });
 
-  return { fixPosition, focus };
+  return {
+    focus,
+    positionStyle: fixPosition ? styles.fixPosition : undefined,
+  };
 };
 
 export default usePinElementToContainer;

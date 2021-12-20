@@ -1,6 +1,6 @@
 import CommentEditForm from '@admin/components/comments/CommentEditForm';
 import { testComments } from '@admin/components/comments/__data__/testComments';
-import { CommentsProvider } from '@admin/contexts/CommentsContext';
+import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { Comment } from '@admin/services/types/content';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -105,7 +105,7 @@ describe('CommentEditForm', () => {
     });
 
     render(
-      <CommentsProvider
+      <CommentsContextProvider
         comments={[]}
         onDeleteComment={jest.fn()}
         onSaveComment={jest.fn()}
@@ -119,7 +119,7 @@ describe('CommentEditForm', () => {
           onCancel={noop}
           onSubmit={handleSubmit}
         />
-      </CommentsProvider>,
+      </CommentsContextProvider>,
     );
 
     await userEvent.type(

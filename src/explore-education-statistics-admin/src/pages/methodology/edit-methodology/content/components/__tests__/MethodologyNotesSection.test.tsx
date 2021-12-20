@@ -1,6 +1,6 @@
 import MethodologyNotesSection from '@admin/pages/methodology/edit-methodology/content/components/MethodologyNotesSection';
 import { MethodologyContent } from '@admin/services/methodologyContentService';
-import { EditingProvider } from '@admin/contexts/EditingContext';
+import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import _methodologyNoteService, {
   MethodologyNote,
 } from '@admin/services/methodologyNoteService';
@@ -47,11 +47,11 @@ describe('MethodologyNotesSection', () => {
   describe('displaying notes', () => {
     test('renders correctly when there are no notes', () => {
       render(
-        <EditingProvider editingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithoutNotes}
           />
-        </EditingProvider>,
+        </EditingContextProvider>,
       );
       expect(screen.getByText('Last updated')).toBeInTheDocument();
       expect(screen.getByTestId('Last updated-value')).toHaveTextContent('TBA');
@@ -62,11 +62,11 @@ describe('MethodologyNotesSection', () => {
 
     test('renders correctly with notes', () => {
       render(
-        <EditingProvider editingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingProvider>,
+        </EditingContextProvider>,
       );
       expect(screen.getByText('Last updated')).toBeInTheDocument();
       expect(screen.getByTestId('Last updated date')).toHaveTextContent(
@@ -112,11 +112,11 @@ describe('MethodologyNotesSection', () => {
 
     test('renders correctly when there are no notes', () => {
       render(
-        <EditingProvider editingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithoutNotes}
           />
-        </EditingProvider>,
+        </EditingContextProvider>,
       );
       expect(screen.getByText('Last updated')).toBeInTheDocument();
       expect(screen.getByTestId('Last updated-value')).toHaveTextContent('TBA');
@@ -136,11 +136,11 @@ describe('MethodologyNotesSection', () => {
         notes: [oldNote, ...testMethodologyContentWithNotes.notes],
       };
       render(
-        <EditingProvider editingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithOldNote}
           />
-        </EditingProvider>,
+        </EditingContextProvider>,
       );
       expect(screen.getByText('Last updated')).toBeInTheDocument();
       expect(screen.getByTestId('Last updated date')).toHaveTextContent(
@@ -152,11 +152,11 @@ describe('MethodologyNotesSection', () => {
   describe('adding a note', () => {
     test('shows validation error if no note given and does not submit', async () => {
       render(
-        <EditingProvider editingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingProvider>,
+        </EditingContextProvider>,
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Add note' }));
@@ -195,11 +195,11 @@ describe('MethodologyNotesSection', () => {
         id: 'note-4',
       });
       render(
-        <EditingProvider editingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingProvider>,
+        </EditingContextProvider>,
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Add note' }));
@@ -241,11 +241,11 @@ describe('MethodologyNotesSection', () => {
   describe('editing a note', () => {
     test('shows validation error if note or date removed and does not submit', async () => {
       render(
-        <EditingProvider editingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingProvider>,
+        </EditingContextProvider>,
       );
 
       const notes = screen.getAllByRole('listitem');
@@ -298,11 +298,11 @@ describe('MethodologyNotesSection', () => {
         id: 'note-1',
       });
       render(
-        <EditingProvider editingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingProvider>,
+        </EditingContextProvider>,
       );
 
       const notes = screen.getAllByRole('listitem');
@@ -343,11 +343,11 @@ describe('MethodologyNotesSection', () => {
   describe('removing notes', () => {
     test('shows the confirm modal when clicking the Remove button', async () => {
       render(
-        <EditingProvider editingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingProvider>,
+        </EditingContextProvider>,
       );
 
       const notes = screen.getAllByRole('listitem');
@@ -373,11 +373,11 @@ describe('MethodologyNotesSection', () => {
 
     test('successfully removes a note', async () => {
       render(
-        <EditingProvider editingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
-        </EditingProvider>,
+        </EditingContextProvider>,
       );
 
       const notes = screen.getAllByRole('listitem');

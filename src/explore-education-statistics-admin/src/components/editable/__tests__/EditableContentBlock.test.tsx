@@ -1,6 +1,6 @@
 import { testComments } from '@admin/components/comments/__data__/testComments';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
-import { CommentsProvider } from '@admin/contexts/CommentsContext';
+import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -180,7 +180,7 @@ Test paragraph
   describe('comments allowed', () => {
     test('renders the view comments button with the number of unresolved comments', () => {
       render(
-        <CommentsProvider
+        <CommentsContextProvider
           comments={testComments}
           onDeleteComment={jest.fn()}
           onSaveComment={jest.fn()}
@@ -196,7 +196,7 @@ Test paragraph
             onSave={noop}
             onDelete={noop}
           />
-        </CommentsProvider>,
+        </CommentsContextProvider>,
       );
 
       expect(
@@ -206,7 +206,7 @@ Test paragraph
 
     test('clicking the view comments button opens the editor', () => {
       render(
-        <CommentsProvider
+        <CommentsContextProvider
           comments={testComments}
           onDeleteComment={jest.fn()}
           onSaveComment={jest.fn()}
@@ -222,7 +222,7 @@ Test paragraph
             onSave={noop}
             onDelete={noop}
           />
-        </CommentsProvider>,
+        </CommentsContextProvider>,
       );
 
       userEvent.click(

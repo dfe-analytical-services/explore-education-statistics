@@ -1,5 +1,5 @@
 import {
-  CommentsProvider,
+  CommentsContextProvider,
   CommentsContextProviderProps,
   useCommentsContext,
 } from '@admin/contexts/CommentsContext';
@@ -17,7 +17,9 @@ describe('CommentsContext', () => {
   type Props = OmitStrict<CommentsContextProviderProps, 'children'>;
 
   const wrapper: FC<Props> = ({ ...props }) => (
-    <CommentsProvider {...props}>{props.children}</CommentsProvider>
+    <CommentsContextProvider {...props}>
+      {props.children}
+    </CommentsContextProvider>
   );
 
   const blockId = 'block-id';
@@ -44,9 +46,11 @@ describe('CommentsContext', () => {
     resolved: '2021-11-30T13:55',
     resolvedBy: testCommentUser1,
   };
-  const unresolvedComment: Comment = { ...testComments[0] };
-  delete unresolvedComment.resolved;
-  delete unresolvedComment.resolvedBy;
+  const unresolvedComment: Comment = {
+    ...testComments[0],
+    resolved: undefined,
+    resolvedBy: undefined,
+  };
 
   const handleSaveComment = jest.fn();
   const handleDeletePendingComment = jest.fn();
@@ -54,19 +58,26 @@ describe('CommentsContext', () => {
   const handleUpdateUnresolvedComments = jest.fn();
   const handleUnsavedCommentDeletion = jest.fn();
 
+  const initialProps: Props = {
+    comments: testComments,
+    onSaveComment: handleSaveComment,
+    onDeleteComment: handleDeletePendingComment,
+    onSaveUpdatedComment: handleSaveUpdatedComment,
+    onUpdateUnresolvedComments: {
+      current: handleUpdateUnresolvedComments,
+    },
+    onUpdateUnsavedCommentDeletions: {
+      current: handleUnsavedCommentDeletion,
+    },
+  };
+
   test('addComment calls the save method and adds the new comment to the comments array', async () => {
     handleSaveComment.mockResolvedValue(addedComment);
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
       initialProps: {
+        ...initialProps,
         comments: [],
-        onDeleteComment: jest.fn(),
-        onSaveComment: handleSaveComment,
-        onSaveUpdatedComment: jest.fn(),
-        onUpdateUnresolvedComments: { current: handleUpdateUnresolvedComments },
-        onUpdateUnsavedCommentDeletions: {
-          current: jest.fn(),
-        },
       },
     });
     expect(result.current.comments).toEqual([]);
@@ -89,16 +100,7 @@ describe('CommentsContext', () => {
   test('removeComment removes comment from the comments array and adds it to pendingDeletions', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
-      initialProps: {
-        comments: testComments,
-        onDeleteComment: jest.fn(),
-        onSaveComment: jest.fn(),
-        onSaveUpdatedComment: jest.fn(),
-        onUpdateUnresolvedComments: { current: jest.fn() },
-        onUpdateUnsavedCommentDeletions: {
-          current: handleUnsavedCommentDeletion,
-        },
-      },
+      initialProps,
     });
     expect(result.current.comments).toEqual(testComments);
     expect(result.current.pendingDeletions).toEqual([]);
@@ -128,15 +130,9 @@ describe('CommentsContext', () => {
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
       initialProps: {
+        ...initialProps,
         comments: [testComments[0], testComments[1]],
         pendingDeletions: [testComments[2], testComments[3], testComments[4]],
-        onDeleteComment: handleDeletePendingComment,
-        onSaveComment: jest.fn(),
-        onSaveUpdatedComment: jest.fn(),
-        onUpdateUnresolvedComments: { current: jest.fn() },
-        onUpdateUnsavedCommentDeletions: {
-          current: jest.fn(),
-        },
       },
     });
     expect(result.current.comments).toEqual([testComments[0], testComments[1]]);
@@ -162,16 +158,7 @@ describe('CommentsContext', () => {
     handleSaveUpdatedComment.mockResolvedValue(resolvedComment);
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
-      initialProps: {
-        comments: testComments,
-        onDeleteComment: jest.fn(),
-        onSaveComment: jest.fn(),
-        onSaveUpdatedComment: handleSaveUpdatedComment,
-        onUpdateUnresolvedComments: { current: handleUpdateUnresolvedComments },
-        onUpdateUnsavedCommentDeletions: {
-          current: jest.fn(),
-        },
-      },
+      initialProps,
     });
     expect(result.current.comments[1].resolved).toBeUndefined();
 
@@ -198,16 +185,7 @@ describe('CommentsContext', () => {
     handleSaveUpdatedComment.mockResolvedValue(unresolvedComment);
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
-      initialProps: {
-        comments: testComments,
-        onDeleteComment: jest.fn(),
-        onSaveComment: jest.fn(),
-        onSaveUpdatedComment: handleSaveUpdatedComment,
-        onUpdateUnresolvedComments: { current: handleUpdateUnresolvedComments },
-        onUpdateUnsavedCommentDeletions: {
-          current: jest.fn(),
-        },
-      },
+      initialProps,
     });
     expect(result.current.comments[0].resolved).toEqual('2021-11-30T13:55');
 
@@ -234,16 +212,7 @@ describe('CommentsContext', () => {
     handleSaveUpdatedComment.mockResolvedValue(updatedComment);
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
-      initialProps: {
-        comments: testComments,
-        onDeleteComment: jest.fn(),
-        onSaveComment: jest.fn(),
-        onSaveUpdatedComment: handleSaveUpdatedComment,
-        onUpdateUnresolvedComments: { current: jest.fn() },
-        onUpdateUnsavedCommentDeletions: {
-          current: jest.fn(),
-        },
-      },
+      initialProps,
     });
     expect(result.current.comments[2].content).toEqual(testComments[2].content);
 
@@ -259,15 +228,9 @@ describe('CommentsContext', () => {
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
       initialProps: {
+        ...initialProps,
         comments: [testComments[0], testComments[1]],
         pendingDeletions: [testComments[2], testComments[3], testComments[4]],
-        onDeleteComment: jest.fn(),
-        onSaveComment: jest.fn(),
-        onSaveUpdatedComment: jest.fn(),
-        onUpdateUnresolvedComments: { current: jest.fn() },
-        onUpdateUnsavedCommentDeletions: {
-          current: handleUnsavedCommentDeletion,
-        },
       },
     });
 

@@ -1,6 +1,6 @@
 import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
-import { EditingProvider } from '@admin/contexts/EditingContext';
+import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
 import {
   ReleaseContentProvider,
@@ -23,7 +23,7 @@ const ReleaseContentPageLoaded = () => {
   const { canUpdateRelease, release } = useReleaseContentState();
 
   return (
-    <EditingProvider
+    <EditingContextProvider
       editingMode={canUpdateRelease ? 'edit' : 'preview'}
       unresolvedComments={getUnresolvedComments(release)}
     >
@@ -99,7 +99,7 @@ const ReleaseContentPageLoaded = () => {
           </>
         );
       }}
-    </EditingProvider>
+    </EditingContextProvider>
   );
 };
 

@@ -1,6 +1,6 @@
 import CommentsList from '@admin/components/comments/CommentsList';
 import { testComments } from '@admin/components/comments/__data__/testComments';
-import { CommentsProvider } from '@admin/contexts/CommentsContext';
+import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -11,7 +11,7 @@ describe('CommentsList', () => {
 
   test('displays unresolved comments ordered by marker position', () => {
     render(
-      <CommentsProvider
+      <CommentsContextProvider
         comments={testComments}
         markersOrder={testMarkersOrder}
         onDeleteComment={jest.fn()}
@@ -21,7 +21,7 @@ describe('CommentsList', () => {
         onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
       >
         <CommentsList blockId={blockId} />
-      </CommentsProvider>,
+      </CommentsContextProvider>,
     );
 
     const unresolvedComments = within(
@@ -35,7 +35,7 @@ describe('CommentsList', () => {
 
   test('displays resolved comments', () => {
     render(
-      <CommentsProvider
+      <CommentsContextProvider
         comments={testComments}
         markersOrder={testMarkersOrder}
         onDeleteComment={jest.fn()}
@@ -45,7 +45,7 @@ describe('CommentsList', () => {
         onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
       >
         <CommentsList blockId={blockId} />
-      </CommentsProvider>,
+      </CommentsContextProvider>,
     );
 
     userEvent.click(

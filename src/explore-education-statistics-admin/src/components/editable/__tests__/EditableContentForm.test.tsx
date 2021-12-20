@@ -4,7 +4,7 @@ import {
   testCommentUser2,
 } from '@admin/components/comments/__data__/testComments';
 import EditableContentForm from '@admin/components/editable/EditableContentForm';
-import { CommentsProvider } from '@admin/contexts/CommentsContext';
+import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { AuthContext, User } from '@admin/contexts/AuthContext';
 import { GlobalPermissions } from '@admin/services/permissionService';
 import { Comment } from '@admin/services/types/content';
@@ -115,7 +115,7 @@ describe('EditableContentForm', () => {
   describe('comments list', () => {
     test('renders the comments list if allowComments', () => {
       render(
-        <CommentsProvider
+        <CommentsContextProvider
           comments={testComments}
           onDeleteComment={jest.fn()}
           onSaveComment={jest.fn()}
@@ -131,7 +131,7 @@ describe('EditableContentForm', () => {
             onCancel={noop}
             onSubmit={noop}
           />
-        </CommentsProvider>,
+        </CommentsContextProvider>,
       );
       const unresolvedComments = within(
         screen.getByTestId('unresolvedComments'),
@@ -146,7 +146,7 @@ describe('EditableContentForm', () => {
             user: testUser1,
           }}
         >
-          <CommentsProvider
+          <CommentsContextProvider
             comments={testComments}
             onDeleteComment={jest.fn()}
             onSaveComment={jest.fn()}
@@ -162,7 +162,7 @@ describe('EditableContentForm', () => {
               onCancel={noop}
               onSubmit={noop}
             />
-          </CommentsProvider>
+          </CommentsContextProvider>
         </AuthContext.Provider>,
       );
 
@@ -208,7 +208,7 @@ describe('EditableContentForm', () => {
             user: testUser1,
           }}
         >
-          <CommentsProvider
+          <CommentsContextProvider
             comments={testComments}
             onDeleteComment={jest.fn()}
             onSaveComment={jest.fn()}
@@ -224,7 +224,7 @@ describe('EditableContentForm', () => {
               onCancel={noop}
               onSubmit={noop}
             />
-          </CommentsProvider>
+          </CommentsContextProvider>
         </AuthContext.Provider>,
       );
 
@@ -265,9 +265,9 @@ describe('EditableContentForm', () => {
       const handleUpdateComment = jest.fn();
       const unresolvedComment: Comment = {
         ...testComments[0],
+        resolved: undefined,
+        resolvedBy: undefined,
       };
-      unresolvedComment.resolved = undefined;
-      unresolvedComment.resolvedBy = undefined;
 
       handleUpdateComment.mockResolvedValue(unresolvedComment);
 
@@ -277,7 +277,7 @@ describe('EditableContentForm', () => {
             user: testUser1,
           }}
         >
-          <CommentsProvider
+          <CommentsContextProvider
             comments={testComments}
             onDeleteComment={jest.fn()}
             onSaveComment={jest.fn()}
@@ -293,7 +293,7 @@ describe('EditableContentForm', () => {
               onCancel={noop}
               onSubmit={noop}
             />
-          </CommentsProvider>
+          </CommentsContextProvider>
         </AuthContext.Provider>,
       );
 

@@ -77,7 +77,7 @@ export interface CommentsContextProviderProps {
   >;
 }
 
-export const CommentsProvider = ({
+export const CommentsContextProvider = ({
   children,
   comments: initialComments,
   markersOrder: initialMarkersOrder = [],

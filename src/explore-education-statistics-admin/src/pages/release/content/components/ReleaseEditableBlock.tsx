@@ -1,4 +1,4 @@
-import { CommentsProvider } from '@admin/contexts/CommentsContext';
+import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import { useEditingContext } from '@admin/contexts/EditingContext';
@@ -128,7 +128,7 @@ const ReleaseEditableBlock = ({
     case 'HtmlBlock':
     case 'MarkDownBlock':
       return (
-        <CommentsProvider
+        <CommentsContextProvider
           comments={block.comments}
           onDeleteComment={handleDeletePendingComment}
           onSaveComment={handleSaveComment}
@@ -156,7 +156,7 @@ const ReleaseEditableBlock = ({
               allowImages ? handleImageUploadCancel : undefined
             }
           />
-        </CommentsProvider>
+        </CommentsContextProvider>
       );
     default:
       return <div>Unable to edit content</div>;
