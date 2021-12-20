@@ -1,42 +1,53 @@
+import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
+import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
-import { EditableBlock } from '@admin/services/types/content';
-import Gate from '@common/components/Gate';
+import { Comment, EditableBlock } from '@admin/services/types/content';
+import releaseContentCommentService, {
+  AddComment,
+} from '@admin/services/releaseContentCommentService';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import Gate from '@common/components/Gate';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import isBrowser from '@common/utils/isBrowser';
-import { useEditingContext } from '@admin/contexts/EditingContext';
 import React, { useCallback } from 'react';
 import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
-import {
-  addUnsavedEdit,
-  removeUnsavedEdit,
-} from '@admin/pages/release/content/components/utils/unsavedEditsUtils';
+import useToggle from '@common/hooks/useToggle';
 
 interface Props {
+  allowComments?: boolean;
   allowImages?: boolean;
-  releaseId: string;
   block: EditableBlock;
-  sectionId: string;
   editable?: boolean;
+  releaseId: string;
+  sectionId: string;
   visible?: boolean;
-  onSave: (blockId: string, content: string) => void;
   onDelete: (blockId: string) => void;
+  onSave: (blockId: string, content: string) => void;
 }
 
 const ReleaseEditableBlock = ({
+  allowComments = false,
   allowImages = false,
-  releaseId,
   block,
-  sectionId,
+  releaseId,
   editable = true,
+  sectionId,
   visible,
-  onSave,
   onDelete,
+  onSave,
 }: Props) => {
+  const {
+    addUnsavedBlock,
+    clearUnsavedCommentDeletions,
+    removeUnsavedBlock,
+    updateUnresolvedComments,
+    updateUnsavedCommentDeletions,
+  } = useEditingContext();
   const blockId = `block-${block.id}`;
+  const [isSaving, toggleIsSaving] = useToggle(false);
 
   const getChartFile = useGetChartFile(releaseId);
 
@@ -48,15 +59,26 @@ const ReleaseEditableBlock = ({
     releaseId,
   });
 
-  const { unsavedEdits, setUnsavedEdits } = useEditingContext();
-
   const handleSave = useCallback(
-    (content: string) => {
+    async (content: string, isAutoSave?: boolean) => {
+      toggleIsSaving.on();
       const contentWithPlaceholders = insertReleaseIdPlaceholders(content);
-      onSave(block.id, contentWithPlaceholders);
-      setUnsavedEdits(removeUnsavedEdit(unsavedEdits, sectionId, block.id));
+      await onSave(block.id, contentWithPlaceholders);
+
+      if (!isAutoSave) {
+        clearUnsavedCommentDeletions(block.id);
+      }
+
+      toggleIsSaving.off();
+      removeUnsavedBlock(block.id);
     },
-    [block.id, sectionId, onSave, unsavedEdits, setUnsavedEdits],
+    [
+      block.id,
+      clearUnsavedCommentDeletions,
+      removeUnsavedBlock,
+      onSave,
+      toggleIsSaving,
+    ],
   );
 
   const handleDelete = useCallback(() => {
@@ -65,13 +87,27 @@ const ReleaseEditableBlock = ({
 
   const handleBlur = (isDirty: boolean) => {
     if (isDirty) {
-      setUnsavedEdits(addUnsavedEdit(unsavedEdits, sectionId, block.id));
+      addUnsavedBlock(block.id);
     }
   };
 
   const handleCancel = () => {
-    setUnsavedEdits(removeUnsavedEdit(unsavedEdits, sectionId, block.id));
+    removeUnsavedBlock(block.id);
   };
+
+  const handleSaveComment = async (comment: AddComment) =>
+    releaseContentCommentService.addContentSectionComment(
+      releaseId,
+      sectionId,
+      blockId.replace('block-', ''),
+      comment,
+    );
+
+  const handleDeletePendingComment = async (commentId: string) =>
+    releaseContentCommentService.deleteContentSectionComment(commentId);
+
+  const handleSaveUpdatedComment = async (comment: Comment) =>
+    releaseContentCommentService.updateContentSectionComment(comment);
 
   switch (block.type) {
     case 'DataBlock':
@@ -92,23 +128,35 @@ const ReleaseEditableBlock = ({
     case 'HtmlBlock':
     case 'MarkDownBlock':
       return (
-        <EditableContentBlock
-          editable={editable && !isBrowser('IE')}
-          id={blockId}
-          label="Content block"
-          hideLabel
-          value={block.body}
-          useMarkdown={block.type === 'MarkDownBlock'}
-          transformImageAttributes={transformImageAttributes}
-          handleBlur={handleBlur}
-          onCancel={handleCancel}
-          onSave={handleSave}
-          onDelete={handleDelete}
-          onImageUpload={allowImages ? handleImageUpload : undefined}
-          onImageUploadCancel={
-            allowImages ? handleImageUploadCancel : undefined
-          }
-        />
+        <CommentsContextProvider
+          comments={block.comments}
+          onDeleteComment={handleDeletePendingComment}
+          onSaveComment={handleSaveComment}
+          onSaveUpdatedComment={handleSaveUpdatedComment}
+          onUpdateUnresolvedComments={updateUnresolvedComments}
+          onUpdateUnsavedCommentDeletions={updateUnsavedCommentDeletions}
+        >
+          <EditableContentBlock
+            allowComments={allowComments}
+            autoSave
+            editable={editable && !isBrowser('IE')}
+            handleBlur={handleBlur}
+            hideLabel
+            id={blockId}
+            isSaving={isSaving}
+            label="Content block"
+            transformImageAttributes={transformImageAttributes}
+            useMarkdown={block.type === 'MarkDownBlock'}
+            value={block.body}
+            onCancel={handleCancel}
+            onSave={handleSave}
+            onDelete={handleDelete}
+            onImageUpload={allowImages ? handleImageUpload : undefined}
+            onImageUploadCancel={
+              allowImages ? handleImageUploadCancel : undefined
+            }
+          />
+        </CommentsContextProvider>
       );
     default:
       return <div>Unable to edit content</div>;

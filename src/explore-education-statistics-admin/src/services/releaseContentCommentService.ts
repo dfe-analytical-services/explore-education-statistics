@@ -27,7 +27,7 @@ const releaseContentCommentService = {
     );
   },
 
-  updateContentSectionComment(comment: UpdateComment): Promise<Comment> {
+  updateContentSectionComment(comment: Comment): Promise<Comment> {
     return client.put(`/comment/${comment.id}`, comment);
   },
 

@@ -1,4 +1,4 @@
-import { toolbarConfigs } from '@admin/components/form/FormEditor';
+import { toolbarConfigs } from '@admin/config/ckEditorConfig';
 import FormFieldEditor from '@admin/components/form/FormFieldEditor';
 import toHtml from '@admin/utils/markdown/toHtml';
 import toMarkdown from '@admin/utils/markdown/toMarkdown';

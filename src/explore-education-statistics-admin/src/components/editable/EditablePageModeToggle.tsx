@@ -1,4 +1,4 @@
-import { useEditingContext, EditingMode } from '@admin/contexts/EditingContext';
+import { EditingMode, useEditingContext } from '@admin/contexts/EditingContext';
 import FormRadioGroup from '@common/components/form/FormRadioGroup';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';

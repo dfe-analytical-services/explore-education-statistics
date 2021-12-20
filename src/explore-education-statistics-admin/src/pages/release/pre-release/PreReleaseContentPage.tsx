@@ -26,7 +26,6 @@ const PreReleaseContentPage = ({
             value={{
               ...content,
               canUpdateRelease: false,
-              unresolvedComments: [],
             }}
           >
             <PageTitle

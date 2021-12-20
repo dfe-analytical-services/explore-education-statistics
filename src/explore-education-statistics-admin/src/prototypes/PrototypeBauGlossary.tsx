@@ -93,6 +93,7 @@ const PrototypeBauGlossary = () => {
               />
             </FormGroup>
             <FormEditor
+              blockId="1"
               id="description"
               label="Item description"
               value={glossaryDescription || ''}

@@ -1,5 +1,4 @@
 import ButtonLink from '@admin/components/ButtonLink';
-import { CommentsChangeHandler } from '@admin/components/editable/Comments';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
@@ -95,18 +94,6 @@ const ReleaseContent = () => {
     [release, actions],
   );
 
-  const updateBlockComments: CommentsChangeHandler = useCallback(
-    async (blockId, comments) => {
-      await actions.updateBlockComments({
-        sectionId: release.summarySection.id,
-        blockId,
-        sectionKey: 'summarySection',
-        comments,
-      });
-    },
-    [actions, release.summarySection.id],
-  );
-
   if (!release) {
     return null;
   }
@@ -145,15 +132,14 @@ const ReleaseContent = () => {
             {release.summarySection && (
               <>
                 <EditableSectionBlocks
-                  allowComments
                   blocks={release.summarySection.content}
                   sectionId={release.summarySection.id}
-                  onBlockCommentsChange={updateBlockComments}
                   renderBlock={block => (
                     <ReleaseBlock block={block} releaseId={release.id} />
                   )}
                   renderEditableBlock={block => (
                     <ReleaseEditableBlock
+                      allowComments
                       block={block}
                       releaseId={release.id}
                       sectionId={release.summarySection.id}
