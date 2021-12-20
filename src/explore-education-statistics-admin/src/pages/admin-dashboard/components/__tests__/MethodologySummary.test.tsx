@@ -272,13 +272,27 @@ describe('MethodologySummary', () => {
 
       expect(
         screen.getByRole('link', {
-          name: 'Link to an externally hosted methodology',
+          name: 'Use an external methodology',
         }),
       ).toBeInTheDocument();
     });
   });
 
   describe('renders correctly when no Methodology is supplied', () => {
+    test('the no methodologies warning is shown', () => {
+      render(
+        <MemoryRouter>
+          <MethodologySummary
+            publication={testPublicationNoMethodology}
+            topicId={testTopicId}
+            onChangePublication={noop}
+          />
+        </MemoryRouter>,
+      );
+
+      expect(screen.getByText('No methodologies added')).toBeInTheDocument();
+    });
+
     test('the correct buttons are shown if the user has permission to use them', () => {
       render(
         <MemoryRouter>
@@ -291,28 +305,20 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.queryByTestId('methodology-summary-link'),
-      ).not.toBeInTheDocument();
-
-      expect(
         screen.getByRole('button', { name: 'Create methodology' }),
       ).toBeInTheDocument();
 
       expect(
         screen.getByRole('link', {
-          name: 'Adopt a methodology',
+          name: 'Adopt an existing methodology',
         }),
       ).toBeInTheDocument();
 
       expect(
         screen.getByRole('link', {
-          name: 'Link to an externally hosted methodology',
+          name: 'Use an external methodology',
         }),
       ).toBeInTheDocument();
-
-      expect(
-        screen.queryByText('No methodologies added.'),
-      ).not.toBeInTheDocument();
     });
 
     test('the methodology buttons are not shown if the user does not have permission to use them', () => {
@@ -335,26 +341,20 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.queryByTestId('methodology-summary-link'),
-      ).not.toBeInTheDocument();
-
-      expect(
         screen.queryByRole('button', { name: 'Create methodology' }),
       ).not.toBeInTheDocument();
 
       expect(
         screen.queryByRole('link', {
-          name: 'Link to an externally hosted methodology',
+          name: 'Use an external methodology',
         }),
       ).not.toBeInTheDocument();
 
       expect(
         screen.queryByRole('link', {
-          name: 'Adopt a methodology',
+          name: 'Adopt an existing methodology',
         }),
       ).not.toBeInTheDocument();
-
-      expect(screen.getByText('No methodologies added.')).toBeInTheDocument();
     });
   });
 
@@ -383,11 +383,11 @@ describe('MethodologySummary', () => {
       expect(screen.getByText('this is the release note')).toBeInTheDocument();
 
       expect(
-        screen.getByRole('link', { name: 'View this methodology' }),
+        screen.getByRole('link', { name: 'View methodology' }),
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('link', { name: 'Edit this methodology' }),
+        screen.queryByRole('link', { name: 'Edit methodology' }),
       ).not.toBeInTheDocument();
     });
 
@@ -456,11 +456,11 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.getByRole('link', { name: 'Edit this methodology' }),
+        screen.getByRole('link', { name: 'Edit methodology' }),
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('link', { name: 'View this methodology' }),
+        screen.queryByRole('link', { name: 'View methodology' }),
       ).not.toBeInTheDocument();
     });
 
@@ -497,11 +497,11 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.getByRole('link', { name: 'Edit this methodology' }),
+        screen.getByRole('link', { name: 'Edit methodology' }),
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('link', { name: 'View this methodology' }),
+        screen.queryByRole('link', { name: 'View methodology' }),
       ).not.toBeInTheDocument();
     });
 
@@ -538,11 +538,11 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.getByRole('link', { name: 'Edit this methodology' }),
+        screen.getByRole('link', { name: 'Edit methodology' }),
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('link', { name: 'View this methodology' }),
+        screen.queryByRole('link', { name: 'View methodology' }),
       ).not.toBeInTheDocument();
     });
   });
@@ -572,11 +572,11 @@ describe('MethodologySummary', () => {
       expect(screen.getByText('this is the release note')).toBeInTheDocument();
 
       expect(
-        screen.getByRole('link', { name: 'View this amendment' }),
+        screen.getByRole('link', { name: 'View amendment' }),
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('link', { name: 'Edit this amendment' }),
+        screen.queryByRole('link', { name: 'Edit amendment' }),
       ).not.toBeInTheDocument();
     });
 
@@ -630,11 +630,11 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.getByRole('link', { name: 'Edit this amendment' }),
+        screen.getByRole('link', { name: 'Edit amendment' }),
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('link', { name: 'View this amendment' }),
+        screen.queryByRole('link', { name: 'View amendment' }),
       ).not.toBeInTheDocument();
     });
 
@@ -672,11 +672,11 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.getByRole('link', { name: 'Edit this amendment' }),
+        screen.getByRole('link', { name: 'Edit amendment' }),
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('link', { name: 'View this amendment' }),
+        screen.queryByRole('link', { name: 'View amendment' }),
       ).not.toBeInTheDocument();
     });
 
@@ -714,11 +714,11 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.getByRole('link', { name: 'Edit this amendment' }),
+        screen.getByRole('link', { name: 'Edit amendment' }),
       ).toBeInTheDocument();
 
       expect(
-        screen.queryByRole('link', { name: 'View this amendment' }),
+        screen.queryByRole('link', { name: 'View amendment' }),
       ).not.toBeInTheDocument();
     });
   });
@@ -741,7 +741,7 @@ describe('MethodologySummary', () => {
 
       userEvent.click(
         screen.getByRole('link', {
-          name: 'Link to an externally hosted methodology',
+          name: 'Use an external methodology',
         }),
       );
 

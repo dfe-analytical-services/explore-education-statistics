@@ -1,4 +1,5 @@
 import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
+import publicationSummaryStyles from '@admin/pages/admin-dashboard/components/PublicationSummary.module.scss';
 import {
   getReleaseApprovalStatusLabel,
   getReleaseSummaryLabel,
@@ -6,6 +7,7 @@ import {
 import { Release } from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import FormattedDate from '@common/components/FormattedDate';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
@@ -16,12 +18,11 @@ import {
 } from '@common/utils/date/partialDate';
 import React, { ReactNode } from 'react';
 import LazyLoad from 'react-lazyload';
-import LoadingSpinner from '@common/components/LoadingSpinner';
+import classNames from 'classnames';
 
 interface Props {
   release: Release;
   actions: ReactNode;
-  secondaryActions?: ReactNode;
   open?: boolean;
   children?: ReactNode;
 }
@@ -29,7 +30,6 @@ interface Props {
 const ReleaseSummary = ({
   release,
   actions,
-  secondaryActions,
   open = false,
   children,
 }: Props) => {
@@ -72,48 +72,59 @@ const ReleaseSummary = ({
         </TagGroup>
       }
     >
-      <SummaryList className="govuk-!-margin-bottom-3">
-        <SummaryListItem term="Publish date">
-          <FormattedDate>
-            {release.published || release.publishScheduled || ''}
-          </FormattedDate>
-        </SummaryListItem>
+      <div className={publicationSummaryStyles.detailsInner}>
+        <div className={publicationSummaryStyles.sectionContent}>
+          <SummaryList className="govuk-!-margin-bottom-3">
+            <SummaryListItem term="Publish date">
+              {release.published || release.publishScheduled ? (
+                <FormattedDate>
+                  {release.published || release.publishScheduled || ''}
+                </FormattedDate>
+              ) : (
+                'Not yet published'
+              )}
+            </SummaryListItem>
 
-        {isValidPartialDate(release.nextReleaseDate) && (
-          <SummaryListItem term="Next release date">
-            <time>{formatPartialDate(release.nextReleaseDate)}</time>
-          </SummaryListItem>
-        )}
-        {release.approvalStatus === 'Approved' && (
-          <SummaryListItem term="Release process status">
-            <ReleaseServiceStatus releaseId={release.id} />
-          </SummaryListItem>
-        )}
-        <SummaryListItem term="Lead statistician">
-          {release.contact && (
-            <span>
-              {release.contact.contactName}
-              <br />
-              <a href="mailto:{lead.teamEmail}">{release.contact.teamEmail}</a>
-              <br />
-              {release.contact.contactTelNo}
-            </span>
+            {isValidPartialDate(release.nextReleaseDate) && (
+              <SummaryListItem term="Next release date">
+                <time>{formatPartialDate(release.nextReleaseDate)}</time>
+              </SummaryListItem>
+            )}
+            {release.approvalStatus === 'Approved' && (
+              <SummaryListItem term="Release process status">
+                <ReleaseServiceStatus releaseId={release.id} />
+              </SummaryListItem>
+            )}
+            <SummaryListItem term="Lead statistician">
+              {release.contact && (
+                <span>
+                  {release.contact.contactName}
+                  <br />
+                  <a href="mailto:{lead.teamEmail}">
+                    {release.contact.teamEmail}
+                  </a>
+                  <br />
+                  {release.contact.contactTelNo}
+                </span>
+              )}
+            </SummaryListItem>
+            {release.latestInternalReleaseNote && (
+              <SummaryListItem term="Internal note">
+                <span className="dfe-multiline-content">
+                  {release.latestInternalReleaseNote}
+                </span>
+              </SummaryListItem>
+            )}
+          </SummaryList>
+          {children}
+        </div>
+        <div
+          className={classNames(
+            publicationSummaryStyles.sectionActions,
+            publicationSummaryStyles.detailsActions,
           )}
-        </SummaryListItem>
-        {release.latestInternalReleaseNote && (
-          <SummaryListItem term="Internal note">
-            <span className="dfe-multiline-content">
-              {release.latestInternalReleaseNote}
-            </span>
-          </SummaryListItem>
-        )}
-      </SummaryList>
-      {children}
-
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">{actions}</div>
-        <div className="govuk-grid-column-one-third dfe-align--right">
-          {secondaryActions}
+        >
+          {actions}
         </div>
       </div>
     </Details>

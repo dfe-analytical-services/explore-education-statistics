@@ -25,7 +25,7 @@ Publish release
 
 Navigate to publication on admin dashboard
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user clicks link    Manage this publication    ${accordion}
+    user clicks link    Manage publication    ${accordion}
     user waits until page contains title    Manage publication
 
 Update publication details

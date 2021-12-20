@@ -1,0 +1,58 @@
+@import '~govuk-frontend/govuk/base';
+
+.section {
+  border-bottom: 1px solid $govuk-border-colour;
+  margin-bottom: govuk-spacing(3);
+  padding-bottom: govuk-spacing(6);
+
+  @include govuk-media-query($from: desktop) {
+    display: flex;
+  }
+
+  &.lastSection {
+    border: 0;
+  }
+}
+
+.sectionHeading {
+  padding-top: govuk-spacing(2);
+
+  @include govuk-media-query($from: desktop) {
+    flex-basis: 20%;
+    flex-shrink: 0;
+  }
+}
+
+.sectionContent {
+  @include govuk-media-query($from: desktop) {
+    flex-basis: 60%;
+    flex-grow: 1;
+  }
+}
+
+.sectionActions {
+  @include govuk-media-query($from: desktop) {
+    border-left: 1px solid $govuk-border-colour;
+    flex-basis: 20%;
+    flex-shrink: 0;
+    margin-left: govuk-spacing(4);
+    padding: govuk-spacing(3) 0 0 govuk-spacing(4);
+  }
+
+  &.detailsActions {
+    @include govuk-media-query($from: desktop) {
+      flex-basis: calc(25% - 15px);
+    }
+  }
+
+  :global(.govuk-button) {
+    width: 100%;
+  }
+}
+
+.detailsInner {
+  @include govuk-media-query($from: desktop) {
+    display: flex;
+    margin-right: govuk-spacing(3) * -1;
+  }
+}

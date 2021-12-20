@@ -1,4 +1,7 @@
 import ButtonLink from '@admin/components/ButtonLink';
+import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
+import MethodologySummary from '@admin/pages/admin-dashboard/components/MethodologySummary';
+import styles from '@admin/pages/admin-dashboard/components/PublicationSummary.module.scss';
 import {
   publicationEditRoute,
   publicationManageTeamAccessRoute,
@@ -7,11 +10,12 @@ import {
 } from '@admin/routes/routes';
 import { MyPublication } from '@admin/services/publicationService';
 import { Release } from '@admin/services/releaseService';
-import ButtonGroup from '@common/components/ButtonGroup';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
+import WarningMessage from '@common/components/WarningMessage';
 import React from 'react';
 import { generatePath } from 'react-router';
-import NonScheduledReleaseSummary from './NonScheduledReleaseSummary';
-import MethodologySummary from './MethodologySummary';
+import classNames from 'classnames';
 
 export interface Props {
   publication: MyPublication;
@@ -30,13 +34,72 @@ const PublicationSummary = ({
 
   const noAmendmentInProgressFilter = (release: Release) =>
     !releases.some(r => r.amendment && r.previousVersionId === release.id);
+
   return (
     <>
-      <table>
-        <tbody>
-          <tr>
-            <th className="govuk-!-width-one-quarter">Team</th>
-            <td className="govuk-!-width-one-half">
+      <div className={styles.section}>
+        <h5 className={`govuk-heading-s ${styles.sectionHeading}`}>Releases</h5>
+        <div
+          className={styles.sectionContent}
+          data-testid={`Releases for ${publication.title}`}
+        >
+          {releases.length > 0 ? (
+            <ul className="govuk-list govuk-!-margin-top-2">
+              {releases.filter(noAmendmentInProgressFilter).map(release => (
+                <li key={release.id}>
+                  <NonScheduledReleaseSummary
+                    includeCreateAmendmentControls
+                    onAmendmentCancelled={onChangePublication}
+                    release={release}
+                  />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <WarningMessage className="govuk-!-margin-bottom-2">
+              No releases created
+            </WarningMessage>
+          )}
+          {permissions.canCreateReleases && (
+            <ButtonLink
+              className="govuk-!-margin-bottom-0"
+              to={generatePath(releaseCreateRoute.path, {
+                publicationId: id,
+              })}
+              data-testid={`Create new release link for ${title}`}
+            >
+              Create new release
+            </ButtonLink>
+          )}
+        </div>
+      </div>
+
+      <div className={styles.section}>
+        <h5 className={`govuk-heading-s ${styles.sectionHeading}`}>
+          Methodologies
+        </h5>
+        <div
+          className={styles.sectionContent}
+          data-testid={`Methodology for ${publication.title}`}
+        >
+          <MethodologySummary
+            publication={publication}
+            topicId={topicId}
+            onChangePublication={onChangePublication}
+          />
+        </div>
+      </div>
+
+      <div className={classNames(styles.section, styles.lastSection)}>
+        <h5 className={`govuk-heading-s ${styles.sectionHeading}`}>
+          Publication details
+        </h5>
+        <div
+          className={styles.sectionContent}
+          data-testid={`Details for ${publication.title}`}
+        >
+          <SummaryList className="govuk-!-margin-bottom-0">
+            <SummaryListItem term="Team">
               <p
                 className="govuk-!-margin-bottom-1"
                 data-testid={`Team name for ${publication.title}`}
@@ -54,11 +117,11 @@ const PublicationSummary = ({
                   </a>
                 </p>
               )}
-            </td>
-          </tr>
-          <tr>
-            <th>Contact</th>
-            <td>
+            </SummaryListItem>
+          </SummaryList>
+
+          <SummaryList>
+            <SummaryListItem term="Contact">
               <p
                 className="govuk-!-margin-bottom-1"
                 data-testid={`Contact name for ${publication.title}`}
@@ -76,85 +139,43 @@ const PublicationSummary = ({
                   </a>
                 </p>
               )}
-            </td>
-          </tr>
-          <tr>
-            <th>Methodologies</th>
-            <td data-testid={`Methodology for ${publication.title}`}>
-              <MethodologySummary
-                publication={publication}
-                topicId={topicId}
-                onChangePublication={onChangePublication}
-              />
-            </td>
-          </tr>
-          {permissions.canUpdatePublication && (
-            <tr>
-              <th>Manage</th>
-              <td>
-                <ButtonGroup className="govuk-!-margin-bottom-2">
-                  <ButtonLink
-                    data-testid={`Edit publication link for ${publication.title}`}
-                    to={generatePath<PublicationRouteParams>(
-                      publicationEditRoute.path,
-                      {
-                        publicationId: publication.id,
-                      },
-                    )}
-                  >
-                    Manage this publication
-                  </ButtonLink>
-                  {showManageTeamAccessButton && (
-                    <ButtonLink
-                      data-testid={`Manage team access for publication ${publication.title}`}
-                      to={generatePath<PublicationRouteParams>(
-                        publicationManageTeamAccessRoute.path,
-                        {
-                          publicationId: publication.id,
-                        },
-                      )}
-                    >
-                      Manage team access
-                    </ButtonLink>
-                  )}
-                </ButtonGroup>
-              </td>
-            </tr>
-          )}
-          <tr>
-            <th>Releases</th>
-            <td colSpan={2} data-testid={`Releases for ${publication.title}`}>
-              <ButtonGroup className="govuk-!-margin-bottom-2">
-                {permissions.canCreateReleases && (
-                  <ButtonLink
-                    to={generatePath(releaseCreateRoute.path, {
-                      publicationId: id,
-                    })}
-                    data-testid={`Create new release link for ${title}`}
-                  >
-                    Create new release
-                  </ButtonLink>
-                )}
-              </ButtonGroup>
-              {releases.length > 0 ? (
-                <ul className="govuk-list">
-                  {releases.filter(noAmendmentInProgressFilter).map(release => (
-                    <li key={release.id}>
-                      <NonScheduledReleaseSummary
-                        includeCreateAmendmentControls
-                        onAmendmentCancelled={onChangePublication}
-                        release={release}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No releases created</p>
+            </SummaryListItem>
+          </SummaryList>
+        </div>
+
+        {permissions.canUpdatePublication && (
+          <div className={styles.sectionActions}>
+            <ButtonLink
+              className="govuk-!-width-full"
+              data-testid={`Edit publication link for ${publication.title}`}
+              to={generatePath<PublicationRouteParams>(
+                publicationEditRoute.path,
+                {
+                  publicationId: publication.id,
+                },
               )}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              variant="secondary"
+            >
+              Manage publication
+            </ButtonLink>
+            {showManageTeamAccessButton && (
+              <ButtonLink
+                className="govuk-!-width-full"
+                data-testid={`Manage team access for publication ${publication.title}`}
+                to={generatePath<PublicationRouteParams>(
+                  publicationManageTeamAccessRoute.path,
+                  {
+                    publicationId: publication.id,
+                  },
+                )}
+                variant="secondary"
+              >
+                Manage team access
+              </ButtonLink>
+            )}
+          </div>
+        )}
+      </div>
     </>
   );
 };
