@@ -38,7 +38,7 @@ user changes to analyst1
     user signs in as analyst1    False
 
 user signs out
-    user clicks link    Sign out
+    user clicks link    Sign out    css:#navigation
     user waits until h1 is visible    Signed out
     user waits until page contains    You have successfully signed out
 
