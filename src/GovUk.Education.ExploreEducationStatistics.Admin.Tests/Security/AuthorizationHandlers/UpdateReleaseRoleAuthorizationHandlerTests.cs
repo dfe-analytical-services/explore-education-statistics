@@ -29,11 +29,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public void CanUpdateReleaseRolesAuthorizationHandler_Contributor_SucceedsWithPublicationOwner()
+        public async Task CanUpdateReleaseRolesAuthorizationHandler_Contributor_SucceedsWithPublicationOwner()
         {
             var publication = new Publication {Id = Guid.NewGuid()};
             var tuple = TupleOf(publication, ReleaseRole.Contributor);
-            AssertHandlerOnlySucceedsWithPublicationRole
+            await AssertHandlerOnlySucceedsWithPublicationRoles
                 <UpdateReleaseRoleRequirement, Tuple<Publication, ReleaseRole>>(
                     publication.Id,
                     tuple,
@@ -45,11 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public void CanUpdateReleaseRolesAuthorizationHandler_NotContributor_FailsWithPublicationOwner()
+        public async Task CanUpdateReleaseRolesAuthorizationHandler_NotContributor_FailsWithPublicationOwner()
         {
             var publication = new Publication {Id = Guid.NewGuid()};
             var tuple = TupleOf(publication, ReleaseRole.PrereleaseViewer);
-            AssertHandlerOnlySucceedsWithPublicationRole
+            await AssertHandlerOnlySucceedsWithPublicationRoles
                 <UpdateReleaseRoleRequirement, Tuple<Publication, ReleaseRole>>(
                     publication.Id,
                     tuple,

@@ -124,6 +124,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
                 options.AddPolicy(SecurityPolicies.CanUpdateSpecificComment.ToString(), policy =>
                     policy.Requirements.Add(new UpdateSpecificCommentRequirement()));
 
+                // does this user have permission to delete a specific Comment?
+                options.AddPolicy(SecurityPolicies.CanDeleteSpecificComment.ToString(), policy =>
+                    policy.Requirements.Add(new DeleteSpecificCommentRequirement()));
+
                 // does this user have permission to cancel an ongoing file import?
                 options.AddPolicy(SecurityPolicies.CanCancelOngoingImports.ToString(), policy =>
                     policy.Requirements.Add(new CancelSpecificFileImportRequirement()));
@@ -243,6 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
             services.AddTransient<IAuthorizationHandler, ViewSpecificPreReleaseSummaryAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ResolveSpecificCommentAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateSpecificCommentAuthorizationHandler>();
+            services.AddTransient<IAuthorizationHandler, DeleteSpecificCommentAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, CancelSpecificFileImportAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, ViewReleaseStatusHistoryAuthorizationHandler>();
             services.AddTransient<IAuthorizationHandler, UpdateReleaseRoleAuthorizationHandler>();

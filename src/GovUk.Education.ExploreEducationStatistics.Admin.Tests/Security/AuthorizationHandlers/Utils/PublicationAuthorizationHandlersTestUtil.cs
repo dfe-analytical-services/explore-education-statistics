@@ -126,60 +126,62 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public List<UserPublicationRole>? UserPublicationRoles { get; set; }
         }
 
-        public static async void AssertHandlerOnlySucceedsWithPublicationRole<TRequirement, TEntity>(
+        public static async Task AssertHandlerOnlySucceedsWithPublicationRoles<TRequirement, TEntity>(
             Guid publicationId,
             TEntity handleRequirementArgument,
             Action<ContentDbContext> addToDbHandler,
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            params PublicationRole[] successfulRoles)
+            params PublicationRole[] rolesExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
             var allPublicationRoles = GetEnumValues<PublicationRole>();
             var userId = Guid.NewGuid();
 
-            allPublicationRoles.ForEach(async role =>
-            {
-                var contentDbContextId = Guid.NewGuid().ToString();
-                using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await allPublicationRoles
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async role =>
                 {
-                    addToDbHandler(contentDbContext);
-                    await contentDbContext.AddAsync(new UserPublicationRole
+                    var contentDbContextId = Guid.NewGuid().ToString();
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        UserId = userId,
-                        Role = role,
-                        PublicationId = publicationId,
-                    });
-                    await contentDbContext.SaveChangesAsync();
-                }
-
-                using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var user = CreateClaimsPrincipal(userId);
-                    var authContext = new AuthorizationHandlerContext(
-                        new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
-                        user, handleRequirementArgument);
-
-                    var handler = handlerSupplier(contentDbContext);
-                    await handler.HandleAsync(authContext);
-                    if (successfulRoles.Contains(role))
-                    {
-                        Assert.True(authContext.HasSucceeded, $"Should succeed with role {role.ToString()}");
+                        addToDbHandler(contentDbContext);
+                        await contentDbContext.AddAsync(new UserPublicationRole
+                        {
+                            UserId = userId,
+                            Role = role,
+                            PublicationId = publicationId,
+                        });
+                        await contentDbContext.SaveChangesAsync();
                     }
-                    else
+
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        Assert.False(authContext.HasSucceeded, $"Should fail with role {role.ToString()}");
+                        var user = CreateClaimsPrincipal(userId);
+                        var authContext = new AuthorizationHandlerContext(
+                            new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
+                            user, handleRequirementArgument);
+
+                        var handler = handlerSupplier(contentDbContext);
+                        await handler.HandleAsync(authContext);
+                        if (rolesExpectedToSucceed.Contains(role))
+                        {
+                            Assert.True(authContext.HasSucceeded, $"Should succeed with role {role.ToString()}");
+                        }
+                        else
+                        {
+                            Assert.False(authContext.HasSucceeded, $"Should fail with role {role.ToString()}");
+                        }
                     }
-                }
-            });
+                });
 
             // NOTE: Permission should fail if user no publication role
-            using (var contentDbContext = InMemoryApplicationDbContext("no-publication-role"))
+            await using (var contentDbContext = InMemoryApplicationDbContext("no-publication-role"))
             {
                 addToDbHandler(contentDbContext);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            using (var contentDbContext = InMemoryApplicationDbContext("no-publication-role"))
+            await using (var contentDbContext = InMemoryApplicationDbContext("no-publication-role"))
             {
                 var user = CreateClaimsPrincipal(userId);
                 var authContext = new AuthorizationHandlerContext(

@@ -55,14 +55,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public void ViewLegacyRelease_PublicationRoles()
+            public async Task ViewLegacyRelease_PublicationRoles()
             {
                 var legacyRelease = new LegacyRelease
                 {
                     PublicationId = Guid.NewGuid(),
                 };
 
-                AssertHandlerOnlySucceedsWithPublicationRole<ViewLegacyReleaseRequirement, LegacyRelease>(
+                await AssertHandlerOnlySucceedsWithPublicationRoles<ViewLegacyReleaseRequirement, LegacyRelease>(
                     legacyRelease.PublicationId,
                     legacyRelease,
                     contentDbContext => contentDbContext.Add(legacyRelease),
@@ -88,14 +88,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public void UpdateLegacyRelease_PublicationRoles()
+            public async Task UpdateLegacyRelease_PublicationRoles()
             {
                 var legacyRelease = new LegacyRelease
                 {
                     PublicationId = Guid.NewGuid(),
                 };
 
-                AssertHandlerOnlySucceedsWithPublicationRole<UpdateLegacyReleaseRequirement, LegacyRelease>(
+                await AssertHandlerOnlySucceedsWithPublicationRoles<UpdateLegacyReleaseRequirement, LegacyRelease>(
                     legacyRelease.PublicationId,
                     legacyRelease,
                     contentDbContext => contentDbContext.Add(legacyRelease),
@@ -121,14 +121,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public void DeleteLegacyRelease_PublicationRoles()
+            public async Task DeleteLegacyRelease_PublicationRoles()
             {
                 var legacyRelease = new LegacyRelease
                 {
                     PublicationId = Guid.NewGuid(),
                 };
 
-                AssertHandlerOnlySucceedsWithPublicationRole<DeleteLegacyReleaseRequirement, LegacyRelease>(
+                await AssertHandlerOnlySucceedsWithPublicationRoles<DeleteLegacyReleaseRequirement, LegacyRelease>(
                     legacyRelease.PublicationId,
                     legacyRelease,
                     contentDbContext => contentDbContext.Add(legacyRelease),
