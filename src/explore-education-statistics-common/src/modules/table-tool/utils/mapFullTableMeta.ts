@@ -32,25 +32,36 @@ export default function mapFullTableMeta({
     return acc;
   }, {});
 
-  const locations = Object.entries(locationsHierarchical).flatMap(
-    ([level, levelOptions]) =>
-      levelOptions.flatMap(levelOption => {
-        if (levelOption.options) {
-          return levelOption.options.map(
-            option =>
-              new LocationFilter({
-                ...option,
-                level,
-                group: levelOption.label,
-              }),
-          );
-        }
+  const locationEntries = Object.entries(locationsHierarchical);
+  const hasNestedLocations = locationEntries.some(([, levelOptions]) =>
+    levelOptions.some(levelOption => levelOption.options),
+  );
 
-        return new LocationFilter({
-          ...levelOption,
-          level,
-        });
-      }),
+  const locations = locationEntries.flatMap(([level, levelOptions]) =>
+    levelOptions.flatMap(levelOption => {
+      if (levelOption.options) {
+        return levelOption.options.map(
+          option =>
+            new LocationFilter({
+              ...option,
+              level,
+              group: levelOption.label,
+            }),
+        );
+      }
+
+      return new LocationFilter({
+        ...levelOption,
+        level,
+        // Make this location have a `group` of itself if there are
+        // any nested locations at all. This is to prevent asymmetric
+        // tables when the user chooses location levels that have a
+        // hierarchy (e.g. local authorities) and are flat (e.g. country).
+        // By setting the `group` to itself, the location should have a
+        // cross span of 2 and we should get a nice symmetric table.
+        group: hasNestedLocations ? levelOption.label : undefined,
+      });
+    }),
   );
 
   return {

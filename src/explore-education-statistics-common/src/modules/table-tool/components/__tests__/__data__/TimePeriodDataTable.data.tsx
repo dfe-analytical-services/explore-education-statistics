@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/prefer-default-export
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import { TableDataResponse } from '@common/services/tableBuilderService';
 
