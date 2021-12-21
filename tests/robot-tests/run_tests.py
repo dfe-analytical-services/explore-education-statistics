@@ -106,14 +106,6 @@ parser.add_argument("--rerun-failed-suites",
                     dest="rerun_failed_suites",
                     action='store_true',
                     help="rerun failed test suites and merge results into original run results")
-parser.add_argument("--timeout",
-                    default="30",
-                    dest="timeout",
-                    help="default robot timeout in seconds (default is 30)")
-parser.add_argument("--implicit-wait",
-                    default="5",
-                    dest="implicit_wait",
-                    help="default robot implicit wait in seconds (default is 5)")
 parser.add_argument("--print-keywords",
                     dest="print_keywords",
                     action='store_true',

@@ -1,5 +1,5 @@
 *** Settings ***
-Library     SeleniumLibrary    timeout=${timeout}    implicit_wait=${implicit_wait}    run_on_failure=do this on failure
+Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=do this on failure
 Library     OperatingSystem
 Library     Collections
 #Library    XvfbRobot    # sudo apt install xvfb + pip install robotframework-xvfb
@@ -14,11 +14,11 @@ ${browser}=                             chrome
 ${headless}=                            1
 ${FILES_DIR}=                           ${EXECDIR}${/}tests${/}files${/}
 
-${timeout}=                             30
-${implicit_wait}=                       15
-${RELEASE_COMPLETE_WAIT}=               900
+${timeout}=                             %{TIMEOUT}
+${implicit_wait}=                       %{IMPLICIT_WAIT}
+${RELEASE_COMPLETE_WAIT}=               %{RELEASE_COMPLETE_WAIT}
 ${prompt_to_continue_on_failure}=       0
-${FAIL_TEST_SUITES_FAST}=               1
+${FAIL_TEST_SUITES_FAST}=               %{FAIL_TEST_SUITES_FAST}
 
 *** Keywords ***
 do this on failure
