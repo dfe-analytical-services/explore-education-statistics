@@ -123,12 +123,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.Equal("foo, bar, baz", list.JoinToString(", "));
         }
 
-        private static async Task<int> GetIntTask(int value)
-        {
-            await Task.Delay(5);
-            return value;
-        }
-
         private static async Task<Either<Unit, int>> GetSuccessfulEither(int value)
         {
             await Task.Delay(5);

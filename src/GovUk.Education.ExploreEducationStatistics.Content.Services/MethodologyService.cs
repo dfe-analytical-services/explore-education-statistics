@@ -98,7 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
             await themes.SelectMany(model => model.Topics)
                 .SelectMany(model => model.Publications)
-                .ForEachAsync(async publication =>
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async publication =>
                     publication.Methodologies = await BuildMethodologiesForPublication(publication.Id));
 
             themes.ForEach(theme => theme.RemoveTopicNodesWithoutMethodologiesAndSort());

@@ -530,7 +530,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await release.Content
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(async cs =>
-
                 {
                     await _context.Entry(cs)
                         .Reference(rcs => rcs.ContentSection)
