@@ -37,12 +37,6 @@
         "master",
         "dev"
       ]
-    },
-    "actionGroupAlerts": {
-      "type": "string"
-    },
-    "enableAlerts": {
-      "type": "bool"
     }
   },
   "variables":{
@@ -109,47 +103,6 @@
       "dependsOn": [
         "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
       ]
-    },
-    {
-      "type": "microsoft.insights/metricAlerts",
-      "apiVersion": "2018-03-01",
-      "name": "[concat(parameters('subscription'),'DataFactoryPipelineFailures')]",
-      "location": "global",
-      "dependsOn": [
-        "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]",
-        "[resourceId('microsoft.insights/actionGroups', parameters('actionGroupAlerts'))]"
-      ],
-      "properties": {
-        "description": "Data Factory - Pipeline Failed Run",
-        "severity": 3,
-        "enabled": "[parameters('enableAlerts')]",
-        "scopes": [
-          "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
-        ],
-        "evaluationFrequency": "PT1M",
-        "windowSize": "PT5M",
-        "criteria": {
-          "allOf": [
-            {
-              "threshold": 1,
-              "name": "Metric1",
-              "metricNamespace": "Microsoft.DataFactory/factories",
-              "metricName": "PipelineFailedRuns",
-              "operator": "GreaterThan",
-              "timeAggregation": "Total",
-              "criterionType": "StaticThresholdCriterion"
-            }
-          ],
-          "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
-        },
-        "autoMitigate": true,
-        "targetResourceType": "Microsoft.DataFactory/factories",
-        "actions": [
-          {
-            "actionGroupId": "[resourceId('microsoft.insights/actionGroups', parameters('actionGroupAlerts'))]"
-          }
-        ]
-      }
     }
   ]
 }
