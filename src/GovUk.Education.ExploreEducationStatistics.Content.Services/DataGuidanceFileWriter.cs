@@ -108,132 +108,138 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             await file.WriteLineAsync("Data files");
             await file.WriteLineAsync();
 
-            await subjects.ForEachAsync(
-                async (subject, index) =>
-                {
-                    await file.WriteLineAsync(subject.Name);
-                    await file.WriteLineAsync();
-
-                    await file.WriteLineAsync("Filename: " + subject.Filename);
-
-                    if (subject.GeographicLevels.Any())
+            await subjects
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(
+                    async (subject, index) =>
                     {
-                        await file.WriteLineAsync("Geographic levels: " + string.Join("; ", subject.GeographicLevels));
-                    }
-
-                    var timePeriodsLabel = subject.TimePeriods.ToLabel();
-
-                    if (!timePeriodsLabel.IsNullOrWhitespace())
-                    {
-                        await file.WriteLineAsync($"Time period: {timePeriodsLabel}");
-                    }
-
-                    if (!subject.Content.IsNullOrWhitespace())
-                    {
-                        var content = await HtmlToTextUtils.HtmlToText(subject.Content);
-                        await file.WriteLineAsync($"Content summary: {content}");
-                    }
-
-                    var variables = subject.Variables
-                        .Where(
-                            variable =>
-                                !variable.Label.IsNullOrWhitespace()
-                                || !variable.Value.IsNullOrWhitespace()
-                        )
-                        .ToList();
-
-                    if (variables.Any())
-                    {
-                        await file.WriteLineAsync();
-                        await file.WriteLineAsync("Variable names and descriptions for this file are provided below:");
+                        await file.WriteLineAsync(subject.Name);
                         await file.WriteLineAsync();
 
-                        var padding = variables.Aggregate(
-                            (Value: 0, Label: 0),
-                            (acc, variable) =>
-                            {
-                                if (variable.Value.Length > acc.Value)
+                        await file.WriteLineAsync("Filename: " + subject.Filename);
+
+                        if (subject.GeographicLevels.Any())
+                        {
+                            await file.WriteLineAsync("Geographic levels: " +
+                                                      string.Join("; ", subject.GeographicLevels));
+                        }
+
+                        var timePeriodsLabel = subject.TimePeriods.ToLabel();
+
+                        if (!timePeriodsLabel.IsNullOrWhitespace())
+                        {
+                            await file.WriteLineAsync($"Time period: {timePeriodsLabel}");
+                        }
+
+                        if (!subject.Content.IsNullOrWhitespace())
+                        {
+                            var content = await HtmlToTextUtils.HtmlToText(subject.Content);
+                            await file.WriteLineAsync($"Content summary: {content}");
+                        }
+
+                        var variables = subject.Variables
+                            .Where(
+                                variable =>
+                                    !variable.Label.IsNullOrWhitespace()
+                                    || !variable.Value.IsNullOrWhitespace()
+                            )
+                            .ToList();
+
+                        if (variables.Any())
+                        {
+                            await file.WriteLineAsync();
+                            await file.WriteLineAsync(
+                                "Variable names and descriptions for this file are provided below:");
+                            await file.WriteLineAsync();
+
+                            var padding = variables.Aggregate(
+                                (Value: 0, Label: 0),
+                                (acc, variable) =>
                                 {
-                                    acc.Value = variable.Value.Length;
-                                }
+                                    if (variable.Value.Length > acc.Value)
+                                    {
+                                        acc.Value = variable.Value.Length;
+                                    }
 
-                                if (variable.Label.Length > acc.Label)
-                                {
-                                    acc.Label = variable.Label.Length;
-                                }
+                                    if (variable.Label.Length > acc.Label)
+                                    {
+                                        acc.Label = variable.Label.Length;
+                                    }
 
-                                return acc;
-                            }
-                        );
-
-                        // Adds a table header for variable names/descriptions
-                        await file.WriteLineAsync(
-                            "Variable name".PadRight(padding.Value) + VariableSeparator + "Variable description"
-                        );
-                        await file.WriteLineAsync(
-                            string.Empty.PadRight(
-                                padding.Value,
-                                '-'
-                            ) + VariableSeparator + string.Empty.PadRight(padding.Label, '-')
-                        );
-
-                        // Add table body for variable names/descriptions
-                        await variables.ForEachAsync(
-                            async variable =>
-                            {
-                                await file.WriteLineAsync(
-                                    variable.Value.PadRight(padding.Value) + VariableSeparator + variable.Label
-                                );
-                            }
-                        );
-                    }
-
-                    var footnotes = subject.Footnotes
-                        .Where(footnote => !footnote.Label.IsNullOrWhitespace())
-                        .ToList();
-
-                    if (footnotes.Any())
-                    {
-                        await file.WriteLineAsync();
-                        await file.WriteLineAsync("Footnotes:");
-                        await file.WriteLineAsync();
-
-                        await footnotes
-                            .ForEachAsync(
-                                async (footnote, footnoteIndex) =>
-                                {
-                                    var listItemStart = $"{footnoteIndex + 1}. ";
-
-                                    await file.WriteAsync(listItemStart);
-
-                                    var indent = string.Empty.PadRight(listItemStart.Length);
-
-                                    await footnote.Label
-                                        .ToLines()
-                                        .ForEachAsync(
-                                            async (line, lineIndex) =>
-                                            {
-                                                if (lineIndex == 0)
-                                                {
-                                                    await file.WriteLineAsync(line);
-                                                    return;
-                                                }
-
-                                                await file.WriteLineAsync(indent + line);
-                                            }
-                                        );
+                                    return acc;
                                 }
                             );
-                    }
 
-                    // Add some extra lines between data files
-                    if (index < subjects.Count - 1)
-                    {
-                        await file.WriteLineAsync();
-                        await file.WriteLineAsync();
+                            // Adds a table header for variable names/descriptions
+                            await file.WriteLineAsync(
+                                "Variable name".PadRight(padding.Value) + VariableSeparator + "Variable description"
+                            );
+                            await file.WriteLineAsync(
+                                string.Empty.PadRight(
+                                    padding.Value,
+                                    '-'
+                                ) + VariableSeparator + string.Empty.PadRight(padding.Label, '-')
+                            );
+
+                            // Add table body for variable names/descriptions
+                            await variables.ForEachAsync(
+                                async variable =>
+                                {
+                                    await file.WriteLineAsync(
+                                        variable.Value.PadRight(padding.Value) + VariableSeparator + variable.Label
+                                    );
+                                }
+                            );
+                        }
+
+                        var footnotes = subject.Footnotes
+                            .Where(footnote => !footnote.Label.IsNullOrWhitespace())
+                            .ToList();
+
+                        if (footnotes.Any())
+                        {
+                            await file.WriteLineAsync();
+                            await file.WriteLineAsync("Footnotes:");
+                            await file.WriteLineAsync();
+
+                            await footnotes
+                                .ToAsyncEnumerable()
+                                .ForEachAwaitAsync(
+                                    async (footnote, footnoteIndex) =>
+                                    {
+                                        var listItemStart = $"{footnoteIndex + 1}. ";
+
+                                        await file.WriteAsync(listItemStart);
+
+                                        var indent = string.Empty.PadRight(listItemStart.Length);
+
+                                        await footnote.Label
+                                            .ToLines()
+                                            .ToAsyncEnumerable()
+                                            .ForEachAwaitAsync(
+                                                async (line, lineIndex) =>
+                                                {
+                                                    if (lineIndex == 0)
+                                                    {
+                                                        await file.WriteLineAsync(line);
+                                                        return;
+                                                    }
+
+                                                    await file.WriteLineAsync(indent + line);
+                                                }
+                                            );
+                                    }
+                                );
+                        }
+
+                        // Add some extra lines between data files
+                        if (index < subjects.Count - 1)
+                        {
+                            await file.WriteLineAsync();
+                            await file.WriteLineAsync();
+                        }
                     }
-                }
-            );
+                );
         }
     }
 }

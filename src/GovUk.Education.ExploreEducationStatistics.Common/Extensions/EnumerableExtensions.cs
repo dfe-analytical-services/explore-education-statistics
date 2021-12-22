@@ -108,17 +108,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
         }
 
-        public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, int, Task> func)
-        {
-            var index = 0;
-
-            foreach (var item in source)
-            {
-                await func(item, index);
-                index += 1;
-            }
-        }
-
         public static int IndexOfFirst<T>(this IEnumerable<T> source, Func<T, bool> predicate)
         {
             var index = 0;
