@@ -7,23 +7,12 @@ import {
   FullTableMeta,
 } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
-import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import last from 'lodash/last';
 import orderBy from 'lodash/orderBy';
 
 const removeSingleOptionFilterGroups = (filters: Filter[][]): Filter[][] => {
   return filters.filter(filterGroup => filterGroup.length > 1);
 };
-
-function sortSubGroup(filters: Filter[]): Filter[] {
-  return naturalOrderBy(filters, filter => {
-    if (filter instanceof TimePeriodFilter) {
-      return filter.order;
-    }
-
-    return filter.label;
-  });
-}
 
 /**
  * Distributes a list of {@param filters} into row groups
@@ -59,8 +48,8 @@ function getSortedRowColGroups(
   // sub groups of the filter group so that
   // they're in ascending order.
   return {
-    columnGroups: columnGroups.map(sortSubGroup),
-    rowGroups: rowGroups.map(sortSubGroup),
+    columnGroups,
+    rowGroups,
   };
 }
 
@@ -86,7 +75,7 @@ function getFixedTimePeriodAndIndicatorTableHeadersConfig(
 }
 
 /**
- * Get a default table header configuration from a {@param fullTableMeta}.
+ * Get a default table header configuration from a {@param fullTable}.
  *
  * We try our best to return table headers for a good default viewing
  * experience, but this is not always guaranteed due to the flexibility
@@ -137,7 +126,7 @@ export default function getDefaultTableHeaderConfig(
   return {
     columnGroups: columnGroups.length > 1 ? columnGroups.slice(0, -1) : [],
     rowGroups: rowGroups.length > 1 ? rowGroups.slice(0, -1) : [],
-    columns: sortSubGroup(last(columnGroups) ?? []),
-    rows: sortSubGroup(last(rowGroups) ?? []),
+    columns: last(columnGroups) ?? [],
+    rows: last(rowGroups) ?? [],
   };
 }

@@ -16,12 +16,12 @@ describe('getDefaultTableHeadersConfig', () => {
               label: 'Ethnic group major',
               options: [
                 {
-                  label: 'Ethnicity Major Black Total',
-                  value: 'ethnicity-major-black-total',
-                },
-                {
                   label: 'Ethnicity Major Asian Total',
                   value: 'ethnicity-major-asian-total',
+                },
+                {
+                  label: 'Ethnicity Major Black Total',
+                  value: 'ethnicity-major-black-total',
                 },
               ],
             },
@@ -37,16 +37,16 @@ describe('getDefaultTableHeadersConfig', () => {
               label: 'Default',
               options: [
                 {
-                  label: 'State-funded secondary',
-                  value: 'state-funded-secondary',
-                },
-                {
                   label: 'Special',
                   value: 'special',
                 },
                 {
                   label: 'State-funded primary',
                   value: 'state-funded-primary',
+                },
+                {
+                  label: 'State-funded secondary',
+                  value: 'state-funded-secondary',
                 },
               ],
             },
@@ -87,8 +87,8 @@ describe('getDefaultTableHeadersConfig', () => {
       ],
       locationsHierarchical: {
         localAuthority: [
-          { value: 'barnsley', label: 'Barnsley' },
           { value: 'barnet', label: 'Barnet' },
+          { value: 'barnsley', label: 'Barnsley' },
         ],
       },
       boundaryLevels: [],
@@ -279,12 +279,12 @@ describe('getDefaultTableHeadersConfig', () => {
                 label: 'Default',
                 options: [
                   {
-                    label: 'State-funded secondary',
-                    value: 'state-funded-secondary',
-                  },
-                  {
                     label: 'Special',
                     value: 'special',
+                  },
+                  {
+                    label: 'State-funded secondary',
+                    value: 'state-funded-secondary',
                   },
                 ],
               },
