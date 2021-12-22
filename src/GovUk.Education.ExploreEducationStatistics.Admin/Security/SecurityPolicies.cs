@@ -38,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
         CanViewSpecificPreReleaseSummary,
         CanResolveSpecificComment,
         CanUpdateSpecificComment,
+        CanDeleteSpecificComment,
         CanCancelOngoingImports,
         CanViewReleaseStatusHistory,
 
