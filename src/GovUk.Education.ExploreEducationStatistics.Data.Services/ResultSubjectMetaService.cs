@@ -308,9 +308,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     {
                         var (geographicLevel, locationAttributes) = pair;
                         var geoJsonByCode = allGeoJson.GetValueOrDefault(geographicLevel);
-                        return locationAttributes
-                            .Select(locationAttribute =>
-                                GetLocationAttributeViewModel(locationAttribute, geoJsonByCode))
+                        return DeduplicateLocationViewModels(
+                                locationAttributes
+                                    .Select(locationAttribute => GetLocationAttributeViewModel(locationAttribute, geoJsonByCode))
+                            )
                             .ToList();
                     });
             }
@@ -341,8 +342,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     Label = locationAttribute.Name ?? string.Empty,
                     Level = locationAttribute.GetType().Name.CamelCase(),
                     Value = code,
-                    Options = locationAttributeNode.Children
-                        .Select(child => GetLocationAttributeViewModel(child, geoJsonByCode))
+                    Options = DeduplicateLocationViewModels(
+                            locationAttributeNode.Children
+                                .Select(child => GetLocationAttributeViewModel(child, geoJsonByCode))
+                        )
                         .ToList()
                 };
             }
