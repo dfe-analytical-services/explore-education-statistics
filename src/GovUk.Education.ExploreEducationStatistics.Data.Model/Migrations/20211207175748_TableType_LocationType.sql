@@ -1,4 +1,4 @@
-create type LocationType as table
+﻿create type LocationType as table
 (
     Id                              uniqueidentifier not null,
     GeographicLevel                 nvarchar(6),

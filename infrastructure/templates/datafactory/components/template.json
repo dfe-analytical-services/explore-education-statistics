@@ -1271,6 +1271,16 @@
                                     },
                                     {
                                         "source": {
+                                            "name": "GeographicLevel",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "GeographicLevel",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
                                             "name": "Country_Code",
                                             "type": "String"
                                         },
@@ -1481,6 +1491,26 @@
                                     },
                                     {
                                         "source": {
+                                            "name": "PlanningArea_Code",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "PlanningArea_Code",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "PlanningArea_Name",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "PlanningArea_Name",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
                                             "name": "Provider_Code",
                                             "type": "String"
                                         },
@@ -1586,26 +1616,6 @@
                                         },
                                         "sink": {
                                             "name": "Ward_Name",
-                                            "type": "String"
-                                        }
-                                    },
-                                    {
-                                        "source": {
-                                            "name": "PlanningArea_Code",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "PlanningArea_Code",
-                                            "type": "String"
-                                        }
-                                    },
-                                    {
-                                        "source": {
-                                            "name": "PlanningArea_Name",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "PlanningArea_Name",
                                             "type": "String"
                                         }
                                     }

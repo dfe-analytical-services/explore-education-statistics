@@ -103,6 +103,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureLocation(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
+                .Property(location => location.GeographicLevel)
+                .HasConversion(new EnumToEnumValueConverter<GeographicLevel>())
+                .HasMaxLength(6);
+
+            modelBuilder.Entity<Location>()
+                .HasIndex(location => location.GeographicLevel);
+
+            modelBuilder.Entity<Location>()
                 .HasIndex(location => location.Country_Code);
 
             modelBuilder.Entity<Location>()
