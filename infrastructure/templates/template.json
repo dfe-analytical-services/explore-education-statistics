@@ -3341,7 +3341,7 @@
           },
           "enableAlerts": {
             "value": "[parameters('enableAlerts')]"
-          },
+          }
         }
       },
       "dependsOn": [
