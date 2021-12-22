@@ -1,12 +1,13 @@
 import os
 from pathlib import Path
+from typing import Tuple
 import requests
 import json
 from scripts.get_auth_tokens import get_identity_info
 
 
 def setup_auth_variables(user, email, password, clear_existing=False, driver=None) \
-        -> (str, str):
+        -> Tuple[str, str]:
     assert user, 'user param must be set'
     assert email, 'email param must be set'
     assert password, 'password param must be set'
