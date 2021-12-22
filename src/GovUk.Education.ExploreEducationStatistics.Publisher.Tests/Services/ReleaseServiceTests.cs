@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -269,13 +270,113 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         };
 
+        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock1 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 summary 1 order 2</p>",
+            Order = 2,
+        };
+
+        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock2 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 summary 2 order 0</p>",
+            Order = 0,
+        };
+
+        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock3 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 summary 3 order 1</p>",
+            Order = 1,
+        };
+
+        private static readonly ContentBlock Release2SummarySectionHtmlContentBlock1 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 summary 1 order 2</p>",
+            Order = 2,
+        };
+
+        private static readonly ContentBlock Release2SummarySectionHtmlContentBlock2 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 summary 2 order 0</p>",
+            Order = 0,
+        };
+
+        private static readonly ContentBlock Release2SummarySectionHtmlContentBlock3 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 summary 3 order 1</p>",
+            Order = 1,
+        };
+
+        private static readonly ContentBlock Release1Section1HtmlContentBlock1 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 section 1 order 2</p>",
+            Order = 2,
+        };
+
+        private static readonly ContentBlock Release1Section1HtmlContentBlock2 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 section 1 order 0</p>",
+            Order = 0,
+        };
+
+        private static readonly ContentBlock Release1Section1HtmlContentBlock3 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 1 section 1 order 1</p>",
+            Order = 1,
+        };
+
+        private static readonly ContentBlock Release2Section1HtmlContentBlock1 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 section 1 order 2</p>",
+            Order = 2,
+        };
+
+        private static readonly ContentBlock Release2Section1HtmlContentBlock2 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 section 1 order 0</p>",
+            Order = 0,
+        };
+
+        private static readonly ContentBlock Release2Section1HtmlContentBlock3 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 section 1 order 1</p>",
+            Order = 1,
+        };
+
+        private static readonly ContentBlock Release1KeyStatsDataBlock = new DataBlock
+        {
+            Id = Guid.NewGuid(),
+        };
+
+        private static readonly ContentBlock Release2KeyStatsDataBlock = new DataBlock
+        {
+            Id = Guid.NewGuid(),
+        };
+
         private static readonly ContentSection Release1SummarySection = new()
         {
             Id = Guid.NewGuid(),
             Order = 1,
             Heading = "Release 1 summary section",
             Caption = "",
-            Type = ContentSectionType.ReleaseSummary
+            Type = ContentSectionType.ReleaseSummary,
+            Content = new List<ContentBlock>
+            {
+                Release1SummarySectionHtmlContentBlock1,
+                Release1SummarySectionHtmlContentBlock2,
+                Release1SummarySectionHtmlContentBlock3,
+            }
         };
 
         private static readonly ContentSection Release1Section1 = new()
@@ -284,7 +385,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 2,
             Heading = "Release 1 section 1 order 2",
             Caption = "",
-            Type = ContentSectionType.Generic
+            Type = ContentSectionType.Generic,
+            Content = new List<ContentBlock>
+            {
+                Release1Section1HtmlContentBlock1,
+                Release1Section1HtmlContentBlock2,
+                Release1Section1HtmlContentBlock3,
+            }
         };
 
         private static readonly ContentSection Release1Section2 = new()
@@ -311,7 +418,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 2,
             Heading = "Release 1 key stats section",
             Caption = "",
-            Type = ContentSectionType.KeyStatistics
+            Type = ContentSectionType.KeyStatistics,
+            Content = new List<ContentBlock>
+            {
+                Release1KeyStatsDataBlock
+            }
         };
 
         private static readonly ContentSection Release2SummarySection = new()
@@ -320,7 +431,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 1,
             Heading = "Release 2 summary section",
             Caption = "",
-            Type = ContentSectionType.ReleaseSummary
+            Type = ContentSectionType.ReleaseSummary,
+            Content = new List<ContentBlock>
+            {
+                Release2SummarySectionHtmlContentBlock1,
+                Release2SummarySectionHtmlContentBlock2,
+                Release2SummarySectionHtmlContentBlock3,
+            }
         };
 
         private static readonly ContentSection Release2Section1 = new()
@@ -329,7 +446,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 2,
             Heading = "Release 2 section 1 order 2",
             Caption = "",
-            Type = ContentSectionType.Generic
+            Type = ContentSectionType.Generic,
+            Content = new List<ContentBlock>
+            {
+                Release2Section1HtmlContentBlock1,
+                Release2Section1HtmlContentBlock2,
+                Release2Section1HtmlContentBlock3,
+            }
         };
 
         private static readonly ContentSection Release2Section2 = new()
@@ -338,7 +461,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 0,
             Heading = "Release 2 section 2 order 0",
             Caption = "",
-            Type = ContentSectionType.Generic
+            Type = ContentSectionType.Generic,
         };
 
         private static readonly ContentSection Release2Section3 = new()
@@ -356,201 +479,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 2,
             Heading = "Release 2 key stats section",
             Caption = "",
-            Type = ContentSectionType.KeyStatistics
-        };
-
-        private static readonly List<ContentSection> ContentSections = new()
-        {
-            Release1SummarySection,
-            Release1Section1,
-            Release1Section2,
-            Release1Section3,
-            Release1KeyStatsSection,
-            Release2SummarySection,
-            Release2Section1,
-            Release2Section2,
-            Release2Section3,
-            Release2KeyStatsSection
+            Type = ContentSectionType.KeyStatistics,
+            Content = new List<ContentBlock>
+            {
+                Release2KeyStatsDataBlock
+            }
         };
 
         private static readonly List<ReleaseContentSection> ReleaseContentSections = new()
         {
             new ReleaseContentSection
             {
-                ReleaseId = PublicationARelease1V1.Id,
-                ContentSectionId = Release1SummarySection.Id
+                Release = PublicationARelease1V1,
+                ContentSection = Release1SummarySection,
             },
             new ReleaseContentSection
             {
-                ReleaseId = PublicationARelease1V1.Id,
-                ContentSectionId = Release1Section1.Id
+                Release = PublicationARelease1V1,
+                ContentSection = Release1Section1
             },
             new ReleaseContentSection
             {
-                ReleaseId = PublicationARelease1V1.Id,
-                ContentSectionId = Release1Section2.Id
+                Release = PublicationARelease1V1,
+                ContentSection = Release1Section2
             },
             new ReleaseContentSection
             {
-                ReleaseId = PublicationARelease1V1.Id,
-                ContentSectionId = Release1Section3.Id
+                Release = PublicationARelease1V1,
+                ContentSection = Release1Section3
             },
             new ReleaseContentSection
             {
-                ReleaseId = PublicationARelease1V1.Id,
-                ContentSectionId = Release1KeyStatsSection.Id
+                Release = PublicationARelease1V1,
+                ContentSection = Release1KeyStatsSection
             },
             new ReleaseContentSection
             {
-                ReleaseId = PublicationARelease2.Id,
-                ContentSectionId = Release2SummarySection.Id
+                Release = PublicationARelease2,
+                ContentSection = Release2SummarySection
             },
             new ReleaseContentSection
             {
-                ReleaseId = PublicationARelease2.Id,
-                ContentSectionId = Release2Section1.Id
+                Release = PublicationARelease2,
+                ContentSection = Release2Section1
             },
             new ReleaseContentSection
             {
-                ReleaseId = PublicationARelease2.Id,
-                ContentSectionId = Release2Section2.Id
+                Release = PublicationARelease2,
+                ContentSection = Release2Section2
             },
             new ReleaseContentSection
             {
-                ReleaseId = PublicationARelease2.Id,
-                ContentSectionId = Release2Section3.Id
+                Release = PublicationARelease2,
+                ContentSection = Release2Section3
             },
             new ReleaseContentSection
             {
-                ReleaseId = PublicationARelease2.Id,
-                ContentSectionId = Release2KeyStatsSection.Id
+                Release = PublicationARelease2,
+                ContentSection = Release2KeyStatsSection
             }
-        };
-
-        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock1 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 1 summary 1 order 2</p>",
-            Order = 2,
-            ContentSectionId = Release1SummarySection.Id
-        };
-
-        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock2 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 1 summary 2 order 0</p>",
-            Order = 0,
-            ContentSectionId = Release1SummarySection.Id
-        };
-
-        private static readonly ContentBlock Release1SummarySectionHtmlContentBlock3 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 1 summary 3 order 1</p>",
-            Order = 1,
-            ContentSectionId = Release1SummarySection.Id
-        };
-
-        private static readonly ContentBlock Release2SummarySectionHtmlContentBlock1 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 2 summary 1 order 2</p>",
-            Order = 2,
-            ContentSectionId = Release2SummarySection.Id
-        };
-
-        private static readonly ContentBlock Release2SummarySectionHtmlContentBlock2 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 2 summary 2 order 0</p>",
-            Order = 0,
-            ContentSectionId = Release2SummarySection.Id
-        };
-
-        private static readonly ContentBlock Release2SummarySectionHtmlContentBlock3 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 2 summary 3 order 1</p>",
-            Order = 1,
-            ContentSectionId = Release2SummarySection.Id
-        };
-
-        private static readonly ContentBlock Release1Section1HtmlContentBlock1 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 1 section 1 order 2</p>",
-            Order = 2,
-            ContentSectionId = Release1Section1.Id
-        };
-
-        private static readonly ContentBlock Release1Section1HtmlContentBlock2 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 1 section 1 order 0</p>",
-            Order = 0,
-            ContentSectionId = Release1Section1.Id
-        };
-
-        private static readonly ContentBlock Release1Section1HtmlContentBlock3 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 1 section 1 order 1</p>",
-            Order = 1,
-            ContentSectionId = Release1Section1.Id
-        };
-
-        private static readonly ContentBlock Release2Section1HtmlContentBlock1 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 2 section 1 order 2</p>",
-            Order = 2,
-            ContentSectionId = Release2Section1.Id
-        };
-
-        private static readonly ContentBlock Release2Section1HtmlContentBlock2 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 2 section 1 order 0</p>",
-            Order = 0,
-            ContentSectionId = Release2Section1.Id
-        };
-
-        private static readonly ContentBlock Release2Section1HtmlContentBlock3 = new HtmlBlock
-        {
-            Id = Guid.NewGuid(),
-            Body = "<p>Release 2 section 1 order 1</p>",
-            Order = 1,
-            ContentSectionId = Release2Section1.Id
-        };
-
-        private static readonly ContentBlock Release1KeyStatsDataBlock = new DataBlock
-        {
-            Id = Guid.NewGuid(),
-            ContentSectionId = Release1KeyStatsSection.Id
-        };
-
-        private static readonly ContentBlock Release2KeyStatsDataBlock = new DataBlock
-        {
-            Id = Guid.NewGuid(),
-            ContentSectionId = Release2KeyStatsSection.Id
-        };
-
-        private static readonly List<ContentBlock> ContentBlocks = new()
-        {
-            Release1SummarySectionHtmlContentBlock1,
-            Release1SummarySectionHtmlContentBlock2,
-            Release1SummarySectionHtmlContentBlock3,
-            Release1Section1HtmlContentBlock1,
-            Release1Section1HtmlContentBlock2,
-            Release1Section1HtmlContentBlock3,
-            Release1KeyStatsDataBlock,
-            Release2SummarySectionHtmlContentBlock1,
-            Release2SummarySectionHtmlContentBlock2,
-            Release2SummarySectionHtmlContentBlock3,
-            Release2Section1HtmlContentBlock1,
-            Release2Section1HtmlContentBlock2,
-            Release2Section1HtmlContentBlock3,
-            Release2KeyStatsDataBlock
         };
 
         private static readonly ReleaseFile PublicationARelease2AncillaryReleaseFile = new()
@@ -806,9 +793,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
                 await contentDbContext.AddRangeAsync(ReleaseFiles);
-                await contentDbContext.AddRangeAsync(ContentSections);
                 await contentDbContext.AddRangeAsync(ReleaseContentSections);
-                await contentDbContext.AddRangeAsync(ContentBlocks);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -869,14 +854,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var keyStatisticsSection = result.KeyStatisticsSection;
                 Assert.NotNull(keyStatisticsSection);
-                Assert.Equal(Release2KeyStatsSection.Id, keyStatisticsSection.Id);
+                Assert.Equal(Release2KeyStatsSection.Id, keyStatisticsSection!.Id);
                 var keyStatisticsSectionContent = keyStatisticsSection.Content;
                 Assert.Single(keyStatisticsSectionContent);
                 Assert.Equal(Release2KeyStatsDataBlock.Id, keyStatisticsSectionContent[0].Id);
 
                 var summarySection = result.SummarySection;
                 Assert.NotNull(summarySection);
-                Assert.Equal(Release2SummarySection.Id, summarySection.Id);
+                Assert.Equal(Release2SummarySection.Id, summarySection!.Id);
                 var summarySectionContent = summarySection.Content;
                 Assert.NotNull(summarySectionContent);
                 Assert.Equal(3, summarySectionContent.Count);
@@ -935,6 +920,133 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
+        public async Task GetLatestReleaseViewModel_FiltersComments()
+        {
+            var publication = new Publication();
+
+            var release = new Release
+            {
+                Publication = publication,
+                ReleaseName = "2018",
+                TimePeriodCoverage = AcademicYearQ2,
+                Slug = "2018-19-q2",
+                Published = new DateTime(2019, 3, 1),
+                ApprovalStatus = Approved,
+            };
+
+            var originalContent = @"
+                <p>
+                    Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
+                </p>
+                <ul>
+                    <li><comment-start name=""comment-2""/>Content 2<comment-end name=""comment-2""/></li>
+                    <li><commentplaceholder-start name=""comment-3""/>Content 3<commentplaceholder-end name=""comment-3""/></li>
+                    <li><resolvedcomment-start name=""comment-4""/>Content 4<resolvedcomment-end name=""comment-4""/></li>
+                </ul>".TrimIndent();
+
+            var releaseContentSections = new List<ReleaseContentSection>
+            {
+                new()
+                {
+                    Release = release,
+                    ContentSection = new ContentSection
+                    {
+                        Type = ContentSectionType.ReleaseSummary,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = originalContent
+                            }
+                        }
+                    }
+                },
+                new()
+                {
+                    Release = release,
+                    ContentSection = new ContentSection
+                    {
+                        Type = ContentSectionType.Headlines,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = originalContent
+                            }
+                        }
+                    }
+                },
+                new()
+                {
+                    Release = release,
+                    ContentSection = new ContentSection
+                    {
+                        Type = ContentSectionType.Generic,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = originalContent
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(release);
+                await contentDbContext.AddRangeAsync(releaseContentSections);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildReleaseService(
+                    contentDbContext: contentDbContext,
+                    publicBlobStorageService: publicBlobStorageService.Object);
+
+                var result =
+                    await service.GetLatestReleaseViewModel(publication.Id, Enumerable.Empty<Guid>(),
+                        PublishContext());
+
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
+
+                Assert.Equal(release.Id, result.Id);
+
+                var expectedContent = @"
+                    <p>
+                        Content 1 goes here
+                    </p>
+                    <ul>
+                        <li>Content 2</li>
+                        <li>Content 3</li>
+                        <li>Content 4</li>
+                    </ul>".TrimIndent();
+
+                var summarySection = result.SummarySection;
+                Assert.Single(summarySection.Content);
+
+                Assert.Equal(expectedContent, (summarySection.Content[0] as HtmlBlockViewModel)?.Body);
+
+                var headlines = result.HeadlinesSection;
+                Assert.Single(headlines.Content);
+
+                Assert.Equal(expectedContent, (headlines.Content[0] as HtmlBlockViewModel)?.Body);
+
+                var content = result.Content;
+                Assert.Single(content);
+                Assert.Single(content[0].Content);
+
+                Assert.Equal(expectedContent, (content[0].Content[0] as HtmlBlockViewModel)?.Body);
+            }
+        }
+
+        [Fact]
         public async Task GetReleaseViewModel()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -944,9 +1056,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
                 await contentDbContext.AddRangeAsync(ReleaseFiles);
-                await contentDbContext.AddRangeAsync(ContentSections);
                 await contentDbContext.AddRangeAsync(ReleaseContentSections);
-                await contentDbContext.AddRangeAsync(ContentBlocks);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -967,14 +1077,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var keyStatisticsSection = result.KeyStatisticsSection;
                 Assert.NotNull(keyStatisticsSection);
-                Assert.Equal(Release1KeyStatsSection.Id, keyStatisticsSection.Id);
+                Assert.Equal(Release1KeyStatsSection.Id, keyStatisticsSection!.Id);
                 var keyStatisticsSectionContent = keyStatisticsSection.Content;
                 Assert.Single(keyStatisticsSectionContent);
                 Assert.Equal(Release1KeyStatsDataBlock.Id, keyStatisticsSectionContent[0].Id);
 
                 var summarySection = result.SummarySection;
                 Assert.NotNull(summarySection);
-                Assert.Equal(Release1SummarySection.Id, summarySection.Id);
+                Assert.Equal(Release1SummarySection.Id, summarySection!.Id);
                 var summarySectionContent = summarySection.Content;
                 Assert.NotNull(summarySectionContent);
                 Assert.Equal(3, summarySectionContent.Count);
@@ -1024,6 +1134,131 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
+        public async Task GetReleaseViewModel_FiltersContent()
+        {
+            var publication = new Publication();
+
+            var release = new Release
+            {
+                Publication = publication,
+                ReleaseName = "2018",
+                TimePeriodCoverage = AcademicYearQ2,
+                Slug = "2018-19-q2",
+                Published = new DateTime(2019, 3, 1),
+                ApprovalStatus = Approved,
+            };
+
+            var originalContent = @"
+                <p>
+                    Content 1 <comment-start name=""comment-1""></comment-start>goes here<comment-end name=""comment-1""></comment-end>
+                </p>
+                <ul>
+                    <li><comment-start name=""comment-2""/>Content 2<comment-end name=""comment-2""/></li>
+                    <li><commentplaceholder-start name=""comment-3""/>Content 3<commentplaceholder-end name=""comment-3""/></li>
+                    <li><resolvedcomment-start name=""comment-4""/>Content 4<resolvedcomment-end name=""comment-4""/></li>
+                </ul>".TrimIndent();
+
+            var releaseContentSections = new List<ReleaseContentSection>
+            {
+                new()
+                {
+                    Release = release,
+                    ContentSection = new ContentSection
+                    {
+                        Type = ContentSectionType.ReleaseSummary,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = originalContent
+                            }
+                        }
+                    }
+                },
+                new()
+                {
+                    Release = release,
+                    ContentSection = new ContentSection
+                    {
+                        Type = ContentSectionType.Headlines,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = originalContent
+                            }
+                        }
+                    }
+                },
+                new()
+                {
+                    Release = release,
+                    ContentSection = new ContentSection
+                    {
+                        Type = ContentSectionType.Generic,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = originalContent
+                            }
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(release);
+                await contentDbContext.AddRangeAsync(releaseContentSections);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildReleaseService(
+                    contentDbContext: contentDbContext,
+                    publicBlobStorageService: publicBlobStorageService.Object);
+
+                var result = await service.GetReleaseViewModel(release.Id, PublishContext());
+
+                MockUtils.VerifyAllMocks(publicBlobStorageService);
+
+                Assert.Equal(release.Id, result.Id);
+
+                var expectedContent = @"
+                    <p>
+                        Content 1 goes here
+                    </p>
+                    <ul>
+                        <li>Content 2</li>
+                        <li>Content 3</li>
+                        <li>Content 4</li>
+                    </ul>".TrimIndent();
+
+                var summarySection = result.SummarySection;
+                Assert.Single(summarySection.Content);
+
+                Assert.Equal(expectedContent, (summarySection.Content[0] as HtmlBlockViewModel)?.Body);
+
+                var headlines = result.HeadlinesSection;
+                Assert.Single(headlines.Content);
+
+                Assert.Equal(expectedContent, (headlines.Content[0] as HtmlBlockViewModel)?.Body);
+
+                var content = result.Content;
+                Assert.Single(content);
+                Assert.Single(content[0].Content);
+
+                Assert.Equal(expectedContent, (content[0].Content[0] as HtmlBlockViewModel)?.Body);
+            }
+        }
+
+        [Fact]
         public async Task GetReleaseViewModel_NotYetPublished()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -1033,9 +1268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
                 await contentDbContext.AddRangeAsync(ReleaseFiles);
-                await contentDbContext.AddRangeAsync(ContentSections);
                 await contentDbContext.AddRangeAsync(ReleaseContentSections);
-                await contentDbContext.AddRangeAsync(ContentBlocks);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1077,9 +1310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
                 await contentDbContext.AddRangeAsync(ReleaseFiles);
-                await contentDbContext.AddRangeAsync(ContentSections);
                 await contentDbContext.AddRangeAsync(ReleaseContentSections);
-                await contentDbContext.AddRangeAsync(ContentBlocks);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1121,9 +1352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await contentDbContext.AddRangeAsync(Publications);
                 await contentDbContext.AddRangeAsync(Releases);
                 await contentDbContext.AddRangeAsync(ReleaseFiles);
-                await contentDbContext.AddRangeAsync(ContentSections);
                 await contentDbContext.AddRangeAsync(ReleaseContentSections);
-                await contentDbContext.AddRangeAsync(ContentBlocks);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -1214,7 +1443,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(published, actualStatisticsRelease.Published);
 
                 Assert.True(actualContentRelease.DataLastPublished.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished.Value).Milliseconds, 0,
+                Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished!.Value).Milliseconds, 0,
                     1500);
             }
 
@@ -1270,7 +1499,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(published, actualContentRelease.Publication.Published);
 
                 Assert.True(actualContentRelease.DataLastPublished.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished.Value).Milliseconds, 0,
+                Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished!.Value).Milliseconds, 0,
                     1500);
             }
 
@@ -1350,7 +1579,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(previousContentRelease.Published.Value, actualStatisticsRelease.Published);
 
                 Assert.True(actualContentRelease.DataLastPublished.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished.Value).Milliseconds, 0,
+                Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished!.Value).Milliseconds, 0,
                     1500);
             }
 

@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
         public async Task DeleteComment()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
-                .SetupResourceCheckToFail(_comment, CanUpdateSpecificComment)
+                .SetupResourceCheckToFail(_comment, CanDeleteSpecificComment)
                 .AssertForbidden(
                     userService =>
                     {

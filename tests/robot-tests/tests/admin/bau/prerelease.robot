@@ -258,7 +258,7 @@ Start prerelease
 
     user checks summary list contains    Current status    Approved
     user checks summary list contains    Scheduled release    ${day} ${month_word} ${year}
-    user waits for release process status to be    Scheduled    90
+    user waits for release process status to be    Scheduled    %{WAIT_MEDIUM}
 
 Validate prerelease has started
     ${current_url}=    get location
@@ -281,7 +281,7 @@ Validate prerelease has started
 Validate metadata guidance page
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
-    user clicks link    data files guide
+    user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
@@ -318,7 +318,7 @@ Go back to prerelease content page
 
 Validate public prerelease access list
     user clicks link    Pre-release access list
-    user waits until page contains title caption    Calendar Year 2000    30
+    user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
     user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
     user waits until page contains    Updated test public access list    %{WAIT_SMALL}
@@ -378,7 +378,7 @@ Validate prerelease has started for Analyst user
 Validate public metdata guidance for Analyst user
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
-    user clicks link    data files guide
+    user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}

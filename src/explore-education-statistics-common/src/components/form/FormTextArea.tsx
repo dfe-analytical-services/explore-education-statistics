@@ -7,6 +7,7 @@ import React, {
   KeyboardEventHandler,
   MouseEventHandler,
   ReactNode,
+  Ref,
 } from 'react';
 import ErrorMessage from '../ErrorMessage';
 
@@ -20,6 +21,7 @@ export interface FormTextAreaProps extends FormLabelProps {
   maxLength?: number;
   name: string;
   rows?: number;
+  textAreaRef?: Ref<HTMLTextAreaElement>;
   value?: string;
   onBlur?: FocusEventHandler<HTMLTextAreaElement>;
   onChange?: ChangeEventHandler<HTMLTextAreaElement>;
@@ -38,6 +40,7 @@ const FormTextArea = ({
   maxLength,
   name,
   rows = 5,
+  textAreaRef,
   value,
   onBlur,
   onChange,
@@ -72,6 +75,7 @@ const FormTextArea = ({
         disabled={disabled}
         id={id}
         name={name}
+        ref={textAreaRef}
         onBlur={onBlur}
         onChange={onChange}
         onClick={onClick}

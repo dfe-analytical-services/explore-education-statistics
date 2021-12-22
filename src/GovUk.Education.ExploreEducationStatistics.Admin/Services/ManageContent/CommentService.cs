@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, bool>> DeleteComment(Guid commentId)
         {
             return _persistenceHelper.CheckEntityExists<Comment>(commentId)
-                .OnSuccess(_userService.CheckCanUpdateComment)
+                .OnSuccess(_userService.CheckCanDeleteComment)
                 .OnSuccess(async comment =>
                     {
                         _context.Comment.Remove(comment);

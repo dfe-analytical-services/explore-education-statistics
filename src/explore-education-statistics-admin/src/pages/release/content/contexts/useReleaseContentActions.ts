@@ -4,7 +4,7 @@ import { ContentSectionKeys } from '@admin/pages/release/content/contexts/Releas
 import releaseContentService, {
   ContentBlockAttachRequest,
 } from '@admin/services/releaseContentService';
-import { Comment, ContentBlockPostModel } from '@admin/services/types/content';
+import { ContentBlockPostModel } from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
 import { useCallback, useMemo } from 'react';
 
@@ -104,6 +104,7 @@ export default function useReleaseContentActions() {
         blockId,
         { body: bodyContent },
       );
+
       dispatch({
         type: 'UPDATE_BLOCK_FROM_SECTION',
         payload: {
@@ -283,29 +284,6 @@ export default function useReleaseContentActions() {
     [dispatch],
   );
 
-  const updateBlockComments = useCallback(
-    async ({
-      sectionId,
-      blockId,
-      sectionKey,
-      comments,
-    }: {
-      sectionId: string;
-      blockId: string;
-      sectionKey: ContentSectionKeys;
-      comments: Comment[];
-    }) => {
-      dispatch({
-        type: 'UPDATE_BLOCK_COMMENTS',
-        payload: {
-          meta: { sectionId, blockId, sectionKey },
-          comments,
-        },
-      });
-    },
-    [dispatch],
-  );
-
   return useMemo(
     () => ({
       updateAvailableDataBlocks,
@@ -319,7 +297,6 @@ export default function useReleaseContentActions() {
       updateContentSectionsOrder,
       removeContentSection,
       updateContentSectionHeading,
-      updateBlockComments,
     }),
     [
       addContentSection,
@@ -328,7 +305,6 @@ export default function useReleaseContentActions() {
       deleteContentSectionBlock,
       removeContentSection,
       updateAvailableDataBlocks,
-      updateBlockComments,
       updateContentSectionBlock,
       updateContentSectionDataBlock,
       updateContentSectionHeading,

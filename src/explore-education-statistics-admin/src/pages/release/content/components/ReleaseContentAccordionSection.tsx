@@ -1,4 +1,3 @@
-import { CommentsChangeHandler } from '@admin/components/editable/Comments';
 import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import { useEditingContext } from '@admin/contexts/EditingContext';
@@ -26,7 +25,11 @@ const ReleaseContentAccordionSection = ({
   section: { id: sectionId, caption, heading, content: sectionContent = [] },
   ...props
 }: ReleaseContentAccordionSectionProps) => {
-  const { editingMode, unsavedEdits } = useEditingContext();
+  const {
+    editingMode,
+    unsavedCommentDeletions,
+    unsavedBlocks,
+  } = useEditingContext();
 
   const actions = useReleaseContentActions();
 
@@ -35,10 +38,17 @@ const ReleaseContentAccordionSection = ({
 
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
 
-  const updatedHeading =
-    unsavedEdits.findIndex(edit => edit.sectionId === sectionId) === -1
-      ? heading
-      : `${heading} (Unsaved changes)`;
+  const updatedHeading = () => {
+    if (
+      blocks.find(block => unsavedBlocks.includes(block.id)) ||
+      blocks.find(block =>
+        Object.keys(unsavedCommentDeletions).includes(block.id),
+      )
+    ) {
+      return `${heading} (unsaved changes)`;
+    }
+    return heading;
+  };
 
   useEffect(() => {
     setBlocks(sectionContent);
@@ -129,22 +139,10 @@ const ReleaseContentAccordionSection = ({
     });
   }, [actions, sectionId, release.id]);
 
-  const updateBlockComments: CommentsChangeHandler = useCallback(
-    async (blockId, comments) => {
-      await actions.updateBlockComments({
-        sectionId,
-        blockId,
-        sectionKey: 'content',
-        comments,
-      });
-    },
-    [actions, sectionId],
-  );
-
   return (
     <EditableAccordionSection
       {...props}
-      heading={updatedHeading || ''}
+      heading={updatedHeading()}
       caption={caption}
       onHeadingChange={handleHeadingChange}
       onRemoveSection={handleRemoveSection}
@@ -167,12 +165,10 @@ const ReleaseContentAccordionSection = ({
       {({ open }) => (
         <>
           <EditableSectionBlocks
-            allowComments
             blocks={blocks}
             isReordering={isReordering}
             sectionId={sectionId}
             onBlocksChange={setBlocks}
-            onBlockCommentsChange={updateBlockComments}
             renderBlock={block => (
               <ReleaseBlock
                 block={block}
@@ -182,6 +178,7 @@ const ReleaseContentAccordionSection = ({
             )}
             renderEditableBlock={block => (
               <ReleaseEditableBlock
+                allowComments
                 allowImages
                 block={block}
                 sectionId={sectionId}

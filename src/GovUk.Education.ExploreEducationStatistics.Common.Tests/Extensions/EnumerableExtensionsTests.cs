@@ -27,6 +27,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         }
 
         [Fact]
+        public void IndexOfFirst()
+        {
+            var result = new List<int> { 1, 2, 3 }
+                .IndexOfFirst(value => value == 2);
+
+            Assert.Equal(1, result);
+        }
+
+        [Fact]
+        public void IndexOfFirst_NoMatch()
+        {
+            var result = new List<int> { 1, 2, 3 }
+                .IndexOfFirst(value => value == 4);
+
+            Assert.Equal(-1, result);
+        }
+
+        [Fact]
         public async Task ForEachAsync()
         {
             List<int> results = new List<int>();

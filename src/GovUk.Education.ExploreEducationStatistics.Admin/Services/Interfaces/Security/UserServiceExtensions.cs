@@ -279,6 +279,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(comment, SecurityPolicies.CanUpdateSpecificComment);
         }
 
+        public static Task<Either<ActionResult, Comment>> CheckCanDeleteComment(
+            this IUserService userService, Comment comment)
+        {
+            return userService.CheckPolicy(comment, SecurityPolicies.CanDeleteSpecificComment);
+        }
+
         public static Task<Either<ActionResult, File>> CheckCanCancelFileImport(
             this IUserService userService, File file)
         {

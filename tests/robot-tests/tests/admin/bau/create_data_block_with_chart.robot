@@ -39,7 +39,7 @@ Select subject "UI test subject"
     user waits until page contains    UI test subject
     user clicks radio    UI test subject
     user clicks element    id:publicationSubjectForm-submit
-    user waits until table tool wizard step is available    2    Choose locations    90
+    user waits until table tool wizard step is available    2    Choose locations    %{WAIT_MEDIUM}
     user checks previous table tool step contains    1    Subject    UI test subject
 
 Select locations

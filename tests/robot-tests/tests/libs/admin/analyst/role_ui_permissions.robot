@@ -40,7 +40,7 @@ user cannot see the enabled approve release controls for release
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
     user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    60
+    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
     user scrolls to element    id:releaseStatusForm-approvalStatus-Approved
     user checks element is disabled    id:releaseStatusForm-approvalStatus-Approved
 

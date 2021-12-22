@@ -58,8 +58,8 @@ Add first content section
 
 Add first text block
     user adds text block to editable accordion section    ${CONTENT_BLOCK_TITLE_1}    css:#releaseMainContent
-    user adds content to accordion section text block    ${CONTENT_BLOCK_TITLE_1}    1    ${CONTENT_BLOCK_BODY_1}
-    ...    css:#releaseMainContent
+    user adds content to autosaving accordion section text block    ${CONTENT_BLOCK_TITLE_1}    1
+    ...    ${CONTENT_BLOCK_BODY_1}    css:#releaseMainContent
 
 Switch to bau1 to add review comments
     [Tags]    HappyPath
@@ -79,20 +79,15 @@ Navigate to content section as bau1
 
 Add review comment for first content block
     [Tags]    HappyPath
-    user scrolls to element    testid:accordionSection
     user clicks button    First content section
-
-    user scrolls to element    testid:Expand Details Section Add / View comments (0 unresolved)
-    user clicks element    testid:Expand Details Section Add / View comments (0 unresolved)
-
-    # avoid set page view box getting in the way
-    user scrolls down    400
+    user clicks button    Edit block
+    # select the text to enable the add comment button
+    user presses keys    CTRL+a
+    user clicks element    xpath://*[@aria-label="Editor toolbar"]//button[9]    # CKEditor comment button
+    user waits until page contains element
+    ...    testid:comment-textarea    5
     user presses keys    This section needs fixing    testid:comment-textarea
     user clicks button    Add comment
-
-    user waits until page contains element
-    ...    //*[@data-testid="comment-content" and text()="This section needs fixing"]    5
-    user clicks element    testid:Expand Details Section Add / View comments (1 unresolved)
 
 Switch to analyst1 and navigate to release
     [Tags]    HappyPath
@@ -115,7 +110,7 @@ Resolve comments
     user closes Set Page View box
     user scrolls to element    testid:accordionSection
     user clicks button    First content section
-    user clicks element    testid:Expand Details Section Add / View comments (1 unresolved)
+    user clicks element    testid:view-comments
 
     # avoid set page view box getting in the way
     user scrolls down    600
@@ -123,15 +118,5 @@ Resolve comments
     # resolve the comment left by bau1
     ${comment}=    user gets comment    This section needs fixing
     user clicks button    Resolve    ${comment}
-
-    user clicks element    testid:comment-textarea
-    user presses keys    Fixed the problem    testid:comment-textarea
-
-    # add another comment letting bau user know they've fixed the problem (and pressing resolve on own comment)
-    user clicks button    Add comment
-
     user waits until page contains element
-    ...    //*[@data-testid="Expand Details Section Add / View comments (1 unresolved)"]    10
-
-    ${comment_2}=    user gets comment    Fixed the problem
-    user clicks button    Resolve    ${comment_2}
+    ...    testid:Expand Details Section Resolved comments (1)    10

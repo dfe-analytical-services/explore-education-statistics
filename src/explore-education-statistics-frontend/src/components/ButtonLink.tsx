@@ -9,14 +9,16 @@ import { LinkProps } from './Link';
 
 type Props = {
   disabled?: boolean;
+  variant?: 'secondary' | 'warning';
 } & LinkProps;
 
 const ButtonLink = ({
   children,
   className,
   disabled = false,
-  to,
   prefetch,
+  to,
+  variant,
   ...props
 }: Props) => {
   const isAbsolute = typeof to === 'string' && to.startsWith('http');
@@ -30,6 +32,8 @@ const ButtonLink = ({
         'govuk-button',
         {
           'govuk-button--disabled': disabled,
+          'govuk-button--secondary': variant === 'secondary',
+          'govuk-button--warning': variant === 'warning',
         },
         className,
       )}

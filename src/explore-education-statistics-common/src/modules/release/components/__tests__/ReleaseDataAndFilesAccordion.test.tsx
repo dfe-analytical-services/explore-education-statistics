@@ -1,5 +1,6 @@
 import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 import { Release } from '@common/services/publicationService';
+import { FileInfo } from '@common/services/types/file';
 import { within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -11,14 +12,14 @@ describe('ReleaseDataAndFilesAccordion', () => {
     downloadFiles: [
       {
         id: 'file-1',
-        name: 'Test data file 2',
+        name: 'Test data file 1',
         size: '10 KB',
         type: 'Data',
         extension: 'csv',
       },
       {
         id: 'file-2',
-        name: 'A Test data file 1',
+        name: 'Test data file 2',
         size: '15 KB',
         type: 'Data',
         extension: 'csv',
@@ -55,28 +56,227 @@ describe('ReleaseDataAndFilesAccordion', () => {
     slug: 'release-1',
   } as Release;
 
-  test('renders with files', () => {
+  const mockAllFilesButton = <a href="#">Mock download all data</a>;
+  const mockCreateTablesButton = <a href="#">Mock create tables button</a>;
+  const mockDataCatalogueLink = <a href="#">Mock data catalogue link</a>;
+  const mockDownloadLink = (file: FileInfo) => <a href="/">{file.name}</a>;
+  const mockDataGuidanceLink = <a href="#">Mock data guidance link</a>;
+
+  test('renders the download all data button if files are available', () => {
     render(
       <ReleaseDataAndFilesAccordion
         release={testRelease}
-        renderAllFilesButton={<a href="#">Mock all files button</a>}
-        renderDownloadLink={file => <a href="/">{file.name}</a>}
-        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
+        renderAllFilesButton={mockAllFilesButton}
+        renderCreateTablesButton={mockCreateTablesButton}
+        renderDataCatalogueLink={mockDataCatalogueLink}
+        renderDownloadLink={mockDownloadLink}
+        renderDataGuidanceLink={mockDataGuidanceLink}
       />,
     );
 
-    expect(screen.getByText('Explore data and files')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'All data used in this release is available as open data for download',
+      ),
+    ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('link', { name: 'Mock all files button' }),
+      screen.getByRole('link', { name: 'Mock download all data' }),
     ).toBeInTheDocument();
+  });
+
+  test('does not render the download all data button if no files are available', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={{
+          ...testRelease,
+          downloadFiles: [],
+        }}
+        renderAllFilesButton={mockAllFilesButton}
+        renderCreateTablesButton={mockCreateTablesButton}
+        renderDataCatalogueLink={mockDataCatalogueLink}
+        renderDownloadLink={mockDownloadLink}
+        renderDataGuidanceLink={mockDataGuidanceLink}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        'All data used in this release is available as open data for download',
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('link', { name: 'Mock download all data' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders the open data section', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={testRelease}
+        renderAllFilesButton={mockAllFilesButton}
+        renderCreateTablesButton={mockCreateTablesButton}
+        renderDataCatalogueLink={mockDataCatalogueLink}
+        renderDownloadLink={mockDownloadLink}
+        renderDataGuidanceLink={mockDataGuidanceLink}
+      />,
+    );
 
     expect(screen.getByText('Open data')).toBeInTheDocument();
 
-    expect(screen.getByText('Other files')).toBeInTheDocument();
-    expect(screen.getByText('List of other files')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'Browse and download individual open data files from this release in our data catalogue',
+      ),
+    ).toBeInTheDocument();
 
-    userEvent.click(screen.getByText('List of other files'));
+    expect(
+      screen.getByRole('link', { name: 'Mock data catalogue link' }),
+    ).toBeInTheDocument();
+  });
+
+  test('renders the download files list if showDataFileList is true', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={testRelease}
+        renderAllFilesButton={mockAllFilesButton}
+        renderCreateTablesButton={mockCreateTablesButton}
+        renderDataCatalogueLink={mockDataCatalogueLink}
+        renderDownloadLink={mockDownloadLink}
+        renderDataGuidanceLink={mockDataGuidanceLink}
+        showDownloadFilesList
+      />,
+    );
+
+    userEvent.click(screen.getByText('Download files'));
+
+    const downloadFiles = within(screen.getByTestId('data-files')).getAllByRole(
+      'listitem',
+    );
+
+    expect(downloadFiles).toHaveLength(2);
+
+    expect(
+      within(downloadFiles[0]).getByRole('link', {
+        name: 'Test data file 1',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(downloadFiles[0]).getByText('(csv, 10 KB)'),
+    ).toBeInTheDocument();
+
+    expect(
+      within(downloadFiles[1]).getByRole('link', {
+        name: 'Test data file 2',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      within(downloadFiles[1]).getByText('(csv, 15 KB)'),
+    ).toBeInTheDocument();
+  });
+
+  test('renders the data guidance section if guidance is available', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={testRelease}
+        renderAllFilesButton={mockAllFilesButton}
+        renderCreateTablesButton={mockCreateTablesButton}
+        renderDataCatalogueLink={mockDataCatalogueLink}
+        renderDownloadLink={mockDownloadLink}
+        renderDataGuidanceLink={mockDataGuidanceLink}
+      />,
+    );
+
+    expect(screen.getByText('Guidance')).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        'Learn more about the data files used in this release using our online guidance',
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', { name: 'Mock data guidance link' }),
+    ).toBeInTheDocument();
+  });
+
+  test('does not render the data guidance section if guidance is not available', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={{
+          ...testRelease,
+          hasDataGuidance: false,
+        }}
+        renderAllFilesButton={mockAllFilesButton}
+        renderCreateTablesButton={mockCreateTablesButton}
+        renderDataCatalogueLink={mockDataCatalogueLink}
+        renderDownloadLink={mockDownloadLink}
+        renderDataGuidanceLink={mockDataGuidanceLink}
+      />,
+    );
+
+    expect(screen.queryByText('Guidance')).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByText(
+        'Learn more about the data files used in this release using our online guidance',
+      ),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('link', { name: 'Mock data guidance link' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders the create tables section', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={testRelease}
+        renderAllFilesButton={mockAllFilesButton}
+        renderCreateTablesButton={mockCreateTablesButton}
+        renderDataCatalogueLink={mockDataCatalogueLink}
+        renderDownloadLink={mockDownloadLink}
+        renderDataGuidanceLink={mockDataGuidanceLink}
+      />,
+    );
+
+    expect(screen.getByText('Create your own tables')).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        'You can view featured tables that we have built for you, or create your own tables from the open data using our table tool',
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('link', { name: 'Mock create tables button' }),
+    ).toBeInTheDocument();
+  });
+
+  test('renders the ancillary files section if ancillary files are available', () => {
+    render(
+      <ReleaseDataAndFilesAccordion
+        release={testRelease}
+        renderAllFilesButton={mockAllFilesButton}
+        renderCreateTablesButton={mockCreateTablesButton}
+        renderDataCatalogueLink={mockDataCatalogueLink}
+        renderDownloadLink={mockDownloadLink}
+        renderDataGuidanceLink={mockDataGuidanceLink}
+      />,
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'All supporting files' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        'All supporting files from this release are listed for individual download below:',
+      ),
+    ).toBeInTheDocument();
+
+    userEvent.click(screen.getByText('List of all supporting files'));
 
     // Files should be ordered alphabetically
     const otherFiles = within(screen.getByTestId('other-files')).getAllByRole(
@@ -106,184 +306,30 @@ describe('ReleaseDataAndFilesAccordion', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders data guidance link', () => {
+  test('does not render the ancillary files section if no ancillary files are available', () => {
     render(
       <ReleaseDataAndFilesAccordion
-        release={testRelease}
-        renderDownloadLink={file => <a href="/">{file.name}</a>}
-        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
+        release={{ ...testRelease, downloadFiles: [] }}
+        renderAllFilesButton={mockAllFilesButton}
+        renderCreateTablesButton={mockCreateTablesButton}
+        renderDataCatalogueLink={mockDataCatalogueLink}
+        renderDownloadLink={mockDownloadLink}
+        renderDataGuidanceLink={mockDataGuidanceLink}
       />,
     );
 
     expect(
-      screen.getByRole('link', { name: 'mock data guidance link' }),
-    ).toBeInTheDocument();
-  });
-
-  test('does not render data guidance link if there is no data guidance', () => {
-    render(
-      <ReleaseDataAndFilesAccordion
-        release={{
-          ...testRelease,
-          hasDataGuidance: false,
-        }}
-        renderDownloadLink={file => <a href="/">{file.name}</a>}
-        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
-      />,
-    );
-
-    expect(
-      screen.queryByRole('link', { name: 'mock data guidance link' }),
-    ).not.toBeInTheDocument();
-  });
-
-  test('renders without files', () => {
-    render(
-      <ReleaseDataAndFilesAccordion
-        release={{
-          ...testRelease,
-          downloadFiles: [],
-        }}
-        renderDownloadLink={file => <a href="/">{file.name}</a>}
-        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
-      />,
-    );
-
-    expect(screen.queryByTestId('data-files')).not.toBeInTheDocument();
-    expect(screen.queryByTestId('other-files')).not.toBeInTheDocument();
-  });
-
-  test('does not render all files button if there are no files', () => {
-    render(
-      <ReleaseDataAndFilesAccordion
-        release={{
-          ...testRelease,
-          downloadFiles: [],
-        }}
-        renderAllFilesButton={<a href="/">Download all files</a>}
-        renderDownloadLink={file => <a href="/">{file.name}</a>}
-        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
-      />,
-    );
-
-    expect(
-      screen.queryByRole('link', { name: 'Download all files' }),
-    ).not.toBeInTheDocument();
-  });
-
-  test('does not render all files button if there is only an all files zip', () => {
-    render(
-      <ReleaseDataAndFilesAccordion
-        release={{
-          ...testRelease,
-          downloadFiles: [
-            {
-              id: 'file-1',
-              name: 'All files',
-              fileName: 'all-files.zip',
-              type: 'Ancillary',
-              size: '0 KB',
-              extension: 'zip',
-            },
-          ],
-        }}
-        renderAllFilesButton={<a href="/">Download all files</a>}
-        renderDownloadLink={file => <a href="/">{file.name}</a>}
-        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
-      />,
-    );
-
-    expect(
-      screen.queryByRole('link', { name: 'Download all files' }),
-    ).not.toBeInTheDocument();
-  });
-
-  test('renders data catalogue link', () => {
-    render(
-      <ReleaseDataAndFilesAccordion
-        release={testRelease}
-        renderDataCatalogueLink={<a href="#">mock data catalogue link</a>}
-        renderDownloadLink={file => <a href="/">{file.name}</a>}
-        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
-      />,
-    );
-
-    expect(
-      screen.getByRole('link', { name: 'mock data catalogue link' }),
-    ).toBeInTheDocument();
-  });
-
-  test('renders data files if there is no data catalogue link', () => {
-    render(
-      <ReleaseDataAndFilesAccordion
-        release={testRelease}
-        renderDownloadLink={file => <a href="/">{file.name}</a>}
-        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
-      />,
-    );
-
-    expect(
-      screen.queryByRole('link', { name: 'mock data catalogue link' }),
+      screen.queryByRole('heading', { name: 'All supporting files' }),
     ).not.toBeInTheDocument();
 
-    // Files should be ordered alphabetically, with the
-    // 'All files' zip always being at the top
-    const downloadFiles = within(screen.getByTestId('data-files')).getAllByRole(
-      'listitem',
-    );
-
-    // File 1
     expect(
-      within(downloadFiles[0]).getByRole('link', {
-        name: 'A Test data file 1',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      within(downloadFiles[0]).getByText('(csv, 15 KB)'),
-    ).toBeInTheDocument();
+      screen.queryByText(
+        'All supporting files from this release are listed for individual download below:',
+      ),
+    ).not.toBeInTheDocument();
 
-    // File 2
     expect(
-      within(downloadFiles[1]).getByRole('link', {
-        name: 'Test data file 2',
-      }),
-    ).toBeInTheDocument();
-    expect(
-      within(downloadFiles[1]).getByText('(csv, 10 KB)'),
-    ).toBeInTheDocument();
-  });
-
-  test('renders create tables link', () => {
-    render(
-      <ReleaseDataAndFilesAccordion
-        release={testRelease}
-        renderCreateTablesButton={<a href="#">mock create tables button</a>}
-        renderDownloadLink={file => <a href="/">{file.name}</a>}
-        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
-      />,
-    );
-
-    expect(screen.getByText('Create your own tables')).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'mock create tables button' }),
-    ).toBeInTheDocument();
-  });
-
-  test('renders pre-release access link', () => {
-    render(
-      <ReleaseDataAndFilesAccordion
-        release={testRelease}
-        renderPreReleaseAccessLink={
-          <a href="#">mock pre-release access link</a>
-        }
-        renderDownloadLink={file => <a href="/">{file.name}</a>}
-        renderDataGuidanceLink={<a href="#">mock data guidance link</a>}
-      />,
-    );
-
-    expect(screen.getByText('Pre-release access list')).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'mock pre-release access link' }),
-    ).toBeInTheDocument();
+      screen.queryByText('List of all supporting files'),
+    ).not.toBeInTheDocument();
   });
 });

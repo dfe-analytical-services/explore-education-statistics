@@ -151,6 +151,12 @@
     "topics": [
       {
         "methodologies": [
+          "UK revenue from education related exports and transnational education activity"
+        ],
+        "topic_heading": "Education exports"
+      },
+      {
+        "methodologies": [
           "Graduate labour market statistics",
           "Graduate outcomes (LEO)",
           "Graduate outcomes (LEO): Provider level data",
@@ -192,6 +198,12 @@
           "Permanent exclusions and suspensions in England"
         ],
         "topic_heading": "Exclusions"
+      },
+      {
+        "methodologies": [
+          "Parental responsibility measures"
+        ],
+        "topic_heading": "Parental responsibility measures"
       },
       {
         "methodologies": [

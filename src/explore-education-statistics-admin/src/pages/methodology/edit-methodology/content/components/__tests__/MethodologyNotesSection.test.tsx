@@ -47,7 +47,7 @@ describe('MethodologyNotesSection', () => {
   describe('displaying notes', () => {
     test('renders correctly when there are no notes', () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithoutNotes}
           />
@@ -62,7 +62,7 @@ describe('MethodologyNotesSection', () => {
 
     test('renders correctly with notes', () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
@@ -112,7 +112,7 @@ describe('MethodologyNotesSection', () => {
 
     test('renders correctly when there are no notes', () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithoutNotes}
           />
@@ -136,7 +136,7 @@ describe('MethodologyNotesSection', () => {
         notes: [oldNote, ...testMethodologyContentWithNotes.notes],
       };
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithOldNote}
           />
@@ -152,7 +152,7 @@ describe('MethodologyNotesSection', () => {
   describe('adding a note', () => {
     test('shows validation error if no note given and does not submit', async () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
@@ -195,7 +195,7 @@ describe('MethodologyNotesSection', () => {
         id: 'note-4',
       });
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
@@ -241,7 +241,7 @@ describe('MethodologyNotesSection', () => {
   describe('editing a note', () => {
     test('shows validation error if note or date removed and does not submit', async () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
@@ -298,7 +298,7 @@ describe('MethodologyNotesSection', () => {
         id: 'note-1',
       });
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
@@ -343,7 +343,7 @@ describe('MethodologyNotesSection', () => {
   describe('removing notes', () => {
     test('shows the confirm modal when clicking the Remove button', async () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />
@@ -373,7 +373,7 @@ describe('MethodologyNotesSection', () => {
 
     test('successfully removes a note', async () => {
       render(
-        <EditingContextProvider initialEditingMode="edit">
+        <EditingContextProvider editingMode="edit">
           <MethodologyNotesSection
             methodology={testMethodologyContentWithNotes}
           />

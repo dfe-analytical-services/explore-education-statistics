@@ -1,0 +1,13 @@
+@import '~govuk-frontend/govuk/base';
+@import '@admin/styles/variables';
+
+.container {
+  background: govuk-colour('white');
+  border: 1px solid govuk-colour('dark-grey');
+  margin-left: -$dfe-comments-gutter/2;
+  padding: govuk-spacing(2);
+  position: absolute;
+  top: 0;
+  width: $dfe-comments-width;
+  z-index: 9;
+}

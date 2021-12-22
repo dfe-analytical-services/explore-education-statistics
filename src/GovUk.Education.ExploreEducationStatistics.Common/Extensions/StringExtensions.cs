@@ -56,6 +56,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return value.StripLineBreaks();
         }
 
+        public static int IndentWidth(this string value)
+        {
+            var firstChar = value.IndexOfFirst(c => !c.IsWhiteSpaceCharacter());
+            return firstChar > -1 ? firstChar : value.Length;
+        }
+
+        public static string TrimIndent(this string value)
+        {
+            var lines = value.ToLines()
+                .ToList();
+
+            var minIndent = lines.Where(line => !string.IsNullOrEmpty(line))
+                .Select(line => line.IndentWidth())
+                .Min();
+
+            return lines
+                .Select(line => line.Skip(minIndent).JoinToString())
+                .JoinToString("\n");
+        }
+
         public static string AppendTrailingSlash(this string input)
         {
             return input.EndsWith("/") ? input : input + "/";

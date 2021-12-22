@@ -13,27 +13,21 @@ import releaseContentService from '@admin/services/releaseContentService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
-import { getNumberOfUnsavedBlocks } from '@admin/pages/release/content/components/utils/unsavedEditsUtils';
 import ReleasePreviewTableTool from '@admin/pages/release/content/components/ReleasePreviewTableTool';
 import getUnresolvedComments from '@admin/pages/release/content/utils/getUnresolvedComments';
-
 import classNames from 'classnames';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
 const ReleaseContentPageLoaded = () => {
-  const {
-    canUpdateRelease,
-    unresolvedComments,
-    release,
-  } = useReleaseContentState();
+  const { canUpdateRelease, release } = useReleaseContentState();
 
   return (
     <EditingContextProvider
-      initialEditingMode={canUpdateRelease ? 'edit' : 'preview'}
+      editingMode={canUpdateRelease ? 'edit' : 'preview'}
+      unresolvedComments={getUnresolvedComments(release)}
     >
-      {({ editingMode, unsavedEdits }) => {
-        const numOfEdits = getNumberOfUnsavedBlocks(unsavedEdits);
+      {({ editingMode, totalUnresolvedComments, totalUnsavedBlocks }) => {
         return (
           <>
             {editingMode === 'edit' && (
@@ -48,18 +42,18 @@ const ReleaseContentPageLoaded = () => {
 
             {canUpdateRelease && (
               <div className="govuk-form-group">
-                {numOfEdits > 0 && (
+                {totalUnsavedBlocks > 0 && (
                   <WarningMessage>
-                    {numOfEdits === 1
-                      ? 'One content block has unsaved changes. Clicking away from this tab will result in the changes being lost.'
-                      : `${numOfEdits} content blocks have unsaved changes. Clicking away from this tab will result in the changes being lost.`}
+                    {`${totalUnsavedBlocks} content ${
+                      totalUnsavedBlocks === 1 ? 'block has' : 'blocks have'
+                    } unsaved changes. Clicking away from this tab will result in the changes being lost.`}
                   </WarningMessage>
                 )}
-                {unresolvedComments.length > 0 && (
+                {totalUnresolvedComments > 0 && (
                   <WarningMessage>
-                    {unresolvedComments.length === 1
+                    {totalUnresolvedComments === 1
                       ? 'There is 1 unresolved comment'
-                      : `There are ${unresolvedComments.length} unresolved comments`}
+                      : `There are ${totalUnresolvedComments} unresolved comments`}
                   </WarningMessage>
                 )}
 
@@ -128,7 +122,6 @@ const ReleaseContentPage = ({
       release,
       availableDataBlocks,
       canUpdateRelease,
-      unresolvedComments: getUnresolvedComments(release),
     };
   }, [releaseId]);
 

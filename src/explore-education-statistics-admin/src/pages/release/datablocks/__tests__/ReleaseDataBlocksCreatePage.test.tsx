@@ -28,9 +28,9 @@ describe('ReleaseDataBlockCreatePage', () => {
           /This release has been approved, and can no longer be updated/,
         ),
       ).toBeInTheDocument();
-
-      expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
     });
+
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
   });
 
   const renderPage = () => {

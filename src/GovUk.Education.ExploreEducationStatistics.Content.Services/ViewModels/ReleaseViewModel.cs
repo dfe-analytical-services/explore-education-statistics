@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public class ReleaseViewModel
+    public record ReleaseViewModel
     {
         public Guid Id { get; }
 
@@ -19,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public string ReleaseName { get; }
 
-        public PartialDate NextReleaseDate { get; }
+        public PartialDate? NextReleaseDate { get; }
 
         public DateTime? Published { get; }
 
@@ -31,13 +32,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public List<ContentSectionViewModel> Content { get; }
 
-        public ContentSectionViewModel SummarySection { get; }
+        public ContentSectionViewModel? SummarySection { get; }
 
-        public ContentSectionViewModel HeadlinesSection { get; }
+        public ContentSectionViewModel? HeadlinesSection { get; }
 
-        public ContentSectionViewModel KeyStatisticsSection { get; }
+        public ContentSectionViewModel? KeyStatisticsSection { get; }
 
-        public ContentSectionViewModel KeyStatisticsSecondarySection { get; }
+        public ContentSectionViewModel? KeyStatisticsSecondarySection { get; }
 
         public List<FileInfo> DownloadFiles { get; }
 

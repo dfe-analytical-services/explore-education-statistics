@@ -996,19 +996,7 @@
         "timeAggregation": "Total",
         "criterionType": "StaticThresholdCriterion"
       }
-      // {
-      //   "name": "[concat(parameters('subscription'),'DataFactoryPipelineFailures')]",
-      //   "description": "Data Factory - Pipeline Failed Run",
-      //   "resourceId": "[resourceId('Microsoft.DataFactory/factories', variables('dataFactoryName'))]",
-      //   "resourceType": "Microsoft.DataFactory/factories",
-      //   "metricName": "PipelineFailedRuns",
-      //   "threshold": 0,
-      //   "operator": "GreaterThan",
-      //   "timeAggregation": "Total",
-      //   "criterionType": "StaticThresholdCriterion"
-      // }
     ],
-
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
     "vNetRef": "[resourceId('Microsoft.Network/virtualNetworks', variables('vNetName'))]",
     "adminSubnetName": "[concat(parameters('subscription'), '-snet-', parameters('environment'), '-admin')]",

@@ -165,31 +165,32 @@ class ReleaseFilesGenerator(object):
         try:
             container_client = self.blob_service_client.create_container(
                 "downloads")
-        except ResourceExistsError as e:
-            print(e)
-
+        except ResourceExistsError:
             container_client = self.blob_service_client.get_container_client(
                 "downloads")
+        except Exception as e:
+            print('Unexpected exception creating "downloads" container: ', e)
 
-            self.upload_files(container_client,
-                              self.all_files_zip_files)
+        assert container_client is not None
 
-            self.upload_files(container_client,
-                              self.data_files)
+        self.upload_files(container_client, self.all_files_zip_files)
+
+        self.upload_files(container_client, self.data_files)
 
     def create_private_release_files(self):
         try:
             container_client = self.blob_service_client.create_container(
                 "releases")
-        except ResourceExistsError as e:
-            print(e)
+        except ResourceExistsError:
             container_client = self.blob_service_client.get_container_client(
                 "releases")
+        except Exception as e:
+            print('Unexpected exception creating "releases" container: ', e)
 
-        self.upload_files(container_client,
-                          self.data_files)
-        self.upload_files(container_client,
-                          self.metadata_files)
+        assert container_client is not None
+
+        self.upload_files(container_client, self.data_files)
+        self.upload_files(container_client, self.metadata_files)
 
     @staticmethod
     def upload_files(container_client, files):
@@ -201,8 +202,10 @@ class ReleaseFilesGenerator(object):
             try:
                 blob_client.upload_blob(
                     data, blob_type="BlockBlob", metadata=file.metadata())
-            except ResourceExistsError as e:
-                print(e)
+            except ResourceExistsError:
+                pass  # file already exists, so no action required
+            except Exception as e:
+                print('Unexpected exception when uploading file: ', e)
 
 
 if __name__ == '__main__':
