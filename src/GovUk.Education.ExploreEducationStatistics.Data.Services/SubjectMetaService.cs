@@ -216,33 +216,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return locationAttributes
                 .ToDictionary(
                     pair => pair.Key.ToString().CamelCase(),
-                    pair =>
+                    pair => new LocationsMetaViewModel
                     {
-                        var options = DeduplicateLocationViewModels(
-                            pair.Value.Select(BuildLocationAttributeViewModel)
-                        )
-                            .ToList();
-
-                        var hasSubOptions = options.Any(option => option.Options is not null);
-
-                        return new LocationsMetaViewModel
-                        {
-                            Legend = pair.Key.GetEnumLabel(),
-                            Options = options
-                                .OrderBy(
-                                    option =>
-                                    {
-                                        // Regions should be ordered by their code
-                                        if (!hasSubOptions && pair.Key == GeographicLevel.Region)
-                                        {
-                                            return option.Value;
-                                        }
-
-                                        return OrderLocationViewModel(option);
-                                    }
-                                )
-                                .ToList()
-                        };
+                        Legend = pair.Key.GetEnumLabel(),
+                        Options = DeduplicateLocationViewModels(
+                                pair.Value
+                                    .OrderBy(OrderLocationAttributes)
+                                    .Select(BuildLocationAttributeViewModel)
+                            )
+                            .ToList()
                     }
                 );
         }
@@ -262,20 +244,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     Level = locationAttributeNode.Attribute.GetType().Name.CamelCase(),
                     Value = locationAttributeNode.Attribute.GetCodeOrFallback(),
                     Options = DeduplicateLocationViewModels(
-                            locationAttributeNode.Children.Select(BuildLocationAttributeViewModel)
+                            locationAttributeNode.Children
+                                .OrderBy(OrderLocationAttributes)
+                                .Select(BuildLocationAttributeViewModel)
                         )
-                        .OrderBy(OrderLocationViewModel)
                         .ToList()
                 };
         }
 
-        private static string OrderLocationViewModel(LocationAttributeViewModel option)
+        private static string OrderLocationAttributes(LocationAttributeNode node)
         {
-            return option switch
+            var locationAttribute = node.Attribute;
+
+            return locationAttribute switch
             {
-                // Regions should be ordered by their code
-                { Level: "region" } => option.Value,
-                _ => option.Label
+                Region region => region.Code ?? string.Empty,
+                _ => locationAttribute.Name ?? string.Empty
             };
         }
 

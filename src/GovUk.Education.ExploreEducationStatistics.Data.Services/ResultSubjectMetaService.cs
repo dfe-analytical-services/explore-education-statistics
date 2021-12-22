@@ -310,6 +310,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         var geoJsonByCode = allGeoJson.GetValueOrDefault(geographicLevel);
                         return DeduplicateLocationViewModels(
                                 locationAttributes
+                                    .OrderBy(OrderLocationAttributes)
                                     .Select(locationAttribute => GetLocationAttributeViewModel(locationAttribute, geoJsonByCode))
                             )
                             .ToList();
@@ -344,9 +345,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     Value = code,
                     Options = DeduplicateLocationViewModels(
                             locationAttributeNode.Children
+                                .OrderBy(OrderLocationAttributes)
                                 .Select(child => GetLocationAttributeViewModel(child, geoJsonByCode))
                         )
                         .ToList()
+                };
+            }
+
+            private static string OrderLocationAttributes(LocationAttributeNode node)
+            {
+                var locationAttribute = node.Attribute;
+
+                return locationAttribute switch
+                {
+                    Region region => region.Code ?? string.Empty,
+                    _ => locationAttribute.Name ?? string.Empty
                 };
             }
 

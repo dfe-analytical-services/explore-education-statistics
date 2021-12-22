@@ -858,6 +858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             // view models to be ordered by the region's location code.
             var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
             {
+                // Flat Regions
                 {
                     GeographicLevel.Region,
                     new List<LocationAttributeNode>
@@ -867,6 +868,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         new(_northEast),
                     }
                 },
+                // Hierarchical Regions - LA
                 {
                     GeographicLevel.LocalAuthority,
                     new List<LocationAttributeNode>
