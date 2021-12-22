@@ -995,6 +995,17 @@
         "operator": "GreaterThan",
         "timeAggregation": "Total",
         "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'DataFactoryPipelineFailures')]",
+        "description": "Data Factory - Pipeline Failed Run",
+        "resourceId": "[resourceId('Microsoft.DataFactory/factories', variables('dataFactoryName'))]",
+        "resourceType": "Microsoft.DataFactory/factories",
+        "metricName": "PipelineFailedRuns",
+        "threshold": 1,
+        "operator": "GreaterThan",
+        "timeAggregation": "Total",
+        "criterionType": "StaticThresholdCriterion"
       }
     ],
     "vNetName": "[concat(parameters('subscription'), '-vnet-', parameters('environment'))]",
@@ -3335,12 +3346,6 @@
           },
           "branch": {
             "value": "[parameters('branch')]"
-          },
-          "actionGroupAlerts": {
-            "value": "[variables('actionGroupAlerts')]"
-          },
-          "enableAlerts": {
-            "value": "[parameters('enableAlerts')]"
           }
         }
       },
@@ -3348,8 +3353,7 @@
         "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
         "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
         "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
       ]
     },
     {
