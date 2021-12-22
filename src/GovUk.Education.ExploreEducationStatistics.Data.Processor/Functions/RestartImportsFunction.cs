@@ -47,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Functions
             logger.LogInformation($"{executionContext.FunctionName} triggered: {message}");
 
             var incompleteImports = await _contentDbContext.DataImports
+                .AsQueryable()
                 .Where(import => IncompleteStatuses.Contains(import.Status))
                 .ToListAsync();
 

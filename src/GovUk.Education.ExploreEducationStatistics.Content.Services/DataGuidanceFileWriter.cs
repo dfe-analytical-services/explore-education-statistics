@@ -182,14 +182,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                             );
 
                             // Add table body for variable names/descriptions
-                            await variables.ForEachAsync(
-                                async variable =>
-                                {
-                                    await file.WriteLineAsync(
-                                        variable.Value.PadRight(padding.Value) + VariableSeparator + variable.Label
-                                    );
-                                }
-                            );
+                            await variables
+                                .ToAsyncEnumerable()
+                                .ForEachAwaitAsync(
+                                    async variable =>
+                                    {
+                                        await file.WriteLineAsync(
+                                            variable.Value.PadRight(padding.Value) + VariableSeparator + variable.Label
+                                        );
+                                    }
+                                );
                         }
 
                         var footnotes = subject.Footnotes

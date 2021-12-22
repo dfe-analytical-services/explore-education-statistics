@@ -527,26 +527,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _context.Entry(release)
                 .Collection(r => r.Content)
                 .LoadAsync();
-            await release.Content.ForEachAsync(async cs =>
-            {
-                await _context.Entry(cs)
-                    .Reference(rcs => rcs.ContentSection)
-                    .LoadAsync();
-                await _context.Entry(cs.ContentSection)
-                    .Collection(s => s.Content)
-                    .LoadAsync();
-            });
+            await release.Content
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async cs =>
+
+                {
+                    await _context.Entry(cs)
+                        .Reference(rcs => rcs.ContentSection)
+                        .LoadAsync();
+                    await _context.Entry(cs.ContentSection)
+                        .Collection(s => s.Content)
+                        .LoadAsync();
+                });
             await _context.Entry(release)
                 .Collection(r => r.Updates)
                 .LoadAsync();
             await _context.Entry(release)
                 .Collection(r => r.ContentBlocks)
                 .LoadAsync();
-            await release.ContentBlocks.ForEachAsync(async rcb =>
-                await _context.Entry(rcb)
-                    .Reference(cb => cb.ContentBlock)
-                    .LoadAsync()
-            );
+            await release.ContentBlocks
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async rcb =>
+                    await _context.Entry(rcb)
+                        .Reference(cb => cb.ContentBlock)
+                        .LoadAsync()
+                );
             return release;
         }
 

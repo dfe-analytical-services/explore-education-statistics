@@ -715,38 +715,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Version = 1
             };
 
-            await ListOf(Approver, Contributor, Lead).ForEachAsync(async role =>
-            {
-                // Assign the role to the latest release
-                var userReleaseRole = new UserReleaseRole
+            await ListOf(Approver, Contributor, Lead)
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async role =>
                 {
-                    User = new User(),
-                    Release = latestRelease,
-                    Role = role
-                };
+                    // Assign the role to the latest release
+                    var userReleaseRole = new UserReleaseRole
+                    {
+                        User = new User(),
+                        Release = latestRelease,
+                        Role = role
+                    };
 
-                var contentDbContextId = Guid.NewGuid().ToString();
+                    var contentDbContextId = Guid.NewGuid().ToString();
 
-                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    await contentDbContext.Publications.AddAsync(publication);
-                    await contentDbContext.Releases.AddRangeAsync(
-                        olderRelease,
-                        latestPublishedRelease,
-                        latestRelease);
-                    await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
-                    await contentDbContext.SaveChangesAsync();
-                }
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        await contentDbContext.Publications.AddAsync(publication);
+                        await contentDbContext.Releases.AddRangeAsync(
+                            olderRelease,
+                            latestPublishedRelease,
+                            latestRelease);
+                        await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
+                        await contentDbContext.SaveChangesAsync();
+                    }
 
-                await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-                {
-                    var service = SetupUserReleaseRoleRepository(contentDbContext);
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                    Assert.True(await service.IsUserEditorOrApproverOnLatestRelease(
-                        userReleaseRole.UserId,
-                        publication.Id));
-                }
-            });
+                        Assert.True(await service.IsUserEditorOrApproverOnLatestRelease(
+                            userReleaseRole.UserId,
+                            publication.Id));
+                    }
+                });
         }
 
         [Fact]

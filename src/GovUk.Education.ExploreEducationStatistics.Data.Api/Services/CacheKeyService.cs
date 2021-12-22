@@ -18,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IFastTrackService _fastTrackService;
 
         public CacheKeyService(
-            ContentDbContext contentDbContext, 
+            ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             IFastTrackService fastTrackService)
         {
@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             _statisticsDbContext = statisticsDbContext;
             _fastTrackService = fastTrackService;
         }
-        
+
         public Task<Either<ActionResult, FastTrackResultsCacheKey>> CreateCacheKeyForFastTrackResults(Guid fastTrackId)
         {
             return _fastTrackService
@@ -38,7 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                         .Include(release => release.Publication)
                         .SingleAsync(release => release.Id == fastTrack.ReleaseId);
 
-                    return new FastTrackResultsCacheKey(owningRelease.Publication.Slug, owningRelease.Slug, fastTrackId);
+                    return new FastTrackResultsCacheKey(owningRelease.Publication.Slug, owningRelease.Slug,
+                        fastTrackId);
                 });
         }
 
@@ -47,7 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var publishedReleaseSubjects = await _statisticsDbContext
                 .ReleaseSubject
                 .Include(releaseSubject => releaseSubject.Release)
-                .Where(releaseSubject => releaseSubject.SubjectId == subjectId && releaseSubject.Release.Published.HasValue)
+                .Where(releaseSubject =>
+                    releaseSubject.SubjectId == subjectId && releaseSubject.Release.Published.HasValue)
                 .ToListAsync();
 
             var liveReleaseSubjects = publishedReleaseSubjects
@@ -67,12 +69,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
             var publication = await _contentDbContext
                 .Publications
+                .AsQueryable()
                 .SingleAsync(publication => publication.Id == latestReleaseSubject.Release.PublicationId);
 
             return new SubjectMetaCacheKey(publication.Slug, latestReleaseSubject.Release.Slug, subjectId);
         }
-        
-        public async Task<Either<ActionResult, ReleaseSubjectsCacheKey>> CreateCacheKeyForReleaseSubjects(Guid releaseId)
+
+        public async Task<Either<ActionResult, ReleaseSubjectsCacheKey>> CreateCacheKeyForReleaseSubjects(
+            Guid releaseId)
         {
             var release = await _contentDbContext
                 .Releases

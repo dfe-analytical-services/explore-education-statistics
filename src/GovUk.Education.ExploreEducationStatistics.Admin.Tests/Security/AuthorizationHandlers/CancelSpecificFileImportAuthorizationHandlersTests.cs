@@ -23,25 +23,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 .Where(status => status.IsFinishedOrAborting())
                 .ToList();
 
-            await finishedOrAbortingStatuses.ForEachAsync(async status =>
-            {
-                var file = new File
+            await finishedOrAbortingStatuses
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async status =>
                 {
-                    Id = Guid.NewGuid()
-                };
+                    var file = new File
+                    {
+                        Id = Guid.NewGuid()
+                    };
 
-                var importRepository = new Mock<IDataImportRepository>();
+                    var importRepository = new Mock<IDataImportRepository>();
 
-                importRepository
-                    .Setup(s => s.GetStatusByFileId(file.Id))
-                    .ReturnsAsync(status);
+                    importRepository
+                        .Setup(s => s.GetStatusByFileId(file.Id))
+                        .ReturnsAsync(status);
 
-                // Assert that no users can cancel a finished or aborting Import
-                await AssertHandlerSucceedsWithCorrectClaims<File, CancelSpecificFileImportRequirement>(
-                    new CancelSpecificFileImportAuthorizationHandler(importRepository.Object), file);
-            });
+                    // Assert that no users can cancel a finished or aborting Import
+                    await AssertHandlerSucceedsWithCorrectClaims<File, CancelSpecificFileImportRequirement>(
+                        new CancelSpecificFileImportAuthorizationHandler(importRepository.Object), file);
+                });
         }
-        
+
         [Fact]
         public async Task CanCancelHealthyOngoingImportWithCorrectClaim()
         {
@@ -50,7 +52,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 .Where(status => !status.IsFinishedOrAborting())
                 .ToList();
 
-            await nonFinishedOrAbortingStatuses.ForEachAsync(async status =>
+            await nonFinishedOrAbortingStatuses
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async status =>
             {
                 var file = new File
                 {
