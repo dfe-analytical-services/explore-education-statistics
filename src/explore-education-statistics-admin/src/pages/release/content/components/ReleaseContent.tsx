@@ -28,7 +28,7 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
 import useToggle from '@common/hooks/useToggle';
 import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
 
 interface MethodologyLink {
@@ -49,7 +49,7 @@ const ReleaseContent = () => {
   const actions = useReleaseContentActions();
   const [blockRouteChange, toggleBlockRouteChange] = useToggle(false);
 
-  useEffect(() => {
+  useMemo(() => {
     const blocksWithCommentDeletions = Object.entries(unsavedCommentDeletions)
       .filter(blockWithDeletions => blockWithDeletions[1].length)
       .map(blockWithDeletions => blockWithDeletions[0]);
@@ -139,7 +139,14 @@ const ReleaseContent = () => {
 
   return (
     <>
-      <RouteLeavingGuard blockRouteChange={blockRouteChange} />
+      <RouteLeavingGuard
+        blockRouteChange={blockRouteChange}
+        title="There are unsaved changes"
+      >
+        <p>
+          Clicking away from this tab will result in the changes being lost.
+        </p>
+      </RouteLeavingGuard>
 
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">

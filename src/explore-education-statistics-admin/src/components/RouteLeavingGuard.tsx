@@ -1,14 +1,20 @@
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
-import React, { useEffect, useState } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Prompt, useLocation } from 'react-router';
 import { useHistory } from 'react-router-dom';
 
 interface Props {
   blockRouteChange: boolean;
+  children: ReactNode;
+  title: string;
 }
 
-const RouteLeavingGuard = ({ blockRouteChange = false }: Props) => {
+const RouteLeavingGuard = ({
+  blockRouteChange = false,
+  children,
+  title,
+}: Props) => {
   const location = useLocation();
   const history = useHistory();
   const [lastLocation, setLastLocation] = useState(location);
@@ -52,7 +58,7 @@ const RouteLeavingGuard = ({ blockRouteChange = false }: Props) => {
         }}
       />
       <ModalConfirm
-        title="There are unsaved changes"
+        title={title}
         open={showModal}
         onConfirm={() => {
           toggleShowModal.off();
@@ -61,9 +67,7 @@ const RouteLeavingGuard = ({ blockRouteChange = false }: Props) => {
         onExit={toggleShowModal.off}
         onCancel={toggleShowModal.off}
       >
-        <p>
-          Clicking away from this tab will result in the changes being lost.
-        </p>
+        {children}
       </ModalConfirm>
     </>
   );
