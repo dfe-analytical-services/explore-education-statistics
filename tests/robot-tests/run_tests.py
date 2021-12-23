@@ -145,6 +145,26 @@ parser.add_argument("--analyst-pass",
                     help="manually specify the analyst password")
 args = parser.parse_args()
 
+
+if args.custom_env:
+    load_dotenv(args.custom_env)
+else:
+    load_dotenv('.env.' + args.env)
+
+assert os.getenv('TIMEOUT') is not None
+assert os.getenv('IMPLICIT_WAIT') is not None
+assert os.getenv('PUBLIC_URL') is not None
+assert os.getenv('ADMIN_URL') is not None
+assert os.getenv('ADMIN_EMAIL') is not None
+assert os.getenv('ADMIN_PASSWORD') is not None
+assert os.getenv('PUBLIC_AUTH_USER') is not None
+assert os.getenv('PUBLIC_AUTH_PASSWORD') is not None
+assert os.getenv('RELEASE_COMPLETE_WAIT') is not None
+assert os.getenv('WAIT_MEDIUM') is not None
+assert os.getenv('WAIT_LONG') is not None
+assert os.getenv('WAIT_SMALL') is not None
+assert os.getenv('FAIL_TEST_SUITES_FAST') is not None
+
 if args.slack_webhook_url:
     os.environ['SLACK_WEBHOOK_URL'] = args.slack_webhook_url
 
@@ -167,8 +187,6 @@ os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
 
 output_file = "rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
 
-assert os.getenv('TIMEOUT') is not None
-assert os.getenv('IMPLICIT_WAIT') is not None
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
@@ -207,17 +225,6 @@ else:
     else:
         load_dotenv('.env.' + args.env)
 
-assert os.getenv('PUBLIC_URL') is not None
-assert os.getenv('ADMIN_URL') is not None
-assert os.getenv('ADMIN_EMAIL') is not None
-assert os.getenv('ADMIN_PASSWORD') is not None
-assert os.getenv('PUBLIC_AUTH_USER') is not None
-assert os.getenv('PUBLIC_AUTH_PASSWORD') is not None
-assert os.getenv('RELEASE_COMPLETE_WAIT') is not None
-assert os.getenv('WAIT_MEDIUM') is not None
-assert os.getenv('WAIT_LONG') is not None
-assert os.getenv('WAIT_SMALL') is not None
-assert os.getenv('FAIL_TEST_SUITES_FAST') is not None
 
 # seed Azure storage emulator release files
 if (args.env == 'local'):
