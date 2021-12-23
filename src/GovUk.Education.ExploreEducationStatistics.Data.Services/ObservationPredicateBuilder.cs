@@ -37,6 +37,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 predicate = predicate.AndAlso(subPredicate);
             }
 
+            if (query.LocationIds != null)
+            {
+                predicate = predicate.AndAlso(observation =>
+                    query.LocationIds.Contains(observation.LocationId));
+            }
+
             if (query.Locations != null)
             {
                 if (query.Locations.GeographicLevel != null)
@@ -45,16 +51,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         observation.GeographicLevel == query.Locations.GeographicLevel);
                 }
 
-                if (ObservationalUnitExists(query.Locations))
+                if (LocationAttributesExist(query.Locations))
                 {
-                    predicate = predicate.AndAlso(ObservationalUnitsPredicate(query.Locations));
+                    predicate = predicate.AndAlso(LocationAttributesPredicate(query.Locations));
                 }
             }
 
             return predicate;
         }
 
-        private static Expression<Func<Observation, bool>> ObservationalUnitsPredicate(LocationQuery query)
+        private static Expression<Func<Observation, bool>> LocationAttributesPredicate(LocationQuery query)
         {
             var predicate = PredicateBuilder.False<Observation>();
 
@@ -146,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return predicate;
         }
 
-        private static bool ObservationalUnitExists(LocationQuery query)
+        private static bool LocationAttributesExist(LocationQuery query)
         {
             return !(query == null ||
                      query.Country.IsNullOrEmpty() &&
@@ -168,21 +174,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static Expression<Func<Observation, bool>> CountryPredicate(LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Country,
+            return LocationAttributePredicate(query, GeographicLevel.Country,
                 observation => query.Country != null &&
                                query.Country.Contains(observation.Location.Country_Code));
         }
 
         private static Expression<Func<Observation, bool>> EnglishDevolvedAreaPredicate(LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.EnglishDevolvedArea,
+            return LocationAttributePredicate(query, GeographicLevel.EnglishDevolvedArea,
                 observation => query.EnglishDevolvedArea != null &&
                                query.EnglishDevolvedArea.Contains(observation.Location.EnglishDevolvedArea_Code));
         }
 
         private static Expression<Func<Observation, bool>> InstitutionPredicate(LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Institution,
+            return LocationAttributePredicate(query, GeographicLevel.Institution,
                 observation => query.Institution != null &&
                                query.Institution.Contains(observation.Location.Institution_Code));
         }
@@ -193,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var localAuthorityOldCodes = allLocalAuthorityCodes.Where(s => s.Length == 3).ToList();
             var localAuthorityNewCodes = allLocalAuthorityCodes.Except(localAuthorityOldCodes).ToList();
 
-            return ObservationalUnitPredicate(query, GeographicLevel.LocalAuthority,
+            return LocationAttributePredicate(query, GeographicLevel.LocalAuthority,
                 observation => localAuthorityNewCodes.Contains(observation.Location.LocalAuthority_Code) ||
                                localAuthorityOldCodes.Contains(observation.Location.LocalAuthority_OldCode));
         }
@@ -201,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static Expression<Func<Observation, bool>> LocalAuthorityDistrictPredicate(
             LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.LocalAuthorityDistrict,
+            return LocationAttributePredicate(query, GeographicLevel.LocalAuthorityDistrict,
                 observation => query.LocalAuthorityDistrict != null &&
                                query.LocalAuthorityDistrict.Contains(observation.Location.LocalAuthorityDistrict_Code));
         }
@@ -209,7 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static Expression<Func<Observation, bool>> LocalEnterprisePartnershipPredicate(
             LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.LocalEnterprisePartnership,
+            return LocationAttributePredicate(query, GeographicLevel.LocalEnterprisePartnership,
                 observation => query.LocalEnterprisePartnership != null &&
                     query.LocalEnterprisePartnership.Contains(observation.Location.LocalEnterprisePartnership_Code));
         }
@@ -217,21 +223,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static Expression<Func<Observation, bool>> MayoralCombinedAuthorityPredicate(
             LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.MayoralCombinedAuthority,
+            return LocationAttributePredicate(query, GeographicLevel.MayoralCombinedAuthority,
                 observation => query.MayoralCombinedAuthority != null &&
                     query.MayoralCombinedAuthority.Contains(observation.Location.MayoralCombinedAuthority_Code));
         }
 
         private static Expression<Func<Observation, bool>> MultiAcademyTrustPredicate(LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.MultiAcademyTrust,
+            return LocationAttributePredicate(query, GeographicLevel.MultiAcademyTrust,
                 observation => query.MultiAcademyTrust != null &&
                     query.MultiAcademyTrust.Contains(observation.Location.MultiAcademyTrust_Code));
         }
 
         private static Expression<Func<Observation, bool>> OpportunityAreaPredicate(LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.OpportunityArea,
+            return LocationAttributePredicate(query, GeographicLevel.OpportunityArea,
                 observation => query.OpportunityArea != null &&
                     query.OpportunityArea.Contains(observation.Location.OpportunityArea_Code));
         }
@@ -239,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static Expression<Func<Observation, bool>> ParliamentaryConstituencyPredicate(
             LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.ParliamentaryConstituency,
+            return LocationAttributePredicate(query, GeographicLevel.ParliamentaryConstituency,
                 observation => query.ParliamentaryConstituency != null &&
                     query.ParliamentaryConstituency.Contains(observation.Location.ParliamentaryConstituency_Code));
         }
@@ -247,54 +253,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private static Expression<Func<Observation, bool>> ProviderPredicate(
             LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Provider,
+            return LocationAttributePredicate(query, GeographicLevel.Provider,
                 observation => query.Provider != null &&
                     query.Provider.Contains(observation.Location.Provider_Code));
         }
 
         private static Expression<Func<Observation, bool>> RegionPredicate(LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Region,
+            return LocationAttributePredicate(query, GeographicLevel.Region,
                 observation => query.Region != null &&
                     query.Region.Contains(observation.Location.Region_Code));
         }
 
         private static Expression<Func<Observation, bool>> RscRegionPredicate(LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.RscRegion,
+            return LocationAttributePredicate(query, GeographicLevel.RscRegion,
                 observation => query.RscRegion != null &&
                                query.RscRegion.Contains(observation.Location.RscRegion_Code));
         }
 
         private static Expression<Func<Observation, bool>> SchoolPredicate(LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.School,
+            return LocationAttributePredicate(query, GeographicLevel.School,
                 observation => query.School != null &&
                     query.School.Contains(observation.Location.School_Code));
         }
 
         private static Expression<Func<Observation, bool>> SponsorPredicate(LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Sponsor,
+            return LocationAttributePredicate(query, GeographicLevel.Sponsor,
                 observation => query.Sponsor != null &&
                                query.Sponsor.Contains(observation.Location.Sponsor_Code));
         }
 
         private static Expression<Func<Observation, bool>> WardPredicate(LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.Ward,
+            return LocationAttributePredicate(query, GeographicLevel.Ward,
                 observation => query.Ward != null &&
                     query.Ward.Contains(observation.Location.Ward_Code));
         }
 
         private static Expression<Func<Observation, bool>> PlanningAreaPredicate(LocationQuery query)
         {
-            return ObservationalUnitPredicate(query, GeographicLevel.PlanningArea,
+            return LocationAttributePredicate(query, GeographicLevel.PlanningArea,
                 observation => query.PlanningArea != null &&
                     query.PlanningArea.Contains(observation.Location.PlanningArea_Code));
         }
 
-        private static Expression<Func<Observation, bool>> ObservationalUnitPredicate(LocationQuery query,
+        private static Expression<Func<Observation, bool>> LocationAttributePredicate(LocationQuery query,
             GeographicLevel geographicLevel, Expression<Func<Observation, bool>> expression)
         {
             return query.GeographicLevel == null

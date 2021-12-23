@@ -1,23 +1,25 @@
+#nullable enable
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
-    public class LocationViewModel
+    public record LocationViewModel
     {
-        public CodeNameViewModel Country { get; set; }
-        public CodeNameViewModel EnglishDevolvedArea { get; set; }
-        public CodeNameViewModel Institution { get; set; }
-        public CodeNameViewModel LocalAuthority { get; set; }
-        public CodeNameViewModel LocalAuthorityDistrict { get; set; }
-        public CodeNameViewModel LocalEnterprisePartnership { get; set; }
-        public CodeNameViewModel MayoralCombinedAuthority { get; set; }
-        public CodeNameViewModel MultiAcademyTrust { get; set; }
-        public CodeNameViewModel OpportunityArea { get; set; }
-        public CodeNameViewModel ParliamentaryConstituency { get; set; }
-        public CodeNameViewModel Provider { get; set; }
-        public CodeNameViewModel Region { get; set; }
-        public CodeNameViewModel RscRegion { get; set; }
-        public CodeNameViewModel School { get; set; }
-        public CodeNameViewModel Sponsor { get; set; }
-        public CodeNameViewModel Ward { get; set; }
-        public CodeNameViewModel PlanningArea { get; set; }
+        public CodeNameViewModel? Country { get; init; }
+        public CodeNameViewModel? EnglishDevolvedArea { get; init; }
+        public CodeNameViewModel? Institution { get; init; }
+        public CodeNameViewModel? LocalAuthority { get; init; }
+        public CodeNameViewModel? LocalAuthorityDistrict { get; init; }
+        public CodeNameViewModel? LocalEnterprisePartnership { get; init; }
+        public CodeNameViewModel? MayoralCombinedAuthority { get; init; }
+        public CodeNameViewModel? MultiAcademyTrust { get; init; }
+        public CodeNameViewModel? OpportunityArea { get; init; }
+        public CodeNameViewModel? ParliamentaryConstituency { get; init; }
+        public CodeNameViewModel? Provider { get; init; }
+        public CodeNameViewModel? Region { get; init; }
+        public CodeNameViewModel? RscRegion { get; init; }
+        public CodeNameViewModel? School { get; init; }
+        public CodeNameViewModel? Sponsor { get; init; }
+        public CodeNameViewModel? Ward { get; init; }
+        public CodeNameViewModel? PlanningArea { get; init; }
     }
 }

@@ -12,6 +12,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             OldCode = oldCode;
         }
 
+        public string GetCacheKey()
+        {
+            return $"{GetType().Name}:{Code ?? string.Empty}:{OldCode ?? string.Empty}:{Name ?? string.Empty}";
+        }
+
         public string GetCodeOrFallback()
         {
             return GetCodeOrOldCodeIfEmpty() ?? string.Empty;

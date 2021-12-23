@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<SubjectMetaViewModel> GetSubjectMetaViewModel(Subject subject)
         {
-            return new SubjectMetaViewModel
+            return new()
             {
                 Filters = GetFilters(subject.Id),
                 Indicators = GetIndicators(subject.Id),

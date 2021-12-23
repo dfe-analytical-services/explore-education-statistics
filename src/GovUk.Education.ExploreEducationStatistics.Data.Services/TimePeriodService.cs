@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             _context = context;
         }
-        
+
         public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(Guid subjectId)
         {
             return _context.Observation
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ThenBy(tuple => tuple.TimeIdentifier)
                 .Select(tuple => (tuple.Year, tuple.TimeIdentifier));
         }
-        
+
         public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(
             IQueryable<Observation> observations)
         {

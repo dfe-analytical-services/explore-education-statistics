@@ -1,21 +1,22 @@
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
-    public class ObservationViewModel
+    public record ObservationViewModel
     {
-        public IEnumerable<string> Filters { get; set; }
+        public List<Guid> Filters { get; set; }
 
-        // TODO could this be [JsonConverter(typeof(EnumToEnumValueJsonConverter<GeographicLevel>))]?
-        [JsonConverter(typeof(StringEnumConverter), true)]
+        [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
         public GeographicLevel GeographicLevel { get; set; }
 
         public LocationViewModel Location { get; set; }
 
-        public Dictionary<string, string> Measures { get; set; }
+        public Dictionary<Guid, string> Measures { get; set; }
 
         public string TimePeriod { get; set; }
     }

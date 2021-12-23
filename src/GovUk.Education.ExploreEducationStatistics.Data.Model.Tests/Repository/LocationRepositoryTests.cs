@@ -34,9 +34,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 {
                     Country = _england,
                     Region = _eastMidlands,
-                    LocalAuthority = _nottingham
+                    LocalAuthority = _nottingham,
+                    GeographicLevel = GeographicLevel.LocalAuthority
                 },
-                GeographicLevel = GeographicLevel.LocalAuthority,
                 Subject = new Subject()
             };
 
@@ -71,9 +71,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 {
                     Country = _england,
                     Region = _eastMidlands,
-                    LocalAuthority = _nottingham
+                    LocalAuthority = _nottingham,
+                    GeographicLevel = GeographicLevel.LocalAuthority
                 },
-                GeographicLevel = GeographicLevel.LocalAuthority,
                 Subject = subject
             };
 
@@ -117,9 +117,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 {
                     Location = new Location
                     {
-                        Country = _england
+                        Country = _england,
+                        GeographicLevel = GeographicLevel.Country
                     },
-                    GeographicLevel = GeographicLevel.Country,
                     Subject = subject
                 },
                 new()
@@ -127,9 +127,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     Location = new Location
                     {
                         Country = _england,
-                        Region = _northEast
+                        Region = _northEast,
+                        GeographicLevel = GeographicLevel.Region
                     },
-                    GeographicLevel = GeographicLevel.Region,
                     Subject = subject
                 },
                 new()
@@ -137,9 +137,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     Location = new Location
                     {
                         Country = _england,
-                        Region = _northWest
+                        Region = _northWest,
+                        GeographicLevel = GeographicLevel.Region
                     },
-                    GeographicLevel = GeographicLevel.Region,
                     Subject = subject
                 },
                 new()
@@ -148,9 +148,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     {
                         Country = _england,
                         Region = _eastMidlands,
-                        LocalAuthority = _derby
+                        LocalAuthority = _derby,
+                        GeographicLevel = GeographicLevel.LocalAuthority
                     },
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Subject = subject
                 }
             };
@@ -219,9 +219,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     {
                         Country = _england,
                         Region = _eastMidlands,
-                        LocalAuthority = _derby
+                        LocalAuthority = _derby,
+                        GeographicLevel = GeographicLevel.LocalAuthority
                     },
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Subject = subject
                 },
                 new()
@@ -230,9 +230,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     {
                         Country = _england,
                         Region = _eastMidlands,
-                        LocalAuthority = _nottingham
+                        LocalAuthority = _nottingham,
+                        GeographicLevel = GeographicLevel.LocalAuthority
                     },
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Subject = subject
                 }
             };
@@ -299,18 +299,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 {
                     Location = new Location
                     {
-                        LocalAuthority = _derby
+                        LocalAuthority = _derby,
+                        GeographicLevel = GeographicLevel.LocalAuthority
                     },
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Subject = subject
                 },
                 new()
                 {
                     Location = new Location
                     {
-                        LocalAuthority = _nottingham
+                        LocalAuthority = _nottingham,
+                        GeographicLevel = GeographicLevel.LocalAuthority
                     },
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Subject = subject
                 }
             };
@@ -382,9 +382,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     {
                         Country = _england,
                         Region = _eastMidlands,
-                        LocalAuthority = _derby
+                        LocalAuthority = _derby,
+                        GeographicLevel = GeographicLevel.LocalAuthority
                     },
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Subject = subject
                 },
                 new()
@@ -392,9 +392,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     Location = new Location
                     {
                         Country = _england,
-                        LocalAuthority = _derby
+                        LocalAuthority = _derby,
+                        GeographicLevel = GeographicLevel.LocalAuthority
                     },
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Subject = subject
                 },
                 new()
@@ -403,9 +403,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     {
                         Country = _england,
                         Region = _eastMidlands,
-                        LocalAuthority = _nottingham
+                        LocalAuthority = _nottingham,
+                        GeographicLevel = GeographicLevel.LocalAuthority
                     },
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Subject = subject
                 }
             };
@@ -480,9 +480,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 {
                     Location = new Location
                     {
-                        Country = _england
+                        Country = _england,
+                        GeographicLevel = GeographicLevel.Country
                     },
-                    GeographicLevel = GeographicLevel.Country,
                     Subject = subject
                 },
                 new()
@@ -490,9 +490,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     Location = new Location
                     {
                         Country = _england,
-                        Region = _northEast
+                        Region = _northEast,
+                        GeographicLevel = GeographicLevel.Region
                     },
-                    GeographicLevel = GeographicLevel.Region,
                     Subject = subject
                 },
                 new()
@@ -500,19 +500,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     Location = new Location
                     {
                         Country = _england,
-                        Region = _northWest
+                        Region = _northWest,
+                        GeographicLevel = GeographicLevel.Region
                     },
-                    GeographicLevel = GeographicLevel.Region,
-                    Subject = subject
-                },
-                new()
-                {
-                    Location = new Location
-                    {
-                        Country = _england,
-                        Region = _eastMidlands
-                    },
-                    GeographicLevel = GeographicLevel.Region,
                     Subject = subject
                 },
                 new()
@@ -521,9 +511,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     {
                         Country = _england,
                         Region = _eastMidlands,
-                        LocalAuthority = _derby
+                        GeographicLevel = GeographicLevel.Region
                     },
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Subject = subject
                 },
                 new()
@@ -532,9 +521,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                     {
                         Country = _england,
                         Region = _eastMidlands,
-                        LocalAuthority = _nottingham
+                        LocalAuthority = _derby,
+                        GeographicLevel = GeographicLevel.LocalAuthority
                     },
-                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Subject = subject
+                },
+                new()
+                {
+                    Location = new Location
+                    {
+                        Country = _england,
+                        Region = _eastMidlands,
+                        LocalAuthority = _nottingham,
+                        GeographicLevel = GeographicLevel.LocalAuthority
+                    },
                     Subject = subject
                 }
             };
