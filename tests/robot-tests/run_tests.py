@@ -167,6 +167,9 @@ os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
 
 output_file = "rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
 
+assert os.getenv('TIMEOUT') is not None
+assert os.getenv('IMPLICIT_WAIT') is not None
+
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
              "--output", output_file,
@@ -174,7 +177,7 @@ robotArgs = ["--outputdir", "test-results/",
              "--exclude", "UnderConstruction",
              "--exclude", "BootstrapData"]
 
-robotArgs += ["-v", f"timeout:{args.timeout}", "-v", f"implicit_wait:{args.implicit_wait}"]
+robotArgs += ["-v", f"timeout:{os.getenv('TIMEOUT')}", "-v", f"implicit_wait:{os.getenv('IMPLICIT_WAIT')}"]
 
 if args.fail_fast:
     robotArgs += ["--exitonfailure"]
@@ -208,7 +211,13 @@ assert os.getenv('PUBLIC_URL') is not None
 assert os.getenv('ADMIN_URL') is not None
 assert os.getenv('ADMIN_EMAIL') is not None
 assert os.getenv('ADMIN_PASSWORD') is not None
-
+assert os.getenv('PUBLIC_AUTH_USER') is not None
+assert os.getenv('PUBLIC_AUTH_PASSWORD') is not None
+assert os.getenv('RELEASE_COMPLETE_WAIT') is not None
+assert os.getenv('WAIT_MEDIUM') is not None
+assert os.getenv('WAIT_LONG') is not None
+assert os.getenv('WAIT_SMALL') is not None
+assert os.getenv('FAIL_TEST_SUITES_FAST') is not None
 
 # seed Azure storage emulator release files
 if (args.env == 'local'):
