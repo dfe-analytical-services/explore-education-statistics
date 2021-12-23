@@ -47,8 +47,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileRepository releaseFileRepository = null,
             IUserService userService = null)
         {
+            contentDbContext ??= new Mock<ContentDbContext>().Object;
+
             return new ReleaseImageService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                contentDbContext,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 blobStorageService ?? new Mock<IBlobStorageService>().Object,
                 fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,

@@ -479,7 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     MethodologyContentService.ContentListType.Content);
 
                 Assert.True(result.IsRight);
-                Assert.Equal(0, result.Right.Content.Count);
+                Assert.Empty(result.Right.Content);
                 Assert.Equal(0, result.Right.Order);
             }
         }

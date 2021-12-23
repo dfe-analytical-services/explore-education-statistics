@@ -236,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .SingleOrDefault(urr => urr.Id == userReleaseRole.Id);
 
                 Assert.NotNull(updatedReleaseRole);
-                Assert.Equal(userReleaseRole.ReleaseId, updatedReleaseRole!.ReleaseId);
+                Assert.Equal(userReleaseRole.ReleaseId, updatedReleaseRole.ReleaseId);
                 Assert.Equal(userReleaseRole.Role, updatedReleaseRole.Role);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedReleaseRole.Deleted!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(deletedById, updatedReleaseRole.DeletedById);

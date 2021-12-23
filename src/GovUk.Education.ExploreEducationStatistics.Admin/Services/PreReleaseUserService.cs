@@ -430,7 +430,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var preReleaseWindow = _preReleaseService.GetPreReleaseWindow(release);
             var preReleaseWindowStart = preReleaseWindow.Start.ConvertUtcToUkTimeZone();
-            var publishScheduled = release.PublishScheduled?.ConvertUtcToUkTimeZone();
+            var publishScheduled = release.PublishScheduled!.Value.ConvertUtcToUkTimeZone();
+
             // TODO EES-828 This time should depend on the Publisher schedule
             var publishScheduledTime = new TimeSpan(9, 30, 0);
 
@@ -439,7 +440,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var publishDay = FormatDayForEmail(publishScheduled);
             var publishTime = FormatTimeForEmail(publishScheduledTime);
 
-            var emailValues = new Dictionary<string, dynamic?>
+            var emailValues = new Dictionary<string, dynamic>
             {
                 {"newUser", isNewUser ? "yes" : "no"},
                 {"release name", release.Title},
@@ -464,9 +465,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return timeSpan.ToString(@"hh\:mm");
         }
 
-        private static string? FormatDayForEmail(DateTime? dateTime)
+        private static string FormatDayForEmail(DateTime dateTime)
         {
-            return dateTime?.ToString("dddd dd MMMM yyyy");
+            return dateTime.ToString("dddd dd MMMM yyyy");
         }
 
         private static Either<ActionResult, List<string>> ValidateEmailAddresses(IEnumerable<string> input)

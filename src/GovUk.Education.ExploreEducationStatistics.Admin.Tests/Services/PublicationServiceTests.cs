@@ -662,7 +662,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
                 Assert.False(updatedPublication.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
                 Assert.Equal("new-title", updatedPublication.Slug);
                 Assert.Equal("New title", updatedPublication.Title);
 
@@ -755,7 +755,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
                 Assert.True(updatedPublication.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
                 // Slug remains unchanged
                 Assert.Equal("old-title", updatedPublication.Slug);
                 Assert.Equal("New title", updatedPublication.Title);
