@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
@@ -19,11 +20,14 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class UserManagementServiceTests
     {
+        private static readonly Guid _createdById = Guid.NewGuid();
+
         [Fact]
         public async Task GetUser()
         {
@@ -95,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
-            var userRoleService = new Mock<IUserRoleService>(MockBehavior.Strict);
+            var userRoleService = new Mock<IUserRoleService>(Strict);
 
             userRoleService.Setup(mock =>
                 mock.GetGlobalRoles(user.Id)).ReturnsAsync(globalRoles);
@@ -136,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetUser_NoUser()
         {
-            var userRoleService = new Mock<IUserRoleService>(MockBehavior.Strict);
+            var userRoleService = new Mock<IUserRoleService>(Strict);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
             {
@@ -230,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
-            var userRoleService = new Mock<IUserRoleService>(MockBehavior.Strict);
+            var userRoleService = new Mock<IUserRoleService>(Strict);
 
             userRoleService.Setup(mock =>
                 mock.RemoveGlobalRole(user.Id, role1.Id)).ReturnsAsync(Unit.Instance);
@@ -284,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await userAndRolesDbContext.SaveChangesAsync();
             }
 
-            var userRoleService = new Mock<IUserRoleService>(MockBehavior.Strict);
+            var userRoleService = new Mock<IUserRoleService>(Strict);
 
             userRoleService.Setup(mock =>
                 mock.AddGlobalRole(user.Id, role.Id)).ReturnsAsync(Unit.Instance);
@@ -308,23 +312,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static UserManagementService SetupUserManagementService(
-            ContentDbContext contentDbContext = null,
-            UsersAndRolesDbContext usersAndRolesDbContext = null,
-            IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper = null,
-            IEmailTemplateService emailTemplateService = null,
-            IUserRoleService userRoleService = null,
-            IUserService userService = null)
+            ContentDbContext? contentDbContext = null,
+            UsersAndRolesDbContext? usersAndRolesDbContext = null,
+            IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
+            IEmailTemplateService? emailTemplateService = null,
+            IUserRoleService? userRoleService = null,
+            IUserService? userService = null,
+            IUserInviteRepository? userInviteRepository = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
 
             return new UserManagementService(
-                usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
+                usersAndRolesDbContext,
                 contentDbContext,
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-                emailTemplateService ?? new Mock<IEmailTemplateService>().Object,
-                userRoleService ?? new Mock<IUserRoleService>().Object,
-                userService ?? AlwaysTrueUserService().Object
+                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
+                userRoleService ?? Mock.Of<IUserRoleService>(Strict),
+                userService ?? AlwaysTrueUserService(_createdById).Object,
+                userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext)
             );
         }
     }

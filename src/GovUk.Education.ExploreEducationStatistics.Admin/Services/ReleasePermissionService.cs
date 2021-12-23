@@ -22,17 +22,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
+        private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
         private readonly IUserService _userService;
 
         public ReleasePermissionService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserReleaseRoleRepository userReleaseRoleRepository,
+            IUserReleaseInviteRepository userReleaseInviteRepository,
             IUserService userService)
         {
             _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _userReleaseRoleRepository = userReleaseRoleRepository;
+            _userReleaseInviteRepository = userReleaseInviteRepository;
             _userService = userService;
         }
 
@@ -145,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             return !userIdsWithReleaseRole.Contains(userId);
                         }).ToList();
 
-                    await _userReleaseRoleRepository.CreateMany(
+                    await _userReleaseRoleRepository.CreateManyIfNotExists(
                         userIds: usersToBeAdded,
                         releaseId: release.Id,
                         role: Contributor,
@@ -166,11 +169,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .CheckCanUpdateReleaseRole(publication, Contributor))
                 .OnSuccessVoid(async publication =>
                 {
+                    var user = _contentDbContext
+                        .Users
+                        .AsQueryable()
+                        .Single(u => u.Id == userId);
+
                     await _userReleaseRoleRepository.RemoveAllForPublication(
                         userId: userId,
                         publication: publication,
                         role: Contributor,
                         deletedById: _userService.GetUserId());
+
+                    await _userReleaseInviteRepository.RemoveByPublication(
+                        publication: publication,
+                        email: user.Email,
+                        role: Contributor);
                 });
         }
     }

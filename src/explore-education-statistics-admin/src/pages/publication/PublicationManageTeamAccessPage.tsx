@@ -103,7 +103,10 @@ const PublicationManageTeamAccessPage = ({
                 />
               </TabsSection>
               <TabsSection id="invite-users" title="Invite new users">
-                <PublicationInviteNewUsersTab />
+                <PublicationInviteNewUsersTab
+                  publication={publication}
+                  releases={releases}
+                />
               </TabsSection>
             </Tabs>
           )}

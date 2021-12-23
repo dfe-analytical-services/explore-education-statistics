@@ -293,6 +293,10 @@
       "type": "securestring",
       "defaultValue": "change-me"
     },
+    "notifyContributorTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me"
+    },
     "teamEmailAddresses": {
       "type": "array",
       "defaultValue": [
@@ -1650,6 +1654,7 @@
         "NotifyPublicationRoleTemplateId": "[parameters('notifyPublicationRoleTemplateId')]",
         "NotifyReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
         "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
+        "NotifyContributorTemplateId": "[parameters('notifyContributorTemplateId')]",
         "AdminUri": "[parameters('adminUri')]",
         "PublicAppUrl": "[variables('publicAppUrl')]",
         "IdentityServer:IssuerUri": "[concat('urn=', parameters('adminUri'))]",
