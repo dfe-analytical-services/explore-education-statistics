@@ -63,9 +63,12 @@ const PublicationSummary = ({
           {permissions.canCreateReleases && (
             <ButtonLink
               className="govuk-!-margin-bottom-0"
-              to={generatePath(releaseCreateRoute.path, {
-                publicationId: id,
-              })}
+              to={generatePath<PublicationRouteParams>(
+                releaseCreateRoute.path,
+                {
+                  publicationId: id,
+                },
+              )}
               data-testid={`Create new release link for ${title}`}
             >
               Create new release

@@ -938,14 +938,16 @@ describe('MethodologySummary', () => {
       );
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('button', { name: 'Remove' }),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.queryByRole('button', { name: 'Amend methodology' }),
-        ).not.toBeInTheDocument();
+        expect(screen.getByText('Remove')).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByRole('button', { name: 'Remove' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByRole('button', { name: 'Amend methodology' }),
+      ).not.toBeInTheDocument();
     });
 
     test('shows the confirm modal when clicking the Remove button', async () => {
@@ -969,17 +971,17 @@ describe('MethodologySummary', () => {
         expect(
           screen.getByText('Confirm you want to remove this methodology'),
         ).toBeInTheDocument();
-
-        expect(
-          screen.getByText(
-            'By removing this methodology you will lose any changes made.',
-          ),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.getByRole('button', { name: 'Confirm' }),
-        ).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByText(
+          'By removing this methodology you will lose any changes made.',
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
     });
 
     test('calls the service to remove the Methodology when the confirm button is clicked', async () => {
@@ -1000,12 +1002,14 @@ describe('MethodologySummary', () => {
       userEvent.click(screen.getByRole('button', { name: 'Remove' }));
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('button', { name: 'Confirm' }),
-        ).toBeInTheDocument();
-
-        userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+        expect(screen.getByText('Confirm')).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
+
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
@@ -1075,11 +1079,11 @@ describe('MethodologySummary', () => {
         expect(
           screen.getByText('Confirm you want to amend this live methodology'),
         ).toBeInTheDocument();
-
-        expect(
-          screen.getByRole('button', { name: 'Confirm' }),
-        ).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
     });
 
     test('calls the service to amend the methodology when the confirm button is clicked', async () => {
@@ -1121,10 +1125,12 @@ describe('MethodologySummary', () => {
         screen.getByRole('button', { name: 'Amend methodology' }),
       );
       await waitFor(() => {
-        expect(
-          screen.getByRole('button', { name: 'Confirm' }),
-        ).toBeInTheDocument();
+        expect(screen.getByText('Confirm')).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
 
       userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
@@ -1189,17 +1195,17 @@ describe('MethodologySummary', () => {
             'Confirm you want to cancel this amended methodology',
           ),
         ).toBeInTheDocument();
-
-        expect(
-          screen.getByText(
-            'By cancelling the amendments you will lose any changes made, and the original methodology will remain unchanged.',
-          ),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.getByRole('button', { name: 'Confirm' }),
-        ).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByText(
+          'By cancelling the amendments you will lose any changes made, and the original methodology will remain unchanged.',
+        ),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
     });
 
     test('calls the service to cancel the amendment when the confirm button is clicked', async () => {
@@ -1218,13 +1224,16 @@ describe('MethodologySummary', () => {
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Cancel amendment' }));
-      await waitFor(() => {
-        expect(
-          screen.getByRole('button', { name: 'Confirm' }),
-        ).toBeInTheDocument();
 
-        userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      await waitFor(() => {
+        expect(screen.getByText('Confirm')).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
+
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
 
       await waitFor(() => {
         expect(methodologyService.deleteMethodology).toHaveBeenCalledWith(
@@ -1323,6 +1332,7 @@ describe('MethodologySummary', () => {
       await waitFor(() => {
         expect(screen.getByText('Confirm')).toBeInTheDocument();
       });
+
       expect(
         screen.getByText(
           'Are you sure you want to remove this adopted methodology?',

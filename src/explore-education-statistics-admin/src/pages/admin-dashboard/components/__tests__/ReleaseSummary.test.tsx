@@ -56,7 +56,6 @@ describe('ReleaseSummary', () => {
     },
   };
   const testActions = <button type="button">Test action</button>;
-  const testChildren = <p>Test children</p>;
 
   const completeReleaseStatus: ReleaseStageStatuses = {
     overallStage: 'Complete',
@@ -203,7 +202,7 @@ describe('ReleaseSummary', () => {
   test('renders children correctly', () => {
     render(
       <ReleaseSummary release={testRelease} actions={testActions}>
-        {testChildren}
+        <p>Test children</p>
       </ReleaseSummary>,
     );
     expect(screen.getByText('Test children')).toBeInTheDocument();
