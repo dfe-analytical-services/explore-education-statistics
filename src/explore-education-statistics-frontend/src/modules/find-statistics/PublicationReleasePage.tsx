@@ -217,8 +217,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   <Link
                     to={
                       release.latestRelease
-                        ? `/find-statistics/${release.publication.slug}/meta-guidance`
-                        : `/find-statistics/${release.publication.slug}/${release.slug}/meta-guidance`
+                        ? `/find-statistics/${release.publication.slug}/data-guidance`
+                        : `/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`
                     }
                   >
                     Data guidance
@@ -431,8 +431,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             <ButtonLink
               to={
                 release.latestRelease
-                  ? `/find-statistics/${release.publication.slug}/meta-guidance`
-                  : `/find-statistics/${release.publication.slug}/${release.slug}/meta-guidance`
+                  ? `/find-statistics/${release.publication.slug}/data-guidance`
+                  : `/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`
               }
               variant="secondary"
             >
