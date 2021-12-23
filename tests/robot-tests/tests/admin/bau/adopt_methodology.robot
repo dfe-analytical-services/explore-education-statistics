@@ -21,8 +21,8 @@ Create Publications and a Methodology to adopt
 
 Adopt a Methodology
     ${accordion}=    user opens publication on the admin dashboard    ${ADOPTING_PUBLICATION_NAME}
-    user checks element contains link    ${accordion}    Adopt a methodology
-    user clicks link    Adopt a methodology    ${accordion}
+    user checks element contains link    ${accordion}    Adopt an existing methodology
+    user clicks link    Adopt an existing methodology    ${accordion}
     user waits until page contains title    Adopt a methodology
     user clicks radio    ${OWNING_PUBLICATION_NAME}
     user opens details dropdown    More details    css:[data-testid="Radio item for ${OWNING_PUBLICATION_NAME}"]

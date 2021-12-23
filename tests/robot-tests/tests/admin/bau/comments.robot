@@ -41,8 +41,8 @@ Switch to analyst1 to work on release content blocks
 
     user opens details dropdown    ${RELEASE_NAME}    ${accordion}
     ${details}=    user gets details content element    ${RELEASE_NAME} (not Live)    ${accordion}
-    user waits until parent contains element    ${details}    xpath:.//a[text()="Edit this release"]
-    user clicks link    Edit this release
+    user waits until parent contains element    ${details}    xpath:.//a[text()="Edit release"]
+    user clicks link    Edit release
 
 Navigate to content section as analyst1
     user clicks link    Content
@@ -69,8 +69,8 @@ Switch to bau1 to add review comments
     ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
     user opens details dropdown    ${RELEASE_NAME}    ${accordion}
     ${details}=    user gets details content element    ${RELEASE_NAME} (not Live)    ${accordion}
-    user waits until parent contains element    ${details}    xpath:.//a[text()="Edit this release"]
-    user clicks link    Edit this release
+    user waits until parent contains element    ${details}    xpath:.//a[text()="Edit release"]
+    user clicks link    Edit release
 
 Navigate to content section as bau1
     [Tags]    HappyPath
@@ -97,8 +97,8 @@ Switch to analyst1 and navigate to release
     ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
     user opens details dropdown    ${RELEASE_NAME}    ${accordion}
     ${details}=    user gets details content element    ${RELEASE_NAME} (not Live)    ${accordion}
-    user waits until parent contains element    ${details}    xpath:.//a[text()="Edit this release"]
-    user clicks link    Edit this release
+    user waits until parent contains element    ${details}    xpath:.//a[text()="Edit release"]
+    user clicks link    Edit release
 
 Navigate to content section to resolve comments
     [Tags]    HappyPath

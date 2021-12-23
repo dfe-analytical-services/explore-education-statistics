@@ -52,19 +52,19 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'View this release',
+        name: 'View release',
       }),
     ).toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', {
-        name: 'Edit this release',
+        name: 'Edit release',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', {
-        name: 'Amend this release',
+        name: 'Amend release',
       }),
     ).not.toBeInTheDocument();
 
@@ -76,13 +76,13 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'View this release amendment',
+        name: 'View release amendment',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', {
-        name: 'Edit this release amendment',
+        name: 'Edit release amendment',
       }),
     ).not.toBeInTheDocument();
 
@@ -116,19 +116,19 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'View this release',
+        name: 'View release',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
-        name: 'Edit this release',
+        name: 'Edit release',
       }),
     ).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {
-        name: 'Amend this release',
+        name: 'Amend release',
       }),
     ).toBeInTheDocument();
 
@@ -140,13 +140,13 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'View this release amendment',
+        name: 'View release amendment',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', {
-        name: 'Edit this release amendment',
+        name: 'Edit release amendment',
       }),
     ).not.toBeInTheDocument();
 
@@ -180,19 +180,19 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'View this release',
+        name: 'View release',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', {
-        name: 'Edit this release',
+        name: 'Edit release',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', {
-        name: 'Amend this release',
+        name: 'Amend release',
       }),
     ).not.toBeInTheDocument();
 
@@ -204,13 +204,13 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'View this release amendment',
+        name: 'View release amendment',
       }),
     ).toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', {
-        name: 'Edit this release amendment',
+        name: 'Edit release amendment',
       }),
     ).not.toBeInTheDocument();
 
@@ -246,19 +246,19 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'View this release',
+        name: 'View release',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', {
-        name: 'Edit this release',
+        name: 'Edit release',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('button', {
-        name: 'Amend this release',
+        name: 'Amend release',
       }),
     ).not.toBeInTheDocument();
 
@@ -270,13 +270,13 @@ describe('NonScheduledReleaseSummary', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'View this release amendment',
+        name: 'View release amendment',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
-        name: 'Edit this release amendment',
+        name: 'Edit release amendment',
       }),
     ).toBeInTheDocument();
 
@@ -309,10 +309,10 @@ describe('NonScheduledReleaseSummary', () => {
       }),
     );
 
-    // Now click the "Amend this release" button and check that the warning modal appears.
+    // Now click the "Amend release" button and check that the warning modal appears.
     userEvent.click(
       screen.getByRole('button', {
-        name: 'Amend this release',
+        name: 'Amend release',
       }),
     );
 
@@ -438,7 +438,7 @@ describe('NonScheduledReleaseSummary', () => {
     // flag.
     expect(
       screen.queryByRole('button', {
-        name: 'Amend this release',
+        name: 'Amend release',
       }),
     ).not.toBeInTheDocument();
   });

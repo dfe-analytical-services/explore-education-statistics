@@ -12,12 +12,12 @@ user navigates to publication on admin dashboard
 user cannot see the create methodologies controls for publication
     [Arguments]    ${PUBLICATION_ACCORDION}
     user checks element does not contain button    ${PUBLICATION_ACCORDION}    Create methodology
-    user checks element does not contain link    ${PUBLICATION_ACCORDION}    Link to an externally hosted methodology
+    user checks element does not contain link    ${PUBLICATION_ACCORDION}    Use an external methodology
 
 user cannot see the create amendment controls for release
     [Arguments]    ${RELEASE_DETAILS_SECTION}
-    user waits until element contains link    ${RELEASE_DETAILS_SECTION}    View this release    %{WAIT_SMALL}
-    user checks element does not contain button    ${RELEASE_DETAILS_SECTION}    Amend this release
+    user waits until element contains link    ${RELEASE_DETAILS_SECTION}    View release    %{WAIT_SMALL}
+    user checks element does not contain button    ${RELEASE_DETAILS_SECTION}    Amend release
 
 user cannot see edit controls for release content
     [Arguments]    ${publication}
@@ -47,12 +47,12 @@ user cannot see the enabled approve release controls for release
 user can see the create methodologies controls for publication
     [Arguments]    ${PUBLICATION_ACCORDION}
     user checks element contains button    ${PUBLICATION_ACCORDION}    Create methodology
-    user checks element contains link    ${PUBLICATION_ACCORDION}    Link to an externally hosted methodology
+    user checks element contains link    ${PUBLICATION_ACCORDION}    Use an external methodology
 
 user can see the create amendment controls for release
     [Arguments]    ${RELEASE_DETAILS_SECTION}
-    user waits until element contains link    ${RELEASE_DETAILS_SECTION}    View this release    %{WAIT_SMALL}
-    user checks element contains button    ${RELEASE_DETAILS_SECTION}    Amend this release
+    user waits until element contains link    ${RELEASE_DETAILS_SECTION}    View release    %{WAIT_SMALL}
+    user checks element contains button    ${RELEASE_DETAILS_SECTION}    Amend release
 
 user cannot see the edit status controls for methodology
     user clicks link    Sign off
@@ -61,10 +61,10 @@ user cannot see the edit status controls for methodology
 
 user cannot see the remove controls for methodology
     [Arguments]    ${DETAILS_SECTION}
-    user checks element contains link    ${DETAILS_SECTION}    View this methodology
+    user checks element contains link    ${DETAILS_SECTION}    View methodology
     user checks element does not contain button    ${DETAILS_SECTION}    Remove
 
 user cannot see the cancel amendment controls for methodology
     [Arguments]    ${DETAILS_SECTION}
-    user checks element contains link    ${DETAILS_SECTION}    View this amendment
+    user checks element contains link    ${DETAILS_SECTION}    View amendment
     user checks element does not contain button    ${DETAILS_SECTION}    Cancel amendment

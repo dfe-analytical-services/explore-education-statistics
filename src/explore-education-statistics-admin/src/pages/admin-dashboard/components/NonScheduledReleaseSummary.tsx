@@ -40,7 +40,6 @@ const NonScheduledReleaseSummary = ({
     <>
       <ReleaseSummary
         release={release}
-        open={release.live && release.latestRelease}
         actions={
           <>
             {release.amendment ? (
@@ -56,10 +55,11 @@ const NonScheduledReleaseSummary = ({
                   data-testid={`Edit release amendment link for ${
                     release.publicationTitle
                   }, ${getReleaseSummaryLabel(release)}`}
+                  variant="secondary"
                 >
                   {release.permissions.canUpdateRelease
-                    ? 'Edit this release amendment'
-                    : 'View this release amendment'}
+                    ? 'Edit release amendment'
+                    : 'View release amendment'}
                 </ButtonLink>
                 <ButtonLink
                   to={generatePath<ReleaseRouteParams>(
@@ -69,10 +69,10 @@ const NonScheduledReleaseSummary = ({
                       releaseId: release.previousVersionId,
                     },
                   )}
-                  className="govuk-button--secondary govuk-!-margin-left-4"
                   data-testid={`View original release link for ${
                     release.publicationTitle
                   }, ${getReleaseSummaryLabel(release)}`}
+                  variant="secondary"
                 >
                   View original release
                 </ButtonLink>
@@ -90,39 +90,37 @@ const NonScheduledReleaseSummary = ({
                   data-testid={`Edit release link for ${
                     release.publicationTitle
                   }, ${getReleaseSummaryLabel(release)}`}
+                  variant="secondary"
                 >
                   {release.permissions.canUpdateRelease
-                    ? 'Edit this release'
-                    : 'View this release'}
+                    ? 'Edit release'
+                    : 'View release'}
                 </ButtonLink>
                 {includeCreateAmendmentControls &&
                   release.permissions.canMakeAmendmentOfRelease && (
                     <Button
-                      className="govuk-button--secondary govuk-!-margin-left-4"
+                      variant="secondary"
                       onClick={() => setAmendReleaseId(release.id)}
                     >
-                      Amend this release
+                      Amend release
                     </Button>
                   )}
               </>
             )}
+            {release.permissions.canDeleteRelease && release.amendment && (
+              <Button
+                onClick={async () => {
+                  setDeleteReleasePlan({
+                    ...(await releaseService.getDeleteReleasePlan(release.id)),
+                    releaseId: release.id,
+                  });
+                }}
+                variant="warning"
+              >
+                Cancel amendment
+              </Button>
+            )}
           </>
-        }
-        secondaryActions={
-          release.permissions.canDeleteRelease &&
-          release.amendment && (
-            <Button
-              onClick={async () => {
-                setDeleteReleasePlan({
-                  ...(await releaseService.getDeleteReleasePlan(release.id)),
-                  releaseId: release.id,
-                });
-              }}
-              className="govuk-button--warning"
-            >
-              Cancel amendment
-            </Button>
-          )
         }
       />
 

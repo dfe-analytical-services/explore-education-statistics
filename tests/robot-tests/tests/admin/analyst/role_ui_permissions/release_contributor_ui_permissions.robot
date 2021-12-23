@@ -32,8 +32,8 @@ Navigate back to admin dashboard for publication
     user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
 Check cannot create an amendment of a published release
-    ${details}=    user gets details content element    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)
-    ...    ${publication_accordion}    %{WAIT_SMALL}
+    ${details}=    user opens details dropdown    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)
+    ...    ${publication_accordion}
     user cannot see the create amendment controls for release    ${details}
 
 Check cannot approve a draft release
