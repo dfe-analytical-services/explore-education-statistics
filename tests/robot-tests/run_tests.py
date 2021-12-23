@@ -155,8 +155,6 @@ assert os.getenv('TIMEOUT') is not None
 assert os.getenv('IMPLICIT_WAIT') is not None
 assert os.getenv('PUBLIC_URL') is not None
 assert os.getenv('ADMIN_URL') is not None
-assert os.getenv('ADMIN_EMAIL') is not None
-assert os.getenv('ADMIN_PASSWORD') is not None
 assert os.getenv('PUBLIC_AUTH_USER') is not None
 assert os.getenv('PUBLIC_AUTH_PASSWORD') is not None
 assert os.getenv('RELEASE_COMPLETE_WAIT') is not None
@@ -164,6 +162,7 @@ assert os.getenv('WAIT_MEDIUM') is not None
 assert os.getenv('WAIT_LONG') is not None
 assert os.getenv('WAIT_SMALL') is not None
 assert os.getenv('FAIL_TEST_SUITES_FAST') is not None
+
 
 if args.slack_webhook_url:
     os.environ['SLACK_WEBHOOK_URL'] = args.slack_webhook_url
