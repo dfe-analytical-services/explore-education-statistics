@@ -1,17 +1,24 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
 using Xunit;
+using static Azure.Storage.Blobs.Models.BlobsModelFactory;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
+using Capture = Moq.Capture;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 {
@@ -205,6 +212,332 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal($"Found empty file when trying to deserialize JSON for path: {path}", exception.Message);
         }
 
+        [Fact]
+        public async Task DeleteBlobs()
+        {
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var pages = CreatePages(
+                new List<BlobItem>
+                {
+                    BlobItem("directory/item-1"),
+                    BlobItem("directory/item-2"),
+                },
+                new List<BlobItem>
+                {
+                    BlobItem("directory/item-3"),
+                }
+            );
+
+            blobContainerClient
+                .Setup(
+                    s =>
+                        s.GetBlobsAsync(default, default, "directory/", default)
+                )
+                .Returns(new TestAsyncPageable<BlobItem>(pages));
+
+            var deletedBlobs = new List<string>();
+
+            blobContainerClient
+                .Setup(
+                    s =>
+                        s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
+                )
+                .ReturnsAsync(Response.FromValue(true, null!));
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            await service.DeleteBlobs(PublicReleaseFiles, "directory");
+
+            MockUtils.VerifyAllMocks(blobContainerClient);
+
+
+            Assert.Equal(3, deletedBlobs.Count);
+            Assert.Equal("directory/item-1", deletedBlobs[0]);
+            Assert.Equal("directory/item-2", deletedBlobs[1]);
+            Assert.Equal("directory/item-3", deletedBlobs[2]);
+        }
+
+        [Fact]
+        public async Task DeleteBlobs_NoDirectory()
+        {
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var pages = CreatePages(
+                new List<BlobItem>
+                {
+                    BlobItem("item-1"),
+                    BlobItem("directory/item-2"),
+                },
+                new List<BlobItem>
+                {
+                    BlobItem("nested/directory/item-3"),
+                }
+            );
+
+            blobContainerClient
+                .Setup(s => s.GetBlobsAsync(default, default, default, default))
+                .Returns(new TestAsyncPageable<BlobItem>(pages));
+
+            var deletedBlobs = new List<string>();
+
+            blobContainerClient
+                .Setup(
+                    s =>
+                        s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
+                )
+                .ReturnsAsync(Response.FromValue(true, null!));
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            await service.DeleteBlobs(PublicReleaseFiles);
+
+            MockUtils.VerifyAllMocks(blobContainerClient);
+
+            Assert.Equal(3, deletedBlobs.Count);
+            Assert.Equal("item-1", deletedBlobs[0]);
+            Assert.Equal("directory/item-2", deletedBlobs[1]);
+            Assert.Equal("nested/directory/item-3", deletedBlobs[2]);
+        }
+
+        [Fact]
+        public async Task DeleteBlobs_FiltersOnExcludeRegex()
+        {
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var pages = CreatePages(
+                new List<BlobItem>
+                {
+                    BlobItem("item-1"),
+                    BlobItem("directory/item-2"),
+                },
+                new List<BlobItem>
+                {
+                    BlobItem("nested/directory/item-3"),
+                }
+            );
+
+            blobContainerClient
+                .Setup(s => s.GetBlobsAsync(default, default, default, default))
+                .Returns(new TestAsyncPageable<BlobItem>(pages));
+
+            var deletedBlobs = new List<string>();
+
+            blobContainerClient
+                .Setup(
+                    s =>
+                        s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
+                )
+                .ReturnsAsync(Response.FromValue(true, null!));
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            await service.DeleteBlobs(
+                PublicReleaseFiles,
+                options: new DeleteBlobsOptions
+                {
+                    ExcludeRegex = new Regex("directory/")
+                }
+            );
+
+            MockUtils.VerifyAllMocks(blobContainerClient);
+
+            Assert.Single(deletedBlobs);
+            Assert.Equal("item-1", deletedBlobs[0]);
+        }
+
+        [Fact]
+        public async Task DeleteBlobs_FiltersOnIncludeRegex()
+        {
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var pages = CreatePages(
+                new List<BlobItem>
+                {
+                    BlobItem("item-1"),
+                    BlobItem("directory/item-2"),
+                },
+                new List<BlobItem>
+                {
+                    BlobItem("nested/directory/item-3"),
+                }
+            );
+
+            blobContainerClient
+                .Setup(s => s.GetBlobsAsync(default, default, default, default))
+                .Returns(new TestAsyncPageable<BlobItem>(pages));
+
+            var deletedBlobs = new List<string>();
+
+            blobContainerClient
+                .Setup(
+                    s =>
+                        s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
+                )
+                .ReturnsAsync(Response.FromValue(true, null!));
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            await service.DeleteBlobs(
+                PublicReleaseFiles,
+                options: new DeleteBlobsOptions
+                {
+                    IncludeRegex = new Regex("item-3")
+                }
+            );
+
+            MockUtils.VerifyAllMocks(blobContainerClient);
+
+            Assert.Single(deletedBlobs);
+            Assert.Equal("nested/directory/item-3", deletedBlobs[0]);
+        }
+
+        [Fact]
+        private async Task DeleteBlobs_FilterPrioritisesExcludeRegex()
+        {
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var pages = CreatePages(
+                new List<BlobItem>
+                {
+                    BlobItem("item-1"),
+                    BlobItem("directory/item-2"),
+                },
+                new List<BlobItem>
+                {
+                    BlobItem("nested/directory/item-3"),
+                }
+            );
+
+            blobContainerClient
+                .Setup(s => s.GetBlobsAsync(default, default, default, default))
+                .Returns(new TestAsyncPageable<BlobItem>(pages));
+
+            var deletedBlobs = new List<string>();
+
+            blobContainerClient
+                .Setup(
+                    s =>
+                        s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
+                )
+                .ReturnsAsync(Response.FromValue(true, null!));
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            await service.DeleteBlobs(
+                PublicReleaseFiles,
+                options: new DeleteBlobsOptions
+                {
+                    IncludeRegex = new Regex("directory/"),
+                    ExcludeRegex = new Regex("item-2")
+                }
+            );
+
+            MockUtils.VerifyAllMocks(blobContainerClient);
+
+            Assert.Single(deletedBlobs);
+            Assert.Equal("nested/directory/item-3", deletedBlobs[0]);
+        }
+
+        [Fact]
+        public async Task DeleteBlobs_NestedReleaseBlobs_IncludeRegex()
+        {
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var pages = CreatePages(
+                new List<BlobItem>
+                {
+                    BlobItem("publications/pupil-absence/releases/2020/data-blocks/item-1"),
+                    BlobItem("publications/pupil-absence/releases/2020/item-2"),
+                    BlobItem("publications/pupil-absence/item-3"),
+                    BlobItem("publications/item-4"),
+                }
+            );
+
+            blobContainerClient
+                .Setup(s => s.GetBlobsAsync(default, default, default, default))
+                .Returns(new TestAsyncPageable<BlobItem>(pages));
+
+            var deletedBlobs = new List<string>();
+
+            blobContainerClient
+                .Setup(
+                    s =>
+                        s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
+                )
+                .ReturnsAsync(Response.FromValue(true, null!));
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            await service.DeleteBlobs(
+                PublicReleaseFiles,
+                options: new DeleteBlobsOptions
+                {
+                    IncludeRegex = new Regex("^publications/.*/releases/.*/data-blocks")
+                }
+            );
+
+            MockUtils.VerifyAllMocks(blobContainerClient);
+
+            Assert.Single(deletedBlobs);
+            Assert.Equal("publications/pupil-absence/releases/2020/data-blocks/item-1", deletedBlobs[0]);
+        }
+
+
+        [Fact]
+        public async Task DeleteBlobs_NestedReleaseBlobs_ExcludeRegex()
+        {
+            var blobContainerClient = MockBlobContainerClient(PublicReleaseFiles.Name);
+            var blobServiceClient = MockBlobServiceClient(blobContainerClient);
+
+            var pages = CreatePages(
+                new List<BlobItem>
+                {
+                    BlobItem("publications/pupil-absence/releases/2020/data-blocks/item-1"),
+                    BlobItem("publications/pupil-absence/releases/2020/item-2"),
+                    BlobItem("publications/pupil-absence/item-3"),
+                    BlobItem("publications/item-4"),
+                }
+            );
+
+            blobContainerClient
+                .Setup(s => s.GetBlobsAsync(default, default, default, default))
+                .Returns(new TestAsyncPageable<BlobItem>(pages));
+
+            var deletedBlobs = new List<string>();
+
+            blobContainerClient
+                .Setup(
+                    s =>
+                        s.DeleteBlobIfExistsAsync(Capture.In(deletedBlobs), default, default, default)
+                )
+                .ReturnsAsync(Response.FromValue(true, null!));
+
+            var service = SetupBlobStorageService(blobServiceClient: blobServiceClient.Object);
+
+            await service.DeleteBlobs(
+                PublicReleaseFiles,
+                options: new DeleteBlobsOptions
+                {
+                    ExcludeRegex = new Regex("^publications/.*/releases/.*/data-blocks")
+                }
+            );
+
+            MockUtils.VerifyAllMocks(blobContainerClient);
+
+            Assert.Equal(3, deletedBlobs.Count);
+            Assert.Equal("publications/pupil-absence/releases/2020/item-2", deletedBlobs[0]);
+            Assert.Equal("publications/pupil-absence/item-3", deletedBlobs[1]);
+            Assert.Equal("publications/item-4", deletedBlobs[2]);
+        }
+
+
         private static Mock<BlobServiceClient> MockBlobServiceClient(
             params Mock<BlobContainerClient>[] blobContainerClients)
         {
@@ -222,7 +555,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             return blobServiceClient;
         }
 
-        private static Mock<BlobContainerClient> MockBlobContainerClient(string containerName,
+        private static Mock<BlobContainerClient> MockBlobContainerClient(
+            string containerName,
             params Mock<BlobClient>[] blobClients)
         {
             var blobContainerClient = new Mock<BlobContainerClient>(MockBehavior.Strict);
@@ -231,9 +565,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 .SetupGet(client => client.Name)
                 .Returns(containerName);
 
-            blobContainerClient.Setup(s => s.CreateIfNotExistsAsync(PublicAccessType.None, default, default, default))
-                .ReturnsAsync(Response.FromValue(BlobsModelFactory.BlobContainerInfo(ETag.All, DateTimeOffset.UtcNow),
-                    null!));
+            blobContainerClient
+                .Setup(s =>
+                    s.CreateIfNotExistsAsync(PublicAccessType.None, default, default,default))
+                .ReturnsAsync(Response.FromValue(
+                    BlobContainerInfo(ETag.All, DateTimeOffset.UtcNow), null!));
 
             foreach (var blobClient in blobClients)
             {
@@ -244,7 +580,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             return blobContainerClient;
         }
 
-        private static Mock<BlobClient> MockBlobClient(string name,
+        private static Mock<BlobClient> MockBlobClient(
+            string name,
             DateTimeOffset createdOn = default,
             int contentLength = 0,
             string? contentType = null,
@@ -259,7 +596,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             blobClient.Setup(client => client.ExistsAsync(default))
                 .ReturnsAsync(Response.FromValue(exists, null!));
 
-            var blobProperties = BlobsModelFactory.BlobProperties(
+            var blobProperties = BlobProperties(
                 createdOn: createdOn,
                 contentLength: contentLength,
                 contentType: contentType,
@@ -280,6 +617,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 blobServiceClient ?? new Mock<BlobServiceClient>().Object,
                 new Mock<ILogger<BlobStorageService>>().Object
             );
+        }
+
+        private IEnumerable<Page<T>> CreatePages<T>(params List<T>[] pages)
+        {
+            return pages.Select(
+                page => Page<T>.FromValues(
+                    ImmutableList.Create(page.ToArray()), "", null!
+                )
+            );
+        }
+
+        private class TestAsyncPageable<T> : AsyncPageable<T> where T : notnull
+        {
+            private readonly IEnumerable<Page<T>> _pages;
+
+            public TestAsyncPageable(IEnumerable<Page<T>> pages)
+            {
+                _pages = pages;
+            }
+
+            public override async IAsyncEnumerable<Page<T>> AsPages(
+                string? continuationToken = null,
+                int? pageSizeHint = null)
+            {
+                foreach (var page in _pages)
+                {
+                    yield return page;
+                }
+
+                await Task.CompletedTask;
+            }
         }
     }
 }
