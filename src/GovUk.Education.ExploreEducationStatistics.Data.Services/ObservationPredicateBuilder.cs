@@ -43,6 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     query.LocationIds.Contains(observation.LocationId));
             }
 
+            // TODO EES-3068 Migrate Location codes to ids in old Datablocks to remove this support for Location codes
             if (query.Locations != null)
             {
                 if (query.Locations.GeographicLevel != null)
