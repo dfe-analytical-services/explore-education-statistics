@@ -71,6 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
 
             var releaseSubjects = await _statisticsDbContext.ReleaseSubject
+                .AsQueryable()
                 .Where(rs => rs.ReleaseId == releaseId && subjectsToInclude.Contains(rs.SubjectId))
                 .ToListAsync();
 

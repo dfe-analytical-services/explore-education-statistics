@@ -66,10 +66,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .ToListAsync();
 
                     var result = new List<DataGuidanceSubjectViewModel>();
-                    await releaseSubjects.ForEachAsync(async releaseSubject =>
-                    {
-                        result.Add(await BuildSubjectViewModel(releaseSubject));
-                    });
+                    await releaseSubjects
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(async releaseSubject =>
+                            {
+                                result.Add(await BuildSubjectViewModel(releaseSubject));
+                            });
 
                     return result
                         .OrderBy(viewModel => viewModel.Name)
@@ -78,13 +80,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 // Currently we expect a failure checking the Release exists and succeed with an empty list.
                 // StatisticsDb Releases are not always in sync with ContentDb Releases.
                 // Until the first Subject is imported, no StatisticsDb Release exists.
-                .OnFailureSucceedWith(result => Task.FromResult(new List<DataGuidanceSubjectViewModel>()));
+                .OnFailureSucceedWith(_ => Task.FromResult(new List<DataGuidanceSubjectViewModel>()));
         }
 
         public async Task<Either<ActionResult, bool>> Validate(Guid releaseId)
         {
             var releaseSubjects = _context
                 .ReleaseSubject
+                .AsQueryable()
                 .Where(rs => rs.ReleaseId == releaseId);
 
             return !await releaseSubjects.AnyAsync() || !await releaseSubjects.AnyAsync(
@@ -95,6 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return await _context
                 .Observation
+                .AsQueryable()
                 .AsNoTracking()
                 .Include(o => o.Location)
                 .Where(o => o.SubjectId == subjectId)

@@ -113,18 +113,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .ToListAsync();
             release.Content = content;
 
-            await release.Content.ForEachAsync(async rcs =>
-            {
-                await rcs.ContentSection.Content.ForEachAsync(async cb =>
+            await release.Content
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async rcs =>
                 {
-                    cb.Comments = await _contentDbContext.Comment
-                        .AsQueryable()
-                        .Where(c => c.ContentBlockId == cb.Id)
-                        .Include(c => c.CreatedBy)
-                        .Include(c => c.ResolvedBy)
-                        .ToListAsync();
+                    await rcs.ContentSection.Content
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(async cb =>
+                        {
+                            cb.Comments = await _contentDbContext.Comment
+                                .AsQueryable()
+                                .Where(c => c.ContentBlockId == cb.Id)
+                                .Include(c => c.CreatedBy)
+                                .Include(c => c.ResolvedBy)
+                                .ToListAsync();
+                        });
                 });
-            });
             return release;
         }
     }

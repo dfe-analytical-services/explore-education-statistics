@@ -52,22 +52,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             var observations = new List<Observation>();
 
-            await batchesOfIds.ForEachAsync(async batchOfIds =>
-            {
-                var observationBatch = await _context
-                    .Observation
-                    .AsNoTracking()
-                    .Include(o => o.FilterItems)
-                    .Include(o => o.Location)
-                    .Where(o => batchOfIds.Contains(o.Id))
-                    .ToListAsync(cancellationToken);
+            await batchesOfIds
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async batchOfIds =>
+                {
+                    var observationBatch = await _context
+                        .Observation
+                        .AsNoTracking()
+                        .Include(o => o.FilterItems)
+                        .Include(o => o.Location)
+                        .Where(o => batchOfIds.Contains(o.Id))
+                        .ToListAsync(cancellationToken);
 
-                observations.AddRange(observationBatch);
+                    observations.AddRange(observationBatch);
 
-                _logger.LogDebug($"Fetched batch of {observationBatch.Count} Observations from their ids in " +
-                                 $"{phasesStopwatch.Elapsed.TotalMilliseconds} ms");
-                phasesStopwatch.Restart();
-            });
+                    _logger.LogDebug($"Fetched batch of {observationBatch.Count} Observations from their ids in " +
+                                     $"{phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+                    phasesStopwatch.Restart();
+                }, cancellationToken: cancellationToken);
 
             _logger.LogDebug($"Finished fetching {ids.Length} Observations in a total of " +
                              $"{totalStopwatch.Elapsed.TotalMilliseconds} ms");

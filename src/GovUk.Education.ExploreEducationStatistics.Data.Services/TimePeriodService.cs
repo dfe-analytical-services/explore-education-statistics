@@ -23,6 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(Guid subjectId)
         {
             return _context.Observation
+                .AsQueryable()
                 .Where(observation => observation.SubjectId == subjectId)
                 .Select(o => new {o.Year, o.TimeIdentifier})
                 .Distinct()
@@ -54,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var observationsQuery = _context
                 .Observation
+                .AsQueryable()
                 .Where(observation => observation.SubjectId == subjectId);
             var orderedTimePeriods = GetDistinctObservationTimePeriods(observationsQuery).ToList();
 

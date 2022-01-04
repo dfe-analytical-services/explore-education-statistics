@@ -46,22 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         }
 
         [Fact]
-        public async Task ForEachAsync()
-        {
-            List<int> results = new();
-
-            await new List<int> {1, 2}.ForEachAsync(async value =>
-            {
-                var result = await GetIntTask(value);
-                results.Add(result);
-            });
-
-            Assert.Equal(2, results.Count);
-            Assert.Contains(1, results);
-            Assert.Contains(2, results);
-        }
-
-        [Fact]
         public async Task ForEachAsync_SuccessfulEitherList()
         {
             Either<Unit, List<int>> results =
@@ -137,12 +121,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             Assert.Equal("foo-bar-baz", list.JoinToString('-'));
             Assert.Equal("foo - bar - baz", list.JoinToString(" - "));
             Assert.Equal("foo, bar, baz", list.JoinToString(", "));
-        }
-
-        private static async Task<int> GetIntTask(int value)
-        {
-            await Task.Delay(5);
-            return value;
         }
 
         private static async Task<Either<Unit, int>> GetSuccessfulEither(int value)

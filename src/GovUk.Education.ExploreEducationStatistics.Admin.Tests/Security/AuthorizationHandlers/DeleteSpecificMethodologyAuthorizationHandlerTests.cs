@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
@@ -240,37 +241,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserWithPublicationOwnerRoleCanDeleteDraftMethodology()
             {
-                await GetEnumValues<PublicationRole>().ForEachAsync(async role =>
-                {
-                    var (
-                        handler,
-                        methodologyRepository,
-                        methodologyVersionRepository,
-                        publicationRoleRepository
-                        ) = CreateHandlerAndDependencies();
+                await GetEnumValues<PublicationRole>()
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(async role =>
+                    {
+                        var (
+                            handler,
+                            methodologyRepository,
+                            methodologyVersionRepository,
+                            publicationRoleRepository
+                            ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository
-                        .Setup(s => s.IsPubliclyAccessible(DraftFirstVersion.Id))
-                        .ReturnsAsync(false);
+                        methodologyVersionRepository
+                            .Setup(s => s.IsPubliclyAccessible(DraftFirstVersion.Id))
+                            .ReturnsAsync(false);
 
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(DraftFirstVersion.MethodologyId))
-                        .ReturnsAsync(OwningPublication);
+                        methodologyRepository.Setup(s =>
+                                s.GetOwningPublication(DraftFirstVersion.MethodologyId))
+                            .ReturnsAsync(OwningPublication);
 
-                    publicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, OwningPublication,
-                        role == Owner);
+                        publicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, OwningPublication,
+                            role == Owner);
 
-                    var user = CreateClaimsPrincipal(UserId);
-                    var authContext = CreateAuthContext(user, DraftFirstVersion);
+                        var user = CreateClaimsPrincipal(UserId);
+                        var authContext = CreateAuthContext(user, DraftFirstVersion);
 
-                    await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                        publicationRoleRepository);
+                        await handler.HandleAsync(authContext);
+                        VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
+                            publicationRoleRepository);
 
-                    // Verify that the presence of a Publication Owner role for this user that is related to a
-                    // Publication that uses this Methodology will pass the handler test
-                    Assert.Equal(role == Owner, authContext.HasSucceeded);
-                });
+                        // Verify that the presence of a Publication Owner role for this user that is related to a
+                        // Publication that uses this Methodology will pass the handler test
+                        Assert.Equal(role == Owner, authContext.HasSucceeded);
+                    });
             }
 
             [Fact]
@@ -356,37 +359,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserWithPublicationOwnerRoleCanDeleteDraftMethodologyAmendment()
             {
-                await GetEnumValues<PublicationRole>().ForEachAsync(async role =>
-                {
-                    var (
-                        handler,
-                        methodologyRepository,
-                        methodologyVersionRepository,
-                        publicationRoleRepository
-                        ) = CreateHandlerAndDependencies();
+                await GetEnumValues<PublicationRole>()
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(async role =>
+                    {
+                        var (
+                            handler,
+                            methodologyRepository,
+                            methodologyVersionRepository,
+                            publicationRoleRepository
+                            ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository
-                        .Setup(s => s.IsPubliclyAccessible(DraftAmendmentVersion.Id))
-                        .ReturnsAsync(false);
+                        methodologyVersionRepository
+                            .Setup(s => s.IsPubliclyAccessible(DraftAmendmentVersion.Id))
+                            .ReturnsAsync(false);
 
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(DraftAmendmentVersion.MethodologyId))
-                        .ReturnsAsync(OwningPublication);
+                        methodologyRepository.Setup(s =>
+                                s.GetOwningPublication(DraftAmendmentVersion.MethodologyId))
+                            .ReturnsAsync(OwningPublication);
 
-                    publicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, OwningPublication,
-                        role == Owner);
+                        publicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, OwningPublication,
+                            role == Owner);
 
-                    var user = CreateClaimsPrincipal(UserId);
-                    var authContext = CreateAuthContext(user, DraftAmendmentVersion);
+                        var user = CreateClaimsPrincipal(UserId);
+                        var authContext = CreateAuthContext(user, DraftAmendmentVersion);
 
-                    await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                        publicationRoleRepository);
+                        await handler.HandleAsync(authContext);
+                        VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
+                            publicationRoleRepository);
 
-                    // Verify that the presence of a Publication Owner role for this user that is related to a
-                    // Publication that uses this Methodology will pass the handler test
-                    Assert.Equal(role == Owner, authContext.HasSucceeded);
-                });
+                        // Verify that the presence of a Publication Owner role for this user that is related to a
+                        // Publication that uses this Methodology will pass the handler test
+                        Assert.Equal(role == Owner, authContext.HasSucceeded);
+                    });
             }
 
             [Fact]
