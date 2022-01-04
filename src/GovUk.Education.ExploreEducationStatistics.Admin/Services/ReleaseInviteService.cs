@@ -202,12 +202,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var uri = _configuration.GetValue<string>("AdminUri");
             var template = _configuration.GetValue<string>("NotifyContributorTemplateId");
 
-            var releaseTitleBullets = await _contentDbContext.Releases
+            var releases = await _contentDbContext.Releases
                 .AsQueryable()
                 .Where(r => releaseIds.Contains(r.Id))
-                .Select(r => $"* {r.Title}")
                 .ToListAsync();
-            var releaseList = releaseTitleBullets.JoinToString("\n");
+
+            var releaseList = releases
+                .OrderBy(r => r.Year)
+                .ThenBy(r => r.TimePeriodCoverage)
+                .Select(r => $"* {r.Title}")
+                .ToList()
+                .JoinToString("\n");
 
             var emailValues = new Dictionary<string, dynamic>
             {
