@@ -1,4 +1,5 @@
 #nullable enable
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
@@ -98,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 
                 // does this user have permission to run release migration endpoints?
                 options.AddPolicy(SecurityPolicies.CanRunReleaseMigrations.ToString(), policy =>
-                    policy.RequireRole("BAU User"));
+                    policy.RequireRole(RoleNames.BauUser));
 
                 // does this user have permission to publish a specific Release?
                 options.AddPolicy(SecurityPolicies.CanPublishSpecificRelease.ToString(), policy =>
