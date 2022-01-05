@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         public Task DeleteBlobs(
             IBlobContainer containerName,
-            string directoryPath = "",
+            string? directoryPath = null,
             DeleteBlobsOptions? options = null);
 
         public Task DeleteBlob(IBlobContainer containerName, string path);

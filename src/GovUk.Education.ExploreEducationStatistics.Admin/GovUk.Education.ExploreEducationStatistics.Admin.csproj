@@ -198,7 +198,6 @@
     <Folder Include="Migrations\ContentMigrations" />
     <Folder Include="Migrations\UsersAndRolesMigrations" />
     <Folder Include="Services\Security" />
-    <Folder Include="ViewModels\Blocks" />
   </ItemGroup>
 
   <PropertyGroup>

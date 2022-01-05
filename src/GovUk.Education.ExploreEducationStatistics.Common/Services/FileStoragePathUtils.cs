@@ -7,6 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
     public static class FileStoragePathUtils
     {
+        public const string PublicContentDataBlocksDirectory = "data-blocks";
+        [Obsolete("EES-2865 - Remove with other fast track code")]
+        public const string PublicContentFastTrackResultsDirectory = "fast-track-results";
+        public const string PublicContentSubjectMetaDirectory = "subject-meta";
+
         public static string PublicContentStagingPath()
         {
             return "staging";
@@ -71,19 +76,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return $"{PublicContentPublicationParentPath(publicationSlug, prefix)}/releases/{releaseSlug}.json";
         }
-        
+
         public static string PrivateContentDataBlockParentPath(
             Guid publicationId,
             Guid releaseId)
         {
-            return $"{PrivateContentReleaseParentPath(publicationId, releaseId)}/data-blocks";
+            return $"{PrivateContentReleaseParentPath(publicationId, releaseId)}/{PublicContentDataBlocksDirectory}";
         }
-        
+
         public static string PublicContentDataBlockParentPath(
             string publicationSlug,
             string releaseSlug)
         {
-            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/data-blocks";
+            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/{PublicContentDataBlocksDirectory}";
         }
 
         public static string PrivateContentDataBlockPath(
@@ -104,17 +109,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public static string PublicContentSubjectMetaParentPath(string publicationSlug, string releaseSlug)
         {
-            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/subject-meta";
+            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/{PublicContentSubjectMetaDirectory}";
         }
-        
+
         public static string PublicContentSubjectMetaPath(string publicationSlug, string releaseSlug, Guid subjectId)
         {
             return $"{PublicContentSubjectMetaParentPath(publicationSlug, releaseSlug)}/{subjectId}.json";
         }
-        
+
         public static string PublicContentFastTrackResultsParentPath(string publicationSlug, string releaseSlug)
         {
-            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/fast-track-results";
+            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/{PublicContentFastTrackResultsDirectory}";
         }
 
         public static string PublicContentFastTrackResultsPath(string publicationSlug, string releaseSlug, Guid fastTrackId)
@@ -126,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/subjects.json";
         }
-        
+
         public static string FilesPath(Guid rootPath, FileType type)
         {
             var typeFolder = (type == Metadata ? Data : type).GetEnumLabel();

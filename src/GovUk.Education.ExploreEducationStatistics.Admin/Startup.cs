@@ -5,6 +5,7 @@ using System.Security.Claims;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
@@ -405,6 +406,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
             services.AddTransient<IBlobCacheService, BlobCacheService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
+
+            // Register any controllers that need specific dependencies
+            services.AddTransient(
+                provider => new BauCacheController(
+                    privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
+                    publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")
+                )
+            );
 
             services.AddSwaggerGen(c =>
             {
