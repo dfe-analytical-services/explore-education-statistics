@@ -20,19 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             _context = context;
         }
 
-        public async Task<Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>> GetLocationAttributes(Guid subjectId)
+        public async Task<Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>> GetLocationAttributes(
+            Guid subjectId)
         {
-            var locationIds = await _context.Observation
+            var locations = await _context.Observation
                 .AsNoTracking()
                 .Where(o => o.SubjectId == subjectId)
-                .Select(observation => observation.LocationId)
+                .Select(observation => observation.Location)
                 .Distinct()
-                .ToListAsync();
-
-            var locations = await _context
-                .Location
-                .AsNoTracking()
-                .Where(location => locationIds.Contains(location.Id))
                 .ToListAsync();
 
             return locations
@@ -62,16 +57,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 ? new Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute>>>()
                 : MapLocationAttributeSelectors(hierarchies);
 
-            var locationIds = observations
+            var locations = await observations
                 .AsNoTracking()
-                .Select(observation => observation.LocationId)
+                .Select(observation => observation.Location)
                 .Distinct()
-                .ToList();
-
-            var locations = await _context
-                .Location
-                .AsNoTracking()
-                .Where(location => locationIds.Contains(location.Id))
                 .ToListAsync();
 
             return locations
