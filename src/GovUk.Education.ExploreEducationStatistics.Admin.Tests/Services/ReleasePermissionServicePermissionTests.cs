@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
                     {
                         var service = SetupReleasePermissionService(contentDbContext, userService.Object);
-                        return await service.ListReleaseContributors(release.Id);
+                        return await service.ListReleaseContributorsAndContributorInvites(release.Id);
                     }
                 });
         }

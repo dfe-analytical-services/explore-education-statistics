@@ -30,12 +30,12 @@ const PublicationReleaseContributorsPage = ({
       publication,
       release,
       publicationContributors,
-      releaseContributors,
+      { contributors: releaseContributors },
     ] = await Promise.all([
       publicationService.getPublication(publicationId),
       releaseService.getRelease(releaseId),
       releasePermissionService.listPublicationContributors(publicationId),
-      releasePermissionService.listReleaseContributors(releaseId),
+      releasePermissionService.listReleaseContributorsAndInvites(releaseId),
     ]);
     return {
       publication,

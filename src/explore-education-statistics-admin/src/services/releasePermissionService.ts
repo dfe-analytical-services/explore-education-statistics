@@ -1,5 +1,10 @@
 import client from '@admin/services/utils/service';
 
+export interface ManageAccessPageContributorsAndInvites {
+  contributors: ManageAccessPageContributor[];
+  pendingInviteEmails: string[];
+}
+
 export interface ManageAccessPageContributor {
   userId: string;
   userDisplayName: string;
@@ -7,9 +12,9 @@ export interface ManageAccessPageContributor {
 }
 
 const releasePermissionService = {
-  listReleaseContributors(
+  listReleaseContributorsAndInvites(
     releaseId: string,
-  ): Promise<ManageAccessPageContributor[]> {
+  ): Promise<ManageAccessPageContributorsAndInvites> {
     return client.get(`/releases/${releaseId}/contributors`);
   },
   listPublicationContributors(

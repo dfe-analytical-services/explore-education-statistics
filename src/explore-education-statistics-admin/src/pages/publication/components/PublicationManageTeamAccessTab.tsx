@@ -18,21 +18,32 @@ export interface Props {
 
 const PublicationManageTeamAccessTab = ({ publication, release }: Props) => {
   const {
-    value: contributors = [],
+    value: contributorsAndInvites = {
+      contributors: [],
+      pendingInviteEmails: [],
+    },
     isLoading,
-    setState: setContributors,
+    setState: setContributorsAndInvites,
   } = useAsyncHandledRetry(
-    async () => releasePermissionService.listReleaseContributors(release.id),
+    async () =>
+      releasePermissionService.listReleaseContributorsAndInvites(release.id),
     [publication, release],
   );
+
+  const { contributors, pendingInviteEmails } = contributorsAndInvites;
 
   const handleUserRemove = async (userId: string) => {
     await releasePermissionService.removeAllUserContributorPermissionsForPublication(
       publication.id,
       userId,
     );
-    setContributors({
-      value: contributors.filter(c => c.userId !== userId),
+    setContributorsAndInvites({
+      value: {
+        contributors: contributorsAndInvites.contributors.filter(
+          c => c.userId !== userId,
+        ),
+        pendingInviteEmails,
+      },
     });
   };
 
@@ -43,13 +54,15 @@ const PublicationManageTeamAccessTab = ({ publication, release }: Props) => {
   return (
     <>
       <h2>Update access for release ({release.title})</h2>
-      {!contributors.length ? (
+      {!contributors.length && !pendingInviteEmails.length ? (
         <WarningMessage>
-          There are no contributors for this release.
+          There are no contributors or pending contributor invites for this
+          release.
         </WarningMessage>
       ) : (
         <ReleaseContributorPermissions
           contributors={contributors}
+          pendingInviteEmails={pendingInviteEmails}
           onUserRemove={handleUserRemove}
         />
       )}

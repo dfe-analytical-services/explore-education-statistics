@@ -186,6 +186,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     r.Role == role);
         }
 
+        public async Task<List<UserReleaseRole>> GetUserReleaseRolesForRelease(Guid releaseId, ReleaseRole role)
+        {
+            return await _contentDbContext.UserReleaseRoles
+                .AsQueryable()
+                .Include(urr => urr.User)
+                .Where(urr =>
+                    urr.ReleaseId == releaseId
+                    && urr.Role == role)
+                .ToListAsync();
+        }
+
         public async Task<bool> HasUserReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
             return await _contentDbContext.UserReleaseRoles

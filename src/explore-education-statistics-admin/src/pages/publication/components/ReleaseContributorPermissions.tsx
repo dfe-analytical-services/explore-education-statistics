@@ -4,25 +4,30 @@ import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import styles from '@admin/pages/publication/components/ReleaseContributorPermissions.module.scss';
 import React, { useState } from 'react';
+import Tag from '@common/components/Tag';
 
 export interface Props {
   contributors: ManageAccessPageContributor[];
+  pendingInviteEmails: string[];
   onUserRemove: (userId: string) => void;
 }
 
 const ReleaseContributorPermissions = ({
   contributors,
+  pendingInviteEmails,
   onUserRemove,
 }: Props) => {
   const [removeUser, setRemoveUser] = useState<ManageAccessPageContributor>();
 
   return (
     <>
-      {!contributors || !contributors.length ? (
+      {(!contributors || !contributors.length) &&
+      (!pendingInviteEmails || !pendingInviteEmails.length) ? (
         <WarningMessage testId="releaseContributors-warning">
-          There are currently no team members associated with this publication.
-          You can invite new users by clicking the "Add or remove users" button
-          or by going to the <a href="#invite-users">invite users tab</a>.
+          There are currently no team members or pending invites associated with
+          this publication. You can invite new users by clicking the "Add or
+          remove users" button or by going to the{' '}
+          <a href="#invite-users">invite users tab</a>.
         </WarningMessage>
       ) : (
         <>
@@ -38,6 +43,15 @@ const ReleaseContributorPermissions = ({
                       Remove user
                     </ButtonText>
                   </td>
+                </tr>
+              ))}
+              {pendingInviteEmails.map(email => (
+                <tr key={email}>
+                  <td className="govuk-!-width-one-half">
+                    {email}
+                    <Tag className="govuk-!-margin-left-3">Pending Invite</Tag>
+                  </td>
+                  <td className={styles.control}>Cancel invite</td>
                 </tr>
               ))}
             </tbody>

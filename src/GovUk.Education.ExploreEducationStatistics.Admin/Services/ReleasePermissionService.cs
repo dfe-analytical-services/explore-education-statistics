@@ -39,36 +39,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, List<ContributorViewModel>>>
-            ListReleaseContributors(Guid releaseId)
+        public async Task<Either<ActionResult, ContributorsAndInvitesViewModel>>
+            ListReleaseContributorsAndContributorInvites(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId,
                     query =>
-                        query.Include(r => r.Publication).
-                            ThenInclude(p => p.Releases))
+                        query.Include(r => r.Publication)
+                            .ThenInclude(p => p.Releases))
                 .OnSuccessDo(release => _userService
                     .CheckCanUpdateReleaseRole(release.Publication, Contributor))
                 .OnSuccess(async release =>
                 {
-                    var allContributorsForRelease = await _contentDbContext.UserReleaseRoles
-                        .Include(urr => urr.User)
-                        .Where(urr =>
-                            urr.ReleaseId == release.Id
-                            && urr.Role == Contributor)
-                        .ToListAsync();
+                    var contributors = await _userReleaseRoleRepository
+                        .GetUserReleaseRolesForRelease(releaseId, Contributor);
 
-                    var contributorList = allContributorsForRelease
-                        .Select(urr => new ContributorViewModel
+                    var contributorViewModels = contributors
+                        .Select(userReleaseRole => new ContributorViewModel
                         {
-                            UserId = urr.UserId,
-                            UserDisplayName = urr.User.DisplayName,
-                            UserEmail = urr.User.Email,
+                            UserId = userReleaseRole.UserId,
+                            UserDisplayName = userReleaseRole.User.DisplayName,
+                            UserEmail = userReleaseRole.User.Email,
                         })
                         .OrderBy(model => model.UserDisplayName)
                         .ToList();
 
-                    return contributorList;
+                    var invites = await _contentDbContext.UserReleaseInvites
+                        .AsQueryable()
+                        .Where(i =>
+                            i.ReleaseId == releaseId
+                            && i.Role == Contributor
+                            && i.Accepted == false)
+                        .ToListAsync();
+
+                    var pendingInviteEmails = invites
+                        .Select(i => i.Email)
+                        .OrderBy(email => email)
+                        .ToList();
+
+                    return new ContributorsAndInvitesViewModel
+                    {
+                        Contributors = contributorViewModels,
+                        PendingInviteEmails = pendingInviteEmails,
+                    };
                 });
         }
 
@@ -89,6 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToList();
 
                     var users = await _contentDbContext.UserReleaseRoles
+                        .AsQueryable()
                         .Include(releaseRole => releaseRole.User)
                         .Where(userReleaseRole =>
                             allLatestReleaseIds.Contains(userReleaseRole.ReleaseId)
@@ -98,7 +112,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Distinct()
                         .ToListAsync();
 
-                    return users
+                    return await users
+                        .ToAsyncEnumerable()
                         .Select(user =>
                             new ContributorViewModel
                             {
@@ -108,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             }
                         )
                         .OrderBy(model => model.UserDisplayName)
-                        .ToList();
+                        .ToListAsync();
                 });
         }
 

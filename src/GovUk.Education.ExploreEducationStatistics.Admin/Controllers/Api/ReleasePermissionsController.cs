@@ -24,11 +24,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/{releaseId}/contributors")]
-        public async Task<ActionResult<List<ContributorViewModel>>> ListReleaseContributors(
+        public async Task<ActionResult<ContributorsAndInvitesViewModel>> ListReleaseContributorsAndContributorInvites(
             Guid releaseId)
         {
             return await _releasePermissionService
-                .ListReleaseContributors(releaseId)
+                .ListReleaseContributorsAndContributorInvites(releaseId)
                 .HandleFailuresOrOk();
         }
 

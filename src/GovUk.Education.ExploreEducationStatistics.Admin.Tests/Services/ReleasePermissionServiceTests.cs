@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleasePermissionService(contentDbContext);
 
-                var result = await service.ListReleaseContributors(release1.Id);
+                var result = await service.ListReleaseContributorsAndContributorInvites(release1.Id);
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(2, viewModel.Count);
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using var contentDbContext = InMemoryApplicationDbContext();
             var service = SetupReleasePermissionService(contentDbContext);
 
-            var result = await service.ListReleaseContributors(Guid.NewGuid());
+            var result = await service.ListReleaseContributorsAndContributorInvites(Guid.NewGuid());
             result.AssertNotFound();
         }
 
@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleasePermissionService(contentDbContext);
 
-                var result = await service.ListReleaseContributors(Guid.NewGuid());
+                var result = await service.ListReleaseContributorsAndContributorInvites(Guid.NewGuid());
                 result.AssertNotFound();
             }
         }
@@ -179,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleasePermissionService(contentDbContext);
 
                 var result = await service
-                    .ListReleaseContributors(release1.Id);
+                    .ListReleaseContributorsAndContributorInvites(release1.Id);
                 var viewModel = result.AssertRight();
 
                 Assert.Empty(viewModel);

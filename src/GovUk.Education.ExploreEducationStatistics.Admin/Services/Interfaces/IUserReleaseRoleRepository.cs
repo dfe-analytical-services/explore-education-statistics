@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
@@ -47,6 +46,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<UserReleaseRole?> GetUserReleaseRole(Guid userId,
             Guid releaseId,
             ReleaseRole role);
+
+        Task<List<UserReleaseRole>> GetUserReleaseRolesForRelease(Guid releaseId, ReleaseRole role);
 
         Task<bool> HasUserReleaseRole(Guid userId,
             Guid releaseId,

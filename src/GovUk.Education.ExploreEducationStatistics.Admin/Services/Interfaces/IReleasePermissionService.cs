@@ -10,8 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleasePermissionService
     {
-        Task<Either<ActionResult, List<ContributorViewModel>>>
-            ListReleaseContributors(Guid releaseId);
+        Task<Either<ActionResult, ContributorsAndInvitesViewModel>>
+            ListReleaseContributorsAndContributorInvites(Guid releaseId);
 
         Task<Either<ActionResult, List<ContributorViewModel>>>
             ListPublicationContributors(Guid releaseId);
