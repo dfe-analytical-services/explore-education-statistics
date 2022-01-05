@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static readonly Guid _userId = Guid.NewGuid();
 
         [Fact]
-        public async Task ListReleaseContributors()
+        public async Task ListReleaseContributorsAndContributorInvites()
         {
             var publication = new Publication();
             var release1 = new Release
@@ -98,12 +98,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Deleted = DateTime.UtcNow,
             };
 
+            var user4ReleaseInvite = new UserReleaseInvite
+            {
+                Email = "user4@test.com",
+                Release = release1,
+                Role = Contributor,
+                Accepted = false,
+            };
+
+            var user5ReleaseInviteIgnored = new UserReleaseInvite
+            {
+                Email = "user5@test.com",
+                Release = release2Amendment, // ignored because not release1
+                Role = Contributor,
+                Accepted = false,
+            };
+
+            var user6ReleaseInvite = new UserReleaseInvite
+            {
+                Email = "user6@test.com",
+                Release = release1,
+                Role = Contributor,
+                Accepted = false,
+            };
+
+            var user7ReleaseInviteIgnored = new UserReleaseInvite
+            {
+                Email = "user5@test.com",
+                Release = release1,
+                Role = Lead, // ignored because not a Contributor
+                Accepted = false,
+            };
+
+            var user8ReleaseInviteIgnored = new UserReleaseInvite
+            {
+                Email = "user5@test.com",
+                Release = release1,
+                Role = Contributor,
+                Accepted = true, // ignored because invite already accepted
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
                     user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
-                    user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3);
+                    user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3,
+                    user4ReleaseInvite, user5ReleaseInviteIgnored, user6ReleaseInvite,
+                    user7ReleaseInviteIgnored, user8ReleaseInviteIgnored);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -114,20 +156,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.ListReleaseContributorsAndContributorInvites(release1.Id);
                 var viewModel = result.AssertRight();
 
-                Assert.Equal(2, viewModel.Count);
+                var contributors = viewModel.Contributors;
+                var pendingInviteEmails = viewModel.PendingInviteEmails;
 
-                Assert.Equal(user1.Id, viewModel[0].UserId);
-                Assert.Equal(user1.DisplayName, viewModel[0].UserDisplayName);
-                Assert.Equal(user1.Email, viewModel[0].UserEmail);
+                Assert.Equal(2, contributors.Count);
 
-                Assert.Equal(user2.Id, viewModel[1].UserId);
-                Assert.Equal(user2.DisplayName, viewModel[1].UserDisplayName);
-                Assert.Equal(user2.Email, viewModel[1].UserEmail);
+                Assert.Equal(user1.Id, contributors[0].UserId);
+                Assert.Equal(user1.DisplayName, contributors[0].UserDisplayName);
+                Assert.Equal(user1.Email, contributors[0].UserEmail);
+
+                Assert.Equal(user2.Id, contributors[1].UserId);
+                Assert.Equal(user2.DisplayName, contributors[1].UserDisplayName);
+                Assert.Equal(user2.Email, contributors[1].UserEmail);
+
+                Assert.Equal(2, pendingInviteEmails.Count);
+                Assert.Equal("user4@test.com", pendingInviteEmails[0]);
+                Assert.Equal("user6@test.com", pendingInviteEmails[1]);
             }
         }
 
         [Fact]
-        public async Task ListReleaseContributors_NoPublication()
+        public async Task ListReleaseContributorsAndContributorInvites_NoPublication()
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
             var service = SetupReleasePermissionService(contentDbContext);
@@ -137,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListReleaseContributors_NoRelease()
+        public async Task ListReleaseContributorsAndContributorInvites_NoRelease()
         {
             var publication = new Publication { Title = "Test Publication" };
 
@@ -158,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListReleaseContributors_NoUserReleaseRoles()
+        public async Task ListReleaseContributorsAndContributorInvites_NoUserReleaseRolesAndReleaseInvites()
         {
             var publication = new Publication();
             var release1 = new Release
@@ -182,7 +231,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ListReleaseContributorsAndContributorInvites(release1.Id);
                 var viewModel = result.AssertRight();
 
-                Assert.Empty(viewModel);
+                Assert.Empty(viewModel.Contributors);
+                Assert.Empty(viewModel.PendingInviteEmails);
             }
         }
 
