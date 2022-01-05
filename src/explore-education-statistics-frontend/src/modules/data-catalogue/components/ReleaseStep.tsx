@@ -61,7 +61,9 @@ const ReleaseStep = ({
       </div>
       <div className="govuk-grid-column-one-third dfe-align--right">
         {stepEnabled && (
-          <WizardStepEditButton {...stepProps} editTitle="Change release" />
+          <WizardStepEditButton {...stepProps}>
+            Change release
+          </WizardStepEditButton>
         )}
       </div>
     </div>

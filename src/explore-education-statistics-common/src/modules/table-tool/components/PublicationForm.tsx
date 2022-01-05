@@ -223,10 +223,9 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
             </div>
             <div className="govuk-grid-column-one-third dfe-align--right">
               {stepEnabled && (
-                <WizardStepEditButton
-                  {...props}
-                  editTitle="Change publication"
-                />
+                <WizardStepEditButton {...props}>
+                  Change publication
+                </WizardStepEditButton>
               )}
             </div>
           </div>

@@ -196,7 +196,9 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
             </div>
             <div className="govuk-grid-column-one-third dfe-align--right">
               {stepEnabled && (
-                <WizardStepEditButton {...props} editTitle="Edit time period" />
+                <WizardStepEditButton {...props}>
+                  Edit time period
+                </WizardStepEditButton>
               )}
               <ResetFormOnPreviousStep
                 currentStep={currentStep}

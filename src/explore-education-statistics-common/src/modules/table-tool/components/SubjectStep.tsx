@@ -135,7 +135,9 @@ const SubjectStep = ({
       </div>
       <div className="govuk-grid-column-one-third dfe-align--right">
         {stepEnabled && (
-          <WizardStepEditButton {...stepProps} editTitle="Change subject" />
+          <WizardStepEditButton {...stepProps}>
+            Change subject
+          </WizardStepEditButton>
         )}
       </div>
     </div>

@@ -1,28 +1,25 @@
+import ButtonText from '@common/components/ButtonText';
 import React from 'react';
 import { InjectedWizardProps } from './Wizard';
-import styles from './WizardStepEditButton.module.scss';
 
 interface Props {
-  editTitle: string;
+  children: string;
 }
 
 const WizardStepEditButton = ({
-  editTitle,
+  children,
   stepNumber,
   setCurrentStep,
 }: Props & InjectedWizardProps) => {
   return (
-    <div className="govuk-!-margin-top-2">
-      <button
-        type="button"
-        data-testid={`wizardStep-${stepNumber}-goToButton`}
-        onClick={() => setCurrentStep(stepNumber)}
-        className={styles.stepButton}
-      >
-        {editTitle}{' '}
-        <span className="govuk-visually-hidden">{`Step ${stepNumber}`}</span>
-      </button>
-    </div>
+    <ButtonText
+      className="govuk-!-margin-top-2 govuk-!-margin-bottom-2"
+      data-testid={`wizardStep-${stepNumber}-goToButton`}
+      onClick={() => setCurrentStep(stepNumber)}
+    >
+      {children}{' '}
+      <span className="govuk-visually-hidden">{`on step ${stepNumber}`}</span>
+    </ButtonText>
   );
 };
 

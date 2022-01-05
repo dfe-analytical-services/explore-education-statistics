@@ -222,7 +222,9 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
             </div>
             <div className="govuk-grid-column-one-third dfe-align--right">
               {stepEnabled && (
-                <WizardStepEditButton {...props} editTitle="Edit locations" />
+                <WizardStepEditButton {...props}>
+                  Edit locations
+                </WizardStepEditButton>
               )}
               <ResetFormOnPreviousStep
                 currentStep={currentStep}
