@@ -47,8 +47,8 @@ Select release from admin dashboard
     ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
     user opens details dropdown    ${RELEASE_NAME} (not Live)    ${accordion}
     ${details}=    user gets details content element    ${RELEASE_NAME} (not Live)    ${accordion}
-    user waits until parent contains element    ${details}    xpath:.//a[text()="Edit this release"]
-    user clicks link    Edit this release
+    user waits until parent contains element    ${details}    xpath:.//a[text()="Edit release"]
+    user clicks link    Edit release
 
 Add public prerelease access list
     user clicks link    Pre-release access

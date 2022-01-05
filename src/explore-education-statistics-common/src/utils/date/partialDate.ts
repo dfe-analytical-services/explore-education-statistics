@@ -39,7 +39,7 @@ export const formatPartialDate = (
 ): string => {
   const opts = {
     monthYearFormat: 'MMMM yyyy',
-    fullFormat: 'dd MMMM yyyy',
+    fullFormat: 'd MMMM yyyy',
     ...options,
   };
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 {
@@ -11,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public long? BoundaryLevel { get; set; }
         public IEnumerable<Guid> Indicators { get; set; }
         public LocationQuery Locations { get; set; }
+        public IEnumerable<Guid> LocationIds { get; set; }
         public bool? IncludeGeoJson { get; set; }
 
         public ObservationQueryContext Clone()
@@ -24,10 +26,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
             return
                 $"{nameof(SubjectId)}: {SubjectId}, " +
                 $"{nameof(TimePeriod)}: {TimePeriod}, " +
-                $"{nameof(Filters)}: [{(Filters == null ? string.Empty : string.Join(", ", Filters))}], " +
+                $"{nameof(Filters)}: [{(Filters == null ? string.Empty : Filters.JoinToString(", "))}], " +
                 $"{nameof(BoundaryLevel)}: {BoundaryLevel}, " +
-                $"{nameof(Indicators)}: [{(Indicators == null ? string.Empty : string.Join(", ", Indicators))}], " +
+                $"{nameof(Indicators)}: [{(Indicators == null ? string.Empty : Indicators.JoinToString(", "))}], " +
                 $"{nameof(Locations)}: {Locations}, " +
+                $"{nameof(LocationIds)}: [{(LocationIds == null ? string.Empty : LocationIds.JoinToString(", "))}], " +
                 $"{nameof(IncludeGeoJson)}: {IncludeGeoJson}";
         }
     }

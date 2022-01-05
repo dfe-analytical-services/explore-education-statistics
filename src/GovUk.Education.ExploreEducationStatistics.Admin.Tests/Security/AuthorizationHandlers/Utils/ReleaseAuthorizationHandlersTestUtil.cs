@@ -8,7 +8,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 
@@ -30,7 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 Id = Guid.NewGuid()
             };
 
-            await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(handler, release, claimsExpectedToSucceed);
+            await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(handler, release,
+                claimsExpectedToSucceed);
         }
 
         public static async Task AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
@@ -43,7 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 Id = Guid.NewGuid()
             };
 
-            await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(handlerSupplier, release, claimsExpectedToSucceed);
+            await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(handlerSupplier, release,
+                claimsExpectedToSucceed);
         }
 
         public static async Task AssertReleaseHandlerSucceedsWithCorrectClaims<TRequirement>(
@@ -52,7 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             params SecurityClaimTypes[] claimsExpectedToSucceed)
             where TRequirement : IAuthorizationRequirement
         {
-            await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(handlerSupplier, release, claimsExpectedToSucceed);
+            await AssertHandlerSucceedsWithCorrectClaims<Release, TRequirement>(handlerSupplier, release,
+                claimsExpectedToSucceed);
         }
 
         /**
@@ -69,7 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 Id = Guid.NewGuid()
             };
 
-            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(handlerSupplier, release, rolesExpectedToSucceed);
+            await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<TRequirement>(handlerSupplier, release,
+                rolesExpectedToSucceed);
         }
 
         /**
@@ -84,8 +89,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             var inTeamScenarios = CreateUserInProductionTeamScenarios(release, rolesExpectedToSucceed);
             var notInTeamScenario = CreateUserNotInProductionTeamScenario(release, rolesExpectedToSucceed);
-            var allScenarios = new List<ReleaseHandlerTestScenario>(inTeamScenarios) {notInTeamScenario};
-            await allScenarios.ForEachAsync(scenario => AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+            var allScenarios = new List<ReleaseHandlerTestScenario>(inTeamScenarios) { notInTeamScenario };
+            await allScenarios
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(scenario =>
+                    AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
         }
 
         /**
@@ -100,8 +108,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             var inTeamScenarios = CreateUserInPublicationTeamScenarios(release, rolesExpectedToSucceed);
             var notInTeamScenario = CreateUserNotInPublicationTeamScenario(release, rolesExpectedToSucceed);
-            var allScenarios = new List<ReleaseHandlerTestScenario>(inTeamScenarios) {notInTeamScenario};
-            await allScenarios.ForEachAsync(scenario => AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+            var allScenarios = new List<ReleaseHandlerTestScenario>(inTeamScenarios) { notInTeamScenario };
+            await allScenarios
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(scenario =>
+                    AssertReleaseHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
         }
 
         private static ReleaseHandlerTestScenario CreateUserNotInProductionTeamScenario(Release release,
@@ -393,7 +404,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 var user = CreateClaimsPrincipal(userId);
                 var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
+                    new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
                     user, handleRequirementArgument);
 
                 var handler = handlerSupplier(contentDbContext);

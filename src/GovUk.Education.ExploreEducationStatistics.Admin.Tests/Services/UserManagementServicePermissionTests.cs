@@ -12,6 +12,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
 using static Moq.MockBehavior;
 
@@ -136,8 +137,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             UsersAndRolesDbContext? usersAndRolesDbContext = null,
             IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
             IEmailTemplateService? emailTemplateService = null,
+            IUserRoleService? userRoleService = null,
             IUserService? userService = null,
-            IUserRoleService? userRoleService = null)
+            IUserInviteRepository? userInviteRepository = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -148,7 +150,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
                 emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
                 userRoleService ?? Mock.Of<IUserRoleService>(Strict),
-                userService ?? Mock.Of<IUserService>(Strict)
+                userService ?? AlwaysTrueUserService().Object,
+                userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext)
             );
         }
     }

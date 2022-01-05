@@ -153,13 +153,13 @@ describe('PublicationSummary', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'Link to an externally hosted methodology',
+        name: 'Use an external methodology',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', {
-        name: 'Manage this publication',
+        name: 'Manage publication',
       }),
     ).not.toBeInTheDocument();
 
@@ -235,13 +235,13 @@ describe('PublicationSummary', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Link to an externally hosted methodology',
+        name: 'Use an external methodology',
       }),
     ).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
-        name: 'Manage this publication',
+        name: 'Manage publication',
       }),
     ).toBeInTheDocument();
 

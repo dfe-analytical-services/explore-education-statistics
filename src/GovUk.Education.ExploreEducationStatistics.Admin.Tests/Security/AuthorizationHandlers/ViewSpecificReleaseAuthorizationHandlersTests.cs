@@ -118,7 +118,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             await GetEnumValues<PreReleaseAccess>()
                 .Where(value => value != PreReleaseAccess.Within)
                 .ToList()
-                .ForEachAsync(async access =>
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async access =>
                 {
                     preReleaseService
                         .Setup(s => s.GetPreReleaseWindowStatus(release, It.IsAny<DateTime>()))

@@ -31,7 +31,7 @@ const ReleaseContributorPermissions = ({
               {contributors.map(contributor => (
                 <tr key={contributor.userId}>
                   <td className="govuk-!-width-one-half">
-                    {contributor.userDisplayName}
+                    {`${contributor.userDisplayName} (${contributor.userEmail})`}
                   </td>
                   <td className={styles.control}>
                     <ButtonText onClick={() => setRemoveUser(contributor)}>

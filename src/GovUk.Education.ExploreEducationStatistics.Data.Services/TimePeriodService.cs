@@ -19,10 +19,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             _context = context;
         }
-        
+
         public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(Guid subjectId)
         {
             return _context.Observation
+                .AsQueryable()
                 .Where(observation => observation.SubjectId == subjectId)
                 .Select(o => new {o.Year, o.TimeIdentifier})
                 .Distinct()
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ThenBy(tuple => tuple.TimeIdentifier)
                 .Select(tuple => (tuple.Year, tuple.TimeIdentifier));
         }
-        
+
         public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(
             IQueryable<Observation> observations)
         {
@@ -54,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var observationsQuery = _context
                 .Observation
+                .AsQueryable()
                 .Where(observation => observation.SubjectId == subjectId);
             var orderedTimePeriods = GetDistinctObservationTimePeriods(observationsQuery).ToList();
 

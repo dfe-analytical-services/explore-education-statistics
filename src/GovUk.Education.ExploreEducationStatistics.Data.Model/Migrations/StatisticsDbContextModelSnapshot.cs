@@ -249,6 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("GeographicLevel")
+                        .IsRequired()
                         .HasColumnType("nvarchar(6)")
                         .HasMaxLength(6);
 

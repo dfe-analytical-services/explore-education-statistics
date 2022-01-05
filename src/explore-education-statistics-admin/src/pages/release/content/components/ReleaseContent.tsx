@@ -2,6 +2,7 @@ import ButtonLink from '@admin/components/ButtonLink';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
+import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import BasicReleaseSummary from '@admin/pages/release/content/components/BasicReleaseSummary';
@@ -25,6 +26,7 @@ import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
+import useToggle from '@common/hooks/useToggle';
 import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
@@ -38,10 +40,23 @@ interface MethodologyLink {
 const ReleaseContent = () => {
   const config = useConfig();
   const location = useLocation();
-
-  const { editingMode } = useEditingContext();
+  const {
+    editingMode,
+    unsavedBlocks,
+    unsavedCommentDeletions,
+  } = useEditingContext();
   const { release } = useReleaseContentState();
   const actions = useReleaseContentActions();
+  const [blockRouteChange, toggleBlockRouteChange] = useToggle(false);
+
+  useMemo(() => {
+    const blocksWithCommentDeletions = Object.entries(unsavedCommentDeletions)
+      .filter(blockWithDeletions => blockWithDeletions[1].length)
+      .map(blockWithDeletions => blockWithDeletions[0]);
+    toggleBlockRouteChange(
+      unsavedBlocks.length > 0 || blocksWithCommentDeletions.length > 0,
+    );
+  }, [toggleBlockRouteChange, unsavedBlocks, unsavedCommentDeletions]);
 
   const releaseCount = useMemo(() => {
     if (release) {
@@ -124,6 +139,15 @@ const ReleaseContent = () => {
 
   return (
     <>
+      <RouteLeavingGuard
+        blockRouteChange={blockRouteChange}
+        title="There are unsaved changes"
+      >
+        <p>
+          Clicking away from this tab will result in the changes being lost.
+        </p>
+      </RouteLeavingGuard>
+
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
           <BasicReleaseSummary release={release} />

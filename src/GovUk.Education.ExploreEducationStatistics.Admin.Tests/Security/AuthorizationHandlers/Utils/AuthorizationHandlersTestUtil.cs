@@ -27,7 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             where TRequirement : IAuthorizationRequirement
         {
             var scenarios = GetClaimTestScenarios(entity, claimsExpectedToSucceed);
-            await scenarios.ForEachAsync(scenario => AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario));
+            await scenarios
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(
+                    scenario => AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario));
         }
 
         public static async Task AssertHandlerSucceedsWithCorrectClaims<TRequirement>(
@@ -36,9 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             where TRequirement : IAuthorizationRequirement
         {
             var scenarios = GetClaimTestScenarios(null, claimsExpectedToSucceed);
-            await scenarios.ForEachAsync(scenario => AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario));
+            await scenarios
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(scenario =>
+                    AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handler, scenario));
         }
-        
+
         public static async Task AssertHandlerSucceedsWithCorrectClaims<TEntity, TRequirement>(
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
             TEntity entity,
@@ -46,7 +52,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             where TRequirement : IAuthorizationRequirement
         {
             var scenarios = GetClaimTestScenarios(entity, claimsExpectedToSucceed);
-            await scenarios.ForEachAsync(scenario => AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+            await scenarios
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(scenario =>
+                    AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
         }
 
         public static async Task AssertHandlerSucceedsWithCorrectClaims<TRequirement>(
@@ -55,7 +64,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             where TRequirement : IAuthorizationRequirement
         {
             var scenarios = GetClaimTestScenarios(null, claimsExpectedToSucceed);
-            await scenarios.ForEachAsync(scenario => AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
+            await scenarios
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(scenario =>
+                    AssertHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier, scenario));
         }
 
         public static async Task AssertHandlerHandlesScenarioSuccessfully<TRequirement>(
@@ -102,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             where TRequirement : IAuthorizationRequirement
         {
             var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
+                new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
                 scenario.User, scenario.Entity);
 
             await handler.HandleAsync(authContext);
@@ -119,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
         public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId)
         {
-            return CreateClaimsPrincipal(userId, new Claim[] {});
+            return CreateClaimsPrincipal(userId, new Claim[] { });
         }
 
         public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params Claim[] additionalClaims)
@@ -133,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
         public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params SecurityClaimTypes[] additionalClaims)
         {
-            return CreateClaimsPrincipal(userId, 
+            return CreateClaimsPrincipal(userId,
                 additionalClaims.Select(c => new Claim(c.ToString(), "")).ToArray());
         }
 
@@ -141,35 +153,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             GetEnumValues<SecurityClaimTypes>().ForEach(action.Invoke);
         }
-        
+
         public static Task ForEachSecurityClaimAsync(Func<SecurityClaimTypes, Task> action)
         {
-            return GetEnumValues<SecurityClaimTypes>().ForEachAsync(action.Invoke);
+            return GetEnumValues<SecurityClaimTypes>()
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(action.Invoke);
         }
 
         public static Task ForEachReleaseRoleAsync(Func<ReleaseRole, Task> action)
         {
-            return GetEnumValues<ReleaseRole>().ForEachAsync(action.Invoke);
+            return GetEnumValues<ReleaseRole>()
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(action.Invoke);
         }
-        
+
         public static Task ForEachPublicationRoleAsync(Func<PublicationRole, Task> action)
         {
-            return GetEnumValues<PublicationRole>().ForEachAsync(action.Invoke);
+            return GetEnumValues<PublicationRole>()
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(action.Invoke);
         }
 
         public static AuthorizationHandlerContext CreateAuthorizationHandlerContext<TRequirement, TEntity>(
             ClaimsPrincipal user, TEntity entity) where TRequirement : IAuthorizationRequirement
         {
             return new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] {Activator.CreateInstance<TRequirement>()},
+                new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
                 user, entity);
-
         }
 
         public class HandlerTestScenario
         {
             public object Entity { get; set; }
-            
+
             public ClaimsPrincipal User { get; set; }
 
             public bool ExpectedToPass { get; set; }

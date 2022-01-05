@@ -129,8 +129,8 @@ Adopt a Draft methodology
     user creates test publication via api    ${ADOPTED_PUBLICATION_NAME}
     user creates methodology for publication    ${ADOPTED_PUBLICATION_NAME}
     ${accordion}    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
-    user checks element contains link    ${accordion}    Adopt a methodology
-    user clicks link    Adopt a methodology
+    user checks element contains link    ${accordion}    Adopt an existing methodology
+    user clicks link    Adopt an existing methodology
     user waits until page contains title    Adopt a methodology
     user clicks radio    ${ADOPTED_PUBLICATION_NAME}
     user clicks button    Save

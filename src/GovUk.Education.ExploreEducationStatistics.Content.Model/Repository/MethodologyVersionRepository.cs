@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         {
             var publication = await _contentDbContext
                 .Publications
+                .AsQueryable()
                 .SingleAsync(p => p.Id == publicationId);
 
             var methodology = (await _contentDbContext.MethodologyVersions.AddAsync(new MethodologyVersion
@@ -66,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         {
             // First check the publication exists
             var publication = await _contentDbContext.Publications
+                .AsQueryable()
                 .SingleAsync(p => p.Id == publicationId);
 
             var methodologies = await _methodologyRepository.GetByPublication(publication.Id);
@@ -84,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         public async Task<MethodologyVersion?> GetLatestPublishedVersion(Guid methodologyId)
         {
             var methodology = await _contentDbContext.Methodologies
+                .AsQueryable()
                 .SingleAsync(mp => mp.Id == methodologyId);
 
             return await GetLatestPublishedByMethodology(methodology);
@@ -135,7 +138,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Select(m => m.Methodology)
                 .ToListAsync();
 
-            await ownedMethodologies.ForEachAsync(async methodology =>
+            await ownedMethodologies
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async methodology =>
             {
                 methodology.OwningPublicationTitle = updatedTitle;
 

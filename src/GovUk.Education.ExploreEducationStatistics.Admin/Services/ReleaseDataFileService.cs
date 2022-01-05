@@ -182,8 +182,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var filesExcludingReplacements = files.Where(file =>
                         !file.File.ReplacingId.HasValue);
 
-                    await filesExcludingReplacements.ForEachAsync(async file =>
-                        fileList.Add(await GetDataFileInfo(releaseId, file.File)));
+                    await filesExcludingReplacements
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(async file =>
+                            fileList.Add(await GetDataFileInfo(releaseId, file.File)));
 
                     return fileList
                         .OrderBy(file => file.Name)
@@ -205,13 +207,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await _persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
-                        .OnSuccessDo(replacingFile => _fileUploadsValidatorService.ValidateDataFilesForUpload(releaseId, dataFormFile, metaFormFile, replacingFile))
+                        .OnSuccessDo(replacingFile =>
+                            _fileUploadsValidatorService.ValidateDataFilesForUpload(releaseId, dataFormFile,
+                                metaFormFile, replacingFile))
                         // First, create with status uploading to prevent other users uploading the same datafile
-                        .OnSuccessCombineWith(replacingFile => ValidateSubjectName(releaseId, subjectName, replacingFile))
+                        .OnSuccessCombineWith(replacingFile =>
+                            ValidateSubjectName(releaseId, subjectName, replacingFile))
                         .OnSuccess(async replacingFileAndSubjectName =>
                         {
                             var (replacingFile, validSubjectName) = replacingFileAndSubjectName;
-                            
+
                             var subjectId =
                                 await _releaseRepository
                                     .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseId);
@@ -358,7 +363,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         UserName = dataFile.CreatedBy.Email,
                                                         Status = DataImportStatus.QUEUED,
                                                         Created = dataFile.Created,
-                                                        Permissions = await _userService.GetDataFilePermissions(dataFile)
+                                                        Permissions =
+                                                            await _userService.GetDataFilePermissions(dataFile)
                                                     };
                                                 });
                                         }));

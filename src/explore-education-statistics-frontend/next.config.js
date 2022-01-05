@@ -21,6 +21,16 @@ const nextConfig = {
         destination: '/data-catalogue',
         permanent: true,
       },
+      {
+        source: '/find-statistics/:publication/meta-guidance',
+        destination: '/find-statistics/:publication/data-guidance',
+        permanent: true,
+      },
+      {
+        source: '/find-statistics/:publication/:release/meta-guidance',
+        destination: '/find-statistics/:publication/:release/data-guidance',
+        permanent: true,
+      },
     ];
   },
   webpack(config, options) {

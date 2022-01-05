@@ -16,7 +16,7 @@ Link Publication to External Methodology
     user creates test publication via api    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology
-    user checks element contains link    ${accordion}    Link to an externally hosted methodology
+    user checks element contains link    ${accordion}    Use an external methodology
     user links publication to external methodology    ${PUBLICATION_NAME}
     user waits until page contains title    Dashboard
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
@@ -39,6 +39,6 @@ Remove the External Methodology from Publication
     user removes an external methodology from publication    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology
-    user checks element contains link    ${accordion}    Link to an externally hosted methodology
+    user checks element contains link    ${accordion}    Use an external methodology
     user checks element does not contain button    ${accordion}    Edit externally hosted methodology
     user checks element does not contain button    ${accordion}    Remove external methodology

@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private readonly ILogger<ObservationService> _logger;
         public IMatchingObservationsGetter MatchingObservationGetter { get; set; } = new MatchingObservationsGetter();
-            
+
         public ObservationService(
             StatisticsDbContext context,
             ILogger<ObservationService> logger) : base(context)
@@ -52,22 +52,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             var observations = new List<Observation>();
 
-            await batchesOfIds.ForEachAsync(async batchOfIds =>
-            {
-                var observationBatch = await _context
-                    .Observation
-                    .AsNoTracking()
-                    .Include(o => o.FilterItems)
-                    .Include(o => o.Location)
-                    .Where(o => batchOfIds.Contains(o.Id))
-                    .ToListAsync(cancellationToken);
+            await batchesOfIds
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async batchOfIds =>
+                {
+                    var observationBatch = await _context
+                        .Observation
+                        .AsNoTracking()
+                        .Include(o => o.FilterItems)
+                        .Include(o => o.Location)
+                        .Where(o => batchOfIds.Contains(o.Id))
+                        .ToListAsync(cancellationToken);
 
-                observations.AddRange(observationBatch);
+                    observations.AddRange(observationBatch);
 
-                _logger.LogDebug($"Fetched batch of {observationBatch.Count} Observations from their ids in " +
-                                 $"{phasesStopwatch.Elapsed.TotalMilliseconds} ms");
-                phasesStopwatch.Restart();
-            });
+                    _logger.LogDebug($"Fetched batch of {observationBatch.Count} Observations from their ids in " +
+                                     $"{phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+                    phasesStopwatch.Restart();
+                }, cancellationToken: cancellationToken);
 
             _logger.LogDebug($"Finished fetching {ids.Length} Observations in a total of " +
                              $"{totalStopwatch.Elapsed.TotalMilliseconds} ms");
@@ -81,114 +83,163 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Include(observation => observation.FilterItems)
                 .Where(ObservationPredicateBuilder.Build(query));
         }
-        
+
         public interface IMatchingObservationsGetter
         {
             Task<Guid[]> GetMatchingObservationIdsQuery(
                 StatisticsDbContext context,
-                ObservationQueryContext query, 
+                ObservationQueryContext query,
                 CancellationToken cancellationToken);
         }
 
         private class MatchingObservationsGetter : IMatchingObservationsGetter
         {
-            public async Task<Guid[]> GetMatchingObservationIdsQuery(
+            public Task<Guid[]> GetMatchingObservationIdsQuery(
                 StatisticsDbContext context,
-                ObservationQueryContext query, 
+                ObservationQueryContext query,
+                CancellationToken cancellationToken)
+            {
+                if (query.LocationIds.IsNullOrEmpty())
+                {
+                    // Support old Data Blocks that have Location codes rather than id's in their query
+                    return GetMatchingObservationIdsByLocationCodes(context, query, cancellationToken);
+                }
+                return GetMatchingObservationIds(context, query, cancellationToken);
+            }
+
+            private static async Task<Guid[]> GetMatchingObservationIds(
+                StatisticsDbContext context,
+                ObservationQueryContext query,
+                CancellationToken cancellationToken)
+            {
+                var subjectId = new SqlParameter("subjectId", query.SubjectId);
+                var filterItemIds = CreateIdListType("filterItemIds", query.Filters);
+                var locationIds = CreateIdListType("locationIds", query.LocationIds);
+                var timePeriods = CreateTimePeriodListType("timePeriods", GetTimePeriodRange(query));
+
+                const string sql = "EXEC dbo.SelectObservations @subjectId,@filterItemIds,@locationIds,@timePeriods";
+
+                // EES-745 It's ok to use Observation as the return type here, as long as only the Id field is selected
+                // ReSharper disable FormatStringProblem
+                return await context
+                    .Set<Observation>()
+                    .FromSqlRaw(sql,
+                        subjectId,
+                        filterItemIds,
+                        locationIds,
+                        timePeriods)
+                    .Select(observation => observation.Id)
+                    .ToArrayAsync(cancellationToken);
+            }
+
+            private static async Task<Guid[]> GetMatchingObservationIdsByLocationCodes(
+                StatisticsDbContext context,
+                ObservationQueryContext query,
                 CancellationToken cancellationToken)
             {
                 var locationsQuery = query.Locations;
 
-                var localAuthorityOldCodes =
-                    locationsQuery?.LocalAuthority?.Where(s => s.Length == 3).ToList() ?? new List<string>();
-                var localAuthorityCodes = locationsQuery?.LocalAuthority?.Except(localAuthorityOldCodes).ToList();
-
                 var subjectIdParam = new SqlParameter("subjectId", query.SubjectId);
-                var geographicLevelParam = new SqlParameter("geographicLevel",
-                    locationsQuery?.GeographicLevel?.GetEnumValue() ?? (object)DBNull.Value);
-                var timePeriodListParam = CreateTimePeriodListType("timePeriodList", GetTimePeriodRange(query));
-                var countriesListParam = CreateIdListType("countriesList", locationsQuery?.Country);
-                var englishDevolvedAreaListParam = CreateIdListType("englishDevolvedAreaList", locationsQuery?.EnglishDevolvedArea);
-                var institutionListParam =
-                    CreateIdListType("institutionList", locationsQuery?.Institution);
-                var localAuthorityListParam = CreateIdListType("localAuthorityList", localAuthorityCodes);
-                var localAuthorityOldCodeListParam = CreateIdListType("localAuthorityOldCodeList", localAuthorityOldCodes);
-                var localAuthorityDistrictListParam =
-                    CreateIdListType("localAuthorityDistrictList", locationsQuery?.LocalAuthorityDistrict);
-                var localEnterprisePartnershipListParam =
-                    CreateIdListType("localEnterprisePartnershipList", locationsQuery?.LocalEnterprisePartnership);
-                var mayoralCombinedAuthorityListParam =
-                    CreateIdListType("mayoralCombinedAuthorityList", locationsQuery?.MayoralCombinedAuthority);
-                var multiAcademyTrustListParam =
-                    CreateIdListType("multiAcademyTrustList", locationsQuery?.MultiAcademyTrust);
-                var opportunityAreaListParam =
-                    CreateIdListType("opportunityAreaList", locationsQuery?.OpportunityArea);
-                var parliamentaryConstituencyListParam =
-                    CreateIdListType("parliamentaryConstituencyList", locationsQuery?.ParliamentaryConstituency);
-                var providersListParam =
-                    CreateIdListType("providersList", locationsQuery?.Provider);
-                var planningAreaListParam =
-                    CreateIdListType("planningAreaList", locationsQuery?.PlanningArea);
-                var regionsListParam = CreateIdListType("regionsList", locationsQuery?.Region);
-                var rscRegionListParam = CreateIdListType("rscRegionsList", locationsQuery?.RscRegion);
-                var schoolsListParam = CreateIdListType("schoolsList", locationsQuery?.School);
-                var sponsorListParam = CreateIdListType("sponsorList", locationsQuery?.Sponsor);
-                var wardListParam =
-                    CreateIdListType("wardList", locationsQuery?.Ward);
-                var filterItemListParam = CreateIdListType("filterItemList", query.Filters);
+                var filterItemIds = CreateIdListType("filterItemIds", query.Filters);
+                var timePeriods = CreateTimePeriodListType("timePeriods", GetTimePeriodRange(query));
+                var geographicLevel = new SqlParameter("geographicLevel",
+                    locationsQuery?.GeographicLevel?.GetEnumValue() ?? (object) DBNull.Value);
+
+                var localAuthorityOldCodesList =
+                    locationsQuery?.LocalAuthority?.Where(s => s.Length == 3).ToList() ?? new List<string>();
+                var localAuthorityCodesList = locationsQuery?.LocalAuthority?.Except(localAuthorityOldCodesList).ToList();
+
+                var countries =
+                    CreateIdListType("countries", locationsQuery?.Country);
+                var englishDevolvedAreas =
+                    CreateIdListType("englishDevolvedAreas", locationsQuery?.EnglishDevolvedArea);
+                var institutions =
+                    CreateIdListType("institutions", locationsQuery?.Institution);
+                var localAuthorities =
+                    CreateIdListType("localAuthorities", localAuthorityCodesList);
+                var localAuthorityOldCodes =
+                    CreateIdListType("localAuthorityOldCodes", localAuthorityOldCodesList);
+                var localAuthorityDistricts =
+                    CreateIdListType("localAuthorityDistricts", locationsQuery?.LocalAuthorityDistrict);
+                var localEnterprisePartnerships =
+                    CreateIdListType("localEnterprisePartnerships", locationsQuery?.LocalEnterprisePartnership);
+                var mayoralCombinedAuthorities =
+                    CreateIdListType("mayoralCombinedAuthorities", locationsQuery?.MayoralCombinedAuthority);
+                var multiAcademyTrusts =
+                    CreateIdListType("multiAcademyTrusts", locationsQuery?.MultiAcademyTrust);
+                var opportunityAreas =
+                    CreateIdListType("opportunityAreas", locationsQuery?.OpportunityArea);
+                var parliamentaryConstituencies =
+                    CreateIdListType("parliamentaryConstituencies", locationsQuery?.ParliamentaryConstituency);
+                var planningAreas =
+                    CreateIdListType("planningAreas", locationsQuery?.PlanningArea);
+                var providers =
+                    CreateIdListType("providers", locationsQuery?.Provider);
+                var regions =
+                    CreateIdListType("regions", locationsQuery?.Region);
+                var rscRegions =
+                    CreateIdListType("rscRegions", locationsQuery?.RscRegion);
+                var schools =
+                    CreateIdListType("schools", locationsQuery?.School);
+                var sponsors =
+                    CreateIdListType("sponsors", locationsQuery?.Sponsor);
+                var wards =
+                    CreateIdListType("wards", locationsQuery?.Ward);
 
                 // EES-745 It's ok to use Observation as the return type here, as long as only the Id field is selected
+                // ReSharper disable FormatStringProblem
+                const string sql = @"EXEC dbo.SelectObservationsByLocationCodes " +
+                                   "@subjectId," +
+                                   "@filterItemIds," +
+                                   "@timePeriods," +
+                                   "@geographicLevel," +
+                                   "@countries," +
+                                   "@englishDevolvedAreas," +
+                                   "@institutions," +
+                                   "@localAuthorities," +
+                                   "@localAuthorityOldCodes," +
+                                   "@localAuthorityDistricts," +
+                                   "@localEnterprisePartnerships," +
+                                   "@mayoralCombinedAuthorities," +
+                                   "@multiAcademyTrusts," +
+                                   "@opportunityAreas," +
+                                   "@parliamentaryConstituencies," +
+                                   "@planningAreas," +
+                                   "@providers," +
+                                   "@regions," +
+                                   "@rscRegions," +
+                                   "@schools," +
+                                   "@sponsors," +
+                                   "@wards";
 
                 var inner = context
                     .Set<Observation>()
-                    .FromSqlRaw("EXEC dbo.FilteredObservations " +
-                                "@subjectId," +
-                                "@geographicLevel," +
-                                "@timePeriodList," +
-                                "@countriesList," +
-                                "@englishDevolvedAreaList," +
-                                "@institutionList," +
-                                "@localAuthorityList," +
-                                "@localAuthorityOldCodeList," +
-                                "@localAuthorityDistrictList," +
-                                "@localEnterprisePartnershipList," +
-                                "@mayoralCombinedAuthorityList," +
-                                "@multiAcademyTrustList," +
-                                "@opportunityAreaList," +
-                                "@parliamentaryConstituencyList," +
-                                "@providersList," +
-                                "@regionsList," +
-                                "@rscRegionsList," +
-                                "@schoolsList," +
-                                "@sponsorList," +
-                                "@wardList," +
-                                "@planningAreaList," +
-                                "@filterItemList",
+                    .FromSqlRaw(sql,
                         subjectIdParam,
-                        geographicLevelParam,
-                        timePeriodListParam,
-                        countriesListParam,
-                        englishDevolvedAreaListParam,
-                        institutionListParam,
-                        localAuthorityListParam,
-                        localAuthorityOldCodeListParam,
-                        localAuthorityDistrictListParam,
-                        localEnterprisePartnershipListParam,
-                        mayoralCombinedAuthorityListParam,
-                        multiAcademyTrustListParam,
-                        opportunityAreaListParam,
-                        parliamentaryConstituencyListParam,
-                        providersListParam,
-                        regionsListParam,
-                        rscRegionListParam,
-                        schoolsListParam,
-                        sponsorListParam,
-                        wardListParam,
-                        planningAreaListParam,
-                        filterItemListParam);
+                        filterItemIds,
+                        timePeriods,
+                        geographicLevel,
+                        countries,
+                        englishDevolvedAreas,
+                        institutions,
+                        localAuthorities,
+                        localAuthorityOldCodes,
+                        localAuthorityDistricts,
+                        localEnterprisePartnerships,
+                        mayoralCombinedAuthorities,
+                        multiAcademyTrusts,
+                        opportunityAreas,
+                        parliamentaryConstituencies,
+                        planningAreas,
+                        providers,
+                        regions,
+                        rscRegions,
+                        schools,
+                        sponsors,
+                        wards);
 
                 return await inner
-                    .Select(obs => obs.Id)
+                    .Select(observation => observation.Id)
                     .ToArrayAsync(cancellationToken);
             }
         }

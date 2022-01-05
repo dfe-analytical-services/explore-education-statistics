@@ -28,6 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         InvalidEmailAddress,
         NoInvitableEmails,
         InvalidUserRole,
+        NotAllReleasesBelongToPublication,
+        UserAlreadyHasReleaseRoleInvites,
+        UserAlreadyHasReleaseRoles,
 
         // Methodology
         MethodologyMustBeDraft,

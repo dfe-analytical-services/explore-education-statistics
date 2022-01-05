@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Subject = subject1,
                 Indicators = new List<Indicator>
                 {
-                    new Indicator
+                    new()
                     {
                         Name = "subject1_indicator",
                         Label = "Subject 1 Indicator"
@@ -68,7 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Subject = subject2,
                 Indicators = new List<Indicator>
                 {
-                    new Indicator
+                    new()
                     {
                         Name = "subject2_indicator",
                         Label = "Subject 2 Indicator"
@@ -92,7 +92,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject1Observation1 = new Observation
             {
-                GeographicLevel = GeographicLevel.Country,
+                Location = new Location
+                {
+                    GeographicLevel = GeographicLevel.Country
+                },
                 Subject = subject1,
                 Year = 2020,
                 TimeIdentifier = TimeIdentifier.AcademicYearQ3
@@ -100,7 +103,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject1Observation2 = new Observation
             {
-                GeographicLevel = GeographicLevel.LocalAuthority,
+                Location = new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority
+                },
                 Subject = subject1,
                 Year = 2020,
                 TimeIdentifier = TimeIdentifier.AcademicYearQ4
@@ -108,7 +114,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject1Observation3 = new Observation
             {
-                GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
+                Location = new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthorityDistrict
+                },
                 Subject = subject1,
                 Year = 2021,
                 TimeIdentifier = TimeIdentifier.AcademicYearQ1
@@ -116,7 +125,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject2Observation1 = new Observation
             {
-                GeographicLevel = GeographicLevel.Country,
+                Location = new Location
+                {
+                    GeographicLevel = GeographicLevel.Country
+                },
                 Subject = subject2,
                 Year = 2020,
                 TimeIdentifier = TimeIdentifier.SummerTerm
@@ -124,7 +136,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject2Observation2 = new Observation
             {
-                GeographicLevel = GeographicLevel.Region,
+                Location = new Location
+                {
+                    GeographicLevel = GeographicLevel.Region
+                },
                 Subject = subject2,
                 Year = 2021,
                 TimeIdentifier = TimeIdentifier.AutumnTerm
@@ -132,7 +147,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subject2Observation3 = new Observation
             {
-                GeographicLevel = GeographicLevel.Region,
+                Location = new Location
+                {
+                    GeographicLevel = GeographicLevel.Region
+                },
                 Subject = subject2,
                 Year = 2021,
                 TimeIdentifier = TimeIdentifier.SpringTerm
@@ -898,7 +916,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subjectObservation1 = new Observation
             {
-                GeographicLevel = GeographicLevel.Country,
+                Location = new Location
+                {
+                    GeographicLevel = GeographicLevel.Country
+                },
                 Subject = subject,
                 Year = 2020,
                 TimeIdentifier = TimeIdentifier.AcademicYearQ3
@@ -906,7 +927,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subjectObservation2 = new Observation
             {
-                GeographicLevel = GeographicLevel.LocalAuthority,
+                Location = new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority
+                },
                 Subject = subject,
                 Year = 2020,
                 TimeIdentifier = TimeIdentifier.AcademicYearQ4
@@ -914,7 +938,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var subjectObservation3 = new Observation
             {
-                GeographicLevel = GeographicLevel.LocalAuthorityDistrict,
+                Location = new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthorityDistrict
+                },
                 Subject = subject,
                 Year = 2021,
                 TimeIdentifier = TimeIdentifier.AcademicYearQ1

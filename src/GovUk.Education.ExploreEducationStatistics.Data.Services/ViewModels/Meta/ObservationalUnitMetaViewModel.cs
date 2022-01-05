@@ -1,8 +1,8 @@
-using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
     /// </summary>
     public record ObservationalUnitMetaViewModel : LabelValue
     {
-        [JsonConverter(typeof(StringEnumConverter), true)]
+        [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
         public GeographicLevel Level { get; set; }
 
         public dynamic GeoJson { get; set; }

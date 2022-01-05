@@ -71,7 +71,7 @@ Verify that the user cannot edit the status of the methodology
     user views methodology for publication
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
-    ...    View this methodology
+    ...    View methodology
     user clicks link    Sign off
     user waits until h2 is visible    Sign off
     user checks page does not contain    Edit status
@@ -118,7 +118,7 @@ Amend the methodology in preparation to test publishing immediately
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - Amended methodology
-    ...    Edit this amendment
+    ...    Edit amendment
 
 Update the methodology amendment's content
     user clicks link    Manage content

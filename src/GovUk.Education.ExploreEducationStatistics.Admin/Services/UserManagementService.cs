@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,13 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IUserRoleService _userRoleService;
         private readonly IUserService _userService;
+        private readonly IUserInviteRepository _userInviteRepository;
 
         public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext,
             ContentDbContext contentDbContext,
             IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
             IEmailTemplateService emailTemplateService,
             IUserRoleService userRoleService,
-            IUserService userService)
+            IUserService userService,
+            IUserInviteRepository userInviteRepository)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -42,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _emailTemplateService = emailTemplateService;
             _userRoleService = userRoleService;
             _userService = userService;
+            _userInviteRepository = userInviteRepository;
         }
 
         public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()
@@ -222,18 +226,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _userService
                 .CheckCanManageAllUsers()
+                .OnSuccess(() => ValidateUserDoesNotExist(email))
                 .OnSuccess<ActionResult, Unit, UserInvite>(async () =>
                 {
-                    if (string.IsNullOrWhiteSpace(email))
-                    {
-                        return ValidationActionResult(InvalidEmailAddress);
-                    }
-
-                    if (_usersAndRolesDbContext.Users.Any(u => u.Email.ToLower() == email.ToLower()))
-                    {
-                        return ValidationActionResult(UserAlreadyExists);
-                    }
-
                     var role = await _usersAndRolesDbContext.Roles
                         .AsQueryable()
                         .FirstOrDefaultAsync(r => r.Id == roleId);
@@ -243,16 +238,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(InvalidUserRole);
                     }
 
-                    var invite = new UserInvite
-                    {
-                        Email = email.ToLower(),
-                        Created = DateTime.UtcNow,
-                        CreatedById = _userService.GetUserId().ToString(),
-                        Role = role
-                    };
-                    await _usersAndRolesDbContext.UserInvites.AddAsync(invite);
-                    await _usersAndRolesDbContext.SaveChangesAsync();
-                    return invite;
+                    return await _userInviteRepository.Create(
+                        email: email.ToLower(),
+                        roleId: roleId,
+                        createdById: _userService.GetUserId());
                 })
                 .OnSuccess(invite =>
                 {
@@ -304,6 +293,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _userRoleService.RemoveGlobalRole(userId, existingRole.RoleId)
                         .OnSuccess(() => _userRoleService.AddGlobalRole(userId, roleId));
                 });
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateUserDoesNotExist(string email)
+        {
+            if (await _usersAndRolesDbContext.Users
+                    .AsQueryable()
+                    .AnyAsync(u => u.Email.ToLower() == email.ToLower()))
+            {
+                return ValidationActionResult(UserAlreadyExists);
+            }
+
+            return Unit.Instance;
         }
     }
 }

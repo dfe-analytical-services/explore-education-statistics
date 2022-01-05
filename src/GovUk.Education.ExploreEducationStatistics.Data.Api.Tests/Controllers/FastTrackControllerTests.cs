@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -29,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         public async Task Get()
         {
             var fastTrackId = Guid.NewGuid();
-            
+
             var fastTrackViewModel = new FastTrackViewModel();
 
             var (controller, mocks) = BuildControllerAndMocks();
@@ -55,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .Returns(Task.CompletedTask);
 
             var result = await controller.Get(fastTrackId.ToString());
-            
+
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(fastTrackViewModel);
@@ -73,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 .cacheKeyService
                 .Setup(s => s.CreateCacheKeyForFastTrackResults(fastTrackId))
                 .ReturnsAsync(cacheKey);
-            
+
             mocks.cacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(FastTrackViewModel)))
                 .ReturnsAsync(null);
@@ -85,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var result = await controller.Get(fastTrackId.ToString());
             VerifyAllMocks(mocks);
-            
+
             result.AssertNotFoundResult();
         }
 
@@ -93,9 +94,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         public async Task Get_NotFoundCreatingCacheKey()
         {
             var fastTrackId = Guid.NewGuid();
-            
+
             var (controller, mocks) = BuildControllerAndMocks();
-            
+
             mocks
                 .cacheKeyService
                 .Setup(s => s.CreateCacheKeyForFastTrackResults(fastTrackId))
@@ -103,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             var result = await controller.Get(fastTrackId.ToString());
             VerifyAllMocks(mocks);
-            
+
             result.AssertNotFoundResult();
         }
 
@@ -171,9 +172,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     {
                         new()
                         {
-                            Filters = new List<string>
+                            Filters = new List<Guid>
                             {
-                                "filter1"
+                                Guid.NewGuid()
                             },
                             Location = new LocationViewModel
                             {
@@ -183,9 +184,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                                     Name = "name"
                                 }
                             },
-                            Measures = new Dictionary<string, string>
+                            Measures = new Dictionary<Guid, string>
                             {
-                                { "key", "value" }
+                                {
+                                    Guid.NewGuid(), "value"
+                                }
                             },
                             GeographicLevel = GeographicLevel.Country,
                             TimePeriod = "2017/18"
@@ -309,7 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var fastTrackService = new Mock<IFastTrackService>(Strict);
             var cacheKeyService = new Mock<ICacheKeyService>(Strict);
             var controller = new FastTrackController(fastTrackService.Object, cacheKeyService.Object);
-            
+
             return (controller, (fastTrackService, cacheKeyService, CacheService));
         }
     }

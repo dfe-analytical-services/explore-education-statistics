@@ -1,3 +1,4 @@
+import useMountedRef from '@common/hooks/useMountedRef';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
 import React, { MouseEventHandler, ReactNode, useCallback } from 'react';
@@ -26,6 +27,7 @@ const Button = ({
   onClick,
 }: ButtonProps) => {
   const [isClicking, toggleClicking] = useToggle(false);
+  const isMountedRef = useMountedRef();
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = useCallback(
     async event => {
@@ -35,11 +37,11 @@ const Button = ({
 
       await onClick?.(event);
 
-      if (disableDoubleClick) {
+      if (disableDoubleClick && isMountedRef.current) {
         toggleClicking.off();
       }
     },
-    [onClick, disableDoubleClick, toggleClicking],
+    [disableDoubleClick, isMountedRef, onClick, toggleClicking],
   );
 
   return (

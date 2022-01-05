@@ -2,13 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -84,6 +83,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     new()
                     {
+                        Location = new Location
+                        {
+                            GeographicLevel = GeographicLevel.Country
+                        },
                         Measures = new Dictionary<Guid, string>
                         {
                             {indicator1Id, "123"},
@@ -95,6 +98,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     },
                     new()
                     {
+                        Location = new Location
+                        {
+                            GeographicLevel = GeographicLevel.Country
+                        },
                         Measures = new Dictionary<Guid, string>
                         {
                             { indicator1Id, "789" },
@@ -172,14 +179,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal(2, observationResults.Count);
 
+                Assert.Equal(GeographicLevel.Country, observationResults[0].GeographicLevel);
                 Assert.Equal("2019_AY", observationResults[0].TimePeriod);
                 Assert.Equal(2, observationResults[0].Measures.Count);
-                Assert.Equal("123", observationResults[0].Measures[indicator1Id.ToString()]);
-                Assert.Equal("456", observationResults[0].Measures[indicator2Id.ToString()]);
+                Assert.Equal("123", observationResults[0].Measures[indicator1Id]);
+                Assert.Equal("456", observationResults[0].Measures[indicator2Id]);
 
+                Assert.Equal(GeographicLevel.Country, observationResults[1].GeographicLevel);
                 Assert.Equal("2020_AY", observationResults[1].TimePeriod);
                 Assert.Single(observationResults[1].Measures);
-                Assert.Equal("789", observationResults[1].Measures[indicator1Id.ToString()]);
+                Assert.Equal("789", observationResults[1].Measures[indicator1Id]);
 
                 Assert.Equal(subjectMeta, result.Right.SubjectMeta);
             }
@@ -295,7 +304,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var query = new ObservationQueryContext
             {
                 SubjectId = releaseSubject.Subject.Id,
-                Filters = new [] {filterItem1Id, filterItem2Id},
+                Filters = new[] {filterItem1Id, filterItem2Id},
                 Indicators = new[] {indicator1Id, indicator2Id},
                 Locations = new LocationQuery
                 {
@@ -426,6 +435,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     new()
                     {
+                        Location = new Location
+                        {
+                            GeographicLevel = GeographicLevel.Country
+                        },
                         Measures = new Dictionary<Guid, string>
                         {
                             { indicator1Id, "123" },
@@ -437,6 +450,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     },
                     new()
                     {
+                        Location = new Location
+                        {
+                            GeographicLevel = GeographicLevel.Country
+                        },
                         Measures = new Dictionary<Guid, string>
                         {
                             { indicator1Id, "789" },
@@ -498,14 +515,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal(2, observationResults.Count);
 
+                Assert.Equal(GeographicLevel.Country, observationResults[0].GeographicLevel);
                 Assert.Equal("2019_AY", observationResults[0].TimePeriod);
                 Assert.Equal(2, observationResults[0].Measures.Count);
-                Assert.Equal("123", observationResults[0].Measures[indicator1Id.ToString()]);
-                Assert.Equal("456", observationResults[0].Measures[indicator2Id.ToString()]);
+                Assert.Equal("123", observationResults[0].Measures[indicator1Id]);
+                Assert.Equal("456", observationResults[0].Measures[indicator2Id]);
 
+                Assert.Equal(GeographicLevel.Country, observationResults[0].GeographicLevel);
                 Assert.Equal("2020_AY", observationResults[1].TimePeriod);
                 Assert.Single(observationResults[1].Measures);
-                Assert.Equal("789", observationResults[1].Measures[indicator1Id.ToString()]);
+                Assert.Equal("789", observationResults[1].Measures[indicator1Id]);
 
                 Assert.Equal(subjectMeta, result.Right.SubjectMeta);
             }

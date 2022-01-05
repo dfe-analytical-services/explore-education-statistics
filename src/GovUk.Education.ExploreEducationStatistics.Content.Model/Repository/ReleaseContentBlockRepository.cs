@@ -21,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         {
             return await _contentDbContext
                 .ReleaseContentBlocks
+                .AsQueryable()
                 .Where(releaseContentBlock => releaseContentBlock.ReleaseId == releaseId)
                 .Select(releaseContentBlock => releaseContentBlock.ContentBlock)
                 .OfType<T>()

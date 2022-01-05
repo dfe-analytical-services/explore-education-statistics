@@ -6,10 +6,13 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
-    public class ImporterFilterService : BaseImporterService
+    public class ImporterFilterService
     {
-        public ImporterFilterService(ImporterMemoryCache cache) : base(cache)
+        private readonly ImporterMemoryCache _memoryCache;
+
+        public ImporterFilterService(ImporterMemoryCache memoryCache)
         {
+            _memoryCache = memoryCache;
         }
 
         public FilterItem Find(string filterItemLabel, string filterGroupLabel, Filter filter, StatisticsDbContext context)
@@ -26,15 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
 
             var cacheKey = GetFilterItemCacheKey( filterGroup, label, context);
-            if (GetCache().TryGetValue(cacheKey, out FilterItem filterItem))
+            if (_memoryCache.Cache.TryGetValue(cacheKey, out FilterItem filterItem))
             {
                 return filterItem;
             }
-            
+
             filterItem = context.FilterItem.AsNoTracking().FirstOrDefault(fi => fi.FilterGroupId == filterGroup.Id && fi.Label == label) 
                          ?? context.FilterItem.Add(new FilterItem(label, filterGroup)).Entity;
-            
-            GetCache().Set(cacheKey, filterItem);
+
+            _memoryCache.Cache.Set(cacheKey, filterItem);
             
             return filterItem;
         }
@@ -45,19 +48,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 label = "Default";
             }
-            
+
             var cacheKey = GetFilterGroupCacheKey(filter, label, context);
-            if (GetCache().TryGetValue(cacheKey, out FilterGroup filterGroup))
+            if (_memoryCache.Cache.TryGetValue(cacheKey, out FilterGroup filterGroup))
             {
                 return filterGroup;
             }
-            
+
             filterGroup = context.FilterGroup.AsNoTracking()
                           .FirstOrDefault(fg => fg.FilterId == filter.Id && fg.Label == label)
                           ?? context.FilterGroup.Add(new FilterGroup(filter, label)).Entity;
             
-            GetCache().Set(cacheKey, filterGroup);
-            
+            _memoryCache.Cache.Set(cacheKey, filterGroup);
+
             return filterGroup;
         }
 
@@ -67,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                    (filter.Id == null ? context.Entry(filter).Property(e => e.Id).CurrentValue : filter.Id) + "_" +
                    filterGroupLabel.ToLower().Replace(" ", "_");            
         } 
-        
+
         private static string GetFilterItemCacheKey(FilterGroup filterGroup, string filterItemLabel, StatisticsDbContext context)
         {
             return typeof(FilterItem).Name + "_" +
