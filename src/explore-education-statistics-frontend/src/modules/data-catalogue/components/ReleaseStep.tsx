@@ -22,12 +22,11 @@ const ReleaseStep = ({
   onSubmit,
   ...stepProps
 }: Props & InjectedWizardProps) => {
-  const { isActive, currentStep, stepNumber } = stepProps;
+  const { isActive, isEnabled } = stepProps;
   const { isMounted } = useMounted();
 
-  const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
-    <WizardStepHeading {...stepProps} fieldsetHeading stepEnabled={stepEnabled}>
+    <WizardStepHeading {...stepProps} fieldsetHeading>
       Choose a release
     </WizardStepHeading>
   );
@@ -60,7 +59,7 @@ const ReleaseStep = ({
         </SummaryList>
       </div>
       <div className="govuk-grid-column-one-third dfe-align--right">
-        {stepEnabled && (
+        {isEnabled && (
           <WizardStepEditButton {...stepProps}>
             Change release
           </WizardStepEditButton>

@@ -42,20 +42,20 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
     options,
     onSubmit,
     isActive,
+    isEnabled,
     goToNextStep,
     currentStep,
     stepNumber,
     initialValues = {},
   } = props;
 
-  const stepEnabled = currentStep > stepNumber;
   const stepHeading = useMemo(
     () => (
-      <WizardStepHeading {...props} fieldsetHeading stepEnabled={stepEnabled}>
+      <WizardStepHeading {...props} fieldsetHeading>
         Choose locations
       </WizardStepHeading>
     ),
-    [props, stepEnabled],
+    [props],
   );
 
   const formOptions = useMemo(() => Object.entries(options), [options]);
@@ -221,7 +221,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
               </SummaryList>
             </div>
             <div className="govuk-grid-column-one-third dfe-align--right">
-              {stepEnabled && (
+              {isEnabled && (
                 <WizardStepEditButton {...props}>
                   Edit locations
                 </WizardStepEditButton>

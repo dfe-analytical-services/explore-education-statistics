@@ -18,7 +18,7 @@ describe('Wizard', () => {
     expect(screen.queryByText('Not a wizard step')).toBeNull();
   });
 
-  test('renders correctly with default `initialStep of Step 1`', () => {
+  test('renders correctly with default `initialStep`', () => {
     render(
       <Wizard id="test-wizard">
         <WizardStep>Step 1</WizardStep>
@@ -38,6 +38,46 @@ describe('Wizard', () => {
     expect(step3).not.toBeVisible();
   });
 
+  test('renders each step with correct state props with default `initialStep`', () => {
+    render(
+      <Wizard id="test-wizard">
+        <WizardStep>
+          {({ isActive, isEnabled }) => (
+            <>
+              <p>{`Step 1 - isActive: ${isActive}`}</p>
+              <p>{`Step 1 - isEnabled: ${isEnabled}`}</p>
+            </>
+          )}
+        </WizardStep>
+        <WizardStep>
+          {({ isActive, isEnabled }) => (
+            <>
+              <p>{`Step 2 - isActive: ${isActive}`}</p>
+              <p>{`Step 2 - isEnabled: ${isEnabled}`}</p>
+            </>
+          )}
+        </WizardStep>
+        <WizardStep>
+          {({ isActive, isEnabled }) => (
+            <>
+              <p>{`Step 3 - isActive: ${isActive}`}</p>
+              <p>{`Step 3 - isEnabled: ${isEnabled}`}</p>
+            </>
+          )}
+        </WizardStep>
+      </Wizard>,
+    );
+
+    expect(screen.getByText('Step 1 - isActive: true')).toBeInTheDocument();
+    expect(screen.getByText('Step 1 - isEnabled: true')).toBeInTheDocument();
+
+    expect(screen.getByText('Step 2 - isActive: false')).toBeInTheDocument();
+    expect(screen.getByText('Step 2 - isEnabled: false')).toBeInTheDocument();
+
+    expect(screen.getByText('Step 3 - isActive: false')).toBeInTheDocument();
+    expect(screen.getByText('Step 3 - isEnabled: false')).toBeInTheDocument();
+  });
+
   test('renders correctly with `initialStep` set to Step 2', () => {
     render(
       <Wizard id="test-wizard" initialStep={2}>
@@ -55,6 +95,46 @@ describe('Wizard', () => {
     expect(step2).toBeVisible();
     expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
+  });
+
+  test('renders each step with correct state props when `initialStep` set to Step 2', () => {
+    render(
+      <Wizard id="test-wizard" initialStep={2}>
+        <WizardStep>
+          {({ isActive, isEnabled }) => (
+            <>
+              <p>{`Step 1 - isActive: ${isActive}`}</p>
+              <p>{`Step 1 - isEnabled: ${isEnabled}`}</p>
+            </>
+          )}
+        </WizardStep>
+        <WizardStep>
+          {({ isActive, isEnabled }) => (
+            <>
+              <p>{`Step 2 - isActive: ${isActive}`}</p>
+              <p>{`Step 2 - isEnabled: ${isEnabled}`}</p>
+            </>
+          )}
+        </WizardStep>
+        <WizardStep>
+          {({ isActive, isEnabled }) => (
+            <>
+              <p>{`Step 3 - isActive: ${isActive}`}</p>
+              <p>{`Step 3 - isEnabled: ${isEnabled}`}</p>
+            </>
+          )}
+        </WizardStep>
+      </Wizard>,
+    );
+
+    expect(screen.getByText('Step 1 - isActive: false')).toBeInTheDocument();
+    expect(screen.getByText('Step 1 - isEnabled: true')).toBeInTheDocument();
+
+    expect(screen.getByText('Step 2 - isActive: true')).toBeInTheDocument();
+    expect(screen.getByText('Step 2 - isEnabled: true')).toBeInTheDocument();
+
+    expect(screen.getByText('Step 3 - isActive: false')).toBeInTheDocument();
+    expect(screen.getByText('Step 3 - isEnabled: false')).toBeInTheDocument();
   });
 
   test('calling `setCurrentStep` render prop moves wizard to that step', () => {

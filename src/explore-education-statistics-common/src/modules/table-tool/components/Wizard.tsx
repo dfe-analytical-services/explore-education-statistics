@@ -16,6 +16,7 @@ export interface InjectedWizardProps {
   currentStep: number;
   setCurrentStep(step: number): void;
   isActive: boolean;
+  isEnabled: boolean;
   isLoading: boolean;
   goToNextStep(): void;
   goToPreviousStep(): void;
@@ -93,6 +94,7 @@ const Wizard = ({
           },
           id: child.props.id || `${id}-step-${stepNumber}`,
           isActive: stepNumber === currentStep,
+          isEnabled: currentStep >= stepNumber,
           isLoading: loading === stepNumber,
           async goToPreviousStep() {
             await setCurrentStep(stepNumber - 1 < 1 ? 1 : stepNumber - 1);

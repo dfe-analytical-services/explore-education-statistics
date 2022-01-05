@@ -39,20 +39,18 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
     options,
     onSubmit,
     isActive,
+    isEnabled,
     goToNextStep,
     initialValues = {
       publicationId: '',
     },
-    currentStep,
-    stepNumber,
   } = props;
 
   const [searchTerm, setSearchTerm] = useState('');
   const lowercaseSearchTerm = searchTerm.toLowerCase();
-  const stepEnabled = currentStep > stepNumber;
 
   const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading stepEnabled={stepEnabled}>
+    <WizardStepHeading {...props} fieldsetHeading>
       Choose a publication
     </WizardStepHeading>
   );
@@ -222,7 +220,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
               </SummaryList>
             </div>
             <div className="govuk-grid-column-one-third dfe-align--right">
-              {stepEnabled && (
+              {isEnabled && (
                 <WizardStepEditButton {...props}>
                   Change publication
                 </WizardStepEditButton>

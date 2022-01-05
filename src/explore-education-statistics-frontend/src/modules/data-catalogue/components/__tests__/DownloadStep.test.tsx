@@ -15,6 +15,7 @@ describe('DownloadStep', () => {
     currentStep: 3,
     setCurrentStep: noop,
     isActive: true,
+    isEnabled: true,
     isLoading: false,
     goToNextStep: noop,
     goToPreviousStep: noop,

@@ -37,16 +37,12 @@ const SubjectStep = ({
   onSubmit,
   ...stepProps
 }: Props & InjectedWizardProps) => {
-  const { isActive, currentStep, stepNumber } = stepProps;
+  const { isActive, isEnabled } = stepProps;
 
   const hasFeaturedTables = renderFeaturedTable && featuredTables.length > 0;
-  const stepEnabled = currentStep > stepNumber;
+
   const stepHeading = (
-    <WizardStepHeading
-      {...stepProps}
-      fieldsetHeading={!hasFeaturedTables}
-      stepEnabled={stepEnabled}
-    >
+    <WizardStepHeading {...stepProps} fieldsetHeading={!hasFeaturedTables}>
       {hasFeaturedTables
         ? 'View a featured table or create your own'
         : 'Choose a subject'}
@@ -134,7 +130,7 @@ const SubjectStep = ({
         </SummaryList>
       </div>
       <div className="govuk-grid-column-one-third dfe-align--right">
-        {stepEnabled && (
+        {isEnabled && (
           <WizardStepEditButton {...stepProps}>
             Change subject
           </WizardStepEditButton>

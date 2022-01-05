@@ -77,6 +77,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     stepNumber,
     initialValues,
     isActive,
+    isEnabled,
     showTableQueryErrorDownload = true,
     onTableQueryError,
   } = props;
@@ -119,11 +120,8 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     };
   }, [initialValues, subjectMeta]);
 
-  const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
-    <WizardStepHeading {...props} stepEnabled={stepEnabled}>
-      Choose your filters
-    </WizardStepHeading>
+    <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
   );
 
   const handleSubmit = async (values: FormValues) => {
@@ -323,7 +321,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
               </SummaryList>
             </div>
             <div className="govuk-grid-column-one-third dfe-align--right">
-              {stepEnabled && (
+              {isEnabled && (
                 <WizardStepEditButton {...props}>
                   Edit filters
                 </WizardStepEditButton>

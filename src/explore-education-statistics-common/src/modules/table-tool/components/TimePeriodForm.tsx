@@ -33,6 +33,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     options,
     onSubmit,
     isActive,
+    isEnabled,
     goToNextStep,
     currentStep,
     stepNumber,
@@ -87,9 +88,8 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     return `${getOptionLabel(startValue)} to ${getOptionLabel(endValue)}`;
   };
 
-  const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading stepEnabled={stepEnabled}>
+    <WizardStepHeading {...props} fieldsetHeading>
       Choose time period
     </WizardStepHeading>
   );
@@ -195,7 +195,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
               </SummaryList>
             </div>
             <div className="govuk-grid-column-one-third dfe-align--right">
-              {stepEnabled && (
+              {isEnabled && (
                 <WizardStepEditButton {...props}>
                   Edit time period
                 </WizardStepEditButton>

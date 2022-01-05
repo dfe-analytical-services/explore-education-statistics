@@ -43,9 +43,8 @@ const DownloadStep = ({
   const { isActive, currentStep, stepNumber } = stepProps;
   const { isMounted } = useMounted();
 
-  const stepEnabled = currentStep > stepNumber;
   const stepHeading = (
-    <WizardStepHeading {...stepProps} fieldsetHeading stepEnabled={stepEnabled}>
+    <WizardStepHeading {...stepProps} fieldsetHeading>
       <span
         className="dfe-flex dfe-align-items--center"
         data-testid="choose-files"

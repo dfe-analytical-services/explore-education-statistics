@@ -178,6 +178,7 @@ describe('PublicationForm', () => {
     currentStep: 1,
     setCurrentStep: () => undefined,
     isActive: true,
+    isEnabled: true,
     isLoading: false,
     goToNextStep: () => undefined,
     goToPreviousStep: () => undefined,
