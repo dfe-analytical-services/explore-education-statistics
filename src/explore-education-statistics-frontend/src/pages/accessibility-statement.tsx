@@ -43,19 +43,25 @@ function AcccessibilityStatementPage() {
             </p>
             <ul className="govuk-list--bullet">
               <li>
-                the drag and drop feature is difficult to use for screen reader,
-                voice activation or keyboard only users
-              </li>
-              <li>some form labels are not descriptive enough</li>
-              <li>some buttons do not have descriptive text</li>
-              <li>
-                the in page search does not read back the amount of results that
-                have been found when users perform a search with JAWS activated
+                the 'in page' search feature does not function as expected using
+                screen reader and keyboard
               </li>
               <li>
-                the chart feature is not accessible to screen reader, voice
-                activation users or users that rely on a keyboard to navigate
+                the drag and drop feature for table reordering is difficult to
+                use for screen reader, voice activation or keyboard only users
               </li>
+              <li>
+                the focus order of hidden links in the charts tab when using
+                keyboard leads to unexpected selections
+              </li>
+              <li>
+                when opening some collapsible sections unexpected elements can
+                be read out to screen reader users
+              </li>
+              <li>some tables are missing title captions</li>
+              <li>some links are not descriptive enough</li>
+              <li>some buttons are not descriptive enough</li>
+              <li>some headings are not descriptive enough</li>
             </ul>
           </section>
 
@@ -136,26 +142,71 @@ function AcccessibilityStatementPage() {
               The content listed below is non-accessible for the following
               reasons.
             </p>
-            <p className="govuk-body">
-              The chart feature was not accessible to screen reader, voice
-              activation users or users that rely on a keyboard to navigate. As
-              a result, users were unable to access this feature without
-              assistance.Users need to be informed that this information can be
-              accessedin another area of the page.
-            </p>
-            <p>
-              The map feature was not accessible to screen reader, voice
-              activation users or users that rely on a keyboard to navigate. As
-              a result, users were unableto access this feature without
-              assistance.
-            </p>
+            <ol>
+              <li>
+                Some tables missing a summary or caption. This means assistive
+                technology users will find it difficult to determine a table's
+                contents without traversing it. This doesn’t meet WCAG 2.1
+                success criterion 1.3.1 (info and relationships).
+              </li>
+              <li>
+                The drag and drop feature for reordering tables has nested
+                active form elements. This means a user could tab to an element,
+                but the screen reader will not announce its name, role or state.
+                This doesn’t meet WCAG 2.1 success criterion 3.3.2
+                (Understanding labels or instructions) and 4.1.2 (Understading
+                name, role, value)
+              </li>
+              <li>
+                Hidden links in content on the charts tab. This means a keyboard
+                user can focus on an unexpected element on the page thus causing
+                confusion. This doesn’t meet WCAG 2.1 success criterion 2.4.3
+                (Understanding focus order)
+              </li>
+              <li>
+                Nested fieldsets used in the table tool. This means screen
+                reader users can find it difficult to traverse through the form
+                elements, and select radio buttons using the keyboard. This
+                doesn’t meet WCAG 2.1 success criterion 2.4.3 (Understanding
+                focus order)
+              </li>
+              <li>
+                In page search results are not appropriately announced. This
+                means when keyboard focus is on an actual result the text is not
+                announced to screen reader users. This doesn’t meet WCAG 2.1
+                success criterion 1.3.1 (info and relationships).
+              </li>
+              <li>
+                Some pages have multiple buttons with the same title. This means
+                a screen reader user is unable to differentiate between these
+                buttons out of context to make an informed selection. This
+                doesn’t meet WCAG 2.1 success criterion 2.4.6 (understanding
+                headings and labels).
+              </li>
+              <li>
+                Some pages have multiple headings with the same title. This
+                means it is difficult for screen reader users to distinguish out
+                of context what the headings are relating to. This doesn’t meet
+                WCAG 2.1 success criterion 2.4.6 (understanding headings and
+                labels).
+              </li>
+              <li>
+                Some collapsible sections can trigger an unexpected announcement
+                when opening. This means when a screen reader user opens a
+                collapsible section they will sometimes hear an unexpected
+                announcement that could cause confusion (occurs whenever there
+                is an element inside the section using aria-live='assertive').
+                This doesn’t meet WCAG 2.1 success criterion 4.1.3
+                (understanding status messages).
+              </li>
+            </ol>
             <h3 className="govuk-heading-m">Disproportionate burden</h3>
             <p className="govuk-body">Not applicable</p>
           </section>
           <section className="govuk-section-break--xl">
             <h2 className="govuk-heading-l">How we tested this website</h2>
             <p className="govuk-body">
-              This website was last tested on 23 September 2019 against{' '}
+              This website was last tested on 15 November 2021 against{' '}
               <a href="https://www.w3.org/TR/WCAG21/" rel="external">
                 Accessibility Guidelines WCAG2.1
               </a>
@@ -219,7 +270,7 @@ function AcccessibilityStatementPage() {
               and create a prioritised list of issues to resolve.
             </p>
             <p className="govuk-body">
-              This statement was prepared on 4 December 2019.
+              This statement was prepared on 6 January 2022.
             </p>
           </section>
         </div>
