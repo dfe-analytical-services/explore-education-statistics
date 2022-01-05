@@ -1,4 +1,5 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import Wizard from '../Wizard';
 import WizardStep from '../WizardStep';
@@ -161,7 +162,7 @@ describe('Wizard', () => {
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
+    userEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
@@ -195,7 +196,7 @@ describe('Wizard', () => {
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go to step 4' }));
+    userEvent.click(screen.getByRole('button', { name: 'Go to step 4' }));
 
     expect(step1).toBeVisible();
     expect(step1).toHaveAttribute('aria-current', 'step');
@@ -229,7 +230,7 @@ describe('Wizard', () => {
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go to step -1' }));
+    userEvent.click(screen.getByRole('button', { name: 'Go to step -1' }));
 
     expect(step1).toBeVisible();
     expect(step1).toHaveAttribute('aria-current', 'step');
@@ -261,7 +262,7 @@ describe('Wizard', () => {
     expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(
+    userEvent.click(
       screen.getByRole('button', { name: 'Go to previous step' }),
     );
 
@@ -295,7 +296,7 @@ describe('Wizard', () => {
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(
+    userEvent.click(
       screen.getByRole('button', { name: 'Go to previous step' }),
     );
 
@@ -329,7 +330,7 @@ describe('Wizard', () => {
     expect(step2).toHaveAttribute('aria-current', 'step');
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go to next step' }));
+    userEvent.click(screen.getByRole('button', { name: 'Go to next step' }));
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
@@ -361,7 +362,7 @@ describe('Wizard', () => {
     expect(step3).toBeVisible();
     expect(step3).toHaveAttribute('aria-current', 'step');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go to next step' }));
+    userEvent.click(screen.getByRole('button', { name: 'Go to next step' }));
 
     expect(step1).toBeVisible();
     expect(step2).toBeVisible();
@@ -440,7 +441,7 @@ describe('Wizard', () => {
     const step2 = screen.getByTestId('wizardStep-2');
     const step3 = screen.getByTestId('wizardStep-3');
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
+    userEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
 
     jest.runAllTimers();
 
@@ -473,7 +474,7 @@ describe('Wizard', () => {
 
     expect(onStepChange).not.toHaveBeenCalled();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
+    userEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
 
     expect(onStepChange).toHaveBeenCalledWith(3, 1);
   });
@@ -502,7 +503,7 @@ describe('Wizard', () => {
     expect(step2).not.toBeVisible();
     expect(step3).not.toBeVisible();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
+    userEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
 
     await waitFor(() => {
       expect(step1).toBeVisible();
@@ -529,7 +530,7 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go to step 1' }));
+    userEvent.click(screen.getByRole('button', { name: 'Go to step 1' }));
 
     await waitFor(() => {
       expect(onBack).toHaveBeenCalledTimes(1);
@@ -553,10 +554,55 @@ describe('Wizard', () => {
       </Wizard>,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Go to step 2' }));
+    userEvent.click(screen.getByRole('button', { name: 'Go to step 2' }));
 
     await waitFor(() => {
       expect(onBack).not.toHaveBeenCalled();
     });
+  });
+
+  test('moving back does not occur until `onBack` has completed', async () => {
+    jest.useFakeTimers();
+
+    const handleBack = jest.fn(
+      () => new Promise(resolve => setTimeout(resolve, 500)),
+    );
+
+    render(
+      <Wizard id="test-wizard" initialStep={2}>
+        <WizardStep onBack={handleBack}>Step 1</WizardStep>
+        <WizardStep>
+          {({ setCurrentStep }) => (
+            <button type="button" onClick={() => setCurrentStep(1)}>
+              Go to step 1
+            </button>
+          )}
+        </WizardStep>
+        <WizardStep>Step 3</WizardStep>
+      </Wizard>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Go to step 1' }));
+
+    await waitFor(() => {
+      expect(handleBack).toHaveBeenCalledTimes(1);
+    });
+
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+
+    expect(step1).not.toHaveAttribute('aria-current');
+    expect(step2).toHaveAttribute('aria-current', 'step');
+
+    jest.advanceTimersByTime(500);
+
+    await waitFor(() => {
+      expect(step1).toHaveAttribute('aria-current', 'step');
+      expect(step2).not.toHaveAttribute('aria-current');
+    });
+
+    expect(handleBack).toHaveBeenCalledTimes(1);
+
+    jest.useRealTimers();
   });
 });

@@ -61,17 +61,16 @@ const Wizard = ({
       next = await onStepChange(nextStep, currentStep);
     }
 
-    setCurrentStepState(next);
+    setLoading(next);
 
     const stepElement = filteredChildren[next - 1];
 
     if (next < current && stepElement?.props?.onBack) {
-      setLoading(next);
-
       await stepElement.props.onBack();
-
-      setLoading(undefined);
     }
+
+    setCurrentStepState(next);
+    setLoading(undefined);
   };
 
   useEffect(() => {
