@@ -90,6 +90,10 @@ export interface UsersService {
     publicationId: string,
     releaseIds: string[],
   ) => Promise<boolean>;
+  removeContributorReleaseInvites: (
+    email: string,
+    publicationId: string,
+  ) => Promise<boolean>;
   cancelInvite: (email: string) => Promise<boolean>;
   updateUser: (userId: string, update: UserUpdate) => Promise<boolean>;
 }
@@ -174,6 +178,15 @@ const userService: UsersService = {
         email,
         releaseIds,
       },
+    );
+  },
+  removeContributorReleaseInvites(
+    email: string,
+    publicationId: string,
+  ): Promise<boolean> {
+    return client.delete(
+      `/user-management/publications/${publicationId}/release-invites/contributor`,
+      { data: { email } },
     );
   },
   cancelInvite(email: string): Promise<boolean> {

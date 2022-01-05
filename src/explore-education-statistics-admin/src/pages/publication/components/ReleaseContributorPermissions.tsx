@@ -10,14 +10,17 @@ export interface Props {
   contributors: ManageAccessPageContributor[];
   pendingInviteEmails: string[];
   onUserRemove: (userId: string) => void;
+  onUserInvitesRemove: (email: string) => void;
 }
 
 const ReleaseContributorPermissions = ({
   contributors,
   pendingInviteEmails,
   onUserRemove,
+  onUserInvitesRemove,
 }: Props) => {
   const [removeUser, setRemoveUser] = useState<ManageAccessPageContributor>();
+  const [removeInvitesEmail, setRemoveInvitesEmail] = useState<string>();
 
   return (
     <>
@@ -51,7 +54,11 @@ const ReleaseContributorPermissions = ({
                     {email}
                     <Tag className="govuk-!-margin-left-3">Pending Invite</Tag>
                   </td>
-                  <td className={styles.control}>Cancel invite</td>
+                  <td className={styles.control}>
+                    <ButtonText onClick={() => setRemoveInvitesEmail(email)}>
+                      Cancel invite
+                    </ButtonText>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -73,6 +80,25 @@ const ReleaseContributorPermissions = ({
               Are you sure you want to remove{' '}
               <strong>{removeUser?.userDisplayName}</strong> from all releases
               in this publication?
+            </p>
+          </ModalConfirm>
+
+          <ModalConfirm
+            title="Confirm cancelling of user invites"
+            open={!!removeInvitesEmail}
+            onConfirm={async () => {
+              if (removeInvitesEmail) {
+                onUserInvitesRemove(removeInvitesEmail);
+                setRemoveInvitesEmail(undefined);
+              }
+            }}
+            onCancel={() => setRemoveInvitesEmail(undefined)}
+            onExit={() => setRemoveInvitesEmail(undefined)}
+          >
+            <p>
+              Are you sure you want to cancel all invites to releases under this
+              publication for email address{' '}
+              <strong>{removeInvitesEmail}</strong>?
             </p>
           </ModalConfirm>
         </>

@@ -78,6 +78,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, Unit>> RemoveByPublication(
+            string email,
+            Guid publicationId,
+            ReleaseRole releaseRole)
+        {
+            return await _contentPersistenceHelper
+                .CheckEntityExists<Publication>(publicationId, query => query
+                    .Include(p => p.Releases))
+                .OnSuccessDo(
+                    publication => _userService.CheckCanUpdateReleaseRole(publication, releaseRole))
+                .OnSuccess(async publication =>
+                {
+                    await _userReleaseInviteRepository.RemoveByPublication(publication, email, releaseRole);
+                    return Unit.Instance;
+                });
+        }
+
         private async Task<Either<ActionResult, Unit>> CreateNewUserContributorInvite(List<Guid> releaseIds,
             string email, string publicationTitle)
         {

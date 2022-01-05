@@ -10,6 +10,7 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { BasicPublicationDetails } from '@admin/services/publicationService';
 import WarningMessage from '@common/components/WarningMessage';
+import userService from '@admin/services/userService';
 
 export interface Props {
   publication: BasicPublicationDetails;
@@ -39,10 +40,18 @@ const PublicationManageTeamAccessTab = ({ publication, release }: Props) => {
     );
     setContributorsAndInvites({
       value: {
-        contributors: contributorsAndInvites.contributors.filter(
-          c => c.userId !== userId,
-        ),
+        contributors: contributors.filter(c => c.userId !== userId),
         pendingInviteEmails,
+      },
+    });
+  };
+
+  const handleUserInvitesRemove = async (email: string) => {
+    await userService.removeContributorReleaseInvites(email, publication.id);
+    setContributorsAndInvites({
+      value: {
+        contributors,
+        pendingInviteEmails: pendingInviteEmails.filter(e => e !== email),
       },
     });
   };
@@ -64,6 +73,7 @@ const PublicationManageTeamAccessTab = ({ publication, release }: Props) => {
           contributors={contributors}
           pendingInviteEmails={pendingInviteEmails}
           onUserRemove={handleUserRemove}
+          onUserInvitesRemove={handleUserInvitesRemove}
         />
       )}
       <ButtonLink
