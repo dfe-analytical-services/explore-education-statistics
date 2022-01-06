@@ -3,6 +3,7 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
+import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import {
   SubjectMeta,
   TimePeriodQuery,
@@ -13,7 +14,6 @@ import React, { useMemo } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
-import WizardStepEditButton from './WizardStepEditButton';
 
 interface FormValues {
   start: string;
@@ -33,10 +33,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     options,
     onSubmit,
     isActive,
-    isEnabled,
     goToNextStep,
-    currentStep,
-    stepNumber,
     initialValues = { timePeriod: undefined },
   } = props;
 
@@ -183,29 +180,19 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
             <WizardStepFormActions {...props} />
           </Form>
         ) : (
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
-              {stepHeading}
-              <SummaryList noBorder>
-                <SummaryListItem term="Time period">
-                  {form.values.start &&
-                    form.values.end &&
-                    getDisplayTimePeriod(form.values.start, form.values.end)}
-                </SummaryListItem>
-              </SummaryList>
-            </div>
-            <div className="govuk-grid-column-one-third dfe-align--right">
-              {isEnabled && (
-                <WizardStepEditButton {...props}>
-                  Edit time period
-                </WizardStepEditButton>
-              )}
-              <ResetFormOnPreviousStep
-                currentStep={currentStep}
-                stepNumber={stepNumber}
-              />
-            </div>
-          </div>
+          <WizardStepSummary {...props} goToButtonText="Edit time period">
+            {stepHeading}
+
+            <SummaryList noBorder>
+              <SummaryListItem term="Time period">
+                {form.values.start &&
+                  form.values.end &&
+                  getDisplayTimePeriod(form.values.start, form.values.end)}
+              </SummaryListItem>
+            </SummaryList>
+
+            <ResetFormOnPreviousStep {...props} />
+          </WizardStepSummary>
         );
       }}
     </Formik>

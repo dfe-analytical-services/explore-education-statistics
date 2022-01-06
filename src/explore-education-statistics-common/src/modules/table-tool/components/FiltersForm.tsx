@@ -14,7 +14,7 @@ import TableQueryError from '@common/modules/table-tool/components/TableQueryErr
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
-import WizardStepEditButton from '@common/modules/table-tool/components/WizardStepEditButton';
+import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import {
   SelectedPublication,
   Subject,
@@ -73,11 +73,8 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
     subject,
     subjectMeta,
     goToNextStep,
-    currentStep,
-    stepNumber,
     initialValues,
     isActive,
-    isEnabled,
     showTableQueryErrorDownload = true,
     onTableQueryError,
   } = props;
@@ -280,58 +277,48 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         }
 
         return (
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
-              {stepHeading}
-              <SummaryList noBorder>
-                <SummaryListItem term="Indicators">
-                  <CollapsibleList>
-                    {Object.values(subjectMeta.indicators)
-                      .flatMap(group => group.options)
-                      .filter(indicator =>
-                        form.values.indicators.includes(indicator.value),
-                      )
-                      .map(indicator => (
-                        <li key={indicator.value}>{indicator.label}</li>
-                      ))}
-                  </CollapsibleList>
-                </SummaryListItem>
+          <WizardStepSummary {...props} goToButtonText="Edit filters">
+            {stepHeading}
 
-                {Object.entries(subjectMeta.filters)
-                  .filter(([groupKey]) => !!form.values.filters[groupKey])
-                  .map(([filterGroupKey, filterGroup]) => (
-                    <SummaryListItem
-                      key={filterGroupKey}
-                      term={filterGroup.legend}
-                    >
-                      <CollapsibleList>
-                        {Object.values(filterGroup.options)
-                          .flatMap(group => group.options)
-                          .filter(option =>
-                            form.values.filters[filterGroupKey].includes(
-                              option.value,
-                            ),
-                          )
-                          .map(option => (
-                            <li key={option.value}>{option.label}</li>
-                          ))}
-                      </CollapsibleList>
-                    </SummaryListItem>
-                  ))}
-              </SummaryList>
-            </div>
-            <div className="govuk-grid-column-one-third dfe-align--right">
-              {isEnabled && (
-                <WizardStepEditButton {...props}>
-                  Edit filters
-                </WizardStepEditButton>
-              )}
-              <ResetFormOnPreviousStep
-                currentStep={currentStep}
-                stepNumber={stepNumber}
-              />
-            </div>
-          </div>
+            <SummaryList noBorder>
+              <SummaryListItem term="Indicators">
+                <CollapsibleList>
+                  {Object.values(subjectMeta.indicators)
+                    .flatMap(group => group.options)
+                    .filter(indicator =>
+                      form.values.indicators.includes(indicator.value),
+                    )
+                    .map(indicator => (
+                      <li key={indicator.value}>{indicator.label}</li>
+                    ))}
+                </CollapsibleList>
+              </SummaryListItem>
+
+              {Object.entries(subjectMeta.filters)
+                .filter(([groupKey]) => !!form.values.filters[groupKey])
+                .map(([filterGroupKey, filterGroup]) => (
+                  <SummaryListItem
+                    key={filterGroupKey}
+                    term={filterGroup.legend}
+                  >
+                    <CollapsibleList>
+                      {Object.values(filterGroup.options)
+                        .flatMap(group => group.options)
+                        .filter(option =>
+                          form.values.filters[filterGroupKey].includes(
+                            option.value,
+                          ),
+                        )
+                        .map(option => (
+                          <li key={option.value}>{option.label}</li>
+                        ))}
+                    </CollapsibleList>
+                  </SummaryListItem>
+                ))}
+            </SummaryList>
+
+            <ResetFormOnPreviousStep {...props} />
+          </WizardStepSummary>
         );
       }}
     </Formik>

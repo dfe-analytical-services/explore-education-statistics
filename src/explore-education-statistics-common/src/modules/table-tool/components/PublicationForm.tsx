@@ -8,6 +8,7 @@ import {
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import { PublicationSummary, Theme } from '@common/services/themeService';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
@@ -16,7 +17,6 @@ import React, { useState } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
-import WizardStepEditButton from './WizardStepEditButton';
 
 export interface PublicationFormValues {
   publicationId: string;
@@ -39,7 +39,6 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
     options,
     onSubmit,
     isActive,
-    isEnabled,
     goToNextStep,
     initialValues = {
       publicationId: '',
@@ -210,23 +209,15 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
           .find(option => option.id === form.values.publicationId);
 
         return (
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
-              {stepHeading}
-              <SummaryList noBorder>
-                <SummaryListItem term="Publication">
-                  {publication?.title}
-                </SummaryListItem>
-              </SummaryList>
-            </div>
-            <div className="govuk-grid-column-one-third dfe-align--right">
-              {isEnabled && (
-                <WizardStepEditButton {...props}>
-                  Change publication
-                </WizardStepEditButton>
-              )}
-            </div>
-          </div>
+          <WizardStepSummary {...props} goToButtonText="Change publication">
+            {stepHeading}
+
+            <SummaryList noBorder>
+              <SummaryListItem term="Publication">
+                {publication?.title}
+              </SummaryListItem>
+            </SummaryList>
+          </WizardStepSummary>
         );
       }}
     </Formik>

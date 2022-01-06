@@ -1,9 +1,9 @@
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import useMounted from '@common/hooks/useMounted';
-import WizardStepEditButton from '@common/modules/table-tool/components//WizardStepEditButton';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import { ReleaseSummary } from '@common/services/publicationService';
 import ReleaseForm, {
   ReleaseFormSubmitHandler,
@@ -22,7 +22,7 @@ const ReleaseStep = ({
   onSubmit,
   ...stepProps
 }: Props & InjectedWizardProps) => {
-  const { isActive, isEnabled } = stepProps;
+  const { isActive } = stepProps;
   const { isMounted } = useMounted();
 
   const stepHeading = (
@@ -49,23 +49,15 @@ const ReleaseStep = ({
   }
 
   return (
-    <div className="govuk-grid-row">
-      <div className="govuk-grid-column-two-thirds">
-        {stepHeading}
-        <SummaryList noBorder>
-          <SummaryListItem term="Release">
-            {selectedRelease?.title}
-          </SummaryListItem>
-        </SummaryList>
-      </div>
-      <div className="govuk-grid-column-one-third dfe-align--right">
-        {isEnabled && (
-          <WizardStepEditButton {...stepProps}>
-            Change release
-          </WizardStepEditButton>
-        )}
-      </div>
-    </div>
+    <WizardStepSummary {...stepProps} goToButtonText="Change release">
+      {stepHeading}
+
+      <SummaryList noBorder>
+        <SummaryListItem term="Release">
+          {selectedRelease?.title}
+        </SummaryListItem>
+      </SummaryList>
+    </WizardStepSummary>
   );
 };
 
