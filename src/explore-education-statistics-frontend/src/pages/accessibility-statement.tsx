@@ -275,7 +275,8 @@ function AcccessibilityStatementPage() {
               Preparation of this accessibility statement
             </h2>
             <p className="govuk-body">
-              This statement was prepared on 6 January 2022.
+              This statement was prepared on 4 December 2019. It was last
+              reviewed on 6 January 2022.
             </p>
           </section>
         </div>
