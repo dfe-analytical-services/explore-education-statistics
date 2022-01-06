@@ -13,10 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Body { get; set; } = string.Empty;
 
-        public DateTime Created { get; set; } = new DateTime();
+        public DateTime Created { get; set; }
 
         public Guid CreatedById { get; set; }
 
-        public User CreatedBy { get; set; } = new User();
+        public User CreatedBy { get; set; } = null!;
     }
 }
