@@ -111,7 +111,12 @@ const MethodologySummary = ({
                   summary={displayTitle}
                   summaryAfter={
                     <TagGroup className="govuk-!-margin-left-2">
-                      <Tag>{methodology.status}</Tag>
+                      <Tag>
+                        {methodology.published &&
+                        methodology.status === 'Approved'
+                          ? 'Published'
+                          : methodology.status}
+                      </Tag>
                       {methodology.amendment && <Tag>Amendment</Tag>}
                     </TagGroup>
                   }
