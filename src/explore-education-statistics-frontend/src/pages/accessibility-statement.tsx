@@ -9,7 +9,7 @@ function AcccessibilityStatementPage() {
       breadcrumbLabel="Accessibility statement"
     >
       <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
+        <div className="govuk-grid-column-three-quarters">
           <section>
             <p className="govuk-body">
               This website is run by{' '}
@@ -59,9 +59,9 @@ function AcccessibilityStatementPage() {
                 be read out to screen reader users
               </li>
               <li>some tables are missing title captions</li>
-              <li>some links are not descriptive enough</li>
-              <li>some buttons are not descriptive enough</li>
-              <li>some headings are not descriptive enough</li>
+              <li>
+                some buttons, links, and headings are not descriptive enough
+              </li>
             </ul>
           </section>
 
@@ -140,7 +140,8 @@ function AcccessibilityStatementPage() {
             <h2 className="govuk-heading-l">Non accessible content</h2>
             <p className="govuk-body">
               The content listed below is non-accessible for the following
-              reasons.
+              reasons. We will address these issues during our public beta phase
+              to ensure our content is accessible.
             </p>
             <ol>
               <li>
@@ -176,16 +177,15 @@ function AcccessibilityStatementPage() {
               <li>
                 Some tables are missing a summary or caption. This means
                 assistive technology users will find it difficult to determine a
-                table's contents without traversing it. This doesn’t meet WCAG
+                table’s contents without traversing it. This doesn’t meet WCAG
                 2.1 success criterion 1.3.1 (info and relationships).
               </li>
               <li>
-                Hidden links in content on the charts tab. This means a keyboard
-                user can focus on an unexpected element on the page thus causing
-                confusion. This doesn’t meet WCAG 2.1 success criterion 2.4.3
-                (Understanding focus order)
+                There are hidden links in content on the charts tab. This means
+                a keyboard user can focus on an unexpected element on the page
+                thus causing confusion. This doesn’t meet WCAG 2.1 success
+                criterion 2.4.3 (Understanding focus order)
               </li>
-
               <li>
                 Some pages have multiple buttons with the same title. This means
                 a screen reader user is unable to differentiate between these
@@ -233,7 +233,7 @@ function AcccessibilityStatementPage() {
                 <Link to="/data-tables">table tool page</Link>
               </li>
               <li>
-                <Link to="/download-latest-data">download data page</Link>
+                <Link to="/data-catalogue">download data page</Link>
               </li>
               <li>
                 <Link to="/find-statistics">find statistics and data page</Link>
@@ -261,7 +261,6 @@ function AcccessibilityStatementPage() {
               </li>
             </ul>
           </section>
-
           <section className="govuk-section-break govuk-section-break--xl">
             <h2 className="govuk-heading-l">
               What we’re doing to improve accessibility
@@ -270,6 +269,11 @@ function AcccessibilityStatementPage() {
               We plan to continually test the service for accessibility issues,
               and create a prioritised list of issues to resolve.
             </p>
+          </section>
+          <section className="govuk-section-break govuk-section-break--xl">
+            <h2 className="govuk-heading-l">
+              Preparation of this accessibility statementy
+            </h2>
             <p className="govuk-body">
               This statement was prepared on 6 January 2022.
             </p>
