@@ -1,10 +1,12 @@
 #nullable enable
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Common;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -84,9 +86,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             {
                 PublicationTreeCacheKey.GetKey(PublicationTreeFilter.AnyData),
                 PublicationTreeCacheKey.GetKey(PublicationTreeFilter.LatestData),
-                PublicationTreeCacheKey.GetKey()
+                PublicationTreeCacheKey.GetKey(),
+                AllMethodologiesCacheKey.GetKey()
             };
 
+            [MinLength(1)]
             [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
             public HashSet<string> Paths { get; set; } = new HashSet<string>();
         }
@@ -101,6 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                 FileStoragePathUtils.PublicContentSubjectMetaDirectory
             };
 
+            [MinLength(1)]
             [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
             public HashSet<string> Paths { get; set; } = new HashSet<string>();
         }
