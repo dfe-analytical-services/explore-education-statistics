@@ -1,6 +1,5 @@
 #nullable enable
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -9,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using Microsoft.AspNetCore.Authorization;
@@ -22,21 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
     [Authorize(Roles = RoleNames.BauUser)]
     public class BauCacheController : ControllerBase
     {
-        private static readonly HashSet<string> AllowedPublicReleasePaths = new HashSet<string>
-        {
-            FileStoragePathUtils.PublicContentDataBlocksDirectory,
-            // TODO: EES-2865 Remove with other fast track code
-            FileStoragePathUtils.PublicContentFastTrackResultsDirectory,
-            FileStoragePathUtils.PublicContentSubjectMetaDirectory
-        };
-
-        private static readonly HashSet<string> AllowedPublicTreePaths = new HashSet<string>
-        {
-            PublicationTreeCacheKey.GetKey(PublicationTreeFilter.AnyData),
-            PublicationTreeCacheKey.GetKey(PublicationTreeFilter.LatestData),
-            PublicationTreeCacheKey.GetKey(null)
-        };
-
         private readonly IBlobStorageService _privateBlobStorageService;
         private readonly IBlobStorageService _publicBlobStorageService;
 
@@ -59,15 +44,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         }
 
         [HttpDelete("public-cache/trees")]
-        public async Task<ActionResult> ClearPublicCacheTrees(ClearCachePathsViewModel request)
+        public async Task<ActionResult> ClearPublicCacheTrees(ClearCacheTreePathsViewModel request)
         {
-            var paths = request.Paths
-                .Where(AllowedPublicTreePaths.Contains)
-                .ToHashSet();
-
-            if (paths.Any())
+            if (request.Paths.Any())
             {
-                await paths
+                await request.Paths
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         path =>
@@ -79,18 +60,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         }
 
         [HttpDelete("public-cache/releases")]
-        public async Task<ActionResult> ClearPublicCacheReleases(ClearCachePathsViewModel request)
+        public async Task<ActionResult> ClearPublicCacheReleases(ClearCacheReleasePathsViewModel request)
         {
-            // Can only allow certain paths right now as not all cached items
-            // are automatically regenerated (e.g. when a user first visits
-            // the relevant part of the frontend).
-            var paths = request.Paths
-                .Where(AllowedPublicReleasePaths.Contains)
-                .ToHashSet();
-
-            if (paths.Any())
+            if (request.Paths.Any())
             {
-                var pathString = paths.JoinToString('|');
+                var pathString = request.Paths.JoinToString('|');
 
                 await _publicBlobStorageService.DeleteBlobs(
                     BlobContainers.PublicContent,
@@ -104,10 +78,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
-        public class ClearCachePathsViewModel
+        public class ClearCacheTreePathsViewModel
         {
-            [Required]
-            public List<string> Paths { get; set; } = new List<string>();
+            private static readonly HashSet<string> AllowedPaths = new HashSet<string>
+            {
+                PublicationTreeCacheKey.GetKey(PublicationTreeFilter.AnyData),
+                PublicationTreeCacheKey.GetKey(PublicationTreeFilter.LatestData),
+                PublicationTreeCacheKey.GetKey()
+            };
+
+            [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
+            public HashSet<string> Paths { get; set; } = new HashSet<string>();
+        }
+
+        public class ClearCacheReleasePathsViewModel
+        {
+            private static readonly HashSet<string> AllowedPaths = new HashSet<string>
+            {
+                FileStoragePathUtils.PublicContentDataBlocksDirectory,
+                // TODO: EES-2865 Remove with other fast track code
+                FileStoragePathUtils.PublicContentFastTrackResultsDirectory,
+                FileStoragePathUtils.PublicContentSubjectMetaDirectory
+            };
+
+            [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
+            public HashSet<string> Paths { get; set; } = new HashSet<string>();
         }
     }
 }

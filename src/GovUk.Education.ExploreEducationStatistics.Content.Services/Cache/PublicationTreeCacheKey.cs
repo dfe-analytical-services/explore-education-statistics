@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache
             Key = GetKey(filter);
         }
 
-        public static string GetKey(PublicationTreeFilter? filter)
+        public static string GetKey(PublicationTreeFilter? filter = null)
         {
             return filter switch
             {

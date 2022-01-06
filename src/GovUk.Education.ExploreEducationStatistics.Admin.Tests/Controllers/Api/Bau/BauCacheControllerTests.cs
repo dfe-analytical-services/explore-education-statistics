@@ -54,9 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = await controller.ClearPublicCacheReleases(
-                new ClearCachePathsViewModel
+                new ClearCacheReleasePathsViewModel
                 {
-                    Paths = ListOf("subject-meta")
+                    Paths = SetOf("subject-meta")
                 }
             );
 
@@ -89,9 +89,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = await controller.ClearPublicCacheReleases(
-                new ClearCachePathsViewModel
+                new ClearCacheReleasePathsViewModel
                 {
-                    Paths = new List<string>
+                    Paths = new HashSet<string>
                     {
                         "data-blocks",
                         "subject-meta",
@@ -113,38 +113,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task ClearPublicCacheReleases_InvalidPaths()
-        {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
-
-            var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
-
-            var result = await controller.ClearPublicCacheReleases(
-                new ClearCachePathsViewModel
-                {
-                    Paths = new List<string>
-                    {
-                        "not a path",
-                        "datablocks",
-                        "Data-Blocks",
-                        "SubjectMeta"
-                    }
-                }
-            );
-
-            result.AssertNoContent();
-
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
-        }
-
-        [Fact]
         public async Task ClearPublicCacheReleases_Empty()
         {
             var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
 
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await controller.ClearPublicCacheReleases(new ClearCachePathsViewModel());
+            var result = await controller.ClearPublicCacheReleases(new ClearCacheReleasePathsViewModel());
 
             result.AssertNoContent();
 
@@ -165,9 +140,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = await controller.ClearPublicCacheTrees(
-                new ClearCachePathsViewModel
+                new ClearCacheTreePathsViewModel
                 {
-                    Paths = ListOf("publication-tree-any-data.json"),
+                    Paths = SetOf("publication-tree-any-data.json"),
                 }
             );
 
@@ -193,9 +168,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = await controller.ClearPublicCacheTrees(
-                new ClearCachePathsViewModel
+                new ClearCacheTreePathsViewModel
                 {
-                    Paths = new List<string>
+                    Paths = new HashSet<string>
                     {
                         "publication-tree.json",
                         "publication-tree-any-data.json",
@@ -215,37 +190,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task ClearPublicCacheTrees_InvalidPaths()
-        {
-            var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
-
-            var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
-
-            var result = await controller.ClearPublicCacheTrees(
-                new ClearCachePathsViewModel
-                {
-                    Paths = new List<string>
-                    {
-                        "publication-tree",
-                        "publication-treee.json",
-                        "publication-tree-some-data.json",
-                    }
-                }
-            );
-
-            result.AssertNoContent();
-
-            MockUtils.VerifyAllMocks(publicBlobStorageService);
-        }
-
-        [Fact]
         public async Task ClearPublicCacheTrees_Empty()
         {
             var publicBlobStorageService = new Mock<IBlobStorageService>(Strict);
 
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await controller.ClearPublicCacheTrees(new ClearCachePathsViewModel());
+            var result = await controller.ClearPublicCacheTrees(new ClearCacheTreePathsViewModel());
 
             result.AssertNoContent();
 
