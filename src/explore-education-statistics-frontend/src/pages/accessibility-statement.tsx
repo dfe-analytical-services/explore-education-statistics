@@ -272,7 +272,7 @@ function AcccessibilityStatementPage() {
           </section>
           <section className="govuk-section-break govuk-section-break--xl">
             <h2 className="govuk-heading-l">
-              Preparation of this accessibility statementy
+              Preparation of this accessibility statement
             </h2>
             <p className="govuk-body">
               This statement was prepared on 6 January 2022.
