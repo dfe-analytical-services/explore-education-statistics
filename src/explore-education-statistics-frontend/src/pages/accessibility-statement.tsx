@@ -144,24 +144,18 @@ function AcccessibilityStatementPage() {
             </p>
             <ol>
               <li>
-                Some tables missing a summary or caption. This means assistive
-                technology users will find it difficult to determine a table's
-                contents without traversing it. This doesn’t meet WCAG 2.1
-                success criterion 1.3.1 (info and relationships).
+                The 'in page' search results are not appropriately announced.
+                This means when keyboard focus is on an actual result the text
+                is not announced to screen reader users. This doesn’t meet WCAG
+                2.1 success criterion 1.3.1 (info and relationships).
               </li>
               <li>
                 The drag and drop feature for reordering tables has nested
                 active form elements. This means a user could tab to an element,
                 but the screen reader will not announce its name, role or state.
                 This doesn’t meet WCAG 2.1 success criterion 3.3.2
-                (Understanding labels or instructions) and 4.1.2 (Understading
+                (Understanding labels or instructions) and 4.1.2 (Understanding
                 name, role, value)
-              </li>
-              <li>
-                Hidden links in content on the charts tab. This means a keyboard
-                user can focus on an unexpected element on the page thus causing
-                confusion. This doesn’t meet WCAG 2.1 success criterion 2.4.3
-                (Understanding focus order)
               </li>
               <li>
                 Nested fieldsets used in the table tool. This means screen
@@ -171,11 +165,27 @@ function AcccessibilityStatementPage() {
                 focus order)
               </li>
               <li>
-                In page search results are not appropriately announced. This
-                means when keyboard focus is on an actual result the text is not
-                announced to screen reader users. This doesn’t meet WCAG 2.1
-                success criterion 1.3.1 (info and relationships).
+                Some collapsible sections can trigger an unexpected
+                announcement. This means when a screen reader user opens a
+                collapsible section they will sometimes hear an unexpected
+                announcement that could cause confusion (occurs whenever there
+                is an element inside the section using aria-live='assertive').
+                This doesn’t meet WCAG 2.1 success criterion 4.1.3
+                (understanding status messages).
               </li>
+              <li>
+                Some tables are missing a summary or caption. This means
+                assistive technology users will find it difficult to determine a
+                table's contents without traversing it. This doesn’t meet WCAG
+                2.1 success criterion 1.3.1 (info and relationships).
+              </li>
+              <li>
+                Hidden links in content on the charts tab. This means a keyboard
+                user can focus on an unexpected element on the page thus causing
+                confusion. This doesn’t meet WCAG 2.1 success criterion 2.4.3
+                (Understanding focus order)
+              </li>
+
               <li>
                 Some pages have multiple buttons with the same title. This means
                 a screen reader user is unable to differentiate between these
@@ -189,15 +199,6 @@ function AcccessibilityStatementPage() {
                 of context what the headings are relating to. This doesn’t meet
                 WCAG 2.1 success criterion 2.4.6 (understanding headings and
                 labels).
-              </li>
-              <li>
-                Some collapsible sections can trigger an unexpected announcement
-                when opening. This means when a screen reader user opens a
-                collapsible section they will sometimes hear an unexpected
-                announcement that could cause confusion (occurs whenever there
-                is an element inside the section using aria-live='assertive').
-                This doesn’t meet WCAG 2.1 success criterion 4.1.3
-                (understanding status messages).
               </li>
             </ol>
             <h3 className="govuk-heading-m">Disproportionate burden</h3>
@@ -220,7 +221,7 @@ function AcccessibilityStatementPage() {
               .
             </p>
             <p className="govuk-body">
-              DAC tested a sample of pages to cover the core funcationality of
+              DAC tested a sample of pages to cover the core functionality of
               the service including:
             </p>
 
