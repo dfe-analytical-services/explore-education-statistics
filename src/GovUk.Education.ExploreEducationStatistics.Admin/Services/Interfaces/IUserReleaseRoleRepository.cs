@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid releaseId,
             ReleaseRole role);
 
-        Task<List<UserReleaseRole>> GetUserReleaseRolesForRelease(Guid releaseId, ReleaseRole role);
+        Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, ReleaseRole role);
 
         Task<bool> HasUserReleaseRole(Guid userId,
             Guid releaseId,

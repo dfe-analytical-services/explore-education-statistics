@@ -688,6 +688,185 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task RemoveByPublication()
+        {
+            var release1 = new Release()
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+            };
+            var release2 = new Release()
+            {
+                TimePeriodCoverage = TimeIdentifier.April,
+                ReleaseName = "2001",
+            };
+            var publication1 = new Publication
+            {
+                Title = "Publication title",
+                Releases = ListOf(release1, release2)
+            };
+
+            var release3 = new Release()
+            {
+                TimePeriodCoverage = TimeIdentifier.January,
+                ReleaseName = "2222",
+            };
+            var publication2 = new Publication
+            {
+                Title = "Ignored publication title",
+                Releases = ListOf(release3),
+            };
+
+            var invite1 = new UserReleaseInvite
+            {
+                Email = "test@test.com",
+                Release = release1,
+                Role = Contributor,
+            };
+            var invite2 = new UserReleaseInvite
+            {
+                Email = "test@test.com",
+                Release = release2,
+                Role = Contributor,
+            };
+            var notRemoveInvite1 = new UserReleaseInvite
+            {
+                Email = "notRemoved@test.com", // different email
+                Release = release1,
+                Role = Contributor,
+            };
+            var notRemoveInvite2 = new UserReleaseInvite
+            {
+                Email = "test@test.com",
+                Release = release3, // release under different publication
+                Role = Contributor,
+            };
+            var notRemoveInvite3 = new UserReleaseInvite
+            {
+                Email = "test@test.com",
+                Release = release1,
+                Role = Lead, // different role
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(publication1, publication2, invite1, invite2,
+                    notRemoveInvite1, notRemoveInvite2, notRemoveInvite3);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseInviteService(
+                    contentDbContext: contentDbContext);
+
+                var result = await service.RemoveByPublication(
+                    email: "test@test.com",
+                    publicationId: publication1.Id,
+                    releaseRole: ReleaseRole.Contributor);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseInvites = await contentDbContext.UserReleaseInvites
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Equal(3, userReleaseInvites.Count);
+
+                Assert.Equal("notRemoved@test.com", userReleaseInvites[0].Email);
+                Assert.Equal(release1.Id, userReleaseInvites[0].ReleaseId);
+                Assert.Equal(Contributor, userReleaseInvites[0].Role);
+
+                Assert.Equal("test@test.com", userReleaseInvites[1].Email);
+                Assert.Equal(release3.Id, userReleaseInvites[1].ReleaseId);
+                Assert.Equal(Contributor, userReleaseInvites[1].Role);
+
+                Assert.Equal("test@test.com", userReleaseInvites[2].Email);
+                Assert.Equal(release1.Id, userReleaseInvites[2].ReleaseId);
+                Assert.Equal(Lead, userReleaseInvites[2].Role);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveByPublication_NoPublication()
+        {
+            var invite = new UserReleaseInvite
+            {
+                Email = "test@test.com",
+                Release = new Release(),
+                Role = Contributor,
+            };
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(invite);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseInviteService(
+                    contentDbContext: contentDbContext);
+
+                var result = await service.RemoveByPublication(
+                    email: "test@test.com",
+                    publicationId: Guid.NewGuid(),
+                    releaseRole: ReleaseRole.Contributor);
+
+                result.AssertNotFound();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseInvites = await contentDbContext.UserReleaseInvites
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Single(userReleaseInvites);
+
+                Assert.Equal(invite.Email, userReleaseInvites[0].Email);
+                Assert.Equal(invite.ReleaseId, userReleaseInvites[0].ReleaseId);
+                Assert.Equal(invite.Role, userReleaseInvites[0].Role);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveByPublication_NoUserReleaseInvites()
+        {
+            var publication = new Publication();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseInviteService(
+                    contentDbContext: contentDbContext);
+
+                var result = await service.RemoveByPublication(
+                    email: "test@test.com",
+                    publicationId: publication.Id,
+                    releaseRole: ReleaseRole.Contributor);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseInvites = await contentDbContext.UserReleaseInvites
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Empty(userReleaseInvites);
+            }
+        }
+
         private static Dictionary<string, dynamic> GetExpectedContributorInviteTemplateValues(string publicationTitle,
             string releaseList)
         {

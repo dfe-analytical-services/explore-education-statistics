@@ -1,4 +1,7 @@
-import { ManageAccessPageContributor } from '@admin/services/releasePermissionService';
+import {
+  ContributorViewModel,
+  ContributorInvite,
+} from '@admin/services/releasePermissionService';
 import ButtonText from '@common/components/ButtonText';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
@@ -7,25 +10,24 @@ import React, { useState } from 'react';
 import Tag from '@common/components/Tag';
 
 export interface Props {
-  contributors: ManageAccessPageContributor[];
-  pendingInviteEmails: string[];
+  contributors: ContributorViewModel[];
+  invites: ContributorInvite[];
   onUserRemove: (userId: string) => void;
   onUserInvitesRemove: (email: string) => void;
 }
 
 const ReleaseContributorPermissions = ({
   contributors,
-  pendingInviteEmails,
+  invites,
   onUserRemove,
   onUserInvitesRemove,
 }: Props) => {
-  const [removeUser, setRemoveUser] = useState<ManageAccessPageContributor>();
-  const [removeInvitesEmail, setRemoveInvitesEmail] = useState<string>();
+  const [removeUser, setRemoveUser] = useState<ContributorViewModel>();
+  const [removeInvite, setRemoveInvite] = useState<ContributorInvite>();
 
   return (
     <>
-      {(!contributors || !contributors.length) &&
-      (!pendingInviteEmails || !pendingInviteEmails.length) ? (
+      {contributors.length === 0 && invites.length === 0 ? (
         <WarningMessage testId="releaseContributors-warning">
           There are currently no team members or pending invites associated with
           this publication. You can invite new users by clicking the "Add or
@@ -48,14 +50,14 @@ const ReleaseContributorPermissions = ({
                   </td>
                 </tr>
               ))}
-              {pendingInviteEmails.map(email => (
-                <tr key={email}>
+              {invites.map(invite => (
+                <tr key={invite.email}>
                   <td className="govuk-!-width-one-half">
-                    {email}
+                    {invite.email}
                     <Tag className="govuk-!-margin-left-3">Pending Invite</Tag>
                   </td>
                   <td className={styles.control}>
-                    <ButtonText onClick={() => setRemoveInvitesEmail(email)}>
+                    <ButtonText onClick={() => setRemoveInvite(invite)}>
                       Cancel invite
                     </ButtonText>
                   </td>
@@ -85,20 +87,20 @@ const ReleaseContributorPermissions = ({
 
           <ModalConfirm
             title="Confirm cancelling of user invites"
-            open={!!removeInvitesEmail}
+            open={!!removeInvite}
             onConfirm={async () => {
-              if (removeInvitesEmail) {
-                onUserInvitesRemove(removeInvitesEmail);
-                setRemoveInvitesEmail(undefined);
+              if (removeInvite) {
+                onUserInvitesRemove(removeInvite.email);
+                setRemoveInvite(undefined);
               }
             }}
-            onCancel={() => setRemoveInvitesEmail(undefined)}
-            onExit={() => setRemoveInvitesEmail(undefined)}
+            onCancel={() => setRemoveInvite(undefined)}
+            onExit={() => setRemoveInvite(undefined)}
           >
             <p>
               Are you sure you want to cancel all invites to releases under this
               publication for email address{' '}
-              <strong>{removeInvitesEmail}</strong>?
+              <strong>{removeInvite?.email}</strong>?
             </p>
           </ModalConfirm>
         </>

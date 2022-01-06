@@ -46,11 +46,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 
         [HttpPost("user-management/publications/{publicationId:guid}/invites/contributor")]
         public async Task<ActionResult<Unit>> InviteContributor(Guid publicationId,
-            ContributorInviteViewModel contributorInviteViewModel)
+            ContributorInviteRequestViewModel contributorInviteRequestViewModel)
         {
             return await _releaseInviteService
-                .InviteContributor(contributorInviteViewModel.Email, publicationId,
-                    contributorInviteViewModel.ReleaseIds)
+                .InviteContributor(contributorInviteRequestViewModel.Email, publicationId,
+                    contributorInviteRequestViewModel.ReleaseIds)
                 .HandleFailuresOrOk();
         }
 

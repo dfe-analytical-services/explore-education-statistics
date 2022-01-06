@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static readonly Guid _userId = Guid.NewGuid();
 
         [Fact]
-        public async Task ListReleaseContributorsAndContributorInvites()
+        public async Task ListReleaseContributors()
         {
             var publication = new Publication();
             var release1 = new Release
@@ -98,54 +98,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Deleted = DateTime.UtcNow,
             };
 
-            var user4ReleaseInvite = new UserReleaseInvite
-            {
-                Email = "user4@test.com",
-                Release = release1,
-                Role = Contributor,
-                Accepted = false,
-            };
-
-            var user5ReleaseInviteIgnored = new UserReleaseInvite
-            {
-                Email = "user5@test.com",
-                Release = release2Amendment, // ignored because not release1
-                Role = Contributor,
-                Accepted = false,
-            };
-
-            var user6ReleaseInvite = new UserReleaseInvite
-            {
-                Email = "user6@test.com",
-                Release = release1,
-                Role = Contributor,
-                Accepted = false,
-            };
-
-            var user7ReleaseInviteIgnored = new UserReleaseInvite
-            {
-                Email = "user5@test.com",
-                Release = release1,
-                Role = Lead, // ignored because not a Contributor
-                Accepted = false,
-            };
-
-            var user8ReleaseInviteIgnored = new UserReleaseInvite
-            {
-                Email = "user5@test.com",
-                Release = release1,
-                Role = Contributor,
-                Accepted = true, // ignored because invite already accepted
-            };
-
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
                     user1ReleaseRole1, user2ReleaseRole1, user2ReleaseRole2,
-                    user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3,
-                    user4ReleaseInvite, user5ReleaseInviteIgnored, user6ReleaseInvite,
-                    user7ReleaseInviteIgnored, user8ReleaseInviteIgnored);
+                    user3ReleaseRoleIgnored1, user3ReleaseRoleIgnored2, user3ReleaseRoleIgnored3);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -153,40 +111,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleasePermissionService(contentDbContext);
 
-                var result = await service.ListReleaseContributorsAndContributorInvites(release1.Id);
+                var result = await service.ListReleaseContributors(release1.Id);
                 var viewModel = result.AssertRight();
 
-                var contributors = viewModel.Contributors;
-                var pendingInviteEmails = viewModel.PendingInviteEmails;
+                Assert.Equal(2, viewModel.Count);
 
-                Assert.Equal(2, contributors.Count);
+                Assert.Equal(user1.Id, viewModel[0].UserId);
+                Assert.Equal(user1.DisplayName, viewModel[0].UserDisplayName);
+                Assert.Equal(user1.Email, viewModel[0].UserEmail);
 
-                Assert.Equal(user1.Id, contributors[0].UserId);
-                Assert.Equal(user1.DisplayName, contributors[0].UserDisplayName);
-                Assert.Equal(user1.Email, contributors[0].UserEmail);
-
-                Assert.Equal(user2.Id, contributors[1].UserId);
-                Assert.Equal(user2.DisplayName, contributors[1].UserDisplayName);
-                Assert.Equal(user2.Email, contributors[1].UserEmail);
-
-                Assert.Equal(2, pendingInviteEmails.Count);
-                Assert.Equal("user4@test.com", pendingInviteEmails[0]);
-                Assert.Equal("user6@test.com", pendingInviteEmails[1]);
+                Assert.Equal(user2.Id, viewModel[1].UserId);
+                Assert.Equal(user2.DisplayName, viewModel[1].UserDisplayName);
+                Assert.Equal(user2.Email, viewModel[1].UserEmail);
             }
         }
 
         [Fact]
-        public async Task ListReleaseContributorsAndContributorInvites_NoPublication()
+        public async Task ListReleaseContributors_NoPublication()
         {
             await using var contentDbContext = InMemoryApplicationDbContext();
             var service = SetupReleasePermissionService(contentDbContext);
 
-            var result = await service.ListReleaseContributorsAndContributorInvites(Guid.NewGuid());
+            var result = await service.ListReleaseContributors(Guid.NewGuid());
             result.AssertNotFound();
         }
 
         [Fact]
-        public async Task ListReleaseContributorsAndContributorInvites_NoRelease()
+        public async Task ListReleaseContributors_NoRelease()
         {
             var publication = new Publication { Title = "Test Publication" };
 
@@ -201,13 +152,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleasePermissionService(contentDbContext);
 
-                var result = await service.ListReleaseContributorsAndContributorInvites(Guid.NewGuid());
+                var result = await service.ListReleaseContributors(Guid.NewGuid());
                 result.AssertNotFound();
             }
         }
 
         [Fact]
-        public async Task ListReleaseContributorsAndContributorInvites_NoUserReleaseRolesAndReleaseInvites()
+        public async Task ListReleaseContributors_NoUserReleaseRoles()
         {
             var publication = new Publication();
             var release1 = new Release
@@ -228,11 +179,156 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleasePermissionService(contentDbContext);
 
                 var result = await service
-                    .ListReleaseContributorsAndContributorInvites(release1.Id);
+                    .ListReleaseContributors(release1.Id);
                 var viewModel = result.AssertRight();
 
-                Assert.Empty(viewModel.Contributors);
-                Assert.Empty(viewModel.PendingInviteEmails);
+                Assert.Empty(viewModel);
+            }
+        }
+
+        [Fact]
+        public async Task ListReleaseContributorsInvites_AcceptedFalse()
+        {
+            var publication = new Publication();
+            var release1 = new Release
+            {
+                Publication = publication,
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            };
+            var release2Original = new Release
+            {
+                Publication = publication,
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            };
+            var release2Amendment = new Release
+            {
+                Publication = publication,
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                PreviousVersion = release2Original,
+            };
+
+            var user1ReleaseInvite = new UserReleaseInvite
+            {
+                Email = "user1@test.com",
+                Release = release1,
+                Role = Contributor,
+                Accepted = false,
+            };
+
+            var user2ReleaseInviteIgnored = new UserReleaseInvite
+            {
+                Email = "user2@test.com",
+                Release = release2Amendment, // ignored because not release1
+                Role = Contributor,
+                Accepted = false,
+            };
+
+            var user3ReleaseInvite = new UserReleaseInvite
+            {
+                Email = "user3@test.com",
+                Release = release1,
+                Role = Contributor,
+                Accepted = false,
+            };
+
+            var user3ReleaseInviteIgnored = new UserReleaseInvite
+            {
+                Email = "user4@test.com",
+                Release = release1,
+                Role = Lead, // ignored because not a Contributor
+                Accepted = false,
+            };
+
+            var user5ReleaseInviteIgnored = new UserReleaseInvite
+            {
+                Email = "user5@test.com",
+                Release = release1,
+                Role = Contributor,
+                Accepted = true, // ignored because invite already accepted
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
+                    user1ReleaseInvite, user2ReleaseInviteIgnored, user3ReleaseInvite,
+                    user3ReleaseInviteIgnored, user5ReleaseInviteIgnored);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleasePermissionService(contentDbContext);
+
+                var result = await service.ListReleaseContributorInvites(release1.Id, false);
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(2, viewModel.Count);
+                Assert.Equal("user1@test.com", viewModel[0].Email);
+                Assert.Equal("user3@test.com", viewModel[1].Email);
+            }
+        }
+
+        [Fact]
+        public async Task ListReleaseContributorInvites_NoPublication()
+        {
+            await using var contentDbContext = InMemoryApplicationDbContext();
+            var service = SetupReleasePermissionService(contentDbContext);
+
+            var result = await service.ListReleaseContributorInvites(Guid.NewGuid());
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task ListReleaseContributorInvites_NoRelease()
+        {
+            var publication = new Publication { Title = "Test Publication" };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleasePermissionService(contentDbContext);
+
+                var result = await service.ListReleaseContributorInvites(Guid.NewGuid());
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task ListReleaseContributorInvites_NoUserReleaseInvites()
+        {
+            var publication = new Publication();
+            var release1 = new Release
+            {
+                ReleaseName = "2000",
+                Publication = publication,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release1);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleasePermissionService(contentDbContext);
+
+                var result = await service
+                    .ListReleaseContributorInvites(release1.Id);
+                var viewModel = result.AssertRight();
+
+                Assert.Empty(viewModel);
             }
         }
 

@@ -39,8 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
         }
 
-        public async Task<Either<ActionResult, ContributorsAndInvitesViewModel>>
-            ListReleaseContributorsAndContributorInvites(Guid releaseId)
+        public async Task<Either<ActionResult, List<ContributorViewModel>>>
+            ListReleaseContributors(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId,
@@ -52,9 +52,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     var contributors = await _userReleaseRoleRepository
-                        .GetUserReleaseRolesForRelease(releaseId, Contributor);
+                        .ListUserReleaseRoles(releaseId, Contributor);
 
-                    var contributorViewModels = contributors
+                   return contributors
                         .Select(userReleaseRole => new ContributorViewModel
                         {
                             UserId = userReleaseRole.UserId,
@@ -63,28 +63,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         })
                         .OrderBy(model => model.UserDisplayName)
                         .ToList();
+                });
+        }
 
+        public async Task<Either<ActionResult, List<ContributorInviteViewModel>>>
+            ListReleaseContributorInvites(Guid releaseId, bool? accepted = null)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId,
+                    query =>
+                        query.Include(r => r.Publication)
+                            .ThenInclude(p => p.Releases))
+                .OnSuccessDo(release => _userService
+                    .CheckCanUpdateReleaseRole(release.Publication, Contributor))
+                .OnSuccess(async release =>
+                {
                     var invites = await _contentDbContext.UserReleaseInvites
                         .AsQueryable()
                         .Where(i =>
                             i.ReleaseId == releaseId
-                            && i.Role == Contributor
-                            && i.Accepted == false)
+                            && i.Role == Contributor)
                         .ToListAsync();
 
-                    var pendingInviteEmails = invites
-                        .Select(i => i.Email)
-                        .OrderBy(email => email)
+                    return invites
+                        .Where(i => accepted == null || i.Accepted == accepted)
+                        .Select(i => new ContributorInviteViewModel
+                        {
+                            Email = i.Email,
+                        })
+                        .OrderBy(model => model.Email)
                         .ToList();
-
-                    return new ContributorsAndInvitesViewModel
-                    {
-                        Contributors = contributorViewModels,
-                        PendingInviteEmails = pendingInviteEmails,
-                    };
                 });
-        }
 
+        }
         public async Task<Either<ActionResult, List<ContributorViewModel>>>
             ListPublicationContributors(Guid publicationId)
         {
@@ -112,8 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Distinct()
                         .ToListAsync();
 
-                    return await users
-                        .ToAsyncEnumerable()
+                    return users
                         .Select(user =>
                             new ContributorViewModel
                             {
@@ -123,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             }
                         )
                         .OrderBy(model => model.UserDisplayName)
-                        .ToListAsync();
+                        .ToList();
                 });
         }
 

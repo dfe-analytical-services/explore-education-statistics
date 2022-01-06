@@ -1,20 +1,16 @@
 import ReleaseContributorsPermissions from '@admin/pages/publication/components/ReleaseContributorPermissions';
-import _releasePermissionService, {
-  ManageAccessPageContributor,
+import {
+  ContributorInvite,
+  ContributorViewModel,
 } from '@admin/services/releasePermissionService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 
-jest.mock('@admin/services/releasePermissionService');
 jest.mock('@admin/services/userService');
 
-const releasePermissionService = _releasePermissionService as jest.Mocked<
-  typeof _releasePermissionService
->;
-
 describe('ReleaseContributorPermissions', () => {
-  const testReleaseContributors: ManageAccessPageContributor[] = [
+  const testReleaseContributors: ContributorViewModel[] = [
     {
       userId: 'user-1',
       userDisplayName: 'User Name 1',
@@ -32,23 +28,19 @@ describe('ReleaseContributorPermissions', () => {
     },
   ];
 
-  const testPendingInviteEmails: string[] = [
-    'user4@test.com',
-    'user5@test.com',
+  const testInvites: ContributorInvite[] = [
+    { email: 'user4@test.com' },
+    { email: 'user5@test.com' },
   ];
 
   test('renders a message when there are no release contributors or invites', async () => {
-    releasePermissionService.listReleaseContributorsAndInvites.mockResolvedValue(
-      { contributors: [], pendingInviteEmails: [] },
-    );
-
     const onUserRemove = jest.fn();
     const onUserInvitesRemove = jest.fn();
 
     render(
       <ReleaseContributorsPermissions
         contributors={[]}
-        pendingInviteEmails={[]}
+        invites={[]}
         onUserRemove={onUserRemove}
         onUserInvitesRemove={onUserInvitesRemove}
       />,
@@ -63,30 +55,25 @@ describe('ReleaseContributorPermissions', () => {
         'There are currently no team members or pending invites associated with this publication.',
       );
     });
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   test('renders the contributors table correctly', async () => {
-    releasePermissionService.listReleaseContributorsAndInvites.mockResolvedValue(
-      {
-        contributors: testReleaseContributors,
-        pendingInviteEmails: testPendingInviteEmails,
-      },
-    );
-
     const onUserRemove = jest.fn();
     const onUserInvitesRemove = jest.fn();
 
     render(
       <ReleaseContributorsPermissions
         contributors={testReleaseContributors}
-        pendingInviteEmails={testPendingInviteEmails}
+        invites={testInvites}
         onUserRemove={onUserRemove}
         onUserInvitesRemove={onUserInvitesRemove}
       />,
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByText('User Name 1 (user1@test.com)'));
     });
 
     const rows = screen.getAllByRole('row');
@@ -125,25 +112,22 @@ describe('ReleaseContributorPermissions', () => {
   });
 
   test('remove user', async () => {
-    releasePermissionService.listReleaseContributorsAndInvites.mockResolvedValue(
-      { contributors: testReleaseContributors, pendingInviteEmails: [] },
-    );
-
     const onUserRemove = jest.fn();
     const onUserInvitesRemove = jest.fn();
 
     render(
       <ReleaseContributorsPermissions
         contributors={testReleaseContributors}
-        pendingInviteEmails={[]}
+        invites={[]}
         onUserRemove={onUserRemove}
         onUserInvitesRemove={onUserInvitesRemove}
       />,
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByText('User Name 1 (user1@test.com)'));
     });
+
     const rows = screen.getAllByRole('row');
     expect(rows.length).toBe(3);
 
@@ -176,25 +160,22 @@ describe('ReleaseContributorPermissions', () => {
   });
 
   test('cancel invite', async () => {
-    releasePermissionService.listReleaseContributorsAndInvites.mockResolvedValue(
-      { contributors: [], pendingInviteEmails: testPendingInviteEmails },
-    );
-
     const onUserRemove = jest.fn();
     const onUserInvitesRemove = jest.fn();
 
     render(
       <ReleaseContributorsPermissions
         contributors={[]}
-        pendingInviteEmails={testPendingInviteEmails}
+        invites={testInvites}
         onUserRemove={onUserRemove}
         onUserInvitesRemove={onUserInvitesRemove}
       />,
     );
 
     await waitFor(() => {
-      expect(screen.getByRole('table')).toBeInTheDocument();
+      expect(screen.getByText('user4@test.com'));
     });
+
     const rows = screen.getAllByRole('row');
     expect(rows.length).toBe(2);
 

@@ -186,7 +186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     r.Role == role);
         }
 
-        public async Task<List<UserReleaseRole>> GetUserReleaseRolesForRelease(Guid releaseId, ReleaseRole role)
+        public async Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, ReleaseRole role)
         {
             return await _contentDbContext.UserReleaseRoles
                 .AsQueryable()
