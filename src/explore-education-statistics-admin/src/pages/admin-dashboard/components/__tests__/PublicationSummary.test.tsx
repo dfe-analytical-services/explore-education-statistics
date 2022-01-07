@@ -313,7 +313,7 @@ describe('PublicationSummary', () => {
     // PublicationSummary.
     expect(
       screen.getByRole('button', {
-        name: `${testMethodologies[0].methodology.title} (Owned) Approved`,
+        name: `${testMethodologies[0].methodology.title} (Owned) Published`,
       }),
     ).toBeInTheDocument();
 
