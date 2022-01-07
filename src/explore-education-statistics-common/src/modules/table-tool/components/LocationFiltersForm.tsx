@@ -116,8 +116,9 @@ const LocationFiltersForm = ({
           return acc;
         }, {});
 
-        await onSubmit({ locations });
-        goToNextStep();
+        await goToNextStep(async () => {
+          await onSubmit({ locations });
+        });
       }}
     >
       {form => {

@@ -103,10 +103,9 @@ const SubjectForm = ({
         subjectId: Yup.string().required('Choose a subject'),
       })}
       onSubmit={async ({ subjectId }) => {
-        await onSubmit({
-          subjectId,
+        await goToNextStep(async () => {
+          await onSubmit({ subjectId });
         });
-        goToNextStep();
       }}
     >
       {form => {

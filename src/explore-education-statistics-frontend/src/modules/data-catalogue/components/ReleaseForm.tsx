@@ -65,8 +65,9 @@ const ReleaseForm = ({
         throw new Error('Selected release not found');
       }
 
-      await onSubmit({ release });
-      goToNextStep();
+      await goToNextStep(async () => {
+        await onSubmit({ release });
+      });
     },
   );
 

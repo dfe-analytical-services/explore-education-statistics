@@ -16,9 +16,9 @@ describe('LocationFiltersForm', () => {
     isEnabled: true,
     isLoading: false,
     stepNumber: 1,
-    setCurrentStep: noop,
-    goToNextStep: noop,
-    goToPreviousStep: noop,
+    setCurrentStep: (step, task) => task?.(),
+    goToNextStep: task => task?.(),
+    goToPreviousStep: task => task?.(),
     shouldScroll: false,
   };
 

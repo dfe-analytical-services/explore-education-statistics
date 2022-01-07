@@ -40,7 +40,7 @@ const WizardStepSummary = ({
             hideText
             loading={isLoading}
             size="sm"
-            text="Page is loading"
+            text={`Loading step ${stepNumber}`}
             className="govuk-!-margin-left-2"
           />
         </div>

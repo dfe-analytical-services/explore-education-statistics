@@ -1,3 +1,4 @@
+import flushPromises from '@common-test/flushPromises';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -238,13 +239,59 @@ describe('Wizard', () => {
     expect(step3).not.toBeVisible();
   });
 
+  test('calling `setCurrentStep` with a task will not transition the wizard until it completes', async () => {
+    jest.useFakeTimers();
+
+    const task = jest.fn(
+      () => new Promise<void>(resolve => setTimeout(resolve, 500)),
+    );
+
+    render(
+      <Wizard id="test-wizard">
+        <WizardStep>
+          {({ setCurrentStep }) => (
+            <button type="button" onClick={() => setCurrentStep(3, task)}>
+              Go to step 3
+            </button>
+          )}
+        </WizardStep>
+        <WizardStep>Step 2</WizardStep>
+        <WizardStep>Step 3</WizardStep>
+      </Wizard>,
+    );
+
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
+
+    userEvent.click(screen.getByRole('button', { name: 'Go to step 3' }));
+
+    // Still on same step
+    expect(step1).toBeVisible();
+    expect(step1).toHaveAttribute('aria-current', 'step');
+    expect(step2).not.toBeVisible();
+    expect(step3).not.toBeVisible();
+
+    // Task needs to complete first
+    jest.advanceTimersByTime(500);
+    await flushPromises();
+
+    // Moved to next step
+    expect(step1).toBeVisible();
+    expect(step2).toBeVisible();
+    expect(step3).toBeVisible();
+    expect(step3).toHaveAttribute('aria-current', 'step');
+
+    jest.useRealTimers();
+  });
+
   test('calling `goToPreviousStep` render prop moves wizard to previous step', () => {
     render(
       <Wizard id="test-wizard" initialStep={2}>
         <WizardStep>Step 1</WizardStep>
         <WizardStep>
           {({ goToPreviousStep }) => (
-            <button type="button" onClick={goToPreviousStep}>
+            <button type="button" onClick={() => goToPreviousStep()}>
               Go to previous step
             </button>
           )}
@@ -277,7 +324,7 @@ describe('Wizard', () => {
       <Wizard id="test-wizard">
         <WizardStep>
           {({ goToPreviousStep }) => (
-            <button type="button" onClick={goToPreviousStep}>
+            <button type="button" onClick={() => goToPreviousStep()}>
               Go to previous step
             </button>
           )}
@@ -306,13 +353,109 @@ describe('Wizard', () => {
     expect(step3).not.toBeVisible();
   });
 
+  test('calling `goToPreviousStep` with a task will not transition the wizard until it completes', async () => {
+    jest.useFakeTimers();
+
+    const task = jest.fn(
+      () => new Promise<void>(resolve => setTimeout(resolve, 500)),
+    );
+
+    render(
+      <Wizard id="test-wizard" initialStep={2}>
+        <WizardStep>Step 1</WizardStep>
+        <WizardStep>
+          {({ goToPreviousStep }) => (
+            <button type="button" onClick={() => goToPreviousStep(task)}>
+              Go to previous step
+            </button>
+          )}
+        </WizardStep>
+        <WizardStep>Step 3</WizardStep>
+      </Wizard>,
+    );
+
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Go to previous step' }),
+    );
+
+    // Still on same step
+    expect(step1).toBeVisible();
+    expect(step2).toBeVisible();
+    expect(step2).toHaveAttribute('aria-current', 'step');
+    expect(step3).not.toBeVisible();
+
+    // Task needs to complete first
+    jest.advanceTimersByTime(500);
+    await flushPromises();
+
+    // Moved to next step
+    expect(step1).toBeVisible();
+    expect(step1).toHaveAttribute('aria-current', 'step');
+    expect(step2).not.toBeVisible();
+    expect(step3).not.toBeVisible();
+
+    jest.useRealTimers();
+  });
+
+  test('calling `goToPreviousStep` with a task sets correct loading render props', async () => {
+    const task = jest.fn(() => Promise.resolve());
+
+    render(
+      <Wizard id="test-wizard" initialStep={2}>
+        <WizardStep>
+          {({ isLoading, loadingStep }) => (
+            <>
+              <p>{`Step 1 - isLoading: ${isLoading}`}</p>
+              <p>{`Step 1 - loadingStep: ${loadingStep}`}</p>
+            </>
+          )}
+        </WizardStep>
+        <WizardStep>
+          {({ goToPreviousStep, isLoading, loadingStep }) => (
+            <>
+              <p>{`Step 2 - isLoading: ${isLoading}`}</p>
+              <p>{`Step 2 - loadingStep: ${loadingStep}`}</p>
+
+              <button type="button" onClick={() => goToPreviousStep(task)}>
+                Go to prev step
+              </button>
+            </>
+          )}
+        </WizardStep>
+        <WizardStep>
+          {({ isLoading, loadingStep }) => (
+            <>
+              <p>{`Step 3 - isLoading: ${isLoading}`}</p>
+              <p>{`Step 3 - loadingStep: ${loadingStep}`}</p>
+            </>
+          )}
+        </WizardStep>
+      </Wizard>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Go to prev step' }));
+
+    expect(screen.getByText('Step 1 - isLoading: true')).toBeInTheDocument();
+    expect(screen.getByText('Step 1 - loadingStep: 1')).toBeInTheDocument();
+
+    expect(screen.getByText('Step 2 - isLoading: false')).toBeInTheDocument();
+    expect(screen.getByText('Step 2 - loadingStep: 1')).toBeInTheDocument();
+
+    expect(screen.getByText('Step 3 - isLoading: false')).toBeInTheDocument();
+    expect(screen.getByText('Step 3 - loadingStep: 1')).toBeInTheDocument();
+  });
+
   test('calling `goToNextStep` render prop moves wizard to next step', () => {
     render(
       <Wizard id="test-wizard" initialStep={2}>
         <WizardStep>Step 1</WizardStep>
         <WizardStep>
           {({ goToNextStep }) => (
-            <button type="button" onClick={goToNextStep}>
+            <button type="button" onClick={() => goToNextStep()}>
               Go to next step
             </button>
           )}
@@ -345,7 +488,7 @@ describe('Wizard', () => {
         <WizardStep>Step 2</WizardStep>
         <WizardStep>
           {({ goToNextStep }) => (
-            <button type="button" onClick={goToNextStep}>
+            <button type="button" onClick={() => goToNextStep()}>
               Go to next step
             </button>
           )}
@@ -368,6 +511,100 @@ describe('Wizard', () => {
     expect(step2).toBeVisible();
     expect(step3).toBeVisible();
     expect(step3).toHaveAttribute('aria-current', 'step');
+  });
+
+  test('calling `goToNextStep` with a task will not transition the wizard until it completes', async () => {
+    jest.useFakeTimers();
+
+    const task = jest.fn(
+      () => new Promise<void>(resolve => setTimeout(resolve, 500)),
+    );
+
+    render(
+      <Wizard id="test-wizard">
+        <WizardStep>
+          {({ goToNextStep }) => (
+            <button type="button" onClick={() => goToNextStep(task)}>
+              Go to next step
+            </button>
+          )}
+        </WizardStep>
+        <WizardStep>Step 2</WizardStep>
+        <WizardStep>Step 3</WizardStep>
+      </Wizard>,
+    );
+
+    const step1 = screen.getByTestId('wizardStep-1');
+    const step2 = screen.getByTestId('wizardStep-2');
+    const step3 = screen.getByTestId('wizardStep-3');
+
+    userEvent.click(screen.getByRole('button', { name: 'Go to next step' }));
+
+    // Still on same step
+    expect(step1).toBeVisible();
+    expect(step1).toHaveAttribute('aria-current', 'step');
+    expect(step2).not.toBeVisible();
+    expect(step3).not.toBeVisible();
+
+    // Task needs to complete first
+    jest.advanceTimersByTime(500);
+    await flushPromises();
+
+    // Moved to next step
+    expect(step1).toBeVisible();
+    expect(step2).toBeVisible();
+    expect(step2).toHaveAttribute('aria-current', 'step');
+    expect(step3).not.toBeVisible();
+
+    jest.useRealTimers();
+  });
+
+  test('calling `goToNextStep` with a task sets correct loading render props', async () => {
+    const task = jest.fn(() => Promise.resolve());
+
+    render(
+      <Wizard id="test-wizard" initialStep={2}>
+        <WizardStep>
+          {({ isLoading, loadingStep }) => (
+            <>
+              <p>{`Step 1 - isLoading: ${isLoading}`}</p>
+              <p>{`Step 1 - loadingStep: ${loadingStep}`}</p>
+            </>
+          )}
+        </WizardStep>
+        <WizardStep>
+          {({ isLoading, loadingStep, goToNextStep }) => (
+            <>
+              <p>{`Step 2 - isLoading: ${isLoading}`}</p>
+              <p>{`Step 2 - loadingStep: ${loadingStep}`}</p>
+
+              <button type="button" onClick={() => goToNextStep(task)}>
+                Go to next step
+              </button>
+            </>
+          )}
+        </WizardStep>
+        <WizardStep>
+          {({ isLoading, loadingStep }) => (
+            <>
+              <p>{`Step 3 - isLoading: ${isLoading}`}</p>
+              <p>{`Step 3 - loadingStep: ${loadingStep}`}</p>
+            </>
+          )}
+        </WizardStep>
+      </Wizard>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Go to next step' }));
+
+    expect(screen.getByText('Step 1 - isLoading: false')).toBeInTheDocument();
+    expect(screen.getByText('Step 1 - loadingStep: 3')).toBeInTheDocument();
+
+    expect(screen.getByText('Step 2 - isLoading: false')).toBeInTheDocument();
+    expect(screen.getByText('Step 2 - loadingStep: 3')).toBeInTheDocument();
+
+    expect(screen.getByText('Step 3 - isLoading: true')).toBeInTheDocument();
+    expect(screen.getByText('Step 3 - loadingStep: 3')).toBeInTheDocument();
   });
 
   test('does not scroll or focus first step when mounted by default', () => {
@@ -602,6 +839,64 @@ describe('Wizard', () => {
     });
 
     expect(handleBack).toHaveBeenCalledTimes(1);
+
+    jest.useRealTimers();
+  });
+
+  test('renders correct loading states whilst `onBack` is running', async () => {
+    jest.useFakeTimers();
+
+    const handleBack = jest.fn(
+      () => new Promise(resolve => setTimeout(resolve, 500)),
+    );
+
+    render(
+      <Wizard id="test-wizard" initialStep={2}>
+        <WizardStep onBack={handleBack}>
+          {({ isLoading, loadingStep }) => (
+            <>
+              <p>{`Step 1 - isLoading: ${isLoading}`}</p>
+              <p>{`Step 1 - loadingStep: ${loadingStep}`}</p>
+            </>
+          )}
+        </WizardStep>
+        <WizardStep>
+          {({ setCurrentStep, isLoading, loadingStep }) => (
+            <>
+              <p>{`Step 2 - isLoading: ${isLoading}`}</p>
+              <p>{`Step 2 - loadingStep: ${loadingStep}`}</p>
+
+              <button type="button" onClick={() => setCurrentStep(1)}>
+                Go to step 1
+              </button>
+            </>
+          )}
+        </WizardStep>
+        <WizardStep>
+          {({ isLoading, loadingStep }) => (
+            <>
+              <p>{`Step 3 - isLoading: ${isLoading}`}</p>
+              <p>{`Step 3 - loadingStep: ${loadingStep}`}</p>
+            </>
+          )}
+        </WizardStep>
+      </Wizard>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Go to step 1' }));
+
+    await waitFor(() => {
+      expect(handleBack).toHaveBeenCalledTimes(1);
+    });
+
+    expect(screen.getByText('Step 1 - isLoading: true')).toBeInTheDocument();
+    expect(screen.getByText('Step 1 - loadingStep: 1')).toBeInTheDocument();
+
+    expect(screen.getByText('Step 2 - isLoading: false')).toBeInTheDocument();
+    expect(screen.getByText('Step 2 - loadingStep: 1')).toBeInTheDocument();
+
+    expect(screen.getByText('Step 3 - isLoading: false')).toBeInTheDocument();
+    expect(screen.getByText('Step 3 - loadingStep: 1')).toBeInTheDocument();
 
     jest.useRealTimers();
   });

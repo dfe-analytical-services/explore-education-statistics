@@ -152,8 +152,9 @@ const TimePeriodForm = ({
           ),
       })}
       onSubmit={async values => {
-        await onSubmit(values);
-        goToNextStep();
+        await goToNextStep(async () => {
+          await onSubmit(values);
+        });
       }}
     >
       {form => {

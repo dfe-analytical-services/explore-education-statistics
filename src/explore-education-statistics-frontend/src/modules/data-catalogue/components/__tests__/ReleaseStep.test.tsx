@@ -33,12 +33,12 @@ describe('ReleaseStep', () => {
     shouldScroll: true,
     stepNumber: 1,
     currentStep: 1,
-    setCurrentStep: noop,
     isActive: true,
     isEnabled: true,
     isLoading: false,
-    goToNextStep: noop,
-    goToPreviousStep: noop,
+    setCurrentStep: (step, task) => task?.(),
+    goToNextStep: task => task?.(),
+    goToPreviousStep: task => task?.(),
   };
 
   test('renders with releases', () => {

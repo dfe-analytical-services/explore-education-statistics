@@ -176,12 +176,12 @@ describe('PublicationForm', () => {
     shouldScroll: true,
     stepNumber: 1,
     currentStep: 1,
-    setCurrentStep: () => undefined,
     isActive: true,
     isEnabled: true,
     isLoading: false,
-    goToNextStep: () => undefined,
-    goToPreviousStep: () => undefined,
+    setCurrentStep: (step, task) => task?.(),
+    goToNextStep: task => task?.(),
+    goToPreviousStep: task => task?.(),
   };
 
   test('renders publication options filtered by title when using search field', async () => {

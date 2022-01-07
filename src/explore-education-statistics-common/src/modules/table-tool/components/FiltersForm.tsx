@@ -122,10 +122,13 @@ const FiltersForm = ({
 
   const handleSubmit = async (values: FormValues) => {
     setPreviousValues(values);
+
     try {
       setTableQueryError(undefined);
-      await onSubmit(values);
-      goToNextStep();
+
+      await goToNextStep(async () => {
+        await onSubmit(values);
+      });
     } catch (error) {
       if (
         !isServerValidationError<TableQueryErrorCode>(error) ||
@@ -257,7 +260,7 @@ const FiltersForm = ({
                 {...stepProps}
                 submitText="Create table"
                 submittingText="Creating table"
-                onSubmitClick={() => {
+                onSubmit={() => {
                   // Automatically select totalValue for filters that haven't had a selection made
                   Object.keys(form.values.filters).forEach(filterName => {
                     if (

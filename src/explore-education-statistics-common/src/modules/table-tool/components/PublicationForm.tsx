@@ -72,9 +72,9 @@ const PublicationForm = ({
           throw new Error('Selected publication not found');
         }
 
-        await onSubmit({ publication });
-
-        goToNextStep();
+        await goToNextStep(async () => {
+          await onSubmit({ publication });
+        });
       }}
     >
       {form => {
