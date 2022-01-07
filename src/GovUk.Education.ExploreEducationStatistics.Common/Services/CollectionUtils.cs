@@ -16,6 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return new List<T>(objects);
         }
 
+        public static HashSet<T> SetOf<T>(params T[] objects)
+        {
+            return new HashSet<T>(objects);
+        }
+
         public static T[] AsArray<T>(params T[] objects)
         {
             return objects;

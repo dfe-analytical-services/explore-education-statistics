@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -23,11 +24,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
      *
      * The validation check assumes that all combinations of data have been provided and calculates the maximum
      * possible table size from the query, rejecting the request if it's greater than the set limit.
-     * 
+     *
      * Note that we *don't* execute all datablock queries here and count the results.
      * A table result might be smaller than the possible table that could be generated since all combinations of time
      * period, location and filters may not be provided in the data.
-     * 
+     *
      * If we were to execute all the datablock queries and set a maximum based on the largest table result,
      * several datablock requests may fail if they have a possible table size greater than the largest actual table.
      */
@@ -46,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("api/data-blocks/query-size-report")]
-        [Authorize(Roles = "BAU User")]
+        [Authorize(Roles = RoleNames.BauUser)]
         public async Task<ActionResult<List<DataBlockQuerySizeReport>>> QuerySizeReport()
         {
             var publishedReleaseIds = _contentDbContext.Releases

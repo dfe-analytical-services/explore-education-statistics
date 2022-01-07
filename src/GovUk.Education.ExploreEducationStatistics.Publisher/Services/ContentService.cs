@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -16,6 +17,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -193,8 +195,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task DeleteAllContentAsyncExcludingStaging()
         {
-            var excludePattern = $"^{PublicContentStagingPath()}/.+$";
-            await _publicBlobStorageService.DeleteBlobs(PublicContent, string.Empty, excludePattern);
+            await _publicBlobStorageService.DeleteBlobs(
+                containerName: PublicContent,
+                options: new DeleteBlobsOptions
+                {
+                    ExcludeRegex = new Regex($"^{PublicContentStagingPath()}/.+$", RegexOptions.IgnoreCase | RegexOptions.Compiled)
+                }
+            );
         }
 
         private static JsonSerializerSettings GetJsonSerializerSettings(NamingStrategy namingStrategy)

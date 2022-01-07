@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             VerifyAllMocks(methodologyService);
 
-            result.AssertNoContentResult();
+            result.AssertNoContent();
         }
 
         [Fact]
@@ -224,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             VerifyAllMocks(methodologyService);
 
-            result.AssertNoContentResult();
+            result.AssertNoContent();
         }
 
         private static MethodologyController SetupMethodologyController(
