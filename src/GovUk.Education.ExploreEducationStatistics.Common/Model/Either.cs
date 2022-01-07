@@ -179,7 +179,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             return await func();
         }
         
-        [Obsolete("Use OnSuccessDo or OnSuccessVoid for chaining a Task with no generic type")]
+        [Obsolete("Use OnSuccessDo or OnSuccessVoid for chaining a non-generic Task")]
         public static async Task<Either<TFailure, Unit>> OnSuccess<TFailure, TSuccess1>(
             this Task<Either<TFailure, TSuccess1>> task,
             Func<TSuccess1, Task> func)
