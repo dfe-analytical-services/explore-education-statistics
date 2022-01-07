@@ -122,10 +122,12 @@ describe('PreReleaseTableToolPage', () => {
           name: 'sess_authorised',
         },
       ],
-      locations: [
-        { level: 'localAuthority', label: 'Barnet', value: 'barnet' },
-        { level: 'localAuthority', label: 'Barnsley', value: 'barnsley' },
-      ],
+      locationsHierarchical: {
+        localAuthority: [
+          { label: 'Barnet', value: 'barnet' },
+          { label: 'Barnsley', value: 'barnsley' },
+        ],
+      },
       boundaryLevels: [],
       publicationName: 'Pupil absence',
       subjectName: 'Absence by characteristic',

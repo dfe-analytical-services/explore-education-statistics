@@ -210,25 +210,21 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
       .map(row => row.filter((_, index) => columnsWithText[index]));
 
     /**
-     * Function to optimize a set of filters for the
-     * best viewing experience.
+     * Function to optimize a set of filters for the best viewing experience.
      *
-     * Typically we add or remove filters depending
-     * on whether they are actually needed for the
-     * user to understand the table.
+     * Typically we add or remove filters depending on whether they are
+     * actually needed for the user to understand the table.
      */
-    const optimizeFilters = (filters: Filter[], headerConfig: Filter[][]) => {
+    function optimizeFilters(filters: Filter[], headerConfig: Filter[][]) {
       const rowColFilters = last(headerConfig);
 
       let optimizedFilters = filters;
 
-      // There is only one or zero row/col filter header,
-      // and we want to avoid having only a single header
-      // as this can often get repeated many times for
-      // tables with multiple filter groups.
-      // We should should try and display these filter group
-      // headers instead of the row/col header as they
-      // should provide more useful information to the user.
+      // There is only one or zero row/col filter header, and we want to avoid
+      // having only a single header as this can often get repeated many times
+      // for tables with multiple filter groups.
+      // We should should try and display these filter group headers instead of the
+      // row/col header as they should provide more useful information to the user.
       if (rowColFilters && rowColFilters.length <= 1) {
         optimizedFilters = filters.length > 1 ? filters.slice(0, -1) : filters;
       }
@@ -253,12 +249,13 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
               : filter;
           })
       );
-    };
+    }
 
     /**
-     * Convert {@param filters} and add them into {@param headers}.
+     * Convert {@param filters} into {@see Header} instances
+     * and add them to {@param headers}.
      */
-    const addFilters = (headers: Header[], filters: Filter[]): Header[] => {
+    function addFilters(headers: Header[], filters: Filter[]): Header[] {
       filters.forEach((filter, filterIndex) => {
         if (!headers.length) {
           headers.push(new Header(filter.id, filter.label));
@@ -284,7 +281,7 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
       });
 
       return headers;
-    };
+    }
 
     const rowHeaders = filteredCartesian.reduce<Header[]>((acc, row) => {
       // Only need to use first column's rowFilters

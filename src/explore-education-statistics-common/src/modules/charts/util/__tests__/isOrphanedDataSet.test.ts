@@ -75,10 +75,12 @@ describe('isOrphanedDataSet', () => {
           name: 'sess_authorised_percent',
         },
       ],
-      locations: [
-        { level: 'localAuthority', label: 'Barnsley', value: 'E08000016' },
-        { level: 'localAuthority', label: 'Barnet', value: 'E09000003' },
-      ],
+      locationsHierarchical: {
+        localAuthority: [
+          { label: 'Barnsley', value: 'E08000016' },
+          { label: 'Barnet', value: 'E09000003' },
+        ],
+      },
       boundaryLevels: [
         {
           id: 2,

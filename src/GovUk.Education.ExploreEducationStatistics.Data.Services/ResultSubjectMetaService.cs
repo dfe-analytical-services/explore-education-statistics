@@ -97,13 +97,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var filterItems = 
+                    var filterItems =
                         _filterItemRepository.GetFilterItemsFromObservationList(observations);
                     var filterViewModels = BuildFilterHierarchy(filterItems);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var footnoteViewModels = 
+                    var footnoteViewModels =
                         GetFilteredFootnoteViewModels(releaseId, queryableObservations, query);
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
@@ -308,9 +308,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     {
                         var (geographicLevel, locationAttributes) = pair;
                         var geoJsonByCode = allGeoJson.GetValueOrDefault(geographicLevel);
-                        return locationAttributes
-                            .Select(locationAttribute =>
-                                GetLocationAttributeViewModel(locationAttribute, geoJsonByCode))
+                        return DeduplicateLocationViewModels(
+                                locationAttributes
+                                    .OrderBy(OrderLocationAttributes)
+                                    .Select(locationAttribute => GetLocationAttributeViewModel(locationAttribute, geoJsonByCode))
+                            )
                             .ToList();
                     });
             }
@@ -339,11 +341,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return new LocationAttributeViewModel
                 {
                     Label = locationAttribute.Name ?? string.Empty,
-                    Level = locationAttribute.GetType().Name,
+                    Level = locationAttribute.GetType().Name.CamelCase(),
                     Value = code,
-                    Options = locationAttributeNode.Children
-                        .Select(child => GetLocationAttributeViewModel(child, geoJsonByCode))
+                    Options = DeduplicateLocationViewModels(
+                            locationAttributeNode.Children
+                                .OrderBy(OrderLocationAttributes)
+                                .Select(child => GetLocationAttributeViewModel(child, geoJsonByCode))
+                        )
                         .ToList()
+                };
+            }
+
+            private static string OrderLocationAttributes(LocationAttributeNode node)
+            {
+                var locationAttribute = node.Attribute;
+
+                return locationAttribute switch
+                {
+                    Region region => region.Code ?? string.Empty,
+                    _ => locationAttribute.Name ?? string.Empty
                 };
             }
 

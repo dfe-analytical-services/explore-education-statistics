@@ -168,13 +168,12 @@ Wait until new footnote is visible
     user checks page contains    Footnote 1 ${SUBJECT_NAME}
 
 Validate results table column headings
-    user checks results table row heading contains    1    1    Asian/Asian British
-    user checks results table row heading contains    2    1    Black/African/Caribbean/Black British
-    user checks results table row heading contains    3    1    Mixed/Multiple ethnic group
-
-    user checks results table row heading contains    4    1    Not Known/Not Provided
-    user checks results table row heading contains    5    1    Other Ethnic Group
-    user checks results table row heading contains    6    1    Total
+    user checks results table row heading contains    1    1    Total
+    user checks results table row heading contains    2    1    Asian/Asian British
+    user checks results table row heading contains    3    1    Black/African/Caribbean/Black British
+    user checks results table row heading contains    4    1    Mixed/Multiple ethnic group
+    user checks results table row heading contains    5    1    Not Known/Not Provided
+    user checks results table row heading contains    6    1    Other Ethnic Group
     user checks results table row heading contains    7    1    White
 
 Validate row headings
@@ -185,44 +184,44 @@ Validate row headings
     user checks table column heading contains    1    5    5 years after study
 
 Validate table cells
-    user checks results table cell contains    1    1    8
-    user checks results table cell contains    2    1    2
-    user checks results table cell contains    3    1    5
-    user checks results table cell contains    4    1    8
+    user checks results table cell contains    1    1    2
+    user checks results table cell contains    2    1    8
+    user checks results table cell contains    3    1    2
+    user checks results table cell contains    4    1    5
     user checks results table cell contains    5    1    8
-    user checks results table cell contains    6    1    2
+    user checks results table cell contains    6    1    8
     user checks results table cell contains    7    1    3
 
-    user checks results table cell contains    1    2    10
-    user checks results table cell contains    2    2    4
-    user checks results table cell contains    3    2    8
-    user checks results table cell contains    4    2    5
+    user checks results table cell contains    1    2    2
+    user checks results table cell contains    2    2    10
+    user checks results table cell contains    3    2    4
+    user checks results table cell contains    4    2    8
     user checks results table cell contains    5    2    5
-    user checks results table cell contains    6    2    2
+    user checks results table cell contains    6    2    5
     user checks results table cell contains    7    2    6
 
-    user checks results table cell contains    1    3    3
-    user checks results table cell contains    2    3    0
-    user checks results table cell contains    3    3    6
-    user checks results table cell contains    4    3    3
-    user checks results table cell contains    5    3    2
-    user checks results table cell contains    6    3    8
+    user checks results table cell contains    1    3    8
+    user checks results table cell contains    2    3    3
+    user checks results table cell contains    3    3    0
+    user checks results table cell contains    4    3    6
+    user checks results table cell contains    5    3    3
+    user checks results table cell contains    6    3    2
     user checks results table cell contains    7    3    0
 
-    user checks results table cell contains    1    4    3
-    user checks results table cell contains    2    4    9
-    user checks results table cell contains    3    4    4
-    user checks results table cell contains    4    4    7
-    user checks results table cell contains    5    4    4
-    user checks results table cell contains    6    4    2
+    user checks results table cell contains    1    4    2
+    user checks results table cell contains    2    4    3
+    user checks results table cell contains    3    4    9
+    user checks results table cell contains    4    4    4
+    user checks results table cell contains    5    4    7
+    user checks results table cell contains    6    4    4
     user checks results table cell contains    7    4    8
 
-    user checks results table cell contains    1    5    0
-    user checks results table cell contains    2    5    6
-    user checks results table cell contains    3    5    8
-    user checks results table cell contains    4    5    1
+    user checks results table cell contains    1    5    9
+    user checks results table cell contains    2    5    0
+    user checks results table cell contains    3    5    6
+    user checks results table cell contains    4    5    8
     user checks results table cell contains    5    5    1
-    user checks results table cell contains    6    5    9
+    user checks results table cell contains    6    5    1
     user checks results table cell contains    7    5    1
 
 Generate the permalink
@@ -314,13 +313,12 @@ Go to permalink page & check for error element to be present
     user waits until page contains    WARNING - The data used in this permalink may be out-of-date.
 
 Check the table has the same results as original table
-    user checks results table row heading contains    1    1    Asian/Asian British
-    user checks results table row heading contains    2    1    Black/African/Caribbean/Black British
-    user checks results table row heading contains    3    1    Mixed/Multiple ethnic group
-
-    user checks results table row heading contains    4    1    Not Known/Not Provided
-    user checks results table row heading contains    5    1    Other Ethnic Group
-    user checks results table row heading contains    6    1    Total
+    user checks results table row heading contains    1    1    Total
+    user checks results table row heading contains    2    1    Asian/Asian British
+    user checks results table row heading contains    3    1    Black/African/Caribbean/Black British
+    user checks results table row heading contains    4    1    Mixed/Multiple ethnic group
+    user checks results table row heading contains    5    1    Not Known/Not Provided
+    user checks results table row heading contains    6    1    Other Ethnic Group
     user checks results table row heading contains    7    1    White
 
     user checks table column heading contains    1    1    1 year after study
@@ -329,44 +327,44 @@ Check the table has the same results as original table
     user checks table column heading contains    1    4    4 years after study
     user checks table column heading contains    1    5    5 years after study
 
-    user checks results table cell contains    1    1    8
-    user checks results table cell contains    2    1    2
-    user checks results table cell contains    3    1    5
-    user checks results table cell contains    4    1    8
+    user checks results table cell contains    1    1    2
+    user checks results table cell contains    2    1    8
+    user checks results table cell contains    3    1    2
+    user checks results table cell contains    4    1    5
     user checks results table cell contains    5    1    8
-    user checks results table cell contains    6    1    2
+    user checks results table cell contains    6    1    8
     user checks results table cell contains    7    1    3
 
-    user checks results table cell contains    1    2    10
-    user checks results table cell contains    2    2    4
-    user checks results table cell contains    3    2    8
-    user checks results table cell contains    4    2    5
+    user checks results table cell contains    1    2    2
+    user checks results table cell contains    2    2    10
+    user checks results table cell contains    3    2    4
+    user checks results table cell contains    4    2    8
     user checks results table cell contains    5    2    5
-    user checks results table cell contains    6    2    2
+    user checks results table cell contains    6    2    5
     user checks results table cell contains    7    2    6
 
-    user checks results table cell contains    1    3    3
-    user checks results table cell contains    2    3    0
-    user checks results table cell contains    3    3    6
-    user checks results table cell contains    4    3    3
-    user checks results table cell contains    5    3    2
-    user checks results table cell contains    6    3    8
+    user checks results table cell contains    1    3    8
+    user checks results table cell contains    2    3    3
+    user checks results table cell contains    3    3    0
+    user checks results table cell contains    4    3    6
+    user checks results table cell contains    5    3    3
+    user checks results table cell contains    6    3    2
     user checks results table cell contains    7    3    0
 
-    user checks results table cell contains    1    4    3
-    user checks results table cell contains    2    4    9
-    user checks results table cell contains    3    4    4
-    user checks results table cell contains    4    4    7
-    user checks results table cell contains    5    4    4
-    user checks results table cell contains    6    4    2
+    user checks results table cell contains    1    4    2
+    user checks results table cell contains    2    4    3
+    user checks results table cell contains    3    4    9
+    user checks results table cell contains    4    4    4
+    user checks results table cell contains    5    4    7
+    user checks results table cell contains    6    4    4
     user checks results table cell contains    7    4    8
 
-    user checks results table cell contains    1    5    0
-    user checks results table cell contains    2    5    6
-    user checks results table cell contains    3    5    8
-    user checks results table cell contains    4    5    1
+    user checks results table cell contains    1    5    9
+    user checks results table cell contains    2    5    0
+    user checks results table cell contains    3    5    6
+    user checks results table cell contains    4    5    8
     user checks results table cell contains    5    5    1
-    user checks results table cell contains    6    5    9
+    user checks results table cell contains    6    5    1
     user checks results table cell contains    7    5    1
 
 Check amended release doesn't contain deleted subject

@@ -1,10 +1,8 @@
 /* eslint-disable max-classes-per-file */
 import {
   FilterOption,
-  FlatLocationOption,
   GeoJsonFeature,
   IndicatorOption,
-  LocationOption,
   TimePeriodOption,
 } from '@common/services/tableBuilderService';
 
@@ -73,7 +71,7 @@ export class LocationFilter extends Filter {
     level,
     geoJson,
     group,
-  }: GroupedFilterOption & FlatLocationOption) {
+  }: GroupedFilterOption & { level: string; geoJson?: GeoJsonFeature[] }) {
     super({ value, label, group });
 
     this.level = level;

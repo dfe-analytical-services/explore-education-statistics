@@ -38,13 +38,14 @@ describe('EditableKeyStat', () => {
           },
         },
       },
-      locations: [
-        {
-          label: 'England',
-          level: 'country',
-          value: 'england',
-        },
-      ],
+      locationsHierarchical: {
+        country: [
+          {
+            label: 'England',
+            value: 'england',
+          },
+        ],
+      },
       timePeriodRange: [{ code: 'AY', label: '2020/21', year: 2020 }],
       indicators: [
         {
