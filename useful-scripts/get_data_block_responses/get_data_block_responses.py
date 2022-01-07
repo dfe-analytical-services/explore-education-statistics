@@ -12,21 +12,21 @@ SELECT ContentBlock.Id AS ContentBlockId, Releases.Id AS ReleaseId, JSON_VALUE([
   FROM ContentBlock
   JOIN ReleaseContentBlocks ON ContentBlock.Id = ReleaseContentBlocks.ContentBlockId
   JOIN Releases ON ReleaseContentBlocks.ReleaseId = Releases.Id
-  Where ContentBlock.Type = 'DataBlock' 
-  AND Releases.Published IS NOT NULL 
-  AND SoftDeleted = 0 
-  AND (ContentSectionId IS NOT NULL 
-	   OR (DataBlock_HighlightName IS NOT NULL 
+  Where ContentBlock.Type = 'DataBlock'
+  AND Releases.Published IS NOT NULL
+  AND SoftDeleted = 0
+  AND (ContentSectionId IS NOT NULL
+	   OR (DataBlock_HighlightName IS NOT NULL
 	       AND DataBlock_HighlightName != ''));
-	       
-And then save the results as a CSV in MS SQL Server Management Studio. 
+
+And then save the results as a CSV in MS SQL Server Management Studio.
 Place it in the same directory as this script.
 
 Find blocks that took over 10 seconds to respond:
 grep -r "time for response: [0-9][0-9][0-9]*" * | awk '{split($0,a,":"); print a[1];}' | zip -@ test.zip
 
-Compare two result directories for differences, but ignoring response time:
-diff -I"^time for response:.*" -r results_dev1/ results_dev2/
+Compare two result directories for differences, but ignoring response time (and any responses that are both Not Found responses, as they contain unique traceIds):
+diff -I"^time for response:.*" -I "Not Found" -r results_dev1/ results_dev2/
 """
 
 parser = argparse.ArgumentParser(prog="python get_data_block_responses.py",
@@ -104,7 +104,7 @@ for datablock in datablocks:
 
     try:
         jsonResponse = json.loads(resp.text)
-    except:
+    except BaseException:
         print(f'json.loads(resp.text) failed with block {guid} '
               f'subject {subjectId}')
         jsonResponse = {'error': 'get_data_block_responeses script failed to process response text'}
@@ -122,7 +122,7 @@ for datablock in datablocks:
                 f'response:\n{json.dumps(jsonResponse, sort_keys=True)}'
             )
         print(f'Successfully processed block {guid} for subject {subjectId}!')
-    except:
+    except BaseException:
         print(f'file.write failed with block {guid} '
               f'subject {subjectId}\n{resp.text}')
 
