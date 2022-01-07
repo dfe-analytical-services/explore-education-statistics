@@ -48,12 +48,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService userService = null)
         {
             return new ReleaseImageService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
-                blobStorageService ?? new Mock<IBlobStorageService>().Object,
-                fileUploadsValidatorService ?? new Mock<IFileUploadsValidatorService>().Object,
-                releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                userService ?? new Mock<IUserService>().Object
+                blobStorageService ?? Mock.Of<IBlobStorageService>(),
+                fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(),
+                releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(),
+                userService ?? Mock.Of<IUserService>()
             );
         }
 

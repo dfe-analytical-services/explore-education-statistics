@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return new ForbidResult();
             }
 
-            return Unit.Instance;
+            return await Task.FromResult(Unit.Instance);
         }
 
         private async Task<List<Theme>> GetUserThemes()
