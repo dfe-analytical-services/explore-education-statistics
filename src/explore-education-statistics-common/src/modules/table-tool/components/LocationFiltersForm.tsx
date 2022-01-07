@@ -31,28 +31,24 @@ export type LocationFiltersFormSubmitHandler = (values: {
 
 const formId = 'locationFiltersForm';
 
-interface Props {
+interface Props extends InjectedWizardProps {
   options: SubjectMeta['locations'];
   initialValues?: Dictionary<string[]>;
   onSubmit: LocationFiltersFormSubmitHandler;
 }
 
-const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
-  const {
-    options,
-    onSubmit,
-    isActive,
-    goToNextStep,
-    initialValues = {},
-  } = props;
+const LocationFiltersForm = ({
+  initialValues = {},
+  options,
+  onSubmit,
+  ...stepProps
+}: Props) => {
+  const { isActive, goToNextStep } = stepProps;
 
-  const stepHeading = useMemo(
-    () => (
-      <WizardStepHeading {...props} fieldsetHeading>
-        Choose locations
-      </WizardStepHeading>
-    ),
-    [props],
+  const stepHeading = (
+    <WizardStepHeading {...stepProps} fieldsetHeading>
+      Choose locations
+    </WizardStepHeading>
   );
 
   const formOptions = useMemo(() => Object.entries(options), [options]);
@@ -176,7 +172,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                 </div>
               </FormFieldset>
 
-              <WizardStepFormActions {...props} />
+              <WizardStepFormActions {...stepProps} />
             </Form>
           );
         }
@@ -194,7 +190,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         );
 
         return (
-          <WizardStepSummary {...props} goToButtonText="Edit locations">
+          <WizardStepSummary {...stepProps} goToButtonText="Edit locations">
             {stepHeading}
 
             <SummaryList noBorder>
@@ -217,7 +213,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                 ))}
             </SummaryList>
 
-            <ResetFormOnPreviousStep {...props} />
+            <ResetFormOnPreviousStep {...stepProps} />
           </WizardStepSummary>
         );
       }}

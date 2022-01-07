@@ -10,7 +10,7 @@ import ReleaseForm, {
 } from '@frontend/modules/data-catalogue/components/ReleaseForm';
 import React from 'react';
 
-interface Props {
+interface Props extends InjectedWizardProps {
   releases: ReleaseSummary[];
   selectedRelease?: ReleaseSummary;
   onSubmit: ReleaseFormSubmitHandler;
@@ -21,7 +21,7 @@ const ReleaseStep = ({
   selectedRelease,
   onSubmit,
   ...stepProps
-}: Props & InjectedWizardProps) => {
+}: Props) => {
   const { isActive } = stepProps;
   const { isMounted } = useMounted();
 

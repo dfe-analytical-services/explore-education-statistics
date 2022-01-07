@@ -22,22 +22,21 @@ interface FormValues {
 
 export type TimePeriodFormSubmitHandler = (values: FormValues) => void;
 
-interface Props {
-  options: SubjectMeta['timePeriod']['options'];
+const formId = 'timePeriodForm';
+
+interface Props extends InjectedWizardProps {
   initialValues?: { timePeriod?: TimePeriodQuery };
+  options: SubjectMeta['timePeriod']['options'];
   onSubmit: TimePeriodFormSubmitHandler;
 }
 
-const TimePeriodForm = (props: Props & InjectedWizardProps) => {
-  const {
-    options,
-    onSubmit,
-    isActive,
-    goToNextStep,
-    initialValues = { timePeriod: undefined },
-  } = props;
-
-  const formId = 'timePeriodForm';
+const TimePeriodForm = ({
+  initialValues = { timePeriod: undefined },
+  options,
+  onSubmit,
+  ...stepProps
+}: Props) => {
+  const { isActive, goToNextStep } = stepProps;
 
   const timePeriodOptions: SelectOption[] = [
     {
@@ -86,7 +85,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
   };
 
   const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading>
+    <WizardStepHeading {...stepProps} fieldsetHeading>
       Choose time period
     </WizardStepHeading>
   );
@@ -177,10 +176,10 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
               />
             </FormFieldset>
 
-            <WizardStepFormActions {...props} />
+            <WizardStepFormActions {...stepProps} />
           </Form>
         ) : (
-          <WizardStepSummary {...props} goToButtonText="Edit time period">
+          <WizardStepSummary {...stepProps} goToButtonText="Edit time period">
             {stepHeading}
 
             <SummaryList noBorder>
@@ -191,7 +190,7 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
               </SummaryListItem>
             </SummaryList>
 
-            <ResetFormOnPreviousStep {...props} />
+            <ResetFormOnPreviousStep {...stepProps} />
           </WizardStepSummary>
         );
       }}

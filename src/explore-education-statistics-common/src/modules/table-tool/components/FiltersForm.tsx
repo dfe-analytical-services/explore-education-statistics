@@ -40,7 +40,16 @@ export interface FormValues {
 
 export type FilterFormSubmitHandler = (values: FormValues) => void;
 
-interface Props {
+const formId = 'filtersForm';
+
+const TableQueryErrorCodes = [
+  'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE',
+  'REQUEST_CANCELLED',
+] as const;
+
+export type TableQueryErrorCode = typeof TableQueryErrorCodes[number];
+
+interface Props extends InjectedWizardProps {
   initialValues?: {
     indicators: string[];
     filters: string[];
@@ -57,27 +66,17 @@ interface Props {
   ) => void;
 }
 
-const formId = 'filtersForm';
-
-const TableQueryErrorCodes = [
-  'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE',
-  'REQUEST_CANCELLED',
-] as const;
-
-export type TableQueryErrorCode = typeof TableQueryErrorCodes[number];
-
-const FiltersForm = (props: Props & InjectedWizardProps) => {
-  const {
-    onSubmit,
-    selectedPublication,
-    subject,
-    subjectMeta,
-    goToNextStep,
-    initialValues,
-    isActive,
-    showTableQueryErrorDownload = true,
-    onTableQueryError,
-  } = props;
+const FiltersForm = ({
+  initialValues,
+  selectedPublication,
+  subject,
+  subjectMeta,
+  showTableQueryErrorDownload = true,
+  onSubmit,
+  onTableQueryError,
+  ...stepProps
+}: Props) => {
+  const { goToNextStep, isActive } = stepProps;
 
   const [tableQueryError, setTableQueryError] = useState<TableQueryErrorCode>();
   const [previousValues, setPreviousValues] = useState<FormValues>();
@@ -118,7 +117,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
   }, [initialValues, subjectMeta]);
 
   const stepHeading = (
-    <WizardStepHeading {...props}>Choose your filters</WizardStepHeading>
+    <WizardStepHeading {...stepProps}>Choose your filters</WizardStepHeading>
   );
 
   const handleSubmit = async (values: FormValues) => {
@@ -255,7 +254,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
               </FormGroup>
 
               <WizardStepFormActions
-                {...props}
+                {...stepProps}
                 submitText="Create table"
                 submittingText="Creating table"
                 onSubmitClick={() => {
@@ -277,7 +276,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
         }
 
         return (
-          <WizardStepSummary {...props} goToButtonText="Edit filters">
+          <WizardStepSummary {...stepProps} goToButtonText="Edit filters">
             {stepHeading}
 
             <SummaryList noBorder>
@@ -317,7 +316,7 @@ const FiltersForm = (props: Props & InjectedWizardProps) => {
                 ))}
             </SummaryList>
 
-            <ResetFormOnPreviousStep {...props} />
+            <ResetFormOnPreviousStep {...stepProps} />
           </WizardStepSummary>
         );
       }}

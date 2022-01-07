@@ -32,7 +32,6 @@ interface Props {
 }
 
 const ReleaseForm = ({
-  goToNextStep,
   legend,
   initialValues = {
     releaseId: '',
@@ -41,7 +40,7 @@ const ReleaseForm = ({
   options,
   ...stepProps
 }: Props & InjectedWizardProps) => {
-  const { isActive, currentStep, stepNumber } = stepProps;
+  const { isActive, currentStep, stepNumber, goToNextStep } = stepProps;
 
   const radioOptions = useMemo<RadioOption[]>(
     () =>

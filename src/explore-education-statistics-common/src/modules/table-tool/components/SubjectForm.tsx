@@ -21,28 +21,27 @@ export type SubjectFormSubmitHandler = (values: { subjectId: string }) => void;
 
 const formId = 'publicationSubjectForm';
 
-interface Props {
+interface Props extends InjectedWizardProps {
   legend?: ReactNode;
   legendSize?: FormFieldsetProps['legendSize'];
   legendHint?: string;
   initialValues?: { subjectId: string };
-  onSubmit: SubjectFormSubmitHandler;
   options: Subject[];
+  onSubmit: SubjectFormSubmitHandler;
 }
 
 const SubjectForm = ({
-  goToNextStep,
   legend,
   legendSize = 'l',
   legendHint,
   initialValues = {
     subjectId: '',
   },
-  onSubmit,
   options,
+  onSubmit,
   ...stepProps
-}: Props & InjectedWizardProps) => {
-  const { isActive, currentStep, stepNumber } = stepProps;
+}: Props) => {
+  const { goToNextStep, isActive, currentStep, stepNumber } = stepProps;
 
   const getTimePeriod = (subject: Subject) => {
     const { from, to } = subject.timePeriods;

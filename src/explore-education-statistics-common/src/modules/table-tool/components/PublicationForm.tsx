@@ -26,30 +26,29 @@ export type PublicationFormSubmitHandler = (values: {
   publication: PublicationSummary;
 }) => void;
 
-interface Props {
-  initialValues?: PublicationFormValues;
-  onSubmit: PublicationFormSubmitHandler;
-  options: Theme[];
-}
-
 const formId = 'publicationForm';
 
-const PublicationForm = (props: Props & InjectedWizardProps) => {
-  const {
-    options,
-    onSubmit,
-    isActive,
-    goToNextStep,
-    initialValues = {
-      publicationId: '',
-    },
-  } = props;
+interface Props extends InjectedWizardProps {
+  initialValues?: PublicationFormValues;
+  options: Theme[];
+  onSubmit: PublicationFormSubmitHandler;
+}
+
+const PublicationForm = ({
+  initialValues = {
+    publicationId: '',
+  },
+  options,
+  onSubmit,
+  ...stepProps
+}: Props) => {
+  const { isActive, goToNextStep } = stepProps;
 
   const [searchTerm, setSearchTerm] = useState('');
   const lowercaseSearchTerm = searchTerm.toLowerCase();
 
   const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading>
+    <WizardStepHeading {...stepProps} fieldsetHeading>
       Choose a publication
     </WizardStepHeading>
   );
@@ -198,7 +197,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                 </FormGroup>
               </FormFieldset>
 
-              <WizardStepFormActions {...props} />
+              <WizardStepFormActions {...stepProps} />
             </Form>
           );
         }
@@ -209,7 +208,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
           .find(option => option.id === form.values.publicationId);
 
         return (
-          <WizardStepSummary {...props} goToButtonText="Change publication">
+          <WizardStepSummary {...stepProps} goToButtonText="Change publication">
             {stepHeading}
 
             <SummaryList noBorder>

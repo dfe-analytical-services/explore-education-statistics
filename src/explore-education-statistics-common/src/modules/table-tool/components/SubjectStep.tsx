@@ -19,7 +19,7 @@ const subjectTabIds = {
   createTable: `${subjectTabsId}-createTable`,
 };
 
-interface Props {
+interface Props extends InjectedWizardProps {
   featuredTables?: FeaturedTable[];
   loadingFastTrack?: boolean;
   subjects: Subject[];
@@ -36,7 +36,7 @@ const SubjectStep = ({
   renderFeaturedTable,
   onSubmit,
   ...stepProps
-}: Props & InjectedWizardProps) => {
+}: Props) => {
   const { isActive } = stepProps;
 
   const hasFeaturedTables = renderFeaturedTable && featuredTables.length > 0;
