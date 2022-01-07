@@ -91,8 +91,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     // Uses the new GetLocationAttributesHierarchical to get the locations regardless of whether the
                     // feature is enabled or not.  If the feature is disabled, requests the locations without a hierarchy.
-                    var locationAttributes = await _locationRepository.GetLocationAttributesHierarchical(
-                        queryableObservations,
+                    var locationAttributes = await _locationRepository.GetLocationAttributesHierarchicalByObservationsList(
+                        observations,
                         hierarchies: locationHierarchiesEnabled ? _locationOptions.Hierarchies : null);
                     _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();

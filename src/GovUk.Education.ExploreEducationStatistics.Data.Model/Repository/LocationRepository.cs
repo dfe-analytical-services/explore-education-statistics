@@ -20,19 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             _context = context;
         }
 
-        public async Task<Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>> GetLocationAttributes(Guid subjectId)
+        public async Task<Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>> GetLocationAttributes(
+            Guid subjectId)
         {
-            var locationIds = await _context.Observation
+            var locations = await _context.Observation
                 .AsNoTracking()
                 .Where(o => o.SubjectId == subjectId)
-                .Select(observation => observation.LocationId)
+                .Select(observation => observation.Location)
                 .Distinct()
-                .ToListAsync();
-
-            var locations = await _context
-                .Location
-                .AsNoTracking()
-                .Where(location => locationIds.Contains(location.Id))
                 .ToListAsync();
 
             return locations
@@ -51,19 +46,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             var observations = _context.Observation
                 .Where(o => o.SubjectId == subjectId);
 
-            return GetLocationAttributesHierarchical(observations, hierarchies);
+            return GetLocationAttributesHierarchicalByObservationsQuery(observations, hierarchies);
         }
 
-        public async Task<Dictionary<GeographicLevel, List<LocationAttributeNode>>> GetLocationAttributesHierarchical(
-            IQueryable<Observation> observations,
-            Dictionary<GeographicLevel, List<string>>? hierarchies)
+        public async Task<Dictionary<GeographicLevel, List<LocationAttributeNode>>>
+            GetLocationAttributesHierarchicalByObservationsList(
+                IList<Observation> observations,
+                Dictionary<GeographicLevel, List<string>>? hierarchies)
         {
-            var hierarchyWithLocationSelectors = hierarchies == null
-                ? new Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute>>>()
-                : MapLocationAttributeSelectors(hierarchies);
-
             var locationIds = observations
-                .AsNoTracking()
                 .Select(observation => observation.LocationId)
                 .Distinct()
                 .ToList();
@@ -73,6 +64,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .AsNoTracking()
                 .Where(location => locationIds.Contains(location.Id))
                 .ToListAsync();
+
+            return GetLocationAttributesHierarchical(locations, hierarchies);
+        }
+
+        public async Task<Dictionary<GeographicLevel, List<LocationAttributeNode>>> GetLocationAttributesHierarchicalByObservationsQuery(
+            IQueryable<Observation> observations,
+            Dictionary<GeographicLevel, List<string>>? hierarchies)
+        {
+            var locations = await observations
+                .AsNoTracking()
+                .Select(observation => observation.Location)
+                .Distinct()
+                .ToListAsync();
+
+            return GetLocationAttributesHierarchical(locations, hierarchies);
+        }
+
+        private static Dictionary<GeographicLevel, List<LocationAttributeNode>> GetLocationAttributesHierarchical(
+            IList<Location> locations,
+            Dictionary<GeographicLevel, List<string>>? hierarchies)
+        {
+            var hierarchyWithLocationSelectors = hierarchies == null
+                ? new Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute>>>()
+                : MapLocationAttributeSelectors(hierarchies);
 
             return locations
                 .GroupBy(location => location.GeographicLevel)

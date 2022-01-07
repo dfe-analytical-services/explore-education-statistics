@@ -102,6 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 if (query.LocationIds.IsNullOrEmpty())
                 {
                     // Support old Data Blocks that have Location codes rather than id's in their query
+                    // TODO EES-3068 Migrate Location codes to ids in old Datablocks to remove this support for Location codes
                     return GetMatchingObservationIdsByLocationCodes(context, query, cancellationToken);
                 }
                 return GetMatchingObservationIds(context, query, cancellationToken);

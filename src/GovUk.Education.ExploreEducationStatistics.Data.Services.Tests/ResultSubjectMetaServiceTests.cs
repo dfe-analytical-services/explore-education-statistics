@@ -142,8 +142,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     new Dictionary<GeographicLevel, List<string>>()))
                 .ReturnsAsync(new Dictionary<GeographicLevel, List<LocationAttributeNode>>());
 
@@ -296,8 +296,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     new Dictionary<GeographicLevel, List<string>>()))
                 .ReturnsAsync(locations);
 
@@ -445,8 +445,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     null))
                 .ReturnsAsync(locations);
 
@@ -657,8 +657,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     null))
                 .ReturnsAsync(locations);
 
@@ -850,8 +850,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     null))
                 .ReturnsAsync(locations);
 
@@ -1062,8 +1062,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     options.Value.Hierarchies))
                 .ReturnsAsync(locations);
 
@@ -1342,8 +1342,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     options.Value.Hierarchies))
                 .ReturnsAsync(locations);
 
@@ -1582,8 +1582,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     options.Value.Hierarchies))
                 .ReturnsAsync(locations);
 
@@ -1774,8 +1774,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<Indicator>());
 
             locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+                .Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     options.Value.Hierarchies))
                 .ReturnsAsync(locations);
 
@@ -1963,8 +1963,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<Indicator>());
 
             locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+                .Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     options.Value.Hierarchies))
                 .ReturnsAsync(locations);
 
@@ -2135,8 +2135,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     options.Value.Hierarchies))
                 .ReturnsAsync(locations);
 
@@ -2334,8 +2334,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<Indicator>());
 
             locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchical(
-                    ItIs.QueryableSequenceEqualTo(observations),
+                .Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
+                    observations,
                     options.Value.Hierarchies))
                 .ReturnsAsync(locations);
 

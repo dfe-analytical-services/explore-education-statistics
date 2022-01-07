@@ -192,7 +192,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IQueryable<Observation> observations)
         {
             var locations =
-                await _locationRepository.GetLocationAttributesHierarchical(observations, _locationOptions.Hierarchies);
+                await _locationRepository.GetLocationAttributesHierarchicalByObservationsQuery(
+                    observations,
+                    _locationOptions.Hierarchies);
             return BuildLocationAttributeViewModels(locations);
         }
 
