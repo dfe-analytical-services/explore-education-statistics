@@ -129,7 +129,7 @@
         "criteria": {
           "allOf": [
             {
-              "threshold": 1,
+              "threshold": 0,
               "name": "Metric1",
               "metricNamespace": "Microsoft.DataFactory/factories",
               "metricName": "PipelineFailedRuns",
