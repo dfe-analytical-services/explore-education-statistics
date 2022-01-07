@@ -1,5 +1,5 @@
 col_name,col_type,label,indicator_grouping,indicator_unit,indicator_dp,filter_hint,filter_grouping_column
-date,Filter,Date,Date,,,,
+date,Filter,Date,,,,,
 response_rate,Indicator,Response rate,Response,%,0,,
 open_settings,Indicator,Number of open settings,Open settings,,,,
 proportion_of_settings_open,Indicator,Proportion of settings open,Open settings,%,0,,

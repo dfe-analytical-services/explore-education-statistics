@@ -36,7 +36,7 @@ Start creating a data block
     user waits until table tool wizard step is available    1    Choose a subject
 
 Select subject "UI test subject"
-    user waits until page contains    UI test subject
+    user waits until page contains    UI test subject    %{WAIT_SMALL}
     user clicks radio    UI test subject
     user clicks element    id:publicationSubjectForm-submit
     user waits until table tool wizard step is available    2    Choose locations    %{WAIT_MEDIUM}
@@ -44,10 +44,11 @@ Select subject "UI test subject"
 
 Select locations
     user opens details dropdown    Opportunity Area
-    user clicks checkbox    Bolton 001 (E02000984)
-    user clicks checkbox    Bolton 001 (E05000364)
-    user clicks checkbox    Bolton 004 (E02000987)
-    user clicks checkbox    Bolton 004 (E05010450)
+    user clicks checkbox    Bolton 001
+    user clicks checkbox    Bolton 002
+    user clicks checkbox    Bolton 003
+    user clicks checkbox    Bolton 004
+
     user opens details dropdown    Ward
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
@@ -58,8 +59,9 @@ Select time period
     user waits until page contains element    id:timePeriodForm-start
     ${timePeriodStartList}=    get list items    id:timePeriodForm-start
     ${timePeriodEndList}=    get list items    id:timePeriodForm-end
-    ${expectedList}=    create list    Please select    2005    2007    2008    2009    2010    2011    2012    2016
-    ...    2017    2018    2019    2020
+
+    ${expectedList}=    create list    Please select    2005    2006    2007    2008    2009    2010    2011    2012
+    ...    2014    2016    2017    2018    2019    2020
     lists should be equal    ${timePeriodStartList}    ${expectedList}
     lists should be equal    ${timePeriodEndList}    ${expectedList}
 
@@ -77,31 +79,31 @@ Create table
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    css:[data-testid="dataTableCaption"]
-    ...    Admission Numbers for 'UI test subject' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020
+    ...    Admission Numbers for 'UI test subject' in Bolton 001, Bolton 002, Bolton 003, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2020
 
 Validate table rows
+    # broken
     user checks table column heading contains    1    1    Admission Numbers
 
-    ${row}=    user gets row number with heading    Bolton 001 (E02000984)
-    user checks table heading in offset row contains    ${row}    0    2    2019
+    ${row}=    user gets row number with heading    Bolton 001
+    user checks table heading in offset row contains    ${row}    0    2    2009
 
-    user checks table cell in offset row contains    ${row}    0    1    8,533
+    user checks table cell in offset row contains    ${row}    0    1    5,815
 
-    ${row}=    user gets row number with heading    Bolton 001 (E05000364)
+    ${row}=    user gets row number with heading    Bolton 001
     user checks table heading in offset row contains    ${row}    0    2    2009
     user checks table heading in offset row contains    ${row}    1    1    2010
     user checks table heading in offset row contains    ${row}    2    1    2017
 
-    user checks table cell in offset row contains    ${row}    0    1    5,815
     user checks table cell in offset row contains    ${row}    1    1    5,595
     user checks table cell in offset row contains    ${row}    2    1    6,373
 
-    ${row}=    user gets row number with heading    Bolton 004 (E02000987)
-    user checks table heading in offset row contains    ${row}    0    2    2020
+    ${row}=    user gets row number with heading    Bolton 004
+    user checks table heading in offset row contains    ${row}    0    2    2005
 
-    user checks table cell in offset row contains    ${row}    0    1    6,031
+    user checks table cell in offset row contains    ${row}    0    1    8,557
 
-    ${row}=    user gets row number with heading    Bolton 004 (E05010450)
+    ${row}=    user gets row number with heading    Bolton 004
     user checks table heading in offset row contains    ${row}    0    2    2005
     user checks table heading in offset row contains    ${row}    1    1    2017
     user checks table heading in offset row contains    ${row}    2    1    2018
@@ -176,7 +178,7 @@ Embed data block into release content
     user chooses and embeds data block    ${DATABLOCK_NAME}
 
 Validate embedded table rows
-    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    ${datablock}=    set variable    //*[@data-testid="Data block - ${DATABLOCK_NAME}"]
     # Need to scroll to block to load it
     user scrolls to element    ${datablock}
 
@@ -184,12 +186,12 @@ Validate embedded table rows
     user waits until page contains element    ${table}    30
     user checks table column heading contains    1    1    Admission Numbers    ${table}
 
-    ${row}=    user gets row number with heading    Bolton 001 (E02000984)    ${table}
-    user checks table heading in offset row contains    ${row}    0    2    2019    ${table}
+    ${row}=    user gets row number with heading    Bolton 001    ${table}
+    user checks table heading in offset row contains    ${row}    0    2    2009    ${table}
 
-    user checks table cell in offset row contains    ${row}    0    1    8,533    ${table}
+    user checks table cell in offset row contains    ${row}    0    1    5,815    ${table}
 
-    ${row}=    user gets row number with heading    Bolton 001 (E05000364)    ${table}
+    ${row}=    user gets row number with heading    Bolton 001    ${table}
     user checks table heading in offset row contains    ${row}    0    2    2009    ${table}
     user checks table heading in offset row contains    ${row}    1    1    2010    ${table}
     user checks table heading in offset row contains    ${row}    2    1    2017    ${table}
@@ -197,13 +199,14 @@ Validate embedded table rows
     user checks table cell in offset row contains    ${row}    0    1    5,815    ${table}
     user checks table cell in offset row contains    ${row}    1    1    5,595    ${table}
     user checks table cell in offset row contains    ${row}    2    1    6,373    ${table}
+    user checks table cell in offset row contains    ${row}    3    1    8,533    ${table}
 
-    ${row}=    user gets row number with heading    Bolton 004 (E02000987)    ${table}
-    user checks table heading in offset row contains    ${row}    0    2    2020    ${table}
+    ${row}=    user gets row number with heading    Bolton 004    ${table}
+    user checks table heading in offset row contains    ${row}    0    2    2005    ${table}
 
-    user checks table cell in offset row contains    ${row}    0    1    6,031    ${table}
+    user checks table cell in offset row contains    ${row}    0    1    8,557    ${table}
 
-    ${row}=    user gets row number with heading    Bolton 004 (E05010450)    ${table}
+    ${row}=    user gets row number with heading    Bolton 004    ${table}
     user checks table heading in offset row contains    ${row}    0    2    2005    ${table}
     user checks table heading in offset row contains    ${row}    1    1    2017    ${table}
     user checks table heading in offset row contains    ${row}    2    1    2018    ${table}

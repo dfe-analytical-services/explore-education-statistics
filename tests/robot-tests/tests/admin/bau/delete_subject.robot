@@ -62,7 +62,7 @@ Create Random Filter Total footnote for new subject
     user waits until page contains testid    footnote-subject UI test subject
     user clicks footnote subject radio    UI test subject    Applies to specific data
     user opens details dropdown    Random Filter
-    user clicks checkbox    Total
+    user clicks checkbox    Select all
     user clicks element    id:footnoteForm-content
     user presses keys    UI tests Random Filter Total footnote
     user clicks button    Save footnote
@@ -99,7 +99,7 @@ Select subject "UI test subject"
 
 Select locations
     user opens details dropdown    Opportunity Area
-    user clicks checkbox    Bolton 001 (E02000984)
+    user clicks checkbox    Bolton 001
     user opens details dropdown    Ward
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
@@ -112,6 +112,10 @@ Select time period
     user clicks element    id:timePeriodForm-submit
     user waits until table tool wizard step is available    4    Choose your filters
 
+Select categories
+    user clicks checkbox    Blue
+    user clicks checkbox    Orange
+
 Select indicators
     user checks indicator checkbox is checked    Admission Numbers
 
@@ -120,7 +124,7 @@ Create table
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    css:[data-testid="dataTableCaption"]
-    ...    Admission Numbers for 'UI test subject' in Bolton 001 for 2019
+    ...    Admission Numbers for 'UI test subject' for Blue and Orange in Bolton 001 for 2019
     sleep    1    # Because otherwise the "Set as featured table" checkbox gets checked on CI pipeline?!?!
     user enters text into element    id:dataBlockDetailsForm-name    UI test table name
     user enters text into element    id:dataBlockDetailsForm-heading    UI test table title
