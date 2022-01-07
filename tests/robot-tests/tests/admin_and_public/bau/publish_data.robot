@@ -325,6 +325,7 @@ Select subject "${SUBJECT_2_NAME}"
     user waits until page contains    ${SUBJECT_2_NAME}
     user clicks radio    ${SUBJECT_2_NAME}
     user clicks element    id:publicationSubjectForm-submit
+    user waits until table is visible
 
 Select locations
     user waits until table tool wizard step is available    2    Choose locations

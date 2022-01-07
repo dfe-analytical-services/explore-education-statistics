@@ -80,7 +80,7 @@ Add Useful information related page link to release
     user clicks button    Create link
 
 Add secondary statistics
-    user waits until page does not contain element    //*[@id="${SECONDARY_STATS_TABLE_TAB_ID}"]
+    user waits until page does not contain element    //*[@id="${SECONDARY_STATS_TABLE_TAB_ID}"]    %{WAIT_MEDIUM}
     user clicks button    Add secondary stats
     user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
     user checks select contains x options    name:selectedDataBlock    5
