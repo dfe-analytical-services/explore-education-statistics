@@ -391,7 +391,7 @@ describe('MethodologySummary', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('the approved tag is shown', () => {
+    test('the published tag is shown', () => {
       render(
         <MemoryRouter>
           <MethodologySummary
@@ -403,7 +403,7 @@ describe('MethodologySummary', () => {
       );
 
       expect(
-        screen.getByText('Approved', { selector: 'span' }),
+        screen.getByText('Published', { selector: 'span' }),
       ).toBeInTheDocument();
     });
 

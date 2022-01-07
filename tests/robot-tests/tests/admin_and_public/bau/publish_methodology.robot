@@ -76,6 +76,12 @@ Verify that the user cannot edit the status of the methodology
     user waits until h2 is visible    Sign off
     user checks page does not contain    Edit status
 
+Verify that the methodology 'Published' tag is shown
+    user opens publication on the admin dashboard    ${PUBLICATION_NAME}    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
+
+    user waits until page contains element
+    ...    //*[@data-testid="Methodology for ${PUBLICATION_NAME}"]//div//span[text()="Published"]
+
 Verify that the methodology is visible on the public methodologies page with the expected URL
     user navigates to public methodologies page
     user waits until page contains accordion section    %{TEST_THEME_NAME}
