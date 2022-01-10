@@ -15,23 +15,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         [Fact]
         public void Left()
         {
-            var either = new Either<string, int>("a failure");
+            var result = new Either<string, int>("a failure");
 
-            Assert.True(either.IsLeft);
-            Assert.False(either.IsRight);
-            Assert.Equal("a failure", either.Left);
-            Assert.Throws<ArgumentException>(() => either.Right);
+            Assert.True(result.IsLeft);
+            Assert.False(result.IsRight);
+            Assert.Equal("a failure", result.Left);
+            Assert.Throws<Exception>(() => result.Right);
         }
 
         [Fact]
         public void Right()
         {
-            var either = new Either<int, string>("a success");
+            var result = new Either<int, string>("a success");
 
-            Assert.True(either.IsRight);
-            Assert.False(either.IsLeft);
-            Assert.Equal("a success", either.Right);
-            Assert.Throws<ArgumentException>(() => either.Left);
+            Assert.True(result.IsRight);
+            Assert.False(result.IsLeft);
+            Assert.Equal("a success", result.Right);
+            Assert.Throws<Exception>(() => result.Left);
         }
 
         [Fact]
@@ -97,160 +97,139 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         [Fact]
         public void OnSuccess()
         {
-            var either =
+            var result =
                 new Either<int, string>("either1")
-                    .OnSuccess(either1Result => either1Result + " either2");
+                    .OnSuccess(previousResult => previousResult + " either2");
             
-            Assert.True(either.IsRight);
-            Assert.Equal("either1 either2", either.Right);
+            result.AssertRight("either1 either2");
         }
 
         [Fact]
         public void OnSuccess_Left_PriorFailure()
         {
-            var eitherResults = new List<string>();
+            var results = new List<string>();
             
-            var either = 
+            var result = 
                 new Either<int, string>(500)
                     .OnSuccess(previousResult =>
                     {
-                        eitherResults.Add(previousResult + " either2");
+                        results.Add(previousResult + " either2");
                         return previousResult + "either2";
                     });
             
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
-            
-            Assert.Empty(eitherResults);
+            result.AssertLeft(500);
+
+            Assert.Empty(results);
         }
         
         [Fact]
         public void OnSuccess_NoArg()
         {
-            var either =
+            var result =
                 new Either<int, string>("either1")
                     .OnSuccess(() => "either2");
             
-            Assert.True(either.IsRight);
-            Assert.Equal("either2", either.Right);
+            result.AssertRight("either2");
         }
 
         [Fact]
         public void OnSuccess_NoArg_Left_PriorFailure()
         {
-            var eitherResults = new List<string>();
+            var results = new List<string>();
             
-            var either = 
+            var result = 
                 new Either<int, string>(500)
                     .OnSuccess(() =>
                     {
-                        eitherResults.Add("either2");
+                        results.Add("either2");
                         return "either2";
                     });
             
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
-            
-            Assert.Empty(eitherResults);
+            result.AssertLeft(500);
+
+            Assert.Empty(results);
         }
 
         [Fact]
         public async Task OnSuccess_WithEitherTask()
         {
-            var either =
+            var result =
                 await new Either<int, string>("either1")
-                    .OnSuccess(either1Result => 
-                        Task.FromResult(new Either<int, string>(either1Result + " either2")));
+                    .OnSuccess(previousResult => 
+                        Task.FromResult(new Either<int, string>(previousResult + " either2")));
             
-            Assert.True(either.IsRight);
-            Assert.Equal("either1 either2", either.Right);
+            result.AssertRight("either1 either2");
         }
 
         [Fact]
         public void OrElse_NoArg()
         {
-            var either =
+            var result =
                 new Either<int, string>(500)
                     .OrElse(() => "either2");
             
-            Assert.True(either.IsRight);
-            Assert.Equal("either2", either.Right);
+            result.AssertRight("either2");
         }
 
         [Fact]
-        public void OrElse_NoArg_Left_PriorSuccess()
+        public void OrElse_NoArg_PriorSuccess()
         {
-            var eitherResults = new List<string>();
+            var results = new List<string>();
             
-            var either = 
+            var result = 
                 new Either<int, string>("either1")
                     .OrElse(() =>
                     {
-                        eitherResults.Add("either2");
+                        results.Add("either2");
                         return "either2";
                     });
             
-            Assert.True(either.IsRight);
-            Assert.Equal("either1", either.Right);
+            result.AssertRight("either1");
             
-            Assert.Empty(eitherResults);
-        }
-
-        [Fact]
-        public async Task OrElse_WithEitherTask()
-        {
-            var either =
-                await new Either<int, string>("either1")
-                    .OnSuccess(either1Result => 
-                        Task.FromResult(new Either<int, string>(either1Result + " either2")));
-            
-            Assert.True(either.IsRight);
-            Assert.Equal("either1 either2", either.Right);
+            Assert.Empty(results);
         }
 
         [Fact]
         public async Task OnSuccess_WithEitherTask_Left()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
             
-            var either =
+            var result =
                 await new Either<int, string>("either1")
                     .OnSuccess(previousResult => Task.Run(async () =>
                     {
                         await Task.Delay(20);
-                        taskResults.Add(previousResult + " task1");
+                        results.Add(previousResult + " task1");
                         return new Either<int, string>(500);
                     }))
                     .OnSuccess(previousResult => Task.Run(async () =>
                     {
                         await Task.Delay(10);
-                        taskResults.Add(previousResult + " task2");
+                        results.Add(previousResult + " task2");
                         return new Either<int, string>(previousResult + " task2");
                     }));
             
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
-            
-            Assert.Equal("either1 task1", Assert.Single(taskResults));
+            result.AssertLeft(500);
+
+            Assert.Equal("either1 task1", Assert.Single(results));
         }
         
         [Fact]
         public async Task OnSuccess_WithEitherTask_Left_PriorFailure()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
             
-            var either =
+            var result =
                 await new Either<int, string>(500)
                     .OnSuccess(previousResult => Task.Run(() =>
                     {
-                        taskResults.Add(previousResult + " task1");
+                        results.Add(previousResult + " task1");
                         return new Either<int, string>(600);
                     }));
+
+            result.AssertLeft(500);
             
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
-            
-            Assert.Empty(taskResults);
+            Assert.Empty(results);
         }
     }
 
@@ -259,212 +238,200 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         [Fact]
         public async Task OnSuccess()
         {
-            var either = await Task.FromResult(new Either<int, string>("a success"))
+            var result = await Task.FromResult(new Either<int, string>("a success"))
                 .OnSuccess(str => str.ToUpper());
 
-            Assert.True(either.IsRight);
-            Assert.Equal("A SUCCESS", either.Right);
+            result.AssertRight("A SUCCESS");
         }
 
         [Fact]
         public async Task OnSuccess_WithRight()
         {
-            var either = await Task.FromResult(new Either<int, string>("a success"))
+            var result = await Task.FromResult(new Either<int, string>("a success"))
                 .OnSuccess(_ => new Either<int, string>("another success"));
 
-            Assert.True(either.IsRight);
-            Assert.Equal("another success", either.Right);
+            result.AssertRight("another success");
         }
 
         [Fact]
         public async Task OnSuccess_WithLeft()
         {
-            var exception = new Exception("Something went wrong");
-            var either = await Task.FromResult(new Either<Exception, string>("a success"))
-                .OnSuccess(_ => new Either<Exception, string>(exception));
+            var result = await Task.FromResult(new Either<int, string>("a success"))
+                .OnSuccess(_ => new Either<int, string>(500));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(exception, either.Left);
+            result.AssertLeft(500);
         }
 
 #pragma warning disable 618
         [Fact]
         public async Task OnSuccess_WithTask()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
             
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(5);
-                    taskResults.Add(previousTaskResult + " task2");
+                    results.Add(previousResult + " task2");
                 }))
                 // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
-                    Assert.IsType<Unit>(previousTaskResult);
+                    Assert.IsType<Unit>(previousResult);
                     await Task.Delay(15);
-                    taskResults.Add("task3");
+                    results.Add("task3");
                 }));
 
-            Assert.True(either.IsRight);
-            Assert.Equal(3, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
-            Assert.Equal("task3", taskResults[2]);
+            Assert.True(result.IsRight);
+            Assert.Equal(3, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task1 task2", results[1]);
+            Assert.Equal("task3", results[2]);
         }
         
         [Fact]
-        public async Task OnSuccess_WithTask_Left()
+        public async Task OnSuccess_WithTask_Throws()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
             
-            await Assert.ThrowsAsync<ArgumentException>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () => 
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(5);
-                    taskResults.Add(previousTaskResult + " task2");
-                    throw new ArgumentException("task2 failed");
+                    results.Add(previousResult + " task2");
+                    throw new Exception("exception thrown");
                 }))
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(15);
-                    taskResults.Add(previousTaskResult + " task3");
+                    results.Add(previousResult + " task3");
                 })));
+            
+            Assert.Equal("exception thrown", exception.Message);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task1 task2", results[1]);
         }
 #pragma warning restore 618
         
         [Fact]
         public async Task OnSuccess_WithGenericTask()
         {
-            var taskResults = new List<string>();
-
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add(previousTaskResult + " task2");
-                    return previousTaskResult + " task2";
+                    return previousResult + " task2";
                 }))
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add(previousTaskResult + " task3");
-                    return previousTaskResult + " task3";
+                    return previousResult + " task3";
                 }));
 
-            Assert.True(either.IsRight);
-            Assert.Equal("task1 task2 task3", either.Right);
-
-            Assert.Equal(3, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
-            Assert.Equal("task1 task2 task3", taskResults[2]);
+            result.AssertRight("task1 task2 task3");
         }
         
         [Fact]
-        public async Task OnSuccess_WithGenericTask_Left()
+        public async Task OnSuccess_WithGenericTask_Throws()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () => 
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add(previousTaskResult + " task2");
-                    throw new ArgumentException("task2 failed");
+                    results.Add(previousResult + " task2");
+                    throw new Exception("exception thrown");
 #pragma warning disable 162
-                    return previousTaskResult + " task2";
+                    return previousResult + " task2";
 #pragma warning restore 162
                 }))
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add(previousTaskResult + " task3");
-                    return previousTaskResult + " task3";
+                    results.Add(previousResult + " task3");
+                    return previousResult + " task3";
                 })));
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
+            Assert.Equal("exception thrown", exception.Message);
+            
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task1 task2", results[1]);
         }
 
         [Fact]
         public async Task OnSuccess_WithGenericTaskNoArg()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccess(() => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add("task2");
+                    results.Add("task2");
                     return "task2";
                 }))
                 .OnSuccess(() => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add("task3");
+                    results.Add("task3");
                     return "task3";
                 }));
 
-            Assert.True(either.IsRight);
-            Assert.Equal("task3", either.Right);
+            result.AssertRight("task3");
 
-            Assert.Equal(3, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
-            Assert.Equal("task3", taskResults[2]);
+            Assert.Equal(3, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
+            Assert.Equal("task3", results[2]);
         }
         
         [Fact]
-        public async Task OnSuccess_WithGenericTaskNoArg_Left()
+        public async Task OnSuccess_WithGenericTaskNoArg_Throws()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () => 
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccess(() => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add("task2");
-                    throw new ArgumentException("task2 failed");
+                    results.Add("task2");
+                    throw new Exception("exception thrown");
 #pragma warning disable 162
                     return "task2";
 #pragma warning restore 162
@@ -472,336 +439,323 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 .OnSuccess(() => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add("task3");
+                    results.Add("task3");
                     return "task3";
                 })));
+            
+            Assert.Equal("exception thrown", exception.Message);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
         }
 
         [Fact]
         public async Task OnSuccess_WithGenericTaskNoArg_Left_PriorFailure()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>(500);
                 })
                 .OnSuccess(() => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add("task2");
+                    results.Add("task2");
                     return "task2";
                 }));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
+            result.AssertLeft(500);
 
-            Assert.Equal("task1", Assert.Single(taskResults));
+            Assert.Equal("task1", Assert.Single(results));
         }
 
         [Fact]
         public async Task OnSuccess_WithEitherTask()
         {
-            var taskResults = new List<string>();
-
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add(previousTaskResult + " task2");
-                    return new Either<int, string>(previousTaskResult + " task2");
+                    return new Either<int, string>(previousResult + " task2");
                 }))
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add(previousTaskResult + " task3");
-                    return new Either<int, string>(previousTaskResult + " task3");
+                    return new Either<int, string>(previousResult + " task3");
                 }));
 
-            Assert.True(either.IsRight);
-            Assert.Equal("task1 task2 task3", either.Right);
-
-            Assert.Equal(3, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
-            Assert.Equal("task1 task2 task3", taskResults[2]);
+            result.AssertRight("task1 task2 task3");
         }
         
         [Fact]
         public async Task OnSuccess_WithEitherTask_Left()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add(previousTaskResult + " task2");
+                    results.Add(previousResult + " task2");
                     return new Either<int, string>(500);
                 }))
-                .OnSuccess(previousTaskResult => Task.Run(async () =>
+                .OnSuccess(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add(previousTaskResult + " task3");
-                    return new Either<int, string>(previousTaskResult + " task3");
+                    results.Add(previousResult + " task3");
+                    return new Either<int, string>(previousResult + " task3");
                 }));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
-            
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
+            result.AssertLeft(500);
+
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task1 task2", results[1]);
         }
 
         [Fact]
         public async Task OnSuccess_WithEitherTaskNoArg()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccess(() => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add("task2");
+                    results.Add("task2");
                     return new Either<int, string>("task2");
                 })).OnSuccess(() => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add("task3");
+                    results.Add("task3");
                     return new Either<int, string>("task3");
                 }));
 
-            Assert.True(either.IsRight);
-            Assert.Equal("task3", either.Right);
+            result.AssertRight("task3");
 
-            Assert.Equal(3, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
-            Assert.Equal("task3", taskResults[2]);
+            Assert.Equal(3, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
+            Assert.Equal("task3", results[2]);
         }
         
         [Fact]
         public async Task OnSuccess_WithEitherTaskNoArg_Left()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccess(() => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add("task2");
+                    results.Add("task2");
                     return new Either<int, string>(500);
                 }))
                 .OnSuccess(() => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add("task3");
+                    results.Add("task3");
                     return new Either<int, string>("task3");
                 }));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
-            
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
+            result.AssertLeft(500);
+
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
         }
         
         [Fact]
         public async Task OnSuccessVoid_WithTask()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccessVoid(previousTaskResult => Task.Run(async () =>
+                .OnSuccessVoid(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add(previousTaskResult + " task2");
+                    results.Add(previousResult + " task2");
                 }))
                 // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-                .OnSuccessVoid(previousTaskResult => Task.Run(async () =>
+                .OnSuccessVoid(previousResult => Task.Run(async () =>
                 {
-                    Assert.IsType<Unit>(previousTaskResult);
+                    Assert.IsType<Unit>(previousResult);
                     await Task.Delay(0);
-                    taskResults.Add("task3");
+                    results.Add("task3");
                 }));
 
-            Assert.True(either.IsRight);
-            Assert.Equal(Unit.Instance, either.Right);
+            result.AssertRight(Unit.Instance);
 
-            Assert.Equal(3, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
-            Assert.Equal("task3", taskResults[2]);
+            Assert.Equal(3, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task1 task2", results[1]);
+            Assert.Equal("task3", results[2]);
         }
         
         [Fact]
-        public async Task OnSuccessVoid_WithTask_Left()
+        public async Task OnSuccessVoid_WithTask_Throws()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => await Task.Run(async () =>
+            var exception = await Assert.ThrowsAsync<Exception>(async () => await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccessVoid(previousTaskResult => Task.Run(async () =>
+                .OnSuccessVoid(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add(previousTaskResult + " task2");
-                    throw new ArgumentException("task2 failed");
+                    results.Add(previousResult + " task2");
+                    throw new Exception("exception thrown");
                 }))
-                .OnSuccessVoid(previousTaskResult => Task.Run(async () =>
+                .OnSuccessVoid(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add(previousTaskResult + " task3");
+                    results.Add(previousResult + " task3");
                 })));
+            
+            Assert.Equal("exception thrown", exception.Message);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task1 task2", results[1]);
         }
         
         
         [Fact]
         public async Task OnSuccessVoid_WithTask_Left_PriorFailure()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>(500);
                 })
-                .OnSuccessVoid(previousTaskResult => Task.Run(async () =>
+                .OnSuccessVoid(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add(previousTaskResult + " task2");
+                    results.Add(previousResult + " task2");
                 }));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
+            result.AssertLeft(500);
 
-            Assert.Equal("task1", Assert.Single(taskResults));
+            Assert.Equal("task1", Assert.Single(results));
         }
         
         [Fact]
         public async Task OnSuccessVoid_WithTaskNoArg()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccessVoid(() => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add("task2");
+                    results.Add("task2");
                 }))
                 .OnSuccessVoid(() => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add("task3");
+                    results.Add("task3");
                 }));
 
-            Assert.True(either.IsRight);
-            Assert.Equal(Unit.Instance, either.Right);
+            result.AssertRight(Unit.Instance);
 
-            Assert.Equal(3, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
-            Assert.Equal("task3", taskResults[2]);
+            Assert.Equal(3, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
+            Assert.Equal("task3", results[2]);
         }
         
         [Fact]
-        public async Task OnSuccessVoid_WithTaskNoArg_Left()
+        public async Task OnSuccessVoid_WithTaskNoArg_Throws()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () => 
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccessVoid(() => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add("task2");
-                    throw new ArgumentException("task2 failed");
+                    results.Add("task2");
+                    throw new Exception("exception thrown");
                 }))
                 .OnSuccessVoid(() => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add("task3");
+                    results.Add("task3");
                 })));
+            
+            Assert.Equal("exception thrown", exception.Message);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
         }
         
         [Fact]
         public async Task OnSuccessVoid_WithTaskNoArg_Left_PriorFailure()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await 
+            var result = await 
                 Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>(500);
                 })
                 .OnSuccessVoid(() => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add("task2");
+                    results.Add("task2");
                 }));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
-            
-            Assert.Single(taskResults);
-            Assert.Equal("task1", taskResults[0]);
+            result.AssertLeft(500);
+
+            Assert.Single(results);
+            Assert.Equal("task1", results[0]);
         }
         
         [Fact]
@@ -809,7 +763,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var actionResults = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
                     actionResults.Add("task1");
@@ -818,8 +772,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 .OnSuccessVoid(() => actionResults.Add("task2"))
                 .OnSuccessVoid(() => actionResults.Add("task3"));
 
-            Assert.True(either.IsRight);
-            Assert.Equal(Unit.Instance, either.Right);
+            result.AssertRight(Unit.Instance);
 
             Assert.Equal(3, actionResults.Count);
             Assert.Equal("task1", actionResults[0]);
@@ -828,30 +781,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         }
         
         [Fact]
-        public async Task OnSuccessVoid_WithAction_Left()
+        public async Task OnSuccessVoid_WithAction_Throws()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () => 
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccessVoid(() => 
                 {
-                    taskResults.Add("task2");
-                    throw new ArgumentException("task2 failed");
+                    results.Add("task2");
+                    throw new Exception("exception thrown");
                 })
                 .OnSuccessVoid(() =>
                 {
-                    taskResults.Add("task3");
+                    results.Add("task3");
                 }));
+            
+            Assert.Equal("exception thrown", exception.Message);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
         }
         
         [Fact]
@@ -859,7 +814,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var actionResults = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
                     actionResults.Add("task1");
@@ -867,8 +822,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 })
                 .OnSuccessVoid(() => actionResults.Add("task2"));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
+            result.AssertLeft(500);
 
             Assert.Equal("task1", Assert.Single(actionResults));
         }
@@ -876,440 +830,420 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         [Fact]
         public async Task OnSuccessVoid()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccessVoid();
 
-            Assert.True(either.IsRight);
-            Assert.Equal(Unit.Instance, either.Right);
+            result.AssertRight(Unit.Instance);
 
-            Assert.Equal("task1", Assert.Single(taskResults));
+            Assert.Equal("task1", Assert.Single(results));
         }
         
         [Fact]
-        public async Task OnSuccessVoid_Left()
+        public async Task OnSuccessVoid_Throws()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () => 
                 await Task.Run(async () =>
                     {
                         await Task.Delay(20);
-                        taskResults.Add("task1");
+                        results.Add("task1");
                         return new Either<int, string>("task1");
                     })
                     .OnSuccessDo(() =>
                     {
-                        taskResults.Add("task2");
-                        throw new ArgumentException();
+                        results.Add("task2");
+                        throw new Exception("exception thrown");
                     })
                     // method under test here
                     .OnSuccessVoid()
                     .OnSuccessVoid(() =>
                     {
-                        taskResults.Add("task3");
+                        results.Add("task3");
                     }));
+            
+            Assert.Equal("exception thrown", exception.Message);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
         }
         
         [Fact]
         public async Task OnSuccessVoid_WithEitherTask()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccessVoid(previousTaskResult =>
+                .OnSuccessVoid(previousResult =>
                 {
-                    taskResults.Add(previousTaskResult + " task2");
+                    results.Add(previousResult + " task2");
                     return Task.FromResult(new Either<int, string>("task2"));
                 });
 
-            Assert.True(either.IsRight);
-            Assert.Equal(Unit.Instance, either.Right);
+            result.AssertRight(Unit.Instance);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task1 task2", results[1]);
         }
         
         [Fact]
-        public async Task OnSuccessVoid_WithEitherTask_Left()
+        public async Task OnSuccessVoid_WithEitherTask_Throws()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
                     {
                         await Task.Delay(20);
-                        taskResults.Add("task1");
+                        results.Add("task1");
                         return new Either<int, string>("task1");
                     })
-                    .OnSuccessVoid(previousTaskResult =>
+                    .OnSuccessVoid(previousResult =>
                     {
-                        taskResults.Add(previousTaskResult + " task2");
-                        throw new ArgumentException();
+                        results.Add(previousResult + " task2");
+                        throw new Exception("exception thrown");
 #pragma warning disable 162
                         return Task.FromResult(new Either<int, string>("task2"));
 #pragma warning restore 162
                     })
-                    .OnSuccessVoid(previousTaskResult =>
+                    .OnSuccessVoid(previousResult =>
                     {
-                        taskResults.Add(previousTaskResult + " task3");
+                        results.Add(previousResult + " task3");
                         return Task.FromResult(new Either<int, string>("task3"));
                     }));
+            
+            Assert.Equal("exception thrown", exception.Message);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task1 task2", results[1]);
         }
         
         [Fact]
         public async Task OnSuccessVoid_WithEitherTaskNoArg()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccessVoid(() =>
                 {
-                    taskResults.Add("task2");
+                    results.Add("task2");
                     return Task.FromResult(new Either<int, string>("task2"));
                 });
 
-            Assert.True(either.IsRight);
-            Assert.Equal(Unit.Instance, either.Right);
+            result.AssertRight(Unit.Instance);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
         }
         
         [Fact]
-        public async Task OnSuccessVoid_WithEitherTaskNoArg_Left()
+        public async Task OnSuccessVoid_WithEitherTaskNoArg_Throws()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () =>
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
                     {
                         await Task.Delay(20);
-                        taskResults.Add("task1");
+                        results.Add("task1");
                         return new Either<int, string>("task1");
                     })
                     .OnSuccessVoid(() =>
                     {
-                        taskResults.Add("task2");
-                        throw new ArgumentException();
+                        results.Add("task2");
+                        throw new Exception("exception thrown");
 #pragma warning disable 162
                         return Task.FromResult(new Either<int, string>("task2"));
 #pragma warning restore 162
                     })
                     .OnSuccessVoid(() =>
                     {
-                        taskResults.Add("task3");
+                        results.Add("task3");
                         return Task.FromResult(new Either<int, string>("task3"));
                     }));
+            
+            Assert.Equal("exception thrown", exception.Message);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
         }
         
         [Fact]
         public async Task OnSuccessDo_WithVoid()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccessDo(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add("task2");
+                    results.Add("task2");
                     await Task.Run(() => {});
                 });
 
-            Assert.True(either.IsRight);
-            Assert.Equal("task1", either.Right);
+            result.AssertRight("task1");
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
         }
 
         [Fact]
         public async Task OnSuccessDo_WithEitherTaskNoArg()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccessDo(async () => await Task.Run(() =>
                 {
                     Task.Delay(20);
-                    taskResults.Add("task2");
+                    results.Add("task2");
                     return new Either<int, string>("task2");
                 }));
             
-            Assert.True(either.IsRight);
-            Assert.Equal("task1", either.Right);
+            result.AssertRight("task1");
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
         }
 
         [Fact]
         public async Task OnSuccessDo_WithEitherTaskNoArg_Left()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 .OnSuccessDo(async () => await Task.Run(() =>
                 {
                     Task.Delay(10);
-                    taskResults.Add("task2");
+                    results.Add("task2");
                     return new Either<int, string>(500);
                 }))
                 .OnSuccessDo(async () => await Task.Run(() =>
                 {
                     Task.Delay(20);
-                    taskResults.Add("task3");
+                    results.Add("task3");
                     return new Either<int, string>(600);
                 }));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
+            result.AssertLeft(500);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
         }
 
         [Fact]
         public async Task OnSuccessDo_WithEitherTaskNoArg_Left_PriorFailure()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>(500);
                 })
                 .OnSuccessDo(async () => await Task.Run(() =>
                 {
                     Task.Delay(20);
-                    taskResults.Add("task2");
+                    results.Add("task2");
                     return new Either<int, string>("task2");
                 }));
             
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
+            result.AssertLeft(500);
 
-            Assert.Equal("task1", Assert.Single(taskResults));
+            Assert.Equal("task1", Assert.Single(results));
         }
 
         [Fact]
         public async Task OnSuccessDo_WithTask()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccessDo(async task1Results => await Task.Run(() =>
+                .OnSuccessDo(async previousResult => await Task.Run(() =>
                 {
                     Task.Delay(20);
-                    taskResults.Add(task1Results + " task2");
+                    results.Add(previousResult + " task2");
                 }))
-                .OnSuccessDo(async task1Results => await Task.Run(() =>
+                .OnSuccessDo(async previousResult => await Task.Run(() =>
                 {
                     Task.Delay(20);
-                    taskResults.Add(task1Results + " task3");
+                    results.Add(previousResult + " task3");
                 }));
             
-            Assert.True(either.IsRight);
-            Assert.Equal("task1", either.Right);
+            result.AssertRight("task1");
 
-            Assert.Equal(3, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
-            Assert.Equal("task1 task3", taskResults[2]);
+            Assert.Equal(3, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task1 task2", results[1]);
+            Assert.Equal("task1 task3", results[2]);
         }
 
         [Fact]
-        public async Task OnSuccessDo_WithTask_Left()
+        public async Task OnSuccessDo_WithTask_Throws()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            await Assert.ThrowsAsync<ArgumentException>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () => 
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccessDo(async task1Results => await Task.Run(() =>
+                .OnSuccessDo(async previousResult => await Task.Run(() =>
                 {
                     Task.Delay(10);
-                    taskResults.Add(task1Results + " task2");
-                    throw new ArgumentException();
+                    results.Add(previousResult + " task2");
+                    throw new Exception("exception thrown");
                 }))
-                .OnSuccessDo(async task1Results => await Task.Run(() =>
+                .OnSuccessDo(async previousResult => await Task.Run(() =>
                 {
                     Task.Delay(20);
-                    taskResults.Add(task1Results + " task3");
+                    results.Add(previousResult + " task3");
                 })));
+            
+            Assert.Equal("exception thrown", exception.Message);
 
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task1 task2", results[1]);
         }
 
         [Fact]
         public async Task OnSuccessDo_WithTask_Left_PriorFailure()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>(500);
                 })
                 .OnSuccessDo(async task1Result => await Task.Run(() =>
                 {
                     Task.Delay(20);
-                    taskResults.Add(task1Result + " task2");
+                    results.Add(task1Result + " task2");
                 }));
             
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
+            result.AssertLeft(500);
 
-            Assert.Equal("task1", Assert.Single(taskResults));
+            Assert.Equal("task1", Assert.Single(results));
         }
 
         [Fact]
         public async Task OnFailureDo_WithTask()
         {
-            var exception = new Exception("Something went wrong");
-            var either = await Task.FromResult(new Either<Exception, string>(exception))
-                .OnFailureDo(_ => Task.FromResult(new Exception("Another failure!")));
+            var result = await Task.FromResult(new Either<int, string>(500))
+                .OnFailureDo(_ => Task.FromResult(600));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(exception, either.Left);
-            Assert.Throws<ArgumentException>(() => either.Right);
+            result.AssertLeft(500);
         }
 
         [Fact]
         public async Task OnFailureDo_WithTask_PriorSuccess()
         {
-            var either = await Task.FromResult(new Either<Exception, string>("Success"))
-                .OnFailureDo(_ => Task.FromResult(new Exception("Something went wrong")));
+            var result = await Task.FromResult(new Either<int, string>("Success"))
+                .OnFailureDo(_ => Task.FromResult(500));
 
-            Assert.True(either.IsRight);
-            Assert.Equal("Success", either.Right);
+            result.AssertRight("Success");
         }
 
         [Fact]
         public async Task OnFailureSucceedWith()
         {
-            var exception = new Exception("Something went wrong");
-            var either = await Task.FromResult(new Either<Exception, string>(exception))
+            var result = await Task.FromResult(new Either<int, string>(500))
                 .OnFailureSucceedWith(_ => Task.FromResult("recovered from failure"));
 
-            Assert.True(either.IsRight);
-            Assert.Equal("recovered from failure", either.Right);
-            Assert.Throws<ArgumentException>(() => either.Left);
+            result.AssertRight("recovered from failure");
         }
 
         [Fact]
         public async Task OnFailureSucceedWith_PriorSuccess()
         {
-            var either = await Task.FromResult(new Either<Exception, string>("Success1"))
+            var result = await Task.FromResult(new Either<int, string>("Success1"))
                 .OnFailureSucceedWith(_ => Task.FromResult("Success2"));
 
-            Assert.True(either.IsRight);
-            Assert.Equal("Success1", either.Right);
+            result.AssertRight("Success1");
         }
         
         [Fact]
         public async Task OnFailureFailWith()
         {
-            var exception = new Exception("Something went wrong");
-            var nextException = new Exception("Another failure!");
+            var result = await Task.FromResult(new Either<int, string>(500))
+                .OnFailureFailWith(() => 600);
 
-            var either = await Task.FromResult(new Either<Exception, string>(exception))
-                .OnFailureFailWith(() => nextException);
-
-            Assert.True(either.IsLeft);
-            Assert.Equal(nextException, either.Left);
-            Assert.Throws<ArgumentException>(() => either.Right);
+            result.AssertLeft(600);
         }
         
         [Fact]
         public async Task OnFailureFailWith_GenericTask()
         {
-            var exception = new Exception("Something went wrong");
-            var nextException = new Exception("Another failure!");
+            var result = await Task.FromResult(new Either<int, string>(500))
+                .OnFailureFailWith(_ => Task.FromResult(600));
 
-            var either = await Task.FromResult(new Either<Exception, string>(exception))
-                .OnFailureFailWith(_ => Task.FromResult(nextException));
-
-            Assert.True(either.IsLeft);
-            Assert.Equal(nextException, either.Left);
-            Assert.Throws<ArgumentException>(() => either.Right);
+            result.AssertLeft(600);
         }
         
         [Fact]
         public async Task OnFailureFailWith_GenericTask_PriorFailure()
         {
-            var either = await Task.FromResult(new Either<Exception, string>("Success"))
-                .OnFailureFailWith(_ => Task.FromResult(new Exception("Something went wrong")));
+            var result = await Task.FromResult(new Either<int, string>("Success"))
+                .OnFailureFailWith(_ => Task.FromResult(500));
 
-            Assert.True(either.IsRight);
-            Assert.Equal("Success", either.Right);
+            result.AssertRight("Success");
         }
 
         [Fact]
         public async Task OnSuccessCombineWith_AllSuccess()
         {
-            var either = await Task.FromResult(new Either<int, string>("Success number one!"))
+            var result = await Task.FromResult(new Either<int, string>("Success number one!"))
                 // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
                 .OnSuccessCombineWith(firstSuccess =>
                 {
@@ -1317,14 +1251,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     return Task.FromResult(new Either<int, string>("Success number two!"));
                 });
 
-            Assert.True(either.IsRight);
-            Assert.Equal(TupleOf("Success number one!", "Success number two!"), either.Right);
+            result.AssertRight(TupleOf("Success number one!", "Success number two!"));
         }
 
         [Fact]
         public async Task OnSuccessCombineWith_AllSuccessMixedTypes()
         {
-            var either = await Task.FromResult(new Either<int, string>("Success number one!"))
+            var result = await 
+                Task.FromResult(new Either<int, string>("Success number one!"))
                 // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
                 .OnSuccessCombineWith(firstSuccess =>
                 {
@@ -1332,111 +1266,107 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     return Task.FromResult(new Either<int, char>('2'));
                 });
 
-            Assert.True(either.IsRight);
-            Assert.Equal(TupleOf("Success number one!", '2'), either.Right);
+            result.AssertRight(TupleOf("Success number one!", '2'));
         }
 
         [Fact]
         public async Task OnSuccessCombineWith_FirstFails()
         {
-            var either = await Task.FromResult(new Either<int, string>(500))
+            var result = await Task.FromResult(new Either<int, string>(500))
                 .OnSuccessCombineWith(_ =>
                 {
                     AssertFail("Second call should not be called if the first failed");
                     return Task.FromResult(new Either<int, string>("this should not be called"));
                 });
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
+            result.AssertLeft(500);
         }
 
         [Fact]
         public async Task OnSuccessCombineWith_SecondFails()
         {
-            var either = await Task.FromResult(new Either<int, string>("Success number one!"))
+            var result = await Task.FromResult(new Either<int, string>("Success number one!"))
                 .OnSuccessCombineWith(_ => Task.FromResult(new Either<int, string>(500)));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
+            result.AssertLeft(500);
         }
         
         [Fact]
         public async Task OnSuccessCombineWith_WithEitherTask()
         {
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
                     return new Either<int, string>("task1");
                 })
-                .OnSuccessCombineWith(previousTaskResult => Task.Run(async () =>
+                .OnSuccessCombineWith(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    return new Either<int, string>(previousTaskResult + " task2");
+                    return new Either<int, string>(previousResult + " task2");
                 }));
 
-            Assert.True(either.IsRight);
-            Assert.Equal("task1", either.Right.Item1);
-            Assert.Equal("task1 task2", either.Right.Item2);
+            Assert.True(result.IsRight);
+            Assert.Equal("task1", result.Right.Item1);
+            Assert.Equal("task1 task2", result.Right.Item2);
         }
         
         [Fact]
         public async Task OnSuccessCombineWith_WithEitherTask_Left()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccessCombineWith(previousTaskResult => Task.Run(async () =>
+                .OnSuccessCombineWith(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(10);
-                    taskResults.Add(previousTaskResult + " task2");
+                    results.Add(previousResult + " task2");
                     return new Either<int, string>(500);
                 }))
-                .OnSuccessCombineWith(previousTaskResult => Task.Run(async () =>
+                .OnSuccessCombineWith(previousResult => Task.Run(async () =>
                 {
                     await Task.Delay(0);
-                    taskResults.Add(previousTaskResult + " task3");
-                    return new Either<int, string>(previousTaskResult + " task3");
+                    results.Add(previousResult + " task3");
+                    return new Either<int, string>(previousResult + " task3");
                 }));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
+            result.AssertLeft(500);
             
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task1 task2", taskResults[1]);
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task1 task2", results[1]);
         }
         
         [Fact]
         public async Task OnSuccessCombineWith_WithEitherTaskTuple3()
         {
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
                     return new Either<int, string>("task1");
                 })
                 // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-                .OnSuccessCombineWith(previousTaskResult => Task.Run(async () =>
+                .OnSuccessCombineWith(previousResult => Task.Run(async () =>
                 {
-                    Assert.Equal("task1", previousTaskResult);
+                    Assert.Equal("task1", previousResult);
                     await Task.Delay(10);
                     return new Either<int, string>("task2");
                 }))
                 // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-                .OnSuccessCombineWith(previousTaskResult => Task.Run(async () =>
+                .OnSuccessCombineWith(previousResult => Task.Run(async () =>
                 {
-                    Assert.Equal("task1", previousTaskResult.Item1);
-                    Assert.Equal("task2", previousTaskResult.Item2);
+                    Assert.Equal("task1", previousResult.Item1);
+                    Assert.Equal("task2", previousResult.Item2);
                     await Task.Delay(10);
                     return new Either<int, string>("task3");
                 }));
 
-            Assert.True(either.IsRight);
-            var (value1, value2, value3) = either.Right;
+            Assert.True(result.IsRight);
+            var (value1, value2, value3) = result.Right;
             Assert.Equal("task1", value1);
             Assert.Equal("task2", value2);
             Assert.Equal("task3", value3);
@@ -1445,74 +1375,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         [Fact]
         public async Task OnSuccessCombineWith_WithEitherTaskTuple3_Left()
         {
-            var taskResults = new List<string>();
+            var results = new List<string>();
 
-            var either = await Task.Run(async () =>
+            var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
-                    taskResults.Add("task1");
+                    results.Add("task1");
                     return new Either<int, string>("task1");
                 })
                 // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-                .OnSuccessCombineWith(previousTaskResult => Task.Run(async () =>
+                .OnSuccessCombineWith(previousResult => Task.Run(async () =>
                 {
-                    Assert.Equal("task1", previousTaskResult);
+                    Assert.Equal("task1", previousResult);
                     await Task.Delay(10);
-                    taskResults.Add("task2");
+                    results.Add("task2");
                     return new Either<int, string>(500);
                 }))
                 // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
-                .OnSuccessCombineWith(previousTaskResult => Task.Run(async () =>
+                .OnSuccessCombineWith(previousResult => Task.Run(async () =>
                 {
-                    Assert.Equal("task1", previousTaskResult.Item1);
-                    Assert.Equal("task2", previousTaskResult.Item2);
+                    Assert.Equal("task1", previousResult.Item1);
+                    Assert.Equal("task2", previousResult.Item2);
                     await Task.Delay(0);
-                    taskResults.Add("task3");
+                    results.Add("task3");
                     return new Either<int, string>("task3");
                 }));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(500, either.Left);
-            
-            Assert.Equal(2, taskResults.Count);
-            Assert.Equal("task1", taskResults[0]);
-            Assert.Equal("task2", taskResults[1]);
+            result.AssertLeft(500);
+
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
         }
 
         [Fact]
         public async Task OrElse_EitherTask_FirstSucceeds()
         {
-            var either = await Task.FromResult(new Either<int, string>("Success number one!"))
+            var result = await Task.FromResult(new Either<int, string>("Success number one!"))
                 .OrElse(() =>
                 {
                     AssertFail("Second call should not be called if the first succeeds");
                     return Task.FromResult(new Either<int, string>("this should not be called"));
                 });
 
-            Assert.True(either.IsRight);
-            Assert.Equal("Success number one!", either.Right);
-            Assert.Throws<ArgumentException>(() => either.Left);
+            result.AssertRight("Success number one!");
         }
 
         [Fact]
         public async Task OrElse_EitherTask_FirstFails()
         {
-            var either = await Task.FromResult(new Either<int, string>(500))
+            var result = await Task.FromResult(new Either<int, string>(500))
                 .OrElse(() => Task.FromResult(new Either<int, string>("Success number two!")));
 
-            Assert.True(either.IsRight);
-            Assert.Equal("Success number two!", either.Right);
-            Assert.Throws<ArgumentException>(() => either.Left);
+            result.AssertRight("Success number two!");
         }
 
         [Fact]
         public async Task OrElse_EitherTask_BothFail()
         {
-            var either = await Task.FromResult(new Either<int, string>(500))
+            var result = await Task.FromResult(new Either<int, string>(500))
                 .OrElse(() => Task.FromResult(new Either<int, string>(600)));
 
-            Assert.True(either.IsLeft);
-            Assert.Equal(600, either.Left);
+            result.AssertLeft(600);
         }
 
         [Fact]
@@ -1540,15 +1464,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         [Fact]
         public async Task OrElse_GenericTaskNoArg_BothFail()
         {
-            await Assert.ThrowsAsync<ArgumentException>(() =>
+            var exception = await Assert.ThrowsAsync<Exception>(() =>
                 Task.FromResult(new Either<int, string>(500))
                 .OrElse(() =>
                 {
-                    throw new ArgumentException();
+                    throw new Exception("exception thrown");
 #pragma warning disable 162
                     return "failure";
 #pragma warning restore 162
                 }));
+            
+            Assert.Equal("exception thrown", exception.Message);
         }
 
         [Fact]
@@ -1566,7 +1492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var failures = new List<int>();
 
-            var either = await Task.FromResult(new Either<int, string>(500))
+            var result = await Task.FromResult(new Either<int, string>(500))
                 .OnFailureVoid(
                     failure =>
                     {
@@ -1574,7 +1500,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     }
                 );
 
-            either.AssertLeft();
+            result.AssertLeft();
 
             var failure = Assert.Single(failures);
             Assert.Equal(500, failure);
@@ -1585,7 +1511,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var failures = new List<int>();
 
-            var either = await Task.FromResult(new Either<int, string>("Success"))
+            var result = await Task.FromResult(new Either<int, string>("Success"))
                 .OnFailureVoid(
                     failure =>
                     {
@@ -1593,7 +1519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     }
                 );
 
-            either.AssertRight("Success");
+            result.AssertRight("Success");
 
             Assert.Empty(failures);
         }
@@ -1649,10 +1575,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             
             var eitherList = ListOf(eitherTask1, eitherTask2, eitherTask3);
 
-            var results = await eitherList.OnSuccessAll();
-            
-            Assert.True(results.IsLeft);
-            Assert.Equal(500, results.Left);
+            var result = await eitherList.OnSuccessAll();
+
+            result.AssertLeft(500);
         }
     }
 }
