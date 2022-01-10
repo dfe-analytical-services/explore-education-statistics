@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model
@@ -5,12 +6,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model
     public class PublicationNotificationMessage
     {
         public Guid PublicationId { get; set; }
-        public string Name { get; set; }
-        public string Slug { get; set; }
+        public string PublicationName { get; set; } = "";
+        public string PublicationSlug { get; set; } = "";
+
+        public string ReleaseName { get; set; } = "";
+        public string ReleaseSlug { get; set; } = "";
+
+        public bool Amendment { get; set; }
+        public string UpdateNote { get; set; } = "";
 
         protected bool Equals(PublicationNotificationMessage other)
         {
-            return Name == other.Name && PublicationId.Equals(other.PublicationId) && Slug == other.Slug;
+            return PublicationId.Equals(other.PublicationId)
+                   && PublicationName == other.PublicationName
+                   && PublicationSlug == other.PublicationSlug
+                   && ReleaseName == other.ReleaseName
+                   && ReleaseSlug == other.ReleaseSlug;
         }
 
         public override bool Equals(object? obj)
@@ -23,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier.Model
 
         public override int GetHashCode()
         {
-            return HashCode.Combine(Name, PublicationId, Slug);
+            return HashCode.Combine(PublicationId, PublicationName, PublicationSlug, ReleaseName, ReleaseSlug, Amendment);
         }
     }
 }

@@ -1,14 +1,12 @@
+#nullable enable
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
 
@@ -30,17 +28,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var releasesToNotify = _context.Releases
                 .Include(r => r.ReleaseStatuses)
+                .Include(r => r.Updates) // used by BuildPublicationNotificationMessage
+                .Include(r => r.Publication) // used by BuildPublicationNotificationMessage
                 .Where(r => releaseIds.Contains(r.Id))
+                .Distinct()
                 .ToList()
                 .Where(r => r.NotifySubscribers)
                 .ToList();
-            var releaseIdsToNotify = releasesToNotify
-                .Select(r => r.Id)
-                .ToArray();
-            var publications = GetPublications(releaseIdsToNotify);
-            var messages = publications
-                .Select(BuildPublicationNotificationMessage)
-                .ToList();
+            var messages = await releasesToNotify
+                .ToAsyncEnumerable()
+                .SelectAwait(async release => await BuildPublicationNotificationMessage(release))
+                .ToListAsync();
             if (messages.Count > 0)
             {
                 await _storageQueueService.AddMessages(PublicationQueue, messages);
@@ -57,22 +55,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private IEnumerable<Publication> GetPublications(IEnumerable<Guid> releaseIds)
+        private async Task<PublicationNotificationMessage> BuildPublicationNotificationMessage(Release release)
         {
-            return _context.Releases
-                .AsNoTracking()
-                .Where(release => releaseIds.Contains(release.Id))
-                .Select(release => release.Publication)
-                .Distinct();
-        }
+            await _context.Entry(release)
+                .Reference(r => r.Publication)
+                .LoadAsync();
 
-        private static PublicationNotificationMessage BuildPublicationNotificationMessage(Publication publication)
-        {
+            await _context.Entry(release)
+                .Collection(r => r.Updates)
+                .LoadAsync();
+
+            var latestUpdateNote = release.Updates
+                .OrderBy(u => u.Created)
+                .LastOrDefault();
+
+            var latestUpdateNoteReason =
+                latestUpdateNote != null ? latestUpdateNote.Reason : "No update note provided.";
+
             return new PublicationNotificationMessage
             {
-                Name = publication.Title,
-                PublicationId = publication.Id,
-                Slug = publication.Slug
+                PublicationId = release.Publication.Id,
+                PublicationName = release.Publication.Title,
+                PublicationSlug = release.Publication.Slug,
+                ReleaseName = release.Title,
+                ReleaseSlug = release.Slug,
+                Amendment = release.Version > 0,
+                UpdateNote = latestUpdateNoteReason,
             };
         }
     }

@@ -6,6 +6,8 @@
     "NotifyApiKey": "change-me",
     "VerificationEmailTemplateId": "change-me",
     "PublicationNotificationEmailTemplateId": "change-me",
+    "OriginalReleasePublicationEmailTemplateId": "change-me",
+    "AmendedReleasePublicationEmailTemplateId": "change-me",
     "SubscriptionConfirmationEmailTemplateId": "change-me",
     "TokenSecretKey": "change-me",
     "BaseUrl": "http://localhost:7073/api/publication/",

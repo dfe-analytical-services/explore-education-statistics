@@ -270,6 +270,20 @@
         "description": "Gov UK Notify service template Id for new release notification"
       }
     },
+    "originalReleasePublicationEmailTemplateId": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for amended release notification"
+      }
+    },
+    "amendedReleasePublicationEmailTemplateId": {
+      "type": "securestring",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for new release notification"
+      }
+    },
     "subscriptionConfirmationEmailTemplateId": {
       "type": "securestring",
       "defaultValue": "",
