@@ -1,5 +1,4 @@
 /* eslint-disable no-console */
-import faker from 'faker';
 import chalk from 'chalk';
 import adminApi from '../utils/adminApi';
 
@@ -54,7 +53,7 @@ const methodologyService = {
     await adminApi.put(
       `/api/methodology/${methodologyId}/content/section/${sectionId}/block/${blockId}`,
       {
-        body: `<p>${faker.lorem.lines(100)}</p>`,
+        body: `<p>Ad ullamco reprehenderit sunt reprehenderit tempor est proident dolor. Nisi occaecat ut duis qui duis eu exercitation ex aute incididunt nisi fugiat est. Incididunt laboris sit aliqua culpa anim culpa. Fugiat id minim laborum pariatur sint fugiat. Ea.</p>`,
       },
     );
   },

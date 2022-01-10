@@ -11,3 +11,5 @@ clean-test-*.zip
 test-files
 test-results
 zip-files
+coverage 
+.swc

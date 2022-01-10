@@ -1,8 +1,8 @@
 /* eslint-disable no-console */
-import { random } from 'faker';
+import { randomInt } from 'crypto';
 import adminApi from '../utils/adminApi';
 
-const id = random.alphaNumeric(10);
+const id = randomInt(1, 30);
 
 const topicService = {
   renameTopic: async (topicId: string, themeId: string): Promise<string> => {
