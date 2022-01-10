@@ -108,8 +108,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             services.AddHealthChecks();
 
+            /*
+             * Logging
+             */
+
             services.AddApplicationInsightsTelemetry()
                 .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
+
+            /*
+             * Web configuration
+             */
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -124,6 +132,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options => { options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(",")); }
                 )
                 .AddControllersAsServices();
+
+            services.AddMvc(options =>
+                {
+                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
+                    options.Filters.Add(new OperationCancelledExceptionFilter());
+                    options.EnableEndpointRouting = false;
+                    options.AllowEmptyInputInBodyModelBinding = true;
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
+
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
+            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
+            /*
+             * Database contexts
+             */
 
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
@@ -149,6 +178,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         })
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
+
+            /*
+             * Auth / IdentityServer
+             */
 
             // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("roles");
@@ -224,16 +257,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'";
             });
 
+            /*
+             * Configuration options
+             */
+
             services.Configure<PreReleaseOptions>(Configuration);
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
-
-            // here we configure our security policies
-            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
-
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
+            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
+
+            /*
+             * Services
+             */
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             services.AddTransient<IMyReleasePermissionsResolver,
                 MyReleasePermissionsResolver>();
             services.AddTransient<IMyPublicationPermissionsResolver,
@@ -242,22 +282,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 MyPublicationMethodologyVersionPermissionsResolver>();
             services.AddTransient<IMyMethodologyVersionPermissionsResolver,
                 MyMethodologyVersionPermissionsResolver>();
-
-            services.AddMvc(options =>
-                {
-                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
-                    options.Filters.Add(new OperationCancelledExceptionFilter());
-                    options.EnableEndpointRouting = false;
-                    options.AllowEmptyInputInBodyModelBinding = true;
-                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                });
-
-            // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddTransient<IDataImportRepository, DataImportRepository>();
@@ -456,6 +480,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")
                 )
             );
+
+            /*
+             * Swagger
+             */
 
             services.AddSwaggerGen(c =>
             {
