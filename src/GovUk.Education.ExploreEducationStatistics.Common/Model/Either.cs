@@ -58,9 +58,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public T FoldRight<T>(Func<TR, T> rightFunc, T defaultValue) => IsRight ? rightFunc(Right) : defaultValue;
 
-        public static implicit operator Either<TL, TR>(TL left) => new Either<TL, TR>(left);
+        public static implicit operator Either<TL, TR>(TL left) => new(left);
 
-        public static implicit operator Either<TL, TR>(TR right) => new Either<TL, TR>(right);
+        public static implicit operator Either<TL, TR>(TR right) => new(right);
     }
 
     public static class EitherTaskExtensions
@@ -177,6 +177,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             }
 
             return await func();
+        }
+        
+        [Obsolete("Use OnSuccessDo or OnSuccessVoid for chaining a non-generic Task")]
+        public static async Task<Either<TFailure, Unit>> OnSuccess<TFailure, TSuccess1>(
+            this Task<Either<TFailure, TSuccess1>> task,
+            Func<TSuccess1, Task> func)
+        {
+            return await task.OnSuccess(async success =>
+                {
+                    await func(success);
+                    return Unit.Instance;
+                }
+            );
         }
 
         public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
