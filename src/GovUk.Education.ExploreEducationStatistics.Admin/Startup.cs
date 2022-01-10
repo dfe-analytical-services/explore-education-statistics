@@ -110,12 +110,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.Secure = CookieSecurePolicy.Always;
             });
 
-            services.AddControllers(
-                options =>
-                {
-                    options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
-                }
-            );
+            services
+                .AddControllers(
+                    options =>
+                    {
+                        options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
+                    }
+                )
+                .AddControllersAsServices();
 
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
