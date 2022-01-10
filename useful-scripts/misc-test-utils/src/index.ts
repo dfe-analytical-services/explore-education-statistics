@@ -14,6 +14,7 @@ import createPublication from './modules/publication/createPublication';
 import addReleaseTextContentBlock from './modules/release/addContentBlock';
 import themeService from './services/themeService';
 import topicService from './services/topicService';
+import Guid from './utils/Guid';
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -47,12 +48,24 @@ const start = async () => {
           type: 'input',
           message: 'Topic ID',
           prefix: '>',
+          validate: async input => {
+            if (!Guid.isGuid(input)) {
+              return 'Not a valid GUID';
+            }
+            return true;
+          },
         });
         const theme = await inquirer.prompt({
           name: 'id',
           type: 'input',
           message: 'Theme ID',
           prefix: '>',
+          validate: async input => {
+            if (!Guid.isGuid(input)) {
+              return 'Not a valid GUID';
+            }
+            return true;
+          },
         });
         await topicService.renameTopic(topic.id, theme.id);
         await themeService.renameTheme(theme.id);
@@ -73,6 +86,12 @@ const start = async () => {
           type: 'input',
           message: 'Release ID from existing publication',
           prefix: '>',
+          validate: async input => {
+            if (!Guid.isGuid(input)) {
+              return 'Not a valid GUID';
+            }
+            return true;
+          },
         });
 
         const numOfSubjects = await inquirer.prompt({
@@ -101,6 +120,12 @@ const start = async () => {
           type: 'input',
           message: 'publication ID from existing publication',
           prefix: '>',
+          validate: async input => {
+            if (!Guid.isGuid(input)) {
+              return 'Not a valid GUID';
+            }
+            return true;
+          },
         });
         await createMethodology(publication.id);
         break;
@@ -136,6 +161,12 @@ const start = async () => {
                 type: 'input',
                 message: 'methodology ID from existing publication',
                 prefix: '>',
+                validate: async input => {
+                  if (!Guid.isGuid(input)) {
+                    return 'Not a valid GUID';
+                  }
+                  return true;
+                },
               });
 
               for (let i = 0; i < times.number; i += 1) {
@@ -172,6 +203,12 @@ const start = async () => {
                 type: 'input',
                 message: 'release ID from existing release',
                 prefix: '>',
+                validate: async input => {
+                  if (!Guid.isGuid(input)) {
+                    return 'Not a valid GUID';
+                  }
+                  return true;
+                },
               });
               for (let i = 0; i < times.number; i += 1) {
                 await addReleaseTextContentBlock(existingRelease.id);

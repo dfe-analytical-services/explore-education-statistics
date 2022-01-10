@@ -1,9 +1,9 @@
 /* eslint-disable no-console */
-import { random } from 'faker';
 import chalk from 'chalk';
+import { randomInt } from 'crypto';
 import adminApi from '../utils/adminApi';
 
-const id = random.alphaNumeric(10);
+const id = randomInt(10, 100);
 
 const themeService = {
   deleteTheme: async (themeId: string): Promise<void> => {
