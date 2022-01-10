@@ -52,18 +52,30 @@ DECLARE
                 OR EXISTS(SELECT TOP 1 1 FROM @schools)
                 OR EXISTS(SELECT TOP 1 1 FROM @sponsors)
                 OR EXISTS(SELECT TOP 1 1 FROM @wards), 1, 0) AS BIT),
+    @filterItemsExist BIT = CAST(IIF(EXISTS(SELECT TOP 1 1 FROM @filterItemIds), 1, 0) AS BIT),
+    @uniqueFiltersCount INT = 0,
     @paramDefinition NVARCHAR(2000),
     @ids NVARCHAR(MAX),
     @sql NVARCHAR(MAX)
 
-    CREATE TABLE #FilterItemId(Id uniqueidentifier)
-    INSERT INTO #FilterItemId SELECT * FROM @filterItemIds
-    
+    IF (@filterItemsExist = 1)
+        BEGIN
+            CREATE TABLE #FilterItemId(Id uniqueidentifier PRIMARY KEY NOT NULL)
+            INSERT INTO #FilterItemId SELECT * FROM @filterItemIds ORDER BY id
+
+            SET @uniqueFiltersCount = (
+                SELECT COUNT(DISTINCT filterGroup.FilterId) 
+                FROM #FilterItemId filterItemId
+                JOIN FilterItem filterItem ON filterItem.Id = filterItemId.Id 
+                JOIN FilterGroup filterGroup ON filterGroup.Id = filterItem.FilterGroupId
+            )                   
+        END
+
     SET @sql = N'SELECT o.id ' +
-                 'FROM Observation o ' +
-                 'JOIN Location l ON o.LocationId = l.Id '
+                'FROM Observation o ' +
+                'JOIN Location l ON o.LocationId = l.Id '
     
-    IF (EXISTS(SELECT * FROM #FilterItemId))
+    IF (@filterItemsExist = 1)
         SET @sql += N'JOIN ObservationFilterItem ofi ON o.Id = ofi.ObservationId ' +
                      'JOIN #FilterItemId filterItemId ON ofi.FilterItemId = filterItemId.id '
 
@@ -187,57 +199,20 @@ DECLARE
             SET @sql = left(@sql, len(@sql) - 3) + N') '
         END
 
-    IF (EXISTS(SELECT * FROM #FilterItemId))
+    IF (@filterItemsExist = 1)
         SET @sql += N'GROUP BY o.Id ' +
-                     'HAVING COUNT(DISTINCT ofi.FilterId) = ' +
-                     '(SELECT COUNT(f.Id) FROM Filter f WHERE f.SubjectId = @subjectId)'
+                     'HAVING COUNT(DISTINCT ofi.FilterId) = @uniqueFiltersCount '
 
     SET @sql += N'ORDER BY o.Id;'
 
     SET @paramDefinition = N'@subjectId uniqueidentifier,
-                           @filterItemIds IdListGuidType READONLY,
-                           @timePeriods TimePeriodListType READONLY,
-                           @geographicLevel nvarchar(6) = NULL,
-                           @countries IdListVarcharType READONLY,
-                           @englishDevolvedAreas IdListVarcharType READONLY,
-                           @institutions IdListVarcharType READONLY,
-                           @localAuthorities IdListVarcharType READONLY,
-                           @localAuthorityOldCodes IdListVarcharType READONLY,
-                           @localAuthorityDistricts IdListVarcharType READONLY,
-                           @localEnterprisePartnerships IdListVarcharType READONLY,
-                           @mayoralCombinedAuthorities IdListVarcharType READONLY,
-                           @multiAcademyTrusts IdListVarcharType READONLY,
-                           @opportunityAreas IdListVarcharType READONLY,
-                           @parliamentaryConstituencies IdListVarcharType READONLY,
-                           @planningAreas IdListVarcharType READONLY,
-                           @providers IdListVarcharType READONLY,
-                           @regions IdListVarcharType READONLY,
-                           @rscRegions IdListVarcharType READONLY,
-                           @schools IdListVarcharType READONLY,
-                           @sponsors IdListVarcharType READONLY,
-                           @wards IdListVarcharType READONLY'
+                             @timePeriods TimePeriodListType READONLY,
+                             @geographicLevel nvarchar(6) = NULL,
+                             @uniqueFiltersCount INT = NULL'
     EXEC sp_executesql
          @sql,
          @paramDefinition,
          @subjectId = @subjectId,
-         @filterItemIds = @filterItemIds,
          @timePeriods = @timePeriods,
          @geographicLevel = @geographicLevel,
-         @countries = @countries,
-         @englishDevolvedAreas = @englishDevolvedAreas,
-         @institutions = @institutions,
-         @localAuthorities = @localAuthorities,
-         @localAuthorityOldCodes = @localAuthorityOldCodes,
-         @localAuthorityDistricts = @localAuthorityDistricts,
-         @localEnterprisePartnerships = @localEnterprisePartnerships,
-         @mayoralCombinedAuthorities = @mayoralCombinedAuthorities,
-         @multiAcademyTrusts = @multiAcademyTrusts,
-         @opportunityAreas = @opportunityAreas,
-         @parliamentaryConstituencies = @parliamentaryConstituencies,
-         @planningAreas = @planningAreas,
-         @providers = @providers,
-         @regions = @regions,
-         @rscRegions = @rscRegions,
-         @schools = @schools,
-         @sponsors = @sponsors,
-         @wards = @wards;
+         @uniqueFiltersCount = @uniqueFiltersCount;

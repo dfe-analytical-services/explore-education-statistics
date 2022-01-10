@@ -14,15 +14,27 @@ DECLARE
     @timePeriodCount INT = (SELECT COUNT(year) FROM @timePeriods),
     @paramDefinition NVARCHAR(2000),
     @locationIdsList NVARCHAR(MAX) = (SELECT CONCAT(CONCAT('''', CAST((SELECT STRING_AGG(CAST(Id AS NVARCHAR(MAX)), ''',''') FROM @locationIds) AS NVARCHAR(MAX))), '''')),
+    @filterItemsExist BIT = CAST(IIF(EXISTS(SELECT TOP 1 1 FROM @filterItemIds), 1, 0) AS BIT),
+    @uniqueFiltersCount INT = 0,
     @sql NVARCHAR(MAX)
 
-    CREATE TABLE #FilterItemId(Id uniqueidentifier)
-    INSERT INTO #FilterItemId SELECT * FROM @filterItemIds
+    IF (@filterItemsExist = 1)
+        BEGIN
+            CREATE TABLE #FilterItemId(Id uniqueidentifier PRIMARY KEY NOT NULL)
+            INSERT INTO #FilterItemId SELECT * FROM @filterItemIds ORDER BY id
+        
+            SET @uniqueFiltersCount = (
+                SELECT COUNT(DISTINCT filterGroup.FilterId) 
+                FROM #FilterItemId filterItemId
+                JOIN FilterItem filterItem ON filterItem.Id = filterItemId.Id 
+                JOIN FilterGroup filterGroup ON filterGroup.Id = filterItem.FilterGroupId
+            )
+        END
 
     SET @sql = N'SELECT o.id ' +
                 'FROM Observation o '
                 
-    IF (EXISTS(SELECT * FROM #FilterItemId))
+    IF (@filterItemsExist = 1)
         SET @sql += N'JOIN ObservationFilterItem ofi ON o.Id = ofi.ObservationId ' +
                      'JOIN #FilterItemId filterItemId ON ofi.FilterItemId = filterItemId.id '
 
@@ -32,21 +44,18 @@ DECLARE
     IF (@timePeriodCount > 0)
         SET @sql += N'AND EXISTS(SELECT 1 from @timePeriods t WHERE t.year = o.Year AND t.timeIdentifier = o.TimeIdentifier) '
 
-    IF (EXISTS(SELECT * FROM #FilterItemId))
+    IF (@filterItemsExist = 1)
         SET @sql += N'GROUP BY o.Id ' +
-                     'HAVING COUNT(DISTINCT ofi.FilterId) = ' +
-                     '(SELECT COUNT(f.Id) FROM Filter f WHERE f.SubjectId = @subjectId)'
+                     'HAVING COUNT(DISTINCT ofi.FilterId) = @uniqueFiltersCount '
 
     SET @sql += N'ORDER BY o.Id;'
 
     SET @paramDefinition = N'@subjectId uniqueidentifier,
-                           @filterItemIds IdListGuidType READONLY,
-                           @locationIds IdListGuidType READONLY,
-                           @timePeriods TimePeriodListType READONLY'
+                             @timePeriods TimePeriodListType READONLY,
+                             @uniqueFiltersCount INT = NULL'
     EXEC sp_executesql
          @sql,
          @paramDefinition,
          @subjectId = @subjectId,
-         @filterItemIds = @filterItemIds,
-         @locationIds = @locationIds,
-         @timePeriods = @timePeriods;
+         @timePeriods = @timePeriods,
+         @uniqueFiltersCount = @uniqueFiltersCount;
