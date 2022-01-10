@@ -456,8 +456,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 })
                 .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
                 .OnSuccessDo(deletePlan => _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan))
-                .OnSuccess(deletePlan => _releaseSubjectRepository.SoftDeleteReleaseSubject(releaseId, deletePlan.SubjectId))
-                .OnSuccess(_ => _releaseDataFileService.Delete(releaseId, fileId));
+                .OnSuccessVoid(deletePlan => _releaseSubjectRepository.SoftDeleteReleaseSubject(releaseId, deletePlan.SubjectId))
+                .OnSuccess(() => _releaseDataFileService.Delete(releaseId, fileId));
         }
 
         public async Task<Either<ActionResult, DataImportViewModel>> GetDataFileImportStatus(Guid releaseId, Guid fileId)
