@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.True(result.IsLeft);
             Assert.False(result.IsRight);
             Assert.Equal("a failure", result.Left);
-            Assert.Throws<Exception>(() => result.Right);
+            Assert.Throws<ArgumentException>(() => result.Right);
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.True(result.IsRight);
             Assert.False(result.IsLeft);
             Assert.Equal("a success", result.Right);
-            Assert.Throws<Exception>(() => result.Left);
+            Assert.Throws<ArgumentException>(() => result.Left);
         }
 
         [Fact]
