@@ -1,3 +1,4 @@
+import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import FiltersForm, {
   TableQueryErrorCode,
 } from '@common/modules/table-tool/components/FiltersForm';
@@ -8,7 +9,6 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
-import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 
 describe('FiltersForm', () => {
   const testSubjectMeta: SubjectMeta = {
@@ -222,11 +222,12 @@ describe('FiltersForm', () => {
   const testWizardStepProps: InjectedWizardProps = {
     currentStep: 1,
     isActive: true,
+    isEnabled: true,
     isLoading: false,
     stepNumber: 1,
-    setCurrentStep: noop,
-    goToNextStep: noop,
-    goToPreviousStep: noop,
+    setCurrentStep: (step, task) => task?.(),
+    goToNextStep: task => task?.(),
+    goToPreviousStep: task => task?.(),
     shouldScroll: false,
   };
 
@@ -608,11 +609,10 @@ describe('FiltersForm', () => {
   });
 
   test('shows table size error when the correct error response is returned from the API', async () => {
-    const onSubmit = jest.fn();
     const errorResponse = createServerValidationErrorMock<TableQueryErrorCode>([
       'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE',
     ]);
-    onSubmit.mockRejectedValue(errorResponse);
+    const onSubmit = jest.fn(() => Promise.reject(errorResponse));
 
     render(
       <FiltersForm
@@ -636,36 +636,30 @@ describe('FiltersForm', () => {
     userEvent.click(screen.getByLabelText('Number of excluded sessions'));
     userEvent.click(screen.getByLabelText('Total'));
 
-    userEvent.click(
-      screen.getByRole('button', {
-        name: 'Create table',
-      }),
-    );
+    userEvent.click(screen.getByRole('button', { name: 'Create table' }));
 
     await waitFor(() => {
       expect(screen.getByText(/Could not create table/)).toBeInTheDocument();
-      expect(
-        screen.getByText(/exceed the maximum allowed table size/),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          /Select different filters or download the subject data/,
-        ),
-      ).toBeInTheDocument();
-      expect(screen.getByText(/Download Subject 1/)).toBeInTheDocument();
-      expect(screen.getByText(/csv, 100mb/)).toBeInTheDocument();
-      expect(
-        screen.getByText(/available when the release is published/),
-      ).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByText(/exceed the maximum allowed table size/),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Select different filters or download the subject data/),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Download Subject 1/)).toBeInTheDocument();
+    expect(screen.getByText(/csv, 100mb/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/available when the release is published/),
+    ).toBeInTheDocument();
   });
 
   test('shows table timeout error when the correct error response is returned from the API', async () => {
-    const onSubmit = jest.fn();
     const errorResponse = createServerValidationErrorMock<TableQueryErrorCode>([
       'REQUEST_CANCELLED',
     ]);
-    onSubmit.mockRejectedValue(errorResponse);
+    const onSubmit = jest.fn(() => Promise.reject(errorResponse));
 
     render(
       <FiltersForm
@@ -689,25 +683,22 @@ describe('FiltersForm', () => {
     userEvent.click(screen.getByLabelText('Number of excluded sessions'));
     userEvent.click(screen.getByLabelText('Total'));
 
-    userEvent.click(
-      screen.getByRole('button', {
-        name: 'Create table',
-      }),
-    );
+    userEvent.click(screen.getByRole('button', { name: 'Create table' }));
 
     await waitFor(() => {
       expect(screen.getByText(/Could not create table/)).toBeInTheDocument();
-      expect(screen.getByText(/took too long to respond/)).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          /Select different filters, try again later or download the subject data/,
-        ),
-      ).toBeInTheDocument();
-      expect(screen.getByText(/Download Subject 1/)).toBeInTheDocument();
-      expect(screen.getByText(/csv, 100mb/)).toBeInTheDocument();
-      expect(
-        screen.getByText(/available when the release is published/),
-      ).toBeInTheDocument();
     });
+
+    expect(screen.getByText(/took too long to respond/)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Select different filters, try again later or download the subject data/,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Download Subject 1/)).toBeInTheDocument();
+    expect(screen.getByText(/csv, 100mb/)).toBeInTheDocument();
+    expect(
+      screen.getByText(/available when the release is published/),
+    ).toBeInTheDocument();
   });
 });

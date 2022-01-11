@@ -1,3 +1,4 @@
+import useMountedRef from '@common/hooks/useMountedRef';
 import isComponentType from '@common/utils/type-guards/components/isComponentType';
 import React, {
   Children,
@@ -14,11 +15,27 @@ export interface InjectedWizardProps {
   shouldScroll: boolean;
   stepNumber: number;
   currentStep: number;
-  setCurrentStep(step: number): void;
   isActive: boolean;
+  isEnabled: boolean;
   isLoading: boolean;
-  goToNextStep(): void;
-  goToPreviousStep(): void;
+  loadingStep?: number;
+  /**
+   * Move the wizard to a specific {@param step}.
+   *
+   * An optional {@param task} can be provided to
+   * run before the step transition completes.
+   */
+  setCurrentStep(step: number, task?: () => Promise<void>): void;
+  /**
+   * Provide an optional {@param task} that should
+   * run before the step transition completes.
+   */
+  goToNextStep(task?: () => Promise<void>): void;
+  /**
+   * Provide an optional {@param task} that should
+   * run before the step transition completes.
+   */
+  goToPreviousStep(task?: () => Promise<void>): void;
 }
 
 interface Props {
@@ -39,10 +56,12 @@ const Wizard = ({
   scrollOnMount = false,
   onStepChange,
 }: Props) => {
+  const mountedRef = useMountedRef();
+
   const [shouldScroll, setShouldScroll] = useState(scrollOnMount);
   const [currentStep, setCurrentStepState] = useState(initialStep);
 
-  const [loading, setLoading] = useState<number>();
+  const [loadingStep, setLoadingStep] = useState<number>();
 
   const filteredChildren = Children.toArray(children).filter(child =>
     isComponentType(child, WizardStep),
@@ -50,7 +69,14 @@ const Wizard = ({
 
   const lastStep = filteredChildren.length;
 
-  const setCurrentStep = async (nextStep: number) => {
+  const setCurrentStep = async (
+    nextStep: number,
+    task?: () => Promise<void>,
+  ) => {
+    if (nextStep > lastStep || nextStep < 1) {
+      return;
+    }
+
     setShouldScroll(true);
 
     const current = currentStep;
@@ -60,16 +86,24 @@ const Wizard = ({
       next = await onStepChange(nextStep, currentStep);
     }
 
-    setCurrentStepState(next);
+    setLoadingStep(next);
 
     const stepElement = filteredChildren[next - 1];
 
     if (next < current && stepElement?.props?.onBack) {
-      setLoading(next);
-
       await stepElement.props.onBack();
+    }
 
-      setLoading(undefined);
+    try {
+      if (task) {
+        await task();
+      }
+
+      setCurrentStepState(next);
+    } finally {
+      if (mountedRef.current) {
+        setLoadingStep(undefined);
+      }
     }
   };
 
@@ -85,21 +119,20 @@ const Wizard = ({
         return cloneElement<WizardStepProps & InjectedWizardProps>(child, {
           stepNumber,
           currentStep,
+          loadingStep,
           shouldScroll,
-          async setCurrentStep(nextStep: number) {
-            if (nextStep <= lastStep && nextStep >= 1) {
-              await setCurrentStep(nextStep);
-            }
-          },
+          setCurrentStep,
           id: child.props.id || `${id}-step-${stepNumber}`,
           isActive: stepNumber === currentStep,
-          isLoading: loading === stepNumber,
-          async goToPreviousStep() {
-            await setCurrentStep(stepNumber - 1 < 1 ? 1 : stepNumber - 1);
+          isEnabled: currentStep >= stepNumber,
+          isLoading: loadingStep === stepNumber,
+          async goToPreviousStep(task) {
+            await setCurrentStep(stepNumber - 1 < 1 ? 1 : stepNumber - 1, task);
           },
-          async goToNextStep() {
+          async goToNextStep(task) {
             await setCurrentStep(
               stepNumber + 1 > lastStep ? lastStep : stepNumber + 1,
+              task,
             );
           },
         });

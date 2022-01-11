@@ -13,11 +13,12 @@ describe('LocationFiltersForm', () => {
   const testWizardStepProps: InjectedWizardProps = {
     currentStep: 1,
     isActive: true,
+    isEnabled: true,
     isLoading: false,
     stepNumber: 1,
-    setCurrentStep: noop,
-    goToNextStep: noop,
-    goToPreviousStep: noop,
+    setCurrentStep: (step, task) => task?.(),
+    goToNextStep: task => task?.(),
+    goToPreviousStep: task => task?.(),
     shouldScroll: false,
   };
 

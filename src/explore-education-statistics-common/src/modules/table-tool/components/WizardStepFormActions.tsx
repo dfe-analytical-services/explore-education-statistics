@@ -7,40 +7,43 @@ import { useFormikContext } from 'formik';
 import React, { MouseEventHandler } from 'react';
 import { InjectedWizardProps } from './Wizard';
 
-interface Props {
-  goToPreviousStep: InjectedWizardProps['goToPreviousStep'];
-  onPreviousStep?: MouseEventHandler;
-  stepNumber: InjectedWizardProps['stepNumber'];
+interface Props extends InjectedWizardProps {
   submitText?: string;
   submittingText?: string;
-  onSubmitClick?: MouseEventHandler<HTMLButtonElement>;
+  onPreviousStep?: MouseEventHandler<HTMLButtonElement>;
+  onSubmit?: MouseEventHandler<HTMLButtonElement>;
 }
 
 const WizardStepFormActions = ({
   goToPreviousStep,
-  onPreviousStep,
+  loadingStep,
   stepNumber,
   submitText = 'Next step',
   submittingText = 'Submitting',
-  onSubmitClick = () => {},
+  onPreviousStep,
+  onSubmit,
 }: Props) => {
   const { formId } = useFormContext();
   const form = useFormikContext();
+
+  const loading = typeof loadingStep !== 'undefined' || form.isSubmitting;
+  const isLoadingNextStep = (loadingStep ?? stepNumber) > stepNumber;
 
   return (
     <FormGroup>
       <ButtonGroup>
         {stepNumber > 1 && (
           <Button
+            disabled={loading}
             type="button"
             variant="secondary"
-            onClick={event => {
+            onClick={async event => {
               if (onPreviousStep) {
-                onPreviousStep(event);
+                await onPreviousStep(event);
               }
 
               if (!event.isDefaultPrevented()) {
-                goToPreviousStep();
+                await goToPreviousStep();
               }
             }}
           >
@@ -49,21 +52,26 @@ const WizardStepFormActions = ({
         )}
 
         <Button
-          disabled={form.isSubmitting}
+          disabled={loading}
           id={`${formId}-submit`}
           type="submit"
-          onClick={onSubmitClick}
+          onClick={onSubmit}
         >
           {form.isSubmitting ? submittingText : submitText}
         </Button>
 
         <LoadingSpinner
-          alert
+          // We trigger another loading spinner that alerts
+          // in the `WizardStepSummary` component, so we
+          // don't need to this one to alert as well.
+          alert={isLoadingNextStep}
           inline
           hideText
-          loading={form.isSubmitting}
+          loading={loading}
           size="md"
-          text="Page is loading"
+          text={
+            isLoadingNextStep ? 'Loading next step' : 'Loading previous step'
+          }
         />
       </ButtonGroup>
     </FormGroup>
