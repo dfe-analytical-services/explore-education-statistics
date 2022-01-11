@@ -77,8 +77,7 @@ DECLARE
     
     IF (@filterItemsExist = 1)
         SET @sql += N'JOIN ObservationFilterItem ofi ON o.Id = ofi.ObservationId ' +
-                     'JOIN #FilterItemId filterItemId ON ofi.FilterItemId = filterItemId.id '
-
+                     'AND ofi.FilterItemId IN (SELECT id FROM #FilterItemId) '
     SET @sql += N'WHERE o.SubjectId = @subjectId '
     
     IF (@geographicLevel IS NOT NULL)
