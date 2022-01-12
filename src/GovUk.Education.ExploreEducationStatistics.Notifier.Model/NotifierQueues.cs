@@ -2,6 +2,6 @@
 {
     public static class NotifierQueues
     {
-        public const string PublicationQueue = "publication-queue";
+        public const string ReleaseNotificationQueue = "release-notifications";
     }
 }

@@ -28,10 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var releasesToNotify = _context.Releases
                 .Include(r => r.ReleaseStatuses)
-                .Include(r => r.Updates) // used by BuildPublicationNotificationMessage
-                .Include(r => r.Publication) // used by BuildPublicationNotificationMessage
                 .Where(r => releaseIds.Contains(r.Id))
-                .Distinct()
                 .ToList()
                 .Where(r => r.NotifySubscribers)
                 .ToList();
@@ -41,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .ToListAsync();
             if (messages.Count > 0)
             {
-                await _storageQueueService.AddMessages(PublicationQueue, messages);
+                await _storageQueueService.AddMessages(ReleaseNotificationQueue, messages);
                 releasesToNotify
                     .ForEach(release =>
                     {
@@ -55,24 +52,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private async Task<PublicationNotificationMessage> BuildPublicationNotificationMessage(Release release)
+        private async Task<ReleaseNotificationMessage> BuildPublicationNotificationMessage(Release release)
         {
             await _context.Entry(release)
                 .Reference(r => r.Publication)
                 .LoadAsync();
 
-            await _context.Entry(release)
-                .Collection(r => r.Updates)
-                .LoadAsync();
+            var latestUpdateNoteReason = "No update note provided.";
+            // NOTE: Only amendment email template displays an update note.
+            if (release.Version > 0)
+            {
+                await _context.Entry(release)
+                    .Collection(r => r.Updates)
+                    .LoadAsync();
+                var latestUpdateNote = release.Updates
+                    .OrderBy(u => u.Created)
+                    .Last();
+                latestUpdateNoteReason = latestUpdateNote.Reason;
+            }
 
-            var latestUpdateNote = release.Updates
-                .OrderBy(u => u.Created)
-                .LastOrDefault();
 
-            var latestUpdateNoteReason =
-                latestUpdateNote != null ? latestUpdateNote.Reason : "No update note provided.";
-
-            return new PublicationNotificationMessage
+            return new ReleaseNotificationMessage
             {
                 PublicationId = release.Publication.Id,
                 PublicationName = release.Publication.Title,

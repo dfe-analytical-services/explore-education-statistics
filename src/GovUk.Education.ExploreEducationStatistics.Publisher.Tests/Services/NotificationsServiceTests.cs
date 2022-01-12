@@ -125,8 +125,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
             storageQueueService.Setup(mock => mock.AddMessages(
-                PublicationQueue,
-                It.IsAny<List<PublicationNotificationMessage>>()))
+                ReleaseNotificationQueue,
+                It.IsAny<List<ReleaseNotificationMessage>>()))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -137,8 +137,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await notificationsService.NotifySubscribersIfApplicable(release1.Id, release2.Id, amendedRelease1.Id);
 
                 storageQueueService.Verify(mock => mock.AddMessages(
-                    PublicationQueue,
-                new List<PublicationNotificationMessage>
+                    ReleaseNotificationQueue,
+                new List<ReleaseNotificationMessage>
                     {
                         new()
                         {
