@@ -45,8 +45,8 @@ Validate Analyst1 can see Absence release summary
 
 Validate Analyst1 can see 'Content' page
     user clicks link    Content
-    user waits until h2 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
     user waits for page to finish loading
+    user waits until h2 is visible    Pupil absence in schools in England    %{WAIT_SMALL}
 
 Validate Analyst1 can see 'Content' page key stats
     user waits until page contains element    id:releaseHeadlines    %{WAIT_LONG}

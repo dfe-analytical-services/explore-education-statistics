@@ -324,35 +324,30 @@ Create new data block
 Select subject "${SUBJECT_2_NAME}"
     user waits until page contains    ${SUBJECT_2_NAME}
     user clicks radio    ${SUBJECT_2_NAME}
-    user clicks element    id:publicationSubjectForm-submit
-    user waits until table is visible
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
 
 Select locations
     user waits until table tool wizard step is available    2    Choose locations
     user opens details dropdown    Opportunity Area
-    user clicks checkbox    Bolton 001 (E02000984)
-    user clicks checkbox    Bolton 001 (E05000364)
-    user clicks checkbox    Bolton 004 (E02000987)
-    user clicks checkbox    Bolton 004 (E05010450)
+    user clicks checkbox    Bolton 001
+    user clicks checkbox    Bolton 004
     user opens details dropdown    Ward
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
-    user clicks element    id:locationFiltersForm-submit
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
 
 Select time period
     user waits until table tool wizard step is available    3    Choose time period
     user chooses select option    id:timePeriodForm-start    2005
-    user chooses select option    id:timePeriodForm-end    2020
-    user clicks element    id:timePeriodForm-submit
-
-Select indicators and filters
-    user waits until table tool wizard step is available    4    Choose your filters
-    user checks indicator checkbox is checked    Admission Numbers
-    user checks category checkbox is checked    Random Filter    Not specified
+    user chooses select option    id:timePeriodForm-end    2017
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
 
 Create table
-    user clicks element    id:filtersForm-submit
-    user waits until results table appears    %{WAIT_LONG}
+    user waits until button is enabled    Create table
+    user clicks button    Create table
 
 Check created table has footnotes
     user checks list has x items    testid:footnotes    3
@@ -457,18 +452,25 @@ Select subject "${SUBJECT_2_NAME}" in table tool
     user waits until table tool wizard step is available    2    Choose a subject
     user waits until page contains    ${SUBJECT_2_NAME}
     user clicks radio    ${SUBJECT_2_NAME}
-    user clicks element    id:publicationSubjectForm-submit
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
     user waits until table tool wizard step is available    3    Choose locations
     user checks previous table tool step contains    2    Subject    ${SUBJECT_2_NAME}
 
 Select locations in table tool
-    user opens details dropdown    Local Authority
+    # LH: Not using the 'user opens details dropdown' keyword here as
+    # it opens the 'Local Authority District' dropdown instead???
+    user clicks element    //*[@data-testid="Expand Details Section Local Authority"]
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
+
     user clicks element    id:locationFiltersForm-submit
+
     user waits until table tool wizard step is available    4    Choose time period
     user checks previous table tool step contains    3    Local Authority    Barnsley
     user checks previous table tool step contains    3    Local Authority    Birmingham
+
+    user waits until table tool wizard step is available    4    Choose time period
 
 Select time period in table tool
     user chooses select option    id:timePeriodForm-start    2014
@@ -528,18 +530,18 @@ Select table featured table from subjects step
     user clicks link    Test highlight name
     user waits until results table appears    %{WAIT_LONG}
     user waits until page contains element
-    ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for '${SUBJECT_2_NAME}' for Not specified in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for '${SUBJECT_2_NAME}' for Not specified in Bolton 001, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2017"]
 
 Validate table column headings for featured table
     user checks table column heading contains    1    1    Admission Numbers
 
 Validate table rows for featured table
-    ${row}=    user gets row number with heading    Bolton 001 (E02000984)
-    user checks table heading in offset row contains    ${row}    0    2    2019
+    ${row}=    user gets row number with heading    Bolton 001
+    user checks table heading in offset row contains    ${row}    0    2    2009
 
-    user checks table cell in offset row contains    ${row}    0    1    8,533
+    user checks table cell in offset row contains    ${row}    0    1    5,815
 
-    ${row}=    user gets row number with heading    Bolton 001 (E05000364)
+    ${row}=    user gets row number with heading    Bolton 001
     user checks table heading in offset row contains    ${row}    0    2    2009
     user checks table heading in offset row contains    ${row}    1    1    2010
     user checks table heading in offset row contains    ${row}    2    1    2017
@@ -548,19 +550,17 @@ Validate table rows for featured table
     user checks table cell in offset row contains    ${row}    1    1    5,595
     user checks table cell in offset row contains    ${row}    2    1    6,373
 
-    ${row}=    user gets row number with heading    Bolton 004 (E02000987)
-    user checks table heading in offset row contains    ${row}    0    2    2020
+    ${row}=    user gets row number with heading    Bolton 004
+    user checks table heading in offset row contains    ${row}    0    2    2005
 
-    user checks table cell in offset row contains    ${row}    0    1    6,031
+    user checks table cell in offset row contains    ${row}    0    1    8,557
 
-    ${row}=    user gets row number with heading    Bolton 004 (E05010450)
+    ${row}=    user gets row number with heading    Bolton 004
     user checks table heading in offset row contains    ${row}    0    2    2005
     user checks table heading in offset row contains    ${row}    1    1    2017
-    user checks table heading in offset row contains    ${row}    2    1    2018
 
     user checks table cell in offset row contains    ${row}    0    1    8,557
     user checks table cell in offset row contains    ${row}    1    1    3,481
-    user checks table cell in offset row contains    ${row}    2    1    8,630
 
     ${row}=    user gets row number with heading    Nailsea Youngwood
     user checks table heading in offset row contains    ${row}    0    2    2005
