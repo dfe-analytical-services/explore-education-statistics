@@ -110,15 +110,15 @@
       ]
     },
     {
-      "type": "microsoft.insights/metricAlerts",
+      "type": "Microsoft.Insights/metricAlerts",
       "apiVersion": "2018-03-01",
-      "name": "[concat(parameters('subscription'),'DataFactoryPipelineFailures')]",
+      "name": "[concat(parameters('subscription'),'DataFactoryActivityFailures')]",
       "location": "global",
       "dependsOn": [
         "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
       ],
       "properties": {
-        "description": "Data Factory - Pipeline Failed Run",
+        "description": "Data Factory - Activity Failures",
         "severity": 3,
         "enabled": "[parameters('enableAlerts')]",
         "scopes": [
@@ -132,7 +132,7 @@
               "threshold": 0,
               "name": "Metric1",
               "metricNamespace": "Microsoft.DataFactory/factories",
-              "metricName": "PipelineFailedRuns",
+              "metricName": "ActivityFailedRuns",
               "operator": "GreaterThan",
               "timeAggregation": "Total",
               "criterionType": "StaticThresholdCriterion"
