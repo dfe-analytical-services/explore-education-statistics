@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils;
@@ -21,7 +20,6 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -137,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(
                         s => s.GetSubjectMeta(
                             release.Id,
-                            It.IsAny<SubjectMetaQueryContext>(),
+                            It.IsAny<ObservationQueryContext>(),
                             It.IsAny<IList<Observation>>()
                         )
                     )
@@ -489,7 +487,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(
                         s => s.GetSubjectMeta(
                             releaseSubject.ReleaseId,
-                            It.IsAny<SubjectMetaQueryContext>(),
+                            It.IsAny<ObservationQueryContext>(),
                             It.IsAny<IList<Observation>>()
                         )
                     )

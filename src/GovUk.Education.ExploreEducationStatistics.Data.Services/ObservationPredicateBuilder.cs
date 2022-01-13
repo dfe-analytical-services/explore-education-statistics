@@ -8,13 +8,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public static class ObservationPredicateBuilder
     {
-        public static Expression<Func<Observation, bool>> Build(SubjectMetaQueryContext query)
+        public static Expression<Func<Observation, bool>> Build(ObservationQueryContext query)
         {
             var predicate = PredicateBuilder.True<Observation>()
                 .AndAlso(observation => observation.SubjectId == query.SubjectId);

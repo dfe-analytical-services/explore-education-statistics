@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -14,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_SubjectNotFound()
         {
-            var query = new SubjectMetaQueryContext();
+            var query = new ObservationQueryContext();
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var observations = new List<Observation>();
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -236,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -427,7 +427,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             });
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -664,7 +664,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             });
 
             // Setup a query requesting geoJson but not with any specific boundary level id
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 BoundaryLevel = null,
                 IncludeGeoJson = true,
@@ -917,7 +917,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             });
 
             // Setup a query requesting geoJson with a specific boundary level id
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 BoundaryLevel = 123,
                 IncludeGeoJson = true,
@@ -1121,7 +1121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             // No location hierarchies are defined so locations should still all be flat.
             var options = DefaultLocationOptions();
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -1309,7 +1309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             });
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -1486,7 +1486,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var options = DefaultLocationOptions();
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -1675,7 +1675,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             });
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id

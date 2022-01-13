@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -72,14 +72,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(
-            SubjectMetaQueryContext query)
+            ObservationQueryContext query)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(_ => GetSubjectMetaViewModelFromQuery(query));
         }
 
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(
-            SubjectMetaQueryContext query)
+            ObservationQueryContext query)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             };
         }
 
-        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromQuery(SubjectMetaQueryContext query)
+        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromQuery(ObservationQueryContext query)
         {
             var observations = _observationService.FindObservations(query).AsQueryable();
             var locations = new Dictionary<string, LocationsMetaViewModel>();

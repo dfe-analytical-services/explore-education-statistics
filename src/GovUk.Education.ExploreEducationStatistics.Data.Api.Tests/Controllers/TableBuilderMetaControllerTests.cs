@@ -1,13 +1,13 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
     {
         private static readonly Guid SubjectId = Guid.NewGuid();
 
-        private static readonly SubjectMetaQueryContext QueryContext = new()
+        private static readonly ObservationQueryContext QueryContext = new()
         {
             SubjectId = SubjectId
         };

@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
@@ -102,9 +101,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
                     }
 
+
                     var observations = 
                         await _observationService.FindObservations(queryContext, cancellationToken);
-
                     if (!observations.Any())
                     {
                         return new TableBuilderResultViewModel();
@@ -113,7 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     return await _resultSubjectMetaService
                         .GetSubjectMeta(
                             release.Id, 
-                            SubjectMetaQueryContext.FromObservationQueryContext(queryContext), 
+                            queryContext, 
                             observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {

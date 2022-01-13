@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(
             Guid releaseId,
-            SubjectMetaQueryContext query,
+            ObservationQueryContext query,
             IList<Observation> observations)
         {
             var queryableObservations = observations.AsQueryable();
@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return new ForbidResult();
         }
 
-        private List<IndicatorMetaViewModel> GetIndicatorViewModels(SubjectMetaQueryContext query)
+        private List<IndicatorMetaViewModel> GetIndicatorViewModels(ObservationQueryContext query)
         {
             var indicators = _indicatorRepository.GetIndicators(query.SubjectId, query.Indicators);
             return BuildIndicatorViewModels(indicators);
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private List<FootnoteViewModel> GetFilteredFootnoteViewModels(
             Guid releaseId,
             IQueryable<Observation> observations,
-            SubjectMetaQueryContext queryContext)
+            ObservationQueryContext queryContext)
         {
             return _footnoteRepository
                 .GetFilteredFootnotes(releaseId, queryContext.SubjectId, observations, queryContext.Indicators)
@@ -184,14 +184,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private class LocationsQueryHelper
         {
             private readonly Dictionary<GeographicLevel, List<LocationAttributeNode>> _locationAttributes;
-            private readonly SubjectMetaQueryContext _query;
+            private readonly ObservationQueryContext _query;
             private readonly IBoundaryLevelRepository _boundaryLevelRepository;
             private readonly IGeoJsonRepository _geoJsonRepository;
             private readonly List<GeographicLevel> _geographicLevels;
 
             internal LocationsQueryHelper(
                 Dictionary<GeographicLevel, List<LocationAttributeNode>> locationAttributes,
-                SubjectMetaQueryContext query,
+                ObservationQueryContext query,
                 IBoundaryLevelRepository boundaryLevelRepository,
                 IGeoJsonRepository geoJsonRepository)
             {

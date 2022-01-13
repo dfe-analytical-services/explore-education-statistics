@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Data.SqlClient;
@@ -76,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return observations;
         }
 
-        public IQueryable<Observation> FindObservations(SubjectMetaQueryContext query)
+        public IQueryable<Observation> FindObservations(ObservationQueryContext query)
         {
             return DbSet()
                 .AsNoTracking()
