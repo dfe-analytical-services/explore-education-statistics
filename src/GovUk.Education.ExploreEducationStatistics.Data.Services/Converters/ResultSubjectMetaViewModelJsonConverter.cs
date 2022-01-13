@@ -58,8 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Converters
                 }
             }
 
-            tableSubjectMeta.Locations?.Clear();
-
             return tableSubjectMeta;
         }
 

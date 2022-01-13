@@ -154,8 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s
-                .GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
+                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
                 .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -194,7 +193,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Empty(viewModel.Filters);
                 Assert.Empty(viewModel.Footnotes);
                 Assert.Empty(viewModel.Indicators);
-                Assert.Empty(viewModel.Locations);
                 Assert.Empty(viewModel.LocationsHierarchical);
                 Assert.Empty(viewModel.BoundaryLevels);
                 Assert.Empty(viewModel.TimePeriodRange);
@@ -356,582 +354,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        // TODO EES-2992 Remove this when the location hierarchies work is complete
-        public async Task GetSubjectMeta_LocationViewModelsReturnedForSubject()
-        {
-            var publication = new Publication();
-
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var observations = new List<Observation>();
-
-            var releaseId = Guid.NewGuid();
-
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
-                {
-                    GeographicLevel.Country,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_england)
-                    }
-                },
-                {
-                    GeographicLevel.Region,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_northEast),
-                        new(_northWest),
-                        new(_eastMidlands)
-                    }
-                }
-            };
-
-            var query = new SubjectMetaQueryContext
-            {
-                Indicators = new List<Guid>(),
-                SubjectId = subject.Id
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Subject.AddAsync(subject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(MockBehavior.Strict);
-            var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-            var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
-            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(It.IsAny<GeographicLevel>()))
-                .Returns((BoundaryLevel?) null);
-
-            boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(
-                    new List<GeographicLevel>
-                    {
-                        GeographicLevel.Country,
-                        GeographicLevel.Region
-                    }))
-                .Returns(new List<BoundaryLevel>());
-
-            filterItemRepository
-                .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
-
-            footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
-                    subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
-                    query.Indicators))
-                .Returns(Enumerable.Empty<Footnote>());
-
-            indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
-                .Returns(Enumerable.Empty<Indicator>());
-
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    null))
-                .ReturnsAsync(locations);
-
-            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
-                .ReturnsAsync(new ReleaseFile());
-
-            subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(publication.Id);
-
-            timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildResultSubjectMetaService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    boundaryLevelRepository: boundaryLevelRepository.Object,
-                    filterItemRepository: filterItemRepository.Object,
-                    footnoteRepository: footnoteRepository.Object,
-                    indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
-                    releaseDataFileRepository: releaseDataFileRepository.Object,
-                    subjectRepository: subjectRepository.Object,
-                    timePeriodService: timePeriodService.Object,
-                    // Setup the location hierarchies featured as disabled
-                    options: DisabledLocationHierarchiesOptions()
-                );
-
-                var result = await service.GetSubjectMeta(
-                    releaseId: releaseId,
-                    query,
-                    observations);
-
-                MockUtils.VerifyAllMocks(
-                    boundaryLevelRepository,
-                    filterItemRepository,
-                    footnoteRepository,
-                    indicatorRepository,
-                    locationRepository,
-                    releaseDataFileRepository,
-                    subjectRepository,
-                    timePeriodService);
-
-                var viewModel = result.AssertRight();
-
-                // With the location hierarchies feature turned off, hierarchical locations should be empty
-                Assert.Empty(viewModel.LocationsHierarchical);
-
-                // Locations should be populated in the legacy locations field
-                var locationViewModels = viewModel.Locations;
-
-                Assert.Equal(4, locationViewModels.Count);
-
-                Assert.Equal(_england.Name, locationViewModels[0].Label);
-                Assert.Equal(_england.Code, locationViewModels[0].Value);
-                Assert.Equal(GeographicLevel.Country, locationViewModels[0].Level);
-                Assert.Null(locationViewModels[0].GeoJson);
-
-                Assert.Equal(_eastMidlands.Name, locationViewModels[1].Label);
-                Assert.Equal(_eastMidlands.Code, locationViewModels[1].Value);
-                Assert.Equal(GeographicLevel.Region, locationViewModels[1].Level);
-                Assert.Null(locationViewModels[1].GeoJson);
-
-                Assert.Equal(_northEast.Name, locationViewModels[2].Label);
-                Assert.Equal(_northEast.Code, locationViewModels[2].Value);
-                Assert.Equal(GeographicLevel.Region, locationViewModels[2].Level);
-                Assert.Null(locationViewModels[2].GeoJson);
-
-                Assert.Equal(_northWest.Name, locationViewModels[3].Label);
-                Assert.Equal(_northWest.Code, locationViewModels[3].Value);
-                Assert.Equal(GeographicLevel.Region, locationViewModels[3].Level);
-                Assert.Null(locationViewModels[3].GeoJson);
-            }
-        }
-
-        [Fact]
-        // TODO EES-2992 Remove this when the location hierarchies work is complete
-        public async Task GetSubjectMeta_LocationViewModelsReturnedForSubject_IncludeGeoJson()
-        {
-            var publication = new Publication();
-
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var observations = new List<Observation>();
-
-            var releaseId = Guid.NewGuid();
-
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
-                {
-                    GeographicLevel.Country,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_england)
-                    }
-                },
-                {
-                    GeographicLevel.Region,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_northEast),
-                        new(_northWest),
-                        new(_eastMidlands)
-                    }
-                }
-            };
-
-            // Setup a query requesting geoJson but not with any specific boundary level id
-            var query = new SubjectMetaQueryContext
-            {
-                BoundaryLevel = null,
-                IncludeGeoJson = true,
-                Indicators = new List<Guid>(),
-                SubjectId = subject.Id
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Subject.AddAsync(subject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(MockBehavior.Strict);
-            var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-            var geoJsonRepository = new Mock<IGeoJsonRepository>(MockBehavior.Strict);
-            var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
-            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(GeographicLevel.Country))
-                .Returns(_countriesBoundaryLevel);
-
-            boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(GeographicLevel.Region))
-                .Returns(_regionsBoundaryLevel);
-
-            boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(
-                    new List<GeographicLevel>
-                    {
-                        GeographicLevel.Country,
-                        GeographicLevel.Region
-                    }))
-                .Returns(new List<BoundaryLevel>());
-
-            filterItemRepository
-                .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
-
-            footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
-                    subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
-                    query.Indicators))
-                .Returns(Enumerable.Empty<Footnote>());
-
-            geoJsonRepository.Setup(s => s.FindByBoundaryLevelAndCodes(
-                _countriesBoundaryLevel.Id,
-                new List<string>
-                {
-                    _england.Code!
-                })).Returns(new Dictionary<string, GeoJson>
-            {
-                {
-                    _england.Code!,
-                    _geoJson
-                }
-            });
-
-            geoJsonRepository.Setup(s => s.FindByBoundaryLevelAndCodes(
-                    _regionsBoundaryLevel.Id,
-                    new List<string>
-                    {
-                        _northEast.Code!, _northWest.Code!, _eastMidlands.Code!
-                    }))
-                .Returns(new Dictionary<string, GeoJson>
-                {
-                    {
-                        _northEast.Code!,
-                        _geoJson
-                    },
-                    {
-                        _northWest.Code!,
-                        _geoJson
-                    },
-                    {
-                        _eastMidlands.Code!,
-                        _geoJson
-                    }
-                });
-
-            indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
-                .Returns(Enumerable.Empty<Indicator>());
-
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    null))
-                .ReturnsAsync(locations);
-
-            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
-                .ReturnsAsync(new ReleaseFile());
-
-            subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(publication.Id);
-
-            timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildResultSubjectMetaService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    boundaryLevelRepository: boundaryLevelRepository.Object,
-                    filterItemRepository: filterItemRepository.Object,
-                    footnoteRepository: footnoteRepository.Object,
-                    geoJsonRepository: geoJsonRepository.Object,
-                    indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
-                    releaseDataFileRepository: releaseDataFileRepository.Object,
-                    subjectRepository: subjectRepository.Object,
-                    timePeriodService: timePeriodService.Object,
-                    // Setup the location hierarchies featured as disabled
-                    options: DisabledLocationHierarchiesOptions()
-                );
-
-                var result = await service.GetSubjectMeta(
-                    releaseId: releaseId,
-                    query,
-                    observations);
-
-                MockUtils.VerifyAllMocks(
-                    boundaryLevelRepository,
-                    filterItemRepository,
-                    footnoteRepository,
-                    geoJsonRepository,
-                    indicatorRepository,
-                    locationRepository,
-                    releaseDataFileRepository,
-                    subjectRepository,
-                    timePeriodService);
-
-                var viewModel = result.AssertRight();
-
-                Assert.True(viewModel.GeoJsonAvailable);
-
-                // With the location hierarchies feature turned off, hierarchical locations should be empty
-                Assert.Empty(viewModel.LocationsHierarchical);
-
-                // Locations should be populated in the legacy locations field
-                var locationViewModels = viewModel.Locations;
-
-                Assert.Equal(4, locationViewModels.Count);
-
-                // Expect all results to have GeoJson
-
-                Assert.Equal(_england.Name, locationViewModels[0].Label);
-                Assert.Equal(_england.Code, locationViewModels[0].Value);
-                Assert.Equal(GeographicLevel.Country, locationViewModels[0].Level);
-                Assert.NotNull(locationViewModels[0].GeoJson);
-
-                Assert.Equal(_eastMidlands.Name, locationViewModels[1].Label);
-                Assert.Equal(_eastMidlands.Code, locationViewModels[1].Value);
-                Assert.Equal(GeographicLevel.Region, locationViewModels[1].Level);
-                Assert.NotNull(locationViewModels[1].GeoJson);
-
-                Assert.Equal(_northEast.Name, locationViewModels[2].Label);
-                Assert.Equal(_northEast.Code, locationViewModels[2].Value);
-                Assert.Equal(GeographicLevel.Region, locationViewModels[2].Level);
-                Assert.NotNull(locationViewModels[2].GeoJson);
-
-                Assert.Equal(_northWest.Name, locationViewModels[3].Label);
-                Assert.Equal(_northWest.Code, locationViewModels[3].Value);
-                Assert.Equal(GeographicLevel.Region, locationViewModels[3].Level);
-                Assert.NotNull(locationViewModels[3].GeoJson);
-            }
-        }
-
-        [Fact]
-        // TODO EES-2992 Remove this when the location hierarchies work is complete
-        public async Task GetSubjectMeta_LocationViewModelsReturnedForSubject_SpecificBoundaryLevelId()
-        {
-            var publication = new Publication();
-
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var observations = new List<Observation>();
-
-            var releaseId = Guid.NewGuid();
-
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
-                {
-                    GeographicLevel.Region,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_northEast),
-                        new(_northWest),
-                        new(_eastMidlands)
-                    }
-                }
-            };
-
-            // Setup a query requesting geoJson with a specific boundary level id
-            var query = new SubjectMetaQueryContext
-            {
-                BoundaryLevel = 123,
-                IncludeGeoJson = true,
-                Indicators = new List<Guid>(),
-                SubjectId = subject.Id
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Subject.AddAsync(subject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(MockBehavior.Strict);
-            var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-            var geoJsonRepository = new Mock<IGeoJsonRepository>(MockBehavior.Strict);
-            var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
-            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(GeographicLevel.Region))
-                .Returns(_regionsBoundaryLevel);
-
-            boundaryLevelRepository.Setup(s => s.FindRelatedByBoundaryLevel(query.BoundaryLevel.Value))
-                .Returns(new List<BoundaryLevel>
-                {
-                    _regionsBoundaryLevel
-                });
-
-            filterItemRepository
-                .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
-
-            footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
-                    subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
-                    query.Indicators))
-                .Returns(Enumerable.Empty<Footnote>());
-
-            geoJsonRepository.Setup(s => s.FindByBoundaryLevelAndCodes(
-                    query.BoundaryLevel.Value,
-                    new List<string>
-                    {
-                        _northEast.Code!, _northWest.Code!, _eastMidlands.Code!
-                    }))
-                .Returns(new Dictionary<string, GeoJson>
-                {
-                    {
-                        _northEast.Code!,
-                        _geoJson
-                    },
-                    {
-                        _northWest.Code!,
-                        _geoJson
-                    },
-                    {
-                        _eastMidlands.Code!,
-                        _geoJson
-                    }
-                });
-
-            indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
-                .Returns(Enumerable.Empty<Indicator>());
-
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    null))
-                .ReturnsAsync(locations);
-
-            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
-                .ReturnsAsync(new ReleaseFile());
-
-            subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(publication.Id);
-
-            timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildResultSubjectMetaService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    boundaryLevelRepository: boundaryLevelRepository.Object,
-                    filterItemRepository: filterItemRepository.Object,
-                    footnoteRepository: footnoteRepository.Object,
-                    geoJsonRepository: geoJsonRepository.Object,
-                    indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
-                    releaseDataFileRepository: releaseDataFileRepository.Object,
-                    subjectRepository: subjectRepository.Object,
-                    timePeriodService: timePeriodService.Object,
-                    // Setup the location hierarchies featured as disabled
-                    options: DisabledLocationHierarchiesOptions()
-                );
-
-                var result = await service.GetSubjectMeta(
-                    releaseId: releaseId,
-                    query,
-                    observations);
-
-                MockUtils.VerifyAllMocks(
-                    boundaryLevelRepository,
-                    filterItemRepository,
-                    footnoteRepository,
-                    geoJsonRepository,
-                    indicatorRepository,
-                    locationRepository,
-                    releaseDataFileRepository,
-                    subjectRepository,
-                    timePeriodService);
-
-                var viewModel = result.AssertRight();
-
-                Assert.True(viewModel.GeoJsonAvailable);
-
-                // With the location hierarchies feature turned off, hierarchical locations should be empty
-                Assert.Empty(viewModel.LocationsHierarchical);
-
-                // Locations should be populated in the legacy locations field
-                var locationViewModels = viewModel.Locations;
-
-                Assert.Equal(3, locationViewModels.Count);
-
-                // Expect all results to have GeoJson
-
-                Assert.Equal(_eastMidlands.Name, locationViewModels[0].Label);
-                Assert.Equal(_eastMidlands.Code, locationViewModels[0].Value);
-                Assert.Equal(GeographicLevel.Region, locationViewModels[0].Level);
-                Assert.NotNull(locationViewModels[0].GeoJson);
-
-                Assert.Equal(_northEast.Name, locationViewModels[1].Label);
-                Assert.Equal(_northEast.Code, locationViewModels[1].Value);
-                Assert.Equal(GeographicLevel.Region, locationViewModels[1].Level);
-                Assert.NotNull(locationViewModels[1].GeoJson);
-
-                Assert.Equal(_northWest.Name, locationViewModels[2].Label);
-                Assert.Equal(_northWest.Code, locationViewModels[2].Value);
-                Assert.Equal(GeographicLevel.Region, locationViewModels[2].Level);
-                Assert.NotNull(locationViewModels[2].GeoJson);
-            }
-        }
-
-        [Fact]
         public async Task GetSubjectMeta_HierarchicalLocationViewModelsReturnedForSubject()
         {
             var publication = new Publication();
@@ -991,7 +413,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var options = Options.Create(new LocationsOptions
             {
-                TableResultLocationHierarchiesEnabled = true,
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
                 {
                     {
@@ -1111,9 +532,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var viewModel = result.AssertRight();
 
-                // With the location hierarchies feature turned on, legacy locations should be empty
-                Assert.Empty(viewModel.Locations);
-
                 var locationViewModels = viewModel.LocationsHierarchical;
 
                 // Result has Country, Region and Local Authority levels
@@ -1232,7 +650,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var options = Options.Create(new LocationsOptions
             {
-                TableResultLocationHierarchiesEnabled = true,
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
                 {
                     {
@@ -1395,9 +812,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.True(viewModel.GeoJsonAvailable);
 
-                // With the location hierarchies feature turned on, legacy locations should be empty
-                Assert.Empty(viewModel.Locations);
-
                 var locationViewModels = viewModel.LocationsHierarchical;
 
                 // Result has Country and Region levels
@@ -1489,7 +903,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var options = Options.Create(new LocationsOptions
             {
-                TableResultLocationHierarchiesEnabled = true,
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
                 {
                     {
@@ -1635,9 +1048,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.True(viewModel.GeoJsonAvailable);
 
-                // With the location hierarchies feature turned on, legacy locations should be empty
-                Assert.Empty(viewModel.Locations);
-
                 var locationViewModels = viewModel.LocationsHierarchical;
 
                 // Result only has a Region level
@@ -1708,12 +1118,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
-            var options = Options.Create(new LocationsOptions
-            {
-                // Hierarchies are enabled, but none have been defined
-                // so locations should still all be flat.
-                TableResultLocationHierarchiesEnabled = true
-            });
+            // No location hierarchies are defined so locations should still all be flat.
+            var options = DefaultLocationOptions();
 
             var query = new SubjectMetaQueryContext
             {
@@ -1890,7 +1296,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var options = Options.Create(new LocationsOptions
             {
-                TableResultLocationHierarchiesEnabled = true,
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
                 {
                     {
@@ -2184,9 +1589,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var viewModel = result.AssertRight();
 
-                // With the location hierarchies feature turned on, legacy locations should be empty
-                Assert.Empty(viewModel.Locations);
-
                 var locationViewModels = viewModel.LocationsHierarchical;
 
                 Assert.Single(locationViewModels);
@@ -2260,7 +1662,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var options = Options.Create(new LocationsOptions
             {
-                TableResultLocationHierarchiesEnabled = true,
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
                 {
                     {
@@ -2435,18 +1836,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private static IOptions<LocationsOptions> DefaultLocationOptions()
         {
-            return Options.Create(new LocationsOptions
-            {
-                TableResultLocationHierarchiesEnabled = true
-            });
-        }
-
-        private static IOptions<LocationsOptions> DisabledLocationHierarchiesOptions()
-        {
-            return Options.Create(new LocationsOptions
-            {
-                TableResultLocationHierarchiesEnabled = false
-            });
+            return Options.Create(new LocationsOptions());
         }
 
         private static ResultSubjectMetaService BuildResultSubjectMetaService(
