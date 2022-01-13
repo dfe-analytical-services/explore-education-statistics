@@ -38,10 +38,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
 
             var subjectMeta = JsonConvert.DeserializeObject<ResultSubjectMetaViewModel>(jsonText, BuildSettings());
 
-            Assert.Empty(subjectMeta!.Locations);
-
             // Expect Locations to have been transformed to LocationsHierarchical
-            Assert.Single(subjectMeta.LocationsHierarchical);
+            Assert.NotNull(subjectMeta);
+            Assert.Single(subjectMeta!.LocationsHierarchical);
             Assert.True(subjectMeta.LocationsHierarchical.ContainsKey("localAuthority"));
 
             var localAuthorities = subjectMeta.LocationsHierarchical["localAuthority"];
@@ -117,9 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
 
             var subjectMeta = JsonConvert.DeserializeObject<ResultSubjectMetaViewModel>(jsonText, BuildSettings());
 
-            Assert.Empty(subjectMeta!.Locations);
-
-            Assert.Single(subjectMeta.LocationsHierarchical);
+            Assert.NotNull(subjectMeta);
+            Assert.Single(subjectMeta!.LocationsHierarchical);
             Assert.True(subjectMeta.LocationsHierarchical.ContainsKey("country"));
 
             var countries = subjectMeta.LocationsHierarchical["country"];
