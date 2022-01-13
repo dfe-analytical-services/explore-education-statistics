@@ -9,6 +9,7 @@
     "@babel/preset-typescript": "^7.16.0",
     "@ckeditor/ckeditor5-react": "^3.0.1",
     "@ckeditor/ckeditor5-upload": "^25.0.0",
+    "@microsoft/signalr": "^6.0.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.1",
     "@svgr/webpack": "^6.1.0",
     "@testing-library/dom": "^7.24.4",

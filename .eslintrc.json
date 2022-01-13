@@ -35,6 +35,7 @@
     ],
     "@typescript-eslint/triple-slash-reference": "off",
     "@typescript-eslint/explicit-module-boundary-types": "off",
+    "class-methods-use-this": "off",
     "import/extensions": "off",
     "import/no-cycle": "off",
     "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],

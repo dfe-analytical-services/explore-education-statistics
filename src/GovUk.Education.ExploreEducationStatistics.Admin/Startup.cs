@@ -23,6 +23,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -239,6 +240,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
                 .AddIdentityServerJwt();
 
+            services.Configure<JwtBearerOptions>(
+                IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
+                options =>
+                {
+                    var originalOnMessageReceived = options.Events.OnMessageReceived;
+
+                    options.Events.OnMessageReceived = async context =>
+                    {
+                        await originalOnMessageReceived(context);
+
+                        if (!context.Token.IsNullOrEmpty())
+                        {
+                            return;
+                        }
+
+                        // Allows requests with `access_token` query parameter to authenticate.
+                        // Only really needed for websockets as we unfortunately can't set any
+                        // headers in the browser for the initial handshake.
+                        if (context.Request.Query.ContainsKey("access_token"))
+                        {
+                            context.Token = context.Request.Query["access_token"];
+                        }
+                    };
+                });
+
             // This configuration has to occur after the AddAuthentication() block as it is otherwise overridden.
             services.Configure<IdentityOptions>(options =>
             {
@@ -256,6 +282,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.User.AllowedUserNameCharacters =
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'";
             });
+
+            /*
+             * SignalR
+             */
+
+            var signalRBuilder = services
+                .AddSignalR()
+                .AddNewtonsoftJsonProtocol();
+
+            var azureSignalRConnectionString = Configuration.GetValue<string>("Azure:SignalR:ConnectionString");
+
+            if (!azureSignalRConnectionString.IsNullOrEmpty())
+            {
+                signalRBuilder.AddAzureSignalR(azureSignalRConnectionString);
+            }
 
             /*
              * Configuration options
