@@ -62,6 +62,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
+using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.FootnoteService;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
@@ -129,14 +130,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                        builder =>
+                        {
+                            builder.MigrationsAssembly(typeof(Startup).Assembly.FullName);
+                        })
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
+                        builder =>
+                        {
+                            builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model");
+                            builder.AddTempTableSupport();
+                        })
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 

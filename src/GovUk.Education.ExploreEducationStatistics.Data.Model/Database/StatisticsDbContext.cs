@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Thinktecture;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 {
@@ -89,6 +90,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
             ConfigureSubject(modelBuilder);
+
+            modelBuilder.ConfigureTempTable<Guid>(isKeyless: false)
+                .HasKey(row => row.Column1);
         }
 
         private static void ConfigureBoundaryLevel(ModelBuilder modelBuilder)

@@ -15,13 +15,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Thinktecture;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class ObservationService : AbstractRepository<Observation, long>, IObservationService
     {
-        private const int ObservationFetchBatchSize = 100;
-
         private readonly ILogger<ObservationService> _logger;
         public IMatchingObservationsGetter MatchingObservationGetter { get; set; } = new MatchingObservationsGetter();
 
@@ -42,34 +41,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var ids = await MatchingObservationGetter
                 .GetMatchingObservationIdsQuery(_context, query, cancellationToken);
 
-            _logger.LogDebug($"Executed FilteredObservations stored procedure in " +
+            _logger.LogDebug($"Executed SelectObservationsByLocationCodes stored procedure in " +
                              $"{phasesStopwatch.Elapsed.TotalMilliseconds} ms - fetched {ids.Length} " +
                              $"Observation ids");
             phasesStopwatch.Restart();
 
-            var batchesOfIds = ids.Batch(ObservationFetchBatchSize).ToList();
+            await using var tempTableQuery = await 
+                _context.BulkInsertValuesIntoTempTableAsync(ids, cancellationToken: cancellationToken);
 
-            var observations = new List<Observation>();
+            _logger.LogDebug($"Loaded {ids.Length} Observation Ids into temporary table in " +
+                             $"{phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+            phasesStopwatch.Restart();
 
-            await batchesOfIds
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async batchOfIds =>
-                {
-                    var observationBatch = await _context
-                        .Observation
-                        .AsNoTracking()
-                        .Include(o => o.FilterItems)
-                        .Include(o => o.Location)
-                        .Where(o => batchOfIds.Contains(o.Id))
-                        .ToListAsync(cancellationToken);
+            var observationIds = tempTableQuery
+                .Query
+                .AsNoTracking()
+                .Select(t => t.Column1);
+            
+            var observations = await _context
+                .Observation
+                .AsNoTracking()
+                .Include(o => o.FilterItems)
+                .Include(o => o.Location)
+                .Where(o => observationIds.Contains(o.Id))
+                .ToListAsync(cancellationToken);
 
-                    observations.AddRange(observationBatch);
-
-                    _logger.LogDebug($"Fetched batch of {observationBatch.Count} Observations from their ids in " +
-                                     $"{phasesStopwatch.Elapsed.TotalMilliseconds} ms");
-                    phasesStopwatch.Restart();
-                }, cancellationToken: cancellationToken);
-
+            _logger.LogDebug($"Fetched {ids.Length} Observations and their Filter Items in " +
+                             $"{phasesStopwatch.Elapsed.TotalMilliseconds} ms");
+            
             _logger.LogDebug($"Finished fetching {ids.Length} Observations in a total of " +
                              $"{totalStopwatch.Elapsed.TotalMilliseconds} ms");
             return observations;
