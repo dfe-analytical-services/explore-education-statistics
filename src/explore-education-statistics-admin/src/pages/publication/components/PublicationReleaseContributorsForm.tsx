@@ -1,7 +1,7 @@
 import WarningMessage from '@common/components/WarningMessage';
 import React from 'react';
 import releasePermissionService, {
-  ManageAccessPageContributor,
+  ContributorViewModel,
 } from '@admin/services/releasePermissionService';
 import { Formik } from 'formik';
 import { Form, FormFieldCheckboxGroup } from '@common/components/form';
@@ -20,8 +20,8 @@ interface AddExistingUsersFormValues {
 export interface Props {
   publicationId: string;
   releaseId: string;
-  publicationContributors: ManageAccessPageContributor[];
-  releaseContributors: ManageAccessPageContributor[];
+  publicationContributors: ContributorViewModel[];
+  releaseContributors: ContributorViewModel[];
 }
 
 const PublicationReleaseContributorsForm = ({

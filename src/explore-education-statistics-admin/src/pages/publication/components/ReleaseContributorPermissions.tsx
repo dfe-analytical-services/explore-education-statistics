@@ -1,28 +1,38 @@
-import { ManageAccessPageContributor } from '@admin/services/releasePermissionService';
+import {
+  ContributorViewModel,
+  ContributorInvite,
+} from '@admin/services/releasePermissionService';
 import ButtonText from '@common/components/ButtonText';
 import ModalConfirm from '@common/components/ModalConfirm';
 import WarningMessage from '@common/components/WarningMessage';
 import styles from '@admin/pages/publication/components/ReleaseContributorPermissions.module.scss';
 import React, { useState } from 'react';
+import Tag from '@common/components/Tag';
 
 export interface Props {
-  contributors: ManageAccessPageContributor[];
+  contributors: ContributorViewModel[];
+  invites: ContributorInvite[];
   onUserRemove: (userId: string) => void;
+  onUserInvitesRemove: (email: string) => void;
 }
 
 const ReleaseContributorPermissions = ({
   contributors,
+  invites,
   onUserRemove,
+  onUserInvitesRemove,
 }: Props) => {
-  const [removeUser, setRemoveUser] = useState<ManageAccessPageContributor>();
+  const [removeUser, setRemoveUser] = useState<ContributorViewModel>();
+  const [removeInvite, setRemoveInvite] = useState<ContributorInvite>();
 
   return (
     <>
-      {!contributors || !contributors.length ? (
+      {contributors.length === 0 && invites.length === 0 ? (
         <WarningMessage testId="releaseContributors-warning">
-          There are currently no team members associated with this publication.
-          You can invite new users by clicking the "Add or remove users" button
-          or by going to the <a href="#invite-users">invite users tab</a>.
+          There are currently no team members or pending invites associated with
+          this publication. You can invite new users by clicking the "Add or
+          remove users" button or by going to the{' '}
+          <a href="#invite-users">invite users tab</a>.
         </WarningMessage>
       ) : (
         <>
@@ -36,6 +46,19 @@ const ReleaseContributorPermissions = ({
                   <td className={styles.control}>
                     <ButtonText onClick={() => setRemoveUser(contributor)}>
                       Remove user
+                    </ButtonText>
+                  </td>
+                </tr>
+              ))}
+              {invites.map(invite => (
+                <tr key={invite.email}>
+                  <td className="govuk-!-width-one-half">
+                    {invite.email}
+                    <Tag className="govuk-!-margin-left-3">Pending Invite</Tag>
+                  </td>
+                  <td className={styles.control}>
+                    <ButtonText onClick={() => setRemoveInvite(invite)}>
+                      Cancel invite
                     </ButtonText>
                   </td>
                 </tr>
@@ -59,6 +82,25 @@ const ReleaseContributorPermissions = ({
               Are you sure you want to remove{' '}
               <strong>{removeUser?.userDisplayName}</strong> from all releases
               in this publication?
+            </p>
+          </ModalConfirm>
+
+          <ModalConfirm
+            title="Confirm cancelling of user invites"
+            open={!!removeInvite}
+            onConfirm={async () => {
+              if (removeInvite) {
+                onUserInvitesRemove(removeInvite.email);
+                setRemoveInvite(undefined);
+              }
+            }}
+            onCancel={() => setRemoveInvite(undefined)}
+            onExit={() => setRemoveInvite(undefined)}
+          >
+            <p>
+              Are you sure you want to cancel all invites to releases under this
+              publication for email address{' '}
+              <strong>{removeInvite?.email}</strong>?
             </p>
           </ModalConfirm>
         </>

@@ -78,6 +78,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, Unit>> RemoveByPublication(
+            string email,
+            Guid publicationId,
+            ReleaseRole releaseRole)
+        {
+            return await _contentPersistenceHelper
+                .CheckEntityExists<Publication>(publicationId, query => query
+                    .Include(p => p.Releases))
+                .OnSuccessDo(
+                    publication => _userService.CheckCanUpdateReleaseRole(publication, releaseRole))
+                .OnSuccess(async publication =>
+                {
+                    await _userReleaseInviteRepository.RemoveByPublication(publication, email, releaseRole);
+                    return Unit.Instance;
+                });
+        }
+
         private async Task<Either<ActionResult, Unit>> CreateNewUserContributorInvite(List<Guid> releaseIds,
             string email, string publicationTitle)
         {
@@ -202,12 +219,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var uri = _configuration.GetValue<string>("AdminUri");
             var template = _configuration.GetValue<string>("NotifyContributorTemplateId");
 
-            var releaseTitleBullets = await _contentDbContext.Releases
+            var releases = await _contentDbContext.Releases
                 .AsQueryable()
                 .Where(r => releaseIds.Contains(r.Id))
-                .Select(r => $"* {r.Title}")
                 .ToListAsync();
-            var releaseList = releaseTitleBullets.JoinToString("\n");
+
+            var releaseList = releases
+                .OrderBy(r => r.Year)
+                .ThenBy(r => r.TimePeriodCoverage)
+                .Select(r => $"* {r.Title}")
+                .ToList()
+                .JoinToString("\n");
 
             var emailValues = new Dictionary<string, dynamic>
             {

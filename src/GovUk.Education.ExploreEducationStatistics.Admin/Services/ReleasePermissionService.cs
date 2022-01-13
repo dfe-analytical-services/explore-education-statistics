@@ -45,33 +45,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId,
                     query =>
-                        query.Include(r => r.Publication).
-                            ThenInclude(p => p.Releases))
+                        query.Include(r => r.Publication)
+                            .ThenInclude(p => p.Releases))
                 .OnSuccessDo(release => _userService
                     .CheckCanUpdateReleaseRole(release.Publication, Contributor))
                 .OnSuccess(async release =>
                 {
-                    var allContributorsForRelease = await _contentDbContext.UserReleaseRoles
-                        .Include(urr => urr.User)
-                        .Where(urr =>
-                            urr.ReleaseId == release.Id
-                            && urr.Role == Contributor)
-                        .ToListAsync();
+                    var contributors = await _userReleaseRoleRepository
+                        .ListUserReleaseRoles(releaseId, Contributor);
 
-                    var contributorList = allContributorsForRelease
-                        .Select(urr => new ContributorViewModel
+                   return contributors
+                        .Select(userReleaseRole => new ContributorViewModel
                         {
-                            UserId = urr.UserId,
-                            UserDisplayName = urr.User.DisplayName,
-                            UserEmail = urr.User.Email,
+                            UserId = userReleaseRole.UserId,
+                            UserDisplayName = userReleaseRole.User.DisplayName,
+                            UserEmail = userReleaseRole.User.Email,
                         })
                         .OrderBy(model => model.UserDisplayName)
                         .ToList();
-
-                    return contributorList;
                 });
         }
 
+        public async Task<Either<ActionResult, List<ContributorInviteViewModel>>>
+            ListReleaseContributorInvites(Guid releaseId, bool? accepted = null)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId,
+                    query =>
+                        query.Include(r => r.Publication)
+                            .ThenInclude(p => p.Releases))
+                .OnSuccessDo(release => _userService
+                    .CheckCanUpdateReleaseRole(release.Publication, Contributor))
+                .OnSuccess(async release =>
+                {
+                    var invites = await _contentDbContext.UserReleaseInvites
+                        .AsQueryable()
+                        .Where(i =>
+                            i.ReleaseId == releaseId
+                            && i.Role == Contributor)
+                        .ToListAsync();
+
+                    return invites
+                        .Where(i => accepted == null || i.Accepted == accepted)
+                        .Select(i => new ContributorInviteViewModel
+                        {
+                            Email = i.Email,
+                        })
+                        .OrderBy(model => model.Email)
+                        .ToList();
+                });
+
+        }
         public async Task<Either<ActionResult, List<ContributorViewModel>>>
             ListPublicationContributors(Guid publicationId)
         {
@@ -89,6 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToList();
 
                     var users = await _contentDbContext.UserReleaseRoles
+                        .AsQueryable()
                         .Include(releaseRole => releaseRole.User)
                         .Where(userReleaseRole =>
                             allLatestReleaseIds.Contains(userReleaseRole.ReleaseId)

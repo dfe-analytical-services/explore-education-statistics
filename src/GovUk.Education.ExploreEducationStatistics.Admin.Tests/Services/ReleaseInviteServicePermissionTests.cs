@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
@@ -55,6 +54,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         return await service.InviteContributor("test@test.com",
                             publication.Id,
                             ListOf(release.Id));
+                    }
+                });
+        }
+
+        [Fact]
+        public async Task RemoveByPublication()
+        {
+            var release = new Release();
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Releases = ListOf(release),
+            };
+
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFailWithMatcher<Tuple<Publication, ReleaseRole>>(
+                    tuple => tuple.Item1.Id == publication.Id && tuple.Item2 == ReleaseRole.Contributor,
+                    CanUpdateSpecificReleaseRole)
+                .AssertForbidden(async userService =>
+                {
+                    var contentDbContextId = Guid.NewGuid().ToString();
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        await contentDbContext.AddAsync(publication);
+                        await contentDbContext.SaveChangesAsync();
+                    }
+
+                    await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        var service = SetupReleaseInviteService(
+                            contentDbContext: contentDbContext,
+                            userService: userService.Object);
+                        return await service.RemoveByPublication("test@test.com",
+                            publication.Id,
+                            ReleaseRole.Contributor);
                     }
                 });
         }

@@ -13,6 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<ContributorViewModel>>>
             ListReleaseContributors(Guid releaseId);
 
+        Task<Either<ActionResult, List<ContributorInviteViewModel>>>
+            ListReleaseContributorInvites(Guid releaseId, bool? accepted = null);
+
         Task<Either<ActionResult, List<ContributorViewModel>>>
             ListPublicationContributors(Guid releaseId);
 

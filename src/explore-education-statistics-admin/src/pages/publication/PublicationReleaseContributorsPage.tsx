@@ -6,7 +6,7 @@ import { RouteComponentProps } from 'react-router';
 import PublicationReleaseContributorsForm from '@admin/pages/publication/components/PublicationReleaseContributorsForm';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import releasePermissionService, {
-  ManageAccessPageContributor,
+  ContributorViewModel,
 } from '@admin/services/releasePermissionService';
 import publicationService, {
   BasicPublicationDetails,
@@ -16,8 +16,8 @@ import releaseService, { Release } from '@admin/services/releaseService';
 interface Model {
   publication: BasicPublicationDetails;
   release: Release;
-  publicationContributors: ManageAccessPageContributor[];
-  releaseContributors: ManageAccessPageContributor[];
+  publicationContributors: ContributorViewModel[];
+  releaseContributors: ContributorViewModel[];
 }
 
 const PublicationReleaseContributorsPage = ({

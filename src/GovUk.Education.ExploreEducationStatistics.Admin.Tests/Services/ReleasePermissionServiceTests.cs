@@ -187,6 +187,152 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task ListReleaseContributorsInvites_AcceptedFalse()
+        {
+            var publication = new Publication();
+            var release1 = new Release
+            {
+                Publication = publication,
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            };
+            var release2Original = new Release
+            {
+                Publication = publication,
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            };
+            var release2Amendment = new Release
+            {
+                Publication = publication,
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                PreviousVersion = release2Original,
+            };
+
+            var user1ReleaseInvite = new UserReleaseInvite
+            {
+                Email = "user1@test.com",
+                Release = release1,
+                Role = Contributor,
+                Accepted = false,
+            };
+
+            var user2ReleaseInviteIgnored = new UserReleaseInvite
+            {
+                Email = "user2@test.com",
+                Release = release2Amendment, // ignored because not release1
+                Role = Contributor,
+                Accepted = false,
+            };
+
+            var user3ReleaseInvite = new UserReleaseInvite
+            {
+                Email = "user3@test.com",
+                Release = release1,
+                Role = Contributor,
+                Accepted = false,
+            };
+
+            var user3ReleaseInviteIgnored = new UserReleaseInvite
+            {
+                Email = "user4@test.com",
+                Release = release1,
+                Role = Lead, // ignored because not a Contributor
+                Accepted = false,
+            };
+
+            var user5ReleaseInviteIgnored = new UserReleaseInvite
+            {
+                Email = "user5@test.com",
+                Release = release1,
+                Role = Contributor,
+                Accepted = true, // ignored because invite already accepted
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
+                    user1ReleaseInvite, user2ReleaseInviteIgnored, user3ReleaseInvite,
+                    user3ReleaseInviteIgnored, user5ReleaseInviteIgnored);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleasePermissionService(contentDbContext);
+
+                var result = await service.ListReleaseContributorInvites(release1.Id, false);
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(2, viewModel.Count);
+                Assert.Equal("user1@test.com", viewModel[0].Email);
+                Assert.Equal("user3@test.com", viewModel[1].Email);
+            }
+        }
+
+        [Fact]
+        public async Task ListReleaseContributorInvites_NoPublication()
+        {
+            await using var contentDbContext = InMemoryApplicationDbContext();
+            var service = SetupReleasePermissionService(contentDbContext);
+
+            var result = await service.ListReleaseContributorInvites(Guid.NewGuid());
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task ListReleaseContributorInvites_NoRelease()
+        {
+            var publication = new Publication { Title = "Test Publication" };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleasePermissionService(contentDbContext);
+
+                var result = await service.ListReleaseContributorInvites(Guid.NewGuid());
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
+        public async Task ListReleaseContributorInvites_NoUserReleaseInvites()
+        {
+            var publication = new Publication();
+            var release1 = new Release
+            {
+                ReleaseName = "2000",
+                Publication = publication,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(release1);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleasePermissionService(contentDbContext);
+
+                var result = await service
+                    .ListReleaseContributorInvites(release1.Id);
+                var viewModel = result.AssertRight();
+
+                Assert.Empty(viewModel);
+            }
+        }
+
+        [Fact]
         public async Task ListPublicationContributors()
         {
             var publication = new Publication();
