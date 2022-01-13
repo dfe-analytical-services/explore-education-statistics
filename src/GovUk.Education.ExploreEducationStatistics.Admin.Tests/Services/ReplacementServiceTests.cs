@@ -2984,10 +2984,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(replacedDataBlock.Query.Indicators);
                 Assert.Equal(replacementIndicator.Id, replacedDataBlock.Query.Indicators.First());
 
-                var replacedFilterItemIds = replacedDataBlock.Query.Filters;
+                var replacedFilterItemIds = replacedDataBlock.Query.Filters.ToList();
                 Assert.Equal(2, replacedFilterItemIds.Count());
-                Assert.Equal(replacementFilterItem1.Id, replacedFilterItemIds.ToList()[0]);
-                Assert.Equal(replacementFilterItem2.Id, replacedFilterItemIds.ToList()[1]);
+                Assert.Equal(replacementFilterItem1.Id, replacedFilterItemIds[0]);
+                Assert.Equal(replacementFilterItem2.Id, replacedFilterItemIds[1]);
 
                 Assert.NotNull(replacedDataBlock.Query.Locations);
                 Assert.Equal(dataBlock.Query.Locations, replacedDataBlock.Query.Locations);

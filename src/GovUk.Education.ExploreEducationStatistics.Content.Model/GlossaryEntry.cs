@@ -1,5 +1,4 @@
 #nullable enable
-
 using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
@@ -8,16 +7,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
-        public string Slug { get; set; }
+        public string Slug { get; set; } = string.Empty;
 
-        public string Body { get; set; }
+        public string Body { get; set; } = string.Empty;
 
         public DateTime Created { get; set; }
 
         public Guid CreatedById { get; set; }
 
-        public User CreatedBy { get; set; }
+        public User CreatedBy { get; set; } = null!;
     }
 }

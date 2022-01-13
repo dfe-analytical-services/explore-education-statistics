@@ -3340,6 +3340,12 @@
           },
           "branch": {
             "value": "[parameters('branch')]"
+          },
+          "actionGroupAlerts": {
+            "value": "[variables('actionGroupAlerts')]"
+          },
+          "enableAlerts": {
+            "value": "[parameters('enableAlerts')]"
           }
         }
       },
@@ -3347,7 +3353,8 @@
         "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
         "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
         "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]"
+        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
+        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
       ]
     },
     {

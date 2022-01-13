@@ -7,30 +7,25 @@ import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import mapFullTableMeta from '@common/modules/table-tool/utils/mapFullTableMeta';
+import { TableDataSubjectMeta } from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
 
 describe('ChartDataSetsConfiguration', () => {
-  const testMeta = {
+  const testMeta: TableDataSubjectMeta = {
     publicationName: '',
     subjectName: '',
     geoJsonAvailable: false,
     footnotes: [],
     boundaryLevels: [],
-    locations: [
-      {
-        label: 'Barnet',
-        value: 'barnet',
-        level: 'localAuthority',
-      },
-      {
-        label: 'Barnsley',
-        value: 'barnsley',
-        level: 'localAuthority',
-      },
-    ],
+    locationsHierarchical: {
+      localAuthority: [
+        { label: 'Barnet', value: 'barnet' },
+        { label: 'Barnsley', value: 'barnsley' },
+      ],
+    },
     timePeriodRange: [
       {
         label: '2019/20',

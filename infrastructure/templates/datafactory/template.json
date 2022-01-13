@@ -37,6 +37,12 @@
         "master",
         "dev"
       ]
+    },
+    "actionGroupAlerts": {
+      "type": "string"
+    },
+    "enableAlerts": {
+      "type": "bool"
     }
   },
   "variables":{
@@ -52,8 +58,7 @@
         "type":"SystemAssigned"
       },
       "properties": {},
-      "dependsOn": [
-      ]
+      "dependsOn": []
     },
     {
       "name": "datafactory-components",
@@ -103,6 +108,46 @@
       "dependsOn": [
         "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
       ]
+    },
+    {
+      "type": "Microsoft.Insights/metricAlerts",
+      "apiVersion": "2018-03-01",
+      "name": "[concat(parameters('subscription'),'DataFactoryActivityFailures')]",
+      "location": "global",
+      "dependsOn": [
+        "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+      ],
+      "properties": {
+        "description": "Data Factory - Activity Failures",
+        "severity": 3,
+        "enabled": "[parameters('enableAlerts')]",
+        "scopes": [
+          "[resourceId('Microsoft.DataFactory/factories', parameters('dataFactoryName'))]"
+        ],
+        "evaluationFrequency": "PT1M",
+        "windowSize": "PT5M",
+        "criteria": {
+          "allOf": [
+            {
+              "threshold": 0,
+              "name": "Metric1",
+              "metricNamespace": "Microsoft.DataFactory/factories",
+              "metricName": "ActivityFailedRuns",
+              "operator": "GreaterThan",
+              "timeAggregation": "Total",
+              "criterionType": "StaticThresholdCriterion"
+            }
+          ],
+          "odata.type": "Microsoft.Azure.Monitor.MultipleResourceMultipleMetricCriteria"
+        },
+        "autoMitigate": true,
+        "targetResourceType": "Microsoft.DataFactory/factories",
+        "actions": [
+          {
+            "actionGroupId": "[resourceId(resourceGroup().name, 'microsoft.insights/actionGroups', parameters('actionGroupAlerts'))]"
+          }
+        ]
+      }
     }
   ]
 }

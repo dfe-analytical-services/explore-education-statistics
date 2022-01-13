@@ -46,6 +46,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             return either.Left;
         }
         
+        public static TLeft AssertLeft<TLeft, TRight>(
+            this Either<TLeft, TRight> either, 
+            TLeft expectedValue, 
+            string message = null)
+        {
+            var value = either.AssertLeft(message);
+            Assert.Equal(expectedValue, value);
+            return either.Left;
+        }
+        
         public static ActionResult AssertBadRequest<TRight>(this Either<ActionResult, TRight> either, 
             params Enum[] expectedValidationErrors)
         {

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.RetryStage;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.BAU
+namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
 {
     [Route("api")]
     [ApiController]

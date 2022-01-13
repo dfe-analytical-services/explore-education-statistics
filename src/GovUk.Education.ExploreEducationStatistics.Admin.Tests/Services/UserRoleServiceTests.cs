@@ -1113,7 +1113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             contentDbContext.SaveChanges();
 
             return new UserRoleService(
-                usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
+                usersAndRolesDbContext,
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),

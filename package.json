@@ -6,6 +6,7 @@
     "@typescript-eslint/eslint-plugin": "^4.33.0",
     "@typescript-eslint/parser": "^4.33.0",
     "chalk": "^4.1.0",
+    "check-node-version": "^4.2.1",
     "cross-spawn": "^7.0.3",
     "eslint": "^7.32.0",
     "eslint-config-airbnb": "^18.2.1",
@@ -15,7 +16,7 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.26.1",
     "eslint-plugin-react-hooks": "^4.1.2",
-    "husky": "^6.0.0",
+    "husky": "^7.0.4",
     "lerna": "^4.0.0",
     "lint-staged": "^10.4.0",
     "prettier": "^2.1.2",
@@ -28,10 +29,13 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "bootstrap": "lerna bootstrap --ci --force-local",
+    "preinstall": "npm run check:node",
+    "prebootstrap:install": "npm run check:node",
+    "bootstrap": "npm run bootstrap:install -- --ci",
+    "bootstrap:prod": "npm run bootstrap:install -- --ci -- --only=prod",
     "bootstrap:install": "lerna bootstrap --force-local",
-    "bootstrap:prod": "lerna bootstrap --ci --force-local -- --only=prod",
     "clean": "lerna clean -y",
+    "check:node": "check-node-version --node 16 --npm 8",
     "fix": "npm run fix:js && npm run fix:style",
     "fix:js": "eslint --fix --ext .ts,.tsx,.js,.jsx src",
     "fix:style": "stylelint --fix src/**/*.{scss,css}",
@@ -71,6 +75,5 @@
     "*.py": [
       "python3 -m pipenv run autopep8"
     ]
-  },
-  "dependencies": {}
+  }
 }

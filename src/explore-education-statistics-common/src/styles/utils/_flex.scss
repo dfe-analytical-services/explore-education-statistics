@@ -6,10 +6,6 @@
   flex-wrap: wrap;
 }
 
-.dfe-align-items--center {
-  align-content: center;
-}
-
 .dfe-justify-content--center {
   justify-content: center;
 }
@@ -26,8 +22,16 @@
   justify-content: space-between;
 }
 
+.dfe-align-items-start {
+  align-items: flex-start;
+}
+
 .dfe-align-items--center {
   align-items: center;
+}
+
+.dfe-align-items-end {
+  align-items: flex-end;
 }
 
 .dfe-flex-shrink--0 {

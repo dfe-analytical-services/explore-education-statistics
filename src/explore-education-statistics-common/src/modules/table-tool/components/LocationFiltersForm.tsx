@@ -4,6 +4,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import FormFieldCheckboxGroupsMenu from '@common/modules/table-tool/components/FormFieldCheckboxGroupsMenu';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
+import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import {
   FilterOption,
   LocationOption,
@@ -19,7 +20,6 @@ import FormFieldCheckboxMenu from './FormFieldCheckboxMenu';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
-import WizardStepEditButton from './WizardStepEditButton';
 
 export interface LocationFormValues {
   locations: Dictionary<string[]>;
@@ -31,31 +31,24 @@ export type LocationFiltersFormSubmitHandler = (values: {
 
 const formId = 'locationFiltersForm';
 
-interface Props {
+interface Props extends InjectedWizardProps {
   options: SubjectMeta['locations'];
   initialValues?: Dictionary<string[]>;
   onSubmit: LocationFiltersFormSubmitHandler;
 }
 
-const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
-  const {
-    options,
-    onSubmit,
-    isActive,
-    goToNextStep,
-    currentStep,
-    stepNumber,
-    initialValues = {},
-  } = props;
+const LocationFiltersForm = ({
+  initialValues = {},
+  options,
+  onSubmit,
+  ...stepProps
+}: Props) => {
+  const { isActive, goToNextStep } = stepProps;
 
-  const stepEnabled = currentStep > stepNumber;
-  const stepHeading = useMemo(
-    () => (
-      <WizardStepHeading {...props} fieldsetHeading stepEnabled={stepEnabled}>
-        Choose locations
-      </WizardStepHeading>
-    ),
-    [props, stepEnabled],
+  const stepHeading = (
+    <WizardStepHeading {...stepProps} fieldsetHeading>
+      Choose locations
+    </WizardStepHeading>
   );
 
   const formOptions = useMemo(() => Object.entries(options), [options]);
@@ -123,8 +116,9 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
           return acc;
         }, {});
 
-        await onSubmit({ locations });
-        goToNextStep();
+        await goToNextStep(async () => {
+          await onSubmit({ locations });
+        });
       }}
     >
       {form => {
@@ -179,7 +173,7 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
                 </div>
               </FormFieldset>
 
-              <WizardStepFormActions {...props} />
+              <WizardStepFormActions {...stepProps} />
             </Form>
           );
         }
@@ -197,39 +191,31 @@ const LocationFiltersForm = (props: Props & InjectedWizardProps) => {
         );
 
         return (
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
-              {stepHeading}
-              <SummaryList noBorder>
-                {Object.entries(locationLevels)
-                  .filter(
-                    ([levelKey, levelOptions]) =>
-                      levelOptions.length > 0 && options[levelKey],
-                  )
-                  .map(([levelKey, levelOptions]) => (
-                    <SummaryListItem
-                      term={options[levelKey].legend}
-                      key={levelKey}
-                    >
-                      <CollapsibleList>
-                        {sortBy(levelOptions, ['label']).map(level => (
-                          <li key={level.value}>{level.label}</li>
-                        ))}
-                      </CollapsibleList>
-                    </SummaryListItem>
-                  ))}
-              </SummaryList>
-            </div>
-            <div className="govuk-grid-column-one-third dfe-align--right">
-              {stepEnabled && (
-                <WizardStepEditButton {...props} editTitle="Edit locations" />
-              )}
-              <ResetFormOnPreviousStep
-                currentStep={currentStep}
-                stepNumber={stepNumber}
-              />
-            </div>
-          </div>
+          <WizardStepSummary {...stepProps} goToButtonText="Edit locations">
+            {stepHeading}
+
+            <SummaryList noBorder>
+              {Object.entries(locationLevels)
+                .filter(
+                  ([levelKey, levelOptions]) =>
+                    levelOptions.length > 0 && options[levelKey],
+                )
+                .map(([levelKey, levelOptions]) => (
+                  <SummaryListItem
+                    term={options[levelKey].legend}
+                    key={levelKey}
+                  >
+                    <CollapsibleList>
+                      {sortBy(levelOptions, ['label']).map(level => (
+                        <li key={level.value}>{level.label}</li>
+                      ))}
+                    </CollapsibleList>
+                  </SummaryListItem>
+                ))}
+            </SummaryList>
+
+            <ResetFormOnPreviousStep {...stepProps} />
+          </WizardStepSummary>
         );
       }}
     </Formik>

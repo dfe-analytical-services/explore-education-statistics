@@ -59,7 +59,7 @@ You will need the following groups of dependencies to run the project successful
 
 1. To run applications in this service you will require the following:
 
-   - [NodeJS v12+](https://nodejs.org/)
+   - [NodeJS v16+](https://nodejs.org/)
    - [.NET Core v3.1](https://dotnet.microsoft.com/download/dotnet-core/3.1)
    - [Azure Functions Core Tools v3+](https://github.com/Azure/azure-functions-core-tools)
    

@@ -67,10 +67,12 @@ describe('createDataSetCategories', () => {
           name: 'sess_overall',
         },
       ],
-      locations: [
-        { level: 'localAuthority', label: 'Barnet', value: 'barnet' },
-        { level: 'localAuthority', label: 'Barnsley', value: 'barnsley' },
-      ],
+      locationsHierarchical: {
+        localAuthority: [
+          { label: 'Barnet', value: 'barnet' },
+          { label: 'Barnsley', value: 'barnsley' },
+        ],
+      },
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
@@ -1196,10 +1198,10 @@ describe('createDataSetCategories', () => {
             name: 'sess_authorised',
           },
         ],
-        locations: [
-          { level: 'country', label: 'England', value: 'E92000001' },
-          { level: 'region', label: 'North East', value: 'E12000001' },
-        ],
+        locationsHierarchical: {
+          country: [{ label: 'England', value: 'E92000001' }],
+          region: [{ label: 'North East', value: 'E12000001' }],
+        },
         boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
         subjectName: 'Absence by geographic level',

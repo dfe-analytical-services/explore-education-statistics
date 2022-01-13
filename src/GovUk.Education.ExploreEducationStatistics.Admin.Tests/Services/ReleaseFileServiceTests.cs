@@ -1457,7 +1457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(mock => mock.GetBlob(PrivateReleaseFiles, releaseFile.Path()))
                 .ReturnsAsync(
                     new BlobInfo(
-                        path: null,
+                        path: string.Empty,
                         size: "93 Kb",
                         contentType: "application/pdf",
                         contentLength: 0L,
@@ -1607,8 +1607,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             var blob = new BlobInfo(
-                path: null,
-                size: null,
+                path: string.Empty,
+                size: string.Empty,
                 contentType: "application/pdf",
                 contentLength: 0L,
                 meta: null,
@@ -1678,8 +1678,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             var blob = new BlobInfo(
-                path: null,
-                size: null,
+                path: string.Empty,
+                size: string.Empty,
                 contentType: "application/pdf",
                 contentLength: 0L,
                 meta: null,
@@ -2087,9 +2087,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             blobStorageService
                 .SetupDownloadToStream(PrivateReleaseFiles, releaseFile1.Path(), "Test 2 blob");
             blobStorageService
-                .SetupDownloadToStream(PrivateReleaseFiles, releaseFile2.Path(), "Test 3 blob");;
+                .SetupDownloadToStream(PrivateReleaseFiles, releaseFile2.Path(), "Test 3 blob");
             blobStorageService
-                .SetupDownloadToStream(PrivateReleaseFiles, releaseFile3.Path(), "Test 1 blob");;
+                .SetupDownloadToStream(PrivateReleaseFiles, releaseFile3.Path(), "Test 1 blob");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -2687,21 +2687,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task Update_NoRelease()
         {
-            await using (var contentDbContext = InMemoryContentDbContext())
-            {
-                var service = SetupReleaseFileService(contentDbContext);
+            await using var contentDbContext = InMemoryContentDbContext();
+            var service = SetupReleaseFileService(contentDbContext);
 
-                var result = await service.Update(
-                    Guid.NewGuid(),
-                    Guid.NewGuid(),
-                    new ReleaseFileUpdateViewModel
-                    {
-                        Title = "New file title",
-                    }
-                );
+            var result = await service.Update(
+                Guid.NewGuid(),
+                Guid.NewGuid(),
+                new ReleaseFileUpdateViewModel
+                {
+                    Title = "New file title",
+                }
+            );
 
-                result.AssertNotFound();
-            }
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -2930,7 +2928,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.NotNull(releaseFile);
-                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile.File.Created.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile.File.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, releaseFile.File.CreatedById);
             }
 

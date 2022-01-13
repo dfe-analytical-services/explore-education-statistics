@@ -30,11 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public TR Right => !IsLeft ? _right : throw new ArgumentException("Calling Right on a Left");
 
-        public Either<TL, T> Map<T>(Func<TR, T> func) =>
+        private Either<TL, T> Map<T>(Func<TR, T> func) =>
             IsLeft ? new Either<TL, T>(Left) : new Either<TL, T>(func.Invoke(Right));
-
-        public Either<TL, T> Map<T>(Func<TR, Either<TL, T>> func) =>
-            IsLeft ? new Either<TL, T>(Left) : func.Invoke(Right);
 
         public Either<TL, T> OnSuccess<T>(Func<TR, T> func) => Map(func);
 
@@ -184,12 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             this Task<Either<TFailure, TSuccess1>> task,
             Func<TSuccess1, Task> func)
         {
-            return await task.OnSuccess(async success =>
-                {
-                    await func(success);
-                    return Unit.Instance;
-                }
-            );
+            return await task.OnSuccessVoid(func);
         }
 
         public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
@@ -364,9 +356,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public static async Task<Either<TFailure1, TFailure2>> OnFailureFailWith<TFailure1, TFailure2>(
             this Task<Either<TFailure1, TFailure2>> task,
-            Func<TFailure1> failureTask)
+            Func<TFailure1> failure)
         {
-            return await task.OnFailureFailWith(async _ => await Task.FromResult(failureTask()));
+            return await task.OnFailureFailWith(async _ => await Task.FromResult(failure()));
         }
 
         /**

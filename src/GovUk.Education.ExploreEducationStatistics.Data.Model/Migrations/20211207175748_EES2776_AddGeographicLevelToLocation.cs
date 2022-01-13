@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     public partial class EES2776_AddGeographicLevelToLocation : Migration
     {
-        private const string MigrationId = "20211207175748";
+        public const string MigrationId = "20211207175748";
         private const string PreviousLocationTypeMigrationId = E2328UpdateLocationTypeAndUpsertLocation.MigrationId;
         private const string PreviousUpsertLocationMigrationId = E2328UpdateLocationTypeAndUpsertLocation.MigrationId;
 
