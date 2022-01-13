@@ -459,8 +459,10 @@ Select subject "${SUBJECT_2_NAME}" in table tool
 
 Select locations in table tool
     # LH: Not using the 'user opens details dropdown' keyword here as
-    # it opens the 'Local Authority District' dropdown instead???
-    user clicks element    //*[@data-testid="Expand Details Section Local Authority"]
+    # it opens the 'Local Authority District' dropdown instead
+    # due to using 'contains'
+    # TODO: LH - fix this
+    user clicks element    testid:Expand Details Section Local Authority
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
 
@@ -538,11 +540,6 @@ Validate table column headings for featured table
 Validate table rows for featured table
     ${row}=    user gets row number with heading    Bolton 001
     user checks table heading in offset row contains    ${row}    0    2    2009
-
-    user checks table cell in offset row contains    ${row}    0    1    5,815
-
-    ${row}=    user gets row number with heading    Bolton 001
-    user checks table heading in offset row contains    ${row}    0    2    2009
     user checks table heading in offset row contains    ${row}    1    1    2010
     user checks table heading in offset row contains    ${row}    2    1    2017
 
@@ -552,13 +549,7 @@ Validate table rows for featured table
 
     ${row}=    user gets row number with heading    Bolton 004
     user checks table heading in offset row contains    ${row}    0    2    2005
-
-    user checks table cell in offset row contains    ${row}    0    1    8,557
-
-    ${row}=    user gets row number with heading    Bolton 004
-    user checks table heading in offset row contains    ${row}    0    2    2005
     user checks table heading in offset row contains    ${row}    1    1    2017
-
     user checks table cell in offset row contains    ${row}    0    1    8,557
     user checks table cell in offset row contains    ${row}    1    1    3,481
 
