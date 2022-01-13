@@ -53,6 +53,9 @@
     "enableThemeDeletion": {
       "value": true
     },
+    "enableAlerts": {
+      "value": true
+    },
     "tableBuilderMaxTableCellsAllowed": {
       "value": 1000000
     }
