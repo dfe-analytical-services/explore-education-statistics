@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
     [ExcludeFromCodeCoverage]
     public partial class EES2778_QueryObservationsByLocationId : Migration
     {
-        private const string MigrationId = "20211209171502";
+        public const string MigrationId = "20211209171502";
         private const string PreviousFilteredObservationsMigrationId = "20210712091202";
 
         protected override void Up(MigrationBuilder migrationBuilder)
