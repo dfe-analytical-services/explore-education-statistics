@@ -27,18 +27,18 @@ export default class CommentsEditing extends Plugin {
     /**
      * Set up commands
      */
-    this.editor.commands.add('addComment', new AddCommentCommand(this.editor));
-    this.editor.commands.add(
+    editor.commands.add('addComment', new AddCommentCommand(editor));
+    editor.commands.add(
       'addCommentPlaceholder',
-      new AddCommentPlaceholderCommand(this.editor),
+      new AddCommentPlaceholderCommand(editor),
     );
-    const selectCommentCommand = new SelectCommentCommand(this.editor);
-    this.editor.commands.add('selectComment', selectCommentCommand);
-    const removeCommentCommand = new RemoveCommentCommand(this.editor);
-    this.editor.commands.add('removeComment', removeCommentCommand);
-    this.editor.commands.add(
+    const selectCommentCommand = new SelectCommentCommand(editor);
+    editor.commands.add('selectComment', selectCommentCommand);
+    const removeCommentCommand = new RemoveCommentCommand(editor);
+    editor.commands.add('removeComment', removeCommentCommand);
+    editor.commands.add(
       'resolveComment',
-      new ToggleResolveCommentCommand(this.editor),
+      new ToggleResolveCommentCommand(editor),
     );
 
     editor.on('ready', () => {
@@ -64,22 +64,21 @@ export default class CommentsEditing extends Plugin {
             return;
           }
 
+          if (
+            lastOperation.batch.operations.length === 1 &&
+            !lastOperation.newRange
+          ) {
+            this.config.undoRedoComment(
+              'undoAddComment',
+              lastOperation.batch.operations[0].name,
+            );
+            return;
+          }
+
           this.removedMarkers = this.removedMarkers.filter(
             marker => marker !== lastOperation.name,
           );
           this.config.undoRedoComment('undoRemoveComment', lastOperation.name);
-          return;
-        }
-
-        if (
-          lastOperation.name === 'commentplaceholder' &&
-          lastOperation.newRange &&
-          !lastOperation.oldRange
-        ) {
-          this.config.undoRedoComment(
-            'undoAddComment',
-            lastOperation.batch.operations[0].name,
-          );
           return;
         }
 
@@ -113,7 +112,10 @@ export default class CommentsEditing extends Plugin {
             return;
           }
 
-          if (lastOperation.batch.operations[0].name === 'commentplaceholder') {
+          if (
+            lastOperation.batch.operations.length === 1 &&
+            !lastOperation.oldRange
+          ) {
             this.config.undoRedoComment('redoAddComment', lastOperation.name);
             return;
           }

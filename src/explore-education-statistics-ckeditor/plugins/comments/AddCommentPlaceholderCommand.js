@@ -25,10 +25,13 @@ export default class AddCommentPlaceholderCommand extends Command {
     const range = editor.model.document.selection.getFirstRange();
 
     editor.model.change(writer => {
+      if (editor.model.markers.has('commentplaceholder')) {
+        return;
+      }
       writer.addMarker(`commentplaceholder`, {
         affectsData: true,
         range,
-        usingOperation: true,
+        usingOperation: false, // don't want placeholders to be in the undo/redo stack.
       });
     });
   }
