@@ -295,14 +295,7 @@
                     {
                         "name": "Copy_Release",
                         "type": "Copy",
-                        "dependsOn": [
-                            {
-                                "activity": "ForEachLinkedFootnote",
-                                "dependencyConditions": [
-                                    "Succeeded"
-                                ]
-                            }
-                        ],
+                        "dependsOn": [],
                         "policy": {
                             "timeout": "7.00:00:00",
                             "retry": 0,
@@ -323,23 +316,7 @@
                                 "type": "AzureSqlSink",
                                 "sqlWriterStoredProcedureName": "[[dbo].[DropAndCreateRelease]",
                                 "sqlWriterTableType": "ReleaseType",
-                                "storedProcedureTableTypeParameterName": "Release",
-                                "storedProcedureParameters": {
-                                    "LinkedFootnotes": {
-                                        "type": "String",
-                                        "value": {
-                                            "value": "@join(variables('LinkedFootnotes'),',')",
-                                            "type": "Expression"
-                                        }
-                                    },
-                                    "LinkedSubjects": {
-                                        "type": "String",
-                                        "value": {
-                                            "value": "@join(variables('LinkedSubjects'),',')",
-                                            "type": "Expression"
-                                        }
-                                    }
-                                }
+                                "storedProcedureTableTypeParameterName": "Release"
                             },
                             "enableStaging": false,
                             "translator": {
@@ -2086,143 +2063,6 @@
                                 }
                             }
                         }
-                    },
-                    {
-                        "name": "ForEachLinkedSubject",
-                        "type": "ForEach",
-                        "dependsOn": [
-                            {
-                                "activity": "Find_Linked_Subjects",
-                                "dependencyConditions": [
-                                    "Succeeded"
-                                ]
-                            }
-                        ],
-                        "userProperties": [],
-                        "typeProperties": {
-                            "items": {
-                                "value": "@activity('Find_Linked_Subjects').output.Value",
-                                "type": "Expression"
-                            },
-                            "activities": [
-                                {
-                                    "name": "AppendToLinkedSubjects",
-                                    "type": "AppendVariable",
-                                    "dependsOn": [],
-                                    "userProperties": [],
-                                    "typeProperties": {
-                                        "variableName": "LinkedSubjects",
-                                        "value": {
-                                            "value": "@item().SubjectId",
-                                            "type": "Expression"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
-                    },
-                    {
-                        "name": "Find_Linked_Subjects",
-                        "type": "Lookup",
-                        "dependsOn": [],
-                        "policy": {
-                            "timeout": "7.00:00:00",
-                            "retry": 0,
-                            "retryIntervalInSeconds": 30,
-                            "secureOutput": false,
-                            "secureInput": false
-                        },
-                        "userProperties": [],
-                        "typeProperties": {
-                            "source": {
-                                "type": "AzureSqlSource",
-                                "sqlReaderQuery": {
-                                    "value": "SELECT SubjectId FROM dbo.ReleaseSubject RS WHERE RS.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')\nAND RS.SubjectId IN (SELECT SubjectId FROM dbo.ReleaseSubject WHERE SubjectId = RS.SubjectId AND ReleaseId != CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))\n",
-                                    "type": "Expression"
-                                },
-                                "queryTimeout": "02:00:00"
-                            },
-                            "dataset": {
-                                "referenceName": "ds_sql_statistics",
-                                "type": "DatasetReference",
-                                "parameters": {
-                                    "cw_table": "ReleaseSubject"
-                                }
-                            },
-                            "firstRowOnly": false
-                        }
-                    },
-                    {
-                        "name": "Find_Linked_Footnotes",
-                        "type": "Lookup",
-                        "dependsOn": [
-                            {
-                                "activity": "ForEachLinkedSubject",
-                                "dependencyConditions": [
-                                    "Succeeded"
-                                ]
-                            }
-                        ],
-                        "policy": {
-                            "timeout": "7.00:00:00",
-                            "retry": 0,
-                            "retryIntervalInSeconds": 30,
-                            "secureOutput": false,
-                            "secureInput": false
-                        },
-                        "userProperties": [],
-                        "typeProperties": {
-                            "source": {
-                                "type": "AzureSqlSource",
-                                "sqlReaderQuery": {
-                                    "value": "SELECT FootnoteId FROM dbo.ReleaseFootnote RF WHERE RF.ReleaseId = CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}')\nAND RF.FootnoteId IN (SELECT FootnoteId FROM dbo.ReleaseFootnote WHERE FootnoteId = RF.FootnoteId AND ReleaseId != CONVERT(UNIQUEIDENTIFIER, '@{pipeline().parameters.releaseId}'))\n",
-                                    "type": "Expression"
-                                },
-                                "queryTimeout": "02:00:00"
-                            },
-                            "dataset": {
-                                "referenceName": "ds_sql_statistics",
-                                "type": "DatasetReference",
-                                "parameters": {
-                                    "cw_table": "ReleaseFootnote"
-                                }
-                            },
-                            "firstRowOnly": false
-                        }
-                    },
-                    {
-                        "name": "ForEachLinkedFootnote",
-                        "type": "ForEach",
-                        "dependsOn": [
-                            {
-                                "activity": "Find_Linked_Footnotes",
-                                "dependencyConditions": [
-                                    "Succeeded"
-                                ]
-                            }
-                        ],
-                        "userProperties": [],
-                        "typeProperties": {
-                            "items": {
-                                "value": "@activity('Find_Linked_Footnotes').output.Value",
-                                "type": "Expression"
-                            },
-                            "activities": [
-                                {
-                                    "name": "AppendToLinkedFootnotes",
-                                    "type": "AppendVariable",
-                                    "dependsOn": [],
-                                    "userProperties": [],
-                                    "typeProperties": {
-                                        "variableName": "LinkedFootnotes",
-                                        "value": {
-                                            "value": "@item().FootnoteId",
-                                            "type": "Expression"
-                                        }
-                                    }
-                                }
-                            ]
-                        }
                     }
                 ],
                 "parameters": {
@@ -2236,14 +2076,6 @@
                     }
                 },
                 "concurrency": 1,
-                "variables": {
-                    "LinkedSubjects": {
-                        "type": "Array"
-                    },
-                    "LinkedFootnotes": {
-                        "type": "Array"
-                    }
-                },
                 "annotations": []
             },
             "dependsOn": [
