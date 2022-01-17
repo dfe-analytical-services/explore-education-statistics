@@ -2076,14 +2076,6 @@
                     }
                 },
                 "concurrency": 1,
-                "variables": {
-                    "LinkedSubjects": {
-                        "type": "Array"
-                    },
-                    "LinkedFootnotes": {
-                        "type": "Array"
-                    }
-                },
                 "annotations": []
             },
             "dependsOn": [

@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
     [ExcludeFromCodeCoverage]
     public partial class InitialCreate_Custom : Migration
     {
-        private const string MigrationId = "20210512112804";
+        public const string MigrationId = "20210512112804";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {

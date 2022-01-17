@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.Sql("DROP PROCEDURE dbo.DropAndCreateRelease");
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousMigrationId}_Routine_DropAndCreateRelease.sql");
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{InitialCreate_Custom.MigrationId}_Routine_DropAndCreateRelease.sql");
         }
     }
 }
