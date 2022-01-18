@@ -65,6 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         public DbSet<ReleaseSubject> ReleaseSubject { get; set; } = null!;
         public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
+        public DbSet<PermlinkInfo> PermalinkInfo { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -290,6 +291,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .Property(observation => observation.GeographicLevel)
                 .HasConversion(geographicLevelConverter)
                 .HasMaxLength(6);
+
+            modelBuilder.Entity<PermlinkInfo>()
+                .Property(permalinkInfo => permalinkInfo.QueryLocationGeographicLevel)
+                .HasConversion(geographicLevelConverter)
+                .HasMaxLength(6);
+
+            modelBuilder.Entity<PermlinkInfo>()
+                .Property(permalinkInfo => permalinkInfo.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
             modelBuilder.Entity<Observation>()
                 .HasIndex(observation => observation.GeographicLevel);
