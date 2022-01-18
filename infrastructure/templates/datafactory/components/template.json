@@ -2075,7 +2075,7 @@
                         "defaultValue": "24B9CBA7-C873-4BF2-8329-355F5FDA14AB"
                     }
                 },
-                "concurrency": 3,
+                "concurrency": 10,
                 "annotations": []
             },
             "dependsOn": [
@@ -2877,7 +2877,7 @@
                         "defaultValue": "24B9CBA7-C873-4BF2-8329-355F5FDA14AB"
                     }
                 },
-                "concurrency": 3,
+                "concurrency": 10,
                 "annotations": []
             },
             "dependsOn": [
