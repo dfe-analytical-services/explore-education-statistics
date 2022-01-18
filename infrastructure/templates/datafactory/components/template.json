@@ -19,6 +19,12 @@
             "metadata": {
                 "description": "The name of the key vault"
             }
+        },
+        "factoryConcurrency": {
+            "type": "int",
+            "metadata": {
+                "description": "Maximum number of runs pipelines will run in parallel"
+            }
         }
     },
     "variables": {
@@ -2075,7 +2081,7 @@
                         "defaultValue": "24B9CBA7-C873-4BF2-8329-355F5FDA14AB"
                     }
                 },
-                "concurrency": 10,
+                "concurrency": "[parameters('factoryConcurrency')]",
                 "annotations": []
             },
             "dependsOn": [
@@ -2877,7 +2883,7 @@
                         "defaultValue": "24B9CBA7-C873-4BF2-8329-355F5FDA14AB"
                     }
                 },
-                "concurrency": 10,
+                "concurrency":  "[parameters('factoryConcurrency')]",
                 "annotations": []
             },
             "dependsOn": [

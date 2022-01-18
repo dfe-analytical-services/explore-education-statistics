@@ -73,6 +73,9 @@
     },
     "maxDbSizeBytes": {
       "value": 322122547200
+    },
+    "dataFactoryConcurrency": {
+      "value": 10
     }
   }
 }
