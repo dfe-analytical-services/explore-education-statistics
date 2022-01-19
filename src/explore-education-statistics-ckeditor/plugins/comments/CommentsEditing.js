@@ -5,6 +5,7 @@ import AddCommentPlaceholderCommand from './AddCommentPlaceholderCommand';
 import SelectCommentCommand from './SelectCommentCommand';
 import RemoveCommentCommand from './RemoveCommentCommand';
 import ToggleResolveCommentCommand from './ToggleResolveCommentCommand';
+import { markerTypes } from './constants';
 
 export default class CommentsEditing extends Plugin {
   constructor(editor) {
@@ -51,10 +52,10 @@ export default class CommentsEditing extends Plugin {
           docVersion - 1,
         );
 
-        if (lastOperation.name?.startsWith('comment:')) {
+        if (lastOperation.name?.startsWith(`${markerTypes.comment}:`)) {
           if (
             lastOperation.batch.operations[0].name?.startsWith(
-              'resolvedcomment:',
+              `${markerTypes.resolvedComment}:`,
             )
           ) {
             this.config.undoRedoComment(
@@ -82,7 +83,7 @@ export default class CommentsEditing extends Plugin {
           return;
         }
 
-        if (lastOperation.name?.startsWith('resolvedcomment:')) {
+        if (lastOperation.name?.startsWith(`${markerTypes.resolvedComment}:`)) {
           this.config.undoRedoComment(
             'undoUnresolveComment',
             lastOperation.name,
@@ -99,10 +100,10 @@ export default class CommentsEditing extends Plugin {
           docVersion - 1,
         );
 
-        if (lastOperation.name?.startsWith('comment:')) {
+        if (lastOperation.name?.startsWith(`${markerTypes.comment}:`)) {
           if (
             lastOperation.batch.operations[0].name?.startsWith(
-              'resolvedcomment:',
+              `${markerTypes.resolvedComment}:`,
             )
           ) {
             this.config.undoRedoComment(
@@ -124,7 +125,7 @@ export default class CommentsEditing extends Plugin {
           return;
         }
 
-        if (lastOperation.name?.startsWith('resolvedcomment:')) {
+        if (lastOperation.name?.startsWith(`${markerTypes.resolvedComment}:`)) {
           this.config.undoRedoComment('redoResolveComment', lastOperation.name);
         }
       });
@@ -139,7 +140,7 @@ export default class CommentsEditing extends Plugin {
       let selectedMarker;
       markerCollection.forEach(marker => {
         if (
-          marker.name.startsWith('comment:') &&
+          marker.name.startsWith(`${markerTypes.comment}:`) &&
           marker.name === selectCommentCommand.commentName
         ) {
           selectedMarker = marker;
@@ -169,7 +170,7 @@ export default class CommentsEditing extends Plugin {
           changedMarkers.forEach(changedMarker => {
             // If it's not a comment marker or already being removed, do nothing
             if (
-              !changedMarker.name.startsWith('comment:') ||
+              !changedMarker.name.startsWith(`${markerTypes.comment}:`) ||
               this.removedMarkers.includes(changedMarker.name)
             ) {
               return;
@@ -206,12 +207,12 @@ export default class CommentsEditing extends Plugin {
     this.listenTo(viewDocument, 'click', () => {
       const { model } = editor;
       const { document } = model;
-      const placeholderMarkerName = 'commentplaceholder';
+      const placeholderMarkerName = markerTypes.commentPlaceholder;
       let selectedMarkerName = '';
 
       [...model.markers].forEach(marker => {
         if (
-          (marker.name.startsWith('comment:') ||
+          (marker.name.startsWith(`${markerTypes.comment}:`) ||
             marker.name === placeholderMarkerName) &&
           isInMarker(document.selection, marker)
         ) {
@@ -250,7 +251,7 @@ export default class CommentsEditing extends Plugin {
 
     // Comment markers
     conversion.for('editingDowncast').markerToHighlight({
-      model: 'comment',
+      model: markerTypes.comment,
       view: data => {
         const classes = ['commentStyle'];
         if (this.selectedComment === data.markerName) {
@@ -261,50 +262,50 @@ export default class CommentsEditing extends Plugin {
     });
 
     conversion.for('dataDowncast').markerToData({
-      model: 'comment',
+      model: markerTypes.comment,
     });
 
     conversion.for('upcast').dataToMarker({
-      view: 'comment',
+      view: markerTypes.comment,
     });
 
     // Comment placeholder markers
     conversion.for('editingDowncast').markerToHighlight({
-      model: 'commentplaceholder',
+      model: markerTypes.commentPlaceholder,
       view: () => {
         return { classes: ['commentPlaceholderStyle'] };
       },
     });
 
     conversion.for('dataDowncast').markerToData({
-      model: 'commentplaceholder',
+      model: markerTypes.commentPlaceholder,
     });
 
     conversion.for('upcast').dataToMarker({
-      view: 'commentplaceholder',
+      view: markerTypes.commentPlaceholder,
     });
 
     // Resolved comment markers
     conversion.for('editingDowncast').markerToHighlight({
-      model: 'resolvedcomment',
+      model: markerTypes.resolvedComment,
       view: () => {
         return { classes: ['resolvedCommentStyle'] };
       },
     });
 
     conversion.for('dataDowncast').markerToData({
-      model: 'resolvedcomment',
+      model: markerTypes.resolvedComment,
     });
 
     conversion.for('upcast').dataToMarker({
-      view: 'resolvedcomment',
+      view: markerTypes.resolvedComment,
     });
   }
 
   defineSchema() {
     const { schema } = this.editor.model;
 
-    schema.register('comment', {
+    schema.register(markerTypes.comment, {
       allowWhere: '$text',
       allowContentOf: '$marker',
       allowAttributes: ['id'],
@@ -312,7 +313,7 @@ export default class CommentsEditing extends Plugin {
       isSelectable: true,
     });
 
-    schema.register('resolvedcomment', {
+    schema.register(markerTypes.resolvedComment, {
       allowWhere: '$text',
       allowContentOf: '$marker',
       allowAttributes: ['id'],

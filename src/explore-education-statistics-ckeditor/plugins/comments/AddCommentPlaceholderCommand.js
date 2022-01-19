@@ -1,4 +1,5 @@
 import Command from '@ckeditor/ckeditor5-core/src/command';
+import { markerTypes } from './constants';
 
 /**
  * Adds a placeholder marker while a comment is being added.
@@ -25,10 +26,10 @@ export default class AddCommentPlaceholderCommand extends Command {
     const range = editor.model.document.selection.getFirstRange();
 
     editor.model.change(writer => {
-      if (editor.model.markers.has('commentplaceholder')) {
+      if (editor.model.markers.has(markerTypes.commentPlaceholder)) {
         return;
       }
-      writer.addMarker(`commentplaceholder`, {
+      writer.addMarker(markerTypes.commentPlaceholder, {
         affectsData: true,
         range,
         usingOperation: false, // don't want placeholders to be in the undo/redo stack.
