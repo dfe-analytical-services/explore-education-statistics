@@ -1,51 +1,64 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
 {
     public static class ImporterUtils
     {
-        public static readonly List<GeographicLevel> IgnoredGeographicLevels = new List<GeographicLevel>
+        /// <summary>
+        /// Levels which data will only be imported for if a file consists exclusively of data of that level.
+        /// </summary>
+        private static readonly List<GeographicLevel> SoloGeographicLevels = new()
         {
             GeographicLevel.Institution,
-            GeographicLevel.Provider,
-            GeographicLevel.School,
-            GeographicLevel.PlanningArea
-        };
-
-        private static readonly List<GeographicLevel> AllowedSoloGeographicLevels = new List<GeographicLevel>
-        {
+            GeographicLevel.PlanningArea,
             GeographicLevel.Provider,
             GeographicLevel.School,
         };
 
-        /// <summary>
-        /// If a subject contains a single geographic level that is contained in AllowedSoloGeographicLevels, then
-        /// we import every CSV row of that subject's data file.
-        /// </summary>
-        /// <remarks>
-        /// If a subject contains more than one geographic level or isn't included in AllowedSoloGeographicLevels,
-        /// we then defer to AllowRowImport to determine if a particular row should be imported.
-        /// </remarks>
-        public static bool HasSoloAllowedGeographicLevel(HashSet<GeographicLevel> subjectGeographicLevels)
+        public static bool IsSoloGeographicLevel(this GeographicLevel geographicLevel)
         {
-            return subjectGeographicLevels.Count == 1
-                   && AllowedSoloGeographicLevels.Contains(subjectGeographicLevels.ElementAt(0));
+            return SoloGeographicLevels.Contains(geographicLevel);
         }
 
         /// <summary>
-        /// Determines if a specific data file CSV row should be imported based on whether it is in
-        /// IgnoredGeographicLevels.
+        /// Determines if a file import consists exclusively of one geographic level.
         /// </summary>
-        /// <remarks>
-        /// This method is used in conjunction with HasSoloAllowedGeographicLevel to determine what data file CSV rows
-        /// should and shouldn't be imported.
-        /// </remarks>
-        public static bool AllowRowImport(GeographicLevel rowGeographicLevel)
+        public static bool IsSoleGeographicLevel(this DataImport dataImport)
         {
-            return !IgnoredGeographicLevels.Contains(rowGeographicLevel);
+            return dataImport.GeographicLevels.Count == 1;
         }
 
+        /// <summary>
+        /// Determines if a row should be imported based on geographic level.
+        /// If a file contains a sole level then any row is allowed, otherwise rows for 'solo' levels are ignored. 
+        /// </summary>
+        public static bool AllowRowImport(bool soleGeographicLevel,
+            IReadOnlyList<string> rowValues,
+            List<string> colValues)
+        {
+            return soleGeographicLevel ||
+                   !GetGeographicLevel(rowValues, colValues).IsSoloGeographicLevel();
+        }
+
+        public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> rowValues, List<string> colValues)
+        {
+            var value = CsvUtil.Value(rowValues, colValues, "geographic_level");
+
+            foreach (var val in (GeographicLevel[]) Enum.GetValues(typeof(GeographicLevel)))
+            {
+                if (val.GetEnumLabel().ToLower().Equals(value.ToLower()))
+                {
+                    return val;
+                }
+            }
+
+            throw new InvalidGeographicLevelException(value);
+        }
     }
 }

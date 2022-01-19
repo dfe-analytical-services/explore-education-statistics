@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
@@ -5,17 +6,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
     public class ProcessorStatistics
     {
-        public int FilteredObservationCount { get; set; }
-        public int RowsPerBatch { get; set; }
-        public int NumBatches { get; set; }
-        public HashSet<GeographicLevel> GeographicLevels { get; set; }
+        public int TotalRows { get; }
+        public int RowsPerBatch { get; }
+        public int NumBatches { get; }
+        public HashSet<GeographicLevel> GeographicLevels { get; }
 
-        public ProcessorStatistics(int filteredObservationCount,
+        public ProcessorStatistics(int totalRows,
             int rowsPerBatch,
             int numBatches,
             HashSet<GeographicLevel> geographicLevels)
         {
-            FilteredObservationCount = filteredObservationCount;
+            TotalRows = totalRows;
             RowsPerBatch = rowsPerBatch;
             NumBatches = numBatches;
             GeographicLevels = geographicLevels;

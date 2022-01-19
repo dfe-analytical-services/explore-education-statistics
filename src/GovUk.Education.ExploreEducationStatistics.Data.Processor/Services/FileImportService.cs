@@ -72,13 +72,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 await using var transaction = await context.Database.BeginTransactionAsync();
 
                 await _importerService.ImportObservations(
+                    import,
                     dataFileTable.Columns,
                     dataFileTable.Rows,
                     subject,
                     _importerService.GetMeta(metaFileTable, subject, context),
-                    import.GeographicLevels,
                     message.BatchNo,
-                    import.RowsPerBatch,
                     context
                 );
 

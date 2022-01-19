@@ -130,7 +130,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return _importerMetaService.Get(table.Columns, table.Rows, subject, context);
         }
 
-        public async Task ImportFiltersAndLocations(DataImport dataImport,
+        public async Task ImportFiltersAndLocations(
+            DataImport dataImport,
             DataColumnCollection cols,
             DataRowCollection rows,
             SubjectMeta subjectMeta,
@@ -142,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var colValues = CsvUtil.GetColumnValues(cols);
             var rowCount = 1;
             var totalRows = rows.Count;
-            var hasSoloAllowedGeographicLevel = HasSoloAllowedGeographicLevel(dataImport.GeographicLevels);
+            var soleGeographicLevel = dataImport.IsSoleGeographicLevel();
 
             foreach (DataRow row in rows)
             {
@@ -163,8 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
 
                 var rowValues = CsvUtil.GetRowValues(row);
-                var rowGeographicLevel = GetGeographicLevel(rowValues, colValues);
-                if (hasSoloAllowedGeographicLevel || AllowRowImport(rowGeographicLevel))
+                if (AllowRowImport(soleGeographicLevel, rowValues, colValues))
                 {
                     CreateFiltersAndLocationsFromCsv(context, rowValues, colValues, subjectMeta.Filters);
                 }
@@ -173,40 +173,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        public async Task ImportObservations(DataColumnCollection cols, DataRowCollection rows, Subject subject,
-            SubjectMeta subjectMeta, HashSet<GeographicLevel> subjectGeographicLevels, int batchNo, int rowsPerBatch, StatisticsDbContext context)
+        public async Task ImportObservations(
+            DataImport import,
+            DataColumnCollection cols,
+            DataRowCollection rows,
+            Subject subject,
+            SubjectMeta subjectMeta, 
+            int batchNo,
+            StatisticsDbContext context)
         {
             _memoryCache.Clear();
 
             var observations = GetObservations(
+                import,
                 context,
                 rows,
                 CsvUtil.GetColumnValues(cols),
                 subject,
                 subjectMeta,
-                subjectGeographicLevels,
-                batchNo,
-                rowsPerBatch).ToList();
+                batchNo).ToList();
 
             await InsertObservations(context, observations);
-        }
-
-        public GeographicLevel GetGeographicLevel(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return GetGeographicLevelFromString(CsvUtil.Value(rowValues, colValues, "geographic_level"));
-        }
-
-        private static GeographicLevel GetGeographicLevelFromString(string value)
-        {
-            foreach (GeographicLevel val in Enum.GetValues(typeof(GeographicLevel)))
-            {
-                if (val.GetEnumLabel().ToLower().Equals(value.ToLower()))
-                {
-                    return val;
-                }
-            }
-
-            throw new InvalidGeographicLevelException(value);
         }
 
         public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues, List<string> colValues)
@@ -235,26 +222,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         }
 
         private IEnumerable<Observation> GetObservations(
+            DataImport import,
             StatisticsDbContext context,
             DataRowCollection rows,
             List<string> colValues,
             Subject subject,
             SubjectMeta subjectMeta,
-            HashSet<GeographicLevel> subjectGeographicLevels,
-            int batchNo,
-            int rowsPerBatch
-        )
+            int batchNo)
         {
             var observations = new List<Observation>();
             var i = 0;
-            var hasSoloAllowedGeographicLevel = HasSoloAllowedGeographicLevel(subjectGeographicLevels);
+            var soleGeographicLevel = import.IsSoleGeographicLevel();
 
             foreach (DataRow row in rows)
             {
                 var rowValues = CsvUtil.GetRowValues(row).ToArray();
                 var geographicLevel = GetGeographicLevel(rowValues, colValues);
 
-                if (hasSoloAllowedGeographicLevel || AllowRowImport(geographicLevel))
+                if (AllowRowImport(soleGeographicLevel, rowValues, colValues))
                 {
                     var o = ObservationFromCsv(
                         context,
@@ -263,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         geographicLevel,
                         subject,
                         subjectMeta,
-                        ((batchNo - 1) * rowsPerBatch) + i++ + 2);
+                        ((batchNo - 1) * import.RowsPerBatch) + i++ + 2);
                     observations.Add(o);
                 }
             }

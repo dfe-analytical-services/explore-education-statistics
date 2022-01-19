@@ -8,11 +8,9 @@ using System.Threading.Tasks;
 using CsvHelper;
 using CsvHelper.Configuration;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
@@ -151,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var table = new DataTable();
                 CopyColumns(dataFileTable, table);
-                CopyRows(table, batch.ToList(), colValues, dataImport.GeographicLevels);
+                CopyRows(table, batch.ToList(), colValues, dataImport);
 
                 var percentageComplete = (double) batchCount / numBatches * 100;
 
@@ -186,23 +184,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        private static GeographicLevel GetGeographicLevel(IReadOnlyList<string> line, List<string> headers)
-        {
-            return GetGeographicLevelFromString(CsvUtil.Value(line, headers, "geographic_level"));
-        }
-
-        private static GeographicLevel GetGeographicLevelFromString(string value)
-        {
-            foreach (GeographicLevel val in Enum.GetValues(typeof(GeographicLevel)))
-            {
-                if (val.GetEnumLabel().ToLower().Equals(value.ToLower()))
-                {
-                    return val;
-                }
-            }
-            throw new InvalidGeographicLevelException(value);
-        }
-
         private static void WriteDataTableToStream(DataTable dataTable, TextWriter tw)
         {
             var csvWriter = new CsvWriter(tw, new CsvConfiguration(CultureInfo.InvariantCulture));
@@ -234,14 +215,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private static void CopyRows(DataTable target,
             IEnumerable<DataRow> rows,
             List<string> colValues,
-            HashSet<GeographicLevel> importGeographicLevels)
+            DataImport dataImport)
         {
-            var hasSoloAllowedGeographicLevel = HasSoloAllowedGeographicLevel(importGeographicLevels);
+            var soleGeographicLevel = dataImport.IsSoleGeographicLevel();
             rows.ForEach(row =>
             {
                 var rowValues = CsvUtil.GetRowValues(row);
-                var geographicLevel = GetGeographicLevel(rowValues, colValues);
-                if (hasSoloAllowedGeographicLevel || AllowRowImport(geographicLevel))
+                if (AllowRowImport(soleGeographicLevel, rowValues, colValues))
                 {
                     target.Rows.Add(row.ItemArray);
                 }
