@@ -564,6 +564,10 @@
       "metadata": {
         "description": "Slack webhook URI for alerts"
       }
+    },
+    "dataFactoryConcurrency": {
+      "type": "int",
+      "defaultValue": 1
     }
   },
   "variables": {
@@ -3334,6 +3338,9 @@
           },
           "dataFactoryName": {
             "value": "[variables('dataFactoryName')]"
+          },
+          "dataFactoryConcurrency": {
+            "value": "[parameters('dataFactoryConcurrency')]"
           },
           "keyVaultName": {
             "value": "[variables('keyVaultName')]"

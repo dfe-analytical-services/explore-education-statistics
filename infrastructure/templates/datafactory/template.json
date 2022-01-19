@@ -24,6 +24,12 @@
         "description": "The data factory name"
       }
     },
+    "dataFactoryConcurrency": {
+      "type": "int",
+      "metadata": {
+        "description": "Maximum number of times a DF pipeline will run in parallel"
+      }
+    },
     "keyVaultName": {
       "type": "string",
       "metadata": {
@@ -79,6 +85,9 @@
           },
           "keyVaultName": {
             "value": "[parameters('keyVaultName')]"
+          },
+          "factoryConcurrency": {
+            "value": "[parameters('dataFactoryConcurrency')]"
           }
         }
       },
