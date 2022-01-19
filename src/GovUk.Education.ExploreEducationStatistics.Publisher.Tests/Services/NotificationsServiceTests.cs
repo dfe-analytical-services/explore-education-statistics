@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -23,6 +24,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var release1 = new Release
             {
                 Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Slug = "2000-01",
+                Version = 0,
                 Publication = new Publication
                 {
                     Id = Guid.NewGuid(),
@@ -51,6 +56,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var release2 = new Release
             {
                 Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Slug = "2001-02",
+                Version = 0,
                 Publication = new Publication
                 {
                     Id = Guid.NewGuid(),
@@ -69,9 +78,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 },
             };
 
-            var release3 = new Release
+            var amendedRelease1 = new Release
             {
                 Id = Guid.NewGuid(),
+                ReleaseName = "2002",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Slug = "2002-03",
+                Version = 1,
                 Publication = new Publication
                 {
                     Id = Guid.NewGuid(),
@@ -88,19 +101,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                         NotifySubscribers = true,
                     },
                 },
+                Updates = new List<Update>
+                {
+                    new()
+                    {
+                        Created = DateTime.UtcNow,
+                        Reason = "latest update note"
+                    },
+                    new()
+                    {
+                        Created = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2)),
+                        Reason = "old update note"
+                    }
+                }
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(release1, release2, release3);
+                await contentDbContext.AddRangeAsync(release1, release2, amendedRelease1);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
             storageQueueService.Setup(mock => mock.AddMessages(
-                PublicationQueue,
-                It.IsAny<List<PublicationNotificationMessage>>()))
+                ReleaseNotificationQueue,
+                It.IsAny<List<ReleaseNotificationMessage>>()))
                 .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -108,23 +134,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var notificationsService = BuildNotificationsService(
                     contentDbContext, storageQueueService.Object);
 
-                await notificationsService.NotifySubscribersIfApplicable(release1.Id, release2.Id, release3.Id);
+                await notificationsService.NotifySubscribersIfApplicable(release1.Id, release2.Id, amendedRelease1.Id);
 
                 storageQueueService.Verify(mock => mock.AddMessages(
-                    PublicationQueue,
-                new List<PublicationNotificationMessage>
+                    ReleaseNotificationQueue,
+                new List<ReleaseNotificationMessage>
                     {
                         new()
                         {
-                            Name = release1.Publication.Title,
                             PublicationId = release1.Publication.Id,
-                            Slug = release1.Publication.Slug,
+                            PublicationName = release1.Publication.Title,
+                            PublicationSlug = release1.Publication.Slug,
+                            ReleaseName = release1.Title,
+                            ReleaseSlug = release1.Slug,
+                            Amendment = false,
+                            UpdateNote = "No update note provided.",
                         },
                         new()
                         {
-                            Name = release3.Publication.Title,
-                            PublicationId = release3.Publication.Id,
-                            Slug = release3.Publication.Slug,
+                            PublicationId = amendedRelease1.Publication.Id,
+                            PublicationName = amendedRelease1.Publication.Title,
+                            PublicationSlug = amendedRelease1.Publication.Slug,
+                            ReleaseName = amendedRelease1.Title,
+                            ReleaseSlug = amendedRelease1.Slug,
+                            Amendment = true,
+                            UpdateNote = "latest update note",
                         },
                     }), Times.Once);
             }

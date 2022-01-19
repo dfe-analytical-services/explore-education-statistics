@@ -1,9 +1,10 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Notifier.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -13,83 +14,25 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
-using Notify.Client;
 using Notify.Exceptions;
-using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
+using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.ConfigKeys;
+using static GovUk.Education.ExploreEducationStatistics.Notifier.Utils.NotifierUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Notifier
 {
     // ReSharper disable once UnusedType.Global
-    public class PublicationNotifier
+    public class SubscriptionManager
     {
-        private const string SubscriptionsTblName = "Subscriptions";
-        private const string PendingSubscriptionsTblName = "PendingSubscriptions";
-        private const string StorageConnectionName = "TableStorageConnString";
-        private const string NotifyApiKeyName = "NotifyApiKey";
-        private const string BaseUrlName = "BaseUrl";
-        private const string WebApplicationBaseUrlName = "WebApplicationBaseUrl";
-        private const string TokenSecretKeyName = "TokenSecretKey";
-        private const string ConfirmationEmailTemplateIdName = "SubscriptionConfirmationEmailTemplateId";
-        private const string NotificationEmailTemplateIdName = "PublicationNotificationEmailTemplateId";
-        private const string VerificationEmailTemplateIdName = "VerificationEmailTemplateId";
-
         private readonly ITokenService _tokenService;
         private readonly IEmailService _emailService;
         private readonly IStorageTableService _storageTableService;
 
-        public PublicationNotifier(ITokenService tokenService, IEmailService emailService,
+        public SubscriptionManager(ITokenService tokenService, IEmailService emailService,
             IStorageTableService storageTableService)
         {
             _tokenService = tokenService ?? throw new ArgumentNullException(nameof(tokenService));
             _emailService = emailService ?? throw new ArgumentNullException(nameof(emailService));
             _storageTableService = storageTableService ?? throw new ArgumentNullException(nameof(storageTableService));
-        }
-
-        [FunctionName("PublicationNotifier")]
-        // ReSharper disable once UnusedMember.Global
-        public void PublicationNotifierFunc(
-            [QueueTrigger(PublicationQueue)] PublicationNotificationMessage publicationNotification,
-            ILogger logger,
-            ExecutionContext context)
-        {
-            logger.LogInformation("{0} triggered",
-                context.FunctionName);
-            
-            var config = LoadAppSettings(context);
-            var emailTemplateId = config.GetValue<string>(NotificationEmailTemplateIdName);
-            var baseUrl = config.GetValue<string>(BaseUrlName);
-            var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName);
-            var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-            var client = GetNotifyClient(config);
-            var table = GetCloudTable(_storageTableService, config, SubscriptionsTblName);
-            var query = new TableQuery<SubscriptionEntity>()
-                .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal,
-                    publicationNotification.PublicationId.ToString()));
-
-            TableContinuationToken token = null;
-            do
-            {
-                var resultSegment =
-                    table.ExecuteQuerySegmentedAsync(query, token).Result;
-                token = resultSegment.ContinuationToken;
-
-                logger.LogInformation("Emailing {0} subscribers",
-                    resultSegment.Results.Count);
-                foreach (var entity in resultSegment.Results)
-                {
-                    var unsubscribeToken =
-                        _tokenService.GenerateToken(tokenSecretKey, entity.RowKey, DateTime.UtcNow.AddYears(1));
-                    var values = new Dictionary<string, dynamic>
-                    {
-                        // Use values from the queue just in case the name or slug of the publication changes
-                        {"publication_name", publicationNotification.Name},
-                        {"publication_link", webApplicationBaseUrl + "find-statistics/" + publicationNotification.Slug},
-                        {"unsubscribe_link", baseUrl + entity.PartitionKey + "/unsubscribe/" + unsubscribeToken}
-                    };
-
-                    _emailService.SendEmail(client, entity.RowKey, emailTemplateId, values);
-                }
-            } while (token != null);
         }
 
         [FunctionName("PublicationSubscribe")]
@@ -100,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             ILogger logger,
             ExecutionContext context)
         {
-            logger.LogInformation("{0} triggered", context.FunctionName);
+            logger.LogInformation("{FunctionName} triggered", context.FunctionName);
 
             var config = LoadAppSettings(context);
             var baseUrl = config.GetValue<string>(BaseUrlName);
@@ -110,19 +53,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             var pendingSubscriptionsTable = GetCloudTable(_storageTableService, config, PendingSubscriptionsTblName);
             var client = GetNotifyClient(config);
 
-            string id = req.Query["id"];
-            string email = req.Query["email"];
-            string slug = req.Query["slug"];
-            string title = req.Query["title"];
+            string? id = req.Query["id"];
+            string? email = req.Query["email"];
+            string? slug = req.Query["slug"];
+            string? title = req.Query["title"];
 
             var subscriptionPending = false;
             var requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
+            dynamic? data = JsonConvert.DeserializeObject(requestBody);
 
-            id = id ?? data?.id;
-            email = email ?? data?.email;
-            slug = slug ?? data?.slug;
-            title = title ?? data?.title;
+            id ??= data?.id;
+            email ??= data?.email;
+            slug ??= data?.slug;
+            title ??= data?.title;
 
             if (id == null || email == null || slug == null || title == null)
             {
@@ -136,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                         .RetrieveSubscriber(pendingSubscriptionsTable, new SubscriptionEntity(id, email)).Result !=
                     null;
 
-                logger.LogDebug("Pending subscription found?: {0}", subscriptionPending);
+                logger.LogDebug("Pending subscription found?: {PendingSubscription}", subscriptionPending);
 
                 // If already existing and pending then don't send another one
                 if (!subscriptionPending)
@@ -154,10 +97,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                         var confirmationEmailTemplateId = config.GetValue<string>(ConfirmationEmailTemplateIdName);
                         var confirmationValues = new Dictionary<string, dynamic>
                         {
-                            {"publication_name", activeSubscriber.Title},
+                            { "publication_name", activeSubscriber.Title },
                             {
                                 "unsubscribe_link",
-                                baseUrl + activeSubscriber.PartitionKey + "/unsubscribe/" + unsubscribeToken
+                                $"{baseUrl}{activeSubscriber.PartitionKey}/unsubscribe/{unsubscribeToken}"
                             }
                         };
                         _emailService.SendEmail(client, email, confirmationEmailTemplateId, confirmationValues);
@@ -173,8 +116,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
                     var values = new Dictionary<string, dynamic>
                     {
-                        {"publication_name", title},
-                        {"verification_link", baseUrl + id + "/verify-subscription/" + activationCode}
+                        { "publication_name", title },
+                        { "verification_link", $"{baseUrl}{id}/verify-subscription/{activationCode}" },
                     };
 
                     _emailService.SendEmail(client, email, emailTemplateId, values);
@@ -184,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             }
             catch (NotifyClientException e)
             {
-                logger.LogError(e,"Caught exception sending email");
+                logger.LogError(e, "Caught exception sending email");
 
                 // Remove the subscriber from storage if we could not successfully send the email & just added it
                 if (!subscriptionPending)
@@ -197,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             }
             catch (Exception e)
             {
-                logger.LogError(e,"Caught exception storing subscription");
+                logger.LogError(e, "Caught exception storing subscription");
                 return new BadRequestResult();
             }
         }
@@ -212,11 +155,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             string id,
             string token)
         {
-            logger.LogInformation("{0} triggered", context.FunctionName);
+            logger.LogInformation("{FunctionName} triggered", context.FunctionName);
 
             var config = LoadAppSettings(context);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-            var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName);
+            var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName).AppendTrailingSlash();
             var email = _tokenService.GetEmailFromToken(token, tokenSecretKey);
 
             if (email != null)
@@ -246,12 +189,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             string id,
             string token)
         {
-            logger.LogInformation("{0} triggered", context.FunctionName);
+            logger.LogInformation("{FunctionName} triggered", context.FunctionName);
 
             var config = LoadAppSettings(context);
             var emailTemplateId = config.GetValue<string>(ConfirmationEmailTemplateIdName);
             var tokenSecretKey = config.GetValue<string>(TokenSecretKeyName);
-            var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName);
+            var webApplicationBaseUrl = config.GetValue<string>(WebApplicationBaseUrlName).AppendTrailingSlash();
             var baseUrl = config.GetValue<string>(BaseUrlName);
             var email = _tokenService.GetEmailFromToken(token, tokenSecretKey);
             var client = GetNotifyClient(config);
@@ -268,7 +211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                     // Remove the pending subscription from the the file now verified
                     logger.LogDebug("Removing address from pending subscribers");
                     await _storageTableService.RemoveSubscriber(pendingSubscriptionsTbl, sub);
-                    
+
                     // Add them to the verified subscribers table
                     logger.LogDebug("Adding address to the verified subscribers");
                     sub.DateTimeCreated = DateTime.UtcNow;
@@ -278,8 +221,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
 
                     var values = new Dictionary<string, dynamic>
                     {
-                        {"publication_name", sub.Title},
-                        {"unsubscribe_link", baseUrl + sub.PartitionKey + "/unsubscribe/" + unsubscribeToken}
+                        { "publication_name", sub.Title },
+                        { "unsubscribe_link", $"{baseUrl}{sub.PartitionKey}/unsubscribe/{unsubscribeToken}" }
                     };
 
                     _emailService.SendEmail(client, email, emailTemplateId, values);
@@ -299,7 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
             ExecutionContext context,
             ILogger logger)
         {
-            logger.LogInformation("{0} triggered at: {1}",
+            logger.LogInformation("{FunctionName} triggered at: {DateTime}",
                 context.FunctionName,
                 DateTime.UtcNow);
 
@@ -310,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                 .Where(TableQuery.GenerateFilterConditionForDate("DateTimeCreated", QueryComparisons.LessThan,
                     DateTime.UtcNow.AddHours(1)));
 
-            TableContinuationToken token = null;
+            TableContinuationToken? token = null;
             do
             {
                 var resultSegment = await pendingSubscriptionsTbl.ExecuteQuerySegmentedAsync(query, token);
@@ -321,28 +264,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Notifier
                     await _storageTableService.RemoveSubscriber(pendingSubscriptionsTbl, entity);
                 }
             } while (token != null);
-        }
-
-        private static IConfigurationRoot LoadAppSettings(ExecutionContext context)
-        {
-            return new ConfigurationBuilder()
-                .SetBasePath(context.FunctionAppDirectory)
-                .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
-                .AddEnvironmentVariables()
-                .Build();
-        }
-
-        private static NotificationClient GetNotifyClient(IConfiguration config)
-        {
-            var notifyApiKey = config.GetValue<string>(NotifyApiKeyName);
-            return new NotificationClient(notifyApiKey);
-        }
-
-        private static CloudTable GetCloudTable(IStorageTableService storageTableService, IConfiguration config,
-            string tableName)
-        {
-            var connectionStr = config.GetValue<string>(StorageConnectionName);
-            return storageTableService.GetTable(connectionStr, tableName).Result;
         }
     }
 }
