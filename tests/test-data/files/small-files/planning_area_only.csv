@@ -1,0 +1,6 @@
+time_period,time_identifier,geographic_level,country_code,country_name,region_code,region_name,old_la_code,new_la_code,la_name,planning_area_code,planning_area_name,school_type,school_capacity
+202223,Academic year,Planning Area,E92000001,England,E12000001,North East,841,E06000005,Darlington,8410001,Darlington Primary,State-funded primary,20
+202223,Academic year,Planning Area,E92000001,England,E12000001,North East,841,E06000005,Darlington,8410002,Darlington Secondary,State-funded secondary,37
+202223,Academic year,Planning Area,E92000001,England,E12000004,East Midlands,830,E10000007,Derbyshire,8300001,Hadfield Primary,State-funded primary,4
+202223,Academic year,Planning Area,E92000001,England,E12000004,East Midlands,830,E10000007,Derbyshire,8300002,Glossop Primary,State-funded primary,12
+202223,Academic year,Planning Area,E92000001,England,E12000004,East Midlands,830,E10000007,Derbyshire,8300003,New Mills/Birch Vale Primary,State-funded primary,8
