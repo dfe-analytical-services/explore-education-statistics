@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-        <LangVersion>9.0</LangVersion>
+        <TargetFramework>net6.0</TargetFramework>
+        <LangVersion>10.0</LangVersion>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
@@ -13,7 +13,7 @@
         <PackageReference Include="Snapshooter.Xunit" Version="0.6.2" />
         <PackageReference Include="xunit" Version="2.4.1" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.4.2" />
-        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="3.1.18" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
-    <LangVersion>9.0</LangVersion>
-    <AzureFunctionsVersion>v3</AzureFunctionsVersion>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <AzureFunctionsVersion>v4</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="GovukNotify" Version="4.0.0" />
+    <PackageReference Include="GovukNotify" Version="4.0.1" />
     <PackageReference Include="IsExternalInit" Version="1.0.1" PrivateAssets="all" />
     <PackageReference Include="JWT" Version="7.3.1" />
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
@@ -14,7 +14,7 @@
     Prevents error when subscribing to Publications
     'Could not load file or assembly 'Microsoft.IdentityModel.Tokens, Version=6.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35'. The system cannot find the file specified'
     See https://github.com/Azure/azure-functions-host/issues/5894 -->
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.3" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.0.1" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.9.0" />
   </ItemGroup>
   <ItemGroup>
