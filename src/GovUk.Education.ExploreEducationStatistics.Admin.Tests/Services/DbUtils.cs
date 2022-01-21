@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public static UsersAndRolesDbContext InMemoryUserAndRolesDbContext(string dbName)
         {
             var builder = new DbContextOptionsBuilder<UsersAndRolesDbContext>();
-            builder.UseInMemoryDatabase(databaseName: dbName);
+            builder.UseInMemoryDatabase(databaseName: dbName, b => b.EnableNullChecks(false));
 
             var operationalStoreOptions = Options.Create(new OperationalStoreOptions());
             return new UsersAndRolesDbContext(builder.Options, operationalStoreOptions);

@@ -2990,10 +2990,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(replacementFilterItem2.Id, replacedFilterItemIds[1]);
 
                 Assert.NotNull(replacedDataBlock.Query.Locations);
-                Assert.Equal(dataBlock.Query.Locations, replacedDataBlock.Query.Locations);
+                dataBlock.Query.Locations.AssertDeepEqualTo(replacedDataBlock.Query.Locations);
 
                 Assert.NotNull(replacedDataBlock.Query.TimePeriod);
-                Assert.Equal(timePeriod, replacedDataBlock.Query.TimePeriod);
+                timePeriod.AssertDeepEqualTo(replacedDataBlock.Query.TimePeriod);
 
                 Assert.Equal(2, replacedDataBlock.Table.TableHeaders.Columns.Count());
                 Assert.Equal(TableHeaderType.TimePeriod, replacedDataBlock.Table.TableHeaders.Columns.First().Type);

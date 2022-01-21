@@ -15,8 +15,13 @@ pr: [ 'master', 'dev' ]
 jobs:
   - job: 'Backend'
     pool:
-      vmImage: 'windows-2019'
+      vmImage: 'windows-2022'
     steps:
+      - task: UseDotNet@2
+        displayName: 'Install .NET Core SDK'
+        inputs:
+          version: 6.0.x
+          performMultiLevelLookup: true
       - task: 'DotNetCoreCLI@2'
         displayName: 'Restore'
         inputs:
@@ -111,7 +116,7 @@ jobs:
       - task: UseDotNet@2
         displayName: 'Install .NET Core SDK'
         inputs:
-          version: 3.1.x
+          version: 6.0.x
           performMultiLevelLookup: true
       - task: 'DotNetCoreCLI@2'
         displayName: 'Restore'

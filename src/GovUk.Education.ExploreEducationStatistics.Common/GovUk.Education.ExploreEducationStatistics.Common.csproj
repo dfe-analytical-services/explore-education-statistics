@@ -25,4 +25,11 @@
         <PackageReference Include="Mime" Version="3.1.0" />
         <PackageReference Include="Mime-Detective" Version="0.0.6-beta5" />
     </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="libs\magic.mgc">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+          <Link>bin\magic.mgc</Link>
+        </Content>
+    </ItemGroup>
 </Project>

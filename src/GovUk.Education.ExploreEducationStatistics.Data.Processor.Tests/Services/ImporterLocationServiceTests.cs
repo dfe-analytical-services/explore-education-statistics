@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var locations = await statisticsDbContext.Location.ToListAsync();
+                var locations = statisticsDbContext.Location.ToList();
 
                 Assert.Equal(2, locations.Count);
 
@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var locations = await statisticsDbContext.Location.ToListAsync();
+                var locations = statisticsDbContext.Location.ToList();
 
                 Assert.Equal(2, locations.Count);
 
@@ -335,7 +335,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var locations = await statisticsDbContext.Location.ToListAsync();
+                var locations = statisticsDbContext.Location.ToList();
 
                 Assert.Equal(2, locations.Count);
 
@@ -419,7 +419,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var locations = await statisticsDbContext.Location.ToListAsync();
+                var locations = statisticsDbContext.Location.ToList();
 
                 Assert.Equal(2, locations.Count);
 
@@ -496,7 +496,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var locations = await statisticsDbContext.Location.ToListAsync();
+                var locations = statisticsDbContext.Location.ToList();
 
                 Assert.Equal(2, locations.Count);
 
@@ -564,7 +564,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var locations = await statisticsDbContext.Location.ToListAsync();
+                var locations = statisticsDbContext.Location.ToList();
 
                 Assert.Equal(2, locations.Count);
 

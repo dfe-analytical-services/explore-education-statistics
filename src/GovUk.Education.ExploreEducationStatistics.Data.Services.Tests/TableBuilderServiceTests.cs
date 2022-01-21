@@ -148,9 +148,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 await context.AddAsync(releaseSubject);
                 await context.Observation.AddRangeAsync(observations);
-                await context.MatchedObservations.AddRangeAsync(
-                    new MatchedObservation(observations[0].Id),
-                    new MatchedObservation(observations[2].Id));
+                //await context.MatchedObservations.AddRangeAsync(
+                //    new MatchedObservation(observations[0].Id),
+                //    new MatchedObservation(observations[2].Id));
                 await context.SaveChangesAsync();
             }
 
@@ -531,9 +531,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 await context.AddAsync(releaseSubject);
                 await context.Observation.AddRangeAsync(observations);
-                await context.MatchedObservations.AddRangeAsync(
-                    new MatchedObservation(observations[0].Id),
-                    new MatchedObservation(observations[2].Id));
+                //context.MatchedObservations.Add(new MatchedObservation(observations[0].Id)); // @MarkFix
+                //context.MatchedObservations.Add(new MatchedObservation(observations[2].Id));
                 await context.SaveChangesAsync();
             }
 

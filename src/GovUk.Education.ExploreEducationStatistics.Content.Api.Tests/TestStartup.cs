@@ -39,12 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests
 
             services.AddDbContext<StatisticsDbContext>(
                 options =>
-                    options.UseInMemoryDatabase("TestStatisticsDb")
+                    options.UseInMemoryDatabase("TestStatisticsDb", b => b.EnableNullChecks(false))
             );
 
             services.AddDbContext<ContentDbContext>(
                 options =>
-                    options.UseInMemoryDatabase("TestContentDb")
+                    options.UseInMemoryDatabase("TestContentDb", b => b.EnableNullChecks(false))
             );
 
             AddPersistenceHelper<ContentDbContext>(services);

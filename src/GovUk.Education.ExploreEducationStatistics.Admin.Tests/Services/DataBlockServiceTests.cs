@@ -107,9 +107,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataBlock.Source, retrievedResult.Source);
                 Assert.Equal(dataBlock.Order, retrievedResult.Order);
 
-                Assert.Equal(dataBlock.Query, retrievedResult.Query);
-                Assert.Equal(dataBlock.Table, retrievedResult.Table);
-                Assert.Equal(dataBlock.Charts, retrievedResult.Charts);
+                dataBlock.Query.AssertDeepEqualTo(retrievedResult.Query);
+                dataBlock.Table.AssertDeepEqualTo(retrievedResult.Table);
+                dataBlock.Charts.AssertDeepEqualTo(retrievedResult.Charts);
             }
         }
 
@@ -151,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(dataBlock.Heading, viewModel.Heading);
-                Assert.Equal(dataBlock.Charts, viewModel.Charts);
+                dataBlock.Charts.AssertDeepEqualTo(viewModel.Charts);
 
                 Assert.Single(viewModel.Charts);
                 Assert.Equal(dataBlock.Heading, viewModel.Charts[0].Title);
@@ -791,7 +791,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(createRequest.HighlightDescription, viewModel.HighlightDescription);
                 Assert.Equal(createRequest.Source, viewModel.Source);
 
-                Assert.Equal(createRequest.Query, viewModel.Query);
+                createRequest.Query.AssertDeepEqualTo(viewModel.Query);
                 Assert.Equal(createRequest.Table, viewModel.Table);
                 Assert.Equal(createRequest.Charts, viewModel.Charts);
 
@@ -817,9 +817,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(createRequest.HighlightDescription, dataBlock.HighlightDescription);
                 Assert.Equal(createRequest.Source, dataBlock.Source);
 
-                Assert.Equal(createRequest.Query, dataBlock.Query);
-                Assert.Equal(createRequest.Table, dataBlock.Table);
-                Assert.Equal(createRequest.Charts, dataBlock.Charts);
+                createRequest.Query.AssertDeepEqualTo(dataBlock.Query);
+                createRequest.Table.AssertDeepEqualTo(dataBlock.Table);
+                createRequest.Charts.AssertDeepEqualTo(dataBlock.Charts);
 
                 var savedRelease = await context.Releases
                     .Include(r => r.ContentBlocks)
@@ -880,7 +880,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var dataBlock = dataBlocks[0];
 
                 Assert.Equal(createRequest.Heading, dataBlock.Heading);
-                Assert.Equal(createRequest.Charts, dataBlock.Charts);
+                createRequest.Charts.AssertDeepEqualTo(dataBlock.Charts);
 
                 Assert.Single(dataBlock.Charts);
                 Assert.Equal(createRequest.Heading, dataBlock.Charts[0].Title);
@@ -1050,9 +1050,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(updateRequest.HighlightDescription, updatedDataBlock.HighlightDescription);
                 Assert.Equal(updateRequest.Source, updatedDataBlock.Source);
 
-                Assert.Equal(updateRequest.Query, updatedDataBlock.Query);
-                Assert.Equal(updateRequest.Table, updatedDataBlock.Table);
-                Assert.Equal(updateRequest.Charts, updatedDataBlock.Charts);
+                updateRequest.Query.AssertDeepEqualTo(updatedDataBlock.Query);
+                updateRequest.Table.AssertDeepEqualTo(updatedDataBlock.Table);
+                updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
             }
         }
 
@@ -1149,7 +1149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlock.Id);
 
                 Assert.Equal(updateRequest.Heading, updatedDataBlock.Heading);
-                Assert.Equal(updateRequest.Charts, updatedDataBlock.Charts);
+                updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
 
                 Assert.Single(updatedDataBlock.Charts);
                 Assert.Equal(updateRequest.Heading, updatedDataBlock.Charts[0].Title);

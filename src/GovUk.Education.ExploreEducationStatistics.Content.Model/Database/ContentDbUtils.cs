@@ -5,10 +5,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 {
     public static class ContentDbUtils
     {
-        public static DbContextOptions<ContentDbContext> InMemoryContentDbContextOptions(string dbName)
+        public static DbContextOptions<ContentDbContext> InMemoryContentDbContextOptions(string databaseName)
         {
             var builder = new DbContextOptionsBuilder<ContentDbContext>()
-                .UseInMemoryDatabase(databaseName: dbName);
+                .UseInMemoryDatabase(databaseName,
+                    b => b.EnableNullChecks(false));
 
             return builder.Options;
         }

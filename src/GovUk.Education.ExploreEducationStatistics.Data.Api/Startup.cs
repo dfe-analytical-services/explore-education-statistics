@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                         builder =>
                         {
                             builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model");
-                            builder.AddTempTableSupport();
+                            builder.AddBulkOperationSupport();
                         })
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
