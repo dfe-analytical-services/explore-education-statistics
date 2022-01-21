@@ -57,7 +57,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             fileStorageService
                 .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(releasePath))
-                .ReturnsAsync(new CachedReleaseViewModel(releaseId));
+                .ReturnsAsync(new CachedReleaseViewModel(releaseId)
+                {
+                    Type = new ReleaseTypeViewModel
+                    {
+                        Title = "National Statistics"
+                    }
+                });
 
             methodologyService.Setup(mock => mock.GetSummariesByPublication(publicationId))
                 .ReturnsAsync(AsList(methodology));
@@ -71,6 +77,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             MockUtils.VerifyAllMocks(fileStorageService, methodologyService);
 
             var releaseViewModel = result.AssertRight();
+
+            Assert.Equal(ReleaseType.NationalStatistics, releaseViewModel.Type);
 
             var publication = releaseViewModel.Publication;
             Assert.Equal(publicationId, publication.Id);
@@ -152,11 +160,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task List()
         {
-            var type = new ReleaseType
-            {
-                Title = "National Statistics",
-            };
-
             var release1 = new Release
             {
                 Slug = "release-1",
@@ -165,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Published = new DateTime(2020, 1, 1),
                 DataLastPublished = new DateTime(2020, 1, 1),
                 NextReleaseDate = new PartialDate { Year = "2020" },
-                Type = type
+                Type = ReleaseType.NationalStatistics
             };
             var release2 = new Release
             {
@@ -175,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Published = new DateTime(2021, 1, 1),
                 DataLastPublished = new DateTime(2021, 1, 1),
                 NextReleaseDate = new PartialDate { Year = "2021" },
-                Type = type
+                Type = ReleaseType.NationalStatistics
             };
 
             var publication = new Publication
@@ -211,8 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(release2.YearTitle, releases[0].YearTitle);
                 Assert.Equal(release2.Published, releases[0].Published);
                 Assert.Equal(release2.NextReleaseDate, releases[0].NextReleaseDate);
-                Assert.Equal(release2.Type.Id, releases[0].Type.Id);
-                Assert.Equal(release2.Type.Title, releases[0].Type.Title);
+                Assert.Equal(release2.Type, releases[0].Type);
                 Assert.Equal(release2.DataLastPublished, releases[0].DataLastPublished);
                 Assert.True(releases[0].LatestRelease);
 
@@ -224,8 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(release1.YearTitle, releases[1].YearTitle);
                 Assert.Equal(release1.Published, releases[1].Published);
                 Assert.Equal(release1.NextReleaseDate, releases[1].NextReleaseDate);
-                Assert.Equal(release1.Type.Id, releases[1].Type.Id);
-                Assert.Equal(release1.Type.Title, releases[1].Type.Title);
+                Assert.Equal(release1.Type, releases[1].Type);
                 Assert.Equal(release1.DataLastPublished, releases[1].DataLastPublished);
                 Assert.False(releases[1].LatestRelease);
             }
@@ -234,24 +235,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task List_FiltersPreviousReleasesForAmendments()
         {
-            var type = new ReleaseType
-            {
-                Title = "National Statistics",
-            };
-
             var originalRelease = new Release
             {
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
                 ReleaseName = "2020",
                 Published = new DateTime(2020, 1, 1),
-                Type = type
+                Type = ReleaseType.NationalStatistics,
             };
             var amendedRelease = new Release
             {
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
                 ReleaseName = "2021",
                 Published = new DateTime(2020, 2, 1),
-                Type = type,
+                Type = ReleaseType.NationalStatistics,
                 PreviousVersion = originalRelease
             };
 
@@ -285,17 +281,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         [Fact]
         public async Task List_FiltersDraftReleases()
         {
-            var type = new ReleaseType
-            {
-                Title = "National Statistics",
-            };
-
             // Draft
             var release1 = new Release
             {
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
                 ReleaseName = "2020",
-                Type = type
+                Type = ReleaseType.NationalStatistics
             };
             // Published
             var release2 = new Release
@@ -303,14 +294,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
                 ReleaseName = "2021",
                 Published = new DateTime(2021, 1, 1),
-                Type = type
+                Type = ReleaseType.NationalStatistics
             };
             // Amendment is draft
             var release2Amendment = new Release
             {
                 TimePeriodCoverage = TimeIdentifier.CalendarYear,
                 ReleaseName = "2021",
-                Type = type,
+                Type = ReleaseType.NationalStatistics,
                 PreviousVersion = release2
             };
 
@@ -358,7 +349,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             IMethodologyService? methodologyService = null,
             IUserService? userService = null)
         {
-            return new ReleaseService(
+            return new(
                 contentDbContext is null
                     ? Mock.Of<IPersistenceHelper<ContentDbContext>>()
                     : new PersistenceHelper<ContentDbContext>(contentDbContext),

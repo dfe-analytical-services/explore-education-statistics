@@ -3,14 +3,12 @@ import AccordionSection from '@common/components/AccordionSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import OfficialStatisticsSection from '@common/modules/find-statistics/components/OfficialStatisticsSection';
-import {
-  PublicationContact,
-  ReleaseType,
-} from '@common/services/publicationService';
+import { PublicationContact } from '@common/services/publicationService';
 import {
   ExternalMethodology,
   MethodologySummary,
 } from '@common/services/types/methodology';
+import { ReleaseType } from '@common/services/types/releaseType';
 import Link from '@frontend/components/Link';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React, { ReactNode } from 'react';
@@ -23,7 +21,7 @@ interface Props {
   publicationTitle: string;
   methodologies: MethodologySummary[];
   externalMethodology?: ExternalMethodology;
-  releaseType?: string;
+  releaseType?: ReleaseType;
   publicationContact: PublicationContact;
 }
 
@@ -71,17 +69,17 @@ const PublicationReleaseHelpAndSupportSection = ({
             )}
           </AccordionSection>
         )}
-        {releaseType === ReleaseType.NationalStatistics && (
+        {releaseType === 'NationalStatistics' && (
           <AccordionSection heading="National Statistics" headingTag="h3">
             <NationalStatisticsSection />
           </AccordionSection>
         )}
-        {releaseType === ReleaseType.OfficialStatistics && (
+        {releaseType === 'OfficialStatistics' && (
           <AccordionSection heading="Official Statistics" headingTag="h3">
             <OfficialStatisticsSection />
           </AccordionSection>
         )}
-        {releaseType === ReleaseType.AdHocStatistics && (
+        {releaseType === 'AdHocStatistics' && (
           <AccordionSection
             heading="Ad hoc Official Statistics"
             headingTag="h3"
@@ -89,7 +87,7 @@ const PublicationReleaseHelpAndSupportSection = ({
             <AdHocOfficialStatisticsSection />
           </AccordionSection>
         )}
-        {releaseType === ReleaseType.ExperimentalStatistics && (
+        {releaseType === 'ExperimentalStatistics' && (
           <AccordionSection heading="Experimental Statistics" headingTag="h3">
             <ExperimentalStatisticsSection />
           </AccordionSection>

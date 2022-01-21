@@ -43,7 +43,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
         public DbSet<MethodologyNote> MethodologyNotes { get; set; }
-        public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
         public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
@@ -229,6 +228,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<Release>()
                 .HasQueryFilter(r => !r.SoftDeleted);
 
+            modelBuilder.Entity<Release>()
+                .Property(release => release.Type)
+                .HasConversion(new EnumToEnumValueConverter<ReleaseType>());
+
+            modelBuilder.Entity<Release>()
+                .HasIndex(release => release.Type);
+            
             modelBuilder.Entity<ReleaseStatus>()
                 .Property(rs => rs.Created)
                 .HasConversion(
@@ -419,33 +425,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
-            modelBuilder.Entity<ReleaseType>().HasData(
-                new ReleaseType
-                {
-                    Id = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    Title = "Official Statistics"
-                },
-                new ReleaseType
-                {
-                    Id = new Guid("1821abb8-68b0-431b-9770-0bea65d02ff0"),
-                    Title = "Ad Hoc Statistics"
-                },
-                new ReleaseType
-                {
-                    Id = new Guid("8becd272-1100-4e33-8a7d-1c0c4e3b42b8"),
-                    Title = "National Statistics"
-                },
-                new ReleaseType
-                {
-                    Id = new Guid("f5de8522-3150-435d-98d5-1d14763f8c54"),
-                    Title = "Experimental Statistics"
-                },
-                new ReleaseType
-                {
-                    Id = new Guid("15bd4f57-c837-4821-b308-7f4169cd9330"),
-                    Title = "Management Information"
-                });
 
             modelBuilder.Entity<GlossaryEntry>()
                 .Property(rs => rs.Created)

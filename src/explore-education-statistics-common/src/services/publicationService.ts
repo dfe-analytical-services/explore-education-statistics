@@ -1,5 +1,6 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 import { FileInfo } from '@common/services/types/file';
+import { ReleaseType } from '@common/services/types/releaseType';
 import {
   MethodologySummary,
   ExternalMethodology,
@@ -77,15 +78,6 @@ export interface ReleaseNote {
   reason: string;
 }
 
-// eslint-disable-next-line no-shadow
-export enum ReleaseType {
-  AdHocStatistics = 'Ad Hoc Statistics',
-  ExperimentalStatistics = 'Experimental Statistics',
-  NationalStatistics = 'National Statistics',
-  OfficialStatistics = 'Official Statistics',
-  ManagementInformation = 'Management Information',
-}
-
 export interface ContentSection<BlockType> {
   id: string;
   order: number;
@@ -114,10 +106,7 @@ export interface Release<
   latestRelease: boolean;
   nextReleaseDate?: PartialDate;
   relatedInformation: BasicLink[];
-  type: {
-    id: string;
-    title: ReleaseType;
-  };
+  type: ReleaseType;
   updates: ReleaseNote[];
   content: ContentSection<ContentBlockType | DataBlockType>[];
   downloadFiles: FileInfo[];
@@ -135,10 +124,7 @@ export interface ReleaseSummary {
   published?: string;
   slug: string;
   nextReleaseDate: PartialDate;
-  type: {
-    id: string;
-    title: ReleaseType;
-  };
+  type: ReleaseType;
   latestRelease: boolean;
   dataLastPublished: string;
 }

@@ -1,4 +1,4 @@
-import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
+import { ValueLabelPair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 
 export interface TimePeriodCoverageGroup {
@@ -11,10 +11,6 @@ export interface TimePeriodCoverageGroup {
 }
 
 const metaService = {
-  getReleaseTypes(): Promise<IdTitlePair[]> {
-    return client.get<IdTitlePair[]>('/meta/releasetypes');
-  },
-
   getTimePeriodCoverageGroups(): Promise<TimePeriodCoverageGroup[]> {
     return client.get<TimePeriodCoverageGroup[]>('/meta/timeidentifiers');
   },

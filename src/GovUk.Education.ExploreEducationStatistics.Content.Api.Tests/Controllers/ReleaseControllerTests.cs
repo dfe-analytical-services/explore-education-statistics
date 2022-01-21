@@ -175,7 +175,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseId = Guid.NewGuid();
 
             return new ReleaseViewModel(
-                new CachedReleaseViewModel(releaseId),
+                new CachedReleaseViewModel(releaseId)
+                {
+                    Type = new ReleaseTypeViewModel
+                    {
+                        Title = "National Statistics"
+                    }
+                },
                 new CachedPublicationViewModel
                 {
                     Releases = AsList(new ReleaseTitleViewModel
@@ -190,7 +196,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseId = Guid.NewGuid();
 
             return new ReleaseSummaryViewModel(
-                new CachedReleaseViewModel(releaseId),
+                new CachedReleaseViewModel(releaseId)
+                {
+                    Type = new ReleaseTypeViewModel
+                    {
+                        Title = "National Statistics"
+                    }
+                },
                 new CachedPublicationViewModel
                 {
                     Releases = AsList(new ReleaseTitleViewModel
@@ -204,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             IReleaseService? releaseService = null
         )
         {
-            return new ReleaseController(
+            return new(
                 releaseService ?? Mock.Of<IReleaseService>()
             );
         }

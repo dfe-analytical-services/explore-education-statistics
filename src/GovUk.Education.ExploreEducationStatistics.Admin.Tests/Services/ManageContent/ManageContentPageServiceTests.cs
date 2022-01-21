@@ -42,13 +42,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Description = "Description",
                 LegacyReleases = new List<LegacyRelease>
                 {
-                    new LegacyRelease
+                    new()
                     {
                         Description = "Legacy 2017/18",
                         Order = 0,
                         Url = "https://legacy-2017-18"
                     },
-                    new LegacyRelease
+                    new()
                     {
                         Description = "Legacy 2018/19",
                         Order = 1,
@@ -67,11 +67,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 }
             };
 
-            var releaseType = new ReleaseType
-            {
-                Title = "Release Type"
-            };
-
             var release = new Release
             {
                 Id = Guid.NewGuid(),
@@ -83,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 ReleaseName = "2020",
                 RelatedInformation = new List<Link>
                 {
-                    new Link
+                    new()
                     {
                         Description = "Related 1",
                         Url = "https://related-1"
@@ -91,7 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 },
                 Slug = "2020-21",
                 TimePeriodCoverage = AcademicYear,
-                Type = releaseType,
+                Type = ReleaseType.OfficialStatistics,
                 Updates = new List<Update>()
             };
 
@@ -104,19 +99,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 ReleaseName = "2019",
                 Slug = "2019-20",
                 TimePeriodCoverage = AcademicYear,
-                Type = releaseType
+                Type = ReleaseType.OfficialStatistics,
             };
 
             var availableDataBlocks = new List<DataBlock>
             {
-                new DataBlock()
+                new()
             };
 
             var ancillaryFileId = Guid.NewGuid();
             var dataFileId = Guid.NewGuid();
             var files = new List<FileInfo>
             {
-                new FileInfo
+                new()
                 {
                     Id = ancillaryFileId,
                     FileName = "ancillary.pdf",
@@ -124,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     Size = "10 Kb",
                     Type = Ancillary
                 },
-                new FileInfo
+                new()
                 {
                     Id = dataFileId,
                     FileName = "data.csv",
@@ -254,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("2020-21", contentRelease.Slug);
                 Assert.Equal(release.SummarySection.Id, contentRelease.SummarySection.Id);
                 Assert.Equal("Academic Year 2020/21", contentRelease.Title);
-                Assert.Equal(release.Type, contentRelease.Type);
+                Assert.Equal(ReleaseType.OfficialStatistics, contentRelease.Type);
                 Assert.Equal("2020/21", contentRelease.YearTitle);
                 Assert.Empty(contentRelease.Updates);
 

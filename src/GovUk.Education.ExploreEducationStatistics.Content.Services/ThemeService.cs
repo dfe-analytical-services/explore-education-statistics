@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OrderBy(publication => publication.Title)
                 .ToListAsync();
 
-            return new()
+            return new TopicTree<PublicationTreeNode>
             {
                 Id = topic.Id,
                 Title = topic.Title,

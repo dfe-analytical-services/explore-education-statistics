@@ -2,6 +2,7 @@ import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
 import { PublicationContactDetails } from '@admin/services/publicationService';
+import { ReleaseType } from '@common/services/types/releaseType';
 import { PartialDate } from '@common/utils/date/partialDate';
 
 export interface Release {
@@ -18,7 +19,7 @@ export interface Release {
   publicationSlug: string;
   timePeriodCoverage: ValueLabelPair;
   title: string;
-  type: IdTitlePair;
+  type: ReleaseType;
   contact: PublicationContactDetails;
   publishScheduled?: string;
   published?: string;
@@ -46,7 +47,7 @@ export interface ReleaseSummary {
   };
   title: string;
   releaseName: string;
-  type: IdTitlePair;
+  type: ReleaseType;
   publishScheduled: string;
   nextReleaseDate?: PartialDate;
   latestInternalReleaseNote: string;
@@ -59,7 +60,7 @@ interface BaseReleaseRequest {
   timePeriodCoverage: {
     value: string;
   };
-  typeId: string;
+  type: ReleaseType;
 }
 
 export interface CreateReleaseRequest extends BaseReleaseRequest {
@@ -72,7 +73,7 @@ export interface UpdateReleaseRequest {
   timePeriodCoverage: {
     value: string;
   };
-  typeId: string;
+  type: ReleaseType;
   preReleaseAccessList?: string;
 }
 

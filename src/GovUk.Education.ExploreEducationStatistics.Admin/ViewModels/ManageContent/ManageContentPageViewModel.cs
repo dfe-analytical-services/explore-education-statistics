@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public bool LatestRelease { get; set; }
 
+            [JsonConverter(typeof(StringEnumConverter))]
             public ReleaseType Type { get; set; }
 
             public List<ReleaseNoteViewModel> Updates { get; set; } = new List<ReleaseNoteViewModel>();

@@ -1,4 +1,3 @@
-import { ReleaseType } from '@common/services/publicationService';
 import PublicationReleasePage from '@frontend/modules/find-statistics/PublicationReleasePage';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -34,10 +33,7 @@ describe('PublicationReleasePage', () => {
       <PublicationReleasePage
         release={{
           ...testRelease,
-          type: {
-            id: 'official-stats-1',
-            title: ReleaseType.OfficialStatistics,
-          },
+          type: 'OfficialStatistics',
         }}
       />,
     );
@@ -54,10 +50,7 @@ describe('PublicationReleasePage', () => {
       <PublicationReleasePage
         release={{
           ...testRelease,
-          type: {
-            id: 'official-stats-1',
-            title: ReleaseType.OfficialStatistics,
-          },
+          type: 'OfficialStatistics',
         }}
       />,
     );

@@ -5,6 +5,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
 import { IdTitlePair } from 'src/services/types/common';
+import { releaseTypes } from '@common/services/types/releaseType';
 import userEvent from '@testing-library/user-event';
 import ReleaseSummaryForm, {
   ReleaseSummaryFormValues,
@@ -15,18 +16,6 @@ const metaService = _metaService as jest.Mocked<typeof _metaService>;
 jest.mock('@admin/services/metaService');
 
 describe('ReleaseSummaryForm', () => {
-  const testReleaseTypes: IdTitlePair[] = [
-    { id: 'a', title: 'Ad Hoc Statistics' },
-    {
-      id: 'b',
-      title: 'National Statistics',
-    },
-    {
-      id: 'c',
-      title: 'Official Statistics',
-    },
-  ];
-
   const testTimeIdentifiers: TimePeriodCoverageGroup[] = [
     {
       category: { label: 'Academic year' },
@@ -40,7 +29,6 @@ describe('ReleaseSummaryForm', () => {
     },
   ];
   test('renders correctly with empty initial values', async () => {
-    metaService.getReleaseTypes.mockResolvedValue(testReleaseTypes);
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
     );
@@ -52,7 +40,6 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
-            releaseTypeId: '',
           };
         }}
         onSubmit={noop}
@@ -78,10 +65,22 @@ describe('ReleaseSummaryForm', () => {
       within(screen.getByRole('group', { name: 'Release Type' })).getAllByRole(
         'radio',
       ),
-    ).toHaveLength(3);
-    expect(screen.getByLabelText('Ad Hoc Statistics')).toBeInTheDocument();
-    expect(screen.getByLabelText('National Statistics')).toBeInTheDocument();
-    expect(screen.getByLabelText('Official Statistics')).toBeInTheDocument();
+    ).toHaveLength(5);
+    expect(
+      screen.getByLabelText(releaseTypes.AdHocStatistics),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(releaseTypes.ExperimentalStatistics),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(releaseTypes.ManagementInformation),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(releaseTypes.NationalStatistics),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByLabelText(releaseTypes.OfficialStatistics),
+    ).toBeInTheDocument();
 
     const buttonCreate = screen.getByRole('button', {
       name: 'Create new release',
@@ -94,7 +93,6 @@ describe('ReleaseSummaryForm', () => {
   });
 
   test('validation error when no year or release type selected', async () => {
-    metaService.getReleaseTypes.mockResolvedValue(testReleaseTypes);
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
     );
@@ -108,7 +106,6 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
-            releaseTypeId: '',
           };
         }}
         onSubmit={onSubmit}
@@ -122,7 +119,6 @@ describe('ReleaseSummaryForm', () => {
       ).toBeInTheDocument();
     });
 
-    testReleaseTypes.map(type => screen.getByLabelText(type.title));
     const buttonCreate = screen.getByRole('button', {
       name: 'Create new release',
     });
@@ -141,7 +137,6 @@ describe('ReleaseSummaryForm', () => {
   });
 
   test('validation error when year "2"', async () => {
-    metaService.getReleaseTypes.mockResolvedValue(testReleaseTypes);
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
     );
@@ -155,7 +150,6 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
-            releaseTypeId: '',
           };
         }}
         onSubmit={onSubmit}
@@ -172,13 +166,12 @@ describe('ReleaseSummaryForm', () => {
     const inputYear = screen.getByLabelText(
       testTimeIdentifiers[0].category.label,
     );
-    testReleaseTypes.map(type => screen.getByLabelText(type.title));
     const buttonCreate = screen.getByRole('button', {
       name: 'Create new release',
     });
 
     userEvent.type(inputYear, '2');
-    userEvent.click(screen.getByLabelText('Ad Hoc Statistics'));
+    userEvent.click(screen.getByLabelText(releaseTypes.AdHocStatistics));
     userEvent.click(buttonCreate);
 
     await waitFor(() => {
@@ -197,7 +190,6 @@ describe('ReleaseSummaryForm', () => {
   });
 
   test('validation error when year "202021"', async () => {
-    metaService.getReleaseTypes.mockResolvedValue(testReleaseTypes);
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
     );
@@ -211,7 +203,6 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
-            releaseTypeId: '',
           };
         }}
         onSubmit={onSubmit}
@@ -228,13 +219,12 @@ describe('ReleaseSummaryForm', () => {
     const inputYear = screen.getByLabelText(
       testTimeIdentifiers[0].category.label,
     );
-    testReleaseTypes.map(type => screen.getByLabelText(type.title));
     const buttonCreate = screen.getByRole('button', {
       name: 'Create new release',
     });
 
     userEvent.type(inputYear, '202021');
-    userEvent.click(screen.getByLabelText('Ad Hoc Statistics'));
+    userEvent.click(screen.getByLabelText(releaseTypes.AdHocStatistics));
     userEvent.click(buttonCreate);
 
     await waitFor(() => {
@@ -253,7 +243,6 @@ describe('ReleaseSummaryForm', () => {
   });
 
   test('validation with valid year but no release type selected', async () => {
-    metaService.getReleaseTypes.mockResolvedValue(testReleaseTypes);
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
     );
@@ -267,7 +256,6 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
-            releaseTypeId: '',
           };
         }}
         onSubmit={onSubmit}
@@ -289,7 +277,6 @@ describe('ReleaseSummaryForm', () => {
     const inputYear = screen.getByLabelText(
       testTimeIdentifiers[0].category.label,
     );
-    testReleaseTypes.map(type => screen.getByLabelText(type.title));
     const buttonCreate = screen.getByRole('button', {
       name: 'Create new release',
     });
@@ -308,7 +295,6 @@ describe('ReleaseSummaryForm', () => {
   });
 
   test('renders with provided initial values', async () => {
-    metaService.getReleaseTypes.mockResolvedValue(testReleaseTypes);
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
     );
@@ -320,7 +306,7 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: 'AYQ4',
             timePeriodCoverageStartYear: '1966',
-            releaseTypeId: testReleaseTypes[1].id,
+            releaseType: 'NationalStatistics',
           };
         }}
         onSubmit={noop}
@@ -345,14 +331,15 @@ describe('ReleaseSummaryForm', () => {
     const radioOptionsReleaseType = within(
       screen.getByRole('group', { name: 'Release Type' }),
     ).getAllByRole('radio');
-    expect(radioOptionsReleaseType).toHaveLength(3);
+    expect(radioOptionsReleaseType).toHaveLength(5);
     expect(radioOptionsReleaseType[0]).not.toBeChecked();
-    expect(radioOptionsReleaseType[1]).toBeChecked();
+    expect(radioOptionsReleaseType[1]).not.toBeChecked();
     expect(radioOptionsReleaseType[2]).not.toBeChecked();
+    expect(radioOptionsReleaseType[3]).toBeChecked();
+    expect(radioOptionsReleaseType[4]).not.toBeChecked();
   });
 
   test('submits form with valid values', async () => {
-    metaService.getReleaseTypes.mockResolvedValue(testReleaseTypes);
     metaService.getTimePeriodCoverageGroups.mockResolvedValue(
       testTimeIdentifiers,
     );
@@ -366,7 +353,6 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
-            releaseTypeId: '',
           };
         }}
         onSubmit={onSubmit}
@@ -389,10 +375,10 @@ describe('ReleaseSummaryForm', () => {
     );
     userEvent.type(inputYear, '1966');
 
-    const radioOptionsReleaseType = testReleaseTypes.map(type =>
-      screen.getByLabelText(type.title),
+    const radioOptionReleaseTypeNationalStats = screen.getByLabelText(
+      releaseTypes.NationalStatistics,
     );
-    userEvent.click(radioOptionsReleaseType[0]);
+    userEvent.click(radioOptionReleaseTypeNationalStats);
 
     const buttonCreate = screen.getByRole('button', {
       name: 'Create new release',
