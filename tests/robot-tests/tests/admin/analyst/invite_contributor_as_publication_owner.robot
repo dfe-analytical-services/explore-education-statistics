@@ -54,7 +54,8 @@ Check Manage team access button is visible
 Go to Manage team access page
     user clicks link    Manage team access
     user waits until page contains    Update access for release (Academic Year 2002/03)
-    user checks page contains    There are no contributors for this release.
+
+    user checks page contains    There are no contributors or pending contributor invites for this release.
 
 Validate Select release dropdown
     user checks select contains x options    id:currentRelease    3
@@ -155,9 +156,8 @@ Validate contributors for 2000/01 release again
     user checks page does not contain    Analyst2 User2 (ees-analyst2@education.gov.uk)
     user checks page does not contain    Analyst3 User3 (ees-analyst3@education.gov.uk)
 
-    # NOTE: Newly invited user do not yet appear on the page
-    # After EES-2913, they will appear as a "Pending invite"
-    user checks page does not contain    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
+    user checks page contains    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
+    user checks page contains tag    Pending Invite
 
 *** Keywords ***
 user clicks remove user button for row

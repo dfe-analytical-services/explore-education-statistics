@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -10,13 +9,11 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
-using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -29,21 +26,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IBlobStorageService _blobStorageService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IReleaseRepository _releaseRepository;
-        private readonly LocationsOptions _locationOptions;
         private readonly IMapper _mapper;
 
         public PermalinkService(ITableBuilderService tableBuilderService,
             IBlobStorageService blobStorageService,
             ISubjectRepository subjectRepository,
             IReleaseRepository releaseRepository,
-            IOptions<LocationsOptions> locationOptions,
             IMapper mapper)
         {
             _tableBuilderService = tableBuilderService;
             _blobStorageService = blobStorageService;
             _subjectRepository = subjectRepository;
             _releaseRepository = releaseRepository;
-            _locationOptions = locationOptions.Value;
             _mapper = mapper;
         }
 
@@ -91,12 +85,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             });
         }
 
-        private JsonSerializerSettings BuildJsonSerializerSettings()
+        private static JsonSerializerSettings BuildJsonSerializerSettings()
         {
             return new()
             {
-                ContractResolver =
-                    new PermalinkContractResolver(_locationOptions.TableResultLocationHierarchiesEnabled),
+                ContractResolver = new PermalinkContractResolver(),
                 NullValueHandling = NullValueHandling.Ignore
             };
         }
@@ -119,34 +112,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
     internal class PermalinkContractResolver : DefaultContractResolver
     {
-        private readonly bool _tableResultLocationHierarchiesEnabled;
-
-        public PermalinkContractResolver(bool tableResultLocationHierarchiesEnabled)
-        {
-            _tableResultLocationHierarchiesEnabled = tableResultLocationHierarchiesEnabled;
-        }
-
-        protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
-        {
-            JsonProperty property = base.CreateProperty(member, memberSerialization);
-            if (property.DeclaringType == typeof(ResultSubjectMetaViewModel))
-            {
-                property.ShouldSerialize = property.PropertyName switch
-                {
-                    "Locations" => _ => !_tableResultLocationHierarchiesEnabled,
-                    "LocationsHierarchical" => _ => _tableResultLocationHierarchiesEnabled,
-                    _ => property.ShouldSerialize
-                };
-            }
-
-            return property;
-        }
-
         protected override JsonObjectContract CreateObjectContract(Type objectType)
         {
             JsonObjectContract contract = base.CreateObjectContract(objectType);
 
-            if (_tableResultLocationHierarchiesEnabled && objectType == typeof(ResultSubjectMetaViewModel))
+            if (objectType == typeof(ResultSubjectMetaViewModel))
             {
                 contract.Converter = new ResultSubjectMetaViewModelJsonConverter();
             }

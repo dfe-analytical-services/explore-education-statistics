@@ -8,13 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public const string Locations = "Locations";
 
         /// <summary>
-        /// Release toggle to support the table result location hierarchies feature while development
-        /// is in progress.
-        /// </summary>
-        //TODO EES-2902 - Remove with SOW8 after EES-2777
-        public bool TableResultLocationHierarchiesEnabled { get; init; }
-
-        /// <summary>
         /// Map of <c>GeographicLevel</c> to attribute names of the <c>Location</c> type.
         /// This is used to configure a hierarchy of location attributes for a geographic level.
         /// Example: For Local Authority level data where Country, Region and Local Authority attributes are provided,

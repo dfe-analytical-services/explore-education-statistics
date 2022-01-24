@@ -389,198 +389,198 @@ describe('DataReplacementPlan', () => {
     await waitFor(() => {
       expect(screen.getByText('Data blocks: ERROR')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: ERROR')).toBeInTheDocument();
-
-      expect(
-        screen.getByText(
-          /One or more data blocks will be invalidated by this data replacement/,
-        ),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          /One or more footnotes will be invalidated by this data replacement/,
-        ),
-      ).toBeInTheDocument();
-
-      const details = screen.getAllByRole('group');
-
-      expect(details).toHaveLength(4);
-
-      const dataBlock1 = within(details[0]);
-
-      expect(
-        dataBlock1.getByRole('button', { name: /Data block 1/ }),
-      ).toHaveTextContent('ERROR');
-
-      expect(dataBlock1.getByTestId('Country')).toHaveTextContent('England');
-      expect(dataBlock1.getByTestId('Country')).not.toHaveTextContent(
-        'England not present',
-      );
-
-      expect(dataBlock1.getByTestId('Local Authority')).toHaveTextContent(
-        'Barnsley',
-      );
-      expect(dataBlock1.getByTestId('Local Authority')).not.toHaveTextContent(
-        'Barnsley not present',
-      );
-
-      expect(dataBlock1.getByTestId('Local Authority')).toHaveTextContent(
-        'Birmingham not present',
-      );
-      expect(dataBlock1.getByTestId('Start date')).toHaveTextContent(
-        '2016 not present',
-      );
-
-      expect(dataBlock1.getByTestId('End date')).toHaveTextContent('2018');
-      expect(dataBlock1.getByTestId('End date')).not.toHaveTextContent(
-        '2018 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Filter 1')).toHaveTextContent('Group 1');
-      expect(dataBlock1.getByTestId('Filter 1')).toHaveTextContent('Group 2');
-
-      expect(dataBlock1.getByTestId('Group 1')).toHaveTextContent(
-        'Item 1 not present',
-      );
-      expect(dataBlock1.getByTestId('Group 1')).toHaveTextContent('Item 2');
-      expect(dataBlock1.getByTestId('Group 1')).not.toHaveTextContent(
-        'Item 2 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Group 2')).toHaveTextContent('Item 3');
-      expect(dataBlock1.getByTestId('Group 2')).not.toHaveTextContent(
-        'Item 3 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Filter 2')).toHaveTextContent('Group 3');
-      expect(dataBlock1.getByTestId('Filter 2')).toHaveTextContent('Group 4');
-
-      expect(dataBlock1.getByTestId('Group 3')).toHaveTextContent('Item 4');
-      expect(dataBlock1.getByTestId('Group 3')).not.toHaveTextContent(
-        'Item 4 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Group 4')).toHaveTextContent(
-        'Item 5 not present',
-      );
-      expect(dataBlock1.getByTestId('Group 4')).toHaveTextContent(
-        'Item 6 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Indicator group 1')).toHaveTextContent(
-        'Indicator 1',
-      );
-      expect(dataBlock1.getByTestId('Indicator group 1')).not.toHaveTextContent(
-        'Indicator 1 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Indicator group 2')).toHaveTextContent(
-        'Indicator 2',
-      );
-      expect(dataBlock1.getByTestId('Indicator group 2')).not.toHaveTextContent(
-        'Indicator 2 not present',
-      );
-      expect(dataBlock1.getByTestId('Indicator group 2')).toHaveTextContent(
-        'Indicator 3 not present',
-      );
-
-      expect(dataBlock1.getByTestId('Indicator group 3')).toHaveTextContent(
-        'Indicator 4 not present',
-      );
-
-      expect(
-        dataBlock1.getByRole('link', { name: 'Edit data block', hidden: true }),
-      ).toHaveAttribute(
-        'href',
-        '/publication/publication-1/release/release-1/data-blocks/block-1',
-      );
-      expect(
-        dataBlock1.getByRole('button', {
-          name: 'Delete data block',
-          hidden: true,
-        }),
-      ).toBeInTheDocument();
-
-      const dataBlock2 = within(details[1]);
-
-      expect(
-        dataBlock2.getByRole('button', { name: /Data block 2/ }),
-      ).toHaveTextContent('OK');
-
-      expect(
-        dataBlock2.getByText(
-          'This data block has no conflicts and can be replaced.',
-        ),
-      ).toBeInTheDocument();
-
-      const footnote1 = within(details[2]);
-
-      expect(
-        footnote1.getByRole('button', { name: /Footnote 1/ }),
-      ).toHaveTextContent('ERROR');
-
-      expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 2');
-      expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 3');
-      expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 1');
-
-      expect(footnote1.getByTestId('Group 2')).toHaveTextContent(
-        'Item 1 not present',
-      );
-      expect(footnote1.getByTestId('Group 2')).toHaveTextContent(
-        'Item 3 not present',
-      );
-
-      expect(footnote1.getByTestId('Group 3')).toHaveTextContent('Item 2');
-      expect(footnote1.getByTestId('Group 3')).not.toHaveTextContent(
-        'Item 2 not present',
-      );
-
-      expect(footnote1.getByTestId('Group 1')).toHaveTextContent(
-        '(All selected)',
-      );
-
-      expect(footnote1.getByTestId('Filter 2')).toHaveTextContent('Group 5');
-      expect(footnote1.getByTestId('Filter 2')).toHaveTextContent('Group 4');
-
-      expect(footnote1.getByTestId('Group 5')).toHaveTextContent(
-        'Item 4 not present',
-      );
-      expect(footnote1.getByTestId('Group 4')).toHaveTextContent(
-        '(All selected)',
-      );
-
-      expect(footnote1.getByTestId('Filter 3')).toHaveTextContent(
-        '(All selected)',
-      );
-      expect(footnote1.getByTestId('Filter 4')).toHaveTextContent(
-        '(All selected)',
-      );
-
-      expect(footnote1.getByTestId('Indicator group 1')).toHaveTextContent(
-        'Indicator 1',
-      );
-      expect(footnote1.getByTestId('Indicator group 1')).not.toHaveTextContent(
-        'Indicator 1 not present',
-      );
-      expect(footnote1.getByTestId('Indicator group 2')).toHaveTextContent(
-        'Indicator 3 not present',
-      );
-
-      const footnote2 = within(details[3]);
-
-      expect(
-        footnote2.getByRole('button', { name: /Footnote 2/ }),
-      ).toHaveTextContent('OK');
-
-      expect(
-        footnote2.getByText(
-          'This footnote has no conflicts and can be replaced.',
-        ),
-      ).toBeInTheDocument();
-
-      expect(
-        screen.queryByRole('button', { name: 'Confirm data replacement' }),
-      ).not.toBeInTheDocument();
     });
+
+    expect(
+      screen.getByText(
+        /One or more data blocks will be invalidated by this data replacement/,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /One or more footnotes will be invalidated by this data replacement/,
+      ),
+    ).toBeInTheDocument();
+
+    const details = screen.getAllByRole('group');
+
+    expect(details).toHaveLength(4);
+
+    const dataBlock1 = within(details[0]);
+
+    expect(
+      dataBlock1.getByRole('button', { name: /Data block 1/ }),
+    ).toHaveTextContent('ERROR');
+
+    expect(dataBlock1.getByTestId('Country')).toHaveTextContent('England');
+    expect(dataBlock1.getByTestId('Country')).not.toHaveTextContent(
+      'England not present',
+    );
+
+    expect(dataBlock1.getByTestId('Local Authority')).toHaveTextContent(
+      'Barnsley',
+    );
+    expect(dataBlock1.getByTestId('Local Authority')).not.toHaveTextContent(
+      'Barnsley not present',
+    );
+
+    expect(dataBlock1.getByTestId('Local Authority')).toHaveTextContent(
+      'Birmingham not present',
+    );
+    expect(dataBlock1.getByTestId('Start date')).toHaveTextContent(
+      '2016 not present',
+    );
+
+    expect(dataBlock1.getByTestId('End date')).toHaveTextContent('2018');
+    expect(dataBlock1.getByTestId('End date')).not.toHaveTextContent(
+      '2018 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Filter 1')).toHaveTextContent('Group 1');
+    expect(dataBlock1.getByTestId('Filter 1')).toHaveTextContent('Group 2');
+
+    expect(dataBlock1.getByTestId('Group 1')).toHaveTextContent(
+      'Item 1 not present',
+    );
+    expect(dataBlock1.getByTestId('Group 1')).toHaveTextContent('Item 2');
+    expect(dataBlock1.getByTestId('Group 1')).not.toHaveTextContent(
+      'Item 2 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Group 2')).toHaveTextContent('Item 3');
+    expect(dataBlock1.getByTestId('Group 2')).not.toHaveTextContent(
+      'Item 3 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Filter 2')).toHaveTextContent('Group 3');
+    expect(dataBlock1.getByTestId('Filter 2')).toHaveTextContent('Group 4');
+
+    expect(dataBlock1.getByTestId('Group 3')).toHaveTextContent('Item 4');
+    expect(dataBlock1.getByTestId('Group 3')).not.toHaveTextContent(
+      'Item 4 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Group 4')).toHaveTextContent(
+      'Item 5 not present',
+    );
+    expect(dataBlock1.getByTestId('Group 4')).toHaveTextContent(
+      'Item 6 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Indicator group 1')).toHaveTextContent(
+      'Indicator 1',
+    );
+    expect(dataBlock1.getByTestId('Indicator group 1')).not.toHaveTextContent(
+      'Indicator 1 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Indicator group 2')).toHaveTextContent(
+      'Indicator 2',
+    );
+    expect(dataBlock1.getByTestId('Indicator group 2')).not.toHaveTextContent(
+      'Indicator 2 not present',
+    );
+    expect(dataBlock1.getByTestId('Indicator group 2')).toHaveTextContent(
+      'Indicator 3 not present',
+    );
+
+    expect(dataBlock1.getByTestId('Indicator group 3')).toHaveTextContent(
+      'Indicator 4 not present',
+    );
+
+    expect(
+      dataBlock1.getByRole('link', { name: 'Edit data block', hidden: true }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/data-blocks/block-1',
+    );
+    expect(
+      dataBlock1.getByRole('button', {
+        name: 'Delete data block',
+        hidden: true,
+      }),
+    ).toBeInTheDocument();
+
+    const dataBlock2 = within(details[1]);
+
+    expect(
+      dataBlock2.getByRole('button', { name: /Data block 2/ }),
+    ).toHaveTextContent('OK');
+
+    expect(
+      dataBlock2.getByText(
+        'This data block has no conflicts and can be replaced.',
+      ),
+    ).toBeInTheDocument();
+
+    const footnote1 = within(details[2]);
+
+    expect(
+      footnote1.getByRole('button', { name: /Footnote 1/ }),
+    ).toHaveTextContent('ERROR');
+
+    expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 2');
+    expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 3');
+    expect(footnote1.getByTestId('Filter 1')).toHaveTextContent('Group 1');
+
+    expect(footnote1.getByTestId('Group 2')).toHaveTextContent(
+      'Item 1 not present',
+    );
+    expect(footnote1.getByTestId('Group 2')).toHaveTextContent(
+      'Item 3 not present',
+    );
+
+    expect(footnote1.getByTestId('Group 3')).toHaveTextContent('Item 2');
+    expect(footnote1.getByTestId('Group 3')).not.toHaveTextContent(
+      'Item 2 not present',
+    );
+
+    expect(footnote1.getByTestId('Group 1')).toHaveTextContent(
+      '(All selected)',
+    );
+
+    expect(footnote1.getByTestId('Filter 2')).toHaveTextContent('Group 5');
+    expect(footnote1.getByTestId('Filter 2')).toHaveTextContent('Group 4');
+
+    expect(footnote1.getByTestId('Group 5')).toHaveTextContent(
+      'Item 4 not present',
+    );
+    expect(footnote1.getByTestId('Group 4')).toHaveTextContent(
+      '(All selected)',
+    );
+
+    expect(footnote1.getByTestId('Filter 3')).toHaveTextContent(
+      '(All selected)',
+    );
+    expect(footnote1.getByTestId('Filter 4')).toHaveTextContent(
+      '(All selected)',
+    );
+
+    expect(footnote1.getByTestId('Indicator group 1')).toHaveTextContent(
+      'Indicator 1',
+    );
+    expect(footnote1.getByTestId('Indicator group 1')).not.toHaveTextContent(
+      'Indicator 1 not present',
+    );
+    expect(footnote1.getByTestId('Indicator group 2')).toHaveTextContent(
+      'Indicator 3 not present',
+    );
+
+    const footnote2 = within(details[3]);
+
+    expect(
+      footnote2.getByRole('button', { name: /Footnote 2/ }),
+    ).toHaveTextContent('OK');
+
+    expect(
+      footnote2.getByText(
+        'This footnote has no conflicts and can be replaced.',
+      ),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Confirm data replacement' }),
+    ).not.toBeInTheDocument();
   });
 
   test('renders correctly with valid plan', async () => {
@@ -602,18 +602,18 @@ describe('DataReplacementPlan', () => {
     await waitFor(() => {
       expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
-
-      expect(
-        screen.getByText(
-          'All existing data blocks can be replaced by this data replacement.',
-        ),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(
-          'All existing footnotes can be replaced by this data replacement.',
-        ),
-      ).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByText(
+        'All existing data blocks can be replaced by this data replacement.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'All existing footnotes can be replaced by this data replacement.',
+      ),
+    ).toBeInTheDocument();
 
     const details = screen.getAllByRole('group');
 
@@ -689,12 +689,10 @@ describe('DataReplacementPlan', () => {
     await waitFor(() => {
       expect(screen.getByText('Data blocks: OK')).toBeInTheDocument();
       expect(screen.getByText('Footnotes: OK')).toBeInTheDocument();
-
-      expect(
-        screen.getByText('No data blocks to replace.'),
-      ).toBeInTheDocument();
-      expect(screen.getByText('No footnotes to replace.')).toBeInTheDocument();
     });
+
+    expect(screen.getByText('No data blocks to replace.')).toBeInTheDocument();
+    expect(screen.getByText('No footnotes to replace.')).toBeInTheDocument();
 
     expect(screen.queryAllByRole('group')).toHaveLength(0);
 
@@ -749,7 +747,12 @@ describe('DataReplacementPlan', () => {
       ).toBeInTheDocument();
     });
 
+    expect(
+      screen.getByRole('button', { name: /Data block 1/ }),
+    ).toBeInTheDocument();
+
     userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+
     expect(
       screen.getByRole('link', { name: 'Edit data block' }),
     ).toHaveAttribute(
@@ -783,10 +786,12 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /Data block 1/ }),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Data block 1/)).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('button', { name: /Data block 1/ }),
+    ).toBeInTheDocument();
 
     userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
     expect(
@@ -812,24 +817,28 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /Data block 1/ }),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Data block 1/)).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('button', { name: /Data block 1/ }),
+    ).toBeInTheDocument();
 
     userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
     userEvent.click(screen.getByRole('button', { name: 'Delete data block' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-
-      const modal = within(screen.getByRole('dialog'));
-
-      expect(modal.getByRole('heading')).toHaveTextContent('Delete data block');
       expect(
-        modal.getByText(/Are you sure you want to delete/),
-      ).toHaveTextContent("Are you sure you want to delete 'Data block 1'");
+        screen.getByText(/Are you sure you want to delete/),
+      ).toBeInTheDocument();
     });
+
+    const modal = within(screen.getByRole('dialog'));
+
+    expect(modal.getByRole('heading')).toHaveTextContent('Delete data block');
+    expect(
+      modal.getByText(/Are you sure you want to delete/),
+    ).toHaveTextContent("Are you sure you want to delete 'Data block 1'");
   });
 
   test('deleting data block hides modal and reloads replacement plan', async () => {
@@ -851,18 +860,23 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /Data block 1/ }),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Data block 1/)).toBeInTheDocument();
     });
 
-    userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
+    expect(
+      screen.getByRole('button', { name: /Data block 1/ }),
+    ).toBeInTheDocument();
 
+    userEvent.click(screen.getByRole('button', { name: /Data block 1/ }));
     userEvent.click(screen.getByRole('button', { name: 'Delete data block' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(
+        screen.getByText(/Are you sure you want to delete/),
+      ).toBeInTheDocument();
     });
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
 
     expect(dataBlockService.deleteDataBlock).not.toHaveBeenCalled();
 
@@ -878,22 +892,26 @@ describe('DataReplacementPlan', () => {
     expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-      const details = screen.getAllByRole('group');
-
-      expect(details).toHaveLength(1);
-
-      const dataBlock = within(details[0]);
-
       expect(
-        dataBlock.getByRole('button', { name: /Data block 2/ }),
+        screen.queryByText(/Are you sure you want to delete/),
       ).toBeInTheDocument();
-
-      expect(
-        screen.queryByRole('button', { name: /Data block 1/ }),
-      ).not.toBeInTheDocument();
     });
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    const details = screen.getAllByRole('group');
+
+    expect(details).toHaveLength(1);
+
+    const dataBlock = within(details[0]);
+
+    expect(
+      dataBlock.getByRole('button', { name: /Data block 2/ }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: /Data block 1/ }),
+    ).not.toBeInTheDocument();
   });
 
   test("renders correct 'Edit footnote' link", async () => {
@@ -914,10 +932,12 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /Footnote 1/ }),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Footnote 1/)).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('button', { name: /Footnote 1/ }),
+    ).toBeInTheDocument();
 
     userEvent.click(screen.getByRole('button', { name: /Footnote 1/ }));
     expect(screen.getByRole('link', { name: 'Edit footnote' })).toHaveAttribute(
@@ -944,27 +964,35 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /Footnote 1/ }),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Footnote 1/)).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('button', { name: /Footnote 1/ }),
+    ).toBeInTheDocument();
 
     userEvent.click(screen.getByRole('button', { name: /Footnote 1/ }));
     userEvent.click(screen.getByRole('button', { name: 'Delete footnote' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
-
-      const modal = within(screen.getByRole('dialog'));
-
-      expect(modal.getByRole('heading')).toHaveTextContent('Delete footnote');
       expect(
-        modal.getByText(
+        screen.getByText(
           'Are you sure you want to delete the following footnote?',
         ),
       ).toBeInTheDocument();
-      expect(modal.getByText('Footnote 1')).toBeInTheDocument();
     });
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    const modal = within(screen.getByRole('dialog'));
+
+    expect(modal.getByRole('heading')).toHaveTextContent('Delete footnote');
+    expect(
+      modal.getByText(
+        'Are you sure you want to delete the following footnote?',
+      ),
+    ).toBeInTheDocument();
+    expect(modal.getByText('Footnote 1')).toBeInTheDocument();
   });
 
   test('deleting footnote hides modal and reloads replacement plan', async () => {
@@ -986,17 +1014,25 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: /Footnote 1/ }),
-      ).toBeInTheDocument();
+      expect(screen.getByText(/Footnote 1/)).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('button', { name: /Footnote 1/ }),
+    ).toBeInTheDocument();
 
     userEvent.click(screen.getByRole('button', { name: /Footnote 1/ }));
     userEvent.click(screen.getByRole('button', { name: 'Delete footnote' }));
 
     await waitFor(() => {
-      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(
+        screen.getByText(
+          'Are you sure you want to delete the following footnote?',
+        ),
+      ).toBeInTheDocument();
     });
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
 
     expect(footnoteService.deleteFootnote).not.toHaveBeenCalled();
 
@@ -1012,22 +1048,28 @@ describe('DataReplacementPlan', () => {
     expect(dataReplacementService.getReplacementPlan).toHaveBeenCalledTimes(1);
 
     await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
-
-      const details = screen.getAllByRole('group');
-
-      expect(details).toHaveLength(1);
-
-      const footnote = within(details[0]);
-
       expect(
-        footnote.getByRole('button', { name: /Footnote 2/ }),
-      ).toBeInTheDocument();
-
-      expect(
-        screen.queryByRole('button', { name: /Footnote 1/ }),
+        screen.queryByText(
+          'Are you sure you want to delete the following footnote?',
+        ),
       ).not.toBeInTheDocument();
     });
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    const details = screen.getAllByRole('group');
+
+    expect(details).toHaveLength(1);
+
+    const footnote = within(details[0]);
+
+    expect(
+      footnote.getByRole('button', { name: /Footnote 2/ }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: /Footnote 1/ }),
+    ).not.toBeInTheDocument();
   });
 
   test('calls service to replace data when confirming replacement', async () => {
@@ -1047,10 +1089,12 @@ describe('DataReplacementPlan', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('button', { name: 'Confirm data replacement' }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Confirm data replacement')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('button', { name: 'Confirm data replacement' }),
+    ).toBeInTheDocument();
 
     expect(dataReplacementService.replaceData).not.toHaveBeenCalled();
 

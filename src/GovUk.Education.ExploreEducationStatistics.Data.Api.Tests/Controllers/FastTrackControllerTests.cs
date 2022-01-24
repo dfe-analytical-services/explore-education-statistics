@@ -240,16 +240,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                                 DecimalPlaces = 2
                             }
                         },
-                        Locations = new List<ObservationalUnitMetaViewModel>
-                        {
-                            new()
-                            {
-                                Label = "A label",
-                                Level = GeographicLevel.Institution,
-                                Value = "1234",
-                                GeoJson = true
-                            }
-                        },
                         BoundaryLevels = new List<BoundaryLevelViewModel>
                         {
                             new(1234, "boundary")

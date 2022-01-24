@@ -798,6 +798,7 @@ user waits until table tool wizard step is available
     ...    ${wait}
     # this visible check passes when it should fail?!
     user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]
+    ...    %{WAIT_SMALL}
     user waits until page does not contain loading spinner
 
 lookup or return webelement

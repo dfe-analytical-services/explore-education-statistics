@@ -2,14 +2,14 @@ import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import PublicationReleaseContributorsForm from '@admin/pages/publication/components/PublicationReleaseContributorsForm';
 import _releasePermissionService, {
-  ManageAccessPageContributor,
+  ContributorViewModel,
 } from '@admin/services/releasePermissionService';
 import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/releasePermissionService');
 
 describe('PublicationReleaseContributorsForm', () => {
-  const testPublicationContributors: ManageAccessPageContributor[] = [
+  const testPublicationContributors: ContributorViewModel[] = [
     {
       userId: 'user-1',
       userDisplayName: 'User Name 1',
@@ -31,7 +31,7 @@ describe('PublicationReleaseContributorsForm', () => {
       userEmail: 'user4@test.com',
     },
   ];
-  const testReleaseContributors: ManageAccessPageContributor[] = [
+  const testReleaseContributors: ContributorViewModel[] = [
     {
       userId: 'user-1',
       userDisplayName: 'User Name 1',

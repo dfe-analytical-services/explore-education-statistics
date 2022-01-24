@@ -1,7 +1,5 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
@@ -14,22 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
         public List<IndicatorMetaViewModel> Indicators { get; init; } = new();
 
         /// <summary>
-        /// Legacy locations field replaced by <see cref="LocationsHierarchical"/>.
-        /// </summary>
-        /// <remarks>
-        /// This should be safe to drop after the feature to add hierarchical locations in Table Result Subject Metadata
-        /// becomes permanent, since a transformation from data in old Permalinks is made during deserialization by
-        /// <see cref="ResultSubjectMetaViewModelJsonConverter"/>.
-        /// </remarks>
-        [Obsolete("TODO EES-2902 - Remove with SOW8 after EES-2777", false)]
-        public List<ObservationalUnitMetaViewModel> Locations { get; init; } = new();
-
-        /// <summary>
         /// Hierarchical locations field.
         /// </summary>
         /// <remarks>
-        /// EES-2943: This could potentially be renamed back to 'Locations' but requires a migration of
+        /// TODO EES-2943: This could potentially be renamed back to 'Locations' but requires a migration of
         /// old Permalinks which already have a legacy 'Locations' field in their JSON serialization of type <see cref="List{ObservationalUnitMetaViewModel}"/>.
+        /// TODO EES-3106: This could also be renamed back to 'Locations' in Permalink responses independently of EES-2943
+        /// but will require a new view model to be split from the model used by serialization.
         /// </remarks>
         public Dictionary<string, List<LocationAttributeViewModel>> LocationsHierarchical { get; set; } = new();
 

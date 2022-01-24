@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -29,6 +30,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             return await _releasePermissionService
                 .ListReleaseContributors(releaseId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("releases/{releaseId}/contributor-invites")]
+        public async Task<ActionResult<List<ContributorInviteViewModel>>> ListReleaseContributorInvites(
+            Guid releaseId, [FromQuery] bool? accepted = null)
+        {
+            return await _releasePermissionService
+                .ListReleaseContributorInvites(releaseId, accepted)
                 .HandleFailuresOrOk();
         }
 

@@ -1,20 +1,33 @@
 import client from '@admin/services/utils/service';
 
-export interface ManageAccessPageContributor {
+export interface ContributorViewModel {
   userId: string;
   userDisplayName: string;
   userEmail: string;
 }
 
+export interface ContributorInvite {
+  email: string;
+}
+
 const releasePermissionService = {
-  listReleaseContributors(
-    releaseId: string,
-  ): Promise<ManageAccessPageContributor[]> {
+  listReleaseContributors(releaseId: string): Promise<ContributorViewModel[]> {
     return client.get(`/releases/${releaseId}/contributors`);
+  },
+  listReleaseContributorInvites(
+    releaseId: string,
+    accepted: boolean | undefined = undefined,
+  ): Promise<ContributorInvite[]> {
+    if (accepted !== undefined) {
+      return client.get(`/releases/${releaseId}/contributor-invites`, {
+        params: { accepted },
+      });
+    }
+    return client.get(`/releases/${releaseId}/contributor-invites`);
   },
   listPublicationContributors(
     publicationId: string,
-  ): Promise<ManageAccessPageContributor[]> {
+  ): Promise<ContributorViewModel[]> {
     return client.get(`/publications/${publicationId}/contributors`);
   },
   updateReleaseContributors(
