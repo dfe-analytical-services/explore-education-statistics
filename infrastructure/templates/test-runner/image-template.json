@@ -1,0 +1,75 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "imageTemplateName": {
+      "type": "string"
+    },
+    "svcLocation": {
+      "type": "string"
+    },
+    "managedImageResGroupId": {
+      "type": "string"
+    },
+    "managedImageName": {
+      "type": "string"
+    }
+  },
+  "variables": {
+    "resourceId": "[concat(parameters('managedImageResGroupId'),parameters('managedImageName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.VirtualMachineImages/imageTemplates",
+      "name": "[parameters('imageTemplateName')]",
+      "apiVersion": "2019-08-01",
+      "properties": {
+        "source": {
+          "type": "PlatformImage",
+          "publisher": "Canonical",
+          "offer": "UbuntuServer",
+          "sku": "18.04-LTS",
+          "version": "latest"
+        },
+        "customize": [
+          {
+            "type": "shell",
+            "name": "InstallPackages",
+            "inline": [
+              "apt-get update -y",
+              "apt-get upgrade -y",
+              "apt-get wget -y",
+              "wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb",
+              "sudo apt install -y ./google-chrome-stable_current_amd64.deb",
+              "apt-get install software-properties-common -y",
+              "add-apt-repository ppa:deadsnakes/ppa -y",
+              "apt-get install python3.8 -y",
+              "apt-get install python3-pip -y",
+              "echo alias pip='pip3' > ~/.bashrc",
+              "pip install pipenv -y ",
+              "apt-get install python-setuptools -y",
+              "sudo easy_install pip",
+              "apt-get update -y",
+              "apt-get install python3-pip",
+              "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
+            ],
+            "inline_shebang": "/bin/sh -x"
+          }
+        ],
+        "distribute": [
+          {
+            "type": "ManagedImage",
+            "imageId": "[variables('resourceId')]",
+            "location": "[parameters('svcLocation')]",
+            "runOutputName": "[parameters('managedimagename')]",
+            "aritfactTags": {
+              "source": "azVmImageBuilder",
+              "releaseStatus": "production",
+              "type": "mdionly"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
