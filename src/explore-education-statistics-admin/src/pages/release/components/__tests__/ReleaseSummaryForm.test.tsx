@@ -40,6 +40,7 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
+            releaseType: undefined,
           };
         }}
         onSubmit={noop}
@@ -106,6 +107,7 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
+            releaseType: undefined,
           };
         }}
         onSubmit={onSubmit}
@@ -150,6 +152,7 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
+            releaseType: undefined,
           };
         }}
         onSubmit={onSubmit}
@@ -203,6 +206,7 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
+            releaseType: undefined,
           };
         }}
         onSubmit={onSubmit}
@@ -256,6 +260,7 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
+            releaseType: undefined,
           };
         }}
         onSubmit={onSubmit}
@@ -353,6 +358,7 @@ describe('ReleaseSummaryForm', () => {
           return {
             timePeriodCoverageCode: '',
             timePeriodCoverageStartYear: '',
+            releaseType: undefined,
           };
         }}
         onSubmit={onSubmit}
