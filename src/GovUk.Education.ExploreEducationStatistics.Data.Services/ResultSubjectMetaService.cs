@@ -77,8 +77,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ObservationQueryContext query,
             IList<Observation> observations)
         {
-            var queryableObservations = observations.AsQueryable();
-
             return await _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(async subject =>
@@ -87,20 +85,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     stopwatch.Start();
 
                     var locationAttributes =
-                        await _locationRepository.GetLocationAttributesHierarchicalByObservationsList(
-                            observations,
+                        _locationRepository.GetLocationAttributesHierarchical(
+                            observations.Select(o => o.Location).ToList(),
                             hierarchies: _locationOptions.Hierarchies);
                     _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
                     var filterItems =
-                        _filterItemRepository.GetFilterItemsFromObservationList(observations);
+                        FilterItemRepository.GetFilterItemsFromObservationList(observations);
                     var filterViewModels = BuildFilterHierarchy(filterItems);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var footnoteViewModels =
-                        GetFilteredFootnoteViewModels(releaseId, queryableObservations, query);
+                    var footnoteViewModels = 
+                        GetFilteredFootnoteViewModels(releaseId, filterItems.Select(fi => fi.Id).ToList(), query);
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -108,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var timePeriodViewModels = GetTimePeriodViewModels(queryableObservations);
+                    var timePeriodViewModels = GetTimePeriodViewModels(observations);
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -161,11 +159,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private List<FootnoteViewModel> GetFilteredFootnoteViewModels(
             Guid releaseId,
-            IQueryable<Observation> observations,
+            IEnumerable<Guid> filterItemIds,
             ObservationQueryContext queryContext)
         {
             return _footnoteRepository
-                .GetFilteredFootnotes(releaseId, queryContext.SubjectId, observations, queryContext.Indicators)
+                .GetFilteredFootnotes(releaseId, queryContext.SubjectId, filterItemIds, queryContext.Indicators)
                 .Select(footnote => new FootnoteViewModel
                 {
                     Id = footnote.Id,
@@ -173,10 +171,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 })
                 .ToList();
         }
-
-        private List<TimePeriodMetaViewModel> GetTimePeriodViewModels(IQueryable<Observation> observations)
+        
+        private List<TimePeriodMetaViewModel> GetTimePeriodViewModels(IList<Observation> observations)
         {
-            return _timePeriodService.GetTimePeriodRange(observations)
+            return _timePeriodService
+                .GetTimePeriodRange(observations)
                 .Select(tuple => new TimePeriodMetaViewModel(tuple.Year, tuple.TimeIdentifier))
                 .ToList();
         }

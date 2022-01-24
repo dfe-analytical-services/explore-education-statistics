@@ -25,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class TableBuilderService : ITableBuilderService
     {
+        private StatisticsDbContext _context;
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly IObservationService _observationService;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IResultBuilder<Observation,
                 ObservationViewModel> resultBuilder,
             IReleaseRepository releaseRepository,
-            IOptions<TableBuilderOptions> options)
+            IOptions<TableBuilderOptions> options, StatisticsDbContext context)
         {
             _filterItemRepository = filterItemRepository;
             _observationService = observationService;
@@ -55,6 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _userService = userService;
             _resultBuilder = resultBuilder;
             _releaseRepository = releaseRepository;
+            _context = context;
             _options = options.Value;
         }
 
@@ -101,18 +103,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
                     }
 
-
-                    var observations = 
-                        await _observationService.FindObservations(queryContext, cancellationToken);
-                    if (!observations.Any())
+                    var observationRows = 
+                        await _observationService.GetMatchedObservations(queryContext, cancellationToken);
+                    
+                    if (!observationRows.Any())
                     {
                         return new TableBuilderResultViewModel();
                     }
+                    
+                    var observationIds = observationRows.Select(row => row.Id);
+                            
+                    var observations = await _context
+                        .Observation
+                        .AsNoTracking()
+                        .Include(o => o.Location)
+                        .Include(o => o.FilterItems)
+                        .Where(o => observationIds.Contains(o.Id))
+                        .ToListAsync(cancellationToken);
 
                     return await _resultSubjectMetaService
                         .GetSubjectMeta(
                             release.Id, 
-                            queryContext, 
+                            queryContext,
                             observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {

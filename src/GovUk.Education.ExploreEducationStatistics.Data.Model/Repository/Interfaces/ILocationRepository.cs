@@ -14,13 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
         Task<Dictionary<GeographicLevel, List<LocationAttributeNode>>> GetLocationAttributesHierarchical(
             Guid subjectId,
             Dictionary<GeographicLevel, List<string>>? hierarchies);
-
-        Task<Dictionary<GeographicLevel, List<LocationAttributeNode>>> GetLocationAttributesHierarchicalByObservationsList(
-            IList<Observation> observations,
-            Dictionary<GeographicLevel, List<string>>? hierarchies);
-
-        Task<Dictionary<GeographicLevel, List<LocationAttributeNode>>> GetLocationAttributesHierarchicalByObservationsQuery(
-            IQueryable<Observation> observations,
+        
+        Dictionary<GeographicLevel, List<LocationAttributeNode>> GetLocationAttributesHierarchical(
+            IList<Location> locations,
             Dictionary<GeographicLevel, List<string>>? hierarchies);
 
         IEnumerable<ILocationAttribute> GetLocationAttributes(

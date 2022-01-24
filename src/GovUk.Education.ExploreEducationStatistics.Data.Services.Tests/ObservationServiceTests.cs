@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Callback(() => cancellationTokenSource.Cancel())
                 .ReturnsAsync(AsArray(Guid.NewGuid()));
 
-            await Assert.ThrowsAsync<OperationCanceledException>(() => service.FindObservations(observationQueryContext, cancellationToken));
+            await Assert.ThrowsAsync<OperationCanceledException>(() => service.GetMatchedObservations(observationQueryContext, cancellationToken));
         }
         
         private static (

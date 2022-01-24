@@ -1,5 +1,4 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -12,12 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public abstract class AbstractSubjectMetaService
     {
-        protected readonly IFilterItemRepository _filterItemRepository;
+        protected readonly IFilterItemRepository FilterItemRepository;
         protected static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
         protected AbstractSubjectMetaService(IFilterItemRepository filterItemRepository)
         {
-            _filterItemRepository = filterItemRepository;
+            FilterItemRepository = filterItemRepository;
         }
 
         protected Dictionary<string, FilterMetaViewModel> BuildFilterHierarchy(IEnumerable<FilterItem> filterItems)
@@ -133,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private string GetTotalValue(IEnumerable<FilterItem> filterItems)
         {
-            return _filterItemRepository.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
+            return FilterItemRepository.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
         }
     }
 }

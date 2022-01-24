@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
@@ -10,17 +11,38 @@ using Thinktecture;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 {
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class MatchedObservation
+    {
+        public Guid Id { get; }
+        
+        public MatchedObservation(Guid id)
+        {
+            Id = id;
+        }
+    }
+    
+    public class IdTempTable
+    {
+        // ReSharper disable once UnusedAutoPropertyAccessor.Local
+        private Guid Id { get; }
+        
+        public IdTempTable(Guid id)
+        {
+            Id = id;
+        }
+    }
+    
     public class StatisticsDbContext : DbContext
     {
+
         public StatisticsDbContext()
         {
         }
 
-        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, int.MaxValue)
-        {
-        }
-
-        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options, int? timeout) : base(options)
+        public StatisticsDbContext(
+            DbContextOptions<StatisticsDbContext> options, 
+            int? timeout = int.MaxValue) : base(options)
         {
             Configure(timeout);
         }
@@ -66,6 +88,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         public DbSet<ReleaseSubject> ReleaseSubject { get; set; } = null!;
         public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
+        
+        public IQueryable<MatchedObservation> MatchedObservations => Set<MatchedObservation>()
+            .Select(t => t);
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -77,22 +103,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureFilterFootnote(modelBuilder);
             ConfigureFilterGroupFootnote(modelBuilder);
             ConfigureFilterItemFootnote(modelBuilder);
+            ConfigureIdTempTable(modelBuilder);
             ConfigureIndicatorFootnote(modelBuilder);
             ConfigureLocation(modelBuilder);
             ConfigureMeasures(modelBuilder);
             ConfigureObservation(modelBuilder);
             ConfigureObservationFilterItem(modelBuilder);
+            ConfigureObservationRowResultTempTable(modelBuilder);
             ConfigurePublication(modelBuilder);
             ConfigureRelease(modelBuilder);
             ConfigureReleaseSubject(modelBuilder);
             ConfigureReleaseFootnote(modelBuilder);
+            ConfigureSubject(modelBuilder);
             ConfigureSubjectFootnote(modelBuilder);
             ConfigureTimePeriod(modelBuilder);
             ConfigureUnit(modelBuilder);
-            ConfigureSubject(modelBuilder);
-
-            modelBuilder.ConfigureTempTable<Guid>(isKeyless: false)
-                .HasKey(row => row.Column1);
         }
 
         private static void ConfigureBoundaryLevel(ModelBuilder modelBuilder)
@@ -199,6 +224,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .WithMany()
                 .HasForeignKey(observationFilterItem => observationFilterItem.FilterId)
                 .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private static void ConfigureObservationRowResultTempTable(ModelBuilder modelBuilder)
+        {
+            modelBuilder
+                .ConfigureTempTableEntity<MatchedObservation>(isKeyless: false)
+                .HasKey("Id");
         }
 
         private static void ConfigureUnit(ModelBuilder modelBuilder)
@@ -360,6 +392,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .WithMany(footnote => footnote.FilterItems)
                 .HasForeignKey(filterItemFootnote => filterItemFootnote.FootnoteId)
                 .OnDelete(DeleteBehavior.Restrict);
+        }
+
+        private static void ConfigureIdTempTable(ModelBuilder modelBuilder)
+        {
+            modelBuilder
+                .ConfigureTempTableEntity<IdTempTable>(isKeyless: false)
+                .HasKey("Id");
         }
 
         private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)

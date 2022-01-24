@@ -37,17 +37,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .ToDictionary(grouping => grouping.Key, grouping => grouping.Count());
         }
 
-        public IEnumerable<FilterItem> GetFilterItemsFromObservationQuery(Guid subjectId, IQueryable<Observation> observations)
+        public async Task<IEnumerable<FilterItem>> GetFilterItemsFromMatchedObservationIds(
+            Guid subjectId, 
+            IQueryable<MatchedObservation> matchedObservations)
         {
-            return _context.FilterItem
-                .Include(fi => fi.FilterGroup)
-                .ThenInclude(fg => fg.Filter).AsNoTracking()
-                .Where(fi => fi.FilterGroup.Filter.SubjectId == subjectId &&
-                       observations.Any(o => o.FilterItems.Any(
-                           ofi => ofi.FilterItemId == fi.Id)));
+            var matchedObservationIds = matchedObservations.Select(o => o.Id);
+
+            var filtersForSubject = await _context
+                .Filter
+                .AsNoTracking()
+                .Include(filter => filter.FilterGroups)
+                .Where(filter => filter.SubjectId == subjectId)
+                .ToListAsync();
+
+            var filterGroupIds = filtersForSubject
+                .SelectMany(filter => filter.FilterGroups)
+                .Select(filterGroup => filterGroup.Id);
+
+            var filterItems = await _context
+                .FilterItem
+                .AsNoTracking()
+                .Where(filterItem =>
+                    filterGroupIds.Contains(filterItem.FilterGroupId) &&
+                    _context.ObservationFilterItem.Any(ofi =>
+                        ofi.FilterItemId == filterItem.Id && matchedObservationIds.Contains(ofi.ObservationId)))
+                .ToListAsync();
+
+            var filterGroupsById = filtersForSubject
+                .SelectMany(filter => filter.FilterGroups)
+                .ToDictionary(filterGroup => filterGroup.Id);
+            
+            filterItems.ForEach(filterItem => filterItem.FilterGroup = filterGroupsById[filterItem.FilterGroupId]);
+
+            return filterItems;
         }
 
-        public IEnumerable<FilterItem> GetFilterItemsFromObservationList(IList<Observation> observations)
+        public IList<FilterItem> GetFilterItemsFromObservationList(IList<Observation> observations)
         {
             var filterItemIds =
                 observations

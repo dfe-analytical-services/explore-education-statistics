@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
@@ -13,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 
         IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(IQueryable<Observation> observations);
 
-        IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(IQueryable<Observation> observations);
+        IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(IList<Observation> observations);
 
         TimePeriodLabels GetTimePeriodLabels(Guid subjectId);
     }
