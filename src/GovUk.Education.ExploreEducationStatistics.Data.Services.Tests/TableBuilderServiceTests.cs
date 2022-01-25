@@ -19,7 +19,10 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -67,81 +70,110 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
+            var observations = new List<Observation>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Country
+                    },
+                    Measures = new Dictionary<Guid, string>
+                    {
+                        { indicator1Id, "123" },
+                        { indicator2Id, "456" },
+                    },
+                    FilterItems = ListOf(new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 1", new FilterGroup())
+                    }),
+                    Year = 2019,
+                    TimeIdentifier = TimeIdentifier.AcademicYear,
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Institution
+                    },
+                    Measures = new Dictionary<Guid, string>
+                    {
+                        { indicator1Id, "678" },
+                    },
+                    FilterItems = ListOf(new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 2", new FilterGroup())
+                    }),
+                    Year = 2020,
+                    TimeIdentifier = TimeIdentifier.AcademicYear,
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Provider
+                    },
+                    Measures = new Dictionary<Guid, string>
+                    {
+                        { indicator1Id, "789" },
+                        { Guid.NewGuid(), "1123" },
+                        { Guid.NewGuid(), "1456" },
+                    },
+                    FilterItems = ListOf(new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 3", new FilterGroup())
+                    }),
+                    Year = 2020,
+                    TimeIdentifier = TimeIdentifier.AcademicYear,
+                }
+            };
+
+            var subjectMeta = new ResultSubjectMetaViewModel
+            {
+                Indicators = new List<IndicatorMetaViewModel>
+                {
+                    new()
+                    {
+                        Label = "Test indicator"
+                    }
+                }
+            };
+
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.AddAsync(releaseSubject);
-                await statisticsDbContext.SaveChangesAsync();
+                await context.AddAsync(releaseSubject);
+                await context.Observation.AddRangeAsync(observations);
+                await context.MatchedObservations.AddRangeAsync(
+                    new MatchedObservation(observations[0].Id),
+                    new MatchedObservation(observations[2].Id));
+                await context.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                var observations = new List<Observation>
-                {
-                    new()
-                    {
-                        Location = new Location
-                        {
-                            GeographicLevel = GeographicLevel.Country
-                        },
-                        Measures = new Dictionary<Guid, string>
-                        {
-                            {indicator1Id, "123"},
-                            {indicator2Id, "456"},
-                        },
-                        FilterItems = new List<ObservationFilterItem>(),
-                        Year = 2019,
-                        TimeIdentifier = TimeIdentifier.AcademicYear,
-                    },
-                    new()
-                    {
-                        Location = new Location
-                        {
-                            GeographicLevel = GeographicLevel.Country
-                        },
-                        Measures = new Dictionary<Guid, string>
-                        {
-                            { indicator1Id, "789" },
-                            { Guid.NewGuid(), "1123" },
-                            { Guid.NewGuid(), "1456" },
-                        },
-                        FilterItems = new List<ObservationFilterItem>(),
-                        Year = 2020,
-                        TimeIdentifier = TimeIdentifier.AcademicYear,
-                    },
-                };
-
-                var subjectMeta = new ResultSubjectMetaViewModel
-                {
-                    Indicators = new List<IndicatorMetaViewModel>
-                    {
-                        new()
-                        {
-                            Label = "Test indicator"
-                        }
-                    },
-                };
-
-                var observationService = new Mock<IObservationService>(MockBehavior.Strict);
-
+                var observationService = new Mock<IObservationService>(Strict);
                 observationService
                     .Setup(s => s.GetMatchedObservations(query, default))
-                    .ReturnsAsync(observations);
+                    .ReturnsAsync(context.MatchedObservations);
 
-                var resultSubjectMetaService = new Mock<IResultSubjectMetaService>(MockBehavior.Strict);
+                var resultSubjectMetaService = new Mock<IResultSubjectMetaService>(Strict);
 
                 resultSubjectMetaService
                     .Setup(
                         s => s.GetSubjectMeta(
                             release.Id,
-                            It.IsAny<ObservationQueryContext>(),
+                            query,
                             It.IsAny<IList<Observation>>()
                         )
                     )
                     .ReturnsAsync(subjectMeta);
 
-                var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+                var subjectRepository = new Mock<ISubjectRepository>(Strict);
 
                 subjectRepository
                     .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
@@ -151,14 +183,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(s => s.IsSubjectForLatestPublishedRelease(query.SubjectId))
                     .ReturnsAsync(true);
 
-                var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+                var releaseRepository = new Mock<IReleaseRepository>(Strict);
 
                 releaseRepository
                     .Setup(s => s.GetLatestPublishedRelease(publicationId))
                     .Returns(release);
 
                 var service = BuildTableBuilderService(
-                    statisticsDbContext,
+                    context,
                     observationService: observationService.Object,
                     resultSubjectMetaService: resultSubjectMetaService.Object,
                     subjectRepository: subjectRepository.Object,
@@ -182,11 +214,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(2, observationResults[0].Measures.Count);
                 Assert.Equal("123", observationResults[0].Measures[indicator1Id]);
                 Assert.Equal("456", observationResults[0].Measures[indicator2Id]);
+                Assert.Equal(ListOf(observations[0].FilterItems.ToList()[0].FilterItemId), observationResults[0].Filters);
 
-                Assert.Equal(GeographicLevel.Country, observationResults[1].GeographicLevel);
+                Assert.Equal(GeographicLevel.Provider, observationResults[1].GeographicLevel);
                 Assert.Equal("2020_AY", observationResults[1].TimePeriod);
                 Assert.Single(observationResults[1].Measures);
                 Assert.Equal("789", observationResults[1].Measures[indicator1Id]);
+                Assert.Equal(ListOf(observations[2].FilterItems.ToList()[0].FilterItemId), observationResults[1].Filters);
 
                 Assert.Equal(subjectMeta, result.Right.SubjectMeta);
             }
@@ -204,15 +238,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+                var subjectRepository = new Mock<ISubjectRepository>(Strict);
 
                 subjectRepository
                     .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
                     .ReturnsAsync(publicationId);
 
-                var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+                var releaseRepository = new Mock<IReleaseRepository>(Strict);
 
                 releaseRepository
                     .Setup(s => s.GetLatestPublishedRelease(publicationId))
@@ -249,14 +283,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+            await using var statisticsDbContext = InMemoryStatisticsDbContext(contextId);
+            var subjectRepository = new Mock<ISubjectRepository>(Strict);
 
             subjectRepository
                 .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
                 .ReturnsAsync(publicationId);
 
-            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+            var releaseRepository = new Mock<IReleaseRepository>(Strict);
 
             releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(publicationId))
@@ -322,15 +356,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 await statisticsDbContext.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
+                var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
 
                 filterItemRepository
                     .Setup(s => s.CountFilterItemsByFilter(
@@ -344,7 +378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         }
                     });
 
-                var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+                var subjectRepository = new Mock<ISubjectRepository>(Strict);
 
                 subjectRepository
                     .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
@@ -354,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(s => s.IsSubjectForLatestPublishedRelease(query.SubjectId))
                     .ReturnsAsync(true);
 
-                var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
+                var releaseRepository = new Mock<IReleaseRepository>(Strict);
 
                 releaseRepository
                     .Setup(s => s.GetLatestPublishedRelease(publicationId))
@@ -419,87 +453,117 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
+            var observations = new List<Observation>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Country
+                    },
+                    Measures = new Dictionary<Guid, string>
+                    {
+                        { indicator1Id, "123" },
+                        { indicator2Id, "456" },
+                    },
+                    FilterItems = ListOf(new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 1", new FilterGroup())
+                    }),
+                    Year = 2019,
+                    TimeIdentifier = TimeIdentifier.AcademicYear,
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Institution
+                    },
+                    Measures = new Dictionary<Guid, string>
+                    {
+                        { indicator1Id, "678" },
+                    },
+                    FilterItems = ListOf(new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 2", new FilterGroup())
+                    }),
+                    Year = 2020,
+                    TimeIdentifier = TimeIdentifier.AcademicYear,
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Provider
+                    },
+                    Measures = new Dictionary<Guid, string>
+                    {
+                        { indicator1Id, "789" },
+                        { Guid.NewGuid(), "1123" },
+                        { Guid.NewGuid(), "1456" },
+                    },
+                    FilterItems = ListOf(new ObservationFilterItem
+                    {
+                        FilterItem = new FilterItem("Filter Item 3", new FilterGroup())
+                    }),
+                    Year = 2020,
+                    TimeIdentifier = TimeIdentifier.AcademicYear,
+                }
+            };
+
+            var subjectMeta = new ResultSubjectMetaViewModel
+            {
+                Indicators = new List<IndicatorMetaViewModel>
+                {
+                    new()
+                    {
+                        Label = "Test indicator"
+                    }
+                }
+            };
+
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                await statisticsDbContext.AddAsync(releaseSubject);
-                await statisticsDbContext.SaveChangesAsync();
+                await context.AddAsync(releaseSubject);
+                await context.Observation.AddRangeAsync(observations);
+                await context.MatchedObservations.AddRangeAsync(
+                    new MatchedObservation(observations[0].Id),
+                    new MatchedObservation(observations[2].Id));
+                await context.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
-                var observations = new List<Observation>
-                {
-                    new()
-                    {
-                        Location = new Location
-                        {
-                            GeographicLevel = GeographicLevel.Country
-                        },
-                        Measures = new Dictionary<Guid, string>
-                        {
-                            { indicator1Id, "123" },
-                            { indicator2Id, "456" },
-                        },
-                        FilterItems = new List<ObservationFilterItem>(),
-                        Year = 2019,
-                        TimeIdentifier = TimeIdentifier.AcademicYear,
-                    },
-                    new()
-                    {
-                        Location = new Location
-                        {
-                            GeographicLevel = GeographicLevel.Country
-                        },
-                        Measures = new Dictionary<Guid, string>
-                        {
-                            { indicator1Id, "789" },
-                            { Guid.NewGuid(), "1123" },
-                            { Guid.NewGuid(), "1456" },
-                        },
-                        FilterItems = new List<ObservationFilterItem>(),
-                        Year = 2020,
-                        TimeIdentifier = TimeIdentifier.AcademicYear,
-                    },
-                };
-
-                var subjectMeta = new ResultSubjectMetaViewModel
-                {
-                    Indicators = new List<IndicatorMetaViewModel>
-                    {
-                        new()
-                        {
-                            Label = "Test indicator"
-                        }
-                    },
-                };
-
-                var observationService = new Mock<IObservationService>(MockBehavior.Strict);
+                var observationService = new Mock<IObservationService>(Strict);
 
                 observationService
                     .Setup(s => s.GetMatchedObservations(query, default))
-                    .ReturnsAsync(observations);
+                    .ReturnsAsync(context.MatchedObservations);
 
-                var resultSubjectMetaService = new Mock<IResultSubjectMetaService>(MockBehavior.Strict);
+                var resultSubjectMetaService = new Mock<IResultSubjectMetaService>(Strict);
 
                 resultSubjectMetaService
                     .Setup(
                         s => s.GetSubjectMeta(
                             releaseSubject.ReleaseId,
-                            It.IsAny<ObservationQueryContext>(),
+                            query,
                             It.IsAny<IList<Observation>>()
                         )
                     )
                     .ReturnsAsync(subjectMeta);
 
-                var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+                var subjectRepository = new Mock<ISubjectRepository>(Strict);
                 subjectRepository.Setup(s =>
                         s.IsSubjectForLatestPublishedRelease(releaseSubject.Subject.Id))
                     .ReturnsAsync(false);
 
                 var service = BuildTableBuilderService(
-                    statisticsDbContext,
+                    context,
                     observationService: observationService.Object,
                     resultSubjectMetaService: resultSubjectMetaService.Object,
                     subjectRepository: subjectRepository.Object
@@ -518,11 +582,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(2, observationResults[0].Measures.Count);
                 Assert.Equal("123", observationResults[0].Measures[indicator1Id]);
                 Assert.Equal("456", observationResults[0].Measures[indicator2Id]);
+                Assert.Equal(ListOf(observations[0].FilterItems.ToList()[0].FilterItemId), observationResults[0].Filters);
 
                 Assert.Equal(GeographicLevel.Country, observationResults[0].GeographicLevel);
                 Assert.Equal("2020_AY", observationResults[1].TimePeriod);
                 Assert.Single(observationResults[1].Measures);
                 Assert.Equal("789", observationResults[1].Measures[indicator1Id]);
+                Assert.Equal(ListOf(observations[2].FilterItems.ToList()[0].FilterItemId), observationResults[1].Filters);
 
                 Assert.Equal(subjectMeta, result.Right.SubjectMeta);
             }
@@ -544,13 +610,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 await statisticsDbContext.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildTableBuilderService(statisticsDbContext);
 
@@ -576,13 +642,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 await statisticsDbContext.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildTableBuilderService(statisticsDbContext);
 
@@ -632,15 +698,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 await statisticsDbContext.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
+                var filterItemRepository = new Mock<IFilterItemRepository>(Strict);
 
                 filterItemRepository
                     .Setup(s => s.CountFilterItemsByFilter(
@@ -654,7 +720,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         }
                     });
 
-                var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+                var subjectRepository = new Mock<ISubjectRepository>(Strict);
                 subjectRepository.Setup(s =>
                         s.IsSubjectForLatestPublishedRelease(releaseSubject.Subject.Id))
                     .ReturnsAsync(false);
@@ -703,14 +769,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IOptions<TableBuilderOptions>? options = null)
         {
             return new(
-                filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
-                observationService ?? Mock.Of<IObservationService>(MockBehavior.Strict),
+                statisticsDbContext,
+                filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
+                observationService ?? Mock.Of<IObservationService>(Strict),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
-                resultSubjectMetaService ?? Mock.Of<IResultSubjectMetaService>(MockBehavior.Strict),
-                subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
+                resultSubjectMetaService ?? Mock.Of<IResultSubjectMetaService>(Strict),
+                subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
                 userService ?? AlwaysTrueUserService().Object,
                 resultBuilder ?? new ResultBuilder(DataServiceMapperUtils.DataServiceMapper()),
-                releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict),
+                releaseRepository ?? Mock.Of<IReleaseRepository>(Strict),
                 options ?? DefaultOptions()
             );
         }

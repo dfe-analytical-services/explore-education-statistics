@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
             builder.UseInMemoryDatabase(databaseName);
-            return new StatisticsDbContext(builder.Options);
+            return new StatisticsDbContext(builder.Options, null);
         }
 
         public static StatisticsDbContext InMemoryStatisticsDbContext()
@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             var builder = new DbContextOptionsBuilder<PublicStatisticsDbContext>();
             builder.UseInMemoryDatabase(databaseName);
-            return new PublicStatisticsDbContext(builder.Options);
+            return new PublicStatisticsDbContext(builder.Options, null);
         }
 
         public static PublicStatisticsDbContext InMemoryPublicStatisticsDbContext()

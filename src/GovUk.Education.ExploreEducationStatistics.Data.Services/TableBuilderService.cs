@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class TableBuilderService : ITableBuilderService
     {
-        private StatisticsDbContext _context;
+        private readonly StatisticsDbContext _context;
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly IObservationService _observationService;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly TableBuilderOptions _options;
 
         public TableBuilderService(
+            StatisticsDbContext context,
             IFilterItemRepository filterItemRepository,
             IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
@@ -44,10 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ISubjectRepository subjectRepository,
             IUserService userService,
             IResultBuilder<Observation,
-                ObservationViewModel> resultBuilder,
+            ObservationViewModel> resultBuilder,
             IReleaseRepository releaseRepository,
-            IOptions<TableBuilderOptions> options, StatisticsDbContext context)
+            IOptions<TableBuilderOptions> options)
         {
+            _context = context;
             _filterItemRepository = filterItemRepository;
             _observationService = observationService;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
@@ -56,7 +58,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _userService = userService;
             _resultBuilder = resultBuilder;
             _releaseRepository = releaseRepository;
-            _context = context;
             _options = options.Value;
         }
 
@@ -103,23 +104,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
                     }
 
-                    var observationRows = 
-                        await _observationService.GetMatchedObservations(queryContext, cancellationToken);
+                    var matchedObservationIds = 
+                        (await _observationService.GetMatchedObservations(queryContext, cancellationToken))
+                        .Select(row => row.Id);
                     
-                    if (!observationRows.Any())
-                    {
-                        return new TableBuilderResultViewModel();
-                    }
-                    
-                    var observationIds = observationRows.Select(row => row.Id);
-                            
                     var observations = await _context
                         .Observation
                         .AsNoTracking()
                         .Include(o => o.Location)
                         .Include(o => o.FilterItems)
-                        .Where(o => observationIds.Contains(o.Id))
+                        .Where(o => matchedObservationIds.Contains(o.Id))
                         .ToListAsync(cancellationToken);
+                    
+                    if (!observations.Any())
+                    {
+                        return new TableBuilderResultViewModel();
+                    }
 
                     return await _resultSubjectMetaService
                         .GetSubjectMeta(

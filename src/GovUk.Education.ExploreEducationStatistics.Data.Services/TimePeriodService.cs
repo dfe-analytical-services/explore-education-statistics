@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _context = context;
         }
 
-        public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(Guid subjectId)
+        public IList<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(Guid subjectId)
         {
             return _context.Observation
                 .AsQueryable()
@@ -31,16 +31,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList()
                 .OrderBy(tuple => tuple.Year)
                 .ThenBy(tuple => tuple.TimeIdentifier)
-                .Select(tuple => (tuple.Year, tuple.TimeIdentifier));
+                .Select(tuple => (tuple.Year, tuple.TimeIdentifier))
+                .ToList();
         }
 
-        public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(
+        public IList<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(
             IQueryable<Observation> observations)
         {
             return GetDistinctObservationTimePeriods(observations);
         }
         
-        public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
+        public IList<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
             IList<Observation> observations)
         {
             var timePeriods = GetDistinctObservationTimePeriods(observations);

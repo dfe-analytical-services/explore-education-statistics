@@ -130,22 +130,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<BoundaryLevel>());
 
             filterItemRepository.Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
+                    new List<Location>(),
                     new Dictionary<GeographicLevel, List<string>>()))
-                .ReturnsAsync(new Dictionary<GeographicLevel, List<LocationAttributeNode>>());
+                .Returns(new Dictionary<GeographicLevel, List<LocationAttributeNode>>());
 
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(releaseFile);
@@ -154,8 +154,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -282,22 +282,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 });
 
             filterItemRepository.Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
+                    new List<Location>(),
                     new Dictionary<GeographicLevel, List<string>>()))
-                .ReturnsAsync(locations);
+                .Returns(locations);
 
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
@@ -306,8 +306,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -471,22 +471,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
+                    new List<Location>(),
                     options.Value.Hierarchies))
-                .ReturnsAsync(locations);
+                .Returns(locations);
 
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
@@ -495,8 +495,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -712,12 +712,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(new List<BoundaryLevel>());
 
             filterItemRepository.Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
@@ -759,10 +759,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
+                    new List<Location>(),
                     options.Value.Hierarchies))
-                .ReturnsAsync(locations);
+                .Returns(locations);
 
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
@@ -771,8 +771,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -961,12 +961,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
@@ -995,10 +995,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
+                    new List<Location>(),
                     options.Value.Hierarchies))
-                .ReturnsAsync(locations);
+                .Returns(locations);
 
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
@@ -1007,8 +1007,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1165,13 +1165,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository
                 .Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
@@ -1180,10 +1180,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<Indicator>());
 
             locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
+                .Setup(s => s.GetLocationAttributesHierarchical(
+                    new List<Location>(),
                     options.Value.Hierarchies))
-                .ReturnsAsync(locations);
+                .Returns(locations);
 
             releaseDataFileRepository
                 .Setup(s => s.GetBySubject(releaseId, subject.Id))
@@ -1194,8 +1194,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1353,13 +1353,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository
                 .Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
@@ -1368,10 +1368,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<Indicator>());
 
             locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
+                .Setup(s => s.GetLocationAttributesHierarchical(
+                    new List<Location>(),
                     options.Value.Hierarchies))
-                .ReturnsAsync(locations);
+                .Returns(locations);
 
             releaseDataFileRepository
                 .Setup(s => s.GetBySubject(releaseId, subject.Id))
@@ -1382,8 +1382,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1528,22 +1528,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
+            locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
+                    new List<Location>(),
                     options.Value.Hierarchies))
-                .ReturnsAsync(locations);
+                .Returns(locations);
 
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
@@ -1552,8 +1552,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1720,13 +1720,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository
                 .Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
@@ -1735,10 +1735,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<Indicator>());
 
             locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
+                .Setup(s => s.GetLocationAttributesHierarchical(
+                    new List<Location>(),
                     options.Value.Hierarchies))
-                .ReturnsAsync(locations);
+                .Returns(locations);
 
             releaseDataFileRepository
                 .Setup(s => s.GetBySubject(releaseId, subject.Id))
@@ -1749,8 +1749,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))

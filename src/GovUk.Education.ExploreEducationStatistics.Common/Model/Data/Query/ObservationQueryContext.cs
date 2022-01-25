@@ -8,6 +8,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
     {
         public Guid SubjectId { get; set; }
         public TimePeriodQuery TimePeriod { get; set; }
+        
+        // TODO nullable
         public IEnumerable<Guid> Filters { get; set; }
         public long? BoundaryLevel { get; set; }
         public IEnumerable<Guid> Indicators { get; set; }

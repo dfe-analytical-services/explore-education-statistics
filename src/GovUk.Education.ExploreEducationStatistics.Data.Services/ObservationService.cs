@@ -23,7 +23,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public class ObservationService : AbstractRepository<Observation, long>, IObservationService
     {
         private readonly ILogger<ObservationService> _logger;
-        public IMatchingObservationsGetter MatchingObservationGetter { get; set; } = new MatchingObservationsGetter();
+
+        public IMatchingObservationsQueryGenerator QueryGenerator = new MatchingObservationsQueryGenerator();
+
+        public IRawSqlExecutor SqlExecutor = new RawSqlExecutor();
 
         public ObservationService(
             StatisticsDbContext context,
@@ -38,117 +41,121 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var sw = Stopwatch.StartNew();
 
-            var observationRows = await MatchingObservationGetter
-                .GetMatchingObservationIdsQuery(_context, query, cancellationToken);
+            IList<Guid> locationIds;
 
-            if (_logger.IsEnabled(LogLevel.Trace))
+            // Support old Data Blocks that have Location codes rather than id's in their query
+            // TODO EES-3068 Migrate Location codes to ids in old Data Blocks to remove this support for Location
+            // codes
+            if (query.LocationIds.IsNullOrEmpty())
             {
-                _logger.LogTrace("Finished fetching {ObservationCount} Observations in a total of " +
-                                 "{Milliseconds} ms", observationRows.Count(), sw.Elapsed.TotalMilliseconds);
+                locationIds = await _context
+                    .Location
+                    .Where(LocationPredicateBuilder.Build(query.LocationIds, query.Locations))
+                    .Select(location => location.Id)
+                    .ToListAsync(cancellationToken);
+            }
+            else
+            {
+                locationIds = query.LocationIds.ToList();
             }
 
-            return observationRows;
-        }
+            var (sql, sqlParameters, tempTables) = await QueryGenerator
+                .GetMatchingObservationsQuery(
+                    _context,
+                    query.SubjectId,
+                    query.Filters?.ToList(),
+                    locationIds,
+                    query.TimePeriod,
+                    cancellationToken);
 
-        public interface IMatchingObservationsGetter
+            try
+            {
+                await SqlExecutor.ExecuteSqlRaw(_context, sql, sqlParameters, cancellationToken);
+
+                var matchedObservations = _context
+                    .MatchedObservations
+                    .AsNoTracking();
+
+                if (_logger.IsEnabled(LogLevel.Trace))
+                {
+                    _logger.LogTrace("Finished fetching {ObservationCount} Observations in a total of " +
+                                     "{Milliseconds} ms", matchedObservations.Count(), sw.Elapsed.TotalMilliseconds);
+                }
+
+                return matchedObservations;
+            }            
+            finally
+            {
+                // Although EF and SQL Server will clean temporary tables up eventually themselves when the Controller
+                // method finishes (and thus the DB connection is disposed), it's nice to leave things as cleared down
+                // as possible before exiting this method.
+                await tempTables
+                    .ToAsyncEnumerable()
+                    // ReSharper disable once MethodSupportsCancellation - don't want to cancel the cleaning up of 
+                    // temporary tables.
+                    .ForEachAwaitAsync(async tempTable => await tempTable.DisposeAsync());
+            }
+        }
+        
+        public interface IMatchingObservationsQueryGenerator
         {
-            Task<IQueryable<MatchedObservation>> GetMatchingObservationIdsQuery(
+            Task<(string, IList<SqlParameter>, IList<IAsyncDisposable>)> GetMatchingObservationsQuery(
                 StatisticsDbContext context,
-                ObservationQueryContext query,
+                Guid subjectId,
+                IList<Guid>? filterItemIds,
+                IList<Guid>? locationIds,
+                TimePeriodQuery? timePeriodQuery,
                 CancellationToken cancellationToken);
         }
 
-        private class MatchingObservationsGetter : IMatchingObservationsGetter
+        public class MatchingObservationsQueryGenerator : IMatchingObservationsQueryGenerator
         {
-            public async Task<IQueryable<MatchedObservation>> GetMatchingObservationIdsQuery(
-                StatisticsDbContext context,
-                ObservationQueryContext query,
-                CancellationToken cancellationToken)
-            {
-                IEnumerable<Guid> locationIds;
+            public ITemporaryTableCreator TempTableCreator = new TemporaryTableCreator();
 
-                // Support old Data Blocks that have Location codes rather than id's in their query
-                // TODO EES-3068 Migrate Location codes to ids in old Datablocks to remove this support for Location codes
-                if (query.LocationIds.IsNullOrEmpty())
-                {
-                    locationIds = await context
-                        .Location
-                        .Where(LocationPredicateBuilder.Build(query.LocationIds, query.Locations))
-                        .Select(location => location.Id)
-                        .ToListAsync(cancellationToken);
-                }
-                else
-                {
-                    locationIds = query.LocationIds;
-                }
-
-                return await GetMatchingObservationIds(
-                    context,
-                    query.SubjectId,
-                    query.Filters?.ToList(),
-                    locationIds?.ToList(),
-                    query.TimePeriod,
-                    cancellationToken);
-            }
-
-            private static async Task<IQueryable<MatchedObservation>> GetMatchingObservationIds(
+            public async Task<(string, IList<SqlParameter>, IList<IAsyncDisposable>)> GetMatchingObservationsQuery(
                 StatisticsDbContext context,
                 Guid subjectId,
-                IList<Guid>? filterItemIds, 
+                IList<Guid>? filterItemIds,
                 IList<Guid>? locationIds,
                 TimePeriodQuery? timePeriodQuery,
                 CancellationToken cancellationToken)
             {
-                await context.CreateTempTableAsync<MatchedObservation>(
-                    new DefaultTempTableNameProvider(), true, cancellationToken);
+                await TempTableCreator.CreateTemporaryTable<MatchedObservation>(context, cancellationToken);
 
-                var (locationIdsClause, locationIdsTempTable) = !locationIds.IsNullOrEmpty() 
-                    ? await GetLocationsClause(context, locationIds!, cancellationToken) 
+                var (locationIdsClause, locationIdsTempTable) = !locationIds.IsNullOrEmpty()
+                    ? await GetLocationsClause(context, locationIds!, cancellationToken)
                     : default;
+
+                var (filterItemIdsClause, filterItemIdTempTables) = !filterItemIds.IsNullOrEmpty()
+                    ? await GetSelectedFilterItemIdsClause(context, subjectId, filterItemIds!, cancellationToken)
+                    : default;
+
+                var sql =
+                    $"INSERT INTO #{nameof(MatchedObservation)} " +
+                    $"SELECT o.id FROM Observation o " +
+                    "WHERE o.SubjectId = @subjectId " +
+                    (timePeriodQuery != null ? $"AND ({GetTimePeriodsClause(timePeriodQuery)}) " : "") +
+                    (locationIdsClause != null ? $"AND ({locationIdsClause}) " : "") +
+                    (filterItemIdsClause != null ? $"AND ({filterItemIdsClause}) " : "") +
+                    "ORDER BY o.Id;";
+
+                var parameters = ListOf(new SqlParameter("subjectId", subjectId));
                 
-                var (filterItemIdsClause, filterItemIdTempTables) = !filterItemIds.IsNullOrEmpty() 
-                    ? await GetSelectedFilterItemIdsClause(context, subjectId, filterItemIds!, cancellationToken) 
-                    : default;
-
-                try
-                {
-                    var sql =
-                        $"INSERT INTO #{nameof(MatchedObservation)} " +
-                        $"SELECT o.id FROM Observation o " +
-                        "WHERE o.SubjectId = @subjectId " +
-                        (timePeriodQuery != null ? $"AND ({GetTimePeriodsClause(timePeriodQuery)}) " : "") +
-                        (locationIdsClause != null ? $"AND ({locationIdsClause}) " : "") +
-                        (filterItemIdsClause != null ? $"AND ({filterItemIdsClause})" : "") +
-                        "ORDER BY o.Id;";
-
-                    await context
-                        .Database
-                        .ExecuteSqlRawAsync(
-                            sql,
-                            ListOf(new SqlParameter("subjectId", subjectId)),
-                            cancellationToken);
-
-                    return context
-                        .MatchedObservations
-                        .AsNoTracking();
+                var tableReferences = new List<IAsyncDisposable>();
+                
+                if (locationIdsTempTable != null) {
+                    tableReferences.Add(locationIdsTempTable);
                 }
-                finally
+                
+                if (!filterItemIdTempTables.IsNullOrEmpty())
                 {
-                    if (locationIdsTempTable != null)
-                    {
-                        await locationIdsTempTable.DisposeAsync();
-                    }
-
-                    if (!filterItemIdTempTables.IsNullOrEmpty())
-                    {
-                        await filterItemIdTempTables
-                            .ToAsyncEnumerable()
-                            .ForEachAwaitAsync(async table => await table.DisposeAsync(), cancellationToken);
-                    }
+                    tableReferences.AddRange(filterItemIdTempTables);
                 }
+                
+                return (sql, parameters, tableReferences);
             }
-
-            private static async Task<(string, List<ITempTableQuery<IdTempTable>>)> GetSelectedFilterItemIdsClause(
+            
+            private async Task<(string, List<ITempTableQuery<IdTempTable>>)> GetSelectedFilterItemIdsClause(
                 StatisticsDbContext context,
                 Guid subjectId, 
                 IList<Guid> filterItemIds,
@@ -156,14 +163,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 var selectedFilterItemIdsByFilter =
                     await GetSelectedFilterItemIdsByFilter(context, filterItemIds, subjectId, cancellationToken);
+
+                // This line adds a potential optimisation to the final generated SQL by placing the EXISTS clauses
+                // with the least number of selected Filter Item Ids first, thus attempting to narrow down the list
+                // of candidate rows for the next EXISTS clause in line to match against, and so on and so on.
+                //
+                // This could also be done by determining the ratio of selected Filter Item Ids for a given Filter
+                // versus the number of potential options for that Filter.  A Filter with 5,000 possible Filter Items
+                // but only one of them selected would no doubt be very selective too before passing to the next EXISTS
+                // clause, but if ratios are being used to determine the order, then if 2,500 options are selected for
+                // this Filter that would give a ratio of 50% selected, and when compared to another Filter with 10
+                // possible options and 6 selected, the 5,000-options Filter clause would be placed first in the EXISTS
+                // chain, which would be less efficient.
+                //
+                // Thus for now we simply order by the least number of selected Filter Items first.
+                var selectedFilterItemsInLeastOptionsOrder = selectedFilterItemIdsByFilter
+                    .Where(filterItemIdsForFilter => !filterItemIdsForFilter.Value.IsNullOrEmpty())
+                    .OrderBy(filterItemIdsForFilter => filterItemIdsForFilter.Value.Count);
                 
-                var filterItemIdTempTablesPerFilter = selectedFilterItemIdsByFilter
+                var filterItemIdTempTablesPerFilter = selectedFilterItemsInLeastOptionsOrder
                     .ToDictionary(
                         filterItemIdsForFilter => filterItemIdsForFilter.Key,
                         filterItemIdsForFilter =>
                         {
-                            var ids = filterItemIdsForFilter.Value.Select(id => new IdTempTable(id));
-                            return context.BulkInsertIntoTempTableAsync(ids, cancellationToken: cancellationToken).Result; // TODO async
+                            var ids = filterItemIdsForFilter
+                                .Value
+                                .OrderBy(id => id)
+                                .Select(id => new IdTempTable(id))
+                                .ToList();
+                            
+                            return TempTableCreator.CreateTemporaryTableAndPopulate(context, ids, cancellationToken).Result; // TODO async
                         });
 
                 // TODO token replacement
@@ -206,13 +235,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         });
             }
 
-            private static async Task<(string, ITempTableQuery<IdTempTable>)> GetLocationsClause(
+            private async Task<(string, ITempTableQuery<IdTempTable>)> GetLocationsClause(
                 StatisticsDbContext context, 
                 IList<Guid> locationIds,
                 CancellationToken cancellationToken)
             {
-                var locationsTempTable = await context.BulkInsertIntoTempTableAsync(
-                    locationIds.Select(id => new IdTempTable(id)), cancellationToken: cancellationToken);
+                var locationsTempTable = await TempTableCreator.CreateTemporaryTableAndPopulate(
+                    context, locationIds.Select(id => new IdTempTable(id)), cancellationToken);
                 
                 // TODO token replacement
                 return ("o.LocationId IN (SELECT Id FROM " + locationsTempTable.Name + ")", locationsTempTable);
@@ -224,6 +253,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 var timePeriodClauses = timePeriods.Select(timePeriod =>
                     $"(o.TimeIdentifier = '{timePeriod.TimeIdentifier.GetEnumValue()}' AND o.Year = {timePeriod.Year})");
                 return timePeriodClauses.JoinToString(" OR ");
+            }
+
+            public interface ITemporaryTableCreator
+            {
+                Task CreateTemporaryTable<TEntity>(
+                    StatisticsDbContext context,
+                    CancellationToken cancellationToken) where TEntity : class;
+            
+                Task<ITempTableQuery<TEntity>> CreateTemporaryTableAndPopulate<TEntity>(
+                    StatisticsDbContext context,
+                    IEnumerable<TEntity> values,
+                    CancellationToken cancellationToken) where TEntity : class;
+            }
+            
+            public class TemporaryTableCreator : ITemporaryTableCreator
+            {
+                public async Task CreateTemporaryTable<TEntity>(
+                    StatisticsDbContext context, 
+                    CancellationToken cancellationToken) where TEntity : class
+                {
+                    await context.CreateTempTableAsync<TEntity>(
+                        new DefaultTempTableNameProvider(), true, cancellationToken);
+                }
+
+                public async Task<ITempTableQuery<TEntity>> CreateTemporaryTableAndPopulate<TEntity>(
+                    StatisticsDbContext context, 
+                    IEnumerable<TEntity> values,
+                    CancellationToken cancellationToken) where TEntity : class
+                {
+                    return await context.BulkInsertIntoTempTableAsync(values, cancellationToken: cancellationToken);
+                }
+            }
+        }
+
+        public interface IRawSqlExecutor
+        {
+            Task ExecuteSqlRaw(
+                StatisticsDbContext context,
+                string sql,
+                IList<SqlParameter> parameters,
+                CancellationToken cancellationToken);
+        }
+
+        public class RawSqlExecutor : IRawSqlExecutor
+        {
+            public async Task ExecuteSqlRaw(
+                StatisticsDbContext context, 
+                string sql, 
+                IList<SqlParameter> parameters, 
+                CancellationToken cancellationToken)
+            {
+                await context
+                    .Database
+                    .ExecuteSqlRawAsync(sql, parameters, cancellationToken);
             }
         }
     }

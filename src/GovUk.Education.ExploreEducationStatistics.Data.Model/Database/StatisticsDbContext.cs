@@ -11,7 +11,6 @@ using Thinktecture;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
     public class MatchedObservation
     {
         public Guid Id { get; }
@@ -24,12 +23,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
     
     public class IdTempTable
     {
-        // ReSharper disable once UnusedAutoPropertyAccessor.Local
-        private Guid Id { get; }
+        public Guid Id { get; }
         
         public IdTempTable(Guid id)
         {
             Id = id;
+        }
+
+        protected bool Equals(IdTempTable other)
+        {
+            return Id.Equals(other.Id);
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((IdTempTable)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return Id.GetHashCode();
         }
     }
     
@@ -40,9 +56,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
         }
 
-        public StatisticsDbContext(
-            DbContextOptions<StatisticsDbContext> options, 
-            int? timeout = int.MaxValue) : base(options)
+        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, int.MaxValue)
+        {
+        }
+
+        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options, int? timeout) : base(options)
         {
             Configure(timeout);
         }
@@ -89,8 +107,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<ReleaseSubject> ReleaseSubject { get; set; } = null!;
         public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
         
-        public IQueryable<MatchedObservation> MatchedObservations => Set<MatchedObservation>()
-            .Select(t => t);
+        public DbSet<MatchedObservation> MatchedObservations { get; set; }
+            // => Set<MatchedObservation>()
+            // .Select(t => t);
         
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

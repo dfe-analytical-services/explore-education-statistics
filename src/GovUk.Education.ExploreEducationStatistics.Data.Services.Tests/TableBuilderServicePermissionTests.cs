@@ -136,6 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IOptions<TableBuilderOptions>? options = null)
         {
             return new(
+                Mock.Of<StatisticsDbContext>(),
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
                 observationService ?? Mock.Of<IObservationService>(MockBehavior.Strict),
                 statisticsPersistenceHelper ?? StatisticsPersistenceHelperMock(_subject).Object,

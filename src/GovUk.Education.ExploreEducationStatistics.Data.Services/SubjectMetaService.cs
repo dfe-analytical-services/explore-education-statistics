@@ -31,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             GetFilterItems
         }
 
-        private StatisticsDbContext _context;
+        private readonly StatisticsDbContext _context;
         private readonly IFilterRepository _filterRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
         private readonly ILocationRepository _locationRepository;
@@ -43,6 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly LocationsOptions _locationOptions;
 
         public SubjectMetaService(
+            StatisticsDbContext context,
             IFilterRepository filterRepository,
             IFilterItemRepository filterItemRepository,
             IIndicatorGroupRepository indicatorGroupRepository,
@@ -52,9 +53,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
-            IOptions<LocationsOptions> locationOptions, StatisticsDbContext context) :
+            IOptions<LocationsOptions> locationOptions) :
             base(filterItemRepository)
         {
+            _context = context;
             _filterRepository = filterRepository;
             _indicatorGroupRepository = indicatorGroupRepository;
             _locationRepository = locationRepository;
@@ -63,7 +65,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _persistenceHelper = persistenceHelper;
             _timePeriodService = timePeriodService;
             _userService = userService;
-            _context = context;
             _locationOptions = locationOptions.Value;
         }
 

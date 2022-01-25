@@ -129,7 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(new Dictionary<GeographicLevel, List<LocationAttributeNode>>());
 
             timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
@@ -256,7 +256,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(locations);
 
             timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
@@ -437,7 +437,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(locations);
 
             timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
@@ -555,7 +555,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(locations);
 
             timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
@@ -649,7 +649,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(subject.Id))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
@@ -781,7 +781,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(subject.Id))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
@@ -939,7 +939,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(locations);
 
             timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
@@ -1031,6 +1031,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IOptions<LocationsOptions>? options = null)
         {
             return new(
+                statisticsDbContext,
                 filterRepository ?? Mock.Of<IFilterRepository>(MockBehavior.Strict),
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
                 indicatorGroupRepository ?? Mock.Of<IIndicatorGroupRepository>(MockBehavior.Strict),
