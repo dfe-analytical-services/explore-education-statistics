@@ -207,8 +207,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }));
         }
 
-        public Guid? TypeId { get; set; }
-
         public ReleaseType Type { get; set; }
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]

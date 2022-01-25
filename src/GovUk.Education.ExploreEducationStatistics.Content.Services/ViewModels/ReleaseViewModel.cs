@@ -4,7 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
@@ -26,7 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public string Slug { get; }
 
-        public ReleaseTypeViewModel Type { get; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseType Type { get; }
 
         public List<ReleaseNoteViewModel> Updates { get; }
 
@@ -62,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             NextReleaseDate = release.NextReleaseDate;
             Published = release.Published;
             Slug = release.Slug;
-            Type = release.Type;
+            Type = ReleaseTypeTitleMap[release.Type.Title];
             Updates = release.Updates;
             Content = release.Content;
             SummarySection = release.SummarySection;
@@ -93,6 +98,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
                 publication.ExternalMethodology
             );
         }
+
+        /// TODO EES-3127 Remove the backwards compatibility of CachedReleaseViewModel.Type.
+        public static readonly Dictionary<string, ReleaseType> ReleaseTypeTitleMap = 
+            EnumUtil.GetEnumValues<ReleaseType>()
+            .ToDictionary(v => v.GetTitle(), v => v);
 
         public bool LatestRelease => Id == Publication.LatestReleaseId;
 

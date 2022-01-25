@@ -10,7 +10,7 @@ import {
   TableDataQuery,
   SelectedPublication,
 } from '@common/services/tableBuilderService';
-import { Release, ReleaseType } from '@common/services/publicationService';
+import { Release } from '@common/services/publicationService';
 
 export const testQuery: TableDataQuery = {
   publicationId: '536154f5-7f82-4dc7-060a-08d9097c1945',
@@ -298,10 +298,7 @@ export const testPublicationRelease: Release = {
   },
   latestRelease: true,
   relatedInformation: [],
-  type: {
-    id: '',
-    title: 'National Statistics' as ReleaseType,
-  },
+  type: 'NationalStatistics',
   updates: [],
   content: [],
   downloadFiles: [],

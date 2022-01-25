@@ -15,8 +15,7 @@ const releaseService = {
       {
         timePeriodCoverage: { value: 'AY' },
         releaseName: 2222,
-        typeId: '1821abb8-68b0-431b-9770-0bea65d02ff0',
-        publicationId: 'c76c1bc4-0a01-4116-74cd-08d8eebbf0c1',
+        type: 'AdHocStatistics',
         templateReleaseId: '',
       },
     );

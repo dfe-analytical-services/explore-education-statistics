@@ -309,7 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async release =>
                 {
                     release.Slug = request.Slug;
-                    release.TypeId = request.TypeId;
+                    release.Type = request.Type;
                     release.ReleaseName = request.ReleaseName;
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
                     release.PreReleaseAccessList = request.PreReleaseAccessList;
@@ -503,24 +503,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
         {
-            // Require publication / release / contact / type graph to be able to work out:
+            // Require publication / release / contact graph to be able to work out:
             // If the release is the latest
             // The contact
-            // The type
             return values.Include(r => r.Publication)
                 .ThenInclude(publication => publication.Releases) // Back refs required to work out latest
                 .Include(r => r.Publication)
                 .ThenInclude(publication => publication.Contact)
-                .Include(r => r.Type)
                 .Include(r => r.ReleaseStatuses);
         }
 
         private async Task<Release> HydrateReleaseForAmendment(Release release)
         {
-            // Require publication / release / contact / type graph to be able to work out:
+            // Require publication / release / contact / graph to be able to work out:
             // If the release is the latest
             // The contact
-            // The type
             await _context.Entry(release)
                 .Reference(r => r.Publication)
                 .LoadAsync();

@@ -102,7 +102,7 @@ const ReleasePreReleaseAccessPage = () => {
                   {
                     releaseName: release.releaseName,
                     timePeriodCoverage: release.timePeriodCoverage,
-                    typeId: release.type.id,
+                    type: release.type,
                     preReleaseAccessList,
                   },
                 );

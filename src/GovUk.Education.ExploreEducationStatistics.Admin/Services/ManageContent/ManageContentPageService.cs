@@ -53,10 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(query => query
-                        .Include(r => r.Type)
-                        .Where(r => r.Id == releaseId)
-                )
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(HydrateReleaseForReleaseViewModel)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccessCombineWith(release => _contentService.GetUnattachedContentBlocks<DataBlock>(releaseId))

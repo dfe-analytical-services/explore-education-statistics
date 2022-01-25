@@ -24,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public string Slug { get; set; } = string.Empty;
 
+        // TODO EES-3127 Replace ReleaseTypeViewModel with ReleaseType. Requires a content cache refresh
         public ReleaseTypeViewModel Type { get; set; } = null!;
 
         public PartialDate? NextReleaseDate { get; set; }

@@ -1,5 +1,4 @@
 import { EditableRelease } from '@admin/services/releaseContentService';
-import { ReleaseType } from '@common/services/publicationService';
 import { Table } from '@common/services/types/blocks';
 
 const emptyTable: Table = {
@@ -49,10 +48,7 @@ export const testEditableRelease: EditableRelease = {
     ],
   },
   latestRelease: false,
-  type: {
-    id: '9d333457-9132-4e55-ae78-c55cb3673d7c',
-    title: ReleaseType.OfficialStatistics,
-  },
+  type: 'OfficialStatistics',
   updates: [
     {
       id: '262cf6c8-db96-40d8-8fb1-b55028a9f55b',

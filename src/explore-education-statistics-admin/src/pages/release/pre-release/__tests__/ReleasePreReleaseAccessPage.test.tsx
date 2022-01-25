@@ -23,10 +23,7 @@ const releaseData: Release = {
   publicationSlug: 'publication-1-slug',
   timePeriodCoverage: { value: 'W51', label: 'Week 51' },
   title: 'Release Title',
-  type: {
-    id: '9d333457-9132-4e55-ae78-c55cb3673d7c',
-    title: 'Official Statistics',
-  },
+  type: 'OfficialStatistics',
   contact: {
     id: '69416b29-8a20-4de1-11de-08d85fc33fc0',
     teamName: 'Test name',

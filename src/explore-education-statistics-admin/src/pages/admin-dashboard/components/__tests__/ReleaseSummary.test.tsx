@@ -50,10 +50,7 @@ describe('ReleaseSummary', () => {
       value: 'AY',
     },
     title: 'Test release title',
-    type: {
-      id: 'test-type-id',
-      title: 'Ad hoc',
-    },
+    type: 'AdHocStatistics',
   };
   const testActions = <button type="button">Test action</button>;
 

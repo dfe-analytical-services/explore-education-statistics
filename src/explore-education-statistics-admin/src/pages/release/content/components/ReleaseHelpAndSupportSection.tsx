@@ -6,7 +6,6 @@ import AccordionSection from '@common/components/AccordionSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import OfficialStatisticsSection from '@common/modules/find-statistics/components/OfficialStatisticsSection';
-import { ReleaseType } from '@common/services/publicationService';
 import React from 'react';
 import AdHocOfficialStatisticsSection from '@common/modules/find-statistics/components/AdHocOfficialStatisticsSection';
 import ExperimentalStatisticsSection from '@common/modules/find-statistics/components/ExperimentalStatisticsSection';
@@ -72,17 +71,17 @@ const ReleaseHelpAndSupportSection = ({
             <p>No methodologies added.</p>
           )}
         </AccordionSection>
-        {release.type.title === ReleaseType.NationalStatistics && (
+        {release.type === 'NationalStatistics' && (
           <AccordionSection heading="National Statistics" headingTag="h3">
             <NationalStatisticsSection />
           </AccordionSection>
         )}
-        {release.type.title === ReleaseType.OfficialStatistics && (
+        {release.type === 'OfficialStatistics' && (
           <AccordionSection heading="Official Statistics" headingTag="h3">
             <OfficialStatisticsSection />
           </AccordionSection>
         )}
-        {release.type.title === ReleaseType.AdHocStatistics && (
+        {release.type === 'AdHocStatistics' && (
           <AccordionSection
             heading="Ad hoc Official Statistics"
             headingTag="h3"
@@ -90,7 +89,7 @@ const ReleaseHelpAndSupportSection = ({
             <AdHocOfficialStatisticsSection />
           </AccordionSection>
         )}
-        {release.type.title === ReleaseType.ExperimentalStatistics && (
+        {release.type === 'ExperimentalStatistics' && (
           <AccordionSection heading="Experimental Statistics" headingTag="h3">
             <ExperimentalStatisticsSection />
           </AccordionSection>

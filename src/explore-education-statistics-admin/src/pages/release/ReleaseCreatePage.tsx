@@ -65,7 +65,7 @@ const ReleaseCreatePage = ({
         value: values.timePeriodCoverageCode,
       },
       releaseName: values.timePeriodCoverageStartYear,
-      typeId: values.releaseTypeId,
+      type: values.releaseType ?? 'AdHocStatistics',
       publicationId,
       templateReleaseId:
         values.templateReleaseId !== 'new' ? values.templateReleaseId : '',
@@ -124,8 +124,8 @@ const ReleaseCreatePage = ({
               timePeriodCoverageGroups[0]?.timeIdentifiers[0]?.identifier
                 .value ?? '',
             timePeriodCoverageStartYear: '',
-            releaseTypeId: '',
             templateReleaseId: '',
+            releaseType: undefined,
           } as FormValues)
         }
         validationSchema={baseRules =>

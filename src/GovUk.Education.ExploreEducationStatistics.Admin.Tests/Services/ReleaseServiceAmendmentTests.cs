@@ -35,11 +35,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         public void CreateReleaseAmendment()
         {
             var releaseId = Guid.NewGuid();
-            var releaseType = new ReleaseType
-            {
-                Id = Guid.NewGuid(),
-                Title = "Official Statistics"
-            };
             var publicationId = Guid.NewGuid();
             var publishedDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(1));
             var createdDate = DateTime.UtcNow.Subtract(TimeSpan.FromDays(2));
@@ -64,12 +59,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Order = 2,
                 Comments = new List<Comment>
                 {
-                    new Comment
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Content = "Comment 1 Text"
                     },
-                    new Comment
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Content = "Comment 2 Text"
@@ -86,8 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var release = new Release
             {
                 Id = releaseId,
-                Type = releaseType,
-                TypeId = releaseType.Id,
+                Type = ReleaseType.OfficialStatistics,
                 PublishScheduled = publishScheduled,
                 NextReleaseDate = nextReleaseDate,
                 ReleaseName = releaseName,
@@ -183,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     },
 
-                    new ReleaseContentSection
+                    new()
                     {
                         ReleaseId = Guid.NewGuid(),
                         ContentSection = new ContentSection
@@ -201,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     Body = "Text",
                                     Comments = new List<Comment>
                                     {
-                                        new Comment
+                                        new()
                                         {
                                             Id = Guid.NewGuid(),
                                             Content = "Inset Comment 1 Text"
@@ -212,7 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     },
 
-                    new ReleaseContentSection
+                    new()
                     {
                         ReleaseId = Guid.NewGuid(),
                         ContentSection = new ContentSection
@@ -341,11 +335,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
             {
-                contentDbContext.AddRange(new List<ReleaseType>
-                {
-                    releaseType
-                });
-
                 contentDbContext.Add(new Publication
                 {
                     Id = publicationId,
@@ -431,7 +420,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var amendment = contentDbContext
                     .Releases
                     .Include(r => r.PreviousVersion)
-                    .Include(r => r.Type)
                     .Include(r => r.CreatedBy)
                     .Include(r => r.Publication)
                     .Include(r => r.Content)
@@ -456,8 +444,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_userId, amendment.CreatedById);
                 Assert.InRange(DateTime.UtcNow.Subtract(amendment.Created).Milliseconds, 0, 1500);
 
-                Assert.Equal(releaseType, amendment.Type);
-                Assert.Equal(releaseType.Id, amendment.TypeId);
+                Assert.Equal(ReleaseType.OfficialStatistics, amendment.Type);
                 Assert.Equal(nextReleaseDate, amendment.NextReleaseDate);
                 Assert.Equal(releaseName, amendment.ReleaseName);
                 Assert.Equal(timePeriodCoverage, amendment.TimePeriodCoverage);

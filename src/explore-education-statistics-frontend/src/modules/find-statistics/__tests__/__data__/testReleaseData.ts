@@ -1,8 +1,4 @@
-import {
-  Publication,
-  Release,
-  ReleaseType,
-} from '@common/services/publicationService';
+import { Publication, Release } from '@common/services/publicationService';
 
 export const testPublication: Publication = {
   id: 'publication-1',
@@ -71,10 +67,7 @@ export const testRelease: Release = {
   dataLastPublished: '',
   hasDataGuidance: true,
   hasPreReleaseAccessList: true,
-  type: {
-    id: 'national-stats-1',
-    title: ReleaseType.NationalStatistics,
-  },
+  type: 'NationalStatistics',
   updates: [
     {
       id: '18e0d40e-bdf7-4c84-99dd-732e72e9c9a5',
