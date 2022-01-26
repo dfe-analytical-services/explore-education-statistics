@@ -247,5 +247,95 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                 PlanningArea_Name = value.Name;
             }
         }
+
+        protected bool Equals(Location other)
+        {
+            return Id.Equals(other.Id) 
+                   && GeographicLevel == other.GeographicLevel 
+                   && Country_Code == other.Country_Code 
+                   && Country_Name == other.Country_Name
+                   && EnglishDevolvedArea_Code == other.EnglishDevolvedArea_Code 
+                   && EnglishDevolvedArea_Name == other.EnglishDevolvedArea_Name 
+                   && Institution_Code == other.Institution_Code 
+                   && Institution_Name == other.Institution_Name 
+                   && LocalAuthority_Code == other.LocalAuthority_Code 
+                   && LocalAuthority_OldCode == other.LocalAuthority_OldCode 
+                   && LocalAuthority_Name == other.LocalAuthority_Name 
+                   && LocalAuthorityDistrict_Code == other.LocalAuthorityDistrict_Code 
+                   && LocalAuthorityDistrict_Name == other.LocalAuthorityDistrict_Name 
+                   && LocalEnterprisePartnership_Code == other.LocalEnterprisePartnership_Code 
+                   && LocalEnterprisePartnership_Name == other.LocalEnterprisePartnership_Name 
+                   && MayoralCombinedAuthority_Code == other.MayoralCombinedAuthority_Code 
+                   && MayoralCombinedAuthority_Name == other.MayoralCombinedAuthority_Name 
+                   && MultiAcademyTrust_Code == other.MultiAcademyTrust_Code 
+                   && MultiAcademyTrust_Name == other.MultiAcademyTrust_Name 
+                   && OpportunityArea_Code == other.OpportunityArea_Code 
+                   && OpportunityArea_Name == other.OpportunityArea_Name 
+                   && ParliamentaryConstituency_Code == other.ParliamentaryConstituency_Code 
+                   && ParliamentaryConstituency_Name == other.ParliamentaryConstituency_Name 
+                   && Provider_Code == other.Provider_Code 
+                   && Provider_Name == other.Provider_Name 
+                   && Region_Code == other.Region_Code 
+                   && Region_Name == other.Region_Name 
+                   && RscRegion_Code == other.RscRegion_Code 
+                   && School_Code == other.School_Code 
+                   && School_Name == other.School_Name 
+                   && Sponsor_Code == other.Sponsor_Code 
+                   && Sponsor_Name == other.Sponsor_Name 
+                   && Ward_Code == other.Ward_Code 
+                   && Ward_Name == other.Ward_Name 
+                   && PlanningArea_Code == other.PlanningArea_Code 
+                   && PlanningArea_Name == other.PlanningArea_Name;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((Location)obj);
+        }
+
+        public override int GetHashCode()
+        {
+            var hashCode = new HashCode();
+            hashCode.Add(Id);
+            hashCode.Add((int)GeographicLevel);
+            hashCode.Add(Country_Code);
+            hashCode.Add(Country_Name);
+            hashCode.Add(EnglishDevolvedArea_Code);
+            hashCode.Add(EnglishDevolvedArea_Name);
+            hashCode.Add(Institution_Code);
+            hashCode.Add(Institution_Name);
+            hashCode.Add(LocalAuthority_Code);
+            hashCode.Add(LocalAuthority_OldCode);
+            hashCode.Add(LocalAuthority_Name);
+            hashCode.Add(LocalAuthorityDistrict_Code);
+            hashCode.Add(LocalAuthorityDistrict_Name);
+            hashCode.Add(LocalEnterprisePartnership_Code);
+            hashCode.Add(LocalEnterprisePartnership_Name);
+            hashCode.Add(MayoralCombinedAuthority_Code);
+            hashCode.Add(MayoralCombinedAuthority_Name);
+            hashCode.Add(MultiAcademyTrust_Code);
+            hashCode.Add(MultiAcademyTrust_Name);
+            hashCode.Add(OpportunityArea_Code);
+            hashCode.Add(OpportunityArea_Name);
+            hashCode.Add(ParliamentaryConstituency_Code);
+            hashCode.Add(ParliamentaryConstituency_Name);
+            hashCode.Add(Provider_Code);
+            hashCode.Add(Provider_Name);
+            hashCode.Add(Region_Code);
+            hashCode.Add(Region_Name);
+            hashCode.Add(RscRegion_Code);
+            hashCode.Add(School_Code);
+            hashCode.Add(School_Name);
+            hashCode.Add(Sponsor_Code);
+            hashCode.Add(Sponsor_Name);
+            hashCode.Add(Ward_Code);
+            hashCode.Add(Ward_Name);
+            hashCode.Add(PlanningArea_Code);
+            hashCode.Add(PlanningArea_Name);
+            return hashCode.ToHashCode();
+        }
     }
 }

@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
             Dictionary<GeographicLevel, List<string>>? hierarchies);
         
         Dictionary<GeographicLevel, List<LocationAttributeNode>> GetLocationAttributesHierarchical(
-            IList<Location> locations,
+            IList<Location> distinctLocations,
             Dictionary<GeographicLevel, List<string>>? hierarchies);
 
         IEnumerable<ILocationAttribute> GetLocationAttributes(

@@ -83,10 +83,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     var stopwatch = Stopwatch.StartNew();
                     stopwatch.Start();
-
+                    
+                    var locations = observations
+                        .Select(o => o.Location)
+                        .Distinct()
+                        .ToList();
+                    
                     var locationAttributes =
                         _locationRepository.GetLocationAttributesHierarchical(
-                            observations.Select(o => o.Location).ToList(),
+                            locations,
                             hierarchies: _locationOptions.Hierarchies);
                     _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();

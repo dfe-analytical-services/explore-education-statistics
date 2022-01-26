@@ -21,6 +21,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 
@@ -363,7 +364,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Id = Guid.NewGuid()
             };
 
-            var observations = new List<Observation>();
+            var observations = new List<Observation>
+            {
+                new()
+                {
+                    Location = new Location
+                    {
+                        Country = new Country("E000001", "England")
+                    }
+                },
+                new()
+                {
+                    Location = new Location
+                    {
+                        Ward = new Ward("0000001", "Ward 1")
+                    }
+                },
+                new()
+                {
+                    Location = new Location
+                    {
+                        Country = new Country("E000001", "England")
+                    }
+                }
+            };
+
+            var expectedDistinctLocations = ListOf(
+                new Location
+                {
+                    Country = new Country("E000001", "England")
+                }, new Location
+                {
+                    Ward = new Ward("0000001", "Ward 1")
+                });
 
             var releaseId = Guid.NewGuid();
 
@@ -484,7 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<Indicator>());
 
             locationRepository.Setup(s => s.GetLocationAttributesHierarchical(
-                    new List<Location>(),
+                    expectedDistinctLocations,
                     options.Value.Hierarchies))
                 .Returns(locations);
 

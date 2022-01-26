@@ -58,14 +58,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         }
         
         public Dictionary<GeographicLevel, List<LocationAttributeNode>> GetLocationAttributesHierarchical(
-            IList<Location> locations,
+            IList<Location> distinctLocations,
             Dictionary<GeographicLevel, List<string>>? hierarchies = null)
         {
             var hierarchyWithLocationSelectors = hierarchies == null
                 ? new Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute>>>()
                 : MapLocationAttributeSelectors(hierarchies);
 
-            return locations
+            return distinctLocations
                 .Distinct()
                 .GroupBy(location => location.GeographicLevel)
                 .ToDictionary(
