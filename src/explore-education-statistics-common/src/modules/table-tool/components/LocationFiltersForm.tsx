@@ -10,6 +10,7 @@ import {
   LocationOption,
   SubjectMeta,
 } from '@common/services/tableBuilderService';
+import locationLevelsMap from '@common/utils/locationLevelsMap';
 import { Dictionary } from '@common/types/util';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
@@ -47,7 +48,10 @@ const LocationFiltersForm = ({
 
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>
-      Choose locations
+      {Object.keys(options).length === 1 &&
+      locationLevelsMap[Object.keys(options)[0]]
+        ? `Choose ${locationLevelsMap[Object.keys(options)[0]].plural}`
+        : 'Choose locations'}
     </WizardStepHeading>
   );
 
