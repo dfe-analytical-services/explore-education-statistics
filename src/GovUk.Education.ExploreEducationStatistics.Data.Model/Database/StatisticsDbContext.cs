@@ -108,9 +108,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
         
         public DbSet<MatchedObservation> MatchedObservations { get; set; }
-            // => Set<MatchedObservation>()
-            // .Select(t => t);
-        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

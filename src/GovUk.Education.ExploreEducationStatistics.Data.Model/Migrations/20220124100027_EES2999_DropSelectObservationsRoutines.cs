@@ -21,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                 $"{PreviousMigrationId}_Routine_SelectObservations.sql");
             migrationBuilder.SqlFromFile(MigrationsPath, 
                 $"{PreviousMigrationId}_Routine_SelectObservationsByLocationCodes.sql");
-
         }
     }
 }
