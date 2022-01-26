@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -111,6 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         public class MatchingObservationsQueryGenerator : IMatchingObservationsQueryGenerator
         {
             public ITemporaryTableCreator TempTableCreator = new TemporaryTableCreator();
+            private readonly Regex _safeTempTableNames = new("^#[a-zA-Z0-9]+[_0-9]*$", RegexOptions.Compiled);
 
             public async Task<(string, IList<SqlParameter>, IList<IAsyncDisposable>)> GetMatchingObservationsQuery(
                 StatisticsDbContext context,
@@ -192,16 +194,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                                 .Select(id => new IdTempTable(id))
                                 .ToList();
                             
-                            return TempTableCreator.CreateTemporaryTableAndPopulate(context, ids, cancellationToken).Result; // TODO async
+                            return TempTableCreator.CreateTemporaryTableAndPopulate(context, ids, cancellationToken).Result;
                         });
 
-                // TODO token replacement
                 var clauses = filterItemIdTempTablesPerFilter
                     .Select(filterItemIdTempTableForFilter =>
-                        $"EXISTS (" +
-                        $"    SELECT 1 FROM ObservationFilterItem ofi WHERE ofi.ObservationId = o.id " +
-                        $"    AND ofi.FilterItemId IN (SELECT Id FROM {filterItemIdTempTableForFilter.Value.Name})" +
-                        $")");
+                    {
+                        var filterItemIdsTempTableName = 
+                            SanitizeTempTableName(filterItemIdTempTableForFilter.Value.Name);
+                        
+                        return $"EXISTS (" +
+                               $"    SELECT 1 FROM ObservationFilterItem ofi WHERE ofi.ObservationId = o.id " +
+                               $"    AND ofi.FilterItemId IN (SELECT Id FROM {filterItemIdsTempTableName})" +
+                               $")";
+                    });
 
                 return (clauses.JoinToString(" AND "), filterItemIdTempTablesPerFilter.Values.ToList());
             }
@@ -243,8 +249,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 var locationsTempTable = await TempTableCreator.CreateTemporaryTableAndPopulate(
                     context, locationIds.Select(id => new IdTempTable(id)), cancellationToken);
                 
-                // TODO token replacement
-                return ("o.LocationId IN (SELECT Id FROM " + locationsTempTable.Name + ")", locationsTempTable);
+                return ($"o.LocationId IN (SELECT Id FROM {SanitizeTempTableName(locationsTempTable.Name)})", locationsTempTable);
+            }
+
+            private string SanitizeTempTableName(string tempTableName)
+            {
+                if (!_safeTempTableNames.IsMatch(tempTableName))
+                {
+                    throw new ArgumentException($"{tempTableName} is not a valid temporary table name");
+                }
+                return tempTableName;
             }
 
             private static string GetTimePeriodsClause(TimePeriodQuery timePeriodQuery)

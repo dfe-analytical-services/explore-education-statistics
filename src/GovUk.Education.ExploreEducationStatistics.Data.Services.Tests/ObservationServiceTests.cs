@@ -20,8 +20,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ObservationService;
 using static Moq.MockBehavior;
-// ReSharper disable AccessToDisposedClosure
 
+// ReSharper disable AccessToDisposedClosure
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
     public class ObservationServiceTests
