@@ -16,11 +16,10 @@ import {
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { Dictionary, Pair } from '@common/types';
-import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import cartesian from '@common/utils/cartesian';
-import parseNumber from '@common/utils/number/parseNumber';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
+import uniq from 'lodash/uniq';
 
 /**
  * We use this form of a data set as it's
@@ -218,33 +217,6 @@ function createKeyedDataSets(
   );
 }
 
-function sortDataSetCategories(
-  dataSetCategories: DataSetCategory[],
-  axisConfiguration: AxisConfiguration,
-): DataSetCategory[] {
-  const { sortBy, sortAsc } = axisConfiguration;
-
-  if (!sortBy) {
-    return dataSetCategories;
-  }
-
-  return naturalOrderBy(
-    dataSetCategories,
-    data => {
-      if (sortBy === 'name') {
-        if (data.filter instanceof TimePeriodFilter) {
-          return data.filter.order;
-        }
-
-        return data.filter.label;
-      }
-
-      return parseNumber(data.dataSets[sortBy]) ?? 0;
-    },
-    sortAsc ? 'asc' : 'desc',
-  );
-}
-
 /**
  * Create chart data that has been categorised by
  * filters, locations, time periods or indicators.
@@ -284,7 +256,6 @@ export default function createDataSetCategories(
   meta: FullTableMeta,
 ): DataSetCategory[] {
   const categoryFilters = getCategoryFilters(axisConfiguration, meta);
-
   const childDataSets = getChildDataSets(axisConfiguration, meta);
   const dedupedChildDataSets = dedupeDataSets(childDataSets);
 
@@ -304,6 +275,30 @@ export default function createDataSetCategories(
       return [childDataSet, value] as Pair<ChildDataSet, number>;
     })
     .filter(([, value]) => !Number.isNaN(value));
+
+  const groupOrder =
+    axisConfiguration.groupBy === 'filters'
+      ? uniq(
+          axisConfiguration.dataSets
+            .map(dataSet => {
+              return dataSet.filters;
+            })
+            .flat(),
+        )
+      : uniq(
+          axisConfiguration.dataSets.map(dataSet => {
+            switch (axisConfiguration.groupBy) {
+              case 'locations':
+                return dataSet.location?.value;
+              case 'indicators':
+                return dataSet.indicator;
+              case 'timePeriod':
+                return dataSet.timePeriod;
+              default:
+                return undefined;
+            }
+          }),
+        );
 
   const dataSetCategories = categoryFilters
     .map(filter => {
@@ -338,10 +333,20 @@ export default function createDataSetCategories(
     })
     .filter(category => Object.values(category.dataSets).length > 0);
 
-  return sortDataSetCategories(dataSetCategories, axisConfiguration).slice(
-    axisConfiguration.min ?? 0,
-    (axisConfiguration.max ?? dataSetCategories.length) + 1,
-  );
+  // Order the categories by dataSet order
+  const sortedDataSetCategories = dataSetCategories
+    .sort(
+      (a, b) =>
+        groupOrder.indexOf(a.filter.value) - groupOrder.indexOf(b.filter.value),
+    )
+    .slice(
+      axisConfiguration.min ?? 0,
+      (axisConfiguration.max ?? dataSetCategories.length) + 1,
+    );
+
+  return axisConfiguration.sortAsc
+    ? sortedDataSetCategories
+    : sortedDataSetCategories.reverse();
 }
 
 export const toChartData = (chartCategory: DataSetCategory): ChartData => {

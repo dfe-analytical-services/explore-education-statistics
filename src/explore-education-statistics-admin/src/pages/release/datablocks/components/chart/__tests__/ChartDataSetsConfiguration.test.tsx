@@ -159,18 +159,17 @@ describe('ChartDataSetsConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    const rows = screen.getAllByRole('row');
-    expect(rows).toHaveLength(4);
+    const items = screen.getAllByRole('listitem');
+    expect(items).toHaveLength(3);
 
-    expect(rows[0].children[0]).toHaveTextContent('Data set');
-    expect(rows[1].children[0]).toHaveTextContent(
-      'Number of authorised absence sessions (Male, All locations, All time periods)',
+    expect(items[0]).toHaveTextContent(
+      'Number of authorised absence sessions (Male, All locations, All time periods)Remove',
     );
-    expect(rows[2].children[0]).toHaveTextContent(
-      'Number of authorised absence sessions (Male, Barnet, All time periods)',
+    expect(items[1]).toHaveTextContent(
+      'Number of authorised absence sessions (Male, Barnet, All time periods)Remove',
     );
-    expect(rows[3].children[0]).toHaveTextContent(
-      'Number of authorised absence sessions (Male, Barnet, 2019/20)',
+    expect(items[2]).toHaveTextContent(
+      'Number of authorised absence sessions (Male, Barnet, 2019/20)Remove',
     );
   });
 
@@ -204,6 +203,57 @@ describe('ChartDataSetsConfiguration', () => {
       expect(screen.getByText('Cannot save chart')).toBeInTheDocument();
       expect(screen.getByText('Options tab is invalid')).toBeInTheDocument();
     });
+  });
+
+  test('toggles the reorder controls on and off', () => {
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartDataSetsConfiguration
+          meta={testSubjectMeta}
+          dataSets={[
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+            },
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+              location: {
+                level: 'localAuthority',
+                value: 'barnet',
+              },
+            },
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+              location: {
+                level: 'localAuthority',
+                value: 'barnet',
+              },
+              timePeriod: '2019_AY',
+            },
+          ]}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    userEvent.click(
+      screen.getByRole('button', {
+        name: 'Reorder data sets',
+      }),
+    );
+    expect(
+      screen.queryByRole('button', {
+        name: 'Reorder data sets',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Finish reordering' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove' }),
+    ).not.toBeInTheDocument();
   });
 
   describe('add data set form', () => {
@@ -825,14 +875,19 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      const tableRows = screen.getAllByRole('row');
-      expect(tableRows).toHaveLength(3);
+      const items = screen.getAllByRole('listitem');
+      expect(items).toHaveLength(2);
+
+      expect(items[0]).toHaveTextContent(
+        'Number of authorised absence sessions (Female, All locations, All time periods)Remove',
+      );
+      expect(items[1]).toHaveTextContent(
+        'Number of unauthorised absence sessions (Male, All locations, All time periods)Remove',
+      );
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      userEvent.click(
-        within(tableRows[1]).getByRole('button', { name: 'Remove' }),
-      );
+      userEvent.click(within(items[0]).getByRole('button', { name: 'Remove' }));
 
       expect(handleChange).toHaveBeenCalledWith([
         {

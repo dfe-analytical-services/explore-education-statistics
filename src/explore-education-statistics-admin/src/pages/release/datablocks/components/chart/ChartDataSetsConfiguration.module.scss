@@ -23,3 +23,42 @@
     margin-bottom: govuk-spacing(4);
   }
 }
+
+.item {
+  background: govuk-colour('white');
+  border-bottom: 1px solid govuk-colour('mid-grey');
+  display: flex;
+  justify-content: space-between;
+  padding: govuk-spacing(3) 0;
+
+  &:last-of-type {
+    border-bottom: 0;
+  }
+}
+
+.dropArea {
+  background: govuk-colour('light-grey');
+  outline: $govuk-focus-width solid $govuk-focus-colour;
+}
+
+.isReordering {
+  position: relative;
+
+  &::before {
+    color: govuk-colour('dark-grey');
+    content: '\2630';
+    cursor: grab;
+    font-size: 1.6rem;
+    position: absolute;
+    right: 0;
+    top: 11px;
+  }
+
+  &:focus {
+    @include govuk-focused-text;
+  }
+}
+
+.isDragging {
+  @include govuk-focused-text;
+}
