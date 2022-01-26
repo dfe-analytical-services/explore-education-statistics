@@ -155,8 +155,7 @@ Validate contributors for 2000/01 release again
     user waits until page contains    Analyst1 User1 (ees-analyst1@education.gov.uk)
     user checks page does not contain    Analyst2 User2 (ees-analyst2@education.gov.uk)
     user checks page does not contain    Analyst3 User3 (ees-analyst3@education.gov.uk)
-
-    user checks page contains    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
+    user waits until page contains    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk    %{WAIT_SMALL}
     user checks page contains tag    Pending Invite
 
 *** Keywords ***
