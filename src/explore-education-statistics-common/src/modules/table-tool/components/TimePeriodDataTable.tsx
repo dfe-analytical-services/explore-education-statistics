@@ -25,7 +25,7 @@ import React, { forwardRef, memo } from 'react';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 
-const EMPTY_CELL_TEXT = 'n/a';
+const EMPTY_CELL_TEXT = 'no data';
 
 class FilterGroup extends Filter {
   constructor(label: string) {
