@@ -854,7 +854,7 @@ describe('MethodologySummary', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Remove external methodology', { selector: 'h1' }),
+          screen.getByText('Remove external methodology', { selector: 'h2' }),
         ).toBeInTheDocument();
       });
 
@@ -896,7 +896,7 @@ describe('MethodologySummary', () => {
 
       await waitFor(() => {
         expect(
-          screen.getByText('Remove external methodology', { selector: 'h1' }),
+          screen.getByText('Remove external methodology', { selector: 'h2' }),
         ).toBeInTheDocument();
       });
 
