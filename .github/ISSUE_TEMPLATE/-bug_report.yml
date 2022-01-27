@@ -32,22 +32,22 @@ body:
 
   - type: textarea
     attributes:
-      label: Describe the Bug
+      label: Describe the bug
       description: A clear and concise description of what the bug is.
     validations:
       required: true
 
   - type: textarea
     attributes:
-      label: Expected Behaviour
+      label: Expected behaviour
       description: A clear and concise description of what you expected to happen.
     validations:
       required: true
 
   - type: textarea
     attributes:
-      label: To Reproduce
-      description: Steps to reproduce the Behaviour, please provide a clear code snippets that always reproduces the issue or a GitHub repository. Screenshots can be provided in the issue body below.
+      label: To reproduce
+      description: Steps to reproduce the behaviour, please provide a clear code snippets that always reproduces the issue or a GitHub repository. Screenshots can be provided in the issue body below.
     validations:
       required: true
 
