@@ -19,6 +19,14 @@ def _generate_slack_attachments(env: str):
     failed_tests = int(test['fail'])
     passed_tests = int(test['pass'])
 
+    failed_tests_field = {},
+
+    if failed_tests:
+        failed_tests_field = {
+            "title": "Failed tests",
+            "value": failed_tests if failed_tests else "0"
+        }
+
     return [
         {
             "pretext": "All results",
@@ -39,21 +47,34 @@ def _generate_slack_attachments(env: str):
                     "title": "Passed tests",
                     "value": passed_tests
                 },
-                {
-                    "title": "Failed tests",
-                    "value": failed_tests if failed_tests else "0"
-                },
+                failed_tests_field,
                 {
                     "title": "Results",
                     "value": "Failed" if failed_tests else "Passed"
                 },
-
             ]
         }
     ]
 
 
+def _get_report_status():
+    with open(f'{PATH}{os.sep}output.xml', 'rb') as report:
+        contents = report.read()
+
+        soup = BeautifulSoup(contents, 'lxml')
+        test = soup.find('total').find('stat')
+
+        failed_tests = int(test['fail'])
+
+        if failed_tests:
+            return True
+        else:
+            return False
+
+
 def send_slack_report(env: str):
+    should_send_report = _get_report_status()
+
     attachments = _generate_slack_attachments(env)
     data = {"attachments": attachments}
 
@@ -71,16 +92,17 @@ def send_slack_report(env: str):
 
     print("Sent UI test statistics to #build")
 
-    client = WebClient(token=slack_bot_token)
-    print('Sending UI test report to #build')
+    if should_send_report:
+        client = WebClient(token=slack_bot_token)
+        print('Sending UI test report to #build')
 
-    shutil.make_archive('UI-test-report', 'zip', PATH)
-    try:
-        client.files_upload(
-            channels='#build',
-            file='UI-test-report.zip',
-            title='test-report.zip',
-        )
-    except SlackApiError as e:
-        print(f'Error uploading test report: {e}')
-    os.remove('UI-test-report.zip')
+        shutil.make_archive('UI-test-report', 'zip', PATH)
+        try:
+            client.files_upload(
+                channels='#build',
+                file='UI-test-report.zip',
+                title='test-report.zip',
+            )
+        except SlackApiError as e:
+            print(f'Error uploading test report: {e}')
+        os.remove('UI-test-report.zip')
