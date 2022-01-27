@@ -8,6 +8,8 @@ import {
 } from '@common/modules/table-tool/types/workerFullTable';
 
 describe('getCsvData', () => {
+  const EMPTY_CELL_TEXT = 'no data';
+
   const testTableMeta: WorkerFullTableMeta = {
     geoJsonAvailable: false,
     publicationName: '',
@@ -177,7 +179,7 @@ describe('getCsvData', () => {
     expect(data).toMatchSnapshot();
   });
 
-  test("contains n/a's if there are some matching results", () => {
+  test(`contains ${EMPTY_CELL_TEXT} if there are only some matching results`, () => {
     const data = getCsvData({
       subjectMeta: {
         ...testTableMeta,
@@ -238,16 +240,16 @@ describe('getCsvData', () => {
 
     expect(data[1]).toHaveLength(8);
     expect(data[1][6]).toBe('111');
-    expect(data[1][7]).toBe('n/a');
+    expect(data[1][7]).toBe(EMPTY_CELL_TEXT);
 
     expect(data[2]).toHaveLength(8);
-    expect(data[2][6]).toBe('n/a');
+    expect(data[2][6]).toBe(EMPTY_CELL_TEXT);
     expect(data[2][7]).toBe('222');
 
     expect(data).toMatchSnapshot();
   });
 
-  test("strips out rows with only n/a's", () => {
+  test(`strips out rows with only ${EMPTY_CELL_TEXT}`, () => {
     const data = getCsvData({
       subjectMeta: {
         ...testTableMeta,
@@ -313,7 +315,7 @@ describe('getCsvData', () => {
     expect(data).toMatchSnapshot();
   });
 
-  test("contains n/a's if matching result but no matching indicator", () => {
+  test(`contains ${EMPTY_CELL_TEXT} if matching result but no matching indicator`, () => {
     const data = getCsvData({
       subjectMeta: testTableMeta,
       results: [
@@ -339,7 +341,7 @@ describe('getCsvData', () => {
     expect(data[0]).toHaveLength(7);
 
     expect(data[1]).toHaveLength(7);
-    expect(data[1][5]).toBe('n/a');
+    expect(data[1][5]).toBe(EMPTY_CELL_TEXT);
     expect(data[1][6]).toBe('111');
 
     expect(data).toMatchSnapshot();
