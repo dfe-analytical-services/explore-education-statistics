@@ -21,6 +21,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
+using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -100,7 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationInsightsTelemetry();
+            services.AddApplicationInsightsTelemetry()
+                .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {

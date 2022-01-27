@@ -4,6 +4,7 @@ using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
+using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -59,7 +60,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         {
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-            services.AddApplicationInsightsTelemetry();
+            services.AddApplicationInsightsTelemetry()
+                .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
+
             services.AddMvc(options =>
                 {
                     options.Filters.Add(new OperationCancelledExceptionFilter());
@@ -194,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     "https://localhost:3001")
                 .AllowAnyMethod()
                 .AllowAnyHeader());
-            
+
             app.UseMvc();
         }
 
