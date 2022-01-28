@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
 {
@@ -40,6 +43,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils
         public static List<string> GetRowValues(DataRow row)
         {
             return row.ItemArray.Select(x => x.ToString()).ToList();
+        }
+
+        public static GeographicLevel GetGeographicLevel(IReadOnlyList<string> rowValues, List<string> colValues)
+        {
+            var value = Value(rowValues, colValues, "geographic_level");
+            foreach (var val in (GeographicLevel[]) Enum.GetValues(typeof(GeographicLevel)))
+            {
+                if (val.GetEnumLabel().ToLower().Equals(value.ToLower()))
+                {
+                    return val;
+                }
+            }
+
+            throw new InvalidGeographicLevelException(value);
+        }
+
+        /// <summary>
+        /// Determines if a row should be imported based on geographic level.
+        /// If a file contains a sole level then any row is allowed, otherwise rows for 'solo' importable levels are ignored. 
+        /// </summary>
+        public static bool IsRowAllowed(bool soleGeographicLevel,
+            IReadOnlyList<string> rowValues,
+            List<string> colValues)
+        {
+            return soleGeographicLevel ||
+                   !GetGeographicLevel(rowValues, colValues).IsSoloImportableLevel();
         }
     }
 }

@@ -19,7 +19,6 @@ using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.ImporterUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -217,11 +216,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             List<string> colValues,
             DataImport dataImport)
         {
-            var soleGeographicLevel = dataImport.IsSoleGeographicLevel();
+            var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
             rows.ForEach(row =>
             {
                 var rowValues = CsvUtil.GetRowValues(row);
-                if (AllowRowImport(soleGeographicLevel, rowValues, colValues))
+                if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))
                 {
                     target.Rows.Add(row.ItemArray);
                 }

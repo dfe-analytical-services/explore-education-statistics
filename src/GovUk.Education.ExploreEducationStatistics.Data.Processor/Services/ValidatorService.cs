@@ -21,7 +21,7 @@ using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.FileTypeValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.ImporterUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Models.SoloImportableLevels;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     _importerService.GetTimeIdentifier(rowValues, colValues);
                     _importerService.GetYear(rowValues, colValues);
 
-                    var level = GetGeographicLevel(rowValues, colValues);
+                    var level = CsvUtil.GetGeographicLevel(rowValues, colValues);
                     if (rowCountByGeographicLevel.ContainsKey(level))
                     {
                         rowCountByGeographicLevel[level]++;
@@ -353,7 +353,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             // Exclude the counts of any 'solo' levels.
             // Those rows will be ignored since they are not being imported exclusively.
-            return rowCountByGeographicLevel.Sum(pair => pair.Key.IsSoloGeographicLevel() ? 0 : pair.Value);
+            return rowCountByGeographicLevel.Sum(pair => pair.Key.IsSoloImportableLevel() ? 0 : pair.Value);
         }
     }
 }

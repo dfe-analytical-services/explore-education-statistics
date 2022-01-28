@@ -11,13 +11,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
+using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.ImporterUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var colValues = CsvUtil.GetColumnValues(cols);
             var rowCount = 1;
             var totalRows = rows.Count;
-            var soleGeographicLevel = dataImport.IsSoleGeographicLevel();
+            var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
 
             foreach (DataRow row in rows)
             {
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
 
                 var rowValues = CsvUtil.GetRowValues(row);
-                if (AllowRowImport(soleGeographicLevel, rowValues, colValues))
+                if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))
                 {
                     CreateFiltersAndLocationsFromCsv(context, rowValues, colValues, subjectMeta.Filters);
                 }
@@ -232,14 +232,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             var observations = new List<Observation>();
             var i = 0;
-            var soleGeographicLevel = import.IsSoleGeographicLevel();
+            var soleGeographicLevel = import.HasSoleGeographicLevel();
 
             foreach (DataRow row in rows)
             {
                 var rowValues = CsvUtil.GetRowValues(row).ToArray();
-                var geographicLevel = GetGeographicLevel(rowValues, colValues);
+                var geographicLevel = CsvUtil.GetGeographicLevel(rowValues, colValues);
 
-                if (AllowRowImport(soleGeographicLevel, rowValues, colValues))
+                if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))
                 {
                     var o = ObservationFromCsv(
                         context,
@@ -334,7 +334,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             return _importerLocationService.FindOrCreate(
                 context,
-                GetGeographicLevel(rowValues, colValues),
+                CsvUtil.GetGeographicLevel(rowValues, colValues),
                 GetCountry(rowValues, colValues),
                 GetEnglishDevolvedArea(rowValues, colValues),
                 GetInstitution(rowValues, colValues),
