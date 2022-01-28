@@ -6,17 +6,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
 {
     public class ProcessorStatistics
     {
-        public int TotalRows { get; }
+        public int ImportableRowCount { get; }
         public int RowsPerBatch { get; }
         public int NumBatches { get; }
         public HashSet<GeographicLevel> GeographicLevels { get; }
 
-        public ProcessorStatistics(int totalRows,
+        public ProcessorStatistics(int importableRowCount,
             int rowsPerBatch,
             int numBatches,
             HashSet<GeographicLevel> geographicLevels)
         {
-            TotalRows = totalRows;
+            ImportableRowCount = importableRowCount;
             RowsPerBatch = rowsPerBatch;
             NumBatches = numBatches;
             GeographicLevels = geographicLevels;

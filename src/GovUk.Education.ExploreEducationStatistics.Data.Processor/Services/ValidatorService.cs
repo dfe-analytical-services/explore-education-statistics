@@ -303,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return new ProcessorStatistics
             (
-                totalRows: GetImportableRowCount(rowCountByGeographicLevel),
+                importableRowCount: GetImportableRowCount(rowCountByGeographicLevel),
                 rowsPerBatch: rowsPerBatch,
                 numBatches: GetNumBatches(totalRowCount, rowsPerBatch),
                 geographicLevels: rowCountByGeographicLevel.Keys.ToHashSet()
