@@ -103,11 +103,12 @@ interface Props {
   fullTable: FullTable;
   tableHeadersConfig: TableHeadersConfig;
   source?: string;
+  dataBlockId?: string;
 }
 
 const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
   function TimePeriodDataTableInternal(
-    { fullTable, tableHeadersConfig, captionTitle, source }: Props,
+    { fullTable, tableHeadersConfig, captionTitle, source, dataBlockId }: Props,
     dataTableRef,
   ) {
     const { subjectMeta, results } = fullTable;
@@ -310,13 +311,18 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
 
     const rows = filteredCartesian.map(row => row.map(cell => cell.text));
 
+    const captionId = dataBlockId
+      ? `dataTableCaption-${dataBlockId}`
+      : 'dataTableCaption';
+
     return (
       <FixedMultiHeaderDataTable
+        captionId={captionId}
         caption={
           <DataTableCaption
             {...subjectMeta}
             title={captionTitle}
-            id="dataTableCaption"
+            id={captionId}
           />
         }
         columnHeaders={columnHeaders}
