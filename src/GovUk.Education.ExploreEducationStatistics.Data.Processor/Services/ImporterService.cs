@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Exceptions;
-using GovUk.Education.ExploreEducationStatistics.Data.Processor.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
