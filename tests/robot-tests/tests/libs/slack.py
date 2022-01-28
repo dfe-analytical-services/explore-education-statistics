@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 PATH = f'{os.getcwd()}{os.sep}test-results'
 
 
-def _generate_slack_attachments(env: str):
+def _generate_slack_attachments(env: str, suite: str):
     with open(f'{PATH}{os.sep}output.xml', 'rb') as report:
         contents = report.read()
 
@@ -21,10 +21,10 @@ def _generate_slack_attachments(env: str):
 
     failed_tests_field = {},
 
-    if failed_tests:
+    if failed_tests > 0:
         failed_tests_field = {
             "title": "Failed tests",
-            "value": failed_tests if failed_tests else "0"
+            "value": failed_tests
         }
 
     return [
@@ -40,24 +40,20 @@ def _generate_slack_attachments(env: str):
                     "value": env
                 },
                 {
+                    "title": "Suite",
+                    "value": suite.replace('tests/', '')
+                },
+                {
                     "title": "Total test cases",
                     "value": passed_tests + failed_tests
                 },
-                {
-                    "title": "Passed tests",
-                    "value": passed_tests
-                },
                 failed_tests_field,
-                {
-                    "title": "Results",
-                    "value": "Failed" if failed_tests else "Passed"
-                },
             ]
         }
     ]
 
 
-def _get_report_status():
+def _tests_failed():
     with open(f'{PATH}{os.sep}output.xml', 'rb') as report:
         contents = report.read()
 
@@ -66,23 +62,20 @@ def _get_report_status():
 
         failed_tests = int(test['fail'])
 
-        if failed_tests:
+        if failed_tests > 0:
             return True
-        else:
-            return False
 
 
-def send_slack_report(env: str):
-    should_send_report = _get_report_status()
+def send_slack_report(env: str, suite: str):
 
-    attachments = _generate_slack_attachments(env)
+    attachments = _generate_slack_attachments(env, suite)
     data = {"attachments": attachments}
 
     webhook_url = os.getenv('SLACK_TEST_REPORT_WEBHOOK_URL')
     slack_bot_token = os.getenv('SLACK_BOT_TOKEN')
 
-    assert webhook_url, print("SLACK_TEST_REPORT_WEBHOOK_URL env variable needs to bet set")
-    assert slack_bot_token, print("SLACK_BOT_TOKEN env variable needs to bet set")
+    assert webhook_url, print("SLACK_TEST_REPORT_WEBHOOK_URL env variable needs to be set")
+    assert slack_bot_token, print("SLACK_BOT_TOKEN env variable needs to be set")
 
     response = requests.post(
         url=webhook_url,
@@ -92,9 +85,8 @@ def send_slack_report(env: str):
 
     print("Sent UI test statistics to #build")
 
-    if should_send_report:
+    if _tests_failed():
         client = WebClient(token=slack_bot_token)
-        print('Sending UI test report to #build')
 
         shutil.make_archive('UI-test-report', 'zip', PATH)
         try:
@@ -106,3 +98,4 @@ def send_slack_report(env: str):
         except SlackApiError as e:
             print(f'Error uploading test report: {e}')
         os.remove('UI-test-report.zip')
+    print('Sent UI test report to #build')
