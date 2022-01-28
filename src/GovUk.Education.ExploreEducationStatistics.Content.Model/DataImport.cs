@@ -77,6 +77,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             });
         }
 
+        /// <summary>
+        /// Determines if a file import consists exclusively of one geographic level.
+        /// </summary>
+        public bool HasSoleGeographicLevel()
+        {
+            return GeographicLevels is {Count: 1};
+        }
+
         public override string ToString()
         {
             return $"{Status} {StagePercentageComplete}%, overall {PercentageComplete()}%";

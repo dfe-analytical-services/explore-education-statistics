@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
@@ -284,6 +283,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             predicateBuilder = predicateBuilder
                 .And(location => location.ParliamentaryConstituency_Code == (parliamentaryConstituency != null ? parliamentaryConstituency.Code : null)
                                  && location.ParliamentaryConstituency_Name == (parliamentaryConstituency != null ? parliamentaryConstituency.Name : null));
+
+            predicateBuilder = predicateBuilder
+                .And(location => location.PlanningArea_Code == (planningArea != null ? planningArea.Code : null) 
+                                 && location.PlanningArea_Name == (planningArea != null ? planningArea.Name : null));
 
             predicateBuilder = predicateBuilder
                 .And(location => location.Provider_Code == (provider != null ? provider.Code : null)
