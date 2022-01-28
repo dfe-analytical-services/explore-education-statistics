@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
                 var table = new DataTable();
                 CopyColumns(dataFileTable, table);
-                CopyRows(table, batch.ToList(), colValues, dataImport);
+                CopyRows(table, batch.ToList(), colValues, dataImport.HasSoleGeographicLevel());
 
                 var percentageComplete = (double) batchCount / numBatches * 100;
 
@@ -214,13 +214,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private static void CopyRows(DataTable target,
             IEnumerable<DataRow> rows,
             List<string> colValues,
-            DataImport dataImport)
+            bool hasSoleGeographicLevel)
         {
-            var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
             rows.ForEach(row =>
             {
                 var rowValues = CsvUtil.GetRowValues(row);
-                if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))
+                if (CsvUtil.IsRowAllowed(hasSoleGeographicLevel, rowValues, colValues))
                 {
                     target.Rows.Add(row.ItemArray);
                 }
