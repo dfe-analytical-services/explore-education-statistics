@@ -71,7 +71,7 @@ Update publication
     user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
     user enters text into element    id:publicationForm-contactTelNo    0987654321
     user clicks button    Save publication
-    user waits until h1 is visible    Confirm publication changes
+    user waits until h2 is visible    Confirm publication changes
     user clicks button    Confirm
 
 Add a methodology

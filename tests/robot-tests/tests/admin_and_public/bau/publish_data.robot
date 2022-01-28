@@ -515,7 +515,7 @@ Validate table has footnotes
 
 Select table featured table from subjects step
     user clicks element    testid:wizardStep-2-goToButton
-    user waits until h1 is visible    Go back to previous step
+    user waits until h2 is visible    Go back to previous step
     user clicks button    Confirm
     user waits until page does not contain button    Confirm
 
