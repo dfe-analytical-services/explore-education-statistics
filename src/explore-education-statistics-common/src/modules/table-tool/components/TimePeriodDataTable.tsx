@@ -112,6 +112,14 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
   ) {
     const { subjectMeta, results } = fullTable;
 
+    if (!tableHeadersConfig.rows.length) {
+      return (
+        <WarningMessage>
+          There was a problem rendering the table.
+        </WarningMessage>
+      );
+    }
+
     if (results.length === 0) {
       return (
         <WarningMessage>
@@ -296,7 +304,7 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
 
     // Only need to use first row's columnFilters
     // as they are the same for every row.
-    const columnHeaders = (filteredCartesian[0] ?? []).reduce<Header[]>(
+    const columnHeaders = filteredCartesian[0].reduce<Header[]>(
       (acc, column) => {
         const filters = optimizeFilters(column.columnFilters, [
           ...tableHeadersConfig.columnGroups,
