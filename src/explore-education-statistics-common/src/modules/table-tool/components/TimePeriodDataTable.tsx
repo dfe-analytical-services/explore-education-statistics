@@ -296,17 +296,16 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
 
     // Only need to use first row's columnFilters
     // as they are the same for every row.
-    const columnHeaders = filteredCartesian[0].reduce<Header[]>(
-      (acc, column) => {
-        const filters = optimizeFilters(column.columnFilters, [
-          ...tableHeadersConfig.columnGroups,
-          tableHeadersConfig.columns,
-        ]);
+    const columnHeaders = filteredCartesian.length
+      ? filteredCartesian[0].reduce<Header[]>((acc, column) => {
+          const filters = optimizeFilters(column.columnFilters, [
+            ...tableHeadersConfig.columnGroups,
+            tableHeadersConfig.columns,
+          ]);
 
-        return addFilters(acc, filters);
-      },
-      [],
-    );
+          return addFilters(acc, filters);
+        }, [])
+      : [];
 
     const rows = filteredCartesian.map(row => row.map(cell => cell.text));
 
