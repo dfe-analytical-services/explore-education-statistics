@@ -172,8 +172,11 @@ const TableToolWizard = ({
 
     updateState(draft => {
       draft.subjectMeta = nextSubjectMeta;
-
       draft.query.subjectId = selectedSubjectId;
+      draft.query.indicators = [];
+      draft.query.filters = [];
+      draft.query.locations = {};
+      draft.query.timePeriod = undefined;
     });
   };
 
@@ -194,11 +197,25 @@ const TableToolWizard = ({
       locations,
       subjectId: state.query.subjectId,
     });
+    // Check if selected time period is in the time period options so can reset it if not.
+    const hasStartTimePeriod = nextSubjectMeta.timePeriod.options.some(
+      option =>
+        option.code === state.query.timePeriod?.startCode &&
+        option.year === state.query.timePeriod.startYear,
+    );
+    const hasEndTimePeriod = nextSubjectMeta.timePeriod.options.some(
+      option =>
+        option.code === state.query.timePeriod?.endCode &&
+        option.year === state.query.timePeriod.endYear,
+    );
 
     updateState(draft => {
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
-
       draft.query.locations = locations;
+      draft.query.timePeriod =
+        hasStartTimePeriod && hasEndTimePeriod
+          ? state.query.timePeriod
+          : undefined;
     });
   };
 
