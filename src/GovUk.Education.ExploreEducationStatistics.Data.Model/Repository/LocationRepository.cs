@@ -48,8 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .AsNoTracking()
                 .Where(o => o.SubjectId == subjectId);
 
-            var locations = await
-                observations
+            var locations = await observations
                 .Select(observation => observation.Location)
                 .Distinct()
                 .ToListAsync();

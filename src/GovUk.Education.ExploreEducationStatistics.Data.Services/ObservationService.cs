@@ -132,10 +132,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     ? await GetSelectedFilterItemIdsClause(context, subjectId, filterItemIds!, cancellationToken)
                     : default;
 
-                var sql =
-                    $"INSERT INTO #{nameof(MatchedObservation)} " +
-                    $"SELECT o.id FROM Observation o " +
-                    "WHERE o.SubjectId = @subjectId " +
+                var sql = @$"
+                    INSERT INTO #{nameof(MatchedObservation)} 
+                    SELECT o.id FROM Observation o
+                    WHERE o.SubjectId = @subjectId " +
                     (timePeriodQuery != null ? $"AND ({GetTimePeriodsClause(timePeriodQuery)}) " : "") +
                     (locationIdsClause != null ? $"AND ({locationIdsClause}) " : "") +
                     (filterItemIdsClause != null ? $"AND ({filterItemIdsClause}) " : "") +
