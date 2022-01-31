@@ -109,15 +109,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         private static PublicationTreeNode BuildPublicationNode(Publication publication)
         {
-            // Ignore any legacyPublicationUrl once the Publication has Releases
-            var legacyPublicationUrlIgnored =
-                publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease());
+            var latestRelease = publication.LatestPublishedRelease();
+            var legacyPublicationUrlIgnored = latestRelease != null;
 
             return new PublicationTreeNode
             {
                 Id = publication.Id,
                 Title = publication.Title,
                 Slug = publication.Slug,
+                LatestReleaseType = latestRelease?.Type,
                 LegacyPublicationUrl = legacyPublicationUrlIgnored
                     ? null
                     : publication.LegacyPublicationUrl?.ToString()
