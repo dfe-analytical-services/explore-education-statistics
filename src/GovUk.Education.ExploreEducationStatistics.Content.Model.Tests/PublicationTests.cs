@@ -54,7 +54,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             };
 
             var result = publication.LatestPublishedRelease();
-            Assert.Equal(amendedRelease1Id, result.Id);
+            Assert.NotNull(result);
+            Assert.Equal(amendedRelease1Id, result!.Id);
         }
 
         [Fact]
@@ -99,7 +100,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             };
 
             var result = publication.LatestPublishedRelease();
-            Assert.Equal(release2001Id, result.Id);
+            Assert.NotNull(result);
+            Assert.Equal(release2001Id, result!.Id);
         }
 
         [Fact]
@@ -182,7 +184,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             };
 
             var result = publication.LatestRelease();
-            Assert.Equal(release2001AmendmentId, result.Id);
+            Assert.NotNull(result);
+            Assert.Equal(release2001AmendmentId, result!.Id);
         }
 
         [Fact]

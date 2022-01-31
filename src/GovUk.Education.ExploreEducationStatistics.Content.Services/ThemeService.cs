@@ -117,7 +117,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             {
                 Id = publication.Id,
                 Title = publication.Title,
-                Summary = publication.Summary,
                 Slug = publication.Slug,
                 LegacyPublicationUrl = legacyPublicationUrlIgnored
                     ? null

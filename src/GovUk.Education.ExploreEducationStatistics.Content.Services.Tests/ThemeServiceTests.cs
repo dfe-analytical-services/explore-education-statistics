@@ -36,20 +36,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                Summary = "Publication A summary",
                 LegacyPublicationUrl = new Uri("https://legacy.url/")
             };
             var publicationB = new Publication
             {
                 Title = "Publication B",
                 Slug = "publication-b",
-                Summary = "Publication B summary"
             };
             var publicationC = new Publication
             {
                 Title = "Publication C",
                 Slug = "publication-c",
-                Summary = "Publication C summary",
                 LegacyPublicationUrl = new Uri("https://legacy.url/")
             };
 
@@ -110,19 +107,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(3, publications.Count);
                 Assert.Equal("publication-a", publications[0].Slug);
-                Assert.Equal("Publication A summary", publications[0].Summary);
                 Assert.Equal("Publication A", publications[0].Title);
                 // Publication has a legacy url but it's not set because Releases exist
                 Assert.Null(publications[0].LegacyPublicationUrl);
 
                 Assert.Equal("publication-b", publications[1].Slug);
-                Assert.Equal("Publication B summary", publications[1].Summary);
                 Assert.Equal("Publication B", publications[1].Title);
                 // Publication has a legacy url but it's not set because Releases exist
                 Assert.Null(publications[1].LegacyPublicationUrl);
 
                 Assert.Equal("publication-c", publications[2].Slug);
-                Assert.Equal("Publication C summary", publications[2].Summary);
                 Assert.Equal("Publication C", publications[2].Title);
                 Assert.Equal("https://legacy.url/", publications[2].LegacyPublicationUrl);
             }
@@ -135,20 +129,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                Summary = "Publication A summary",
                 LegacyPublicationUrl = new Uri("https://legacy.url/")
             };
             var publicationB = new Publication
             {
                 Title = "Publication B",
                 Slug = "publication-b",
-                Summary = "Publication B summary"
             };
             var publicationC = new Publication
             {
                 Title = "Publication C",
                 Slug = "publication-c",
-                Summary = "Publication C summary",
                 LegacyPublicationUrl = new Uri("https://legacy.url/")
             };
 
@@ -236,7 +227,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Single(topicAPublications);
                 Assert.Equal("publication-a", topicAPublications[0].Slug);
-                Assert.Equal("Publication A summary", topicAPublications[0].Summary);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
                 // Publication has a legacy url but it's not set because Releases exist
                 Assert.Null(topicAPublications[0].LegacyPublicationUrl);
@@ -245,7 +235,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Single(topicBPublications);
                 Assert.Equal("publication-b", topicBPublications[0].Slug);
-                Assert.Equal("Publication B summary", topicBPublications[0].Summary);
                 Assert.Equal("Publication B", topicBPublications[0].Title);
                 // Publication has a legacy url but it's not set because Releases exist
                 Assert.Null(topicBPublications[0].LegacyPublicationUrl);
@@ -254,7 +243,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Single(topicCPublications);
                 Assert.Equal("publication-c", topicCPublications[0].Slug);
-                Assert.Equal("Publication C summary", topicCPublications[0].Summary);
                 Assert.Equal("Publication C", topicCPublications[0].Title);
                 Assert.Equal("https://legacy.url/", topicCPublications[0].LegacyPublicationUrl);
             }
@@ -738,14 +726,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                Summary = "Publication A summary",
                 LegacyPublicationUrl = new Uri("https://legacy.url/")
             };
             var publicationB = new Publication
             {
                 Title = "Publication B",
                 Slug = "publication-b",
-                Summary = "Publication B summary"
             };
 
             var theme = new Theme
@@ -817,13 +803,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(2, publications.Count);
                 Assert.Equal("publication-a", publications[0].Slug);
-                Assert.Equal("Publication A summary", publications[0].Summary);
                 Assert.Equal("Publication A", publications[0].Title);
                 // Publication has a legacy url but it's not set because Releases exist
                 Assert.Null(publications[0].LegacyPublicationUrl);
 
                 Assert.Equal("publication-b", publications[1].Slug);
-                Assert.Equal("Publication B summary", publications[1].Summary);
                 Assert.Equal("Publication B", publications[1].Title);
                 Assert.Null(publications[1].LegacyPublicationUrl);
             }
@@ -836,13 +820,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                Summary = "Publication A summary",
             };
             var publicationB = new Publication
             {
                 Title = "Publication B",
                 Slug = "publication-b",
-                Summary = "Publication B summary"
             };
 
             var themes = new List<Theme>
@@ -937,7 +919,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Single(topicAPublications);
                 Assert.Equal("publication-a", topicAPublications[0].Slug);
-                Assert.Equal("Publication A summary", topicAPublications[0].Summary);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
                 Assert.Null(topicAPublications[0].LegacyPublicationUrl);
 
@@ -945,7 +926,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Single(topicBPublications);
                 Assert.Equal("publication-b", topicBPublications[0].Slug);
-                Assert.Equal("Publication B summary", topicBPublications[0].Summary);
                 Assert.Equal("Publication B", topicBPublications[0].Title);
                 Assert.Null(topicBPublications[0].LegacyPublicationUrl);
             }
@@ -1495,13 +1475,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                Summary = "Publication A summary",
             };
             var publicationB = new Publication
             {
                 Title = "Publication B",
                 Slug = "publication-b",
-                Summary = "Publication B summary"
             };
 
             var theme = new Theme
@@ -1577,12 +1555,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Equal(2, publications.Count);
                 Assert.Equal("publication-a", publications[0].Slug);
-                Assert.Equal("Publication A summary", publications[0].Summary);
                 Assert.Equal("Publication A", publications[0].Title);
                 Assert.Null(publications[0].LegacyPublicationUrl);
 
                 Assert.Equal("publication-b", publications[1].Slug);
-                Assert.Equal("Publication B summary", publications[1].Summary);
                 Assert.Equal("Publication B", publications[1].Title);
                 Assert.Null(publications[1].LegacyPublicationUrl);
             }
@@ -1595,19 +1571,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication A",
                 Slug = "publication-a",
-                Summary = "Publication A summary",
             };
             var publicationB = new Publication
             {
                 Title = "Publication B",
                 Slug = "publication-b",
-                Summary = "Publication B summary"
             };
             var publicationC = new Publication
             {
                 Title = "Publication C",
                 Slug = "publication-c",
-                Summary = "Publication C summary",
             };
 
             var themes = new List<Theme>
@@ -1723,7 +1696,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Single(topicAPublications);
                 Assert.Equal("publication-a", topicAPublications[0].Slug);
-                Assert.Equal("Publication A summary", topicAPublications[0].Summary);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
                 Assert.Null(topicAPublications[0].LegacyPublicationUrl);
 
@@ -1731,7 +1703,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Single(topicBPublications);
                 Assert.Equal("publication-b", topicBPublications[0].Slug);
-                Assert.Equal("Publication B summary", topicBPublications[0].Summary);
                 Assert.Equal("Publication B", topicBPublications[0].Title);
                 Assert.Null(topicBPublications[0].LegacyPublicationUrl);
 
@@ -1739,7 +1710,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 Assert.Single(topicCPublications);
                 Assert.Equal("publication-c", topicCPublications[0].Slug);
-                Assert.Equal("Publication C summary", topicCPublications[0].Summary);
                 Assert.Equal("Publication C", topicCPublications[0].Title);
                 Assert.Null(topicBPublications[0].LegacyPublicationUrl);
             }

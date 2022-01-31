@@ -272,9 +272,6 @@ export const testPublicationRelease: Release = {
     id: '',
     slug: '',
     title: '',
-    description: '',
-    dataSource: '',
-    summary: '',
     otherReleases: [],
     legacyReleases: [],
     topic: {

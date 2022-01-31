@@ -12,12 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public string Slug { get; set; } = string.Empty;
 
-        public string Description { get; set; } = string.Empty;
-
-        public string DataSource { get; set; } = string.Empty;
-
-        public string Summary { get; set; } = string.Empty;
-
         public PublicationSummaryViewModel()
         {
         }
@@ -27,9 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             Id = publication.Id;
             Title = publication.Title;
             Slug = publication.Slug;
-            Description = publication.Description;
-            DataSource = publication.DataSource;
-            Summary = publication.Summary;
         }
     }
 }
