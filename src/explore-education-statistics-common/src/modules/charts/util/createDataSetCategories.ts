@@ -19,6 +19,7 @@ import { Dictionary, Pair } from '@common/types';
 import cartesian from '@common/utils/cartesian';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
+import sortBy from 'lodash/sortBy';
 import uniq from 'lodash/uniq';
 
 /**
@@ -218,6 +219,42 @@ function createKeyedDataSets(
 }
 
 /**
+ * Order the categories by dataSet order.
+ */
+function sortDataSetCategories(
+  dataSetCategories: DataSetCategory[],
+  axisConfiguration: AxisConfiguration,
+): DataSetCategory[] {
+  const groupOrder = uniq(
+    axisConfiguration.dataSets.flatMap(dataSet => {
+      switch (axisConfiguration.groupBy) {
+        case 'locations':
+          return dataSet.location?.value;
+        case 'indicators':
+          return dataSet.indicator;
+        case 'timePeriod':
+          return dataSet.timePeriod;
+        case 'filters':
+          return dataSet.filters;
+        default:
+          return undefined;
+      }
+    }),
+  );
+
+  const sortedDataSetCategories = sortBy(dataSetCategories, category =>
+    groupOrder.indexOf(category.filter.value),
+  ).slice(
+    axisConfiguration.min ?? 0,
+    (axisConfiguration.max ?? dataSetCategories.length) + 1,
+  );
+
+  return axisConfiguration.sortAsc
+    ? sortedDataSetCategories
+    : sortedDataSetCategories.reverse();
+}
+
+/**
  * Create chart data that has been categorised by
  * filters, locations, time periods or indicators.
  *
@@ -276,30 +313,6 @@ export default function createDataSetCategories(
     })
     .filter(([, value]) => !Number.isNaN(value));
 
-  const groupOrder =
-    axisConfiguration.groupBy === 'filters'
-      ? uniq(
-          axisConfiguration.dataSets
-            .map(dataSet => {
-              return dataSet.filters;
-            })
-            .flat(),
-        )
-      : uniq(
-          axisConfiguration.dataSets.map(dataSet => {
-            switch (axisConfiguration.groupBy) {
-              case 'locations':
-                return dataSet.location?.value;
-              case 'indicators':
-                return dataSet.indicator;
-              case 'timePeriod':
-                return dataSet.timePeriod;
-              default:
-                return undefined;
-            }
-          }),
-        );
-
   const dataSetCategories = categoryFilters
     .map(filter => {
       const matchingDataSets = childDataSetsWithValues.filter(
@@ -333,20 +346,7 @@ export default function createDataSetCategories(
     })
     .filter(category => Object.values(category.dataSets).length > 0);
 
-  // Order the categories by dataSet order
-  const sortedDataSetCategories = dataSetCategories
-    .sort(
-      (a, b) =>
-        groupOrder.indexOf(a.filter.value) - groupOrder.indexOf(b.filter.value),
-    )
-    .slice(
-      axisConfiguration.min ?? 0,
-      (axisConfiguration.max ?? dataSetCategories.length) + 1,
-    );
-
-  return axisConfiguration.sortAsc
-    ? sortedDataSetCategories
-    : sortedDataSetCategories.reverse();
+  return sortDataSetCategories(dataSetCategories, axisConfiguration);
 }
 
 export const toChartData = (chartCategory: DataSetCategory): ChartData => {

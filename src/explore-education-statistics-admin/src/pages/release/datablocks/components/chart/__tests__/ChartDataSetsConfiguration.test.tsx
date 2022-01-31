@@ -163,13 +163,13 @@ describe('ChartDataSetsConfiguration', () => {
     expect(items).toHaveLength(3);
 
     expect(items[0]).toHaveTextContent(
-      'Number of authorised absence sessions (Male, All locations, All time periods)Remove',
+      'Number of authorised absence sessions (Male, All locations, All time periods)',
     );
     expect(items[1]).toHaveTextContent(
-      'Number of authorised absence sessions (Male, Barnet, All time periods)Remove',
+      'Number of authorised absence sessions (Male, Barnet, All time periods)',
     );
     expect(items[2]).toHaveTextContent(
-      'Number of authorised absence sessions (Male, Barnet, 2019/20)Remove',
+      'Number of authorised absence sessions (Male, Barnet, 2019/20)',
     );
   });
 
@@ -879,10 +879,10 @@ describe('ChartDataSetsConfiguration', () => {
       expect(items).toHaveLength(2);
 
       expect(items[0]).toHaveTextContent(
-        'Number of authorised absence sessions (Female, All locations, All time periods)Remove',
+        'Number of authorised absence sessions (Female, All locations, All time periods)',
       );
       expect(items[1]).toHaveTextContent(
-        'Number of unauthorised absence sessions (Male, All locations, All time periods)Remove',
+        'Number of unauthorised absence sessions (Male, All locations, All time periods)',
       );
 
       expect(handleChange).not.toHaveBeenCalled();

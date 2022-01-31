@@ -1341,7 +1341,7 @@ describe('createDataSetCategories', () => {
     expect(dataSetCategories[1].filter.label).toBe('State-funded secondary');
   });
 
-  describe('ordering dataSetCategories', () => {
+  describe('ordering', () => {
     const testAxisConfigurationForOrdering: AxisConfiguration = {
       type: 'major',
       groupBy: 'timePeriod',
@@ -1390,7 +1390,7 @@ describe('createDataSetCategories', () => {
       min: 0,
     };
 
-    test('dataSetCategories should be ordered by the order of the dataSets when grouped by timeperiod', () => {
+    test('orders by order of configuration dataSets when grouped by time period', () => {
       const fullTable = mapFullTable(testTable);
       const dataSetCategories = createDataSetCategories(
         testAxisConfigurationForOrdering,
@@ -1445,7 +1445,7 @@ describe('createDataSetCategories', () => {
       });
     });
 
-    test('dataSetCategories should be ordered by the order of the dataSets when grouped by filter', () => {
+    test('orders by order of configuration dataSets when grouped by filter', () => {
       const axisConfiguration: AxisConfiguration = {
         ...testAxisConfigurationForOrdering,
         groupBy: 'filters',
@@ -1540,7 +1540,7 @@ describe('createDataSetCategories', () => {
       });
     });
 
-    test('dataSetCategories should be ordered by the order of the dataSets when grouped by indicator', () => {
+    test('orders by order of configuration dataSets when grouped by indicator', () => {
       const axisConfiguration: AxisConfiguration = {
         ...testAxisConfigurationForOrdering,
         groupBy: 'indicators',
@@ -1596,7 +1596,7 @@ describe('createDataSetCategories', () => {
       });
     });
 
-    test('dataSetCategories should be ordered by the order of the dataSets when grouped by indicator', () => {
+    test('orders by order of configuration dataSets when grouped by location', () => {
       const axisConfiguration: AxisConfiguration = {
         ...testAxisConfigurationForOrdering,
         groupBy: 'locations',
@@ -1654,7 +1654,7 @@ describe('createDataSetCategories', () => {
       });
     });
 
-    test('setting sortAsc to false should reverse the order of the dataSetCategories', () => {
+    test('order is reversed when sortAsc = true', () => {
       const axisConfiguration: AxisConfiguration = {
         ...testAxisConfigurationForOrdering,
         groupBy: 'filters',
@@ -1672,9 +1672,4 @@ describe('createDataSetCategories', () => {
       expect(dataSetCategories[0].filter.value).toBe('state-funded-primary');
     });
   });
-
-  //reverse sort
-  //diff groupbys
 });
-
-// TO DO add tests for ordering
