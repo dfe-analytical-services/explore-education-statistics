@@ -112,14 +112,6 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
   ) {
     const { subjectMeta, results } = fullTable;
 
-    if (!tableHeadersConfig.rows.length) {
-      return (
-        <WarningMessage>
-          There was a problem rendering the table.
-        </WarningMessage>
-      );
-    }
-
     if (results.length === 0) {
       return (
         <WarningMessage>
@@ -216,6 +208,14 @@ const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
     const filteredCartesian = tableCartesian
       .filter(row => row.some(cell => cell.text !== EMPTY_CELL_TEXT))
       .map(row => row.filter((_, index) => columnsWithText[index]));
+
+    if (!filteredCartesian.length) {
+      return (
+        <WarningMessage>
+          There was a problem rendering the table.
+        </WarningMessage>
+      );
+    }
 
     /**
      * Function to optimize a set of filters for the best viewing experience.
