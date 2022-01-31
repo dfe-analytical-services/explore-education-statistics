@@ -1,6 +1,10 @@
 import { Dictionary } from '@common/types';
 
-const locationLevelsMap: Dictionary<Dictionary<string>> = {
+const locationLevelsMap: Dictionary<{
+  label: string;
+  plural: string;
+  prefix: string;
+}> = {
   country: {
     label: 'Country',
     plural: 'Countries',

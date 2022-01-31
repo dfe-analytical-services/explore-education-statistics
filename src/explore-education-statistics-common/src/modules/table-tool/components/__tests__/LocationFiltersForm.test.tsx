@@ -111,69 +111,6 @@ describe('LocationFiltersForm', () => {
     },
   };
 
-  const testSingleLocation: SubjectMeta['locations'] = {
-    country: {
-      legend: 'Country',
-      options: [
-        {
-          label: 'Country 1',
-          value: 'country-1',
-        },
-      ],
-    },
-  };
-
-  const testSingleLocationNested: SubjectMeta['locations'] = {
-    localAuthority: {
-      legend: 'Local authority',
-      options: [
-        {
-          label: 'Region 1',
-          value: 'region-1',
-          level: 'Region',
-          options: [
-            {
-              label: 'Local authority 1',
-              value: 'local-authority-1',
-            },
-          ],
-        },
-      ],
-    },
-  };
-
-  const testSingleLocationType: SubjectMeta['locations'] = {
-    country: {
-      legend: 'Country',
-      options: [
-        {
-          label: 'Country 1',
-          value: 'country-1',
-        },
-        {
-          label: 'Country 2',
-          value: 'country-2',
-        },
-      ],
-    },
-  };
-
-  const testSingleLocationTypeUnknown: SubjectMeta['locations'] = {
-    unknownType: {
-      legend: 'Unknown',
-      options: [
-        {
-          label: 'Unknown 1',
-          value: 'unknown-1',
-        },
-        {
-          label: 'Unknown 2',
-          value: 'unknown-2',
-        },
-      ],
-    },
-  };
-
   test('renders flat location group options correctly', () => {
     render(
       <LocationFiltersForm
@@ -469,6 +406,18 @@ describe('LocationFiltersForm', () => {
   });
 
   test('automatically selects the option and expands the group if only one location available', () => {
+    const testSingleLocation: SubjectMeta['locations'] = {
+      country: {
+        legend: 'Country',
+        options: [
+          {
+            label: 'Country 1',
+            value: 'country-1',
+          },
+        ],
+      },
+    };
+
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -495,6 +444,25 @@ describe('LocationFiltersForm', () => {
   });
 
   test('automatically selects the option and expands the nested group if only one location available', () => {
+    const testSingleLocationNested: SubjectMeta['locations'] = {
+      localAuthority: {
+        legend: 'Local authority',
+        options: [
+          {
+            label: 'Region 1',
+            value: 'region-1',
+            level: 'Region',
+            options: [
+              {
+                label: 'Local authority 1',
+                value: 'local-authority-1',
+              },
+            ],
+          },
+        ],
+      },
+    };
+
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -678,6 +646,22 @@ describe('LocationFiltersForm', () => {
   });
 
   test('sets the step heading based on location type if only one type', () => {
+    const testSingleLocationType: SubjectMeta['locations'] = {
+      country: {
+        legend: 'Country',
+        options: [
+          {
+            label: 'Country 1',
+            value: 'country-1',
+          },
+          {
+            label: 'Country 2',
+            value: 'country-2',
+          },
+        ],
+      },
+    };
+
     render(
       <LocationFiltersForm
         {...testWizardStepProps}
@@ -694,6 +678,22 @@ describe('LocationFiltersForm', () => {
   });
 
   test('sets the step heading to `Choose locations` if single location type is not in the locationLevelsMap', () => {
+    const testSingleLocationTypeUnknown: SubjectMeta['locations'] = {
+      unknownType: {
+        legend: 'Unknown',
+        options: [
+          {
+            label: 'Unknown 1',
+            value: 'unknown-1',
+          },
+          {
+            label: 'Unknown 2',
+            value: 'unknown-2',
+          },
+        ],
+      },
+    };
+
     render(
       <LocationFiltersForm
         {...testWizardStepProps}

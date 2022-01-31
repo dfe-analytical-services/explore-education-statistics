@@ -45,12 +45,12 @@ const LocationFiltersForm = ({
   ...stepProps
 }: Props) => {
   const { isActive, goToNextStep } = stepProps;
+  const levelKeys = Object.keys(options);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>
-      {Object.keys(options).length === 1 &&
-      locationLevelsMap[Object.keys(options)[0]]
-        ? `Choose ${locationLevelsMap[Object.keys(options)[0]].plural}`
+      {levelKeys.length === 1 && locationLevelsMap[levelKeys[0]]
+        ? `Choose ${locationLevelsMap[levelKeys[0]].plural}`
         : 'Choose locations'}
     </WizardStepHeading>
   );
