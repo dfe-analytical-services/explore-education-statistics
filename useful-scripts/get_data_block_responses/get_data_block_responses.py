@@ -113,11 +113,16 @@ for datablock in datablocks:
     headers = {
         'Content-Type': 'application/json'
     }
+
     block_time_start = time.perf_counter()
-    resp = requests.post(url=url,
-                         headers=headers,
-                         data=query
-                         )
+    try:
+        resp = requests.post(url=url,
+                             headers=headers,
+                             data=query,
+                             timeout=120)
+    except Exception as e:
+        print(f'request exception with block {guid} subject {subjectId}\nException: {e}')
+        jsonResponse = {'error': f'request exception thrown, {e}'}
     block_time_end = time.perf_counter()
 
     file_path = results_dir
@@ -134,7 +139,7 @@ for datablock in datablocks:
     except BaseException:
         print(f'json.loads(resp.text) failed with block {guid} '
               f'subject {subjectId}')
-        jsonResponse = {'error': 'get_data_block_responeses script failed to process response text'}
+        jsonResponse = {'error': 'get_data_block_responses script failed to process response text'}
 
     try:
         with open(f'{file_path}/block_{guid}', 'w') as file:
