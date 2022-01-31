@@ -90,7 +90,7 @@ Validate the query could exceed the maximum allowable table size
 
 Go back to Locations step
     user clicks button    Edit locations
-    user waits until page contains element    xpath://h1[text()="Go back to previous step"]
+    user waits until page contains element    xpath://h2[text()="Go back to previous step"]
     user clicks button    Confirm
 
 Unselect all LA Locations

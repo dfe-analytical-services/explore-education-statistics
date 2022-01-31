@@ -84,7 +84,7 @@ Approve release
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    3002
 
     user clicks button    Update status
-    user waits until h1 is visible    Confirm publish date
+    user waits until h2 is visible    Confirm publish date
     user clicks button    Confirm
 
 Verify release status is Approved

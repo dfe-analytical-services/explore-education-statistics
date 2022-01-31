@@ -187,7 +187,7 @@ Validate ancillary file details were changed
 Delete ancillary file
     ${file_2_section}=    user gets accordion section content element    Test 2 updated    id:file-uploads
     user clicks button    Delete file    ${file_2_section}
-    user waits until h1 is visible    Confirm deletion of file
+    user waits until h2 is visible    Confirm deletion of file
     user clicks button    Confirm
 
     user waits until page does not contain accordion section    Test 2 updated

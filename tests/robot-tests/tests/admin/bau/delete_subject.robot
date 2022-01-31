@@ -156,7 +156,7 @@ Delete UI test subject
     user opens accordion section    UI test subject
     user clicks button    Delete files
 
-    user waits until h1 is visible    Confirm deletion of selected data files    %{WAIT_SMALL}
+    user waits until h2 is visible    Confirm deletion of selected data files    %{WAIT_SMALL}
     user checks page contains    4 footnotes will be removed or updated.
     user checks page contains    The following data blocks will also be deleted:
     user checks page contains    UI test table name

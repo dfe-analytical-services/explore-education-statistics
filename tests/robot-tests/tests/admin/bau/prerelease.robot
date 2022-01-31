@@ -122,7 +122,7 @@ Approve release and wait for it to be Scheduled
     user enters text into element    id:releaseStatusForm-nextReleaseDate-month    1
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    2001
     user clicks button    Update status
-    user waits until h1 is visible    Confirm publish date
+    user waits until h2 is visible    Confirm publish date
     user clicks button    Confirm
 
     user checks summary list contains    Current status    Approved
@@ -253,7 +253,7 @@ Start prerelease
     user enters text into element    id:releaseStatusForm-publishScheduled-month    ${month}
     user enters text into element    id:releaseStatusForm-publishScheduled-year    ${year}
     user clicks button    Update status
-    user waits until h1 is visible    Confirm publish date
+    user waits until h2 is visible    Confirm publish date
     user clicks button    Confirm
 
     user checks summary list contains    Current status    Approved

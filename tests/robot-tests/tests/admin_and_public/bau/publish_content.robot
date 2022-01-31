@@ -47,10 +47,10 @@ Check glossary info icon appears on release preview
 
 Click glossary info icon and validate glossary entry
     user clicks button    Absence
-    user waits until h1 is visible    Absence
+    user waits until h2 is visible    Absence
     user checks page contains    When a pupil misses (or is absent from) at least 1 possible school session.
     user clicks button    Close
-    user waits until page does not contain element    xpath://h1[text()="Absence"]
+    user waits until page does not contain element    xpath://h2[text()="Absence"]
     user checks page does not contain    When a pupil misses (or is absent from) at least 1 possible school session.
 
 Approve release
@@ -83,8 +83,8 @@ Check latest release contains glossary info icon
 
 Click glossary info icon and verify entry is correct
     user clicks button    Absence
-    user waits until h1 is visible    Absence
+    user waits until h2 is visible    Absence
     user checks page contains    When a pupil misses (or is absent from) at least 1 possible school session.
     user clicks button    Close
-    user waits until page does not contain element    xpath://h1[text()="Absence"]
+    user waits until page does not contain element    xpath://h2[text()="Absence"]
     user checks page does not contain    When a pupil misses (or is absent from) at least 1 possible school session.
