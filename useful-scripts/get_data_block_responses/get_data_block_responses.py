@@ -37,6 +37,11 @@ parser.add_argument("-e", "--env",
                     default="dev",
                     choices=["local", "dev", "test", "preprod", "prod"],
                     help="the environment to run again")
+parser.add_argument("--stage",
+                    dest="stage",
+                    default="table",
+                    choices=["table", "filters", "time_periods"],
+                    help="the stage of the table tool to wish to get the response for")
 parser.add_argument("-f", "--file",
                     dest="datablocks_csv",
                     default="datablocks.csv",
@@ -57,7 +62,7 @@ data_api_urls = {
 }
 
 data_api_url = data_api_urls[args.env]
-results_dir = f'results_{args.env}'
+results_dir = f'results_{args.env}_{args.stage}'
 
 datablocks = []
 
@@ -77,12 +82,34 @@ for datablock in datablocks:
     guid = datablock[0]
     releaseId = datablock[1]
     subjectId = datablock[2]
-    query = datablock[3]
+
+    global query
+    global url
+    if args.stage == "table":
+        query = datablock[3]
+        url = f'{data_api_url}/tablebuilder/release/{releaseId}'
+
+    if args.stage == "filters":
+        queryDict = json.loads(datablock[3])
+        queryDict.pop("Filters")
+        queryDict.pop("Indicators")
+        query = json.dumps(queryDict)
+        url = f'{data_api_url}/meta/subject'
+
+    if args.stage == "time_periods":
+        queryDict = json.loads(datablock[3])
+        queryDict.pop("Filters")
+        queryDict.pop("Indicators")
+        queryDict.pop("TimePeriod")
+        query = json.dumps(queryDict)
+        url = f'{data_api_url}/meta/subject'
+
+    assert url is not None
+    assert query is not None
 
     if os.path.exists(f'{results_dir}/block_{guid}') or os.path.exists(f'{results_dir}/fails/block_{guid}'):
         continue
 
-    url = f'{data_api_url}/tablebuilder/release/{releaseId}'
     headers = {
         'Content-Type': 'application/json'
     }
