@@ -167,5 +167,5 @@ for datablock in datablocks:
 
 end_time = time.perf_counter()
 with open(f'{file_path}/time_elapsed', 'w') as file:
-    file.write('Elapsed time: ', end_time - start_time)
-print('Elapsed time: ', end_time - start_time)
+    file.write(f'Elapsed time: {end_time - start_time}')
+print(f'Elapsed time: {end_time - start_time}')
