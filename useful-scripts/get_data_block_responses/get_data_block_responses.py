@@ -3,6 +3,7 @@ import json
 import csv
 import time
 import os
+import datetime
 import argparse
 
 """
@@ -62,7 +63,9 @@ data_api_urls = {
 }
 
 data_api_url = data_api_urls[args.env]
-results_dir = f'results_{args.env}_{args.stage}'
+
+date = datetime.datetime.now().strftime("%Y%m%d")
+results_dir = f'results_{args.env}_{args.stage}_{date}'
 
 datablocks = []
 
@@ -114,6 +117,8 @@ for datablock in datablocks:
         'Content-Type': 'application/json'
     }
 
+    file_path = results_dir
+
     block_time_start = time.perf_counter()
     try:
         resp = requests.post(url=url,
@@ -123,9 +128,9 @@ for datablock in datablocks:
     except Exception as e:
         print(f'request exception with block {guid} subject {subjectId}\nException: {e}')
         jsonResponse = {'error': f'request exception thrown, {e}'}
+        file_path = f'{results_dir}/fails'
     block_time_end = time.perf_counter()
 
-    file_path = results_dir
     if resp.status_code != 200:
         print(
             f'Response status wasn\'t 200 for block {guid} '
@@ -161,4 +166,6 @@ for datablock in datablocks:
     time.sleep(args.sleep_duration)
 
 end_time = time.perf_counter()
+with open(f'{file_path}/time_elapsed', 'w') as file:
+    file.write('Elapsed time: ', end_time - start_time)
 print('Elapsed time: ', end_time - start_time)
