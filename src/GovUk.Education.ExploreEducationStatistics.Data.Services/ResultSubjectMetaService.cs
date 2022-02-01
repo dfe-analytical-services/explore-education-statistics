@@ -32,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IGeoJsonRepository _geoJsonRepository;
         private readonly IIndicatorRepository _indicatorRepository;
-        private readonly ILocationRepository _locationRepository;
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
@@ -48,7 +47,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IFootnoteRepository footnoteRepository,
             IGeoJsonRepository geoJsonRepository,
             IIndicatorRepository indicatorRepository,
-            ILocationRepository locationRepository,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
@@ -62,7 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _footnoteRepository = footnoteRepository;
             _geoJsonRepository = geoJsonRepository;
             _indicatorRepository = indicatorRepository;
-            _locationRepository = locationRepository;
             _persistenceHelper = persistenceHelper;
             _timePeriodService = timePeriodService;
             _userService = userService;
@@ -90,14 +87,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .ToList();
                     
                     var locationAttributes =
-                        _locationRepository.GetLocationAttributesHierarchical(
-                            locations,
-                            hierarchies: _locationOptions.Hierarchies);
+                        locations.GetLocationAttributesHierarchical(_locationOptions.Hierarchies);
                     _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
                     var filterItems =
-                        FilterItemRepository.GetFilterItemsFromObservationList(observations);
+                        _filterItemRepository.GetFilterItemsFromObservationList(observations);
                     var filterViewModels = BuildFilterHierarchy(filterItems);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();

@@ -11,12 +11,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public abstract class AbstractSubjectMetaService
     {
-        protected readonly IFilterItemRepository FilterItemRepository;
+        protected readonly IFilterItemRepository _filterItemRepository;
         protected static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
         protected AbstractSubjectMetaService(IFilterItemRepository filterItemRepository)
         {
-            FilterItemRepository = filterItemRepository;
+            _filterItemRepository = filterItemRepository;
         }
 
         protected Dictionary<string, FilterMetaViewModel> BuildFilterHierarchy(IEnumerable<FilterItem> filterItems)
@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private string GetTotalValue(IEnumerable<FilterItem> filterItems)
         {
-            return FilterItemRepository.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
+            return _filterItemRepository.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
         }
     }
 }

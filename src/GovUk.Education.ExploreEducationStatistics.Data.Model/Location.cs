@@ -1,7 +1,10 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
@@ -336,6 +339,107 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             hashCode.Add(PlanningArea_Code);
             hashCode.Add(PlanningArea_Name);
             return hashCode.ToHashCode();
+        }
+        
+        public ILocationAttribute ToLocationAttribute()
+        {
+            return GeographicLevel switch
+            {
+                GeographicLevel.Country => Country,
+                GeographicLevel.EnglishDevolvedArea => EnglishDevolvedArea,
+                GeographicLevel.LocalAuthority => LocalAuthority,
+                GeographicLevel.LocalAuthorityDistrict => LocalAuthorityDistrict,
+                GeographicLevel.LocalEnterprisePartnership => LocalEnterprisePartnership,
+                GeographicLevel.Institution => Institution,
+                GeographicLevel.MayoralCombinedAuthority => MayoralCombinedAuthority,
+                GeographicLevel.MultiAcademyTrust => MultiAcademyTrust,
+                GeographicLevel.OpportunityArea => OpportunityArea,
+                GeographicLevel.ParliamentaryConstituency => ParliamentaryConstituency,
+                GeographicLevel.PlanningArea => PlanningArea,
+                GeographicLevel.Provider => Provider,
+                GeographicLevel.Region => Region,
+                GeographicLevel.RscRegion => RscRegion,
+                GeographicLevel.School => School,
+                GeographicLevel.Sponsor => Sponsor,
+                GeographicLevel.Ward => Ward,
+                _ => throw new ArgumentOutOfRangeException()
+            };
+        }
+    }
+    
+    public static class LocationListExtensions {
+        
+        public static Dictionary<GeographicLevel, List<LocationAttributeNode>> GetLocationAttributesHierarchical(
+            this IList<Location> distinctLocations,
+            Dictionary<GeographicLevel, List<string>>? hierarchies = null)
+        {
+            var hierarchyWithLocationSelectors = hierarchies == null
+                ? new Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute>>>()
+                : MapLocationAttributeSelectors(hierarchies);
+
+            return distinctLocations
+                .Distinct()
+                .GroupBy(location => location.GeographicLevel)
+                .ToDictionary(
+                    grouping => grouping.Key,
+                    grouping =>
+                    {
+                        var geographicLevel = grouping.Key;
+                        var locationsForLevel = grouping.ToList();
+
+                        if (hierarchyWithLocationSelectors.ContainsKey(geographicLevel))
+                        {
+                            return GroupLocationAttributes(locationsForLevel,
+                                hierarchyWithLocationSelectors[geographicLevel]);
+                        }
+
+                        return locationsForLevel
+                            .Select(location => new LocationAttributeNode(location.ToLocationAttribute()))
+                            .ToList();
+                    });
+        }
+        
+        private static Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute>>>
+            MapLocationAttributeSelectors(Dictionary<GeographicLevel, List<string>> hierarchies)
+        {
+            return hierarchies.ToDictionary(
+                pair => pair.Key,
+                pair => pair.Value.Select(propertyName =>
+                {
+                    return (Func<Location, ILocationAttribute>) (location =>
+                    {
+                        var propertyInfo = typeof(Location).GetProperty(propertyName);
+                        if (propertyInfo == null)
+                        {
+                            throw new ArgumentException($"{nameof(Location)} does not have a property {propertyName}");
+                        }
+
+                        var value = propertyInfo.GetValue(location);
+                        return (value as ILocationAttribute)!;
+                    });
+                }).ToList()
+            );
+        }
+        
+        private static List<LocationAttributeNode> GroupLocationAttributes(
+            IEnumerable<Location> locations,
+            IReadOnlyList<Func<Location, ILocationAttribute>> attributeSelectors)
+        {
+            if (attributeSelectors.IsNullOrEmpty())
+            {
+                return new List<LocationAttributeNode>();
+            }
+
+            // Recursively GroupBy the Location attributes
+            return locations
+                .GroupBy(attributeSelectors[0])
+                .Select(
+                    grouping => new LocationAttributeNode(grouping.Key)
+                    {
+                        Attribute = grouping.Key,
+                        Children = GroupLocationAttributes(grouping, attributeSelectors.Skip(1).ToList())
+                    })
+                .ToList();
         }
     }
 }

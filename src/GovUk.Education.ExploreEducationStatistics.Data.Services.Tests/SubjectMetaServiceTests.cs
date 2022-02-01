@@ -19,6 +19,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
@@ -79,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectMetaService(
-                    statisticsDbContext: statisticsDbContext,
+                    statisticsDbContext,
                     userService: userService.Object);
 
                 var result = await service.GetSubjectMetaRestricted(subject.Id);
@@ -122,19 +123,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(Enumerable.Empty<IndicatorGroup>());
 
-            locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchical(
-                    subject.Id,
-                    new Dictionary<GeographicLevel, List<string>>()))
-                .ReturnsAsync(new Dictionary<GeographicLevel, List<LocationAttributeNode>>());
-
-            timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
+            timePeriodService
+                .Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            locationRepository
+                .Setup(s => s.GetDistinctForSubject(subject.Id))
+                .ReturnsAsync(new List<Location>());
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectMetaService(
-                    statisticsDbContext: statisticsDbContext,
+                    statisticsDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
@@ -171,48 +171,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            var locations = ListOf(
+                new Location
                 {
-                    GeographicLevel.Country,
-                    // No hierarchy in Country level data
-                    new List<LocationAttributeNode>
-                    {
-                        new(_england)
-                    }
+                    GeographicLevel = GeographicLevel.Country,
+                    Country = _england,
                 },
+                new Location
                 {
-                    GeographicLevel.Region,
-                    // No hierarchy in Regional level data
-                    new List<LocationAttributeNode>
-                    {
-                        new(_northEast),
-                        new(_northWest),
-                        new(_eastMidlands)
-                    }
+                    GeographicLevel = GeographicLevel.Region,
+                    Country = _england,
+                    Region = _northEast,
                 },
+                new Location
                 {
-                    GeographicLevel.LocalAuthority,
-                    // Country-Region-LA hierarchy in the LA level data
-                    new List<LocationAttributeNode>
-                    {
-                        new(_england)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_eastMidlands)
-                                {
-                                    Children = new List<LocationAttributeNode>
-                                    {
-                                        new(_derby),
-                                        new(_nottingham)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
+                    GeographicLevel = GeographicLevel.Region,
+                    Country = _england,
+                    Region = _northWest,
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.Region,
+                    Country = _england,
+                    Region = _eastMidlands,
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.Region,
+                    Country = _england,
+                    Region = _eastMidlands,
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Country = _england,
+                    Region = _eastMidlands,
+                    LocalAuthority = _derby
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Country = _england,
+                    Region = _eastMidlands,
+                    LocalAuthority = _nottingham
+                });
 
             var options = Options.Create(new LocationsOptions
             {
@@ -251,17 +253,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(Enumerable.Empty<IndicatorGroup>());
 
-            locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchical(subject.Id, options.Value.Hierarchies))
-                .ReturnsAsync(locations);
-
-            timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
+            timePeriodService
+                .Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
+            locationRepository
+                .Setup(s => s.GetDistinctForSubject(subject.Id))
+                .ReturnsAsync(locations);
+            
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectMetaService(
-                    statisticsDbContext: statisticsDbContext,
+                    statisticsDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
@@ -369,31 +372,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             // Setup a hierarchy of Country-Region-LA data within the Local Authority level where one of the attributes
             // of the hierarchy is not present (possible if the data was not provided, e.g. LA data supplied without Regions).
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            var locations = ListOf(
+                new Location
                 {
-                    GeographicLevel.LocalAuthority,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_england)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                // Omit the Region to simulate the Region data not being provided
-                                new(Region.Empty())
-                                {
-                                    Attribute = Region.Empty(),
-                                    Children = new List<LocationAttributeNode>
-                                    {
-                                        new(_derby),
-                                        new(_nottingham)
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            };
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Country = _england,
+                    LocalAuthority = _derby
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Country = _england,
+                    LocalAuthority = _nottingham
+                });
 
             var options = Options.Create(new LocationsOptions
             {
@@ -432,17 +423,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(Enumerable.Empty<IndicatorGroup>());
 
-            locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchical(subject.Id, options.Value.Hierarchies))
-                .ReturnsAsync(locations);
-
-            timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
+            timePeriodService
+                .Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            locationRepository
+                .Setup(s => s.GetDistinctForSubject(subject.Id))
+                .ReturnsAsync(locations);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectMetaService(
-                    statisticsDbContext: statisticsDbContext,
+                    statisticsDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
@@ -513,16 +505,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            var locations = ListOf(
+                new Location
                 {
-                    GeographicLevel.LocalAuthority,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_cheshireOldCode)
-                    }
-                }
-            };
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    LocalAuthority = _cheshireOldCode
+                });
 
             var options = Options.Create(new LocationsOptions
             {
@@ -550,17 +538,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(Enumerable.Empty<IndicatorGroup>());
 
-            locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchical(subject.Id, options.Value.Hierarchies))
-                .ReturnsAsync(locations);
-
-            timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
+            timePeriodService
+                .Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+            
+            locationRepository
+                .Setup(s => s.GetDistinctForSubject(subject.Id))
+                .ReturnsAsync(locations);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectMetaService(
-                    statisticsDbContext: statisticsDbContext,
+                    statisticsDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
@@ -606,19 +595,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Subject = subject
             };
 
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            var locations = ListOf(
+                new Location
                 {
-                    GeographicLevel.LocalAuthority,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_derby),
-                        // Include a duplicate Derby that has a different code
-                        new(_derbyDupe),
-                        new(_nottingham)
-                    }
-                }
-            };
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    LocalAuthority = _derby
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    LocalAuthority = _derbyDupe
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    LocalAuthority = _nottingham
+                });
 
             var options = Options.Create(new LocationsOptions());
 
@@ -643,18 +635,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(Enumerable.Empty<IndicatorGroup>());
 
-            locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchical(subject.Id, options.Value.Hierarchies))
-                .ReturnsAsync(locations);
-
             timePeriodService
                 .Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
+            locationRepository
+                .Setup(s => s.GetDistinctForSubject(subject.Id))
+                .ReturnsAsync(locations);
+
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectMetaService(
-                    statisticsDbContext: statisticsDbContext,
+                    statisticsDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
@@ -716,26 +708,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Subject = subject
             };
 
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            var locations = ListOf(
+                new Location
                 {
-                    GeographicLevel.LocalAuthority,
-                    // Region-LA hierarchy in the LA level data
-                    new List<LocationAttributeNode>
-                    {
-                        new(_eastMidlands)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_derby),
-                                // Include a duplicate Derby that has a different code
-                                new(_derbyDupe),
-                                new(_nottingham)
-                            }
-                        }
-                    }
-                }
-            };
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Region = _eastMidlands,
+                    LocalAuthority = _derby
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Region = _eastMidlands,
+                    LocalAuthority = _derbyDupe
+                },
+                new Location
+                {
+                    GeographicLevel = GeographicLevel.LocalAuthority,
+                    Region = _eastMidlands,
+                    LocalAuthority = _nottingham
+                });
 
             var options = Options.Create(
                 new LocationsOptions
@@ -775,18 +766,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(Enumerable.Empty<IndicatorGroup>());
 
-            locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchical(subject.Id, options.Value.Hierarchies))
-                .ReturnsAsync(locations);
-
             timePeriodService
                 .Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
+            locationRepository
+                .Setup(s => s.GetDistinctForSubject(subject.Id))
+                .ReturnsAsync(locations);
+
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectMetaService(
-                    statisticsDbContext: statisticsDbContext,
+                    statisticsDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
@@ -856,47 +847,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             // Regions have been ordered randomly, but we expect the returned
             // view models to be ordered by the region's location code.
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            var locations = ListOf(
+
                 // Flat Regions
+                new Location
                 {
-                    GeographicLevel.Region,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_northWest),
-                        new(_eastMidlands),
-                        new(_northEast),
-                    }
+                    GeographicLevel    = GeographicLevel.Region,
+                    Region = _northWest
+                },
+                new Location
+                {
+                    GeographicLevel    = GeographicLevel.Region,
+                    Region = _eastMidlands
+                },
+                new Location
+                {
+                    GeographicLevel    = GeographicLevel.Region,
+                    Region = _northEast
                 },
                 // Hierarchical Regions - LA
+                new Location
                 {
-                    GeographicLevel.LocalAuthority,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_northWest)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_blackpool),
-                            }
-                        },
-                        new(_eastMidlands)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_derby),
-                            }
-                        },
-                        new(_northEast)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_sunderland),
-                            }
-                        }
-                    }
-                }
-            };
+                    GeographicLevel    = GeographicLevel.LocalAuthority,
+                    Region = _northWest,
+                    LocalAuthority = _blackpool
+                },
+                new Location
+                {
+                    GeographicLevel    = GeographicLevel.LocalAuthority,
+                    Region = _eastMidlands,
+                    LocalAuthority = _derby
+                },
+                new Location
+                {
+                    GeographicLevel    = GeographicLevel.LocalAuthority,
+                    Region = _northEast,
+                    LocalAuthority = _sunderland
+                });
 
             var options = Options.Create(new LocationsOptions
             {
@@ -934,17 +921,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(Enumerable.Empty<IndicatorGroup>());
 
-            locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchical(subject.Id, options.Value.Hierarchies))
-                .ReturnsAsync(locations);
-
-            timePeriodService.Setup(s => s.GetTimePeriods(subject.Id))
+            timePeriodService
+                .Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            locationRepository
+                .Setup(s => s.GetDistinctForSubject(subject.Id))
+                .ReturnsAsync(locations);
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectMetaService(
-                    statisticsDbContext: statisticsDbContext,
+                    statisticsDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,

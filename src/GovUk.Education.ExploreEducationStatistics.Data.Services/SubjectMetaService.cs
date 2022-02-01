@@ -130,6 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     
                     var locationIds = _context
                         .Location
+                        .AsNoTracking()
                         .Where(locationQuery)
                         .Select(l => l.Id);
                     
@@ -157,7 +158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     stopwatch.Restart();
                     
                     var filterItems = await 
-                        FilterItemRepository.GetFilterItemsFromMatchedObservationIds(query.SubjectId, observations);
+                        _filterItemRepository.GetFilterItemsFromMatchedObservationIds(query.SubjectId, observations);
                     var filters = BuildFilterHierarchy(filterItems);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
@@ -209,9 +210,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Dictionary<string, LocationsMetaViewModel>> GetLocations(Guid subjectId)
         {
-            var locations =
-                await _locationRepository.GetLocationAttributesHierarchical(subjectId, _locationOptions.Hierarchies);
-            return BuildLocationAttributeViewModels(locations);
+            var locations = await _locationRepository.GetDistinctForSubject(subjectId);
+            var locationsHierarchical = 
+                locations.GetLocationAttributesHierarchical(_locationOptions.Hierarchies);
+            return BuildLocationAttributeViewModels(locationsHierarchical);
         }
 
         private Dictionary<string, IndicatorsMetaViewModel> GetIndicators(Guid subjectId)
@@ -295,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private string GetTotalValue(Filter filter)
         {
-            return FilterItemRepository.GetTotal(filter)?.Id.ToString() ?? string.Empty;
+            return _filterItemRepository.GetTotal(filter)?.Id.ToString() ?? string.Empty;
         }
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
