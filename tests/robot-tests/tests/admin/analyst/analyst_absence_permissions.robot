@@ -41,7 +41,7 @@ Navigate to Absence release
 
 Validate Analyst1 can see Absence release summary
     user verifies release summary    Pupil absence in schools in England    Academic Year    2016/17    Data Analyst
-    ...    Official Statistics
+    ...    Official statistics
 
 Validate Analyst1 can see 'Content' page
     user clicks link    Content

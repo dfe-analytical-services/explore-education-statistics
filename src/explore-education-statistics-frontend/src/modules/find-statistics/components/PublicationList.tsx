@@ -4,19 +4,20 @@ import React from 'react';
 
 interface Props {
   publications: PublicationSummary[];
+  testId?: string;
 }
 
-function PublicationList({ publications }: Props) {
+function PublicationList({ publications, testId }: Props) {
   return publications.length > 0 ? (
-    <ul className="govuk-!-margin-top-0">
+    <ul className="govuk-!-margin-top-0" data-testid={testId}>
       {publications.map(({ id, legacyPublicationUrl, slug, title }) => (
         <li key={id} className="govuk-!-margin-bottom-0">
-          <h3
-            id={`publication-heading-${id}}`}
-            className="govuk-heading-s govuk-!-margin-bottom-0"
+          <h4
+            id={`publication-heading-${id}`}
+            className="govuk-heading-s govuk-!-font-weight-regular govuk-!-margin-bottom-0"
           >
             {title}
-          </h3>
+          </h4>
           {legacyPublicationUrl ? (
             <div className="govuk-!-margin-bottom-3">
               {' '}

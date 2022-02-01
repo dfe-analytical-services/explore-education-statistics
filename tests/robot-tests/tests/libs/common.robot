@@ -691,6 +691,10 @@ user checks key stat definition
     user checks element should contain
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-definition"]    ${definition}
 
+user checks page contains radio
+    [Arguments]    ${label}
+    page should contain radio button    xpath://label[text()="${label}"]/../input[@type="radio"]
+
 user clicks radio
     [Arguments]    ${label}
     user clicks element    xpath://label[text()="${label}"]/../input[@type="radio"]
