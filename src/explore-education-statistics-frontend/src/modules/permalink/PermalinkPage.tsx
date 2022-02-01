@@ -10,10 +10,13 @@ import permalinkService, { Permalink } from '@common/services/permalinkService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
+import styles from '@frontend/modules/permalink/PermalinkPage.module.scss';
+import {
+  logEvent,
+  logException,
+} from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { useRef } from 'react';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
-import styles from './PermalinkPage.module.scss';
 
 interface Props {
   data: Permalink;
@@ -70,6 +73,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
       <div ref={tableRef}>
         <TimePeriodDataTable
           fullTable={fullTable}
+          onError={logException}
           source={`${publicationName}, ${subjectName}`}
           tableHeadersConfig={tableHeadersConfig}
         />
