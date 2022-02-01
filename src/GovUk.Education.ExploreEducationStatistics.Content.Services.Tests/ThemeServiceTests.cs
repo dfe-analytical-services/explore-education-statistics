@@ -377,7 +377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         new()
                         {
                             Title = "Topic A",
-                            Publications =  ListOf(publicationA)
+                            Publications = ListOf(publicationA)
                         },
                     }
                 },
@@ -771,6 +771,178 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
+        public async Task GetPublicationTree_PublicationWithMultipleReleasesHasCorrectLatestReleaseType()
+        {
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Summary = "Theme A summary",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        Publications = new List<Publication>
+                        {
+                            new()
+                            {
+                                Title = "Publication A",
+                                Slug = "publication-a",
+                                Releases = new List<Release>
+                                {
+                                    // Previous release
+                                    new()
+                                    {
+                                        ReleaseName = "2020",
+                                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                                        Type = ReleaseType.OfficialStatistics,
+                                        Published = new DateTime(2020, 1, 1),
+                                    },
+                                    // Latest release
+                                    new()
+                                    {
+                                        ReleaseName = "2021",
+                                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                                        Type = ReleaseType.NationalStatistics,
+                                        Published = new DateTime(2021, 1, 1),
+                                    },
+                                    // Not published
+                                    new()
+                                    {
+                                        ReleaseName = "2022",
+                                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                                        Type = ReleaseType.AdHocStatistics,
+                                    }
+                                }
+                            }
+                        }
+                    },
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(theme);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree();
+
+                Assert.Single(result);
+                Assert.Equal("Theme A", result[0].Title);
+                Assert.Equal("Theme A summary", result[0].Summary);
+
+                Assert.Single(result[0].Topics);
+                Assert.Equal("Topic A", result[0].Topics[0].Title);
+
+                var publications = result[0].Topics[0].Publications;
+
+                Assert.Single(publications);
+                Assert.Equal("publication-a", publications[0].Slug);
+                Assert.Equal("Publication A", publications[0].Title);
+                Assert.Equal(ReleaseType.NationalStatistics, publications[0].LatestReleaseType);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_PublicationWithAmendedReleaseHasCorrectLatestReleaseType()
+        {
+            var previousRelease = new Release
+            {
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = new DateTime(2020, 1, 1),
+            };
+
+            var latestReleaseOriginalVersion = new Release
+            {
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.ExperimentalStatistics,
+                Published = new DateTime(2021, 1, 1),
+            };
+
+            var latestReleaseAmendedVersion = new Release
+            {
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.NationalStatistics,
+                Published = new DateTime(2021, 2, 1),
+                PreviousVersion = latestReleaseOriginalVersion
+            };
+
+            var unpublishedRelease = new Release
+            {
+                ReleaseName = "2022",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.AdHocStatistics,
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Summary = "Theme A summary",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        Publications = new List<Publication>
+                        {
+                            new()
+                            {
+                                Title = "Publication A",
+                                Slug = "publication-a",
+                                Releases = ListOf(
+                                    previousRelease,
+                                    latestReleaseOriginalVersion,
+                                    latestReleaseAmendedVersion,
+                                    unpublishedRelease
+                                )
+                            }
+                        }
+                    },
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(theme);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree();
+
+                Assert.Single(result);
+                Assert.Equal("Theme A", result[0].Title);
+                Assert.Equal("Theme A summary", result[0].Summary);
+
+                Assert.Single(result[0].Topics);
+                Assert.Equal("Topic A", result[0].Topics[0].Title);
+
+                var publications = result[0].Topics[0].Publications;
+
+                Assert.Single(publications);
+                Assert.Equal("publication-a", publications[0].Slug);
+                Assert.Equal("Publication A", publications[0].Title);
+                Assert.Equal(ReleaseType.NationalStatistics, publications[0].LatestReleaseType);
+            }
+        }
+
+        [Fact]
         public async Task GetPublicationTree_AnyData_SingleThemeTopic()
         {
             var publicationA = new Publication
@@ -926,7 +1098,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Publication = publicationA,
                         ReleaseName = "2020",
                         TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = ReleaseType.OfficialStatistics,                        
+                        Type = ReleaseType.OfficialStatistics,
                         Published = new DateTime(2020, 1, 1),
                     },
                     File = new File
@@ -1104,7 +1276,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         new()
                         {
                             Title = "Topic A",
-                            Publications =  ListOf(publicationA)
+                            Publications = ListOf(publicationA)
                         },
                     }
                 },
@@ -1597,7 +1769,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFiles = new List<ReleaseFile>
             {
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationA,
@@ -1611,7 +1784,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Type = FileType.Data
                     }
                 },
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationB,
@@ -1722,7 +1896,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFiles = new List<ReleaseFile>
             {
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationA,
@@ -1736,7 +1911,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Type = FileType.Data
                     }
                 },
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationB,
@@ -1750,7 +1926,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Type = FileType.Data
                     }
                 },
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationC,
@@ -1863,7 +2040,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var releaseFiles = new List<ReleaseFile>
             {
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationA,
@@ -1930,7 +2108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         new()
                         {
                             Title = "Topic A",
-                            Publications =  ListOf(publicationA)
+                            Publications = ListOf(publicationA)
                         },
                     }
                 },
@@ -1951,7 +2129,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var releaseFiles = new List<ReleaseFile>
             {
                 // Published with latest data
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationA,
@@ -1966,7 +2145,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     }
                 },
                 // Not published
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationB,
@@ -2046,7 +2226,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var releaseFiles = new List<ReleaseFile>
             {
                 // Published with latest data
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationA,
@@ -2061,7 +2242,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     }
                 },
                 // Not published
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationB,
@@ -2144,7 +2326,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var releaseFiles = new List<ReleaseFile>
             {
                 // Published with latest data
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationA,
@@ -2159,7 +2342,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     }
                 },
                 // Published without latest data
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationB,
@@ -2174,7 +2358,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     }
                 },
                 // Not published
-                new() {
+                new()
+                {
                     Release = new Release
                     {
                         Publication = publicationC,
