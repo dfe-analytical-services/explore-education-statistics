@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -82,18 +83,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         }
 
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(
-            ObservationQueryContext query)
+            ObservationQueryContext query, CancellationToken cancellationToken)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
-                .OnSuccess(_ => GetSubjectMetaViewModelFromQuery(query));
+                .OnSuccess(_ => GetSubjectMetaViewModelFromQuery(query, cancellationToken));
         }
 
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(
-            ObservationQueryContext query)
+            ObservationQueryContext query, CancellationToken cancellationToken)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
-                .OnSuccess(_ => GetSubjectMetaViewModelFromQuery(query));
+                .OnSuccess(_ => GetSubjectMetaViewModelFromQuery(query, cancellationToken));
         }
 
         private async Task<SubjectMetaViewModel> GetSubjectMetaViewModel(Subject subject)
@@ -107,7 +108,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             };
         }
 
-        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromQuery(ObservationQueryContext query)
+        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromQuery(
+            ObservationQueryContext query,
+            CancellationToken cancellationToken)
         {
             SubjectMetaQueryStep? subjectMetaStep = null;
             if (query.Locations != null && query.TimePeriod == null)
@@ -153,7 +156,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     var stopwatch = Stopwatch.StartNew();
                     
-                    var observations = await _observationService.GetMatchedObservations(query);
+                    var observations = 
+                        await _observationService.GetMatchedObservations(query, cancellationToken);
                     _logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
                     

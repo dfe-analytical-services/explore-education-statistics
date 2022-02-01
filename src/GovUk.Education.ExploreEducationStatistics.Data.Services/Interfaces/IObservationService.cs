@@ -24,6 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
         /// <returns>A query for selecting the matched Observation Ids from the temporary table.</returns>
         Task<IQueryable<MatchedObservation>> GetMatchedObservations(
             ObservationQueryContext query,
-            CancellationToken cancellationToken = default);
+            CancellationToken cancellationToken);
     }
 }

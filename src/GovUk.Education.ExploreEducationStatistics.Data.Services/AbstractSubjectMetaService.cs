@@ -36,8 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             .ThenBy(items => items.Key.Label, LabelComparer)
                             .ToDictionary(
                                 itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
-                                itemsGroupedByFilterGroup => BuildFilterItemsViewModel(itemsGroupedByFilterGroup.Key,
-                                    itemsGroupedByFilterGroup)
+                                itemsGroupedByFilterGroup => 
+                                    BuildFilterItemsViewModel(itemsGroupedByFilterGroup.Key, itemsGroupedByFilterGroup)
                             ),
                         TotalValue = GetTotalValue(itemsGroupedByFilter)
                     });
@@ -68,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .OrderBy(item => item.Label.ToLower() != "total")
                     .ThenBy(item => item.Label, LabelComparer)
                     .Select(item => new LabelValue(item.Label, item.Id.ToString()))
+                    .ToList()
             };
         }
 

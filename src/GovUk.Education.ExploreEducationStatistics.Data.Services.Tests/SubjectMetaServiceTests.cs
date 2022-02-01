@@ -2,12 +2,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -20,7 +22,9 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -84,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     userService: userService.Object);
 
                 var result = await service.GetSubjectMetaRestricted(subject.Id);
-                MockUtils.VerifyAllMocks(userService);
+                VerifyAllMocks(userService);
 
                 result.AssertForbidden();
             }
@@ -143,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
@@ -274,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
@@ -444,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
@@ -559,7 +563,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
@@ -656,7 +660,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
@@ -787,7 +791,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
@@ -942,7 +946,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
@@ -1001,9 +1005,418 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             }
         }
 
+        [Fact]
+        public async Task GetSubjectMetaForQuery_TimePeriods()
+        {
+            var contextId = Guid.NewGuid().ToString();
+            
+            var subject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var query = new ObservationQueryContext
+            {
+                SubjectId = subject.Id,
+                Locations = new LocationQuery
+                {
+                    Country = ListOf(_england.Code)!,
+                    LocalAuthority = ListOf(_blackpool.Code, _derby.Code)!
+                }
+            };
+            
+            var observations = ListOf(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subject.Id,
+                    Location = new Location
+                    {
+                        LocalAuthority = _blackpool
+                    }
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subject.Id,
+                    Location = new Location
+                    {
+                        LocalAuthority = _derby
+                    }
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subject.Id,
+                    Location = new Location
+                    {
+                        Country = _england
+                    }
+                });
+            
+            var observationsWithDifferentLocations = ListOf(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subject.Id,
+                    Location = new Location
+                    {
+                        LocalAuthority = _nottingham
+                    }
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subject.Id,
+                    Location = new Location
+                    {
+                        LocalAuthority = _sunderland
+                    }
+                });
+
+            var observationsFromAnotherSubject = ListOf(
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subject.Id,
+                    Location = new Location
+                    {
+                        LocalAuthority = _derby
+                    }
+                },
+                new Observation
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subject.Id,
+                    Location = new Location
+                    {
+                        Country = _england
+                    }
+                });
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.Subject.AddRangeAsync(subject);
+                await statisticsDbContext.Observation.AddRangeAsync(observations);
+                await statisticsDbContext.Observation.AddRangeAsync(observationsWithDifferentLocations);
+                await statisticsDbContext.Observation.AddRangeAsync(observationsFromAnotherSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var cancellationToken = new CancellationTokenSource().Token;
+
+                var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
+
+                timePeriodService
+                    .Setup(s => s.GetTimePeriods(It.Is<IQueryable<Observation>>(
+                        observationsWihMatchingLocations => observationsWihMatchingLocations
+                            .ToList()
+                            .Select(o => o.Id)
+                            .SequenceEqual(observationsWihMatchingLocations.Select(m => m.Id)))))
+                    .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                    {
+                        (2012, TimeIdentifier.April),
+                        (2012, TimeIdentifier.May),
+                        (2012, TimeIdentifier.June)
+                    });
+                
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    timePeriodService: timePeriodService.Object);
+
+                var result = await service.GetSubjectMeta(query, cancellationToken);
+
+                VerifyAllMocks(timePeriodService);
+                
+                var meta = result.AssertRight();
+                Assert.Empty(meta.Locations);
+                Assert.Empty(meta.Filters);
+                Assert.Empty(meta.Indicators);
+                
+                var periods = meta.TimePeriod.Options.ToList();
+                Assert.Equal(3, periods.Count());
+                Assert.Equal(2012, periods[0].Year);
+                Assert.Equal(TimeIdentifier.April, periods[0].Code);
+                Assert.Equal(2012, periods[1].Year);
+                Assert.Equal(TimeIdentifier.May, periods[1].Code);
+                Assert.Equal(2012, periods[2].Year);
+                Assert.Equal(TimeIdentifier.June, periods[2].Code);
+            }
+        }
+
+        [Fact]
+        public async Task GetSubjectMetaForQuery_FilterItems()
+        {
+            var contextId = Guid.NewGuid().ToString();
+            
+            var subject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var query = new ObservationQueryContext
+            {
+                SubjectId = subject.Id,
+                Locations = new LocationQuery
+                {
+                    Country = ListOf(_england.Code)!
+                },
+                TimePeriod = new TimePeriodQuery
+                {
+                    StartYear = 2012,
+                    StartCode = TimeIdentifier.AcademicYear,
+                    EndYear = 2012,
+                    EndCode = TimeIdentifier.AcademicYear
+                }
+            };
+
+            var matchedObservations = ListOf(
+                new MatchedObservation(Guid.NewGuid()),
+                new MatchedObservation(Guid.NewGuid()),
+                new MatchedObservation(Guid.NewGuid()));
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.Subject.AddRangeAsync(subject);
+                await statisticsDbContext.MatchedObservations.AddRangeAsync(matchedObservations);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var cancellationToken = new CancellationTokenSource().Token;
+
+                var observationService = new Mock<IObservationService>(MockBehavior.Strict);
+
+                observationService
+                    .Setup(s => s.GetMatchedObservations(query, cancellationToken))
+                    .ReturnsAsync(statisticsDbContext.MatchedObservations);
+
+                var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
+
+                var filter1 = new Filter
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subject.Id,
+                    Label = "Filter 1"
+                };
+                filter1.FilterGroups = CreateFilterGroups(filter1, 2, 1);
+                    
+                var filter2 = new Filter
+                {
+                    Id = Guid.NewGuid(),
+                    SubjectId = subject.Id,
+                    Label = "Filter 2"
+                };
+                filter2.FilterGroups = CreateFilterGroups(filter2, 2);
+
+                var filter1FilterItems = filter1
+                    .FilterGroups
+                    .SelectMany(fg => fg.FilterItems)
+                    .ToList();
+                
+                var filter2FilterItems = filter2
+                    .FilterGroups
+                    .SelectMany(fg => fg.FilterItems)
+                    .ToList();
+                
+                var allFilterItems = filter1FilterItems.Concat(filter2FilterItems);
+
+                filterItemRepository
+                    .Setup(s => s.GetFilterItemsFromMatchedObservationIds(
+                        subject.Id, statisticsDbContext.MatchedObservations))
+                    .ReturnsAsync(allFilterItems);
+
+                filterItemRepository
+                    .Setup(s => s.GetTotal(filter1FilterItems))
+                    .Returns(filter1FilterItems[1]);
+                
+                filterItemRepository
+                    .Setup(s => s.GetTotal(filter2FilterItems))
+                    .Returns((FilterItem?)null);
+
+                var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+
+                var indicatorGroups = ListOf(
+                    new IndicatorGroup
+                    {
+                        Id = Guid.NewGuid(),
+                        Label = "Indicator Group 2",
+                        Indicators = ListOf(
+                            new Indicator
+                            {
+                                Id = Guid.NewGuid(),
+                                Unit = Unit.Number,
+                                Label = "Indicator 2"
+                            })
+                    },
+                    new IndicatorGroup
+                    {
+                        Id = Guid.NewGuid(),
+                        Label = "Indicator Group 1",
+                        Indicators = ListOf(
+                            new Indicator
+                            {
+                                Id = Guid.NewGuid(),
+                                Unit = Unit.Percent,
+                                Label = "Indicator 1"
+                            })
+                    });
+                
+                indicatorGroupRepository
+                    .Setup(s => s.GetIndicatorGroups(subject.Id))
+                    .Returns(indicatorGroups);
+                
+                var service = BuildSubjectMetaService(
+                    statisticsDbContext,
+                    observationService: observationService.Object,
+                    filterItemRepository: filterItemRepository.Object,
+                    indicatorGroupRepository: indicatorGroupRepository.Object);
+
+                var result = await service.GetSubjectMeta(query, cancellationToken);
+
+                VerifyAllMocks(observationService, filterItemRepository, indicatorGroupRepository);
+                
+                var meta = result.AssertRight();
+                meta.TimePeriod.AssertDeepEqualTo(new TimePeriodsMetaViewModel());
+                Assert.Empty(meta.Locations);
+                
+                meta.Filters.AssertDeepEqualTo(new Dictionary<string, FilterMetaViewModel>
+                {
+                    {"Filter1", new FilterMetaViewModel
+                    {
+                        Legend = "Filter 1",
+                        Options = new Dictionary<string, FilterItemsMetaViewModel>
+                        {
+                            {"FilterGroup1", new FilterItemsMetaViewModel
+                            {
+                                Label = "Filter Group 1",
+                                Options = ListOf(
+                                    new LabelValue("Filter Item 1", filter1FilterItems[0].Id.ToString()),
+                                    new LabelValue("Filter Item 2", filter1FilterItems[1].Id.ToString()))
+                            }},
+                            {"FilterGroup2", new FilterItemsMetaViewModel
+                            {
+                                Label = "Filter Group 2",
+                                Options = ListOf(
+                                    new LabelValue("Filter Item 1", filter1FilterItems[2].Id.ToString()))
+                            }}
+                        },
+                        TotalValue = filter1FilterItems[1].Id.ToString()
+                    }},
+                    {"Filter2", new FilterMetaViewModel
+                    {
+                        Legend = "Filter 2",
+                        Options = new Dictionary<string, FilterItemsMetaViewModel>
+                        {
+                            {"FilterGroup1", new FilterItemsMetaViewModel
+                            {
+                                Label = "Filter Group 1",
+                                Options = ListOf(
+                                    new LabelValue("Filter Item 1", filter2FilterItems[0].Id.ToString()),
+                                    new LabelValue("Filter Item 2", filter2FilterItems[1].Id.ToString()))
+                            }}
+                        },
+                        TotalValue = ""
+                    }},
+                });
+
+                meta.Indicators.AssertDeepEqualTo(new Dictionary<string, IndicatorsMetaViewModel>
+                {
+                    {"IndicatorGroup1", new IndicatorsMetaViewModel
+                    {
+                        Label = "Indicator Group 1",
+                        Options = ListOf(
+                            new IndicatorMetaViewModel
+                            {
+                                Label = "Indicator 1",
+                                Unit = "%",
+                                Value = indicatorGroups[1].Indicators[0].Id.ToString()
+                            })
+                    }},
+                    {"IndicatorGroup2", new IndicatorsMetaViewModel
+                    {
+                        Label = "Indicator Group 2",
+                        Options = ListOf(
+                            new IndicatorMetaViewModel
+                            {
+                                Label = "Indicator 2",
+                                Unit = "",
+                                Value = indicatorGroups[0].Indicators[0].Id.ToString()
+                            })
+                    }}
+                });
+            }
+        }
+        
+        [Fact]
+        public async Task GetSubjectMetaForQuery_InvalidCombination_NoTimePeriodsOrLocations()
+        {
+            var contextId = Guid.NewGuid().ToString();
+            
+            var subject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var query = new ObservationQueryContext
+            {
+                SubjectId = subject.Id,
+                Locations = null,
+                TimePeriod = null
+            };
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.Subject.AddRangeAsync(subject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext);
+                
+                var exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
+                () => service.GetSubjectMeta(query, default));
+                
+                Assert.Equal("Unable to determine which SubjectMeta information has requested " +
+                             "(Parameter 'subjectMetaStep')", exception.Message);
+            }
+        }
+
         private static IOptions<LocationsOptions> DefaultLocationOptions()
         {
             return Options.Create(new LocationsOptions());
+        }
+
+        private static List<FilterGroup> CreateFilterGroups(Filter filter, params int[] numberOfFilterItemsPerFilterGroup)
+        {
+            return numberOfFilterItemsPerFilterGroup
+                .Select((filterItemCount, index) =>
+                {
+                    var filterGroup = new FilterGroup
+                    {
+                        Id = Guid.NewGuid(),
+                        Label = $"Filter Group {index + 1}",
+                        Filter = filter,
+                        FilterItems = Enumerable
+                            .Range(0, filterItemCount)
+                            .Select(filterItemIndex => 
+                                new FilterItem
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Label = $"Filter Item {filterItemIndex + 1}",
+                                })
+                            .ToList()
+                    };
+                    
+                    filterGroup.FilterItems.ForEach(filterItem => filterItem.FilterGroup = filterGroup);
+
+                    return filterGroup;
+                })
+                .ToList();
         }
 
         private static SubjectMetaService BuildSubjectMetaService(
@@ -1028,7 +1441,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 observationService ?? Mock.Of<IObservationService>(MockBehavior.Strict),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 timePeriodService ?? Mock.Of<ITimePeriodService>(MockBehavior.Strict),
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                userService ?? AlwaysTrueUserService().Object,
                 options ?? DefaultLocationOptions()
             );
         }
