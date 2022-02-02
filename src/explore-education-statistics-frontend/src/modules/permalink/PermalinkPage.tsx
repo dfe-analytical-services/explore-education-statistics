@@ -1,5 +1,6 @@
 import FormattedDate from '@common/components/FormattedDate';
 import WarningMessage from '@common/components/WarningMessage';
+import useToggle from '@common/hooks/useToggle';
 import DownloadTable, {
   FileFormat,
 } from '@common/modules/table-tool/components/DownloadTable';
@@ -10,16 +11,17 @@ import permalinkService, { Permalink } from '@common/services/permalinkService';
 import ButtonLink from '@frontend/components/ButtonLink';
 import Page from '@frontend/components/Page';
 import PrintThisPage from '@frontend/components/PrintThisPage';
+import styles from '@frontend/modules/permalink/PermalinkPage.module.scss';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import React, { useRef } from 'react';
-import { logEvent } from '@frontend/services/googleAnalyticsService';
-import styles from './PermalinkPage.module.scss';
 
 interface Props {
   data: Permalink;
 }
 
 const PermalinkPage: NextPage<Props> = ({ data }) => {
+  const [hasTableError, toggleHasTableError] = useToggle(false);
   const tableRef = useRef<HTMLDivElement>(null);
   const fullTable = mapFullTable(data.fullTable);
   const tableHeadersConfig = mapTableHeadersConfig(
@@ -72,33 +74,43 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
           fullTable={fullTable}
           source={`${publicationName}, ${subjectName}`}
           tableHeadersConfig={tableHeadersConfig}
+          onError={message => {
+            toggleHasTableError.on();
+            logEvent({
+              category: 'Permalink page',
+              action: 'Table rendering error',
+              label: message,
+            });
+          }}
         />
       </div>
 
       <div className={styles.hidePrint}>
-        <DownloadTable
-          fullTable={fullTable}
-          fileName={`permalink-${data.id}`}
-          headingSize="m"
-          headingTag="h2"
-          tableRef={tableRef}
-          onSubmit={(fileFormat: FileFormat) =>
-            logEvent({
-              category: 'Permalink page',
-              action:
-                fileFormat === 'csv'
-                  ? 'CSV download button clicked'
-                  : 'ODS download button clicked',
-              label: `${fullTable.subjectMeta.publicationName} between ${
-                fullTable.subjectMeta.timePeriodRange[0].label
-              } and ${
-                fullTable.subjectMeta.timePeriodRange[
-                  fullTable.subjectMeta.timePeriodRange.length - 1
-                ].label
-              }`,
-            })
-          }
-        />
+        {hasTableError && (
+          <DownloadTable
+            fullTable={fullTable}
+            fileName={`permalink-${data.id}`}
+            headingSize="m"
+            headingTag="h2"
+            tableRef={tableRef}
+            onSubmit={(fileFormat: FileFormat) =>
+              logEvent({
+                category: 'Permalink page',
+                action:
+                  fileFormat === 'csv'
+                    ? 'CSV download button clicked'
+                    : 'ODS download button clicked',
+                label: `${fullTable.subjectMeta.publicationName} between ${
+                  fullTable.subjectMeta.timePeriodRange[0].label
+                } and ${
+                  fullTable.subjectMeta.timePeriodRange[
+                    fullTable.subjectMeta.timePeriodRange.length - 1
+                  ].label
+                }`,
+              })
+            }
+          />
+        )}
 
         <h2 className="govuk-heading-m govuk-!-margin-top-9">
           Create your own tables
