@@ -73,9 +73,9 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
       <div ref={tableRef}>
         <TimePeriodDataTable
           fullTable={fullTable}
-          onError={logException}
           source={`${publicationName}, ${subjectName}`}
           tableHeadersConfig={tableHeadersConfig}
+          onError={logException}
         />
       </div>
 
@@ -85,6 +85,11 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
           fileName={`permalink-${data.id}`}
           headingSize="m"
           headingTag="h2"
+          isValidTable={
+            fullTable.results.length > 0 &&
+            tableHeadersConfig.rows.length > 0 &&
+            tableHeadersConfig.columns.length > 0
+          }
           tableRef={tableRef}
           onSubmit={(fileFormat: FileFormat) =>
             logEvent({

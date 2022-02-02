@@ -22,6 +22,7 @@ interface Props {
   fullTable: FullTable;
   headingTag?: 'h2' | 'h3' | 'h4';
   headingSize?: 's' | 'm' | 'l';
+  isValidTable?: boolean;
   tableRef: RefObject<HTMLElement>;
   onSubmit?: (type: FileFormat) => void;
 }
@@ -31,6 +32,7 @@ const DownloadTable = ({
   fullTable,
   headingTag = 'h3',
   headingSize = 's',
+  isValidTable = true,
   tableRef,
   onSubmit,
 }: Props) => {
@@ -46,6 +48,10 @@ const DownloadTable = ({
     downloadTableOdsFile(fileName, fullTable.subjectMeta, tableRef, title);
     toggleProcessingData();
   };
+
+  if (!isValidTable) {
+    return null;
+  }
 
   return (
     <Formik<FormValues>
