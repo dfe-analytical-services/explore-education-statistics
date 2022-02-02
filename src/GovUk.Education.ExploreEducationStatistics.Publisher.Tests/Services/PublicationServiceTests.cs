@@ -67,8 +67,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Contact = Contact1,
             Title = "Publication A",
             TopicId = Topic.Id,
-            DataSource = "first publication data source",
-            Description = "first publication description",
             ExternalMethodology = new ExternalMethodology
             {
                 Title = "external methodology title",
@@ -98,7 +96,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 }
             ),
             Slug = "publication-a",
-            Summary = "first publication summary",
             LegacyPublicationUrl = new Uri("http://legacy.url/")
         };
 
@@ -108,10 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Contact = Contact2,
             Title = "Publication B",
             TopicId = Topic.Id,
-            DataSource = "second publication data source",
-            Description = "second publication description",
             Slug = "publication-b",
-            Summary = "second publication summary"
         };
 
         private static readonly Publication PublicationC = new()
@@ -120,10 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Contact = Contact3,
             Title = "Publication C",
             TopicId = Topic.Id,
-            DataSource = "third publication data source",
-            Description = "third publication description",
             Slug = "publication-c",
-            Summary = "third publication summary",
             LegacyPublicationUrl = new Uri("http://legacy.url/")
         };
 
@@ -255,9 +246,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(PublicationA.Id, result.Id);
                 Assert.Equal("Publication A", result.Title);
                 Assert.Equal("publication-a", result.Slug);
-                Assert.Equal("first publication description", result.Description);
-                Assert.Equal("first publication data source", result.DataSource);
-                Assert.Equal("first publication summary", result.Summary);
                 Assert.Equal(PublicationARelease1V1.Id, result.LatestReleaseId);
                 Assert.Contains(PublicationARelease1V1.Id, result.Releases.Select(r => r.Id));
                 Assert.DoesNotContain(PublicationARelease1V0.Id, result.Releases.Select(r => r.Id));

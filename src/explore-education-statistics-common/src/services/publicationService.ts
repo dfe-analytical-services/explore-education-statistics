@@ -14,9 +14,6 @@ export interface Publication {
   id: string;
   slug: string;
   title: string;
-  description: string;
-  dataSource: string;
-  summary: string;
   otherReleases: {
     id: string;
     slug: string;
@@ -41,9 +38,6 @@ export interface PublicationSummary {
   id: string;
   slug: string;
   title: string;
-  description: string;
-  dataSource: string;
-  summary: string;
 }
 
 export interface BasicPublicationContact {

@@ -38,8 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     TeamEmail = "test@test.com",
                     TeamName = "Team Name"
                 },
-                DataSource = "Data Source",
-                Description = "Description",
                 LegacyReleases = new List<LegacyRelease>
                 {
                     new()
@@ -56,7 +54,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     }
                 },
                 Slug = "test-publication",
-                Summary = "Summary",
                 Title = "Publication",
                 Topic = new Topic
                 {
@@ -285,11 +282,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal(publication.Contact.ContactName, contentPublication.Contact.ContactName);
                 Assert.Equal(publication.Contact.TeamEmail, contentPublication.Contact.TeamEmail);
                 Assert.Equal(publication.Contact.ContactTelNo, contentPublication.Contact.ContactTelNo);
-                Assert.Equal("Data Source", contentPublication.DataSource);
-                Assert.Equal("Description", contentPublication.Description);
                 Assert.Null(contentPublication.ExternalMethodology);
                 Assert.Equal("test-publication", contentPublication.Slug);
-                Assert.Equal("Summary", contentPublication.Summary);
                 Assert.Equal("Publication", contentPublication.Title);
                 Assert.Equal("Theme", contentPublication.Topic.Theme.Title);
                 Assert.NotNull(contentPublication.Topic);

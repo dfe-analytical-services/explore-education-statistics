@@ -85,12 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public string Slug { get; set; }
 
-            public string Description { get; set; }
-
-            public string DataSource { get; set; }
-
-            public string Summary { get; set; }
-
             public List<PreviousReleaseViewModel> OtherReleases { get; set; }
 
             public List<LegacyReleaseViewModel> LegacyReleases { get; set; }

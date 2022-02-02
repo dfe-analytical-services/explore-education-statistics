@@ -42,7 +42,7 @@ describe('DataCataloguePage', () => {
               id: 'publication-1',
               title: 'Test publication',
               slug: 'test-publication',
-              summary: '',
+              latestReleaseType: 'OfficialStatistics',
             },
           ],
         },

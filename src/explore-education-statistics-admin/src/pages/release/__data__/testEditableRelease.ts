@@ -29,9 +29,6 @@ export const testEditableRelease: EditableRelease = {
     slug: 'my-pub',
     otherReleases: [],
     legacyReleases: [],
-    dataSource: '',
-    description: '',
-    summary: '',
     topic: { theme: { title: 'Children, early years and social care' } },
     contact: {
       teamName: 'Explore Education Statistics',

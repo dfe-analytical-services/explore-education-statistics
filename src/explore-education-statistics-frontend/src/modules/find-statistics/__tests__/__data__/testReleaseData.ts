@@ -3,11 +3,7 @@ import { Publication, Release } from '@common/services/publicationService';
 export const testPublication: Publication = {
   id: 'publication-1',
   title: 'Pupil absence in schools in England',
-  description: '',
   slug: 'pupil-absence-in-schools-in-england',
-  dataSource:
-    '[Pupil absence statistics: guide](https://www.gov.uk/government/publications/absence-statistics-guide#)',
-  summary: '',
   otherReleases: [],
   legacyReleases: [
     {

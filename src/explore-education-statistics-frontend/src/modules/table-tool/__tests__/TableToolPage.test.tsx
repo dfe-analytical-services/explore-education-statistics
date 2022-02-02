@@ -293,7 +293,7 @@ describe('TableToolPage', () => {
               id: testPublicationId,
               title: 'Test publication',
               slug: 'test-publication',
-              summary: '',
+              latestReleaseType: 'NationalStatistics',
             },
           ],
         },

@@ -149,11 +149,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => new ManageContentPageViewModel.PublicationViewModel
                     {
                         Id = r.Publication.Id,
-                        Description = r.Publication.Description,
                         Title = r.Publication.Title,
                         Slug = r.Publication.Slug,
-                        Summary = r.Publication.Summary,
-                        DataSource = r.Publication.DataSource,
                         Contact = r.Publication.Contact,
                         Topic = new ManageContentPageViewModel.TopicViewModel
                         {

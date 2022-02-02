@@ -810,7 +810,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 Title = "Publication title",
                 Slug = "publication-slug",
-                Summary = "Publication summary"
             };
 
             var theme = new Theme
