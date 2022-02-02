@@ -23,6 +23,7 @@ import {
   GeoJsonFeatureProperties,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
+import locationLevelsMap from '@common/utils/locationLevelsMap';
 import generateHslColour from '@common/utils/colour/generateHslColour';
 import lighten from '@common/utils/colour/lighten';
 import { unsafeCountDecimals } from '@common/utils/number/countDecimals';
@@ -363,77 +364,6 @@ export const MapBlockInternal = ({
   }, [dataSetCategories]);
 
   const locationType = useMemo(() => {
-    const locationLevelsMap: Dictionary<Dictionary<string>> = {
-      country: {
-        label: 'Country',
-        prefix: 'a',
-      },
-      englishDevolvedArea: {
-        label: 'English Devolved Area',
-        prefix: 'an',
-      },
-      institution: {
-        label: 'Institution',
-        prefix: 'an',
-      },
-      localAuthority: {
-        label: 'Local Authority',
-        prefix: 'a',
-      },
-      localAuthorityDistrict: {
-        label: 'Local Authority District',
-        prefix: 'a',
-      },
-      localEnterprisePartnership: {
-        label: 'Local Enterprise Partnership',
-        prefix: 'a',
-      },
-      mayoralCombinedAuthority: {
-        label: 'Mayoral Combined Authority',
-        prefix: 'a',
-      },
-      multiAcademyTrust: {
-        label: 'Multi Academy Trust',
-        prefix: 'a',
-      },
-      opportunityArea: {
-        label: 'Opportunity Area',
-        prefix: 'an',
-      },
-      parliamentaryConstituency: {
-        label: 'Parliamentary Constituency',
-        prefix: 'a',
-      },
-      provider: {
-        label: 'Provider',
-        prefix: 'a',
-      },
-      region: {
-        label: 'Region',
-        prefix: 'a',
-      },
-      rscRegion: {
-        label: 'RSC Region',
-        prefix: 'an',
-      },
-      school: {
-        label: 'School',
-        prefix: 'a',
-      },
-      sponsor: {
-        label: 'Sponsor',
-        prefix: 'a',
-      },
-      ward: {
-        label: 'Ward',
-        prefix: 'a',
-      },
-      planningArea: {
-        label: 'Planning Area',
-        prefix: 'a',
-      },
-    };
-
     const levels = dataSetCategories.map(category => category.filter.level);
     return !levels.every(level => level === levels[0]) ||
       !locationLevelsMap[levels[0]]
