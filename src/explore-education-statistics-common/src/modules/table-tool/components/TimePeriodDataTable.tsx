@@ -1,9 +1,9 @@
-import ErrorBoundary from '@common/components/ErrorBoundary';
 import WarningMessage from '@common/components/WarningMessage';
 import { ExpandedDataSet } from '@common/modules/charts/types/dataSet';
 import { getIndicatorPath } from '@common/modules/charts/util/groupResultMeasuresByDataSet';
 import groupResultMeasuresByCombination from '@common/modules/table-tool/components/utils/groupResultMeasuresByCombination';
 import Header from '@common/modules/table-tool/components/utils/Header';
+import isErrorLike from '@common/utils/error/isErrorLike';
 import {
   CategoryFilter,
   Filter,
@@ -92,6 +92,80 @@ function getCellText(
   return formatPretty(value, indicator.unit, indicator.decimalPlaces);
 }
 
+/**
+ * Function to optimize a set of filters for the best viewing experience.
+ *
+ * Typically we add or remove filters depending on whether they are
+ * actually needed for the user to understand the table.
+ */
+function optimizeFilters(filters: Filter[], headerConfig: Filter[][]) {
+  const rowColFilters = last(headerConfig);
+
+  let optimizedFilters = filters;
+
+  // There is only one or zero row/col filter header, and we want to avoid
+  // having only a single header as this can often get repeated many times
+  // for tables with multiple filter groups.
+  // We should should try and display these filter group headers instead of the
+  // row/col header as they should provide more useful information to the user.
+  if (rowColFilters && rowColFilters.length <= 1) {
+    optimizedFilters = filters.length > 1 ? filters.slice(0, -1) : filters;
+  }
+
+  return (
+    optimizedFilters
+      // Add additional filter sub groups
+      // to our filters if required.
+      .flatMap((filter, index) => {
+        const firstSubGroup = headerConfig[index][0].group;
+
+        // Don't bother showing a single subgroup as this adds
+        // additional groups to a potentially crowded table.
+        const hasMultipleSubGroups = headerConfig[index].some(
+          header => header.group !== firstSubGroup,
+        );
+
+        return hasMultipleSubGroups &&
+          filter.group &&
+          filter.group !== 'Default'
+          ? [new FilterGroup(filter.group), filter]
+          : filter;
+      })
+  );
+}
+
+/**
+ * Convert {@param filters} into {@see Header} instances
+ * and add them to {@param headers}.
+ */
+function addFilters(headers: Header[], filters: Filter[]): Header[] {
+  filters.forEach((filter, filterIndex) => {
+    if (!headers.length) {
+      headers.push(new Header(filter.id, filter.label));
+      return;
+    }
+
+    const currentHeader = last(headers);
+
+    if (!currentHeader) {
+      return;
+    }
+
+    if (currentHeader.id === filter.id) {
+      currentHeader.span += 1;
+    } else if (filterIndex === 0) {
+      headers.push(new Header(filter.id, filter.label));
+    } else {
+      currentHeader.addChildToLastParent(
+        new Header(filter.id, filter.label),
+        filterIndex - 1,
+      );
+    }
+  });
+
+  return headers;
+}
+
 interface TableCell {
   text: string;
   rowFilters: Filter[];
@@ -100,255 +174,187 @@ interface TableCell {
 
 interface Props {
   captionTitle?: string;
+  dataBlockId?: string;
   fullTable: FullTable;
   tableHeadersConfig: TableHeadersConfig;
   source?: string;
-  dataBlockId?: string;
+  onError?: (message: string) => void;
 }
 
-const TimePeriodDataTableInternal = forwardRef<HTMLElement, Props>(
-  function TimePeriodDataTableInternal(
-    { fullTable, tableHeadersConfig, captionTitle, source, dataBlockId }: Props,
+const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
+  function TimePeriodDataTable(
+    {
+      fullTable,
+      tableHeadersConfig,
+      captionTitle,
+      dataBlockId,
+      source,
+      onError,
+    }: Props,
     dataTableRef,
   ) {
-    const { subjectMeta, results } = fullTable;
+    try {
+      const { subjectMeta, results } = fullTable;
 
-    if (results.length === 0) {
-      return (
-        <WarningMessage>
-          A table could not be returned. There is no data for the options
-          selected.
-        </WarningMessage>
-      );
-    }
-
-    const rowHeadersCartesian = cartesian(
-      ...tableHeadersConfig.rowGroups,
-      tableHeadersConfig.rows as Filter[],
-    );
-
-    const columnHeadersCartesian = cartesian(
-      ...tableHeadersConfig.columnGroups,
-      tableHeadersConfig.columns as Filter[],
-    );
-
-    // Track which columns actually have text values
-    // as we want to remove empty ones later.
-    const columnsWithText = columnHeadersCartesian.map(() => false);
-
-    const excludedFilters = getExcludedFilters(tableHeadersConfig, subjectMeta);
-
-    // Group measures by their respective combination of filters
-    // allowing lookups later on to be MUCH faster.
-    const measuresByFilterCombination = groupResultMeasuresByCombination(
-      results,
-      excludedFilters,
-    );
-
-    const tableCartesian: TableCell[][] = rowHeadersCartesian.map(
-      rowFilterCombination => {
-        return columnHeadersCartesian.map(
-          (columnFilterCombination, columnIndex) => {
-            const filterCombination = [
-              ...rowFilterCombination,
-              ...columnFilterCombination,
-            ];
-
-            const dataSet = filterCombination.reduce<
-              PartialBy<ExpandedDataSet, 'indicator'>
-            >(
-              (acc, filter) => {
-                if (filter instanceof CategoryFilter) {
-                  acc.filters.push(filter);
-                }
-
-                if (filter instanceof TimePeriodFilter) {
-                  acc.timePeriod = filter;
-                }
-
-                if (filter instanceof LocationFilter) {
-                  acc.location = filter;
-                }
-
-                if (filter instanceof Indicator) {
-                  acc.indicator = filter;
-                }
-
-                return acc;
-              },
-              {
-                filters: [],
-              },
-            );
-
-            if (!dataSet.indicator) {
-              throw new Error('No indicator for filter combination');
-            }
-
-            const text = getCellText(
-              measuresByFilterCombination,
-              dataSet as ExpandedDataSet,
-            );
-
-            // There is at least one cell in this
-            // column that has a text value.
-            if (text !== EMPTY_CELL_TEXT) {
-              columnsWithText[columnIndex] = true;
-            }
-
-            return {
-              text,
-              rowFilters: rowFilterCombination,
-              columnFilters: columnFilterCombination,
-            };
-          },
+      if (results.length === 0) {
+        return (
+          <WarningMessage>
+            A table could not be returned. There is no data for the options
+            selected.
+          </WarningMessage>
         );
-      },
-    );
-
-    const filteredCartesian = tableCartesian
-      .filter(row => row.some(cell => cell.text !== EMPTY_CELL_TEXT))
-      .map(row => row.filter((_, index) => columnsWithText[index]));
-
-    /**
-     * Function to optimize a set of filters for the best viewing experience.
-     *
-     * Typically we add or remove filters depending on whether they are
-     * actually needed for the user to understand the table.
-     */
-    function optimizeFilters(filters: Filter[], headerConfig: Filter[][]) {
-      const rowColFilters = last(headerConfig);
-
-      let optimizedFilters = filters;
-
-      // There is only one or zero row/col filter header, and we want to avoid
-      // having only a single header as this can often get repeated many times
-      // for tables with multiple filter groups.
-      // We should should try and display these filter group headers instead of the
-      // row/col header as they should provide more useful information to the user.
-      if (rowColFilters && rowColFilters.length <= 1) {
-        optimizedFilters = filters.length > 1 ? filters.slice(0, -1) : filters;
       }
 
-      return (
-        optimizedFilters
-          // Add additional filter sub groups
-          // to our filters if required.
-          .flatMap((filter, index) => {
-            const firstSubGroup = headerConfig[index][0].group;
-
-            // Don't bother showing a single subgroup as this adds
-            // additional groups to a potentially crowded table.
-            const hasMultipleSubGroups = headerConfig[index].some(
-              header => header.group !== firstSubGroup,
-            );
-
-            return hasMultipleSubGroups &&
-              filter.group &&
-              filter.group !== 'Default'
-              ? [new FilterGroup(filter.group), filter]
-              : filter;
-          })
-      );
-    }
-
-    /**
-     * Convert {@param filters} into {@see Header} instances
-     * and add them to {@param headers}.
-     */
-    function addFilters(headers: Header[], filters: Filter[]): Header[] {
-      filters.forEach((filter, filterIndex) => {
-        if (!headers.length) {
-          headers.push(new Header(filter.id, filter.label));
-          return;
-        }
-
-        const currentHeader = last(headers);
-
-        if (!currentHeader) {
-          return;
-        }
-
-        if (currentHeader.id === filter.id) {
-          currentHeader.span += 1;
-        } else if (filterIndex === 0) {
-          headers.push(new Header(filter.id, filter.label));
-        } else {
-          currentHeader.addChildToLastParent(
-            new Header(filter.id, filter.label),
-            filterIndex - 1,
-          );
-        }
-      });
-
-      return headers;
-    }
-
-    const rowHeaders = filteredCartesian.reduce<Header[]>((acc, row) => {
-      // Only need to use first column's rowFilters
-      // as they are the same for every column.
-      const filters = optimizeFilters(row[0].rowFilters, [
+      const rowHeadersCartesian = cartesian(
         ...tableHeadersConfig.rowGroups,
-        tableHeadersConfig.rows,
-      ]);
+        tableHeadersConfig.rows as Filter[],
+      );
 
-      return addFilters(acc, filters);
-    }, []);
+      const columnHeadersCartesian = cartesian(
+        ...tableHeadersConfig.columnGroups,
+        tableHeadersConfig.columns as Filter[],
+      );
 
-    // Only need to use first row's columnFilters
-    // as they are the same for every row.
-    const columnHeaders = filteredCartesian[0].reduce<Header[]>(
-      (acc, column) => {
-        const filters = optimizeFilters(column.columnFilters, [
-          ...tableHeadersConfig.columnGroups,
-          tableHeadersConfig.columns,
+      // Track which columns actually have text values
+      // as we want to remove empty ones later.
+      const columnsWithText = columnHeadersCartesian.map(() => false);
+
+      const excludedFilters = getExcludedFilters(
+        tableHeadersConfig,
+        subjectMeta,
+      );
+
+      // Group measures by their respective combination of filters
+      // allowing lookups later on to be MUCH faster.
+      const measuresByFilterCombination = groupResultMeasuresByCombination(
+        results,
+        excludedFilters,
+      );
+
+      const tableCartesian: TableCell[][] = rowHeadersCartesian.map(
+        rowFilterCombination => {
+          return columnHeadersCartesian.map(
+            (columnFilterCombination, columnIndex) => {
+              const filterCombination = [
+                ...rowFilterCombination,
+                ...columnFilterCombination,
+              ];
+
+              const dataSet = filterCombination.reduce<
+                PartialBy<ExpandedDataSet, 'indicator'>
+              >(
+                (acc, filter) => {
+                  if (filter instanceof CategoryFilter) {
+                    acc.filters.push(filter);
+                  }
+
+                  if (filter instanceof TimePeriodFilter) {
+                    acc.timePeriod = filter;
+                  }
+
+                  if (filter instanceof LocationFilter) {
+                    acc.location = filter;
+                  }
+
+                  if (filter instanceof Indicator) {
+                    acc.indicator = filter;
+                  }
+
+                  return acc;
+                },
+                {
+                  filters: [],
+                },
+              );
+
+              if (!dataSet.indicator) {
+                throw new Error('No indicator for filter combination');
+              }
+
+              const text = getCellText(
+                measuresByFilterCombination,
+                dataSet as ExpandedDataSet,
+              );
+
+              // There is at least one cell in this
+              // column that has a text value.
+              if (text !== EMPTY_CELL_TEXT) {
+                columnsWithText[columnIndex] = true;
+              }
+
+              return {
+                text,
+                rowFilters: rowFilterCombination,
+                columnFilters: columnFilterCombination,
+              };
+            },
+          );
+        },
+      );
+
+      const filteredCartesian = tableCartesian
+        .filter(row => row.some(cell => cell.text !== EMPTY_CELL_TEXT))
+        .map(row => row.filter((_, index) => columnsWithText[index]));
+
+      const rowHeaders = filteredCartesian.reduce<Header[]>((acc, row) => {
+        // Only need to use first column's rowFilters
+        // as they are the same for every column.
+        const filters = optimizeFilters(row[0].rowFilters, [
+          ...tableHeadersConfig.rowGroups,
+          tableHeadersConfig.rows,
         ]);
 
         return addFilters(acc, filters);
-      },
-      [],
-    );
+      }, []);
 
-    const rows = filteredCartesian.map(row => row.map(cell => cell.text));
+      // Only need to use first row's columnFilters
+      // as they are the same for every row.
+      const columnHeaders = filteredCartesian[0].reduce<Header[]>(
+        (acc, column) => {
+          const filters = optimizeFilters(column.columnFilters, [
+            ...tableHeadersConfig.columnGroups,
+            tableHeadersConfig.columns,
+          ]);
 
-    const captionId = dataBlockId
-      ? `dataTableCaption-${dataBlockId}`
-      : 'dataTableCaption';
+          return addFilters(acc, filters);
+        },
+        [],
+      );
 
-    return (
-      <FixedMultiHeaderDataTable
-        captionId={captionId}
-        caption={
-          <DataTableCaption
-            {...subjectMeta}
-            title={captionTitle}
-            id={captionId}
-          />
-        }
-        columnHeaders={columnHeaders}
-        rowHeaders={rowHeaders}
-        rows={rows}
-        ref={dataTableRef}
-        footnotes={subjectMeta.footnotes}
-        source={source}
-      />
-    );
-  },
-);
+      const captionId = dataBlockId
+        ? `dataTableCaption-${dataBlockId}`
+        : 'dataTableCaption';
 
-const TimePeriodDataTable = forwardRef<HTMLElement, Props>((props, ref) => {
-  return (
-    <ErrorBoundary
-      fallback={
+      const rows = filteredCartesian.map(row => row.map(cell => cell.text));
+
+      return (
+        <FixedMultiHeaderDataTable
+          caption={
+            <DataTableCaption
+              {...subjectMeta}
+              title={captionTitle}
+              id="dataTableCaption"
+            />
+          }
+          captionId={captionId}
+          columnHeaders={columnHeaders}
+          rowHeaders={rowHeaders}
+          rows={rows}
+          ref={dataTableRef}
+          footnotes={subjectMeta.footnotes}
+          source={source}
+        />
+      );
+    } catch (error) {
+      onError?.(isErrorLike(error) ? error.message : 'Unknown error');
+      return (
         <WarningMessage>
           There was a problem rendering the table.
         </WarningMessage>
-      }
-    >
-      <TimePeriodDataTableInternal {...props} ref={ref} />
-    </ErrorBoundary>
-  );
-});
+      );
+    }
+  },
+);
 
 TimePeriodDataTable.displayName = 'TimePeriodDataTable';
 
