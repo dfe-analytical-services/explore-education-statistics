@@ -158,6 +158,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
+        public string? PlanningArea_Code { get; set; }
+        public string? PlanningArea_Name { get; set; }
+
+        [NotMapped]
+        public PlanningArea PlanningArea
+        {
+            get => new(PlanningArea_Code, PlanningArea_Name);
+            set
+            {
+                PlanningArea_Code = value.Code;
+                PlanningArea_Name = value.Name;
+            }
+        }
+
         public string? Provider_Code { get; set; }
         public string? Provider_Name { get; set; }
 
@@ -237,20 +251,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             }
         }
 
-        public string? PlanningArea_Code { get; set; }
-        public string? PlanningArea_Name { get; set; }
-
-        [NotMapped]
-        public PlanningArea PlanningArea
-        {
-            get => new(PlanningArea_Code, PlanningArea_Name);
-            set
-            {
-                PlanningArea_Code = value.Code;
-                PlanningArea_Name = value.Name;
-            }
-        }
-
         protected bool Equals(Location other)
         {
             return Id.Equals(other.Id) 
@@ -276,6 +276,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                    && OpportunityArea_Name == other.OpportunityArea_Name 
                    && ParliamentaryConstituency_Code == other.ParliamentaryConstituency_Code 
                    && ParliamentaryConstituency_Name == other.ParliamentaryConstituency_Name 
+                   && PlanningArea_Code == other.PlanningArea_Code 
+                   && PlanningArea_Name == other.PlanningArea_Name 
                    && Provider_Code == other.Provider_Code 
                    && Provider_Name == other.Provider_Name 
                    && Region_Code == other.Region_Code 
@@ -286,9 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                    && Sponsor_Code == other.Sponsor_Code 
                    && Sponsor_Name == other.Sponsor_Name 
                    && Ward_Code == other.Ward_Code 
-                   && Ward_Name == other.Ward_Name 
-                   && PlanningArea_Code == other.PlanningArea_Code 
-                   && PlanningArea_Name == other.PlanningArea_Name;
+                   && Ward_Name == other.Ward_Name;
         }
 
         public override bool Equals(object? obj)
@@ -325,6 +325,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             hashCode.Add(OpportunityArea_Name);
             hashCode.Add(ParliamentaryConstituency_Code);
             hashCode.Add(ParliamentaryConstituency_Name);
+            hashCode.Add(PlanningArea_Code);
+            hashCode.Add(PlanningArea_Name);
             hashCode.Add(Provider_Code);
             hashCode.Add(Provider_Name);
             hashCode.Add(Region_Code);
@@ -336,8 +338,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             hashCode.Add(Sponsor_Name);
             hashCode.Add(Ward_Code);
             hashCode.Add(Ward_Name);
-            hashCode.Add(PlanningArea_Code);
-            hashCode.Add(PlanningArea_Name);
             return hashCode.ToHashCode();
         }
         

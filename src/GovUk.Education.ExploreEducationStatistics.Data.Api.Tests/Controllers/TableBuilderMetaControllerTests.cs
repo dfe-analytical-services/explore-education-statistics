@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -92,15 +93,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         public async Task Post_GetSubjectMeta()
         {
             var subjectMetaViewModel = new SubjectMetaViewModel();
+            var cancellationToken = new CancellationTokenSource().Token;
 
             var (controller, mocks) = BuildControllerAndMocks();
 
             mocks
                 .subjectMetaService
-                .Setup(s => s.GetSubjectMeta(QueryContext))
+                .Setup(s => s.GetSubjectMeta(QueryContext, cancellationToken))
                 .ReturnsAsync(subjectMetaViewModel);
 
-            var result = await controller.GetSubjectMeta(QueryContext);
+            var result = await controller.GetSubjectMeta(QueryContext, cancellationToken);
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(subjectMetaViewModel);
@@ -109,14 +111,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task Post_GetSubjectMeta_NotFound()
         {
+            var cancellationToken = new CancellationTokenSource().Token;
+            
             var (controller, mocks) = BuildControllerAndMocks();
 
             mocks
                 .subjectMetaService
-                .Setup(s => s.GetSubjectMeta(QueryContext))
+                .Setup(s => s.GetSubjectMeta(QueryContext, cancellationToken))
                 .ReturnsAsync(new NotFoundResult());
 
-            var result = await controller.GetSubjectMeta(QueryContext);
+            var result = await controller.GetSubjectMeta(QueryContext, cancellationToken);
             VerifyAllMocks(mocks);
 
             result.AssertNotFoundResult();

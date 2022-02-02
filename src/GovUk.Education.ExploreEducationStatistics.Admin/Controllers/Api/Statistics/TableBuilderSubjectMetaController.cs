@@ -1,5 +1,6 @@
 #nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -31,9 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
 
         [HttpPost("data/meta/subject")]
         public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(
-            [FromBody] ObservationQueryContext query)
+            [FromBody] ObservationQueryContext query,
+            CancellationToken cancellationToken)
         {
-            return _subjectMetaService.GetSubjectMetaRestricted(query)
+            return _subjectMetaService.GetSubjectMetaRestricted(query, cancellationToken)
                 .HandleFailuresOrOk();
         }
     }
