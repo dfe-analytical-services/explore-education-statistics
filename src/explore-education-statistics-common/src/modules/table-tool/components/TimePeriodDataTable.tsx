@@ -333,7 +333,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
             <DataTableCaption
               {...subjectMeta}
               title={captionTitle}
-              id="dataTableCaption"
+              id={captionId}
             />
           }
           captionId={captionId}
