@@ -86,7 +86,7 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
       </div>
 
       <div className={styles.hidePrint}>
-        {hasTableError && (
+        {!hasTableError && (
           <DownloadTable
             fullTable={fullTable}
             fileName={`permalink-${data.id}`}
