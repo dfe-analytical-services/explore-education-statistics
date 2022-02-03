@@ -454,12 +454,6 @@ export const MapBlockInternal = ({
   const selectedDataSetConfiguration =
     dataSetCategoryConfigs[selectedDataSetKey];
 
-  if (mapRef && mapRef.current) {
-    mapRef.current.leafletElement.setMaxBounds(
-      mapRef.current.leafletElement.getBounds(),
-    );
-  }
-
   // initialise
   useEffect(() => {
     import('@common/modules/charts/files/ukGeoJson.json').then(imported => {
@@ -687,6 +681,11 @@ export const MapBlockInternal = ({
               center={position}
               minZoom={5}
               zoom={5}
+              whenReady={() => {
+                mapRef.current?.leafletElement.setMaxBounds(
+                  mapRef.current.leafletElement.getBounds(),
+                );
+              }}
             >
               <GeoJSON data={ukGeometry} className={styles.uk} ref={ukRef} />
 
