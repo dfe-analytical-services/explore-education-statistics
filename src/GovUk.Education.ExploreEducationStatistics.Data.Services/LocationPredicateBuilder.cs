@@ -14,14 +14,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public static class LocationPredicateBuilder
     {
         public static Expression<Func<Location, bool>> Build(
-            IEnumerable<Guid>? locationIds,
+            IList<Guid>? locationIds,
             LocationQuery? locationCodes)
         {
             var predicate = PredicateBuilder.True<Location>();
 
-            if (locationIds != null)
+            if (locationIds != null && locationIds.Any())
             {
-                predicate = predicate.AndAlso(location =>
+                return predicate.AndAlso(location =>
                     locationIds.Contains(location.Id));
             }
 
@@ -37,9 +37,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     predicate = predicate.AndAlso(LocationAttributesPredicate(locationCodes));
                 }
+
+                return predicate;
             }
 
-            return predicate;
+            throw new ArgumentException("Location predicate too broad");
         }
 
         private static Expression<Func<Location, bool>> LocationAttributesPredicate(LocationQuery query)
@@ -96,6 +98,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 predicate = predicate.Or(ParliamentaryConstituencyPredicate(query));
             }
 
+            if (query.PlanningArea != null)
+            {
+                predicate = predicate.Or(PlanningAreaPredicate(query));
+            }
+
             if (query.Provider != null)
             {
                 predicate = predicate.Or(ProviderPredicate(query));
@@ -126,11 +133,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 predicate = predicate.Or(WardPredicate(query));
             }
 
-            if (query.PlanningArea != null)
-            {
-                predicate = predicate.Or(PlanningAreaPredicate(query));
-            }
-
             return predicate;
         }
 
@@ -146,11 +148,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                      query.MayoralCombinedAuthority.IsNullOrEmpty() &&
                      query.OpportunityArea.IsNullOrEmpty() &&
                      query.ParliamentaryConstituency.IsNullOrEmpty() &&
+                     query.PlanningArea.IsNullOrEmpty() &&
+                     query.Provider.IsNullOrEmpty() &&
                      query.Region.IsNullOrEmpty() &&
                      query.RscRegion.IsNullOrEmpty() &&
+                     query.School.IsNullOrEmpty() &&
                      query.Sponsor.IsNullOrEmpty() &&
-                     query.Ward.IsNullOrEmpty() &&
-                     query.PlanningArea.IsNullOrEmpty());
+                     query.Ward.IsNullOrEmpty());
         }
 
         private static Expression<Func<Location, bool>> CountryPredicate(LocationQuery query)

@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 locationIds = await _context
                     .Location
-                    .Where(LocationPredicateBuilder.Build(query.LocationIds, query.Locations))
+                    .Where(LocationPredicateBuilder.Build(query.LocationIds?.ToList(), query.Locations))
                     .Select(location => location.Id)
                     .ToListAsync(cancellationToken);
             }

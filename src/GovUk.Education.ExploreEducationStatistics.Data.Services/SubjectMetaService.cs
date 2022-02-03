@@ -129,7 +129,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     var stopwatch = Stopwatch.StartNew();
                     
-                    var locationQuery = LocationPredicateBuilder.Build(query.LocationIds, query.Locations);
+                    var locationQuery = 
+                        LocationPredicateBuilder.Build(query.LocationIds?.ToList(), query.Locations);
                     
                     var locationIds = _context
                         .Location
