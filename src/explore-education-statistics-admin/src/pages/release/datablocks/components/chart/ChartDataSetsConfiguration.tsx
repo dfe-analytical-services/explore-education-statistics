@@ -5,6 +5,7 @@ import generateDataSetLabel from '@admin/pages/release/datablocks/components/cha
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import { Form, FormFieldSelect, FormSelect } from '@common/components/form';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
@@ -216,60 +217,75 @@ const ChartDataSetsConfiguration = ({
           >
             <Droppable droppableId="droppable" isDropDisabled={!isReordering}>
               {(droppableProvided, droppableSnapshot) => (
-                <ol
-                  ref={droppableProvided.innerRef}
-                  className={classNames('govuk-list', {
-                    [styles.dropArea]: droppableSnapshot.isDraggingOver,
-                  })}
-                >
-                  {dataSets.map((dataSet, index) => {
-                    const expandedDataSet = expandDataSet(dataSet, meta);
-                    const label = generateDataSetLabel(expandedDataSet);
-                    const itemId = `items-${index}`;
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Data set</th>
+                      <th>
+                        <VisuallyHidden>Actions</VisuallyHidden>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    ref={droppableProvided.innerRef}
+                    className={classNames({
+                      [styles.dropArea]: droppableSnapshot.isDraggingOver,
+                    })}
+                  >
+                    {dataSets.map((dataSet, index) => {
+                      const expandedDataSet = expandDataSet(dataSet, meta);
+                      const label = generateDataSetLabel(expandedDataSet);
+                      const key = generateDataSetKey(dataSet);
 
-                    return (
-                      <Draggable
-                        draggableId={itemId}
-                        isDragDisabled={!isReordering}
-                        key={itemId}
-                        index={index}
-                      >
-                        {(draggableProvided, draggableSnapshot) => (
-                          <li
-                            key={generateDataSetKey(dataSet)}
-                            // eslint-disable-next-line react/jsx-props-no-spreading
-                            {...draggableProvided.draggableProps}
-                            // eslint-disable-next-line react/jsx-props-no-spreading
-                            {...draggableProvided.dragHandleProps}
-                            className={classNames(styles.item, {
-                              [styles.isReordering]: isReordering,
-                              [styles.isDragging]: draggableSnapshot.isDragging,
-                            })}
-                            ref={draggableProvided.innerRef}
-                          >
-                            {label}
-                            {!isReordering && (
-                              <ButtonText
-                                className="govuk-!-margin-bottom-0"
-                                onClick={() => {
-                                  if (onChange) {
-                                    const nextDataSets = [...dataSets];
-                                    nextDataSets.splice(index, 1);
-
-                                    onChange(nextDataSets);
-                                  }
-                                }}
+                      return (
+                        <Draggable
+                          draggableId={key}
+                          isDragDisabled={!isReordering}
+                          key={key}
+                          index={index}
+                        >
+                          {(draggableProvided, draggableSnapshot) => (
+                            <tr
+                              // eslint-disable-next-line react/jsx-props-no-spreading
+                              {...draggableProvided.draggableProps}
+                              // eslint-disable-next-line react/jsx-props-no-spreading
+                              {...draggableProvided.dragHandleProps}
+                              className={classNames(styles.item, {
+                                [styles.isDragging]:
+                                  draggableSnapshot.isDragging,
+                              })}
+                              ref={draggableProvided.innerRef}
+                            >
+                              <td>{label}</td>
+                              <td
+                                className={classNames('dfe-align--right', {
+                                  [styles.isReordering]: isReordering,
+                                })}
                               >
-                                Remove
-                              </ButtonText>
-                            )}
-                          </li>
-                        )}
-                      </Draggable>
-                    );
-                  })}
-                  {droppableProvided.placeholder}
-                </ol>
+                                {!isReordering && (
+                                  <ButtonText
+                                    className="govuk-!-margin-bottom-0"
+                                    onClick={() => {
+                                      if (onChange) {
+                                        const nextDataSets = [...dataSets];
+                                        nextDataSets.splice(index, 1);
+
+                                        onChange(nextDataSets);
+                                      }
+                                    }}
+                                  >
+                                    Remove
+                                  </ButtonText>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                    {droppableProvided.placeholder}
+                  </tbody>
+                </table>
               )}
             </Droppable>
           </DragDropContext>

@@ -221,7 +221,7 @@ function createKeyedDataSets(
 /**
  * Order the categories by dataSet order.
  */
-function sortDataSetCategories(
+function getSortedDataSetCategoriesRange(
   dataSetCategories: DataSetCategory[],
   axisConfiguration: AxisConfiguration,
 ): DataSetCategory[] {
@@ -346,7 +346,7 @@ export default function createDataSetCategories(
     })
     .filter(category => Object.values(category.dataSets).length > 0);
 
-  return sortDataSetCategories(dataSetCategories, axisConfiguration);
+  return getSortedDataSetCategoriesRange(dataSetCategories, axisConfiguration);
 }
 
 export const toChartData = (chartCategory: DataSetCategory): ChartData => {

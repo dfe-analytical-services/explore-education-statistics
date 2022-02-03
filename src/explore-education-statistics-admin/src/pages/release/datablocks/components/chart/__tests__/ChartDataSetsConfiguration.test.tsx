@@ -159,16 +159,17 @@ describe('ChartDataSetsConfiguration', () => {
       </ChartBuilderFormsContextProvider>,
     );
 
-    const items = screen.getAllByRole('listitem');
-    expect(items).toHaveLength(3);
+    const rows = screen.getAllByRole('row');
+    expect(rows).toHaveLength(4);
 
-    expect(items[0]).toHaveTextContent(
+    expect(rows[0].children[0]).toHaveTextContent('Data set');
+    expect(rows[1].children[0]).toHaveTextContent(
       'Number of authorised absence sessions (Male, All locations, All time periods)',
     );
-    expect(items[1]).toHaveTextContent(
+    expect(rows[2].children[0]).toHaveTextContent(
       'Number of authorised absence sessions (Male, Barnet, All time periods)',
     );
-    expect(items[2]).toHaveTextContent(
+    expect(rows[3].children[0]).toHaveTextContent(
       'Number of authorised absence sessions (Male, Barnet, 2019/20)',
     );
   });
@@ -875,19 +876,12 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      const items = screen.getAllByRole('listitem');
-      expect(items).toHaveLength(2);
-
-      expect(items[0]).toHaveTextContent(
-        'Number of authorised absence sessions (Female, All locations, All time periods)',
-      );
-      expect(items[1]).toHaveTextContent(
-        'Number of unauthorised absence sessions (Male, All locations, All time periods)',
-      );
+      const rows = screen.getAllByRole('row');
+      expect(rows).toHaveLength(3);
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      userEvent.click(within(items[0]).getByRole('button', { name: 'Remove' }));
+      userEvent.click(within(rows[1]).getByRole('button', { name: 'Remove' }));
 
       expect(handleChange).toHaveBeenCalledWith([
         {
