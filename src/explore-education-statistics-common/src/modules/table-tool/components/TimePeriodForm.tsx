@@ -25,13 +25,13 @@ export type TimePeriodFormSubmitHandler = (values: FormValues) => void;
 const formId = 'timePeriodForm';
 
 interface Props extends InjectedWizardProps {
-  initialValues?: { timePeriod?: TimePeriodQuery };
+  initialValues?: Partial<TimePeriodQuery>;
   options: SubjectMeta['timePeriod']['options'];
   onSubmit: TimePeriodFormSubmitHandler;
 }
 
 const TimePeriodForm = ({
-  initialValues = { timePeriod: undefined },
+  initialValues = {},
   options,
   onSubmit,
   ...stepProps
@@ -51,21 +51,6 @@ const TimePeriodForm = ({
     }),
   ];
 
-  const formInitialValues = useMemo(() => {
-    let start = '';
-    let end = '';
-
-    if (initialValues && initialValues.timePeriod) {
-      start = `${initialValues.timePeriod.startYear}_${initialValues.timePeriod.startCode}`;
-      end = `${initialValues.timePeriod.endYear}_${initialValues.timePeriod.endCode}`;
-    }
-
-    return {
-      start,
-      end,
-    };
-  }, [initialValues]);
-
   const getOptionLabel = (optionValue: string) => {
     const matchingOption = timePeriodOptions.find(
       option => option.value === optionValue,
@@ -83,6 +68,18 @@ const TimePeriodForm = ({
     }
     return `${getOptionLabel(startValue)} to ${getOptionLabel(endValue)}`;
   };
+
+  const formInitialValues = useMemo(() => {
+    const { startYear, startCode, endYear, endCode } = initialValues;
+
+    const start = startYear && startCode ? `${startYear}_${startCode}` : '';
+    const end = endYear && endCode ? `${endYear}_${endCode}` : '';
+
+    return {
+      start,
+      end,
+    };
+  }, [initialValues]);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>

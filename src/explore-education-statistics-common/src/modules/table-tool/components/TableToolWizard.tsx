@@ -197,25 +197,36 @@ const TableToolWizard = ({
       locations,
       subjectId: state.query.subjectId,
     });
+
+    const { timePeriod } = state.query;
+
     // Check if selected time period is in the time period options so can reset it if not.
     const hasStartTimePeriod = nextSubjectMeta.timePeriod.options.some(
       option =>
-        option.code === state.query.timePeriod?.startCode &&
-        option.year === state.query.timePeriod.startYear,
+        option.code === timePeriod?.startCode &&
+        option.year === timePeriod.startYear,
     );
     const hasEndTimePeriod = nextSubjectMeta.timePeriod.options.some(
       option =>
-        option.code === state.query.timePeriod?.endCode &&
-        option.year === state.query.timePeriod.endYear,
+        option.code === timePeriod?.endCode &&
+        option.year === timePeriod.endYear,
     );
 
     updateState(draft => {
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
+
       draft.query.locations = locations;
-      draft.query.timePeriod =
-        hasStartTimePeriod && hasEndTimePeriod
-          ? state.query.timePeriod
-          : undefined;
+
+      if (timePeriod && hasStartTimePeriod && hasEndTimePeriod) {
+        draft.query.timePeriod = {
+          startYear: hasStartTimePeriod ? timePeriod.startYear : 0,
+          startCode: hasStartTimePeriod ? timePeriod.startCode : '',
+          endYear: hasEndTimePeriod ? timePeriod.endYear : 0,
+          endCode: hasEndTimePeriod ? timePeriod.endCode : '',
+        };
+      } else {
+        draft.query.timePeriod = undefined;
+      }
     });
   };
 
@@ -372,9 +383,7 @@ const TableToolWizard = ({
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
-                  initialValues={{
-                    timePeriod: state.query.timePeriod,
-                  }}
+                  initialValues={state.query.timePeriod}
                   options={state.subjectMeta.timePeriod.options}
                   onSubmit={handleTimePeriodFormSubmit}
                 />

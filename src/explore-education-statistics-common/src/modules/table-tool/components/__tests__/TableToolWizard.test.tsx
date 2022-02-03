@@ -328,6 +328,7 @@ describe('TableToolWizard', () => {
   test('re-populates step choices when subject meta changes', async () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
+
     render(
       <TableToolWizard
         themeMeta={testThemeMeta}
@@ -420,9 +421,10 @@ describe('TableToolWizard', () => {
     expect(indicatorCheckboxes[0]).not.toBeChecked();
   });
 
-  test('prevent progress to next step without setting dates if changing location makes the selected time period invalid', async () => {
+  test('prevent progress to filters step if pre-selected time periods are not in the subject meta', async () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
+
     render(
       <TableToolWizard
         themeMeta={testThemeMeta}
