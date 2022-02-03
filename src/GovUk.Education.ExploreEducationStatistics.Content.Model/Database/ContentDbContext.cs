@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -16,11 +17,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
     {
         public ContentDbContext()
         {
+            // We intentionally don't run `Configure` here as Moq would call this constructor
+            // and we'd immediately get a MockException from interacting with its fields
+            // e.g. from adding events listeners to `ChangeTracker`.
+            // We can just rely on the variants which take options instead as these
+            // are what get used in real application scenarios.
         }
 
-        public ContentDbContext(DbContextOptions<ContentDbContext> options)
-            : base(options)
+        public ContentDbContext(DbContextOptions<ContentDbContext> options) : base(options)
         {
+            Configure();
+        }
+
+        private void Configure()
+        {
+            ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
+            ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
         }
 
         public DbSet<Methodology> Methodologies { get; set; }
@@ -123,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.Created)
                 .HasConversion(
-                    v => v, 
+                    v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
             modelBuilder.Entity<MethodologyVersion>()
@@ -234,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Release>()
                 .HasIndex(release => release.Type);
-            
+
             modelBuilder.Entity<ReleaseStatus>()
                 .Property(rs => rs.Created)
                 .HasConversion(

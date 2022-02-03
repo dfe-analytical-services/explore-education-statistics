@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Model
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using IdentityServer4.EntityFramework.Options;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
@@ -20,6 +21,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
             DbContextOptions<UsersAndRolesDbContext> options,
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
         {
+            Configure();
+        }
+
+        private void Configure()
+        {
+            ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
+            ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
         }
 
         private static IdentityRole<string> CreateRole(Role role)
@@ -32,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                 ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
             };
         }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -42,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                 .HasConversion(
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-            
+
             modelBuilder.Entity<IdentityRole>()
                 .HasData(
                     CreateRole(Role.BauUser),

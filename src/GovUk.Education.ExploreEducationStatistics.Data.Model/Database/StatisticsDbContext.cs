@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -13,6 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
     {
         public StatisticsDbContext()
         {
+            // We intentionally don't run `Configure` here as Moq would call this constructor
+            // and we'd immediately get a MockException from interacting with its fields
+            // e.g. from adding events listeners to `ChangeTracker`.
+            // We can just rely on the variants which take options instead as these
+            // are what get used in real application scenarios.
         }
 
         public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options) : this(options, int.MaxValue)
@@ -36,8 +42,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             Configure(timeout);
         }
 
-        private void Configure(int? timeout)
+        private void Configure(int? timeout = null)
         {
+            ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
+            ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
+
             if (timeout.HasValue)
             {
                 Database.SetCommandTimeout(timeout);
