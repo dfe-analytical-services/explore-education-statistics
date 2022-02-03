@@ -17,6 +17,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IList<Guid>? locationIds,
             LocationQuery? locationCodes)
         {
+            if (locationIds == null && locationCodes == null)
+            {
+                throw new ArgumentException("Only valid to use LocationPredicateBuilder when supplying " +
+                                            "either LocationIds or LocationCodes");
+            }
+            
             var predicate = PredicateBuilder.True<Location>();
 
             if (locationIds != null && locationIds.Any())
@@ -26,35 +32,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
 
             // TODO EES-3068 Migrate Location codes to ids in old Datablocks to remove this support for Location codes
-            if (locationCodes != null)
+            var geographicLevel = locationCodes.GeographicLevel;
+            var locationAttributesPredicate = LocationAttributesExist(locationCodes)
+                ? LocationAttributesPredicate(locationCodes)
+                : null;
+
+            if (geographicLevel == null && locationAttributesPredicate == null)
             {
-                var geographicLevel = locationCodes.GeographicLevel;
-                var locationAttributesPredicate = LocationAttributesExist(locationCodes)
-                    ? LocationAttributesPredicate(locationCodes)
-                    : null;
-
-                if (geographicLevel == null && locationAttributesPredicate == null)
-                {
-                    throw new ArgumentException("Using LocationPredicateBuilder with LocationCodes is only " +
-                                                "valid if a GeographicLevel or Location Attributes are provided");
-                }
-                
-                if (geographicLevel != null)
-                {
-                    predicate = predicate.AndAlso(location => location.GeographicLevel == locationCodes.GeographicLevel);
-                }
-
-                if (locationAttributesPredicate != null)
-                {
-                    predicate = predicate.AndAlso(locationAttributesPredicate);
-                }
-
-                return predicate;
+                throw new ArgumentException("Using LocationPredicateBuilder with LocationCodes is only " +
+                                            "valid if a GeographicLevel or Location Attributes are provided");
+            }
+            
+            if (geographicLevel != null)
+            {
+                predicate = predicate.AndAlso(location => location.GeographicLevel == locationCodes.GeographicLevel);
             }
 
-            throw new ArgumentException("Only valid to use LocationPredicateBuilder when supplying " +
-                                        "LocationIds, LocationCodes with a GeographicLevel or LocationCodes with " +
-                                        "Location Attributes supplied");
+            if (locationAttributesPredicate != null)
+            {
+                predicate = predicate.AndAlso(locationAttributesPredicate);
+            }
+
+            return predicate;
         }
 
         private static Expression<Func<Location, bool>> LocationAttributesPredicate(LocationQuery query)
