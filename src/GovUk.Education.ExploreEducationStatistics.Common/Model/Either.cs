@@ -49,6 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public Either<TL, TR> OrElse(Func<TR> func) => IsLeft ? func() : Right;
 
+        public Either<TL, TR> OrElse(Func<TL, TR> func) => IsLeft ? func(Left) : Right;
+
         public T Fold<T>(Func<TL, T> leftFunc, Func<TR, T> rightFunc) => IsRight ? rightFunc(Right) : leftFunc(Left);
 
         public T FoldLeft<T>(Func<TL, T> leftFunc, T defaultValue) => IsLeft ? leftFunc(Left) : defaultValue;
@@ -58,6 +60,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         public static implicit operator Either<TL, TR>(TL left) => new(left);
 
         public static implicit operator Either<TL, TR>(TR right) => new(right);
+    }
+    
+    public static class EitherExtensions {
+        public static T Result<T>(this Either<T, T> either)
+        {
+            return either.IsLeft ? either.Left : either.Right;
+        }
     }
 
     public static class EitherTaskExtensions
