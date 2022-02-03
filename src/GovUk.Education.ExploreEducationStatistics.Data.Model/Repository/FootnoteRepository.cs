@@ -17,16 +17,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         public IEnumerable<Footnote> GetFilteredFootnotes(
             Guid releaseId,
             Guid subjectId,
-            IQueryable<Observation> observations,
+            IEnumerable<Guid> filterItemIds,
             IEnumerable<Guid> indicatorIds)
         {
-            var filterItemIds = observations.SelectMany(observation => observation.FilterItems)
-                .Select(item => item.FilterItemId).Distinct();
-
             var releaseIdParam = new SqlParameter("releaseId", releaseId);
             var subjectIdParam = new SqlParameter("subjectId", subjectId);
-            var indicatorListParam = CreateIdListType("indicatorList", indicatorIds);
             var filterItemListParam = CreateIdListType("filterItemList", filterItemIds);
+            var indicatorListParam = CreateIdListType("indicatorList", indicatorIds);
 
             return _context
                 .Footnote

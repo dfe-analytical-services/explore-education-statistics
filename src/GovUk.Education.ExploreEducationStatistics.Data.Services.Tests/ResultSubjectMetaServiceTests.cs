@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -14,13 +15,13 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 
@@ -59,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_SubjectNotFound()
         {
-            var query = new SubjectMetaQueryContext();
+            var query = new ObservationQueryContext();
 
             var contextId = Guid.NewGuid().ToString();
 
@@ -96,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var observations = new List<Observation>();
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -130,22 +131,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<BoundaryLevel>());
 
             filterItemRepository.Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
-
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    new Dictionary<GeographicLevel, List<string>>()))
-                .ReturnsAsync(new Dictionary<GeographicLevel, List<LocationAttributeNode>>());
 
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(releaseFile);
@@ -154,8 +150,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -167,14 +163,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId: releaseId,
+                    releaseId,
                     query,
                     observations);
 
@@ -212,31 +207,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Id = Guid.NewGuid()
             };
 
-            var observations = new List<Observation>();
+            var observations = ListOf(
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Country,
+                        Country = _england,
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _northWest
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _northEast
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _eastMidlands
+                    }
+                });
+            
+            var options = Options.Create(new LocationsOptions
+            {
+                Hierarchies = new Dictionary<GeographicLevel, List<string>>
+                {
+                    {
+                        GeographicLevel.Region,
+                        new List<string>
+                        {
+                            "Country",
+                            "Region"
+                        }
+                    }
+                }
+            });
 
             var releaseId = Guid.NewGuid();
 
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
-                {
-                    GeographicLevel.Country,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_england)
-                    }
-                },
-                {
-                    GeographicLevel.Region,
-                    new List<LocationAttributeNode>
-                    {
-                        new(_northEast),
-                        new(_northWest),
-                        new(_eastMidlands)
-                    }
-                }
-            };
-
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -282,22 +307,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 });
 
             filterItemRepository.Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
-
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    new Dictionary<GeographicLevel, List<string>>()))
-                .ReturnsAsync(locations);
 
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
@@ -306,8 +326,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -319,14 +339,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
-                    timePeriodService: timePeriodService.Object
+                    timePeriodService: timePeriodService.Object,
+                    options: options
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId: releaseId,
+                    releaseId,
                     query,
                     observations);
 
@@ -363,53 +383,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Id = Guid.NewGuid()
             };
 
-            var observations = new List<Observation>();
-
             var releaseId = Guid.NewGuid();
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            var observations = ListOf(
+                // No hierarchy in Country level data
+                new Observation
                 {
-                    GeographicLevel.Country,
-                    // No hierarchy in Country level data
-                    new List<LocationAttributeNode>
+                    Location = new Location
                     {
-                        new(_england)
+                        GeographicLevel = GeographicLevel.Country,
+                        Country = _england,
                     }
                 },
+                // No hierarchy in Regional level data
+                new Observation
                 {
-                    GeographicLevel.Region,
-                    // No hierarchy in Regional level data
-                    new List<LocationAttributeNode>
+                    Location = new Location
                     {
-                        new(_northEast),
-                        new(_northWest),
-                        new(_eastMidlands)
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _northWest
                     }
                 },
+                new Observation
                 {
-                    GeographicLevel.LocalAuthority,
-                    // Country-Region-LA hierarchy in the LA level data
-                    new List<LocationAttributeNode>
+                    Location = new Location
                     {
-                        new(_england)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_eastMidlands)
-                                {
-                                    Children = new List<LocationAttributeNode>
-                                    {
-                                        new(_derby),
-                                        new(_nottingham)
-                                    }
-                                }
-                            }
-                        }
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _northEast
                     }
-                }
-            };
+                },
+                // A duplicate Location is here
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _northEast
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _eastMidlands
+                    }
+                },
+                // Country-Region-LA hierarchy in the LA level data
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        Country = _england,
+                        Region = _eastMidlands,
+                        LocalAuthority = _derby
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        Country = _england,
+                        Region = _eastMidlands,
+                        LocalAuthority = _nottingham
+                    }
+                });
 
             var options = Options.Create(new LocationsOptions
             {
@@ -427,7 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             });
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -471,22 +516,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
-
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    options.Value.Hierarchies))
-                .ReturnsAsync(locations);
 
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
@@ -495,8 +535,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -508,7 +548,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
@@ -616,37 +655,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Id = Guid.NewGuid()
             };
 
-            var observations = new List<Observation>();
-
             var releaseId = Guid.NewGuid();
-
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            
+            var observations = ListOf(
+                // No hierarchy in Country level data
+                new Observation
                 {
-                    GeographicLevel.Country,
-                    // No hierarchy in Country level data
-                    new List<LocationAttributeNode>
+                    Location = new Location
                     {
-                        new(_england)
+                        GeographicLevel = GeographicLevel.Country,
+                        Country = _england,
                     }
                 },
+                // Country-Region hierarchy in the Region level data
+                new Observation
                 {
-                    GeographicLevel.Region,
-                    // Country-Region hierarchy in the Region level data
-                    new List<LocationAttributeNode>
+                    Location = new Location
                     {
-                        new(_england)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_northEast),
-                                new(_northWest),
-                                new(_eastMidlands)
-                            }
-                        }
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _northEast
                     }
-                }
-            };
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _northWest
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _eastMidlands
+                    }
+                });
 
             var options = Options.Create(new LocationsOptions
             {
@@ -664,7 +712,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             });
 
             // Setup a query requesting geoJson but not with any specific boundary level id
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 BoundaryLevel = null,
                 IncludeGeoJson = true,
@@ -712,12 +760,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(new List<BoundaryLevel>());
 
             filterItemRepository.Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
@@ -759,11 +807,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    options.Value.Hierarchies))
-                .ReturnsAsync(locations);
-
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
@@ -771,8 +814,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -785,7 +828,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     footnoteRepository: footnoteRepository.Object,
                     geoJsonRepository: geoJsonRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
@@ -793,7 +835,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId: releaseId,
+                    releaseId,
                     query,
                     observations);
 
@@ -877,29 +919,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Id = Guid.NewGuid()
             };
 
-            var observations = new List<Observation>();
-
             var releaseId = Guid.NewGuid();
 
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            var observations = ListOf(
+                new Observation
                 {
-                    GeographicLevel.Region,
-                    // Country-Region hierarchy in the Region level data
-                    new List<LocationAttributeNode>
+                    Location = new Location
                     {
-                        new(_england)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_northEast),
-                                new(_northWest),
-                                new(_eastMidlands)
-                            }
-                        }
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _northEast
                     }
-                }
-            };
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _northWest
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _eastMidlands
+                    }
+                });
 
             var options = Options.Create(new LocationsOptions
             {
@@ -917,7 +966,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             });
 
             // Setup a query requesting geoJson with a specific boundary level id
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 BoundaryLevel = 123,
                 IncludeGeoJson = true,
@@ -961,12 +1010,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
@@ -995,11 +1044,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    options.Value.Hierarchies))
-                .ReturnsAsync(locations);
-
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
@@ -1007,8 +1051,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1021,7 +1065,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     footnoteRepository: footnoteRepository.Object,
                     geoJsonRepository: geoJsonRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
@@ -1029,7 +1072,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId: releaseId,
+                    releaseId,
                     query,
                     observations);
 
@@ -1101,27 +1144,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Id = Guid.NewGuid()
             };
 
-            var observations = new List<Observation>();
-
             var releaseId = Guid.NewGuid();
-
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            
+            var observations = ListOf(
+                new Observation
                 {
-                    GeographicLevel.LocalAuthority,
-                    new List<LocationAttributeNode>
+                    Location = new Location
                     {
-                        new(_derby),
-                        new(_derbyDupe),
-                        new(_nottingham)
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        LocalAuthority = _derby
                     }
-                }
-            };
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        LocalAuthority = _derbyDupe
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        LocalAuthority = _nottingham
+                    }
+                });
 
             // No location hierarchies are defined so locations should still all be flat.
             var options = DefaultLocationOptions();
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -1165,25 +1219,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository
                 .Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
             indicatorRepository
                 .Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
-
-            locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    options.Value.Hierarchies))
-                .ReturnsAsync(locations);
 
             releaseDataFileRepository
                 .Setup(s => s.GetBySubject(releaseId, subject.Id))
@@ -1194,8 +1242,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1207,7 +1255,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
@@ -1270,29 +1317,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Id = Guid.NewGuid()
             };
 
-            var observations = new List<Observation>();
-
             var releaseId = Guid.NewGuid();
 
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            var observations = ListOf(
+                new Observation
                 {
-                    GeographicLevel.LocalAuthority,
-                    // Region-LA hierarchy in the LA level data
-                    new List<LocationAttributeNode>
+                    Location = new Location
                     {
-                        new(_eastMidlands)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_derby),
-                                new(_derbyDupe),
-                                new(_nottingham)
-                            }
-                        }
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        Region = _eastMidlands,
+                        LocalAuthority = _derby
                     }
-                }
-            };
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        Region = _eastMidlands,
+                        LocalAuthority = _derbyDupe
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        Region = _eastMidlands,
+                        LocalAuthority = _nottingham
+                    }
+                });
 
             var options = Options.Create(new LocationsOptions
             {
@@ -1309,7 +1363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             });
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -1353,25 +1407,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository
                 .Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
             indicatorRepository
                 .Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
-
-            locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    options.Value.Hierarchies))
-                .ReturnsAsync(locations);
 
             releaseDataFileRepository
                 .Setup(s => s.GetBySubject(releaseId, subject.Id))
@@ -1382,8 +1430,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1395,7 +1443,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
@@ -1467,26 +1514,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Id = Guid.NewGuid()
             };
 
-            var observations = new List<Observation>();
-
             var releaseId = Guid.NewGuid();
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            var observations = ListOf(
+                new Observation
                 {
-                    GeographicLevel.LocalAuthority,
-                    new List<LocationAttributeNode>
+                    Location = new Location
                     {
-                        new(_cheshireOldCode),
-                        new(_derby)
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        LocalAuthority = _cheshireOldCode
                     }
-                }
-            };
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        LocalAuthority = _derby
+                    }
+                });
 
             var options = DefaultLocationOptions();
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -1528,22 +1579,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
-
-            locationRepository.Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    options.Value.Hierarchies))
-                .ReturnsAsync(locations);
 
             releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
@@ -1552,8 +1598,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1565,7 +1611,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
@@ -1573,7 +1618,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId: releaseId,
+                    releaseId,
                     query,
                     observations);
 
@@ -1614,51 +1659,68 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Id = Guid.NewGuid()
             };
 
-            var observations = new List<Observation>();
-
             var releaseId = Guid.NewGuid();
-
-            var locations = new Dictionary<GeographicLevel, List<LocationAttributeNode>>
-            {
+            
+            var observations = ListOf(
                 // Flat Regions
+                new Observation
                 {
-                    GeographicLevel.Region,
-                    new List<LocationAttributeNode>
+                    Location = new Location
                     {
-                        new(_northWest),
-                        new(_eastMidlands),
-                        new(_northEast),
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _northWest
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _northEast
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.Region,
+                        Country = _england,
+                        Region = _eastMidlands
                     }
                 },
                 // Hierarchical Regions - LA
+                new Observation
                 {
-                    GeographicLevel.LocalAuthority,
-                    new List<LocationAttributeNode>
+                    Location = new Location
                     {
-                        new(_northWest)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_blackpool),
-                            }
-                        },
-                        new(_eastMidlands)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_derby),
-                            }
-                        },
-                        new(_northEast)
-                        {
-                            Children = new List<LocationAttributeNode>
-                            {
-                                new(_sunderland),
-                            }
-                        }
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        Country = _england,
+                        Region = _northWest,
+                        LocalAuthority = _blackpool
                     }
-                }
-            };
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        Country = _england,
+                        Region = _eastMidlands,
+                        LocalAuthority = _derby
+                    }
+                },
+                new Observation
+                {
+                    Location = new Location
+                    {
+                        GeographicLevel = GeographicLevel.LocalAuthority,
+                        Country = _england,
+                        Region = _northEast,
+                        LocalAuthority = _sunderland
+                    }
+                });
 
             var options = Options.Create(new LocationsOptions
             {
@@ -1675,7 +1737,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             });
 
-            var query = new SubjectMetaQueryContext
+            var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
@@ -1720,25 +1782,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(Enumerable.Empty<FilterItem>());
+                .Returns(new List<FilterItem>());
 
             footnoteRepository
                 .Setup(s => s.GetFilteredFootnotes(
                     releaseId,
                     subject.Id,
-                    ItIs.QueryableSequenceEqualTo(observations),
+                    new List<Guid>(),
                     query.Indicators))
                 .Returns(Enumerable.Empty<Footnote>());
 
             indicatorRepository
                 .Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
-
-            locationRepository
-                .Setup(s => s.GetLocationAttributesHierarchicalByObservationsList(
-                    observations,
-                    options.Value.Hierarchies))
-                .ReturnsAsync(locations);
 
             releaseDataFileRepository
                 .Setup(s => s.GetBySubject(releaseId, subject.Id))
@@ -1749,8 +1805,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ReturnsAsync(publication.Id);
 
             timePeriodService
-                .Setup(s => s.GetTimePeriodRange(ItIs.QueryableSequenceEqualTo(observations)))
-                .Returns(Enumerable.Empty<(int Year, TimeIdentifier TimeIdentifier)>());
+                .Setup(s => s.GetTimePeriodRange(observations))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1762,7 +1818,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     filterItemRepository: filterItemRepository.Object,
                     footnoteRepository: footnoteRepository.Object,
                     indicatorRepository: indicatorRepository.Object,
-                    locationRepository: locationRepository.Object,
                     releaseDataFileRepository: releaseDataFileRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
@@ -1847,7 +1902,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IFootnoteRepository? footnoteRepository = null,
             IGeoJsonRepository? geoJsonRepository = null,
             IIndicatorRepository? indicatorRepository = null,
-            ILocationRepository? locationRepository = null,
             IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
             ITimePeriodService? timePeriodService = null,
             IUserService? userService = null,
@@ -1862,7 +1916,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
                 geoJsonRepository ?? Mock.Of<IGeoJsonRepository>(MockBehavior.Strict),
                 indicatorRepository ?? Mock.Of<IIndicatorRepository>(MockBehavior.Strict),
-                locationRepository ?? Mock.Of<ILocationRepository>(MockBehavior.Strict),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 timePeriodService ?? Mock.Of<ITimePeriodService>(MockBehavior.Strict),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,

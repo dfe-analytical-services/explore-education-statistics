@@ -9,14 +9,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public static class TimePeriodUtil
     {
-        public static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
+        public static IList<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
             (int Year, TimeIdentifier TimeIdentifier) start,
             (int Year, TimeIdentifier TimeIdentifier) end)
         {
             return Range(start.Year, start.TimeIdentifier, end.Year, end.TimeIdentifier);
         }
 
-        public static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> Range(TimePeriodQuery timePeriodQuery)
+        public static IList<(int Year, TimeIdentifier TimeIdentifier)> Range(TimePeriodQuery timePeriodQuery)
         {
             return Range(timePeriodQuery.StartYear,
                 timePeriodQuery.StartCode,
@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 timePeriodQuery.EndCode);
         }
 
-        public static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> Range(int startYear,
+        private static IList<(int Year, TimeIdentifier TimeIdentifier)> Range(int startYear,
             TimeIdentifier startCode, int endYear, TimeIdentifier endCode)
         {
             if (startYear <= 0)
@@ -81,13 +81,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 "The time period StartCode and EndCode must either represent a year or be part of an associated range");
         }
 
-        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetYearsForTimeIdentifier(int startYear,
+        private static IList<(int Year, TimeIdentifier TimeIdentifier)> GetYearsForTimeIdentifier(int startYear,
             int endYear, TimeIdentifier identifier)
         {
-            return Enumerable.Range(startYear, endYear - startYear + 1).Select(year => (year, identifier));
+            return Enumerable.Range(startYear, endYear - startYear + 1).Select(year => (year, identifier)).ToList();
         }
 
-        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetYearsForTimeIdentifierRange(
+        private static IList<(int Year, TimeIdentifier TimeIdentifier)> GetYearsForTimeIdentifierRange(
             int startYear, int endYear, TimeIdentifier startCode, TimeIdentifier endCode, TimeIdentifier[] range)
         {
             var indexOfStart = Array.IndexOf(range, startCode);
@@ -97,8 +97,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             if (startYear == endYear)
             {
-                return range.Skip(indexOfStart).Take(indexOfEnd - indexOfStart + 1).Select(identifier =>
-                    (startYear, identifier));
+                return range
+                    .Skip(indexOfStart).Take(indexOfEnd - indexOfStart + 1)
+                    .Select(identifier => (startYear, identifier))
+                    .ToList();
             }
 
             for (var i = startYear; i <= endYear; i++)

@@ -5,10 +5,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 {
     public static class StatisticsDbUtils
     {
-        public static StatisticsDbContext InMemoryStatisticsDbContext(string dbName)
+        public static StatisticsDbContext InMemoryStatisticsDbContext(string databaseName)
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
-            builder.UseInMemoryDatabase(databaseName: dbName);
+            builder.UseInMemoryDatabase(databaseName);
             return new StatisticsDbContext(builder.Options, null);
         }
 
@@ -17,10 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             return InMemoryStatisticsDbContext(Guid.NewGuid().ToString());
         }
 
-        public static PublicStatisticsDbContext InMemoryPublicStatisticsDbContext(string dbName)
+        public static PublicStatisticsDbContext InMemoryPublicStatisticsDbContext(string databaseName)
         {
             var builder = new DbContextOptionsBuilder<PublicStatisticsDbContext>();
-            builder.UseInMemoryDatabase(databaseName: dbName);
+            builder.UseInMemoryDatabase(databaseName);
             return new PublicStatisticsDbContext(builder.Options, null);
         }
 
