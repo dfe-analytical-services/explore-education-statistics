@@ -36,6 +36,7 @@ import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, PathOptions, Polyline } from 'leaflet';
 import clamp from 'lodash/clamp';
+import { groupBy } from 'lodash';
 import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import times from 'lodash/times';
@@ -351,17 +352,50 @@ export const MapBlockInternal = ({
     );
   }, [dataSetCategoryConfigs]);
 
+  const shouldGroupLocationOptions = dataSetCategories.some(
+    element => element.filter.level === 'localAuthority',
+  );
+
+  // If no LAs don't group the locations.
   const locationOptions = useMemo(() => {
-    const locations = orderBy(
+    if (shouldGroupLocationOptions) {
+      return undefined;
+    }
+    return orderBy(
       dataSetCategories.map(dataSetCategory => ({
         label: dataSetCategory.filter.label,
         value: dataSetCategory.filter.id,
       })),
       ['label'],
     );
-    locations.unshift({ label: 'None selected', value: '' });
-    return locations;
-  }, [dataSetCategories]);
+  }, [dataSetCategories, shouldGroupLocationOptions]);
+
+  // If has LAs, group them by region and group any others by level
+  const groupedLocationOptions = useMemo(() => {
+    if (!shouldGroupLocationOptions) {
+      return undefined;
+    }
+    const groupedLocations = groupBy(dataSetCategories, dataSetCategory =>
+      dataSetCategory.filter.level === 'localAuthority'
+        ? dataSetCategory.filter.group
+        : dataSetCategory.filter.level,
+    );
+    return Object.fromEntries(
+      Object.entries(groupedLocations).map(group => {
+        const key =
+          group[1][0].filter.level === 'localAuthority'
+            ? group[0]
+            : locationLevelsMap[group[0]].label;
+        const options = group[1].map(dataSetCategory => {
+          return {
+            label: dataSetCategory.filter.label,
+            value: dataSetCategory.filter.id,
+          };
+        });
+        return [key, options];
+      }),
+    );
+  }, [dataSetCategories, shouldGroupLocationOptions]);
 
   const locationType = useMemo(() => {
     const levels = dataSetCategories.map(category => category.filter.level);
@@ -583,7 +617,9 @@ export const MapBlockInternal = ({
               label={`2. Select ${locationType.prefix} ${locationType.label}`}
               value={selectedFeature?.id?.toString()}
               options={locationOptions}
+              optGroups={groupedLocationOptions}
               order={FormSelect.unordered}
+              placeholder="None selected"
               onChange={e => {
                 const feature = geometry?.features.find(
                   feat => feat.id === e.currentTarget.value,

@@ -3,6 +3,9 @@ import {
   testMapTableData,
   testMapTableDataRegion,
   testMapTableDataMixed,
+  testsMixedLocationsFullTableMeta,
+  testsMixedLocationsTableData,
+  testMixedLocationsAxes,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
 import MapBlock, {
   MapBlockProps,
@@ -110,24 +113,6 @@ describe('MapBlock', () => {
       expect(select.children[1]).toHaveTextContent(
         'Overall absence rate (2016/17)',
       );
-    });
-  });
-
-  test('includes all locations in select', async () => {
-    render(<MapBlock {...testBlockProps} />);
-
-    await waitFor(() => {
-      const select = screen.getByLabelText(
-        '2. Select a Local Authority District',
-      );
-
-      expect(select).toBeVisible();
-
-      expect(select.children).toHaveLength(4);
-      expect(select.children[0]).toHaveTextContent('None selected');
-      expect(select.children[1]).toHaveTextContent('Leeds');
-      expect(select.children[2]).toHaveTextContent('Manchester');
-      expect(select.children[3]).toHaveTextContent('Sheffield');
     });
   });
 
@@ -342,20 +327,81 @@ describe('MapBlock', () => {
     });
 
     test('shows the default label if the data set contains multiple types', async () => {
-      const testFullTableRegion = mapFullTable(testMapTableDataMixed);
-
-      const testBlockPropsRegion = produce(testBlockProps, draft => {
-        draft.meta = testFullTableRegion.subjectMeta;
-        draft.data = testFullTableRegion.results;
+      const testFullTableMixed = mapFullTable(testMapTableDataMixed);
+      const testBlockPropsMixed = produce(testBlockProps, draft => {
+        draft.meta = testFullTableMixed.subjectMeta;
+        draft.data = testFullTableMixed.results;
       });
 
-      render(<MapBlock {...testBlockPropsRegion} />);
+      render(<MapBlock {...testBlockPropsMixed} />);
 
       await waitFor(() => {
         expect(
           screen.getByLabelText('2. Select a location'),
         ).toBeInTheDocument();
       });
+    });
+
+    test('includes all locations and is ungrouped if does not contain local authorities', async () => {
+      render(<MapBlock {...testBlockProps} />);
+
+      await waitFor(() => {
+        const select = screen.getByLabelText(
+          '2. Select a Local Authority District',
+        );
+
+        expect(select).toBeVisible();
+
+        expect(select.children).toHaveLength(4);
+        expect(select.children[0]).toHaveTextContent('None selected');
+        expect(select.children[1]).toHaveTextContent('Leeds');
+        expect(select.children[2]).toHaveTextContent('Manchester');
+        expect(select.children[3]).toHaveTextContent('Sheffield');
+      });
+    });
+
+    test('includes all locations and is grouped if contains local authorities', async () => {
+      const testBlockProps2: MapBlockProps = {
+        ...testMapConfiguration,
+        id: 'testMap',
+        axes: testMixedLocationsAxes as MapBlockProps['axes'],
+        legend: testMapConfiguration.legend as LegendConfiguration,
+        meta: testsMixedLocationsFullTableMeta,
+        data: testsMixedLocationsTableData,
+      };
+
+      render(<MapBlock {...testBlockProps2} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('2. Select a location'),
+        ).toBeInTheDocument();
+      });
+      const select = screen.getByLabelText('2. Select a location');
+
+      expect(select.children[0]).toHaveTextContent('None selected');
+
+      const groups = within(select).getAllByRole('group');
+      expect(groups).toHaveLength(4);
+
+      const group1Options = within(groups[0]).getAllByRole('option');
+      expect(group1Options).toHaveLength(1);
+      expect(group1Options[0]).toHaveTextContent('England');
+
+      const group2Options = within(groups[1]).getAllByRole('option');
+      expect(group2Options).toHaveLength(2);
+      expect(group2Options[0]).toHaveTextContent('Darlington');
+      expect(group2Options[1]).toHaveTextContent('Newcastle upon Tyne');
+
+      const group3Options = within(groups[2]).getAllByRole('option');
+      expect(group3Options).toHaveLength(2);
+      expect(group3Options[0]).toHaveTextContent('Rotherham');
+      expect(group3Options[1]).toHaveTextContent('Sheffield');
+
+      const group4Options = within(groups[3]).getAllByRole('option');
+      expect(group4Options).toHaveLength(2);
+      expect(group4Options[0]).toHaveTextContent('North East');
+      expect(group4Options[1]).toHaveTextContent('North West');
     });
   });
 });
