@@ -259,10 +259,31 @@ const TableToolWizard = ({
       },
     });
 
+    const indicatorValues = new Set(
+      Object.values(nextSubjectMeta.indicators).flatMap(indicator =>
+        indicator.options.map(option => option.value),
+      ),
+    );
+    const filteredIndicators = state.query.indicators.filter(indicator =>
+      indicatorValues.has(indicator),
+    );
+
+    const filterValues = new Set(
+      Object.values(nextSubjectMeta.filters).flatMap(filterGroup =>
+        Object.values(filterGroup.options).flatMap(filter =>
+          filter.options.map(option => option.value),
+        ),
+      ),
+    );
+    const filteredFilters = state.query.filters.filter(filter =>
+      filterValues.has(filter),
+    );
+
     updateState(draft => {
       draft.subjectMeta.indicators = nextSubjectMeta.indicators;
       draft.subjectMeta.filters = nextSubjectMeta.filters;
-
+      draft.query.indicators = filteredIndicators;
+      draft.query.filters = filteredFilters;
       draft.query.timePeriod = {
         startYear,
         startCode,

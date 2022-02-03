@@ -470,4 +470,103 @@ describe('TableToolWizard', () => {
       ).toBeInTheDocument();
     });
   });
+
+  test('prevent progress to final step step if pre-selected indicators are not in the subject meta', async () => {
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
+
+    render(
+      <TableToolWizard
+        themeMeta={testThemeMeta}
+        initialState={{
+          initialStep: 4,
+          subjects: testSubjects,
+          subjectMeta: testSubjectMeta,
+          query: {
+            publicationId: 'publication-1',
+            subjectId: 'subject-1',
+            locations: {
+              localAuthority: ['barnet'],
+            },
+            filters: ['state-funded-primary'],
+            indicators: ['another-indicator'],
+            timePeriod: {
+              endCode: 'AY',
+              endYear: 2021,
+              startCode: 'AY',
+              startYear: 2021,
+            },
+          },
+        }}
+      />,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Step 5')).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('button', { name: 'Create table' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', {
+          name: 'Select at least one option from indicators',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('prevent progress to final step if pre-selected filters are not in the subject meta', async () => {
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
+
+    render(
+      <TableToolWizard
+        themeMeta={testThemeMeta}
+        initialState={{
+          initialStep: 4,
+          subjects: testSubjects,
+          subjectMeta: testSubjectMeta,
+          query: {
+            publicationId: 'publication-1',
+            subjectId: 'subject-1',
+            locations: {
+              localAuthority: ['barnet'],
+            },
+            filters: ['another-filter'],
+            indicators: [
+              'authorised-absence-sessions',
+              'overall-absence-sessions',
+            ],
+            timePeriod: {
+              endCode: 'AY',
+              endYear: 2021,
+              startCode: 'AY',
+              startYear: 2021,
+            },
+          },
+        }}
+      />,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Step 5')).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('button', { name: 'Create table' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', {
+          name: 'Select at least one option from school type',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
 });
