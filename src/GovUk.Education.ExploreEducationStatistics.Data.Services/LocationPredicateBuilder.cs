@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IList<Guid>? locationIds,
             LocationQuery? locationCodes)
         {
-            if (locationIds == null && locationCodes == null)
+            if ((locationIds == null || !locationIds.Any()) && locationCodes == null)
             {
                 throw new ArgumentException("Only valid to use LocationPredicateBuilder when supplying " +
                                             "either LocationIds or LocationCodes");
