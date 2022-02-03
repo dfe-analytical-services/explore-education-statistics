@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             var result =
                 new Either<int, string>("either1")
                     .OnSuccess(previousResult => previousResult + " either2");
-            
+
             result.AssertRight("either1 either2");
         }
 
@@ -108,27 +108,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public void OnSuccess_Left_PriorFailure()
         {
             var results = new List<string>();
-            
-            var result = 
+
+            var result =
                 new Either<int, string>(500)
                     .OnSuccess(previousResult =>
                     {
                         results.Add(previousResult + " either2");
                         return previousResult + "either2";
                     });
-            
+
             result.AssertLeft(500);
 
             Assert.Empty(results);
         }
-        
+
         [Fact]
         public void OnSuccess_NoArg()
         {
             var result =
                 new Either<int, string>("either1")
                     .OnSuccess(() => "either2");
-            
+
             result.AssertRight("either2");
         }
 
@@ -136,15 +136,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public void OnSuccess_NoArg_Left_PriorFailure()
         {
             var results = new List<string>();
-            
-            var result = 
+
+            var result =
                 new Either<int, string>(500)
                     .OnSuccess(() =>
                     {
                         results.Add("either2");
                         return "either2";
                     });
-            
+
             result.AssertLeft(500);
 
             Assert.Empty(results);
@@ -155,9 +155,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var result =
                 await new Either<int, string>("either1")
-                    .OnSuccess(previousResult => 
+                    .OnSuccess(previousResult =>
                         Task.FromResult(new Either<int, string>(previousResult + " either2")));
-            
+
             result.AssertRight("either1 either2");
         }
 
@@ -167,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             var result =
                 new Either<int, string>(500)
                     .OrElse(() => "either2");
-            
+
             result.AssertRight("either2");
         }
 
@@ -175,17 +175,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public void OrElse_NoArg_PriorSuccess()
         {
             var results = new List<string>();
-            
-            var result = 
+
+            var result =
                 new Either<int, string>("either1")
                     .OrElse(() =>
                     {
                         results.Add("either2");
                         return "either2";
                     });
-            
+
             result.AssertRight("either1");
-            
+
             Assert.Empty(results);
         }
 
@@ -193,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public async Task OnSuccess_WithEitherTask_Left()
         {
             var results = new List<string>();
-            
+
             var result =
                 await new Either<int, string>("either1")
                     .OnSuccess(previousResult => Task.Run(async () =>
@@ -208,17 +208,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                         results.Add(previousResult + " task2");
                         return new Either<int, string>(previousResult + " task2");
                     }));
-            
+
             result.AssertLeft(500);
 
             Assert.Equal("either1 task1", Assert.Single(results));
         }
-        
+
         [Fact]
         public async Task OnSuccess_WithEitherTask_Left_PriorFailure()
         {
             var results = new List<string>();
-            
+
             var result =
                 await new Either<int, string>(500)
                     .OnSuccess(previousResult => Task.Run(() =>
@@ -228,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     }));
 
             result.AssertLeft(500);
-            
+
             Assert.Empty(results);
         }
     }
@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         public async Task OnSuccess_WithTask()
         {
             var results = new List<string>();
-            
+
             var result = await Task.Run(async () =>
                 {
                     await Task.Delay(20);
@@ -293,13 +293,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task1 task2", results[1]);
             Assert.Equal("task3", results[2]);
         }
-        
+
         [Fact]
         public async Task OnSuccess_WithTask_Throws()
         {
             var results = new List<string>();
-            
-            var exception = await Assert.ThrowsAsync<Exception>(async () => 
+
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
@@ -317,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     await Task.Delay(15);
                     results.Add(previousResult + " task3");
                 })));
-            
+
             Assert.Equal("exception thrown", exception.Message);
 
             Assert.Equal(2, results.Count);
@@ -325,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task1 task2", results[1]);
         }
 #pragma warning restore 618
-        
+
         [Fact]
         public async Task OnSuccess_WithGenericTask()
         {
@@ -347,13 +347,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             result.AssertRight("task1 task2 task3");
         }
-        
+
         [Fact]
         public async Task OnSuccess_WithGenericTask_Throws()
         {
             var results = new List<string>();
 
-            var exception = await Assert.ThrowsAsync<Exception>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
@@ -377,7 +377,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 })));
 
             Assert.Equal("exception thrown", exception.Message);
-            
+
             Assert.Equal(2, results.Count);
             Assert.Equal("task1", results[0]);
             Assert.Equal("task1 task2", results[1]);
@@ -414,13 +414,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task2", results[1]);
             Assert.Equal("task3", results[2]);
         }
-        
+
         [Fact]
         public async Task OnSuccess_WithGenericTaskNoArg_Throws()
         {
             var results = new List<string>();
 
-            var exception = await Assert.ThrowsAsync<Exception>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
@@ -442,7 +442,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     results.Add("task3");
                     return "task3";
                 })));
-            
+
             Assert.Equal("exception thrown", exception.Message);
 
             Assert.Equal(2, results.Count);
@@ -494,7 +494,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             result.AssertRight("task1 task2 task3");
         }
-        
+
         [Fact]
         public async Task OnSuccess_WithEitherTask_Left()
         {
@@ -556,7 +556,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task2", results[1]);
             Assert.Equal("task3", results[2]);
         }
-        
+
         [Fact]
         public async Task OnSuccess_WithEitherTaskNoArg_Left()
         {
@@ -587,7 +587,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task1", results[0]);
             Assert.Equal("task2", results[1]);
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithTask()
         {
@@ -619,7 +619,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task1 task2", results[1]);
             Assert.Equal("task3", results[2]);
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithTask_Throws()
         {
@@ -642,15 +642,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     await Task.Delay(0);
                     results.Add(previousResult + " task3");
                 })));
-            
+
             Assert.Equal("exception thrown", exception.Message);
 
             Assert.Equal(2, results.Count);
             Assert.Equal("task1", results[0]);
             Assert.Equal("task1 task2", results[1]);
         }
-        
-        
+
+
         [Fact]
         public async Task OnSuccessVoid_WithTask_Left_PriorFailure()
         {
@@ -672,7 +672,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             Assert.Equal("task1", Assert.Single(results));
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithTaskNoArg()
         {
@@ -702,13 +702,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task2", results[1]);
             Assert.Equal("task3", results[2]);
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithTaskNoArg_Throws()
         {
             var results = new List<string>();
 
-            var exception = await Assert.ThrowsAsync<Exception>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
@@ -726,20 +726,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     await Task.Delay(0);
                     results.Add("task3");
                 })));
-            
+
             Assert.Equal("exception thrown", exception.Message);
 
             Assert.Equal(2, results.Count);
             Assert.Equal("task1", results[0]);
             Assert.Equal("task2", results[1]);
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithTaskNoArg_Left_PriorFailure()
         {
             var results = new List<string>();
 
-            var result = await 
+            var result = await
                 Task.Run(async () =>
                 {
                     await Task.Delay(20);
@@ -757,7 +757,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Single(results);
             Assert.Equal("task1", results[0]);
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithAction()
         {
@@ -779,20 +779,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task2", actionResults[1]);
             Assert.Equal("task3", actionResults[2]);
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithAction_Throws()
         {
             var results = new List<string>();
 
-            var exception = await Assert.ThrowsAsync<Exception>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
                     results.Add("task1");
                     return new Either<int, string>("task1");
                 })
-                .OnSuccessVoid(() => 
+                .OnSuccessVoid(() =>
                 {
                     results.Add("task2");
                     throw new Exception("exception thrown");
@@ -801,14 +801,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 {
                     results.Add("task3");
                 }));
-            
+
             Assert.Equal("exception thrown", exception.Message);
 
             Assert.Equal(2, results.Count);
             Assert.Equal("task1", results[0]);
             Assert.Equal("task2", results[1]);
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithAction_PriorFailure()
         {
@@ -844,13 +844,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             Assert.Equal("task1", Assert.Single(results));
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_Throws()
         {
             var results = new List<string>();
 
-            var exception = await Assert.ThrowsAsync<Exception>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
                     {
                         await Task.Delay(20);
@@ -868,14 +868,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     {
                         results.Add("task3");
                     }));
-            
+
             Assert.Equal("exception thrown", exception.Message);
 
             Assert.Equal(2, results.Count);
             Assert.Equal("task1", results[0]);
             Assert.Equal("task2", results[1]);
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithEitherTask()
         {
@@ -899,7 +899,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task1", results[0]);
             Assert.Equal("task1 task2", results[1]);
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithEitherTask_Throws()
         {
@@ -925,14 +925,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                         results.Add(previousResult + " task3");
                         return Task.FromResult(new Either<int, string>("task3"));
                     }));
-            
+
             Assert.Equal("exception thrown", exception.Message);
 
             Assert.Equal(2, results.Count);
             Assert.Equal("task1", results[0]);
             Assert.Equal("task1 task2", results[1]);
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithEitherTaskNoArg()
         {
@@ -956,7 +956,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task1", results[0]);
             Assert.Equal("task2", results[1]);
         }
-        
+
         [Fact]
         public async Task OnSuccessVoid_WithEitherTaskNoArg_Throws()
         {
@@ -982,14 +982,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                         results.Add("task3");
                         return Task.FromResult(new Either<int, string>("task3"));
                     }));
-            
+
             Assert.Equal("exception thrown", exception.Message);
 
             Assert.Equal(2, results.Count);
             Assert.Equal("task1", results[0]);
             Assert.Equal("task2", results[1]);
         }
-        
+
         [Fact]
         public async Task OnSuccessDo_WithVoid()
         {
@@ -1032,7 +1032,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     results.Add("task2");
                     return new Either<int, string>("task2");
                 }));
-            
+
             result.AssertRight("task1");
 
             Assert.Equal(2, results.Count);
@@ -1088,7 +1088,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     results.Add("task2");
                     return new Either<int, string>("task2");
                 }));
-            
+
+            result.AssertLeft(500);
+
+            Assert.Equal("task1", Assert.Single(results));
+        }
+
+        [Fact]
+        public async Task OnSuccessDo_WithEitherNoArg()
+        {
+            var results = new List<string>();
+
+            var result = await Task.Run(async () =>
+                {
+                    await Task.Delay(20);
+                    results.Add("task1");
+                    return new Either<int, string>("task1");
+                })
+                .OnSuccessDo(() =>
+                {
+                    results.Add("task2");
+                    return new Either<int, string>("task2");
+                });
+
+            result.AssertRight("task1");
+
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
+        }
+
+        [Fact]
+        public async Task OnSuccessDo_WithEitherNoArg_Left()
+        {
+            var results = new List<string>();
+
+            var result = await Task.Run(() =>
+                {
+                    results.Add("task1");
+                    return new Either<int, string>("task1");
+                })
+                .OnSuccessDo(() =>
+                {
+                    results.Add("task2");
+                    return new Either<int, string>(500);
+                })
+                .OnSuccessDo(() =>
+                {
+                    results.Add("task3");
+                    return new Either<int, string>(600);
+                });
+
+            result.AssertLeft(500);
+
+            Assert.Equal(2, results.Count);
+            Assert.Equal("task1", results[0]);
+            Assert.Equal("task2", results[1]);
+        }
+
+        [Fact]
+        public async Task OnSuccessDo_WithEitherNoArg_Left_PriorFailure()
+        {
+            var results = new List<string>();
+
+            var result = await Task.Run(() =>
+                {
+                    results.Add("task1");
+                    return new Either<int, string>(500);
+                })
+                .OnSuccessDo(() =>
+                {
+                    results.Add("task2");
+                    return new Either<int, string>("task2");
+                });
+
             result.AssertLeft(500);
 
             Assert.Equal("task1", Assert.Single(results));
@@ -1115,7 +1188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     Task.Delay(20);
                     results.Add(previousResult + " task3");
                 }));
-            
+
             result.AssertRight("task1");
 
             Assert.Equal(3, results.Count);
@@ -1129,7 +1202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         {
             var results = new List<string>();
 
-            var exception = await Assert.ThrowsAsync<Exception>(async () => 
+            var exception = await Assert.ThrowsAsync<Exception>(async () =>
                 await Task.Run(async () =>
                 {
                     await Task.Delay(20);
@@ -1147,7 +1220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     Task.Delay(20);
                     results.Add(previousResult + " task3");
                 })));
-            
+
             Assert.Equal("exception thrown", exception.Message);
 
             Assert.Equal(2, results.Count);
@@ -1171,7 +1244,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     Task.Delay(20);
                     results.Add(task1Result + " task2");
                 }));
-            
+
             result.AssertLeft(500);
 
             Assert.Equal("task1", Assert.Single(results));
@@ -1212,7 +1285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             result.AssertRight("Success1");
         }
-        
+
         [Fact]
         public async Task OnFailureFailWith()
         {
@@ -1221,7 +1294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             result.AssertLeft(600);
         }
-        
+
         [Fact]
         public async Task OnFailureFailWith_GenericTask()
         {
@@ -1230,7 +1303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             result.AssertLeft(600);
         }
-        
+
         [Fact]
         public async Task OnFailureFailWith_GenericTask_PriorFailure()
         {
@@ -1257,7 +1330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
         [Fact]
         public async Task OnSuccessCombineWith_AllSuccessMixedTypes()
         {
-            var result = await 
+            var result = await
                 Task.FromResult(new Either<int, string>("Success number one!"))
                 // ReSharper disable once ParameterOnlyUsedForPreconditionCheck.Local
                 .OnSuccessCombineWith(firstSuccess =>
@@ -1290,7 +1363,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             result.AssertLeft(500);
         }
-        
+
         [Fact]
         public async Task OnSuccessCombineWith_WithEitherTask()
         {
@@ -1309,7 +1382,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task1", result.Right.Item1);
             Assert.Equal("task1 task2", result.Right.Item2);
         }
-        
+
         [Fact]
         public async Task OnSuccessCombineWith_WithEitherTask_Left()
         {
@@ -1335,12 +1408,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 }));
 
             result.AssertLeft(500);
-            
+
             Assert.Equal(2, results.Count);
             Assert.Equal("task1", results[0]);
             Assert.Equal("task1 task2", results[1]);
         }
-        
+
         [Fact]
         public async Task OnSuccessCombineWith_WithEitherTaskTuple3()
         {
@@ -1371,7 +1444,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.Equal("task2", value2);
             Assert.Equal("task3", value3);
         }
-        
+
         [Fact]
         public async Task OnSuccessCombineWith_WithEitherTaskTuple3_Left()
         {
@@ -1473,17 +1546,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                     return "failure";
 #pragma warning restore 162
                 }));
-            
+
             Assert.Equal("exception thrown", exception.Message);
         }
 
         [Fact]
         public async Task OrElse_GenericTaskNoArg_PriorSuccess()
         {
-            var result = await 
+            var result = await
                 Task.FromResult(new Either<int, string>("Success1"))
                 .OrElse(() => "Success2");
-            
+
             Assert.Equal("Success1", result);
         }
 
@@ -1523,7 +1596,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
 
             Assert.Empty(failures);
         }
-        
+
         [Fact]
         public async Task OnSuccessAll()
         {
@@ -1542,18 +1615,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 await Task.Delay(30);
                 return new Either<int, string>("task3");
             });
-            
+
             var eitherList = ListOf(eitherTask1, eitherTask2, eitherTask3);
 
             var results = await eitherList.OnSuccessAll();
-            
+
             Assert.True(results.IsRight);
             Assert.Equal(3, results.Right.Count);
             Assert.Equal("task1", results.Right[0]);
             Assert.Equal("task2", results.Right[1]);
             Assert.Equal("task3", results.Right[2]);
         }
-        
+
         [Fact]
         public async Task OnSuccessAll_Left()
         {
@@ -1572,7 +1645,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
                 await Task.Delay(30);
                 return new Either<int, string>("task3");
             });
-            
+
             var eitherList = ListOf(eitherTask1, eitherTask2, eitherTask3);
 
             var result = await eitherList.OnSuccessAll();

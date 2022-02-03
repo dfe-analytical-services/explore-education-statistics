@@ -102,6 +102,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
             this Task<Either<TFailure, TSuccess1>> task,
+            Func<Either<TFailure, TSuccess2>> successTask)
+        {
+            return await task.OnSuccessDo(async _=> await Task.FromResult(successTask()));
+        }
+
+        public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
+            this Task<Either<TFailure, TSuccess1>> task,
+            Func<TSuccess1, Either<TFailure, TSuccess2>> successTask)
+        {
+            return await task.OnSuccessDo(async result=> await Task.FromResult(successTask(result)));
+        }
+
+        public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
+            this Task<Either<TFailure, TSuccess1>> task,
             Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> successTask)
         {
             var firstResult = await task;
@@ -184,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
             return await func();
         }
-        
+
         [Obsolete("Use OnSuccessDo or OnSuccessVoid for chaining a non-generic Task")]
         public static async Task<Either<TFailure, Unit>> OnSuccess<TFailure, TSuccess1>(
             this Task<Either<TFailure, TSuccess1>> task,
@@ -226,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
             return Unit.Instance;
         }
-        
+
         /**
          * Convenience method so that the chained function can be
          * void and doesn't have to explicitly return a Unit.
@@ -239,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
                 .OnSuccess(task2.Invoke)
                 .OnSuccessVoid();
         }
-        
+
         /**
          * Convenience method so that the chained function can be
          * void and doesn't have to explicitly return a Unit.
