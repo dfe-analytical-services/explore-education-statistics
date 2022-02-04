@@ -14,29 +14,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public static class LocationPredicateBuilder
     {
         public static Expression<Func<Location, bool>> Build(
-            IEnumerable<Guid>? locationIds,
+            IList<Guid>? locationIds,
             LocationQuery? locationCodes)
         {
+            if ((locationIds == null || !locationIds.Any()) && locationCodes == null)
+            {
+                throw new ArgumentException("Only valid to use LocationPredicateBuilder when supplying " +
+                                            "either LocationIds or LocationCodes");
+            }
+            
             var predicate = PredicateBuilder.True<Location>();
 
-            if (locationIds != null)
+            if (locationIds != null && locationIds.Any())
             {
-                predicate = predicate.AndAlso(location =>
+                return predicate.AndAlso(location =>
                     locationIds.Contains(location.Id));
             }
 
             // TODO EES-3068 Migrate Location codes to ids in old Datablocks to remove this support for Location codes
-            if (locationCodes != null)
-            {
-                if (locationCodes.GeographicLevel != null)
-                {
-                    predicate = predicate.AndAlso(location => location.GeographicLevel == locationCodes.GeographicLevel);
-                }
+            var geographicLevel = locationCodes.GeographicLevel;
+            var locationAttributesPredicate = LocationAttributesExist(locationCodes)
+                ? LocationAttributesPredicate(locationCodes)
+                : null;
 
-                if (LocationAttributesExist(locationCodes))
-                {
-                    predicate = predicate.AndAlso(LocationAttributesPredicate(locationCodes));
-                }
+            if (geographicLevel == null && locationAttributesPredicate == null)
+            {
+                throw new ArgumentException("Using LocationPredicateBuilder with LocationCodes is only " +
+                                            "valid if a GeographicLevel or Location Attributes are provided");
+            }
+            
+            if (geographicLevel != null)
+            {
+                predicate = predicate.AndAlso(location => location.GeographicLevel == locationCodes.GeographicLevel);
+            }
+
+            if (locationAttributesPredicate != null)
+            {
+                predicate = predicate.AndAlso(locationAttributesPredicate);
             }
 
             return predicate;
@@ -96,6 +110,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 predicate = predicate.Or(ParliamentaryConstituencyPredicate(query));
             }
 
+            if (query.PlanningArea != null)
+            {
+                predicate = predicate.Or(PlanningAreaPredicate(query));
+            }
+
             if (query.Provider != null)
             {
                 predicate = predicate.Or(ProviderPredicate(query));
@@ -126,11 +145,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 predicate = predicate.Or(WardPredicate(query));
             }
 
-            if (query.PlanningArea != null)
-            {
-                predicate = predicate.Or(PlanningAreaPredicate(query));
-            }
-
             return predicate;
         }
 
@@ -146,11 +160,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                      query.MayoralCombinedAuthority.IsNullOrEmpty() &&
                      query.OpportunityArea.IsNullOrEmpty() &&
                      query.ParliamentaryConstituency.IsNullOrEmpty() &&
+                     query.PlanningArea.IsNullOrEmpty() &&
+                     query.Provider.IsNullOrEmpty() &&
                      query.Region.IsNullOrEmpty() &&
                      query.RscRegion.IsNullOrEmpty() &&
+                     query.School.IsNullOrEmpty() &&
                      query.Sponsor.IsNullOrEmpty() &&
-                     query.Ward.IsNullOrEmpty() &&
-                     query.PlanningArea.IsNullOrEmpty());
+                     query.Ward.IsNullOrEmpty());
         }
 
         private static Expression<Func<Location, bool>> CountryPredicate(LocationQuery query)
