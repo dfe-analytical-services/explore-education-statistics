@@ -4,6 +4,7 @@ import {
   publicationTypes,
 } from '@common/services/types/publicationType';
 import Link from '@frontend/components/Link';
+import groupBy from 'lodash/groupBy';
 import React from 'react';
 
 interface Props {
@@ -19,12 +20,7 @@ const publicationTypeReferenceOrder: PublicationType[] = [
 ];
 
 const groupPublicationsByType = (publications: PublicationSummary[]) =>
-  Object.entries(
-    publications.reduce((acc, publication) => {
-      (acc[publication.type] ??= []).push(publication);
-      return acc;
-    }, {} as { [key in PublicationType]?: PublicationSummary[] }),
-  )
+  Object.entries(groupBy(publications, publication => publication.type))
     .map(([key, value]) => ({
       type: key as PublicationType,
       group: value,
