@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private static PublicationTreeNode BuildPublicationNode(Publication publication)
         {
             var latestRelease = publication.LatestPublishedRelease();
-            var type = latestRelease == null ? PublicationType.Legacy : GetPublicationType(latestRelease.Type);
+            var type = GetPublicationType(latestRelease?.Type);
 
             return new PublicationTreeNode
             {
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .ToListAsync();
         }
 
-        private static PublicationType GetPublicationType(ReleaseType releaseType)
+        private static PublicationType GetPublicationType(ReleaseType? releaseType)
         {
             return releaseType switch
             {
@@ -142,6 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 ReleaseType.ExperimentalStatistics => PublicationType.Experimental,
                 ReleaseType.ManagementInformation => PublicationType.ManagementInformation,
                 ReleaseType.OfficialStatistics => PublicationType.NationalAndOfficial,
+                null => PublicationType.Legacy,
                 _ => throw new ArgumentOutOfRangeException()
             };
         }
