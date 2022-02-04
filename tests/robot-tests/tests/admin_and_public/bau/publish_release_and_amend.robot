@@ -141,7 +141,6 @@ Verify newly published release is on Find Statistics page
 
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}
-    ...    %{WAIT_MEDIUM}
     user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
     user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
     user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
@@ -293,6 +292,17 @@ Verify Test text accordion section contains correct text
 Return to Admin and Create amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
+
+Change the Release type
+    user waits until page contains link    Edit release summary
+    user clicks link    Edit release summary
+    user waits until h2 is visible    Edit release summary
+    user checks page contains radio    Experimental statistics
+    user clicks radio    Experimental statistics
+    user clicks button    Update release summary
+    user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
+    user verifies release summary    ${PUBLICATION_NAME}    Financial Year    3000-01    UI test contact name
+    ...    Experimental statistics
 
 Navigate to data replacement page
     user clicks link    Data and files
@@ -485,7 +495,8 @@ Verify amendment is on Find Statistics page again
     user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
 
     user opens details dropdown    %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}    10
+    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}
+    ...    Experimental statistics
     user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
     user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
     user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
@@ -604,7 +615,7 @@ Verify amendment accordions are correct
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
 
-    user checks accordion is in position    National Statistics    1    id:help-and-support
+    user checks accordion is in position    Experimental Statistics    1    id:help-and-support
     user checks accordion is in position    Contact us    2    id:help-and-support
 
 Verify amendment Dates data block accordion section

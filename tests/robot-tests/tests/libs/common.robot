@@ -654,15 +654,6 @@ user checks page for details dropdown
     [Arguments]    ${text}
     user checks page contains element    xpath:.//details/summary[contains(., "${text}")]
 
-user waits until details contains element
-    [Arguments]    ${text}    ${element}    ${parent}=css:body    ${wait}=${timeout}
-    ${details}=    user gets details content element    ${text}    ${parent}
-    user waits until parent contains element    ${details}    ${element}    timeout=${wait}
-
-user waits until details contains link
-    [Arguments]    ${text}    ${link}    ${parent}=css:body
-    user waits until details contains element    ${text}    link:${link}    ${parent}
-
 user checks publication bullet contains link
     [Arguments]    ${publication}    ${link}
     user checks page contains element    xpath://details[@open]//*[text()="${publication}"]/..//a[text()="${link}"]
