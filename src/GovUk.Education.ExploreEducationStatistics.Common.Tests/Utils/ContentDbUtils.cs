@@ -1,7 +1,8 @@
 using System;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
 {
     public static class ContentDbUtils
     {
@@ -19,9 +20,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             return InMemoryContentDbContextOptions(Guid.NewGuid().ToString());
         }
 
-        public static ContentDbContext InMemoryContentDbContext(string dbName)
+        public static ContentDbContext InMemoryContentDbContext(string databaseName)
         {
-            return new ContentDbContext(InMemoryContentDbContextOptions(dbName));
+            return new ContentDbContext(InMemoryContentDbContextOptions(databaseName));
         }
 
         public static ContentDbContext InMemoryContentDbContext()

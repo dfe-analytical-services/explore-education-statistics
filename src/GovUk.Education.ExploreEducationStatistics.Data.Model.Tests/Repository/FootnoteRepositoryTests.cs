@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 {
@@ -144,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddAsync(release);
                 await context.AddRangeAsync(releaseSubject1, releaseSubject2);
@@ -152,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
                 var results = repository.GetFootnotes(release.Id).ToList();
@@ -281,7 +282,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddAsync(release);
                 await context.AddRangeAsync(releaseSubject1, releaseSubject2);
@@ -289,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
                 var results = repository.GetFootnotes(release.Id).ToList();
@@ -378,7 +379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddAsync(release);
                 await context.AddRangeAsync(releaseSubject1, releaseSubject2);
@@ -386,7 +387,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
                 var results = repository.GetFootnotes(release.Id, releaseSubject2.SubjectId).ToList();
@@ -478,7 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddAsync(release);
                 await context.AddRangeAsync(releaseSubject1, releaseSubject2, releaseSubject3);
@@ -486,7 +487,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
                 var results = repository.GetFootnotes(
@@ -641,7 +642,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddRangeAsync(release, otherRelease);
                 await context.AddRangeAsync(releaseSubject, otherReleaseSubject);
@@ -649,7 +650,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
                 var results = repository.GetFootnotes(release.Id, releaseSubject.SubjectId).ToList();
@@ -842,7 +843,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddRangeAsync(release);
                 await context.AddRangeAsync(
@@ -857,7 +858,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
                 var results = await repository.GetSubjectsWithNoFootnotes(release.Id);
@@ -977,7 +978,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddRangeAsync(release);
                 await context.AddRangeAsync(
@@ -992,7 +993,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var repository = BuildFootnoteRepository(context);
                 var results = await repository.GetSubjectsWithNoFootnotes(release.Id);

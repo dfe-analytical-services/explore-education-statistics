@@ -24,7 +24,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using ContentRelease = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -79,7 +79,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var savedTopic = await context.Topics.FindAsync(result.Right.Id);
 
-                Assert.Equal("Test topic", savedTopic.Title);
+                Assert.NotNull(savedTopic);
+                Assert.Equal("Test topic", savedTopic!.Title);
                 Assert.Equal("test-topic", savedTopic.Slug);
                 Assert.Equal(theme.Id, savedTopic.ThemeId);
             }
@@ -201,7 +202,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var savedTopic = await context.Topics.FindAsync(result.Right.Id);
 
-                Assert.Equal("New title", savedTopic.Title);
+                Assert.NotNull(savedTopic);
+                Assert.Equal("New title", savedTopic!.Title);
                 Assert.Equal("new-title", savedTopic.Slug);
                 Assert.Equal(theme.Id, savedTopic.ThemeId);
             }

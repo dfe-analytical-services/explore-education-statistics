@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services
@@ -146,6 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var updated = await contentDbContext.DataImports.FindAsync(import.Id);
+                Assert.NotNull(updated);
                 Assert.Equal(1000, updated.RowsPerBatch);
                 Assert.Equal(10000, updated.TotalRows);
                 Assert.Equal(10, updated.NumBatches);

@@ -4,19 +4,17 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityServer4.EntityFramework.Options;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public static class DbUtils
     {
-        public static ContentDbContext InMemoryApplicationDbContext(string dbName)
-        {
-            return ContentDbUtils.InMemoryContentDbContext(dbName);
-        }
+        public static ContentDbContext InMemoryApplicationDbContext(string dbName) => InMemoryContentDbContext(dbName);
 
         public static ContentDbContext InMemoryApplicationDbContext()
         {
-            return ContentDbUtils.InMemoryContentDbContext();
+            return InMemoryContentDbContext();
         }
 
         public static UsersAndRolesDbContext InMemoryUserAndRolesDbContext(string dbName)

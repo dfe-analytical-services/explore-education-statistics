@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 using static Moq.MockBehavior;
@@ -375,7 +375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
                 VerifyAllMocks(methodologyRepository);
 
                 Assert.NotNull(result);
-                Assert.Equal(latestPublishedVersion.Id, result.Id);
+                Assert.Equal(latestPublishedVersion.Id, result!.Id);
             }
         }
 
@@ -827,17 +827,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Reposit
             methodologyRepository.Setup(mock => mock.GetByPublication(It.IsAny<Guid>()))
                 .ReturnsAsync(new List<Methodology>());
 
-            await using (var contentDbContext = InMemoryContentDbContext())
-            {
-                var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
-                    methodologyRepository: methodologyRepository.Object);
+            await using var contentDbContext = InMemoryContentDbContext();
+            var service = BuildMethodologyVersionRepository(contentDbContext: contentDbContext,
+                methodologyRepository: methodologyRepository.Object);
 
-                var result = await service.GetLatestPublishedVersionByPublication(Guid.NewGuid());
+            var result = await service.GetLatestPublishedVersionByPublication(Guid.NewGuid());
 
-                VerifyAllMocks(methodologyRepository);
+            VerifyAllMocks(methodologyRepository);
 
-                Assert.Empty(result);
-            }
+            Assert.Empty(result);
         }
 
         [Fact]

@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services
 {

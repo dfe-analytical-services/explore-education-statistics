@@ -12,7 +12,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -275,7 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
                 Assert.NotNull(statsRelease);
-                Assert.Equal(release.Published, statsRelease.Published);
+                Assert.Equal(release.Published, statsRelease!.Published);
                 Assert.Equal(release.Slug, statsRelease.Slug);
                 Assert.Equal(release.PublicationId, statsRelease.PublicationId);
                 Assert.Equal(release.TimePeriodCoverage, statsRelease.TimeIdentifier);

@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
@@ -20,14 +20,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = BuildThemeService(context);
+            await using var context = InMemoryContentDbContext(contextId);
+            var service = BuildThemeService(context);
 
-                var result = await service.GetPublicationTree();
+            var result = await service.GetPublicationTree();
 
-                Assert.Empty(result);
-            }
+            Assert.Empty(result);
         }
 
         [Fact]

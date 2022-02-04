@@ -12,6 +12,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
@@ -223,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contextId = Guid.NewGuid().ToString();
 
-            using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(Theme);
                 await context.AddAsync(Topic);
@@ -232,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            using (var context = InMemoryContentDbContext(contextId))
             {
                 var releaseService = new Mock<IReleaseService>();
 
@@ -329,13 +330,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildPublicationService(contentDbContext);
 
@@ -350,13 +351,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildPublicationService(contentDbContext);
 
@@ -378,13 +379,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildPublicationService(contentDbContext);
 
@@ -409,22 +410,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publishDate = DateTime.Now;
 
             var contextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 var service = BuildPublicationService(contentDbContext);
                 await service.SetPublishedDate(publication.Id, publishDate);
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
 
+                Assert.NotNull(contentPublication);
                 Assert.Equal(publication.Id, contentPublication.Id);
                 Assert.Equal("Test publication", contentPublication.Title);
                 Assert.Equal("test-publication", contentPublication.Slug);
@@ -449,23 +451,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publishDate = DateTime.Now;
 
             var contextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 var service = BuildPublicationService(contentDbContext);
 
                 await service.SetPublishedDate(publication.Id, publishDate);
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
 
+                Assert.NotNull(contentPublication);
                 Assert.Equal(publication.Id, contentPublication.Id);
                 Assert.Equal("Test publication", contentPublication.Title);
                 Assert.Equal("test-publication", contentPublication.Slug);

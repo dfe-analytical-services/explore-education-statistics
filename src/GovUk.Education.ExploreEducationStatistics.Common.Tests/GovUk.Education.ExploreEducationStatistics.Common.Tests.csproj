@@ -7,8 +7,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="CompareNETObjects" Version="4.74.0" />
         <PackageReference Include="IsExternalInit" Version="1.0.1" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.1" PrivateAssets="all" />
+        <PackageReference Include="CompareNETObjects" Version="4.74.0" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="6.0.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
@@ -21,6 +22,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common\GovUk.Education.ExploreEducationStatistics.Common.csproj" />
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model\GovUk.Education.ExploreEducationStatistics.Content.Model.csproj" />
+      <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Data.Model\GovUk.Education.ExploreEducationStatistics.Data.Model.csproj" />
     </ItemGroup>
 
     <ItemGroup>

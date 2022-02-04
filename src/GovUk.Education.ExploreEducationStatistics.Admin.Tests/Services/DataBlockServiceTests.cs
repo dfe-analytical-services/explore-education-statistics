@@ -24,8 +24,8 @@ using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -163,13 +163,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = BuildDataBlockService(context);
-                var result = await service.Get(Guid.NewGuid());
+            await using var context = InMemoryContentDbContext(contextId);
+            var service = BuildDataBlockService(context);
+            var result = await service.Get(Guid.NewGuid());
 
-                result.AssertNotFound();
-            }
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -1044,8 +1042,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlock.Id);
 
-                Assert.Equal(updateRequest.Heading, updatedDataBlock.Heading);
-                Assert.Equal(updateRequest.Name, updatedDataBlock.Name);
+                Assert.Equal(updateRequest.Heading, updatedDataBlock?.Heading);
+                Assert.Equal(updateRequest.Name, updatedDataBlock?.Name);
                 Assert.Equal(updateRequest.HighlightName, updatedDataBlock.HighlightName);
                 Assert.Equal(updateRequest.HighlightDescription, updatedDataBlock.HighlightDescription);
                 Assert.Equal(updateRequest.Source, updatedDataBlock.Source);
@@ -1148,10 +1146,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlock.Id);
 
-                Assert.Equal(updateRequest.Heading, updatedDataBlock.Heading);
-                updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
+                Assert.Equal(updateRequest.Heading, updatedDataBlock?.Heading);
+                updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock?.Charts);
 
-                Assert.Single(updatedDataBlock.Charts);
+                Assert.Single(updatedDataBlock?.Charts);
                 Assert.Equal(updateRequest.Heading, updatedDataBlock.Charts[0].Title);
             }
         }

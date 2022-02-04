@@ -21,7 +21,8 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.StatisticsDbUtils;
+using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests

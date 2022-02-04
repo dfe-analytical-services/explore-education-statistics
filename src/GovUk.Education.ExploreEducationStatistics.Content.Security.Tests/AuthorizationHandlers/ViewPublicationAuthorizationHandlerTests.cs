@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationH
 using Microsoft.AspNetCore.Authorization;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.AuthorizationHandlers
 {

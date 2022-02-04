@@ -11,7 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Notifier.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Notifier.Model.NotifierQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services

@@ -30,8 +30,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 using Publication = GovUk.Education.ExploreEducationStatistics.Content.Model.Publication;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -417,7 +417,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(await contentDbContext.Files.FindAsync(zipFile.Id));
 
                 // Check that the reference to the replacement is removed
-                Assert.Null((await contentDbContext.Files.FindAsync(dataFile.Id)).ReplacedById);
+                Assert.Null((await contentDbContext.Files.FindAsync(dataFile.Id))?.ReplacedById);
             }
         }
 
@@ -800,18 +800,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext())
-            {
-                var service = SetupReleaseDataFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
-                    dataImportService: dataImportService.Object);
+            await using var contentDbContext = InMemoryApplicationDbContext();
+            var service = SetupReleaseDataFileService(contentDbContext: contentDbContext,
+                blobStorageService: blobStorageService.Object,
+                dataImportService: dataImportService.Object);
 
-                var result = await service.DeleteAll(Guid.NewGuid());
+            var result = await service.DeleteAll(Guid.NewGuid());
 
-                result.AssertNotFound();
+            result.AssertNotFound();
 
-                MockUtils.VerifyAllMocks(blobStorageService, dataImportService);
-            }
+            MockUtils.VerifyAllMocks(blobStorageService, dataImportService);
         }
 
         [Fact]

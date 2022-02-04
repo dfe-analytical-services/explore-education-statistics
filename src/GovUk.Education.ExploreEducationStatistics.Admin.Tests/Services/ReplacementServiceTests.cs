@@ -29,7 +29,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
@@ -2978,7 +2978,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var replacedDataBlock = await contentDbContext.DataBlocks.FindAsync(dataBlock.Id);
                 Assert.NotNull(replacedDataBlock);
-                Assert.Equal(dataBlock.Name, replacedDataBlock.Name);
+                Assert.Equal(dataBlock.Name, replacedDataBlock!.Name);
                 Assert.Equal(replacementSubject.Id, replacedDataBlock.Query.SubjectId);
 
                 Assert.Single(replacedDataBlock.Query.Indicators);

@@ -23,8 +23,8 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -264,7 +264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             locationRepository
                 .Setup(s => s.GetDistinctForSubject(subject.Id))
                 .ReturnsAsync(locations);
-            
+
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectMetaService(
@@ -545,7 +545,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             timePeriodService
                 .Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
-            
+
             locationRepository
                 .Setup(s => s.GetDistinctForSubject(subject.Id))
                 .ReturnsAsync(locations);
@@ -1009,7 +1009,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task GetSubjectMetaForQuery_TimePeriods()
         {
             var contextId = Guid.NewGuid().ToString();
-            
+
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
@@ -1024,7 +1024,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     LocalAuthority = ListOf(_blackpool.Code, _derby.Code)!
                 }
             };
-            
+
             var observations = ListOf(
                 new Observation
                 {
@@ -1053,7 +1053,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         Country = _england
                     }
                 });
-            
+
             var observationsWithDifferentLocations = ListOf(
                 new Observation
                 {
@@ -1121,7 +1121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         (2012, TimeIdentifier.May),
                         (2012, TimeIdentifier.June)
                     });
-                
+
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
                     timePeriodService: timePeriodService.Object);
@@ -1129,12 +1129,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(query, cancellationToken);
 
                 VerifyAllMocks(timePeriodService);
-                
+
                 var meta = result.AssertRight();
                 Assert.Empty(meta.Locations);
                 Assert.Empty(meta.Filters);
                 Assert.Empty(meta.Indicators);
-                
+
                 var periods = meta.TimePeriod.Options.ToList();
                 Assert.Equal(3, periods.Count());
                 Assert.Equal(2012, periods[0].Year);
@@ -1150,7 +1150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task GetSubjectMetaForQuery_FilterItems()
         {
             var contextId = Guid.NewGuid().ToString();
-            
+
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
@@ -1203,7 +1203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     Label = "Filter 1"
                 };
                 filter1.FilterGroups = CreateFilterGroups(filter1, 2, 1);
-                    
+
                 var filter2 = new Filter
                 {
                     Id = Guid.NewGuid(),
@@ -1216,12 +1216,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .FilterGroups
                     .SelectMany(fg => fg.FilterItems)
                     .ToList();
-                
+
                 var filter2FilterItems = filter2
                     .FilterGroups
                     .SelectMany(fg => fg.FilterItems)
                     .ToList();
-                
+
                 var allFilterItems = filter1FilterItems.Concat(filter2FilterItems);
 
                 filterItemRepository
@@ -1232,7 +1232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 filterItemRepository
                     .Setup(s => s.GetTotal(filter1FilterItems))
                     .Returns(filter1FilterItems[1]);
-                
+
                 filterItemRepository
                     .Setup(s => s.GetTotal(filter2FilterItems))
                     .Returns((FilterItem?)null);
@@ -1264,11 +1264,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                                 Label = "Indicator 1"
                             })
                     });
-                
+
                 indicatorGroupRepository
                     .Setup(s => s.GetIndicatorGroups(subject.Id))
                     .Returns(indicatorGroups);
-                
+
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
                     observationService: observationService.Object,
@@ -1278,11 +1278,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var result = await service.GetSubjectMeta(query, cancellationToken);
 
                 VerifyAllMocks(observationService, filterItemRepository, indicatorGroupRepository);
-                
+
                 var meta = result.AssertRight();
                 meta.TimePeriod.AssertDeepEqualTo(new TimePeriodsMetaViewModel());
                 Assert.Empty(meta.Locations);
-                
+
                 meta.Filters.AssertDeepEqualTo(new Dictionary<string, FilterMetaViewModel>
                 {
                     {"Filter1", new FilterMetaViewModel
@@ -1350,12 +1350,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 });
             }
         }
-        
+
         [Fact]
         public async Task GetSubjectMetaForQuery_InvalidCombination_NoTimePeriodsOrLocations()
         {
             var contextId = Guid.NewGuid().ToString();
-            
+
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
@@ -1377,10 +1377,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectMetaService(statisticsDbContext);
-                
+
                 var exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
                 () => service.GetSubjectMeta(query, default));
-                
+
                 Assert.Equal("Unable to determine which SubjectMeta information has requested " +
                              "(Parameter 'subjectMetaStep')", exception.Message);
             }
@@ -1403,7 +1403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         Filter = filter,
                         FilterItems = Enumerable
                             .Range(0, filterItemCount)
-                            .Select(filterItemIndex => 
+                            .Select(filterItemIndex =>
                                 new FilterItem
                                 {
                                     Id = Guid.NewGuid(),
@@ -1411,7 +1411,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                                 })
                             .ToList()
                     };
-                    
+
                     filterGroup.FilterItems.ForEach(filterItem => filterItem.FilterGroup = filterGroup);
 
                     return filterGroup;

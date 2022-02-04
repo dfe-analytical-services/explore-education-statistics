@@ -1,7 +1,8 @@
 ﻿using System;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
+namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
 {
     public static class StatisticsDbUtils
     {
@@ -9,8 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             var builder = new DbContextOptionsBuilder<StatisticsDbContext>();
             builder.UseInMemoryDatabase(databaseName,
-                b =>
-                    b.EnableNullChecks(false));
+                b => b.EnableNullChecks(false));
             return new StatisticsDbContext(builder.Options, null);
         }
 

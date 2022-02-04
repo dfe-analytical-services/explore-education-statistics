@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
@@ -59,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            await using var contentDbContext = ContentDbUtils.InMemoryContentDbContext();
+            await using var contentDbContext = InMemoryContentDbContext();
 
             await contentDbContext.AddAsync(releaseContentBlock);
             await contentDbContext.SaveChangesAsync();
@@ -138,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            await using var contentDbContext = ContentDbUtils.InMemoryContentDbContext();
+            await using var contentDbContext = InMemoryContentDbContext();
 
             await contentDbContext.AddAsync(releaseContentBlock);
             await contentDbContext.SaveChangesAsync();
@@ -203,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 ContentBlock = new HtmlBlock(),
             };
 
-            await using var contentDbContext = ContentDbUtils.InMemoryContentDbContext();
+            await using var contentDbContext = InMemoryContentDbContext();
 
             await contentDbContext.AddAsync(releaseContentBlock);
             await contentDbContext.SaveChangesAsync();

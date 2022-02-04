@@ -13,8 +13,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfa
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.StatisticsDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.DataImportStatus;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Services

@@ -17,8 +17,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.StatisticsDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
