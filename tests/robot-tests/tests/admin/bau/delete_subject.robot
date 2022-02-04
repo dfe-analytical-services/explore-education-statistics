@@ -21,7 +21,7 @@ Verify Release summary
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    Tax Year 2020-21 (not Live)
     user verifies release summary    ${PUBLICATION_NAME}    Tax Year    2020-21    UI test contact name
-    ...    National Statistics
+    ...    National statistics
 
 Upload subject
     user uploads subject    UI test subject    upload-file-test-with-filter.csv

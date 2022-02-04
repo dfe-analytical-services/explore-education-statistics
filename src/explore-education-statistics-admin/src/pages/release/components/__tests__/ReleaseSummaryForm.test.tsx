@@ -63,7 +63,7 @@ describe('ReleaseSummaryForm', () => {
     expect(inputYear).toBeInTheDocument();
 
     expect(
-      within(screen.getByRole('group', { name: 'Release Type' })).getAllByRole(
+      within(screen.getByRole('group', { name: 'Release type' })).getAllByRole(
         'radio',
       ),
     ).toHaveLength(5);
@@ -334,7 +334,7 @@ describe('ReleaseSummaryForm', () => {
     expect(inputYear).toHaveValue(1966);
 
     const radioOptionsReleaseType = within(
-      screen.getByRole('group', { name: 'Release Type' }),
+      screen.getByRole('group', { name: 'Release type' }),
     ).getAllByRole('radio');
     expect(radioOptionsReleaseType).toHaveLength(5);
     expect(radioOptionsReleaseType[0]).not.toBeChecked();

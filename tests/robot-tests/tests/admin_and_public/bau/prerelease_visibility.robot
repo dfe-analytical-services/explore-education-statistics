@@ -21,7 +21,7 @@ Verify release summary
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
     user verifies release summary    ${PUBLICATION_NAME}    Calendar Year    2000    UI test contact name
-    ...    National Statistics
+    ...    National statistics
 
 Upload subject
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv

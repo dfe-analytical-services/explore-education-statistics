@@ -142,7 +142,7 @@ const ReleaseSummaryForm = <
             </FormFieldset>
 
             <FormFieldRadioGroup<ReleaseSummaryFormValues>
-              legend="Release Type"
+              legend="Release type"
               name="releaseType"
               options={(Object.keys(releaseTypes) as ReleaseType[]).map(
                 type => ({

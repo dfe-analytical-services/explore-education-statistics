@@ -71,7 +71,11 @@ const MethodologyIndexPage: NextPage<Props> = ({ themes = [] }) => {
               >
                 {topics.map(
                   ({ id: topicId, title: topicTitle, publications }) => (
-                    <Details key={topicId} summary={topicTitle}>
+                    <Details
+                      key={topicId}
+                      summary={topicTitle}
+                      detailsId="topic"
+                    >
                       <MethodologyList publications={publications} />
                     </Details>
                   ),

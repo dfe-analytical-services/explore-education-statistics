@@ -18,9 +18,20 @@ user checks release update
     user waits until element contains    css:#releaseLastUpdates li:nth-of-type(${number}) p    ${text}
 
 user waits until details dropdown contains publication
-    [Arguments]    ${details_heading}    ${publication_name}    ${wait}=3
-    user waits until details contains element    ${details_heading}    xpath:.//*[text()="${publication_name}"]
-    ...    wait=${wait}
+    [Arguments]    ${details_heading}    ${publication_name}    ${publication_type}=National and official statistics
+    ${details}=    user gets details content element    ${details_heading}
+    user checks publication appears under correct publication type heading
+    ...    ${details}
+    ...    ${publication_type}
+    ...    ${publication_name}
+
+user checks publication appears under correct publication type heading
+    [Arguments]    ${parent}    ${publication_type}    ${publication_name}
+    ${publication_type}=    get child element
+    ...    ${parent}
+    ...    xpath:.//div[@data-testid="publication-type" and descendant::h3[text()="${publication_type}"]]
+    ${publications}=    get child element    ${publication_type}    css:ul
+    user checks element should contain    ${publications}    ${publication_name}
 
 user goes to release page via breadcrumb
     [Arguments]    ${publication}    ${release}
