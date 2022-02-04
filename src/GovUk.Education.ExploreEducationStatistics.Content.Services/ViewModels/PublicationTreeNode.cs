@@ -1,16 +1,23 @@
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+#nullable enable
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-
-#nullable enable
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
     public record PublicationTreeNode : BasePublicationTreeNode
     {
-        [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseType? LatestReleaseType { get; set; }
-
         public string? LegacyPublicationUrl { get; init; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public PublicationType Type { get; set; }
+    }
+
+    public enum PublicationType
+    {
+        NationalAndOfficial,
+        AdHoc,
+        Experimental,
+        ManagementInformation,
+        Legacy
     }
 }

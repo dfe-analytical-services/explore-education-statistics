@@ -41,16 +41,12 @@ def create_find_statistics_snapshot(public_url) -> str:
                 'publication_types': [],
             }
 
-            publication_types = topic_html.select('[id^="publication-type-heading-"]') or []
+            publication_types = topic_html.select('[data-testid="publication-type"]') or []
             for publication_type_html in publication_types:
-                publication_type_key = publication_type_html['id'].replace('publication-type-heading-', '')
-                publication_type = {
-                    'publication_type_heading': publication_type_html.string,
-                    'publications': [],
-                }
+                publication_type = {'publication_type_heading': publication_type_html.select_one(
+                    '[data-testid^="type-heading-"]').string, 'publications': [], }
 
-                publications = topic_html.select(
-                    f'ul[data-testid="publications-list-{publication_type_key}"] > li') or []
+                publications = publication_type_html.select('li') or []
                 for publication_html in publications:
                     publication = {
                         'publication_heading': publication_html.select_one('[id^="publication-heading-"]').string,

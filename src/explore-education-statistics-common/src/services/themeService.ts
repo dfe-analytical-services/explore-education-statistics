@@ -1,12 +1,12 @@
 import { contentApi } from '@common/services/api';
 import { MethodologySummary } from '@common/services/types/methodology';
-import { ReleaseType } from '@common/services/types/releaseType';
+import { PublicationType } from '@common/services/types/publicationType';
 
 export interface PublicationSummary {
   id: string;
   title: string;
   slug: string;
-  latestReleaseType?: ReleaseType;
+  type: PublicationType;
   legacyPublicationUrl?: string;
 }
 

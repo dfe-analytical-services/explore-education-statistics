@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import {
   testThemes,
-  testThemeWithAllReleaseTypes,
-} from './__data__/testThemeData';
+  testThemeWithAllPublicationTypes,
+} from '@frontend/modules/find-statistics/__tests__/__data__/testThemeData';
 
 describe('FindStatisticsPage', () => {
   test('renders basic page correctly', async () => {
@@ -56,7 +56,6 @@ describe('FindStatisticsPage', () => {
     const { container } = render(<FindStatisticsPage themes={testThemes} />);
 
     const contentAccordion = screen.getByTestId('accordion');
-    expect(contentAccordion.innerHTML).toMatchSnapshot();
 
     expect(container.querySelectorAll('details[open]')).toHaveLength(0);
 
@@ -102,19 +101,21 @@ describe('FindStatisticsPage', () => {
       }),
     );
 
-    const theme1Topic1Types = theme1Topic1.getAllByRole('heading', {
-      level: 3,
-    });
+    const theme1Topic1Types = theme1Topic1.getAllByTestId('publication-type');
     expect(theme1Topic1Types).toHaveLength(1);
 
     // Theme 1 Topic 1 Type 1
-    expect(theme1Topic1Types[0]).toHaveTextContent(
-      'National and official statistics',
-    );
+    const theme1Topic1Type1 = within(theme1Topic1Types[0]);
 
-    const theme1Topic1Type1Publications = within(
-      theme1Topic1.getByTestId('publications-list-NationalAndOfficial'),
-    ).getAllByRole('listitem');
+    expect(
+      theme1Topic1Type1.getByRole('heading', {
+        level: 3,
+      }),
+    ).toHaveTextContent('National and official statistics');
+
+    const theme1Topic1Type1Publications = theme1Topic1Type1.getAllByRole(
+      'listitem',
+    );
 
     expect(theme1Topic1Type1Publications).toHaveLength(1);
     expect(theme1Topic1Type1Publications[0]).toHaveTextContent(
@@ -157,19 +158,21 @@ describe('FindStatisticsPage', () => {
       }),
     );
 
-    const theme2Topic1Types = theme2Topic1.getAllByRole('heading', {
-      level: 3,
-    });
+    const theme2Topic1Types = theme2Topic1.getAllByTestId('publication-type');
     expect(theme2Topic1Types).toHaveLength(2);
 
     // Theme 2 Topic 1 Type 1
-    expect(theme2Topic1Types[0]).toHaveTextContent(
-      'National and official statistics',
-    );
+    const theme2Topic1Type1 = within(theme2Topic1Types[0]);
 
-    const theme2Topic1Type1Publications = within(
-      theme2Topic1.getByTestId('publications-list-NationalAndOfficial'),
-    ).getAllByRole('listitem');
+    expect(
+      theme2Topic1Type1.getByRole('heading', {
+        level: 3,
+      }),
+    ).toHaveTextContent('National and official statistics');
+
+    const theme2Topic1Type1Publications = theme2Topic1Type1.getAllByRole(
+      'listitem',
+    );
 
     expect(theme2Topic1Type1Publications).toHaveLength(2);
     expect(theme2Topic1Type1Publications[0]).toHaveTextContent(
@@ -180,11 +183,17 @@ describe('FindStatisticsPage', () => {
     );
 
     // Theme 2 Topic 1 Type 2
-    expect(theme2Topic1Types[1]).toHaveTextContent('Ad hoc statistics');
+    const theme2Topic1Type2 = within(theme2Topic1Types[1]);
 
-    const theme2Topic1Type2Publications = within(
-      theme2Topic1.getByTestId('publications-list-AdHocStatistics'),
-    ).getAllByRole('listitem');
+    expect(
+      theme2Topic1Type2.getByRole('heading', {
+        level: 3,
+      }),
+    ).toHaveTextContent('Ad hoc statistics');
+
+    const theme2Topic1Type2Publications = theme2Topic1Type2.getAllByRole(
+      'listitem',
+    );
 
     expect(theme2Topic1Type2Publications).toHaveLength(1);
     expect(theme2Topic1Type2Publications[0]).toHaveTextContent(
@@ -205,19 +214,21 @@ describe('FindStatisticsPage', () => {
       }),
     );
 
-    const theme2Topic2Types = theme2Topic2.getAllByRole('heading', {
-      level: 3,
-    });
+    const theme2Topic2Types = theme2Topic2.getAllByTestId('publication-type');
     expect(theme2Topic2Types).toHaveLength(2);
 
     // Theme 2 Topic 2 Type 1
-    expect(theme2Topic2Types[0]).toHaveTextContent(
-      'National and official statistics',
-    );
+    const theme2Topic2Type1 = within(theme2Topic2Types[0]);
 
-    const theme2Topic2Type1Publications = within(
-      theme2Topic2.getByTestId('publications-list-NationalAndOfficial'),
-    ).getAllByRole('listitem');
+    expect(
+      theme2Topic2Type1.getByRole('heading', {
+        level: 3,
+      }),
+    ).toHaveTextContent('National and official statistics');
+
+    const theme2Topic2Type1Publications = theme2Topic2Type1.getAllByRole(
+      'listitem',
+    );
 
     expect(theme2Topic2Type1Publications).toHaveLength(2);
     expect(theme2Topic2Type1Publications[0]).toHaveTextContent(
@@ -228,11 +239,17 @@ describe('FindStatisticsPage', () => {
     );
 
     // Theme 2 Topic 2 Type 2
-    expect(theme2Topic2Types[1]).toHaveTextContent('Not yet on this service');
+    const theme2Topic2Type2 = within(theme2Topic2Types[1]);
 
-    const theme2Topic2Type2Publications = within(
-      theme2Topic2.getByTestId('publications-list-Legacy'),
-    ).getAllByRole('listitem');
+    expect(
+      theme2Topic2Type2.getByRole('heading', {
+        level: 3,
+      }),
+    ).toHaveTextContent('Not yet on this service');
+
+    const theme2Topic2Type2Publications = theme2Topic2Type2.getAllByRole(
+      'listitem',
+    );
 
     expect(theme2Topic2Type2Publications).toHaveLength(1);
     expect(theme2Topic2Type2Publications[0]).toHaveTextContent(
@@ -241,7 +258,7 @@ describe('FindStatisticsPage', () => {
   });
 
   test('renders publication types in correct order within a topic', async () => {
-    render(<FindStatisticsPage themes={[testThemeWithAllReleaseTypes]} />);
+    render(<FindStatisticsPage themes={[testThemeWithAllPublicationTypes]} />);
 
     const contentAccordion = screen.getByTestId('accordion');
     const accordionSections = within(contentAccordion).getAllByTestId(
@@ -279,9 +296,7 @@ describe('FindStatisticsPage', () => {
       }),
     );
 
-    const types = topic.getAllByRole('heading', {
-      level: 3,
-    });
+    const types = topic.getAllByTestId('publication-type');
     expect(types).toHaveLength(5);
 
     expect(types[0]).toHaveTextContent('National and official statistics');

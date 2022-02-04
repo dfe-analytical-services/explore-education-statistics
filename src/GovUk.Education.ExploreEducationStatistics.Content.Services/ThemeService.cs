@@ -110,17 +110,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private static PublicationTreeNode BuildPublicationNode(Publication publication)
         {
             var latestRelease = publication.LatestPublishedRelease();
-            var legacyPublicationUrlIgnored = latestRelease != null;
+            var type = latestRelease == null ? PublicationType.Legacy : GetPublicationType(latestRelease.Type);
 
             return new PublicationTreeNode
             {
                 Id = publication.Id,
                 Title = publication.Title,
                 Slug = publication.Slug,
-                LatestReleaseType = latestRelease?.Type,
-                LegacyPublicationUrl = legacyPublicationUrlIgnored
-                    ? null
-                    : publication.LegacyPublicationUrl?.ToString()
+                Type = type,
+                LegacyPublicationUrl = type == PublicationType.Legacy
+                    ? publication.LegacyPublicationUrl?.ToString()
+                    : null
             };
         }
 
@@ -131,6 +131,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .ThenInclude(topic => topic.Publications)
                 .ThenInclude(publication => publication.Releases)
                 .ToListAsync();
+        }
+
+        private static PublicationType GetPublicationType(ReleaseType releaseType)
+        {
+            return releaseType switch
+            {
+                ReleaseType.AdHocStatistics => PublicationType.AdHoc,
+                ReleaseType.NationalStatistics => PublicationType.NationalAndOfficial,
+                ReleaseType.ExperimentalStatistics => PublicationType.Experimental,
+                ReleaseType.ManagementInformation => PublicationType.ManagementInformation,
+                ReleaseType.OfficialStatistics => PublicationType.NationalAndOfficial,
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
     }
 }
