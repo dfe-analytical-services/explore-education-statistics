@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -9,12 +10,14 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using IdentityModel;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account
 {
@@ -23,15 +26,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
     {
         private const string LoginErrorMessage = "Sorry, there was a problem logging you in.";
         
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ISignInManagerDelegate _signInManager;
+        private readonly IUserManagerDelegate _userManager;
         private readonly ContentDbContext _contentDbContext;
         private readonly UsersAndRolesDbContext _usersAndRolesDbContext;
         private readonly ILogger<ExternalLoginModel> _logger;
 
         public ExternalLoginModel(
-            SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager,
+            ISignInManagerDelegate signInManager,
+            IUserManagerDelegate userManager,
             ILogger<ExternalLoginModel> logger,
             ContentDbContext contentDbContext,
             UsersAndRolesDbContext usersAndRolesDbContext)
@@ -86,17 +89,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 return RedirectToLoginPageWithError(returnUrl);
             }
 
-            // Gather some user information from the Claims given to the service from the External IdP.
-            var userDetails = GetUserDetailsFromClaims(info);
-
-            if (userDetails.email == null)
-            {
-                _logger.LogError(
-                    "No Email Claim was provided by the external Identity Provider in either the " +
-                    "{EmailClaimType} or {NameClaimType} claims", ClaimTypes.Email, ClaimTypes.Name);
-                return RedirectToLoginPageWithError(returnUrl);
-            }
-            
             // See if we have previously-recorded login details that match the details we have been provided by the
             // IdP.
             var existingMatchingLoginDetails = await _usersAndRolesDbContext
@@ -112,7 +104,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                 return await HandleLoginWithRecognisedProviderDetails(returnUrl, info);
             }
 
-            // Otherwise, see if we have an existing AspNetUsers user with this email address already in the system.
+            // Gather some user information from the Claims given to the service from the External IdP.
+            // We can use these to see if we have a matching user in the system already, or for creating
+            // a new user if this is a user logging in after being invited.
+            var userDetails = GetUserDetailsFromClaims(info);
+
+            if (userDetails.email == null)
+            {
+                _logger.LogError(
+                    "No Email Claim was provided by the external Identity Provider in either the " +
+                    "{EmailClaimType} or {NameClaimType} claims", ClaimTypes.Email, ClaimTypes.Name);
+                return RedirectToLoginPageWithError(returnUrl);
+            }
+
+            // See if we have an existing AspNetUsers user with this email address already in the system.
             // If we do, this should mean that we're seeing a new set of login information from the IdP for this
             // same user, or potentially a set of login information from a new IdP but for this same user.
             var existingAspNetUser = await _usersAndRolesDbContext
@@ -167,7 +172,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
         }
 
-        private async Task<IActionResult> HandleLoginExistingUser(string returnUrl, ApplicationUser existingAspNetUser, ExternalLoginInfo info)
+        private async Task<IActionResult> HandleLoginExistingUser(
+            string returnUrl, 
+            ApplicationUser existingAspNetUser, 
+            ExternalLoginInfo info)
         {
             // If this user already exists in the AspNetUsers table, then we must already had at least one
             // successful login for this user in the past from a trusted IdP, so we should find at least one entry
@@ -187,13 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             // in. 
             if (!recordIdpLoginDetailsResult.Succeeded)
             {
-                _logger.LogError("Unable to create the latest set of login details for " +
-                                   "user {UserId} - unable to log user in", existingAspNetUser.Id);
-
-                recordIdpLoginDetailsResult.Errors.ForEach(error =>
-                    ModelState.AddModelError(string.Empty, error.Description));
-
-                return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                return HandleAddingLoginIdentityFailure(returnUrl, existingAspNetUser, recordIdpLoginDetailsResult);
             }
 
             // Now that we definitely have login details for the existing user, log them in.
@@ -217,6 +219,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
             if (loginResult.IsLockedOut)
             {
+                _logger.LogError("User is locked out - unable to log in");
+
+                ErrorMessage = LoginErrorMessage;
+                
                 return RedirectToPage("./Lockout");
             }
 
@@ -255,69 +261,83 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             };
 
             var createdIdentityUserResult = await _userManager.CreateAsync(newAspNetUser);
+
+            if (!createdIdentityUserResult.Succeeded)
+            {
+                return HandleCreateIdentityFailure(returnUrl, createdIdentityUserResult);
+            }
+            
             var addedIdentityUserRoles = await _userManager.AddToRoleAsync(newAspNetUser, inviteToSystem.Role.Name);
+
+            if (!addedIdentityUserRoles.Succeeded)
+            {
+                _logger.LogError("Error adding role to invited User - unable to log in");
+
+                return HandleIdentityResultFailure(returnUrl, addedIdentityUserRoles);
+            }
+            
             var recordIdpLoginDetailsResult = await _userManager.AddLoginAsync(newAspNetUser, info);
+
+            if (!recordIdpLoginDetailsResult.Succeeded)
+            {
+                return HandleAddingLoginIdentityFailure(returnUrl, newAspNetUser, recordIdpLoginDetailsResult);
+            }
 
             // If adding the new Identity Framework user records succeeded, continue on to create internal User
             // and Role records for the application itself and sign the user in.
-            if (createdIdentityUserResult.Succeeded && 
-                addedIdentityUserRoles.Succeeded &&
-                recordIdpLoginDetailsResult.Succeeded)
+            
+            // If we didn't yet have an existing "internal" User record matching this new login in the Users
+            // table, create one now, being sure to establish the one-to-one id relationship between the
+            // AspNetUsers record and the Users record.
+            if (existingInternalUser == null)
             {
-                // If we didn't yet have an existing "internal" User record matching this new login in the Users
-                // table, create one now, being sure to establish the one-to-one id relationship between the
-                // AspNetUsers record and the Users record.
-                if (existingInternalUser == null)
+                var newInternalUser = new User
                 {
-                    var newInternalUser = new User
+                    Id = Guid.Parse(newAspNetUser.Id),
+                    FirstName = newAspNetUser.FirstName,
+                    LastName = newAspNetUser.LastName,
+                    Email = newAspNetUser.Email
+                };
+
+                await _contentDbContext.Users.AddAsync(newInternalUser);
+
+                var releaseInvites = _contentDbContext
+                    .UserReleaseInvites
+                    .AsQueryable()
+                    .Where(i => i.Email.ToLower() == newAspNetUser.Email.ToLower());
+
+                await releaseInvites.ForEachAsync(invite =>
+                {
+                    _contentDbContext.AddAsync(new UserReleaseRole
                     {
-                        Id = Guid.Parse(newAspNetUser.Id),
-                        FirstName = newAspNetUser.FirstName,
-                        LastName = newAspNetUser.LastName,
-                        Email = newAspNetUser.Email
-                    };
-
-                    await _contentDbContext.Users.AddAsync(newInternalUser);
-
-                    var releaseInvites = _contentDbContext
-                        .UserReleaseInvites
-                        .AsQueryable()
-                        .Where(i => i.Email.ToLower() == newAspNetUser.Email.ToLower());
-
-                    await releaseInvites.ForEachAsync(invite =>
-                    {
-                        _contentDbContext.AddAsync(new UserReleaseRole
-                        {
-                            ReleaseId = invite.ReleaseId,
-                            Role = invite.Role,
-                            UserId = newInternalUser.Id,
-                            Created = DateTime.UtcNow,
-                            CreatedById = invite.CreatedById,
-                        });
-
-                        invite.Accepted = true;
+                        ReleaseId = invite.ReleaseId,
+                        Role = invite.Role,
+                        UserId = newInternalUser.Id,
+                        Created = DateTime.UtcNow,
+                        CreatedById = invite.CreatedById,
                     });
-                }
 
-                await _contentDbContext.SaveChangesAsync();
-                await _usersAndRolesDbContext.SaveChangesAsync();
-
-                await _signInManager.ExternalLoginSignInAsync(
-                    info.LoginProvider,
-                    info.ProviderKey,
-                    isPersistent: false,
-                    bypassTwoFactor: true);
-                
-                return LocalRedirect(returnUrl);
+                    invite.Accepted = true;
+                });
             }
+
+            await _contentDbContext.SaveChangesAsync();
+            await _usersAndRolesDbContext.SaveChangesAsync();
+
+            await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider,
+                info.ProviderKey,
+                isPersistent: false,
+                bypassTwoFactor: true);
             
-            var allErrors = 
-                createdIdentityUserResult.Errors
-                .Concat(addedIdentityUserRoles.Errors)
-                .Concat(recordIdpLoginDetailsResult.Errors);
-            
-            allErrors.ForEach(error => ModelState.AddModelError(string.Empty, error.Description));
-            return Page();
+            return LocalRedirect(returnUrl);
+        }
+
+        private IActionResult HandleCreateIdentityFailure(string returnUrl, IdentityResult createdIdentityUserResult)
+        {
+            _logger.LogError("Unable to create AspNetUsers record for invited User - unable to log in");
+
+            return HandleIdentityResultFailure(returnUrl, createdIdentityUserResult);
         }
 
         private (
@@ -366,6 +386,111 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
             // This method should no longer be used but just in case, return user to login page if it is hit.
             var pageRedirect = RedirectToPage("./Login", new {ReturnUrl = returnUrl ?? Url.Content("~/")});
             return await Task.FromResult(pageRedirect);
+        }
+
+        private IActionResult HandleAddingLoginIdentityFailure(
+            string returnUrl, 
+            ApplicationUser user,
+            IdentityResult identityResult)
+        {
+            _logger.LogError("Unable to create the latest set of login details for " +
+                             "user {UserId} - unable to log user in", user.Id);
+
+            return HandleIdentityResultFailure(returnUrl, identityResult);
+        }
+
+        private IActionResult HandleIdentityResultFailure(string returnUrl, IdentityResult identityResult)
+        {
+            identityResult.Errors.ForEach(error =>
+                ModelState.AddModelError(string.Empty, error.Description));
+
+            ErrorMessage = LoginErrorMessage;
+
+            return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+        }
+    }
+
+    public interface ISignInManagerDelegate
+    {
+        AuthenticationProperties ConfigureExternalAuthenticationProperties(
+            string provider, 
+            string redirectUrl,
+            string userId = null);
+
+        Task<ExternalLoginInfo> GetExternalLoginInfoAsync(
+            string expectedXsrf = null);
+
+        Task<SignInResult> ExternalLoginSignInAsync(
+            string loginProvider, 
+            string providerKey, 
+            bool isPersistent,
+            bool bypassTwoFactor);
+    }
+
+    public class SignInManagerDelegate : ISignInManagerDelegate
+    {
+        private readonly SignInManager<ApplicationUser> _signInManager;
+
+        public SignInManagerDelegate(SignInManager<ApplicationUser> signInManager)
+        {
+            _signInManager = signInManager;
+        }
+
+        public AuthenticationProperties ConfigureExternalAuthenticationProperties(string provider, string redirectUrl,
+            string userId = null)
+        {
+            return _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, userId);
+        }
+
+        public Task<ExternalLoginInfo> GetExternalLoginInfoAsync(string expectedXsrf = null)
+        {
+            return _signInManager.GetExternalLoginInfoAsync(expectedXsrf);
+        }
+
+        public Task<SignInResult> ExternalLoginSignInAsync(string loginProvider, string providerKey, bool isPersistent, bool bypassTwoFactor)
+        {
+            return _signInManager.ExternalLoginSignInAsync(loginProvider, providerKey, isPersistent, bypassTwoFactor);
+        }
+    }
+
+    public interface IUserManagerDelegate
+    {
+        Task<IList<UserLoginInfo>> GetLoginsAsync(ApplicationUser user);
+
+        Task<IdentityResult> AddLoginAsync(ApplicationUser user, UserLoginInfo login);
+
+        Task<IdentityResult> CreateAsync(ApplicationUser user);
+
+        Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role);
+    }
+
+    public class UserManagerDelegate : IUserManagerDelegate
+    {
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public UserManagerDelegate(UserManager<ApplicationUser> userManager)
+        {
+            _userManager = userManager;
+        }
+
+        public Task<IList<UserLoginInfo>> GetLoginsAsync(ApplicationUser user)
+        {
+            return _userManager.GetLoginsAsync(user);
+        }
+
+        public Task<IdentityResult> AddLoginAsync(ApplicationUser user, UserLoginInfo login)
+        {
+            return _userManager.AddLoginAsync(user, login);
+        }
+
+        public Task<IdentityResult> CreateAsync(ApplicationUser user)
+        {
+            return _userManager.CreateAsync(user);
+        }
+
+        public Task<IdentityResult> AddToRoleAsync(ApplicationUser user, string role)
+        {
+            return _userManager.AddToRoleAsync(user, role);
         }
     }
 }

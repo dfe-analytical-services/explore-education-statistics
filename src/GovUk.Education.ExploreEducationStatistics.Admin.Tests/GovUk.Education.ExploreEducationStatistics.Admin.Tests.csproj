@@ -29,7 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Areas" />
     <Folder Include="Controllers\Api\UserManagement" />
   </ItemGroup>
 

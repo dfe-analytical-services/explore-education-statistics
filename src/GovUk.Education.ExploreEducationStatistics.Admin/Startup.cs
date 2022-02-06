@@ -5,6 +5,7 @@ using System.Security.Claims;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
@@ -404,6 +405,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
+
+            // These services act as delegates through to underlying Identity services that cannot be mocked or are
+            // hard to mock.
+            services.AddTransient<ISignInManagerDelegate, SignInManagerDelegate>();
+            services.AddTransient<IUserManagerDelegate, UserManagerDelegate>();
 
             // This service allows a set of users to be pre-invited to the service on startup.
             if (HostEnvironment.IsDevelopment())
