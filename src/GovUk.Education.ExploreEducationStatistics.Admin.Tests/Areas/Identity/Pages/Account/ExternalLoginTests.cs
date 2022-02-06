@@ -6,12 +6,15 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Castle.Core.Internal;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -81,14 +84,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                 ListOf(_providerDetails),
                 IdentityResult.Success, 
                 SignInResult.Success);
-            
-            var redirectPage = Assert.IsType<LocalRedirectResult>(result);
-            Assert.Equal(ReturnUrl, redirectPage.Url);
-            Assert.False(redirectPage.Permanent);
-            Assert.Null(loginService.ErrorMessage);
-            Assert.Empty(loginService.ModelState);
+
+            AssertSuccessfulLogin(result, loginService);
         }
-        
+
         [Fact]
         public async Task Login_ExistingUser_NewProviderDetails_FailureToAddNewProviderDetails()
         {
@@ -164,13 +163,211 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     ProviderKey,
                     LoginProviderDisplayName));
 
+            await using var usersDbContext = InMemoryUserAndRolesDbContext();
+            await using var contentDbContext = InMemoryApplicationDbContext();
+            
             var loginService = BuildService(
-                signInManager.Object);
+                signInManager.Object,
+                usersDbContext: usersDbContext,
+                contentDbContext: contentDbContext);
 
             var result = await loginService.OnGetCallbackAsync(ReturnUrl);
             VerifyAllMocks(signInManager);
             
             AssertRedirectedToLoginPageUponFailure(result, loginService);
+        }
+
+        [Fact]
+        public async Task Login_UninvitedNewUser_Failure()
+        {
+            var claimsPrincipal = CreateClaimsPrincipal(
+                "uninviteduser@example.com",
+                "FirstName",
+                "LastName");
+
+            var userManager = new Mock<IUserManagerDelegate>(Strict);
+            var signInManager = new Mock<ISignInManagerDelegate>(Strict);
+
+            await using var usersDbContext = InMemoryUserAndRolesDbContext();
+            await using var contentDbContext = InMemoryApplicationDbContext();
+            
+            var loginService = BuildService(
+                signInManager.Object,
+                userManager.Object,
+                contentDbContext,
+                usersDbContext);
+
+            signInManager
+                .Setup(s => s.GetExternalLoginInfoAsync(null))
+                .ReturnsAsync(new ExternalLoginInfo(
+                    claimsPrincipal,
+                    LoginProvider,
+                    ProviderKey,
+                    LoginProviderDisplayName));
+
+            var result = await loginService.OnGetCallbackAsync(ReturnUrl);
+            VerifyAllMocks(userManager, signInManager);
+                
+            AssertRedirectedToLoginPageUponFailure(result, loginService);
+        }
+
+        [Fact]
+        public async Task Login_InvitedUser_Success()
+        {
+            var contextId = Guid.NewGuid().ToString();
+
+            var email = "inviteduser@example.com";
+            var firstName = "FirstName";
+            var lastName = "LastName";
+            
+            var claimsPrincipal = CreateClaimsPrincipal(email, firstName, lastName);
+
+            var userManager = new Mock<IUserManagerDelegate>(Strict);
+            var signInManager = new Mock<ISignInManagerDelegate>(Strict);
+            
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.UserReleaseInvites.AddRangeAsync(
+                    new UserReleaseInvite
+                    {
+                        Email = email,
+                        Role = ReleaseRole.Approver,
+                        Accepted = false
+                    },
+                    new UserReleaseInvite
+                    {
+                        Email = email,
+                        Role = ReleaseRole.Lead,
+                        Accepted = false
+                    },
+                    new UserReleaseInvite
+                    {
+                        Email = "anotheruser@example.com",
+                        Accepted = false
+                    });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var usersDbContext = InMemoryUserAndRolesDbContext(contextId))
+            {
+                await usersDbContext.UserInvites.AddRangeAsync(
+                    new UserInvite
+                    {
+                        Email = email,
+                        Role = new IdentityRole("Role A"),
+                        Accepted = false
+                    },
+                    new UserInvite
+                    {
+                        Email = "anotheruser@example.com",
+                        Role = new IdentityRole("Role B"),
+                        Accepted = false
+                    });
+
+                await usersDbContext.SaveChangesAsync();
+            }
+
+            await using (var usersDbContext = InMemoryUserAndRolesDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var loginService = BuildService(
+                    signInManager.Object,
+                    userManager.Object,
+                    contentDbContext,
+                    usersDbContext);
+
+                signInManager
+                    .Setup(s => s.GetExternalLoginInfoAsync(null))
+                    .ReturnsAsync(new ExternalLoginInfo(
+                        claimsPrincipal,
+                        LoginProvider,
+                        ProviderKey,
+                        LoginProviderDisplayName));
+
+                userManager
+                    .Setup(s => s.CreateAsync(
+                        It.Is<ApplicationUser>(u =>
+                            u.Email == email &&
+                            u.FirstName == firstName &&
+                            u.LastName == lastName)))
+                    .ReturnsAsync(IdentityResult.Success);
+
+                userManager
+                    .Setup(s => s.AddToRoleAsync(
+                        It.Is<ApplicationUser>(u =>
+                            u.Email == email &&
+                            u.FirstName == firstName &&
+                            u.LastName == lastName), 
+                        "Role A"))
+                    .ReturnsAsync(IdentityResult.Success);
+                
+                userManager
+                    .Setup(s => s.AddLoginAsync(
+                        It.Is<ApplicationUser>(u =>
+                            u.Email == email &&
+                            u.FirstName == firstName &&
+                            u.LastName == lastName), 
+                        It.Is<UserLoginInfo>(l =>
+                            l.ProviderKey == ProviderKey
+                            && l.LoginProvider == LoginProvider
+                            && l.ProviderDisplayName == LoginProviderDisplayName)))
+                    .ReturnsAsync(IdentityResult.Success);
+
+                signInManager
+                    .Setup(s => s.ExternalLoginSignInAsync(LoginProvider, ProviderKey, false, true))
+                    .ReturnsAsync(SignInResult.Success);
+
+                var result = await loginService.OnGetCallbackAsync(ReturnUrl);
+                VerifyAllMocks(userManager, signInManager);
+                
+                AssertSuccessfulLogin(result, loginService);
+            }
+
+            await using (var usersDbContext = InMemoryUserAndRolesDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                // Assert that the new user's invites have all been accepted.
+                var newUsersInvite = await usersDbContext
+                    .UserInvites
+                    .AsQueryable()
+                    .SingleAsync(invite => invite.Email == email);
+                Assert.True(newUsersInvite.Accepted);
+                
+                // Assert that the other user's invites have all been left alone.
+                var otherUsersInvite = await usersDbContext
+                    .UserInvites
+                    .AsQueryable()
+                    .SingleAsync(invite => invite.Email != email);
+                Assert.False(otherUsersInvite.Accepted);
+                
+                // Assert that the new user's release role invites have all been accepted.
+                var newUsersReleaseRoleInvites = await contentDbContext
+                    .UserReleaseInvites
+                    .AsQueryable()
+                    .Where(invite => invite.Email == email)
+                    .ToListAsync();
+                Assert.Equal(2, newUsersReleaseRoleInvites.Count);
+                newUsersReleaseRoleInvites.ForEach(invite => Assert.True(invite.Accepted));
+
+                // Assert that the other user's release role invites have all been left alone.
+                var otherUsersReleaseRoleInvites = await contentDbContext
+                    .UserReleaseInvites
+                    .AsQueryable()
+                    .Where(invite => invite.Email != email)
+                    .ToListAsync();
+                Assert.Single(otherUsersReleaseRoleInvites);
+                otherUsersReleaseRoleInvites.ForEach(invite => Assert.False(invite.Accepted));
+
+                // Assert that the user has been assigned the new release roles.
+                var newUsersReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Equal(2, newUsersReleaseRoles.Count);
+                Assert.Equal(
+                    ListOf(ReleaseRole.Approver, ReleaseRole.Lead),
+                    newUsersReleaseRoles.Select(r => r.Role));
+            }
         }
 
         private async Task<(IActionResult, ExternalLoginModel)> DoExistingUserLogin(SignInResult signInResult)
@@ -342,10 +539,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                 new Claim(ClaimTypes.Surname, lastName));
         }
 
-        private static void AssertModelErrorsEqual(IList<string> expectedErrors, ExternalLoginModel? loginService)
+        private static void AssertModelErrorsEqual(IList<string> expectedErrors, ExternalLoginModel loginService)
         {
-            Assert.Equal(expectedErrors,
-                loginService.ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage)).ToList());
+            Assert.Equal(expectedErrors, loginService
+                .ModelState
+                .Values
+                .SelectMany(v => v
+                    .Errors
+                    .Select(e => e.ErrorMessage))
+                .ToList());
+        }        
+        
+        private static void AssertSuccessfulLogin(IActionResult? result, ExternalLoginModel loginService)
+        {
+            var redirectPage = Assert.IsType<LocalRedirectResult>(result);
+            Assert.Equal(ReturnUrl, redirectPage.Url);
+            Assert.False(redirectPage.Permanent);
+            Assert.Null(loginService.ErrorMessage);
+            Assert.Empty(loginService.ModelState);
         }
 
         private static ExternalLoginModel BuildService(
