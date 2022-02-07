@@ -34,27 +34,21 @@ def create_find_statistics_snapshot(public_url) -> str:
             'topics': [],
         }
 
-        topics = theme_html.select('[id^="topic-details-"]') or []
+        topics = theme_html.select('details') or []
         for topic_html in topics:
             topic = {
                 'topic_heading': topic_html.select_one('[id^="topic-heading-"]').string,
-                'publication_types': [],
+                'publications': [],
             }
 
-            publication_types = topic_html.select('[data-testid="publication-type"]') or []
-            for publication_type_html in publication_types:
-                publication_type = {'publication_type_heading': publication_type_html.select_one(
-                    '[data-testid^="type-heading-"]').string, 'publications': [], }
+            publications = topic_html.select('li') or []
+            for publication_html in publications:
+                publication = {
+                    'publication_heading': publication_html.select_one('[id^="publication-heading-"]').string,
+                    'on_ees': publication_html.find(text="View statistics and data") is not None,
+                }
 
-                publications = publication_type_html.select('li') or []
-                for publication_html in publications:
-                    publication = {
-                        'publication_heading': publication_html.select_one('[id^="publication-heading-"]').string,
-                    }
-
-                    publication_type['publications'].append(publication)
-
-                topic['publication_types'].append(publication_type)
+                topic['publications'].append(publication)
 
             theme['topics'].append(topic)
 
@@ -142,11 +136,11 @@ def create_all_methodologies_snapshot(public_url) -> str:
             'theme_heading': theme_html.select_one(f'#themes-{theme_index + 1}-heading').string,
             'topics': []
         }
-        topics = theme_html.select('[id^="topic-details-"]') or []
+        topics = theme_html.select('details') or []
 
         for topic_html in topics:
             topic = {
-                'topic_heading': topic_html.select_one('[id^="topic-heading-"]').string,
+                'topic_heading': topic_html.select_one('[id^="details-heading-"]').string,
                 'methodologies': []
             }
 
