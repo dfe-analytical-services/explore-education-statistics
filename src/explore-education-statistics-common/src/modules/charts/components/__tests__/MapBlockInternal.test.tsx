@@ -7,9 +7,8 @@ import {
   testsMixedLocationsTableData,
   testMixedLocationsAxes,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
-import MapBlock, {
-  MapBlockProps,
-} from '@common/modules/charts/components/MapBlock';
+import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
+import { MapBlockInternal } from '@common/modules/charts/components/MapBlockInternal';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
@@ -18,7 +17,7 @@ import produce from 'immer';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 
-describe('MapBlock', () => {
+describe('MapBlockInternal', () => {
   const testFullTable = mapFullTable(testMapTableData);
   const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
@@ -32,7 +31,7 @@ describe('MapBlock', () => {
   };
 
   test('renders legends and polygons correctly', async () => {
-    const { container } = render(<MapBlock {...testBlockProps} />);
+    const { container } = render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       const paths = container.querySelectorAll<HTMLElement>(
@@ -79,7 +78,7 @@ describe('MapBlock', () => {
     );
 
     render(
-      <MapBlock
+      <MapBlockInternal
         {...testBlockProps}
         meta={fullTable.subjectMeta}
         data={fullTable.results}
@@ -99,7 +98,7 @@ describe('MapBlock', () => {
   });
 
   test('includes all data sets in select', async () => {
-    render(<MapBlock {...testBlockProps} />);
+    render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       const select = screen.getByLabelText('1. Select data to view');
@@ -117,7 +116,7 @@ describe('MapBlock', () => {
   });
 
   test('changing selected data set changes legends and polygons', async () => {
-    const { container } = render(<MapBlock {...testBlockProps} />);
+    const { container } = render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       const select = screen.getByLabelText('1. Select data to view');
@@ -159,7 +158,7 @@ describe('MapBlock', () => {
   });
 
   test('changing selected location focuses the correct polygon', async () => {
-    const { container } = render(<MapBlock {...testBlockProps} />);
+    const { container } = render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -189,7 +188,7 @@ describe('MapBlock', () => {
   });
 
   test('changing selected location renders its indicator tiles', async () => {
-    render(<MapBlock {...testBlockProps} />);
+    render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -237,7 +236,7 @@ describe('MapBlock', () => {
     );
 
     render(
-      <MapBlock
+      <MapBlockInternal
         {...testBlockProps}
         meta={fullTable.subjectMeta}
         data={fullTable.results}
@@ -286,7 +285,7 @@ describe('MapBlock', () => {
   });
 
   test('reseting the map when select None Selected', async () => {
-    const { container } = render(<MapBlock {...testBlockProps} />);
+    const { container } = render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -319,7 +318,7 @@ describe('MapBlock', () => {
         draft.data = testFullTableRegion.results;
       });
 
-      render(<MapBlock {...testBlockPropsRegion} />);
+      render(<MapBlockInternal {...testBlockPropsRegion} />);
 
       await waitFor(() => {
         expect(screen.getByLabelText('2. Select a Region')).toBeInTheDocument();
@@ -333,7 +332,7 @@ describe('MapBlock', () => {
         draft.data = testFullTableMixed.results;
       });
 
-      render(<MapBlock {...testBlockPropsMixed} />);
+      render(<MapBlockInternal {...testBlockPropsMixed} />);
 
       await waitFor(() => {
         expect(
@@ -343,7 +342,7 @@ describe('MapBlock', () => {
     });
 
     test('includes all locations and is ungrouped if does not contain local authorities', async () => {
-      render(<MapBlock {...testBlockProps} />);
+      render(<MapBlockInternal {...testBlockProps} />);
 
       await waitFor(() => {
         const select = screen.getByLabelText(
@@ -370,7 +369,7 @@ describe('MapBlock', () => {
         data: testsMixedLocationsTableData,
       };
 
-      render(<MapBlock {...testBlockProps2} />);
+      render(<MapBlockInternal {...testBlockProps2} />);
 
       await waitFor(() => {
         expect(
@@ -385,23 +384,23 @@ describe('MapBlock', () => {
       expect(groups).toHaveLength(4);
 
       const group1Options = within(groups[0]).getAllByRole('option');
-      expect(group1Options).toHaveLength(1);
-      expect(group1Options[0]).toHaveTextContent('England');
+      expect(group1Options).toHaveLength(2);
+      expect(group1Options[0]).toHaveTextContent('North West');
+      expect(group1Options[1]).toHaveTextContent('North East');
 
       const group2Options = within(groups[1]).getAllByRole('option');
       expect(group2Options).toHaveLength(2);
-      expect(group2Options[0]).toHaveTextContent('Darlington');
-      expect(group2Options[1]).toHaveTextContent('Newcastle upon Tyne');
+      expect(group2Options[0]).toHaveTextContent('Sheffield');
+      expect(group2Options[1]).toHaveTextContent('Rotherham');
 
       const group3Options = within(groups[2]).getAllByRole('option');
       expect(group3Options).toHaveLength(2);
-      expect(group3Options[0]).toHaveTextContent('Rotherham');
-      expect(group3Options[1]).toHaveTextContent('Sheffield');
+      expect(group3Options[0]).toHaveTextContent('Newcastle upon Tyne');
+      expect(group3Options[1]).toHaveTextContent('Darlington');
 
       const group4Options = within(groups[3]).getAllByRole('option');
-      expect(group4Options).toHaveLength(2);
-      expect(group4Options[0]).toHaveTextContent('North East');
-      expect(group4Options[1]).toHaveTextContent('North West');
+      expect(group4Options).toHaveLength(1);
+      expect(group4Options[0]).toHaveTextContent('England');
     });
   });
 });
