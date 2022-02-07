@@ -11,6 +11,11 @@ $active-colour: lighten(govuk-colour('orange'), 10);
   :global(.ck-focused) {
     border-color: $govuk-input-border-colour !important;
   }
+
+  // Make sure svgs are visible (they use the image tag)
+  :global(.ck-content img) {
+    width: 100%;
+  }
 }
 
 .focused {
