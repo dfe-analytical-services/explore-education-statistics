@@ -16,6 +16,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Thinktecture;
+using Thinktecture.EntityFrameworkCore.BulkOperations;
 using Thinktecture.EntityFrameworkCore.TempTables;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
@@ -60,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 locationIds = query.LocationIds.ToList();
             }
 
-            var (sql, sqlParameters, tempTables) = await QueryGenerator
+            var (sql, sqlParameters, tempTables, matchedObservations) = await QueryGenerator
                 .GetMatchingObservationsQuery(
                     _context,
                     query.SubjectId,
@@ -73,9 +74,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 await SqlExecutor.ExecuteSqlRaw(_context, sql, sqlParameters, cancellationToken);
 
-                var matchedObservations = _context
-                    .MatchedObservations
-                    .AsNoTracking();
+                // var matchedObservations = _context
+                //     .Set<MatchedObservation>("MatchedObservation");
 
                 if (_logger.IsEnabled(LogLevel.Trace))
                 {
@@ -100,13 +100,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         
         public interface IMatchingObservationsQueryGenerator
         {
-            Task<(string, IList<SqlParameter>, IList<IAsyncDisposable>)> GetMatchingObservationsQuery(
-                StatisticsDbContext context,
-                Guid subjectId,
-                IList<Guid>? filterItemIds,
-                IList<Guid>? locationIds,
-                TimePeriodQuery? timePeriodQuery,
-                CancellationToken cancellationToken);
+            Task<(string sql, List<SqlParameter> parameters, List<IAsyncDisposable> tableReferences, IQueryable<MatchedObservation> Query)>
+                GetMatchingObservationsQuery(StatisticsDbContext context,
+                    Guid subjectId,
+                    IList<Guid>? filterItemIds,
+                    IList<Guid>? locationIds,
+                    TimePeriodQuery? timePeriodQuery,
+                    CancellationToken cancellationToken);
         }
 
         public class MatchingObservationsQueryGenerator : IMatchingObservationsQueryGenerator
@@ -114,15 +114,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             public ITemporaryTableCreator TempTableCreator = new TemporaryTableCreator();
             private readonly Regex _safeTempTableNames = new("^#[a-zA-Z0-9]+[_0-9]*$", RegexOptions.Compiled);
 
-            public async Task<(string, IList<SqlParameter>, IList<IAsyncDisposable>)> GetMatchingObservationsQuery(
-                StatisticsDbContext context,
-                Guid subjectId,
-                IList<Guid>? filterItemIds,
-                IList<Guid>? locationIds,
-                TimePeriodQuery? timePeriodQuery,
-                CancellationToken cancellationToken)
+            public async
+                Task<(string sql, List<SqlParameter> parameters, List<IAsyncDisposable> tableReferences,
+                    IQueryable<MatchedObservation> Query)> GetMatchingObservationsQuery(StatisticsDbContext context,
+                    Guid subjectId,
+                    IList<Guid>? filterItemIds,
+                    IList<Guid>? locationIds,
+                    TimePeriodQuery? timePeriodQuery,
+                    CancellationToken cancellationToken)
             {
-                await TempTableCreator.CreateTemporaryTable<MatchedObservation>(context, cancellationToken);
+                var observationTempTable = await TempTableCreator.CreateTemporaryTable<MatchedObservation>(context, cancellationToken);
 
                 var (locationIdsClause, locationIdsTempTable) = !locationIds.IsNullOrEmpty()
                     ? await GetLocationsClause(context, locationIds!, cancellationToken)
@@ -133,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     : default;
 
                 var sql = @$"
-                    INSERT INTO #{nameof(MatchedObservation)} 
+                    INSERT INTO {SanitizeTempTableName(observationTempTable.Name)} 
                     SELECT o.id FROM Observation o
                     WHERE o.SubjectId = @subjectId " +
                     (timePeriodQuery != null ? $"AND ({GetTimePeriodsClause(timePeriodQuery)}) " : "") +
@@ -154,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     tableReferences.AddRange(filterItemIdTempTables);
                 }
                 
-                return (sql, parameters, tableReferences);
+                return (sql, parameters, tableReferences, observationTempTable.Query);
             }
             
             private async Task<(string, List<ITempTableQuery<IdTempTable>>)> GetSelectedFilterItemIdsClause(
@@ -271,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             public interface ITemporaryTableCreator
             {
-                Task CreateTemporaryTable<TEntity>(
+                Task<ITempTableQuery<TEntity>> CreateTemporaryTable<TEntity>(
                     StatisticsDbContext context,
                     CancellationToken cancellationToken) where TEntity : class;
             
@@ -283,18 +284,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             
             public class TemporaryTableCreator : ITemporaryTableCreator
             {
-                public async Task CreateTemporaryTable<TEntity>(
+                public async Task<ITempTableQuery<TEntity>> CreateTemporaryTable<TEntity>(
                     StatisticsDbContext context, 
                     CancellationToken cancellationToken) where TEntity : class
                 {
-                    var options = new TempTableCreationOptions
-                    {
-                       TableNameProvider = new DefaultTempTableNameProvider(),
-                    };
-
-                    await context.CreateTempTableAsync<TEntity>(
-                        options,
-                        cancellationToken);
+                    return await context.BulkInsertIntoTempTableAsync(
+                        new List<TEntity>(), 
+                        cancellationToken: cancellationToken);
                 }
 
                 public async Task<ITempTableQuery<TEntity>> CreateTemporaryTableAndPopulate<TEntity>(

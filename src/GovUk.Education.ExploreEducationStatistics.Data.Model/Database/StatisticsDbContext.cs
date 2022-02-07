@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
 
         //public DbSet<MatchedObservation> MatchedObservations => Set<MatchedObservation>();
-        public IQueryable<MatchedObservation> MatchedObservations => Set<MatchedObservation>().AsQueryable();
+        // public IQueryable<MatchedObservation> MatchedObservations => Set<MatchedObservation>("#MatchedObservation").AsQueryable();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1192,7 +1192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 observationService
                     .Setup(s => s.GetMatchedObservations(query, cancellationToken))
-                    .ReturnsAsync(statisticsDbContext.MatchedObservations);
+                    .ReturnsAsync(statisticsDbContext.Set<MatchedObservation>("MatchedObservation"));
 
                 var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
 
@@ -1226,7 +1226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 filterItemRepository
                     .Setup(s => s.GetFilterItemsFromMatchedObservationIds(
-                        subject.Id, statisticsDbContext.MatchedObservations))
+                        subject.Id, statisticsDbContext.Set<MatchedObservation>("MatchedObservation")))
                     .ReturnsAsync(allFilterItems);
 
                 filterItemRepository
