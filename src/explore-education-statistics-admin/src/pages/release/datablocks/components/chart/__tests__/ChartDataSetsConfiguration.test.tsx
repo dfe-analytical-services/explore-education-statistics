@@ -206,57 +206,6 @@ describe('ChartDataSetsConfiguration', () => {
     });
   });
 
-  test('toggles the reorder controls on and off', () => {
-    render(
-      <ChartBuilderFormsContextProvider initialForms={testFormState}>
-        <ChartDataSetsConfiguration
-          meta={testSubjectMeta}
-          dataSets={[
-            {
-              indicator: 'authorised-absence-sessions',
-              filters: ['male'],
-            },
-            {
-              indicator: 'authorised-absence-sessions',
-              filters: ['male'],
-              location: {
-                level: 'localAuthority',
-                value: 'barnet',
-              },
-            },
-            {
-              indicator: 'authorised-absence-sessions',
-              filters: ['male'],
-              location: {
-                level: 'localAuthority',
-                value: 'barnet',
-              },
-              timePeriod: '2019_AY',
-            },
-          ]}
-          onChange={noop}
-        />
-      </ChartBuilderFormsContextProvider>,
-    );
-
-    userEvent.click(
-      screen.getByRole('button', {
-        name: 'Reorder data sets',
-      }),
-    );
-    expect(
-      screen.queryByRole('button', {
-        name: 'Reorder data sets',
-      }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Finish reordering' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Remove' }),
-    ).not.toBeInTheDocument();
-  });
-
   describe('add data set form', () => {
     test('renders correctly with multiple options per select', () => {
       render(
