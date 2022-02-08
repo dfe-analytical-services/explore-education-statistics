@@ -309,15 +309,15 @@ const ChartDataSetsConfiguration = ({
             >
               {buttons}
             </ChartBuilderSaveActions>
-
-            <Button
+            {/* EES-2556
+             <Button
               variant="secondary"
               onClick={
                 isReordering ? toggleIsReordering.off : toggleIsReordering.on
               }
             >
               {isReordering ? 'Finish reordering' : 'Reorder data sets'}
-            </Button>
+            </Button> */}
           </div>
         </>
       )}
