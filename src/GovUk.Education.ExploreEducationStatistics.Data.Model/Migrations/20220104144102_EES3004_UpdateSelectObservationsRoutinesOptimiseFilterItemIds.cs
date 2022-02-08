@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     public partial class EES3004_UpdateSelectObservationsRoutinesOptimiseFilterItemIds : Migration
     {
-        private const string MigrationId = "20220104144102";
+        public const string MigrationId = "20220104144102";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {

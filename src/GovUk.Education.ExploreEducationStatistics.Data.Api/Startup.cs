@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
+using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -39,6 +40,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
@@ -58,7 +60,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationInsightsTelemetry();
+            services.AddApplicationInsightsTelemetry()
+                .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
+            
             services.AddMvc(options =>
             {
                 options.Filters.Add(new OperationCancelledExceptionFilter());
@@ -82,7 +86,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
+                        builder =>
+                        {
+                            builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model");
+                            builder.AddTempTableSupport();
+                        })
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -226,7 +234,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     "https://localhost:3001")
                 .AllowAnyMethod()
                 .AllowAnyHeader());
-            
+
             app.UseMvc();
         }
 

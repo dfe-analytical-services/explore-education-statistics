@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -32,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IGeoJsonRepository _geoJsonRepository;
         private readonly IIndicatorRepository _indicatorRepository;
-        private readonly ILocationRepository _locationRepository;
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
@@ -48,7 +47,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IFootnoteRepository footnoteRepository,
             IGeoJsonRepository geoJsonRepository,
             IIndicatorRepository indicatorRepository,
-            ILocationRepository locationRepository,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
@@ -62,7 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _footnoteRepository = footnoteRepository;
             _geoJsonRepository = geoJsonRepository;
             _indicatorRepository = indicatorRepository;
-            _locationRepository = locationRepository;
             _persistenceHelper = persistenceHelper;
             _timePeriodService = timePeriodService;
             _userService = userService;
@@ -74,22 +71,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public async Task<Either<ActionResult, ResultSubjectMetaViewModel>> GetSubjectMeta(
             Guid releaseId,
-            SubjectMetaQueryContext query,
+            ObservationQueryContext query,
             IList<Observation> observations)
         {
-            var queryableObservations = observations.AsQueryable();
-
             return await _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(async subject =>
                 {
                     var stopwatch = Stopwatch.StartNew();
                     stopwatch.Start();
-
+                    
+                    var locations = observations
+                        .Select(o => o.Location)
+                        .Distinct()
+                        .ToList();
+                    
                     var locationAttributes =
-                        await _locationRepository.GetLocationAttributesHierarchicalByObservationsList(
-                            observations,
-                            hierarchies: _locationOptions.Hierarchies);
+                        locations.GetLocationAttributesHierarchical(_locationOptions.Hierarchies);
                     _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -99,8 +97,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var footnoteViewModels =
-                        GetFilteredFootnoteViewModels(releaseId, queryableObservations, query);
+                    var footnoteViewModels = 
+                        GetFilteredFootnoteViewModels(releaseId, filterItems.Select(fi => fi.Id).ToList(), query);
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -108,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var timePeriodViewModels = GetTimePeriodViewModels(queryableObservations);
+                    var timePeriodViewModels = GetTimePeriodViewModels(observations);
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -153,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return new ForbidResult();
         }
 
-        private List<IndicatorMetaViewModel> GetIndicatorViewModels(SubjectMetaQueryContext query)
+        private List<IndicatorMetaViewModel> GetIndicatorViewModels(ObservationQueryContext query)
         {
             var indicators = _indicatorRepository.GetIndicators(query.SubjectId, query.Indicators);
             return BuildIndicatorViewModels(indicators);
@@ -161,11 +159,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private List<FootnoteViewModel> GetFilteredFootnoteViewModels(
             Guid releaseId,
-            IQueryable<Observation> observations,
-            SubjectMetaQueryContext queryContext)
+            IEnumerable<Guid> filterItemIds,
+            ObservationQueryContext queryContext)
         {
             return _footnoteRepository
-                .GetFilteredFootnotes(releaseId, queryContext.SubjectId, observations, queryContext.Indicators)
+                .GetFilteredFootnotes(releaseId, queryContext.SubjectId, filterItemIds, queryContext.Indicators)
                 .Select(footnote => new FootnoteViewModel
                 {
                     Id = footnote.Id,
@@ -173,10 +171,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 })
                 .ToList();
         }
-
-        private List<TimePeriodMetaViewModel> GetTimePeriodViewModels(IQueryable<Observation> observations)
+        
+        private List<TimePeriodMetaViewModel> GetTimePeriodViewModels(IList<Observation> observations)
         {
-            return _timePeriodService.GetTimePeriodRange(observations)
+            return _timePeriodService
+                .GetTimePeriodRange(observations)
                 .Select(tuple => new TimePeriodMetaViewModel(tuple.Year, tuple.TimeIdentifier))
                 .ToList();
         }
@@ -184,14 +183,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private class LocationsQueryHelper
         {
             private readonly Dictionary<GeographicLevel, List<LocationAttributeNode>> _locationAttributes;
-            private readonly SubjectMetaQueryContext _query;
+            private readonly ObservationQueryContext _query;
             private readonly IBoundaryLevelRepository _boundaryLevelRepository;
             private readonly IGeoJsonRepository _geoJsonRepository;
             private readonly List<GeographicLevel> _geographicLevels;
 
             internal LocationsQueryHelper(
                 Dictionary<GeographicLevel, List<LocationAttributeNode>> locationAttributes,
-                SubjectMetaQueryContext query,
+                ObservationQueryContext query,
                 IBoundaryLevelRepository boundaryLevelRepository,
                 IGeoJsonRepository geoJsonRepository)
             {

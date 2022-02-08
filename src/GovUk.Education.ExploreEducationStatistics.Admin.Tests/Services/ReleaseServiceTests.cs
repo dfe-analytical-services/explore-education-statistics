@@ -49,12 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddAsync(
-                    new ReleaseType
-                    {
-                        Title = "Ad Hoc Statistics",
-                    }
-                );
                 await context.AddAsync(publication);
                 await context.SaveChangesAsync();
             }
@@ -63,24 +57,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var releaseService = BuildReleaseService(context);
 
-                var result = releaseService.CreateRelease(
+                var result = (await releaseService.CreateRelease(
                     new ReleaseCreateViewModel
                     {
                         PublicationId = publication.Id,
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublishScheduled = "2050-06-30",
-                        TypeId = new Guid("02e664f2-a4bc-43ee-8ff0-c87354adae72")
+                        Type = ReleaseType.OfficialStatistics
                     }
-                );
+                )).AssertRight();
 
                 var publishScheduled = new DateTime(2050, 6, 30, 0, 0, 0, DateTimeKind.Unspecified);
 
-                Assert.Equal("Academic Year 2018/19", result.Result.Right.Title);
-                Assert.Null(result.Result.Right.Published);
-                Assert.Equal(publishScheduled, result.Result.Right.PublishScheduled);
-                Assert.False(result.Result.Right.LatestRelease); // Most recent - but not published yet.
-                Assert.Equal(TimeIdentifier.AcademicYear, result.Result.Right.TimePeriodCoverage);
+                Assert.Equal("Academic Year 2018/19", result.Title);
+                Assert.Null(result.Published);
+                Assert.Equal(publishScheduled, result.PublishScheduled);
+                Assert.False(result.LatestRelease); // Most recent - but not published yet.
+                Assert.Equal(TimeIdentifier.AcademicYear, result.TimePeriodCoverage);
+                Assert.Equal(ReleaseType.OfficialStatistics, result.Type);
             }
         }
 
@@ -94,12 +89,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Order = 2,
                 Comments = new List<Comment>
                 {
-                    new Comment
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Content = "Comment 1 Text"
                     },
-                    new Comment
+                    new()
                     {
                         Id = Guid.NewGuid(),
                         Content = "Comment 2 Text"
@@ -120,12 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 await context.AddAsync(
-                    new ReleaseType
-                    {
-                        Id = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8"), Title = "Ad Hoc Statistics",
-                    }
-                );
-                await context.AddAsync(
                     new Publication
                     {
                         Id = new Guid("403d3c5d-a8cd-4d54-a029-0c74c86c55b2"),
@@ -138,7 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 ReleaseName = "2018",
                                 Content = new List<ReleaseContentSection>
                                 {
-                                    new ReleaseContentSection
+                                    new()
                                     {
                                         ReleaseId = Guid.NewGuid(),
                                         ContentSection = new ContentSection
@@ -157,12 +146,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                                     Order = 1,
                                                     Comments = new List<Comment>
                                                     {
-                                                        new Comment
+                                                        new()
                                                         {
                                                             Id = Guid.NewGuid(),
                                                             Content = "Comment 1 Text"
                                                         },
-                                                        new Comment
+                                                        new()
                                                         {
                                                             Id = Guid.NewGuid(),
                                                             Content = "Comment 2 Text"
@@ -178,13 +167,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 PreviousVersionId = templateReleaseId,
                                 ContentBlocks = new List<ReleaseContentBlock>
                                 {
-                                    new ReleaseContentBlock
+                                    new()
                                     {
                                         ReleaseId = templateReleaseId,
                                         ContentBlock = dataBlock1,
                                         ContentBlockId = dataBlock1.Id,
                                     },
-                                    new ReleaseContentBlock
+                                    new()
                                     {
                                         ReleaseId = templateReleaseId,
                                         ContentBlock = dataBlock2,
@@ -210,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         ReleaseName = "2018",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         PublishScheduled = "2050-01-01",
-                        TypeId = new Guid("2a0217ca-c514-45da-a8b3-44c68a6737e8")
+                        Type = ReleaseType.OfficialStatistics
                     }
                 );
 
@@ -630,30 +619,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateRelease()
         {
-            var releaseId = Guid.NewGuid();
-
-            var adHocReleaseType = new ReleaseType {Title = "Ad Hoc Statistics"};
-            var officialStatisticsReleaseType = new ReleaseType {Title = "Official Statistics"};
-
             var release = new Release
             {
-                Id = releaseId,
-                Type = adHocReleaseType,
+                Type = ReleaseType.AdHocStatistics,
                 Publication = new Publication(),
                 ReleaseName = "2030",
                 PublishScheduled = DateTime.UtcNow,
                 NextReleaseDate = new PartialDate {Day = "15", Month = "6", Year = "2039"},
                 PreReleaseAccessList = "Old access list",
-                Version = 0,
-                PreviousVersionId = releaseId
+                Version = 0
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddRangeAsync(release,
-                    adHocReleaseType, officialStatisticsReleaseType);
+                await context.AddRangeAsync(release);
                 await context.SaveChangesAsync();
             }
 
@@ -663,10 +644,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .UpdateRelease(
-                        releaseId,
+                        release.Id,
                         new ReleaseUpdateViewModel
                         {
-                            TypeId = officialStatisticsReleaseType.Id,
+                            Type = ReleaseType.OfficialStatistics,
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.March,
                             PreReleaseAccessList = "New access list",
@@ -677,7 +658,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(release.Publication.Id, viewModel.PublicationId);
                 Assert.Equal(release.NextReleaseDate, viewModel.NextReleaseDate);
-                Assert.Equal(officialStatisticsReleaseType, viewModel.Type);
+                Assert.Equal(ReleaseType.OfficialStatistics, viewModel.Type);
                 Assert.Equal("2035", viewModel.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, viewModel.TimePeriodCoverage);
                 Assert.Equal("New access list", viewModel.PreReleaseAccessList);
@@ -687,11 +668,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var saved = await context.Releases
                     .Include(r => r.ReleaseStatuses)
-                    .FirstAsync(r => r.Id == releaseId);
+                    .FirstAsync(r => r.Id == release.Id);
 
                 Assert.Equal(release.Publication.Id, saved.PublicationId);
                 Assert.Equal(release.NextReleaseDate, saved.NextReleaseDate);
-                Assert.Equal(officialStatisticsReleaseType.Id, saved.TypeId);
+                Assert.Equal(ReleaseType.OfficialStatistics, saved.Type);
                 Assert.Equal("2035-march", saved.Slug);
                 Assert.Equal("2035", saved.ReleaseName);
                 Assert.Equal(TimeIdentifier.March, saved.TimePeriodCoverage);
@@ -704,40 +685,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateRelease_FailsNonUniqueSlug()
         {
-            var releaseType = new ReleaseType {Title = "Ad Hoc Statistics"};
-
             var publication = new Publication();
 
-            var releaseId = Guid.NewGuid();
             var release = new Release
             {
-                Id = releaseId,
-                Type = releaseType,
+                Type = ReleaseType.AdHocStatistics,
                 Publication = publication,
                 ReleaseName = "2030",
                 Slug = "2030",
                 PublishScheduled = DateTime.UtcNow,
-                Version = 0,
-                PreviousVersionId = releaseId
+                Version = 0
             };
 
-            var otherReleaseId = Guid.NewGuid();
             var otherRelease = new Release
             {
-                Id = otherReleaseId,
-                Type = releaseType,
+                Type = ReleaseType.AdHocStatistics,
                 Publication = publication,
                 ReleaseName = "2035",
                 Slug = "2035",
                 PublishScheduled = DateTime.UtcNow,
-                Version = 0,
-                PreviousVersionId = otherReleaseId
+                Version = 0
             };
 
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddRangeAsync(releaseType, release, otherRelease);
+                await context.AddRangeAsync(release, otherRelease);
                 await context.SaveChangesAsync();
             }
 
@@ -747,10 +720,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await releaseService
                     .UpdateRelease(
-                        releaseId,
+                        release.Id,
                         new ReleaseUpdateViewModel
                         {
-                            TypeId = releaseType.Id,
+                            Type = ReleaseType.AdHocStatistics,
                             ReleaseName = "2035",
                             TimePeriodCoverage = TimeIdentifier.CalendarYear,
                             PreReleaseAccessList = "Test"
@@ -764,18 +737,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetRelease()
         {
-            var adHocReleaseType = new ReleaseType
-            {
-                Title = "Ad Hoc Statistics"
-            };
-
             var releaseId = Guid.NewGuid();
             var nextReleaseDate = new PartialDate {Day = "1", Month = "1", Year = "2040"};
 
             var release = new Release
             {
                 Id = releaseId,
-                Type = adHocReleaseType,
+                Type = ReleaseType.AdHocStatistics,
                 TimePeriodCoverage = TimeIdentifier.January,
                 PublishScheduled = DateTime.Parse("2020-06-29T00:00:00.00Z", styles: DateTimeStyles.AdjustToUniversal),
                 Published = DateTime.Parse("2020-06-29T02:00:00.00Z"),
@@ -819,11 +787,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Releases = new List<Release>
                 {
-                    new Release
+                    new()
                     {
                         ReleaseStatuses = new List<ReleaseStatus>
                         {
-                            new ReleaseStatus
+                            new()
                             {
                                 InternalReleaseNote = "Different release",
                                 Created = DateTime.UtcNow
@@ -859,7 +827,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(DateTime.Parse("2020-06-29T02:00:00.00Z"), viewModel.Published);
                 Assert.Equal("Test access list", viewModel.PreReleaseAccessList);
                 Assert.Equal(nextReleaseDate, viewModel.NextReleaseDate);
-                Assert.Equal(adHocReleaseType, viewModel.Type);
+                Assert.Equal(ReleaseType.AdHocStatistics, viewModel.Type);
                 Assert.Equal(TimeIdentifier.January, viewModel.TimePeriodCoverage);
                 Assert.Equal("2035", viewModel.YearTitle);
 

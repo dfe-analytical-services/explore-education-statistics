@@ -149,7 +149,7 @@ user creates release for publication
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    %{WAIT_SMALL}
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    ${start_year}
-    user clicks radio    National Statistics
+    user clicks radio    National statistics
     user clicks radio if exists    Create new template
     user clicks button    Create new release
 
@@ -641,7 +641,7 @@ user approves release for scheduled release
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${NEXT_RELEASE_YEAR}
 
     user clicks button    Update status
-    user waits until h1 is visible    Confirm publish date
+    user waits until h2 is visible    Confirm publish date
     user clicks button    Confirm
 
 user verifies release summary
@@ -734,7 +734,7 @@ user waits until modal is visible
     ...    ${MODAL_TITLE}
     ...    ${MODAL_TEXT}=${EMPTY}
 
-    user waits until parent contains element    css:.ReactModal__Content    xpath://h1[.="${MODAL_TITLE}"]
+    user waits until parent contains element    css:.ReactModal__Content    xpath://h2[.="${MODAL_TITLE}"]
     IF    "${MODAL_TEXT}" != "${EMPTY}"
         user waits until parent contains element    css:.ReactModal__Content    xpath://*[.="${MODAL_TEXT}"]
     END

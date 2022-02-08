@@ -467,4 +467,4 @@ finally:
     print(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
     print("\nTests finished!")
     if args.enable_slack:
-        send_slack_report(args.env)
+        send_slack_report(args.env, args.tests)

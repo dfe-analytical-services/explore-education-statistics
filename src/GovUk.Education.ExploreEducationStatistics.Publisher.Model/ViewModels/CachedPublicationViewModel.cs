@@ -11,12 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public string Slug { get; set; }
 
-        public string Description { get; set; }
-
-        public string DataSource { get; set; }
-
-        public string Summary { get; set; }
-
         public Guid LatestReleaseId { get; set; }
 
         public List<ReleaseTitleViewModel> Releases { get; set; }

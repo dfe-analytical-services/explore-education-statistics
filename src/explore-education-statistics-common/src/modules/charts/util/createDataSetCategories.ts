@@ -284,7 +284,6 @@ export default function createDataSetCategories(
   meta: FullTableMeta,
 ): DataSetCategory[] {
   const categoryFilters = getCategoryFilters(axisConfiguration, meta);
-
   const childDataSets = getChildDataSets(axisConfiguration, meta);
   const dedupedChildDataSets = dedupeDataSets(childDataSets);
 

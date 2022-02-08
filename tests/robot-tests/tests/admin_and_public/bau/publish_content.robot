@@ -16,7 +16,7 @@ ${RELEASE_NAME}=        Calendar Year 2001
 *** Test Cases ***
 Create new publication and release via API
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
-    user create test release via api    ${PUBLICATION_ID}    CY    2001
+    user create test release via api    ${PUBLICATION_ID}    CY    2001    AdHocStatistics
 
 Navigate to release content
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
@@ -47,10 +47,10 @@ Check glossary info icon appears on release preview
 
 Click glossary info icon and validate glossary entry
     user clicks button    Absence
-    user waits until h1 is visible    Absence
+    user waits until h2 is visible    Absence
     user checks page contains    When a pupil misses (or is absent from) at least 1 possible school session.
     user clicks button    Close
-    user waits until page does not contain element    xpath://h1[text()="Absence"]
+    user waits until page does not contain element    xpath://h2[text()="Absence"]
     user checks page does not contain    When a pupil misses (or is absent from) at least 1 possible school session.
 
 Approve release
@@ -67,6 +67,7 @@ Verify newly published release is on Find Statistics page
 
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}
+    ...    Ad hoc statistics
     user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
     user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
     user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
@@ -83,8 +84,8 @@ Check latest release contains glossary info icon
 
 Click glossary info icon and verify entry is correct
     user clicks button    Absence
-    user waits until h1 is visible    Absence
+    user waits until h2 is visible    Absence
     user checks page contains    When a pupil misses (or is absent from) at least 1 possible school session.
     user clicks button    Close
-    user waits until page does not contain element    xpath://h1[text()="Absence"]
+    user waits until page does not contain element    xpath://h2[text()="Absence"]
     user checks page does not contain    When a pupil misses (or is absent from) at least 1 possible school session.

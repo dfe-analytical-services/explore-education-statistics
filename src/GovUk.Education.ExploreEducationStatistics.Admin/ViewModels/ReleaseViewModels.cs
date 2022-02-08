@@ -32,8 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string YearTitle { get; set; }
 
-        public Guid? TypeId { get; set; }
-
         public PartialDate NextReleaseDate { get; set; }
 
         [JsonConverter(typeof(DateTimeToDateJsonConverter))]
@@ -50,6 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public bool LatestRelease { get; set; }
 
+        [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseType Type { get; set; }
 
         public Contact Contact { get; set; }
@@ -70,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public Guid PublicationId { get; set; }
 
-        [Required] public Guid? TypeId { get; set; }
+        [Required] public ReleaseType Type { get; set; }
 
         [Required]
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
@@ -114,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
     public class ReleaseUpdateViewModel
     {
-        [Required] public Guid TypeId { get; set; }
+        [Required] public ReleaseType Type { get; set; }
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         [Required]

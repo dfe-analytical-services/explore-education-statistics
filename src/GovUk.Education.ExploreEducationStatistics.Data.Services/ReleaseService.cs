@@ -70,7 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return new List<SubjectViewModel>();
             }
 
-            var releaseSubjects = await _statisticsDbContext.ReleaseSubject
+            var releaseSubjects = await _statisticsDbContext
+                .ReleaseSubject
                 .AsQueryable()
                 .Where(rs => rs.ReleaseId == releaseId && subjectsToInclude.Contains(rs.SubjectId))
                 .ToListAsync();

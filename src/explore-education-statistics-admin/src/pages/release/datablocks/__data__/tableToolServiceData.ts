@@ -38,6 +38,10 @@ export const testSubjectMeta: SubjectMeta = {
     },
   },
   locations: {
+    country: {
+      legend: 'Country',
+      options: [{ value: 'england', label: 'England' }],
+    },
     localAuthority: {
       legend: 'Local authority',
       options: [{ value: 'barnet', label: 'Barnet' }],

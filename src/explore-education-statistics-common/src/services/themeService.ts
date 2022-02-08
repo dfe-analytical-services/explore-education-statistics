@@ -1,18 +1,18 @@
 import { contentApi } from '@common/services/api';
 import { MethodologySummary } from '@common/services/types/methodology';
+import { PublicationType } from '@common/services/types/publicationType';
 
-interface BasePublicationSummary {
+export interface PublicationSummary {
   id: string;
   title: string;
   slug: string;
-  summary: string;
-}
-
-export interface PublicationSummary extends BasePublicationSummary {
+  type: PublicationType;
   legacyPublicationUrl?: string;
 }
 
-export interface PublicationMethodologySummary extends BasePublicationSummary {
+export interface PublicationMethodologySummary {
+  id: string;
+  title: string;
   methodologies: MethodologySummary[];
 }
 

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _context = context;
         }
 
-        public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(Guid subjectId)
+        public IList<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(Guid subjectId)
         {
             return _context.Observation
                 .AsQueryable()
@@ -31,19 +32,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToList()
                 .OrderBy(tuple => tuple.Year)
                 .ThenBy(tuple => tuple.TimeIdentifier)
-                .Select(tuple => (tuple.Year, tuple.TimeIdentifier));
+                .Select(tuple => (tuple.Year, tuple.TimeIdentifier))
+                .ToList();
         }
 
-        public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(
+        public IList<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriods(
             IQueryable<Observation> observations)
         {
             return GetDistinctObservationTimePeriods(observations);
         }
-
-        public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
-            IQueryable<Observation> observations)
+        
+        public IList<(int Year, TimeIdentifier TimeIdentifier)> GetTimePeriodRange(
+            IList<Observation> observations)
         {
-            var timePeriods = GetDistinctObservationTimePeriods(observations).ToList();
+            var timePeriods = GetDistinctObservationTimePeriods(observations);
 
             var start = timePeriods.First();
             var end = timePeriods.Last();
@@ -57,7 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .Observation
                 .AsQueryable()
                 .Where(observation => observation.SubjectId == subjectId);
-            var orderedTimePeriods = GetDistinctObservationTimePeriods(observationsQuery).ToList();
+            
+            var orderedTimePeriods = GetDistinctObservationTimePeriods(observationsQuery);
 
             if (!orderedTimePeriods.Any())
             {
@@ -72,16 +75,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 TimePeriodLabelFormatter.Format(last.Year, last.TimeIdentifier));
         }
 
-        private static IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> GetDistinctObservationTimePeriods(
+        private static IList<(int Year, TimeIdentifier TimeIdentifier)> GetDistinctObservationTimePeriods(
             IQueryable<Observation> observations)
         {
-            return observations.Select(o => new {o.Year, o.TimeIdentifier})
+            return observations
+                .Select(o => new {o.Year, o.TimeIdentifier})
                 .Distinct()
                 .AsNoTracking()
                 .ToList()
                 .OrderBy(tuple => tuple.Year)
                 .ThenBy(tuple => tuple.TimeIdentifier)
-                .Select(tuple => (tuple.Year, tuple.TimeIdentifier));
+                .Select(tuple => (tuple.Year, tuple.TimeIdentifier))
+                .ToList();
+        }
+        
+        private static IList<(int Year, TimeIdentifier TimeIdentifier)> GetDistinctObservationTimePeriods(
+            IList<Observation> observations)
+        {
+            return observations
+                .Select(o => new {o.Year, o.TimeIdentifier})
+                .Distinct()
+                .ToList()
+                .OrderBy(tuple => tuple.Year)
+                .ThenBy(tuple => tuple.TimeIdentifier)
+                .Select(tuple => (tuple.Year, tuple.TimeIdentifier))
+                .ToList();
         }
     }
 }

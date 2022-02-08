@@ -105,7 +105,7 @@ exports[`TimePeriodDataTable renders table with completely empty columns removed
       <td
         class="govuk-table__cell--numeric"
       >
-        n/a
+        no data
       </td>
     </tr>
     <tr>
@@ -135,7 +135,7 @@ exports[`TimePeriodDataTable renders table with completely empty columns removed
       <td
         class="govuk-table__cell--numeric borderBottom"
       >
-        n/a
+        no data
       </td>
     </tr>
     <tr>
@@ -423,12 +423,12 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
       <td
         class="govuk-table__cell--numeric"
       >
-        n/a
+        no data
       </td>
       <td
         class="govuk-table__cell--numeric"
       >
-        n/a
+        no data
       </td>
     </tr>
     <tr>
@@ -448,12 +448,12 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
       <td
         class="govuk-table__cell--numeric borderBottom"
       >
-        n/a
+        no data
       </td>
       <td
         class="govuk-table__cell--numeric borderBottom"
       >
-        n/a
+        no data
       </td>
     </tr>
   </tbody>

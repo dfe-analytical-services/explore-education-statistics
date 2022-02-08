@@ -78,7 +78,7 @@ Array [
 ]
 `;
 
-exports[`getCsvData contains n/a's if matching result but no matching indicator 1`] = `
+exports[`getCsvData contains no data if matching result but no matching indicator 1`] = `
 Array [
   Array [
     "location",
@@ -95,13 +95,13 @@ Array [
     "country",
     "201516",
     "Female",
-    "n/a",
+    "no data",
     "111",
   ],
 ]
 `;
 
-exports[`getCsvData contains n/a's if there are some matching results 1`] = `
+exports[`getCsvData contains no data if there are only some matching results 1`] = `
 Array [
   Array [
     "location",
@@ -121,7 +121,7 @@ Array [
     "Female",
     "State-funded primary",
     "111",
-    "n/a",
+    "no data",
   ],
   Array [
     "England",
@@ -130,7 +130,7 @@ Array [
     "201516",
     "Female",
     "State-funded secondary",
-    "n/a",
+    "no data",
     "222",
   ],
 ]
@@ -173,7 +173,7 @@ Array [
 ]
 `;
 
-exports[`getCsvData strips out rows with only n/a's 1`] = `
+exports[`getCsvData strips out rows with only no data 1`] = `
 Array [
   Array [
     "location",

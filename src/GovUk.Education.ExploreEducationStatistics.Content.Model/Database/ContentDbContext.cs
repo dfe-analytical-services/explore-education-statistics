@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -16,11 +17,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
     {
         public ContentDbContext()
         {
+            // We intentionally don't run `Configure` here as Moq would call this constructor
+            // and we'd immediately get a MockException from interacting with its fields
+            // e.g. from adding events listeners to `ChangeTracker`.
+            // We can just rely on the variants which take options instead as these
+            // are what get used in real application scenarios.
         }
 
-        public ContentDbContext(DbContextOptions<ContentDbContext> options)
-            : base(options)
+        public ContentDbContext(DbContextOptions<ContentDbContext> options) : base(options)
         {
+            Configure();
+        }
+
+        private void Configure()
+        {
+            ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
+            ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
         }
 
         public DbSet<Methodology> Methodologies { get; set; }
@@ -43,7 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
         public DbSet<MethodologyNote> MethodologyNotes { get; set; }
-        public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
         public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
@@ -124,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.Created)
                 .HasConversion(
-                    v => v, 
+                    v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
             modelBuilder.Entity<MethodologyVersion>()
@@ -228,6 +239,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Release>()
                 .HasQueryFilter(r => !r.SoftDeleted);
+
+            modelBuilder.Entity<Release>()
+                .Property(release => release.Type)
+                .HasConversion(new EnumToEnumValueConverter<ReleaseType>());
+
+            modelBuilder.Entity<Release>()
+                .HasIndex(release => release.Type);
 
             modelBuilder.Entity<ReleaseStatus>()
                 .Property(rs => rs.Created)
@@ -419,33 +437,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-
-            modelBuilder.Entity<ReleaseType>().HasData(
-                new ReleaseType
-                {
-                    Id = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    Title = "Official Statistics"
-                },
-                new ReleaseType
-                {
-                    Id = new Guid("1821abb8-68b0-431b-9770-0bea65d02ff0"),
-                    Title = "Ad Hoc Statistics"
-                },
-                new ReleaseType
-                {
-                    Id = new Guid("8becd272-1100-4e33-8a7d-1c0c4e3b42b8"),
-                    Title = "National Statistics"
-                },
-                new ReleaseType
-                {
-                    Id = new Guid("f5de8522-3150-435d-98d5-1d14763f8c54"),
-                    Title = "Experimental Statistics"
-                },
-                new ReleaseType
-                {
-                    Id = new Guid("15bd4f57-c837-4821-b308-7f4169cd9330"),
-                    Title = "Management Information"
-                });
 
             modelBuilder.Entity<GlossaryEntry>()
                 .Property(rs => rs.Created)

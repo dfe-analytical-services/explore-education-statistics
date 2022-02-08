@@ -10,8 +10,8 @@ import ContentBlockRenderer from '@common/modules/find-statistics/components/Con
 import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 import publicationService, {
   Release,
-  ReleaseType,
 } from '@common/services/publicationService';
+import { releaseTypes } from '@common/services/types/releaseType';
 import { Dictionary } from '@common/types';
 import {
   formatPartialDate,
@@ -90,9 +90,9 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                   </span>
                 </Link>
               )}
-              {release.type && <Tag>{release.type.title}</Tag>}
+              {release.type && <Tag>{releaseTypes[release.type]}</Tag>}
             </div>
-            {release.type?.title === ReleaseType.NationalStatistics && (
+            {release.type === 'NationalStatistics' && (
               <img
                 src="/assets/images/UKSA-quality-mark.jpg"
                 alt="UK statistics authority quality mark"
@@ -475,7 +475,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         methodologies={release.publication.methodologies}
         externalMethodology={release.publication.externalMethodology}
         publicationContact={release.publication.contact}
-        releaseType={release.type.title}
+        releaseType={release.type}
       />
 
       <PrintThisPage

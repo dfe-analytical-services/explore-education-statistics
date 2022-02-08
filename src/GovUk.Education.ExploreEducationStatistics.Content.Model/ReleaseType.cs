@@ -1,30 +1,33 @@
-using System;
-using System.ComponentModel.DataAnnotations;
+﻿using GovUk.Education.ExploreEducationStatistics.Common.Database;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class ReleaseType
+    public enum ReleaseType
     {
-        public Guid Id { get; set; }
+        [EnumLabelValue("Ad Hoc Statistics")]
+        AdHocStatistics,
 
-        [Required] public string Title { get; set; }
+        [EnumLabelValue("National Statistics")]
+        NationalStatistics,
 
-        protected bool Equals(ReleaseType other)
+        [EnumLabelValue("Experimental Statistics")]
+        ExperimentalStatistics,
+
+        [EnumLabelValue("Management Information")]
+        ManagementInformation,
+
+        [EnumLabelValue("Official Statistics")]
+        OfficialStatistics,
+    }
+
+    /// TODO EES-3127 Titles can be removed after removing the backwards compatibility of
+    /// CachedReleaseViewModel.Type in cached Release content. This will require a content cache refresh.
+    public static class ReleaseTypeExtensions
+    {
+        public static string GetTitle(this ReleaseType releaseType)
         {
-            return Id.Equals(other.Id);
-        }
-
-        public override bool Equals(object obj)
-        {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
-            return Equals((ReleaseType) obj);
-        }
-
-        public override int GetHashCode()
-        {
-            return Id.GetHashCode();
+            return releaseType.GetEnumLabel();
         }
     }
 }

@@ -71,7 +71,7 @@ Update publication
     user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
     user enters text into element    id:publicationForm-contactTelNo    0987654321
     user clicks button    Save publication
-    user waits until h1 is visible    Confirm publication changes
+    user waits until h2 is visible    Confirm publication changes
     user clicks button    Confirm
 
 Add a methodology
@@ -88,13 +88,22 @@ Verify publication has been updated
     user checks testid element contains    Methodology for ${PUBLICATION_NAME}    ${PUBLICATION_NAME}
     user checks testid element contains    Releases for ${PUBLICATION_NAME}    No releases created
 
-Create new release
+Go to 'Create new release'
     user clicks element    testid:Create new release link for ${PUBLICATION_NAME}
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
+
+Verify Release type options
+    user checks page contains radio    Ad hoc statistics
+    user checks page contains radio    Experimental statistics
+    user checks page contains radio    Management information
+    user checks page contains radio    National statistics
+    user checks page contains radio    Official statistics
+
+Create new release
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Spring Term
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2025
-    user clicks radio    National Statistics
+    user clicks radio    National statistics
     user clicks button    Create new release
     user waits until page contains title caption    Edit release for Spring Term 2025/26
     user waits until h1 is visible    ${PUBLICATION_NAME}
@@ -103,7 +112,7 @@ Verify created release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
     user verifies release summary    ${PUBLICATION_NAME}    Spring Term    2025/26    UI Tests Contact Name
-    ...    National Statistics
+    ...    National statistics
 
 Edit release summary
     user waits until page contains link    Edit release summary
@@ -112,13 +121,13 @@ Edit release summary
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Summer Term
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2026
-    user clicks radio    Official Statistics
+    user clicks radio    Official statistics
     user clicks button    Update release summary
 
 Verify updated release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    ${PUBLICATION_NAME}    Summer Term    2026/27    UI Tests Contact Name
-    ...    Official Statistics
+    ...    Official statistics
 
 *** Keywords ***
 teardown suite

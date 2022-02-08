@@ -24,10 +24,7 @@ describe('ReleaseStatusForm', () => {
     publicationSlug: 'publication-1-slug',
     timePeriodCoverage: { value: 'W51', label: 'Week 51' },
     title: 'Release Title',
-    type: {
-      id: 'type-1',
-      title: 'Official Statistics',
-    },
+    type: 'OfficialStatistics',
     contact: {
       id: 'contact-1',
       teamName: 'Test name',

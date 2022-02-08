@@ -7,6 +7,8 @@ import {
 } from '@common/modules/table-tool/types/workerFullTable';
 import cartesian from '@common/utils/cartesian';
 
+const EMPTY_CELL_TEXT = 'no data';
+
 /**
  * Gets the CSV data for download.
  *
@@ -65,13 +67,13 @@ export default function getCsvData(fullTable: WorkerFullTable): string[][] {
         });
 
         if (!matchingResult) {
-          return 'n/a';
+          return EMPTY_CELL_TEXT;
         }
 
-        return matchingResult.measures[indicator.value] ?? 'n/a';
+        return matchingResult.measures[indicator.value] ?? EMPTY_CELL_TEXT;
       });
 
-      if (indicatorCells.every(cell => cell === 'n/a')) {
+      if (indicatorCells.every(cell => cell === EMPTY_CELL_TEXT)) {
         return [];
       }
 

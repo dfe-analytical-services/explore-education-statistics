@@ -10,9 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             Guid id,
             string title,
             string slug,
-            string description,
-            string dataSource,
-            string summary,
             Guid latestReleaseId,
             List<ReleaseTitleViewModel> otherReleases,
             List<LegacyReleaseViewModel> legacyReleases,
@@ -23,9 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             Id = id;
             Title = title;
             Slug = slug;
-            Description = description;
-            DataSource = dataSource;
-            Summary = summary;
             LatestReleaseId = latestReleaseId;
             OtherReleases = otherReleases;
             LegacyReleases = legacyReleases;
@@ -39,12 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
         public string Title { get; }
 
         public string Slug { get; }
-
-        public string Description { get; }
-
-        public string DataSource { get; }
-
-        public string Summary { get; }
 
         public Guid LatestReleaseId { get; }
 

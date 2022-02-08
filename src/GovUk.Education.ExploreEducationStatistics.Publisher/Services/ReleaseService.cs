@@ -100,7 +100,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         public async Task<CachedReleaseViewModel> GetReleaseViewModel(Guid id, PublishContext context)
         {
             var release = _contentDbContext.Releases
-                .Include(r => r.Type)
                 .Include(r => r.Content)
                 .ThenInclude(releaseContentSection => releaseContentSection.ContentSection)
                 .ThenInclude(section => section.Content)

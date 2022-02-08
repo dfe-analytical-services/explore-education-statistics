@@ -25,7 +25,7 @@ import React, { forwardRef, memo } from 'react';
 import DataTableCaption from './DataTableCaption';
 import FixedMultiHeaderDataTable from './FixedMultiHeaderDataTable';
 
-const EMPTY_CELL_TEXT = 'n/a';
+const EMPTY_CELL_TEXT = 'no data';
 
 class FilterGroup extends Filter {
   constructor(label: string) {
@@ -174,6 +174,7 @@ interface TableCell {
 
 interface Props {
   captionTitle?: string;
+  dataBlockId?: string;
   fullTable: FullTable;
   tableHeadersConfig: TableHeadersConfig;
   source?: string;
@@ -182,7 +183,14 @@ interface Props {
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   function TimePeriodDataTable(
-    { fullTable, tableHeadersConfig, captionTitle, source, onError }: Props,
+    {
+      fullTable,
+      tableHeadersConfig,
+      captionTitle,
+      dataBlockId,
+      source,
+      onError,
+    }: Props,
     dataTableRef,
   ) {
     try {
@@ -313,6 +321,10 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         [],
       );
 
+      const captionId = dataBlockId
+        ? `dataTableCaption-${dataBlockId}`
+        : 'dataTableCaption';
+
       const rows = filteredCartesian.map(row => row.map(cell => cell.text));
 
       return (
@@ -321,9 +333,10 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
             <DataTableCaption
               {...subjectMeta}
               title={captionTitle}
-              id="dataTableCaption"
+              id={captionId}
             />
           }
+          captionId={captionId}
           columnHeaders={columnHeaders}
           rowHeaders={rowHeaders}
           rows={rows}

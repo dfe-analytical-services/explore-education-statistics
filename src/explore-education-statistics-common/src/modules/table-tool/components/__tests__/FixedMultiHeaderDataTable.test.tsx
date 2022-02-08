@@ -8,6 +8,7 @@ describe('FixedMultiHeaderDataTable', () => {
     const { container } = render(
       <FixedMultiHeaderDataTable
         caption="Test table"
+        captionId="test-caption-id"
         columnHeaders={[
           new Header('A', 'Col group A')
             .addChild(new Header('C', 'Col C'))
@@ -25,6 +26,8 @@ describe('FixedMultiHeaderDataTable', () => {
     );
 
     const table = container.querySelector('table') as HTMLElement;
+
+    expect(table).toHaveAttribute('aria-labelledby', 'test-caption-id');
 
     expect(table.querySelectorAll('thead tr')).toHaveLength(2);
     expect(table.querySelectorAll('thead tr:nth-child(1) th')).toHaveLength(2);

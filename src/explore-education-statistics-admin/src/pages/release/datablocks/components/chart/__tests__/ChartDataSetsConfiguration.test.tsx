@@ -825,14 +825,12 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      const tableRows = screen.getAllByRole('row');
-      expect(tableRows).toHaveLength(3);
+      const rows = screen.getAllByRole('row');
+      expect(rows).toHaveLength(3);
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      userEvent.click(
-        within(tableRows[1]).getByRole('button', { name: 'Remove' }),
-      );
+      userEvent.click(within(rows[1]).getByRole('button', { name: 'Remove' }));
 
       expect(handleChange).toHaveBeenCalledWith([
         {

@@ -220,7 +220,8 @@ const TableToolWizard = ({
     const [endYear, endCode] = parseYearCodeTuple(values.end);
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-      ...state.query,
+      locations: state.query.locations,
+      geographicLevel: state.query.geographicLevel,
       subjectId: state.query.subjectId,
       timePeriod: {
         startYear,

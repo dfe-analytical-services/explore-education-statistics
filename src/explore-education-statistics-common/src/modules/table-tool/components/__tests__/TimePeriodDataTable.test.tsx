@@ -806,4 +806,134 @@ describe('TimePeriodDataTable', () => {
 
     expect(table).toMatchSnapshot();
   });
+
+  test('renders table correctly with no `dataBlockId` ', () => {
+    const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
+
+    const tableHeadersConfig: UnmappedTableHeadersConfig = {
+      columnGroups: [
+        [
+          {
+            value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
+            type: 'Filter',
+          },
+        ],
+      ],
+      rowGroups: [
+        [
+          { value: 'E08000026', type: 'Location', level: 'localAuthority' },
+          { value: 'E09000008', type: 'Location', level: 'localAuthority' },
+        ],
+        [
+          {
+            value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+            type: 'Filter',
+          },
+          {
+            value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+            type: 'Filter',
+          },
+        ],
+      ],
+      columns: [
+        { value: '2013_AY', type: 'TimePeriod' },
+        { value: '2014_AY', type: 'TimePeriod' },
+        { value: '2015_AY', type: 'TimePeriod' },
+      ],
+      rows: [
+        {
+          value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
+          type: 'Indicator',
+        },
+        {
+          value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
+          type: 'Indicator',
+        },
+      ],
+    };
+
+    render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          tableHeadersConfig,
+          fullTable,
+        )}
+      />,
+    );
+    expect(screen.getByRole('table')).toHaveAttribute(
+      'aria-labelledby',
+      'dataTableCaption',
+    );
+    expect(screen.getByTestId('dataTableCaption')).toHaveAttribute(
+      'id',
+      'dataTableCaption',
+    );
+  });
+
+  test('renders table & caption correctly with `dataBlockId`', () => {
+    const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
+
+    const tableHeadersConfig: UnmappedTableHeadersConfig = {
+      columnGroups: [
+        [
+          {
+            value: 'b3207d77-143b-43d5-8b48-32d29727e96f',
+            type: 'Filter',
+          },
+        ],
+      ],
+      rowGroups: [
+        [
+          { value: 'E08000026', type: 'Location', level: 'localAuthority' },
+          { value: 'E09000008', type: 'Location', level: 'localAuthority' },
+        ],
+        [
+          {
+            value: '5675d1fa-77fd-4dfd-bb1f-08d78f6f2c4d',
+            type: 'Filter',
+          },
+          {
+            value: '53da1e17-184f-43f6-bb27-08d78f6f2c4d',
+            type: 'Filter',
+          },
+        ],
+      ],
+      columns: [
+        { value: '2013_AY', type: 'TimePeriod' },
+        { value: '2014_AY', type: 'TimePeriod' },
+        { value: '2015_AY', type: 'TimePeriod' },
+      ],
+      rows: [
+        {
+          value: '0003d2ac-4425-4432-2afb-08d78f6f2b08',
+          type: 'Indicator',
+        },
+        {
+          value: '829460cd-ae9e-4266-2aff-08d78f6f2b08',
+          type: 'Indicator',
+        },
+      ],
+    };
+
+    render(
+      <TimePeriodDataTable
+        dataBlockId="test-datablock-id"
+        fullTable={fullTable}
+        tableHeadersConfig={mapTableHeadersConfig(
+          tableHeadersConfig,
+          fullTable,
+        )}
+      />,
+    );
+
+    expect(screen.getByRole('table')).toHaveAttribute(
+      'aria-labelledby',
+      'dataTableCaption-test-datablock-id',
+    );
+    expect(screen.getByTestId('dataTableCaption')).toHaveAttribute(
+      'id',
+      'dataTableCaption-test-datablock-id',
+    );
+  });
 });

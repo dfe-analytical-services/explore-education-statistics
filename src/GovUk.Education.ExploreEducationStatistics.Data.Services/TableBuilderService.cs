@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
@@ -26,6 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class TableBuilderService : ITableBuilderService
     {
+        private readonly StatisticsDbContext _context;
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly IObservationService _observationService;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly TableBuilderOptions _options;
 
         public TableBuilderService(
+            StatisticsDbContext context,
             IFilterItemRepository filterItemRepository,
             IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
@@ -44,10 +45,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ISubjectRepository subjectRepository,
             IUserService userService,
             IResultBuilder<Observation,
-                ObservationViewModel> resultBuilder,
+            ObservationViewModel> resultBuilder,
             IReleaseRepository releaseRepository,
             IOptions<TableBuilderOptions> options)
         {
+            _context = context;
             _filterItemRepository = filterItemRepository;
             _observationService = observationService;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
@@ -102,9 +104,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
                     }
 
-                    var observations = 
-                        await _observationService.FindObservations(queryContext, cancellationToken);
-
+                    var matchedObservationIds = 
+                        (await _observationService.GetMatchedObservations(queryContext, cancellationToken))
+                        .Select(row => row.Id);
+                    
+                    var observations = await _context
+                        .Observation
+                        .AsNoTracking()
+                        .Include(o => o.Location)
+                        .Include(o => o.FilterItems)
+                        .Where(o => matchedObservationIds.Contains(o.Id))
+                        .ToListAsync(cancellationToken);
+                    
                     if (!observations.Any())
                     {
                         return new TableBuilderResultViewModel();
@@ -113,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     return await _resultSubjectMetaService
                         .GetSubjectMeta(
                             release.Id, 
-                            SubjectMetaQueryContext.FromObservationQueryContext(queryContext), 
+                            queryContext,
                             observations)
                         .OnSuccess(subjectMetaViewModel =>
                         {

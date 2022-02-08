@@ -21,7 +21,7 @@ describe('TableToolWizard', () => {
               id: 'publication-1',
               title: 'Publication 1',
               slug: 'publication-1',
-              summary: '',
+              type: 'NationalAndOfficial',
             },
           ],
         },
@@ -135,6 +135,10 @@ describe('TableToolWizard', () => {
       },
     },
     locations: {
+      country: {
+        legend: 'Country',
+        options: [{ value: 'england', label: 'England' }],
+      },
       localAuthority: {
         legend: 'Local authority',
         options: [

@@ -10,14 +10,18 @@ import { DataSet } from '@common/modules/charts/types/dataSet';
 import expandDataSet from '@common/modules/charts/util/expandDataSet';
 import generateDataSetKey from '@common/modules/charts/util/generateDataSetKey';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
 import WarningMessage from '@common/components/WarningMessage';
 import getSelectedDataSets from '@admin/pages/release/datablocks/components/chart/utils/getSelectedDataSets';
+import reorder from '@common/utils/reorder';
 import { Formik } from 'formik';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
 import React, { ReactNode, useEffect, useMemo } from 'react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import classNames from 'classnames';
 
 const formId = 'chartDataSetsConfigurationForm';
 
@@ -42,6 +46,7 @@ const ChartDataSetsConfiguration = ({
   onChange,
 }: Props) => {
   const { forms, updateForm, submit } = useChartBuilderFormsContext();
+  const [isReordering, toggleIsReordering] = useToggle(false);
 
   const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
     meta.indicators,
@@ -197,62 +202,123 @@ const ChartDataSetsConfiguration = ({
 
       {dataSets?.length > 0 && (
         <>
-          <table>
-            <thead>
-              <tr>
-                <th>Data set</th>
-                <th>
-                  <VisuallyHidden>Actions</VisuallyHidden>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {dataSets.map((dataSet, index) => {
-                const expandedDataSet = expandDataSet(dataSet, meta);
-                const label = generateDataSetLabel(expandedDataSet);
-
-                return (
-                  <tr key={generateDataSetKey(dataSet)}>
-                    <td>{label}</td>
-                    <td className="dfe-align--right">
-                      <ButtonText
-                        className="govuk-!-margin-bottom-0"
-                        onClick={() => {
-                          if (onChange) {
-                            const nextDataSets = [...dataSets];
-                            nextDataSets.splice(index, 1);
-
-                            onChange(nextDataSets);
-                          }
-                        }}
-                      >
-                        Remove
-                      </ButtonText>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-
-          <ChartBuilderSaveActions
-            formId={formId}
-            formKey="dataSets"
-            onClick={() => {
-              if (!forms.dataSets) {
+          <DragDropContext
+            onDragEnd={result => {
+              if (!result.destination) {
                 return;
               }
-
-              updateForm({
-                formKey: 'dataSets',
-                submitCount: forms.dataSets.submitCount + 1,
-              });
-
-              submit();
+              const reorderedDataSets = reorder(
+                dataSets,
+                result.source.index,
+                result.destination.index,
+              );
+              onChange(reorderedDataSets);
             }}
           >
-            {buttons}
-          </ChartBuilderSaveActions>
+            <Droppable droppableId="droppable" isDropDisabled={!isReordering}>
+              {(droppableProvided, droppableSnapshot) => (
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Data set</th>
+                      <th>
+                        <VisuallyHidden>Actions</VisuallyHidden>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    ref={droppableProvided.innerRef}
+                    className={classNames({
+                      [styles.dropArea]: droppableSnapshot.isDraggingOver,
+                    })}
+                  >
+                    {dataSets.map((dataSet, index) => {
+                      const expandedDataSet = expandDataSet(dataSet, meta);
+                      const label = generateDataSetLabel(expandedDataSet);
+                      const key = generateDataSetKey(dataSet);
+
+                      return (
+                        <Draggable
+                          draggableId={key}
+                          isDragDisabled={!isReordering}
+                          key={key}
+                          index={index}
+                        >
+                          {(draggableProvided, draggableSnapshot) => (
+                            <tr
+                              // eslint-disable-next-line react/jsx-props-no-spreading
+                              {...draggableProvided.draggableProps}
+                              // eslint-disable-next-line react/jsx-props-no-spreading
+                              {...draggableProvided.dragHandleProps}
+                              className={classNames(styles.item, {
+                                [styles.isDragging]:
+                                  draggableSnapshot.isDragging,
+                              })}
+                              ref={draggableProvided.innerRef}
+                            >
+                              <td>{label}</td>
+                              <td
+                                className={classNames('dfe-align--right', {
+                                  [styles.isReordering]: isReordering,
+                                })}
+                              >
+                                {!isReordering && (
+                                  <ButtonText
+                                    className="govuk-!-margin-bottom-0"
+                                    onClick={() => {
+                                      if (onChange) {
+                                        const nextDataSets = [...dataSets];
+                                        nextDataSets.splice(index, 1);
+
+                                        onChange(nextDataSets);
+                                      }
+                                    }}
+                                  >
+                                    Remove
+                                  </ButtonText>
+                                )}
+                              </td>
+                            </tr>
+                          )}
+                        </Draggable>
+                      );
+                    })}
+                    {droppableProvided.placeholder}
+                  </tbody>
+                </table>
+              )}
+            </Droppable>
+          </DragDropContext>
+
+          <div className="dfe-flex dfe-justify-content--space-between">
+            <ChartBuilderSaveActions
+              formId={formId}
+              formKey="dataSets"
+              onClick={() => {
+                if (!forms.dataSets) {
+                  return;
+                }
+
+                updateForm({
+                  formKey: 'dataSets',
+                  submitCount: forms.dataSets.submitCount + 1,
+                });
+
+                submit();
+              }}
+            >
+              {buttons}
+            </ChartBuilderSaveActions>
+            {/* EES-2556
+             <Button
+              variant="secondary"
+              onClick={
+                isReordering ? toggleIsReordering.off : toggleIsReordering.on
+              }
+            >
+              {isReordering ? 'Finish reordering' : 'Reorder data sets'}
+            </Button> */}
+          </div>
         </>
       )}
     </>

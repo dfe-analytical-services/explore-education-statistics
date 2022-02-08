@@ -21,7 +21,7 @@ Verify release summary
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
     user verifies release summary    ${PUBLICATION_NAME}    Calendar Year    2000    UI test contact name
-    ...    National Statistics
+    ...    National statistics
 
 Upload subject
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
@@ -94,7 +94,7 @@ Approve release and wait for it to be Scheduled
     user enters text into element    id:releaseStatusForm-nextReleaseDate-month    1
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    2001
     user clicks button    Update status
-    user waits until h1 is visible    Confirm publish date
+    user waits until h2 is visible    Confirm publish date
     user clicks button    Confirm
     # the below fails on dev
     user checks summary list contains    Scheduled release    ${day} ${month_word} ${year}
