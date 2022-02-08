@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Thinktecture.Internal;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
 {
@@ -84,6 +85,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             reloadedEntity = reloaded;
             return true;
         }
+
+        public static DbSet<TEntity> TempTableSet<TEntity>(this DbContext dbContext) where TEntity : class
+        {
+            return dbContext.Set<TEntity>(EntityNameProvider.GetTempTableName(typeof(TEntity)));
+        } 
 
         private static string GetDisplayString(this DbContext context, object entity)
         {

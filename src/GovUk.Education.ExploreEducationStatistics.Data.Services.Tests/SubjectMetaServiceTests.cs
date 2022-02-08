@@ -1172,15 +1172,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
-            var matchedObservations = ListOf(
-                new MatchedObservation(Guid.NewGuid()),
-                new MatchedObservation(Guid.NewGuid()),
-                new MatchedObservation(Guid.NewGuid()));
-
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
                 await statisticsDbContext.Subject.AddRangeAsync(subject);
-                //await statisticsDbContext.MatchedObservations.AddRangeAsync(matchedObservations); // @MarkFix
+                await statisticsDbContext.MatchedObservations.AddRangeAsync(
+                    new MatchedObservation(Guid.NewGuid()),
+                    new MatchedObservation(Guid.NewGuid()),
+                    new MatchedObservation(Guid.NewGuid()));
                 await statisticsDbContext.SaveChangesAsync();
             }
 

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -114,9 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         public DbSet<ReleaseSubject> ReleaseSubject { get; set; } = null!;
         public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
-
-        //public DbSet<MatchedObservation> MatchedObservations => Set<MatchedObservation>();
-        public IQueryable<MatchedObservation> MatchedObservations => Set<MatchedObservation>().AsQueryable();
+        public DbSet<MatchedObservation> MatchedObservations => this.TempTableSet<MatchedObservation>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -256,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder
                 .ConfigureTempTableEntity<MatchedObservation>(isKeyless: false,
                     builder => builder
-                        .HasKey(matchedObservation => matchedObservation.Id)); // @MarkFix
+                        .HasKey(matchedObservation => matchedObservation.Id));
         }
 
         private static void ConfigureUnit(ModelBuilder modelBuilder)
