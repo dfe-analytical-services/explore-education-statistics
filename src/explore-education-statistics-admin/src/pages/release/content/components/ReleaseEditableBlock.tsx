@@ -13,6 +13,7 @@ import releaseContentCommentService, {
 } from '@admin/services/releaseContentCommentService';
 import { Comment, EditableBlock } from '@admin/services/types/content';
 import Gate from '@common/components/Gate';
+import useAsyncCallback from '@common/hooks/useAsyncCallback';
 import useToggle from '@common/hooks/useToggle';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
@@ -55,7 +56,6 @@ const ReleaseEditableBlock = ({
   } = useEditingContext();
 
   const [isEditing, toggleEditing] = useToggle(false);
-  const [isSaving, toggleIsSaving] = useToggle(false);
 
   const getChartFile = useGetChartFile(releaseId);
 
@@ -67,28 +67,23 @@ const ReleaseEditableBlock = ({
     releaseId,
   });
 
-  const handleSave = useCallback(
-    async (content: string, isAutoSave?: boolean) => {
-      toggleIsSaving.on();
+  const [{ isLoading: isSaving }, handleSave] = useAsyncCallback(
+    async (content: string) => {
       const contentWithPlaceholders = insertReleaseIdPlaceholders(content);
       await onSave(block.id, contentWithPlaceholders);
-
-      if (!isAutoSave) {
-        clearUnsavedCommentDeletions(block.id);
-        toggleEditing.off();
-      }
-
-      toggleIsSaving.off();
       removeUnsavedBlock(block.id);
     },
-    [
-      onSave,
-      block.id,
-      removeUnsavedBlock,
-      clearUnsavedCommentDeletions,
-      toggleEditing,
-      toggleIsSaving,
-    ],
+    [],
+  );
+
+  const handleSubmit = useCallback(
+    async (content: string) => {
+      await handleSave(content);
+
+      clearUnsavedCommentDeletions(block.id);
+      toggleEditing.off();
+    },
+    [handleSave, clearUnsavedCommentDeletions, block.id, toggleEditing],
   );
 
   const handleDelete = useCallback(() => {
@@ -165,7 +160,6 @@ const ReleaseEditableBlock = ({
         >
           <EditableContentBlock
             allowComments={allowComments}
-            autoSave
             editable={editable && !isBrowser('IE')}
             handleBlur={handleBlur}
             hideLabel
@@ -176,7 +170,8 @@ const ReleaseEditableBlock = ({
             transformImageAttributes={transformImageAttributes}
             useMarkdown={block.type === 'MarkDownBlock'}
             value={block.body}
-            onSave={handleSave}
+            onAutoSave={handleSave}
+            onSubmit={handleSubmit}
             onDelete={handleDelete}
             onEditing={toggleEditing.on}
             onImageUpload={allowImages ? handleImageUpload : undefined}

@@ -43,13 +43,13 @@ describe('EditableContentForm', () => {
       ).toBeInTheDocument();
     });
 
-    test('renders the form controls when autosave enabled', () => {
+    test('renders correct form controls when `onAutoSave` is set', () => {
       render(
         <EditableContentForm
-          autoSave
           content=""
           id="block-id"
           label="Form label"
+          onAutoSave={noop}
           onCancel={noop}
           onSubmit={noop}
         />,

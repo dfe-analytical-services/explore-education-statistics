@@ -19,7 +19,6 @@ import React, { useMemo } from 'react';
 
 interface EditableContentBlockProps {
   allowComments?: boolean;
-  autoSave?: boolean;
   editable?: boolean;
   id: string;
   isEditing?: boolean;
@@ -32,17 +31,17 @@ interface EditableContentBlockProps {
   ) => Dictionary<string>;
   useMarkdown?: boolean;
   value: string;
+  onAutoSave?: (value: string) => void;
   onCancel?: () => void;
   onDelete: () => void;
   onEditing: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
-  onSave: (value: string, isAutoSave?: boolean) => void;
+  onSubmit: (value: string) => void;
 }
 
 const EditableContentBlock = ({
   allowComments = false,
-  autoSave = false,
   editable = true,
   id,
   isEditing,
@@ -53,12 +52,13 @@ const EditableContentBlock = ({
   transformImageAttributes,
   useMarkdown,
   value,
+  onAutoSave,
   onCancel,
   onDelete,
   onEditing,
   onImageUpload,
   onImageUploadCancel,
-  onSave,
+  onSubmit,
 }: EditableContentBlockProps) => {
   const { comments } = useCommentsContext();
 
@@ -106,17 +106,17 @@ const EditableContentBlock = ({
     return (
       <EditableContentForm
         allowComments={allowComments}
-        autoSave={autoSave}
         content={content ? sanitizeHtml(content, sanitizeOptions) : ''} // NOTE: Sanitize to transform img src attribs
         label={label}
         handleBlur={handleBlur}
         hideLabel={hideLabel}
         id={id}
         isSaving={isSaving}
+        onAutoSave={onAutoSave}
         onImageUpload={onImageUpload}
         onImageUploadCancel={onImageUploadCancel}
         onCancel={onCancel}
-        onSubmit={onSave}
+        onSubmit={onSubmit}
       />
     );
   }

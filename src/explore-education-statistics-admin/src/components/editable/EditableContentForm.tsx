@@ -24,28 +24,28 @@ interface FormValues {
 
 export interface Props {
   allowComments?: boolean;
-  autoSave?: boolean;
   content: string;
   hideLabel?: boolean;
   handleBlur?: (isDirty: boolean) => void;
   id: string;
   isSaving?: boolean;
   label: string;
+  onAutoSave?: (content: string) => void;
   onCancel?: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
-  onSubmit: (content: string, isAutoSave?: boolean) => void;
+  onSubmit: (content: string) => void;
 }
 
 const EditableContentForm = ({
   allowComments = false,
-  autoSave = false,
   content,
   hideLabel = false,
   handleBlur,
   id,
   isSaving = false,
   label,
+  onAutoSave,
   onCancel,
   onImageUpload,
   onImageUploadCancel,
@@ -116,9 +116,7 @@ const EditableContentForm = ({
               label={label}
               name="content"
               validateElements={validateElements}
-              onAutoSave={values => {
-                onSubmit(values, true);
-              }}
+              onAutoSave={onAutoSave}
               onCancelComment={toggleCommentAddForm.off}
               onClickAddComment={toggleCommentAddForm.on}
               onImageUpload={onImageUpload}
@@ -127,20 +125,21 @@ const EditableContentForm = ({
 
             <ButtonGroup>
               <Button type="submit" disabled={isSaving}>
-                {autoSave ? 'Save & close' : 'Save'}
+                {onAutoSave ? 'Save & close' : 'Save'}
               </Button>
-              <LoadingSpinner
-                inline
-                hideText
-                loading={autoSave && isSaving}
-                size="md"
-                text="Saving"
-              />
-              {!autoSave && onCancel && (
+              {!onAutoSave && onCancel && (
                 <Button variant="secondary" onClick={onCancel}>
                   Cancel
                 </Button>
               )}
+
+              <LoadingSpinner
+                inline
+                hideText
+                loading={isSaving}
+                size="md"
+                text="Saving"
+              />
             </ButtonGroup>
           </Form>
         </Formik>

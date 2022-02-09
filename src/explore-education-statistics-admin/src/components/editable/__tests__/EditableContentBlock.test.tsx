@@ -21,7 +21,7 @@ Test paragraph
         value="<p>Test content</p>"
         onEditing={noop}
         onCancel={noop}
-        onSave={noop}
+        onSubmit={noop}
         onDelete={noop}
       />,
     );
@@ -47,7 +47,7 @@ Test paragraph
         useMarkdown
         onEditing={noop}
         onCancel={noop}
-        onSave={noop}
+        onSubmit={noop}
         onDelete={noop}
       />,
     );
@@ -70,7 +70,7 @@ Test paragraph
         editable={false}
         onEditing={noop}
         onCancel={noop}
-        onSave={noop}
+        onSubmit={noop}
         onDelete={noop}
       />,
     );
@@ -97,7 +97,7 @@ Test paragraph
         useMarkdown
         onEditing={noop}
         onCancel={noop}
-        onSave={noop}
+        onSubmit={noop}
         onDelete={noop}
       />,
     );
@@ -121,7 +121,7 @@ Test paragraph
         value="<p>Test content</p>"
         onEditing={handleEditing}
         onCancel={noop}
-        onSave={noop}
+        onSubmit={noop}
         onDelete={noop}
       />,
     );
@@ -145,7 +145,7 @@ Test paragraph
         isEditing
         onCancel={noop}
         onEditing={noop}
-        onSave={handleSave}
+        onSubmit={handleSave}
         onDelete={noop}
       />,
     );
@@ -169,7 +169,7 @@ Test paragraph
         value="<p>Test content</p>"
         onCancel={noop}
         onEditing={noop}
-        onSave={noop}
+        onSubmit={noop}
         onDelete={handleDelete}
       />,
     );
@@ -209,7 +209,7 @@ Test paragraph
             value="<p>Test content</p>"
             onCancel={noop}
             onEditing={noop}
-            onSave={noop}
+            onSubmit={noop}
             onDelete={noop}
           />
         </CommentsContextProvider>,
@@ -239,7 +239,7 @@ Test paragraph
             value="<p>Test content</p>"
             onEditing={handleEditing}
             onCancel={noop}
-            onSave={noop}
+            onSubmit={noop}
             onDelete={noop}
           />
         </CommentsContextProvider>,
