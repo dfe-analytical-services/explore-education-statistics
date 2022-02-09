@@ -31,7 +31,7 @@ export interface Props {
   id: string;
   isSaving?: boolean;
   label: string;
-  onCancel: () => void;
+  onCancel?: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
   onSubmit: (content: string, isAutoSave?: boolean) => void;
@@ -136,7 +136,7 @@ const EditableContentForm = ({
                 size="md"
                 text="Saving"
               />
-              {!autoSave && (
+              {!autoSave && onCancel && (
                 <Button variant="secondary" onClick={onCancel}>
                   Cancel
                 </Button>

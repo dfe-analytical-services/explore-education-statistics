@@ -19,6 +19,8 @@ Test paragraph
         id="test-id"
         label="Block content"
         value="<p>Test content</p>"
+        onEditing={noop}
+        onCancel={noop}
         onSave={noop}
         onDelete={noop}
       />,
@@ -43,6 +45,8 @@ Test paragraph
         label="Block content"
         value={testMarkdown}
         useMarkdown
+        onEditing={noop}
+        onCancel={noop}
         onSave={noop}
         onDelete={noop}
       />,
@@ -64,6 +68,8 @@ Test paragraph
         label="Block content"
         value="<p>Test content</p>"
         editable={false}
+        onEditing={noop}
+        onCancel={noop}
         onSave={noop}
         onDelete={noop}
       />,
@@ -89,6 +95,8 @@ Test paragraph
         value={testMarkdown}
         editable={false}
         useMarkdown
+        onEditing={noop}
+        onCancel={noop}
         onSave={noop}
         onDelete={noop}
       />,
@@ -103,25 +111,30 @@ Test paragraph
     ).toBeInTheDocument();
   });
 
-  test('clicking `Edit block` button shows editor', () => {
+  test('clicking `Edit block` button calls `onEditing` handler', () => {
+    const handleEditing = jest.fn();
+
     render(
       <EditableContentBlock
         id="test-id"
         label="Block content"
         value="<p>Test content</p>"
+        onEditing={handleEditing}
+        onCancel={noop}
         onSave={noop}
         onDelete={noop}
       />,
     );
 
     expect(screen.queryByLabelText('Block content')).not.toBeInTheDocument();
+    expect(handleEditing).not.toHaveBeenCalled();
 
     userEvent.click(screen.getByRole('button', { name: 'Edit block' }));
 
-    expect(screen.getByLabelText('Block content')).toBeInTheDocument();
+    expect(handleEditing).toHaveBeenCalledTimes(1);
   });
 
-  test('clicking `Edit block` and `Save` buttons calls `onSave` handler', async () => {
+  test('clicking `Save` buttons calls `onSave` handler', async () => {
     const handleSave = jest.fn();
 
     render(
@@ -129,20 +142,20 @@ Test paragraph
         id="test-id"
         label="Block content"
         value="<p>Test content</p>"
+        isEditing
+        onCancel={noop}
+        onEditing={noop}
         onSave={handleSave}
         onDelete={noop}
       />,
     );
-
-    userEvent.click(screen.getByRole('button', { name: 'Edit block' }));
-
     expect(handleSave).not.toHaveBeenCalled();
 
     userEvent.click(screen.getByRole('button', { name: 'Save' }));
 
     await waitFor(() => {
       expect(handleSave).toHaveBeenCalledTimes(1);
-      expect(handleSave).toHaveBeenCalledWith('<p>Test content</p>', undefined);
+      expect(handleSave).toHaveBeenCalledWith('<p>Test content</p>');
     });
   });
 
@@ -154,6 +167,8 @@ Test paragraph
         id="test-id"
         label="Block content"
         value="<p>Test content</p>"
+        onCancel={noop}
+        onEditing={noop}
         onSave={noop}
         onDelete={handleDelete}
       />,
@@ -173,12 +188,11 @@ Test paragraph
 
     await waitFor(() => {
       expect(handleDelete).toHaveBeenCalledTimes(1);
-      expect(handleDelete).toHaveBeenCalled();
     });
   });
 
   describe('comments allowed', () => {
-    test('renders the view comments button with the number of unresolved comments', () => {
+    test('renders the `View comments` button with the number of unresolved comments', () => {
       render(
         <CommentsContextProvider
           comments={testComments}
@@ -193,6 +207,8 @@ Test paragraph
             id="test-id"
             label="Block content"
             value="<p>Test content</p>"
+            onCancel={noop}
+            onEditing={noop}
             onSave={noop}
             onDelete={noop}
           />
@@ -204,7 +220,9 @@ Test paragraph
       ).toBeInTheDocument();
     });
 
-    test('clicking the view comments button opens the editor', () => {
+    test('clicking the `View comments` button calls the `onEditing` handler', () => {
+      const handleEditing = jest.fn();
+
       render(
         <CommentsContextProvider
           comments={testComments}
@@ -219,6 +237,8 @@ Test paragraph
             id="test-id"
             label="Block content"
             value="<p>Test content</p>"
+            onEditing={handleEditing}
+            onCancel={noop}
             onSave={noop}
             onDelete={noop}
           />
@@ -229,7 +249,7 @@ Test paragraph
         screen.getByRole('button', { name: 'View comments (3 unresolved)' }),
       );
 
-      expect(screen.getByLabelText('Block content')).toBeInTheDocument();
+      expect(handleEditing).toHaveBeenCalledTimes(1);
     });
   });
 });

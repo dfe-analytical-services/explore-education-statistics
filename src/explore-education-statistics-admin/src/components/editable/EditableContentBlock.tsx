@@ -9,20 +9,20 @@ import {
 import toHtml from '@admin/utils/markdown/toHtml';
 import Button from '@common/components/Button';
 import ContentHtml from '@common/components/ContentHtml';
-import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import sanitizeHtml, {
   defaultSanitizeOptions,
   SanitizeHtmlOptions,
 } from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 interface EditableContentBlockProps {
   allowComments?: boolean;
   autoSave?: boolean;
   editable?: boolean;
   id: string;
+  isEditing?: boolean;
   isSaving?: boolean;
   label: string;
   handleBlur?: (isDirty: boolean) => void;
@@ -34,6 +34,7 @@ interface EditableContentBlockProps {
   value: string;
   onCancel?: () => void;
   onDelete: () => void;
+  onEditing: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
   onSave: (value: string, isAutoSave?: boolean) => void;
@@ -44,6 +45,7 @@ const EditableContentBlock = ({
   autoSave = false,
   editable = true,
   id,
+  isEditing,
   isSaving,
   label,
   handleBlur,
@@ -53,6 +55,7 @@ const EditableContentBlock = ({
   value,
   onCancel,
   onDelete,
+  onEditing,
   onImageUpload,
   onImageUploadCancel,
   onSave,
@@ -63,8 +66,6 @@ const EditableContentBlock = ({
     useMarkdown,
     value,
   ]);
-
-  const [isEditing, toggleEditing] = useToggle(false);
 
   const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
     const commentTags = [
@@ -101,20 +102,6 @@ const EditableContentBlock = ({
     };
   }, [transformImageAttributes]);
 
-  const handleSave = useCallback(
-    (nextValue: string, isAutoSave?: boolean) => {
-      if (!isAutoSave) {
-        toggleEditing.off();
-      }
-      // No need to handle useMarkdown case
-      // as Admin API now converts MarkDownBlocks
-      // to HtmlBlocks
-
-      onSave(nextValue, isAutoSave);
-    },
-    [toggleEditing, onSave],
-  );
-
   if (isEditing) {
     return (
       <EditableContentForm
@@ -128,11 +115,8 @@ const EditableContentBlock = ({
         isSaving={isSaving}
         onImageUpload={onImageUpload}
         onImageUploadCancel={onImageUploadCancel}
-        onCancel={() => {
-          toggleEditing.off();
-          onCancel?.();
-        }}
-        onSubmit={handleSave}
+        onCancel={onCancel}
+        onSubmit={onSave}
       />
     );
   }
@@ -143,8 +127,8 @@ const EditableContentBlock = ({
         <div className={styles.commentsButtonContainer}>
           <Button
             variant="secondary"
-            onClick={toggleEditing.on}
             testId="view-comments"
+            onClick={onEditing}
           >
             View comments
             <br />
@@ -157,7 +141,7 @@ const EditableContentBlock = ({
         </div>
       )}
       <EditableBlockWrapper
-        onEdit={editable ? toggleEditing.on : undefined}
+        onEdit={editable ? onEditing : undefined}
         onDelete={editable ? onDelete : undefined}
       >
         <div
@@ -167,7 +151,7 @@ const EditableContentBlock = ({
         >
           {editable ? (
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-            <div className={styles.editButton} onClick={toggleEditing.on}>
+            <div className={styles.editButton} onClick={onEditing}>
               <ContentHtml
                 html={content || '<p>This section is empty</p>'}
                 sanitizeOptions={sanitizeOptions}

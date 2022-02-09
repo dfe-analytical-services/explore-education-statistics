@@ -1,6 +1,6 @@
-import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
+import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
@@ -8,16 +8,16 @@ import {
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
 } from '@admin/routes/releaseRoutes';
-import { Comment, EditableBlock } from '@admin/services/types/content';
 import releaseContentCommentService, {
   AddComment,
 } from '@admin/services/releaseContentCommentService';
-import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import { Comment, EditableBlock } from '@admin/services/types/content';
 import Gate from '@common/components/Gate';
-import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
-import isBrowser from '@common/utils/isBrowser';
-import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
 import useToggle from '@common/hooks/useToggle';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
+import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
+import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
+import isBrowser from '@common/utils/isBrowser';
 import React, { useCallback } from 'react';
 import { generatePath } from 'react-router';
 
@@ -53,7 +53,8 @@ const ReleaseEditableBlock = ({
     updateUnresolvedComments,
     updateUnsavedCommentDeletions,
   } = useEditingContext();
-  const blockId = `block-${block.id}`;
+
+  const [isEditing, toggleEditing] = useToggle(false);
   const [isSaving, toggleIsSaving] = useToggle(false);
 
   const getChartFile = useGetChartFile(releaseId);
@@ -74,16 +75,18 @@ const ReleaseEditableBlock = ({
 
       if (!isAutoSave) {
         clearUnsavedCommentDeletions(block.id);
+        toggleEditing.off();
       }
 
       toggleIsSaving.off();
       removeUnsavedBlock(block.id);
     },
     [
-      block.id,
-      clearUnsavedCommentDeletions,
-      removeUnsavedBlock,
       onSave,
+      block.id,
+      removeUnsavedBlock,
+      clearUnsavedCommentDeletions,
+      toggleEditing,
       toggleIsSaving,
     ],
   );
@@ -92,29 +95,36 @@ const ReleaseEditableBlock = ({
     onDelete(block.id);
   }, [block.id, onDelete]);
 
-  const handleBlur = (isDirty: boolean) => {
-    if (isDirty) {
-      addUnsavedBlock(block.id);
-    }
-  };
-
-  const handleCancel = () => {
-    removeUnsavedBlock(block.id);
-  };
+  const handleBlur = useCallback(
+    (isDirty: boolean) => {
+      if (isDirty) {
+        addUnsavedBlock(block.id);
+      }
+    },
+    [addUnsavedBlock, block.id],
+  );
 
   const handleSaveComment = async (comment: AddComment) =>
     releaseContentCommentService.addContentSectionComment(
       releaseId,
       sectionId,
-      blockId.replace('block-', ''),
+      block.id,
       comment,
     );
 
-  const handleDeletePendingComment = async (commentId: string) =>
-    releaseContentCommentService.deleteContentSectionComment(commentId);
+  const handleDeletePendingComment = useCallback(
+    async (commentId: string) =>
+      releaseContentCommentService.deleteContentSectionComment(commentId),
+    [],
+  );
 
-  const handleSaveUpdatedComment = async (comment: Comment) =>
-    releaseContentCommentService.updateContentSectionComment(comment);
+  const handleSaveUpdatedComment = useCallback(
+    async (comment: Comment) =>
+      releaseContentCommentService.updateContentSectionComment(comment),
+    [],
+  );
+
+  const blockId = `block-${block.id}`;
 
   switch (block.type) {
     case 'DataBlock':
@@ -160,14 +170,15 @@ const ReleaseEditableBlock = ({
             handleBlur={handleBlur}
             hideLabel
             id={blockId}
+            isEditing={isEditing}
             isSaving={isSaving}
             label="Content block"
             transformImageAttributes={transformImageAttributes}
             useMarkdown={block.type === 'MarkDownBlock'}
             value={block.body}
-            onCancel={handleCancel}
             onSave={handleSave}
             onDelete={handleDelete}
+            onEditing={toggleEditing.on}
             onImageUpload={allowImages ? handleImageUpload : undefined}
             onImageUploadCancel={
               allowImages ? handleImageUploadCancel : undefined
