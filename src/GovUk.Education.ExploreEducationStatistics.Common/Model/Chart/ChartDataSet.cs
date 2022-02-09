@@ -11,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public List<Guid> Filters = new List<Guid>();
         public ChartDataSetLocation Location;
         public string TimePeriod;
+        public int? Order;
 
         // TODO EES-1649 Migrate data set configs to legend item configs
         public ChartDataSetConfiguration Config;

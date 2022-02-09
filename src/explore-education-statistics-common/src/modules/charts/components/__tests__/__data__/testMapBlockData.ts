@@ -11,7 +11,6 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
-import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
 import produce from 'immer';
 
 export const testMapConfiguration: Chart = {
@@ -888,19 +887,3 @@ export const testsMixedLocationsTableDataWithLADs: TableDataResult[] = [
     timePeriod: '2016_AY',
   },
 ];
-
-export const testMixedLocationsAxes: MapBlockProps['axes'] = {
-  major: {
-    type: 'major',
-    groupBy: 'locations',
-    dataSets: [
-      {
-        indicator: 'authorised-absence-rate',
-        filters: ['characteristic-total'],
-        timePeriod: '2016_AY',
-      },
-    ],
-    referenceLines: [],
-    visible: true,
-  },
-};
