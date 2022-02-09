@@ -55,9 +55,6 @@
     },
     "tableBuilderMaxTableCellsAllowed": {
       "value": 1000000
-    },
-    "enableAlerts": {
-      "value": true
     }
   }
 }
