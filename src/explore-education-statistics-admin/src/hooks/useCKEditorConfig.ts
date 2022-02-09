@@ -83,6 +83,9 @@ const useCKEditorConfig = ({
         ? {
             toolbar: imageToolbar,
             resizeOptions,
+            upload: {
+              types: ['jpeg', 'png', 'gif', 'bmp', 'tiff', 'svg+xml'],
+            },
           }
         : undefined,
       table: {
