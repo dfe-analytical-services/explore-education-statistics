@@ -24,33 +24,30 @@
   }
 }
 
-.item {
-  background: govuk-colour('white');
-}
-
 .dropArea {
   background: govuk-colour('light-grey');
   outline: $govuk-focus-width solid $govuk-focus-colour;
 }
 
-.isReordering {
-  position: relative;
+.item {
+  background: govuk-colour('white');
 
-  &::before {
-    color: govuk-colour('dark-grey');
-    content: '\2630';
-    cursor: grab;
-    font-size: 1.6rem;
-    position: absolute;
-    right: 0;
-    top: 6px;
-  }
-
-  &:focus {
+  &:focus,
+  &.isDragging {
     @include govuk-focused-text;
   }
 }
 
-.isDragging {
-  @include govuk-focused-text;
+.labelReordering {
+  cursor: grab;
+  cursor: move;
+  display: flex;
+  justify-content: space-between;
+
+  &::after {
+    color: govuk-colour('dark-grey');
+    content: '\2630';
+    font-size: 1.6rem;
+    line-height: 1;
+  }
 }

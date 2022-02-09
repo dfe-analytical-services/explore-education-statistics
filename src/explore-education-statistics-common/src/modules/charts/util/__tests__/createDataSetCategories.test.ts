@@ -1340,4 +1340,339 @@ describe('createDataSetCategories', () => {
     expect(dataSetCategories[0].filter.label).toBe('State-funded primary');
     expect(dataSetCategories[1].filter.label).toBe('State-funded secondary');
   });
+
+  describe('ordering data sets with `order` property', () => {
+    const testOrderedAxisConfiguration: AxisConfiguration = {
+      type: 'major',
+      groupBy: 'timePeriod',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnet',
+          },
+          timePeriod: '2015_AY',
+          order: 0,
+        },
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnsley',
+          },
+          timePeriod: '2015_AY',
+          order: 1,
+        },
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnet',
+          },
+          timePeriod: '2014_AY',
+          order: 2,
+        },
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnsley',
+          },
+          timePeriod: '2014_AY',
+          order: 3,
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      min: 0,
+    };
+
+    test('grouped by time period', () => {
+      const fullTable = mapFullTable(testTable);
+      const dataSetCategories = createDataSetCategories(
+        testOrderedAxisConfiguration,
+        fullTable.results,
+        fullTable.subjectMeta,
+      );
+
+      expect(dataSetCategories).toHaveLength(2);
+      expect(dataSetCategories[0].filter.label).toBe('2015/16');
+      expect(dataSetCategories[1].filter.label).toBe('2014/15');
+    });
+
+    test('grouped by filter', () => {
+      const axisConfiguration: AxisConfiguration = {
+        ...testOrderedAxisConfiguration,
+        groupBy: 'filters',
+      };
+
+      const fullTable = mapFullTable(testTable);
+      const dataSetCategories = createDataSetCategories(
+        axisConfiguration,
+        fullTable.results,
+        fullTable.subjectMeta,
+      );
+
+      expect(dataSetCategories).toHaveLength(2);
+      expect(dataSetCategories[0].filter.value).toBe('ethnicity-major-chinese');
+      expect(dataSetCategories[1].filter.value).toBe('state-funded-primary');
+    });
+
+    test('grouped by indicator', () => {
+      const indicatorDataSets = [
+        {
+          indicator: 'overall-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnsley',
+          },
+          timePeriod: '2015_AY',
+          order: 0,
+        },
+        {
+          indicator: 'overall-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnet',
+          },
+          timePeriod: '2015_AY',
+          order: 1,
+        },
+      ];
+
+      const axisConfiguration: AxisConfiguration = {
+        ...testOrderedAxisConfiguration,
+        groupBy: 'indicators',
+        dataSets: [
+          ...indicatorDataSets,
+          ...testOrderedAxisConfiguration.dataSets,
+        ],
+      };
+
+      const fullTable = mapFullTable(testTable);
+      const dataSetCategories = createDataSetCategories(
+        axisConfiguration,
+        fullTable.results,
+        fullTable.subjectMeta,
+      );
+
+      expect(dataSetCategories).toHaveLength(2);
+      expect(dataSetCategories[0].filter.label).toBe(
+        'Number of overall absence sessions',
+      );
+      expect(dataSetCategories[1].filter.label).toBe(
+        'Number of authorised absence sessions',
+      );
+    });
+
+    test('grouped by location', () => {
+      const axisConfiguration: AxisConfiguration = {
+        ...testOrderedAxisConfiguration,
+        groupBy: 'locations',
+      };
+
+      const fullTable = mapFullTable(testTable);
+      const dataSetCategories = createDataSetCategories(
+        axisConfiguration,
+        fullTable.results,
+        fullTable.subjectMeta,
+      );
+
+      expect(dataSetCategories).toHaveLength(2);
+      expect(dataSetCategories[0].filter.value).toBe('barnet');
+      expect(dataSetCategories[1].filter.value).toBe('barnsley');
+    });
+
+    test('reversed when `sortAsc` = false', () => {
+      const axisConfiguration: AxisConfiguration = {
+        ...testOrderedAxisConfiguration,
+        groupBy: 'filters',
+        sortAsc: false,
+      };
+      const fullTable = mapFullTable(testTable);
+      const dataSetCategories = createDataSetCategories(
+        axisConfiguration,
+        fullTable.results,
+        fullTable.subjectMeta,
+      );
+
+      expect(dataSetCategories).toHaveLength(2);
+      expect(dataSetCategories[0].filter.label).toBe('State-funded primary');
+      expect(dataSetCategories[1].filter.label).toBe('Ethnicity Major Chinese');
+    });
+  });
+
+  describe('ordering for older charts with no `order` property', () => {
+    const testUnorderedAxisConfiguration: AxisConfiguration = {
+      type: 'major',
+      groupBy: 'timePeriod',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['state-funded-primary', 'ethnicity-major-chinese'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnsley',
+          },
+          timePeriod: '2015_AY',
+        },
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['state-funded-primary', 'ethnicity-major-chinese'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnet',
+          },
+          timePeriod: '2015_AY',
+        },
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['state-funded-primary', 'ethnicity-major-chinese'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnet',
+          },
+          timePeriod: '2014_AY',
+        },
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['state-funded-primary', 'ethnicity-major-chinese'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnsley',
+          },
+          timePeriod: '2014_AY',
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      min: 0,
+    };
+
+    test('orders by `label` when grouped by filters', () => {
+      const axisConfiguration: AxisConfiguration = {
+        ...testUnorderedAxisConfiguration,
+        groupBy: 'filters',
+      };
+
+      const fullTable = mapFullTable(testTable);
+      const dataSetCategories = createDataSetCategories(
+        axisConfiguration,
+        fullTable.results,
+        fullTable.subjectMeta,
+      );
+
+      expect(dataSetCategories).toHaveLength(2);
+      expect(dataSetCategories[0].filter.label).toBe('Ethnicity Major Chinese');
+      expect(dataSetCategories[1].filter.label).toBe('State-funded primary');
+    });
+
+    test('orders by `label` when grouped by indicator', () => {
+      const indicatorDataSets = [
+        {
+          indicator: 'overall-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnsley',
+          },
+          timePeriod: '2015_AY',
+        },
+        {
+          indicator: 'overall-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnet',
+          },
+          timePeriod: '2015_AY',
+        },
+      ];
+
+      const axisConfiguration: AxisConfiguration = {
+        ...testUnorderedAxisConfiguration,
+        groupBy: 'indicators',
+        dataSets: [
+          ...indicatorDataSets,
+          ...testUnorderedAxisConfiguration.dataSets,
+        ],
+      };
+
+      const fullTable = mapFullTable(testTable);
+      const dataSetCategories = createDataSetCategories(
+        axisConfiguration,
+        fullTable.results,
+        fullTable.subjectMeta,
+      );
+
+      expect(dataSetCategories).toHaveLength(2);
+      expect(dataSetCategories[0].filter.label).toBe(
+        'Number of authorised absence sessions',
+      );
+      expect(dataSetCategories[1].filter.label).toBe(
+        'Number of overall absence sessions',
+      );
+    });
+
+    test('orders by `label` when grouped by location', () => {
+      const axisConfiguration: AxisConfiguration = {
+        ...testUnorderedAxisConfiguration,
+        groupBy: 'locations',
+      };
+
+      const fullTable = mapFullTable(testTable);
+      const dataSetCategories = createDataSetCategories(
+        axisConfiguration,
+        fullTable.results,
+        fullTable.subjectMeta,
+      );
+
+      expect(dataSetCategories).toHaveLength(2);
+      expect(dataSetCategories[0].filter.label).toBe('Barnet');
+      expect(dataSetCategories[1].filter.label).toBe('Barnsley');
+    });
+
+    test('orders by `order` when grouped by time period', () => {
+      const fullTable = mapFullTable(testTable);
+      const dataSetCategories = createDataSetCategories(
+        testUnorderedAxisConfiguration,
+        fullTable.results,
+        fullTable.subjectMeta,
+      );
+
+      expect(dataSetCategories).toHaveLength(2);
+      expect(dataSetCategories[0].filter.label).toBe('2014/15');
+      expect(dataSetCategories[1].filter.label).toBe('2015/16');
+    });
+
+    test('reversed when `sortAsc` = false', () => {
+      const axisConfiguration: AxisConfiguration = {
+        ...testUnorderedAxisConfiguration,
+        groupBy: 'filters',
+        sortAsc: false,
+      };
+
+      const fullTable = mapFullTable(testTable);
+      const dataSetCategories = createDataSetCategories(
+        axisConfiguration,
+        fullTable.results,
+        fullTable.subjectMeta,
+      );
+
+      expect(dataSetCategories).toHaveLength(2);
+      expect(dataSetCategories[0].filter.label).toBe('State-funded primary');
+      expect(dataSetCategories[1].filter.label).toBe('Ethnicity Major Chinese');
+    });
+  });
 });

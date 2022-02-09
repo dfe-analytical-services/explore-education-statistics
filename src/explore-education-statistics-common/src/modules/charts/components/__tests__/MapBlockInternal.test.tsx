@@ -6,7 +6,6 @@ import {
   testsMixedLocationsFullTableMeta,
   testsMixedLocationsTableData,
   testsMixedLocationsTableDataWithLADs,
-  testMixedLocationsAxes,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
 import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
 import { MapBlockInternal } from '@common/modules/charts/components/MapBlockInternal';
@@ -29,6 +28,22 @@ describe('MapBlockInternal', () => {
     data: testFullTable.results,
     height: 600,
     width: 900,
+  };
+
+  const testMixedLocationsAxes: MapBlockProps['axes'] = {
+    major: {
+      type: 'major',
+      groupBy: 'locations',
+      dataSets: [
+        {
+          indicator: 'authorised-absence-rate',
+          filters: ['characteristic-total'],
+          timePeriod: '2016_AY',
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+    },
   };
 
   test('renders legends and polygons correctly', async () => {
@@ -403,17 +418,17 @@ describe('MapBlockInternal', () => {
       expect(group2Options[0]).toHaveTextContent('Darlington');
       expect(group2Options[1]).toHaveTextContent('Newcastle upon Tyne');
 
-      expect(groups[2]).toHaveProperty('label', 'Yorkshire and the Humber');
+      expect(groups[2]).toHaveProperty('label', 'Region');
       const group3Options = within(groups[2]).getAllByRole('option');
       expect(group3Options).toHaveLength(2);
-      expect(group3Options[0]).toHaveTextContent('Rotherham');
-      expect(group3Options[1]).toHaveTextContent('Sheffield');
+      expect(group3Options[0]).toHaveTextContent('North East');
+      expect(group3Options[1]).toHaveTextContent('North West');
 
-      expect(groups[3]).toHaveProperty('label', 'Region');
+      expect(groups[3]).toHaveProperty('label', 'Yorkshire and the Humber');
       const group4Options = within(groups[3]).getAllByRole('option');
       expect(group4Options).toHaveLength(2);
-      expect(group4Options[0]).toHaveTextContent('North East');
-      expect(group4Options[1]).toHaveTextContent('North West');
+      expect(group4Options[0]).toHaveTextContent('Rotherham');
+      expect(group4Options[1]).toHaveTextContent('Sheffield');
     });
 
     test('shows grouped location options if there are local authority districts', async () => {
@@ -445,8 +460,8 @@ describe('MapBlockInternal', () => {
       expect(groups[0]).toHaveProperty('label', 'Yorkshire and the Humber');
       const group1Options = within(groups[0]).getAllByRole('option');
       expect(group1Options).toHaveLength(2);
-      expect(group1Options[0]).toHaveTextContent('Sheffield LAD');
-      expect(group1Options[1]).toHaveTextContent('Rotherham LAD');
+      expect(group1Options[0]).toHaveTextContent('Rotherham LAD');
+      expect(group1Options[1]).toHaveTextContent('Sheffield LAD');
     });
   });
 });
