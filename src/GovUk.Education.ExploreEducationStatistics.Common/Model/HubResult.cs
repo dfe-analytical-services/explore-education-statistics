@@ -16,6 +16,10 @@ public record HubResult
 {
     public string Type = nameof(HubResult);
 
+    /// <summary>
+    /// Status code for the result. Should use
+    /// the same semantics as a HTTP status code.
+    /// </summary>
     public int Status { get; }
 
     /// <summary>
@@ -54,16 +58,18 @@ public record HubResult
 /// <typeparam name="TData">The data returned by the response</typeparam>
 public record HubResult<TData> : HubResult where TData : class
 {
-    private const int DefaultStatusCode = 200;
+    private const int DefaultStatusCode = StatusCodes.Status200OK;
 
     public TData? Data { get; }
 
-    public HubResult(TData data) : base(DefaultStatusCode)
+    public HubResult(TData data, int status = DefaultStatusCode) : base(status)
     {
         Data = data;
     }
 
-    public HubResult(ActionResult<TData> result) : base(DefaultStatusCode)
+    public HubResult(
+        ActionResult<TData> result,
+        int status = DefaultStatusCode) : base(status)
     {
         Data = result.Value;
     }

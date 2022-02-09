@@ -7,6 +7,7 @@ using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
+using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
@@ -417,6 +418,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
             services.AddTransient<IContentService, ContentService>();
+            services.AddTransient<IReleaseContentBlockService, ReleaseContentBlockService>();
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
@@ -616,18 +618,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
             app.UseCookiePolicy();
+            app.UseRouting();
+            app.UseHealthChecks("/api/health");
 
             app.UseAuthentication();
             app.UseIdentityServer();
             app.UseAuthorization();
-            app.UseRouting();
-            app.UseHealthChecks("/api/health");
 
             // deny access to all Identity routes other than /Identity/Account/Login and
             // /Identity/Account/ExternalLogin
             var options = new RewriteOptions()
                 .AddRewrite(@"^(?i)identity/(?!account/(?:external)*login$)", "/", skipRemainingRules: true);
             app.UseRewriter(options);
+
+            app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
+                }
+            );
 
             app.UseMvc(routes =>
             {

@@ -22,6 +22,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     [KnownType(typeof(HtmlBlock))]
     public abstract class ContentBlock : ICreatedUpdatedTimestamps<DateTime?, DateTime?>
     {
+        /// <summary>
+        /// The maximum time a block can be locked (in minutes).
+        /// </summary>
+        public const int MaxLockTime = 10;
+
         public Guid Id { get; set; }
 
         [JsonIgnore] public ContentSection? ContentSection { get; set; }
@@ -37,6 +42,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<Comment> Comments { get; set; } = new();
 
         public DateTime? Locked { get; set; }
+
+        [JsonIgnore]
+        public DateTime? LockedUntil => Locked?.AddMinutes(MaxLockTime);
 
         public User? LockedBy { get; set; }
 
