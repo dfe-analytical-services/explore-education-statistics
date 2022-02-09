@@ -11,16 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 
         public List<IndicatorMetaViewModel> Indicators { get; init; } = new();
 
-        /// <summary>
-        /// Hierarchical locations field.
-        /// </summary>
-        /// <remarks>
-        /// TODO EES-2943: This could potentially be renamed back to 'Locations' but requires a migration of
-        /// old Permalinks which already have a legacy 'Locations' field in their JSON serialization of type <see cref="List{ObservationalUnitMetaViewModel}"/>.
-        /// TODO EES-3106: This could also be renamed back to 'Locations' in Permalink responses independently of EES-2943
-        /// but will require a new view model to be split from the model used by serialization.
-        /// </remarks>
-        public Dictionary<string, List<LocationAttributeViewModel>> LocationsHierarchical { get; set; } = new();
+        public Dictionary<string, List<LocationAttributeViewModel>> Locations { get; set; } = new();
 
         public List<BoundaryLevelViewModel> BoundaryLevels { get; init; } = new();
 

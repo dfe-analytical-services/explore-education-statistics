@@ -137,10 +137,7 @@ export interface ReleaseTableDataQuery extends TableDataQuery {
 export interface TableDataSubjectMeta {
   publicationName: string;
   subjectName: string;
-  /**
-   * TODO: EES-2902 Change this key back to `locations`
-   */
-  locationsHierarchical: Dictionary<LocationOption[]>;
+  locations: Dictionary<LocationOption[]>;
   boundaryLevels: BoundaryLevel[];
   timePeriodRange: TimePeriodOption[];
   filters: Dictionary<{

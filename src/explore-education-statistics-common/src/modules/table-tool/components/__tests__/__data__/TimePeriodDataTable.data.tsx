@@ -66,7 +66,7 @@ export const testData1 = {
           decimalPlaces: 0,
         },
       ],
-      locationsHierarchical: {
+      locations: {
         localAuthority: [
           { value: 'E09000003', label: 'Barnet' },
           { value: 'E08000016', label: 'Barnsley' },
@@ -459,7 +459,7 @@ export const testData2 = {
           decimalPlaces: 1,
         },
       ],
-      locationsHierarchical: {
+      locations: {
         localAuthority: [
           { value: 'E09000003', label: 'Barnet' },
           { value: 'E08000016', label: 'Barnsley' },
@@ -800,7 +800,7 @@ export const testData3 = {
           decimalPlaces: 1,
         },
       ],
-      locationsHierarchical: {
+      locations: {
         localAuthority: [
           { value: 'E09000003', label: 'Barnet' },
           { value: 'E08000016', label: 'Barnsley' },
@@ -994,7 +994,7 @@ export const testDataNoFilters = {
           decimalPlaces: 1,
         },
       ],
-      locationsHierarchical: {
+      locations: {
         country: [{ value: 'E92000001', label: 'England' }],
       },
       boundaryLevels: [],
@@ -1129,7 +1129,7 @@ export const testDataFiltersWithNoResults = {
           decimalPlaces: 0,
         },
       ],
-      locationsHierarchical: {
+      locations: {
         localAuthority: [
           { value: 'E08000026', label: 'Coventry' },
           { value: 'E09000008', label: 'Croydon' },

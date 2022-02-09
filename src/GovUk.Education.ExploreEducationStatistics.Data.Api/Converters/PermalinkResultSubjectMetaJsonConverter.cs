@@ -3,14 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Converters
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Converters
 {
     /// <summary>
-    /// JsonConverter which transforms the legacy 'Locations' field of ResultSubjectMetaViewModel to 'LocationsHierarchical'.
+    /// JsonConverter which transforms the legacy 'Locations' field of PermalinkResultSubjectMeta to 'LocationsHierarchical'.
     ///
     /// Intended to be temporary until this transformation is made permanent by migrating old Permalinks in blob storage (EES-2943).
     ///
@@ -21,23 +22,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Converters
     /// flat 'Locations' field in their JSON serialization of type <see cref="List{ObservationalUnitMetaViewModel}"/>.
     ///
     /// Permalinks created afterwards, plus any created while the dedicated release toggle for that feature was turned on,
-    /// have locations in field <see cref="ResultSubjectMetaViewModel.LocationsHierarchical">ResultSubjectMetaViewModel.LocationsHierarchical</see>.
+    /// have locations in field <see cref="ResultSubjectMetaViewModel.Locations">PermalinkResultSubjectMeta.LocationsHierarchical</see>.
     ///
     /// Until old Permalinks are migrated, the translation provided by this converter ensures that consumers
-    /// are aware of legacy locations when accessing <see cref="ResultSubjectMetaViewModel.LocationsHierarchical" />.
+    /// are aware of legacy locations when accessing <see cref="PermalinkResultSubjectMeta.LocationsHierarchical" />.
     /// </summary>
-    public class ResultSubjectMetaViewModelJsonConverter : JsonConverter<ResultSubjectMetaViewModel>
+    public class PermalinkResultSubjectMetaJsonConverter : JsonConverter<PermalinkResultSubjectMeta>
     {
         public override bool CanWrite => false;
 
-        public override ResultSubjectMetaViewModel ReadJson(JsonReader reader,
+        public override PermalinkResultSubjectMeta ReadJson(JsonReader reader,
             Type objectType,
-            ResultSubjectMetaViewModel? existingValue,
+            PermalinkResultSubjectMeta? existingValue,
             bool hasExistingValue,
             JsonSerializer serializer)
         {
             JToken token = JToken.Load(reader);
-            var tableSubjectMeta = token.ToObject<ResultSubjectMetaViewModel>();
+            var tableSubjectMeta = token.ToObject<PermalinkResultSubjectMeta>();
 
             if (tableSubjectMeta == null)
             {
@@ -62,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Converters
         }
 
         public override void WriteJson(JsonWriter writer,
-            ResultSubjectMetaViewModel? value,
+            PermalinkResultSubjectMeta? value,
             JsonSerializer serializer)
         {
             throw new InvalidOperationException("Use default serialization.");

@@ -40,7 +40,7 @@ describe('PermalinkPage', () => {
         footnotes: [],
         subjectName: 'Subject 1',
         geoJsonAvailable: false,
-        locationsHierarchical: {
+        locations: {
           localAuthority: [
             {
               label: 'Barnet',

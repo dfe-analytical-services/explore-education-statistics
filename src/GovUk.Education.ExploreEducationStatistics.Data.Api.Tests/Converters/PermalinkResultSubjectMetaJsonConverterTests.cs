@@ -1,13 +1,13 @@
 ﻿#nullable enable
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Converters;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using Newtonsoft.Json;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
 {
-    public class ResultSubjectMetaViewModelJsonConverterTests
+    public class PermalinkResultSubjectMetaJsonConverterTests
     {
         [Fact]
         public void ReadJson_LegacyLocationsFieldIsTransformed()
@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
                 ]
             }";
 
-            var subjectMeta = JsonConvert.DeserializeObject<ResultSubjectMetaViewModel>(jsonText, BuildSettings());
+            var subjectMeta = JsonConvert.DeserializeObject<PermalinkResultSubjectMeta>(jsonText, BuildSettings());
 
             // Expect Locations to have been transformed to LocationsHierarchical
             Assert.NotNull(subjectMeta);
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
                 }
             }";
 
-            var subjectMeta = JsonConvert.DeserializeObject<ResultSubjectMetaViewModel>(jsonText, BuildSettings());
+            var subjectMeta = JsonConvert.DeserializeObject<PermalinkResultSubjectMeta>(jsonText, BuildSettings());
 
             Assert.Single(subjectMeta!.LocationsHierarchical);
             Assert.True(subjectMeta.LocationsHierarchical.ContainsKey("country"));
@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
                 }
             }";
 
-            var subjectMeta = JsonConvert.DeserializeObject<ResultSubjectMetaViewModel>(jsonText, BuildSettings());
+            var subjectMeta = JsonConvert.DeserializeObject<PermalinkResultSubjectMeta>(jsonText, BuildSettings());
 
             Assert.NotNull(subjectMeta);
             Assert.Single(subjectMeta!.LocationsHierarchical);
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
         {
             const string jsonText = @"{""Locations"":[]}";
 
-            var subjectMeta = JsonConvert.DeserializeObject<ResultSubjectMetaViewModel>(jsonText, BuildSettings());
+            var subjectMeta = JsonConvert.DeserializeObject<PermalinkResultSubjectMeta>(jsonText, BuildSettings());
 
             Assert.Empty(subjectMeta!.LocationsHierarchical);
         }
@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
         {
             const string jsonText = @"{""Locations"":null}";
 
-            var subjectMeta = JsonConvert.DeserializeObject<ResultSubjectMetaViewModel>(jsonText, BuildSettings());
+            var subjectMeta = JsonConvert.DeserializeObject<PermalinkResultSubjectMeta>(jsonText, BuildSettings());
 
             Assert.Empty(subjectMeta!.LocationsHierarchical);
         }
@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
         {
             const string jsonText = "{}";
 
-            var subjectMeta = JsonConvert.DeserializeObject<ResultSubjectMetaViewModel>(jsonText, BuildSettings());
+            var subjectMeta = JsonConvert.DeserializeObject<PermalinkResultSubjectMeta>(jsonText, BuildSettings());
 
             Assert.Empty(subjectMeta!.LocationsHierarchical);
         }
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Converters
             {
                 Converters = new List<JsonConverter>
                 {
-                    new ResultSubjectMetaViewModelJsonConverter()
+                    new PermalinkResultSubjectMetaJsonConverter()
                 }
             };
         }

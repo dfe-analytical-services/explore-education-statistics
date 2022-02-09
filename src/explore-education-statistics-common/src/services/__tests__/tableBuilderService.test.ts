@@ -132,7 +132,7 @@ describe('tableBuilderService', () => {
         subjectName: '',
         timePeriodRange: [],
         publicationName: '',
-        locationsHierarchical: {
+        locations: {
           provider: [
             {
               value: 'unique-provider',
@@ -227,7 +227,7 @@ describe('tableBuilderService', () => {
         subjectName: '',
         timePeriodRange: [],
         publicationName: '',
-        locationsHierarchical: {
+        locations: {
           provider: [
             {
               value: 'unique-provider',
