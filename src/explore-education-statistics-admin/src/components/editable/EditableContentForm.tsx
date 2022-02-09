@@ -26,11 +26,11 @@ export interface Props {
   allowComments?: boolean;
   content: string;
   hideLabel?: boolean;
-  handleBlur?: (isDirty: boolean) => void;
   id: string;
   isSaving?: boolean;
   label: string;
   onAutoSave?: (content: string) => void;
+  onBlur?: (isDirty: boolean) => void;
   onCancel?: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
@@ -41,11 +41,11 @@ const EditableContentForm = ({
   allowComments = false,
   content,
   hideLabel = false,
-  handleBlur,
   id,
   isSaving = false,
   label,
   onAutoSave,
+  onBlur,
   onCancel,
   onImageUpload,
   onImageUploadCancel,
@@ -111,12 +111,12 @@ const EditableContentForm = ({
               allowComments={allowComments}
               blockId={blockId}
               focusOnInit
-              handleBlur={handleBlur}
               hideLabel={hideLabel}
               label={label}
               name="content"
               validateElements={validateElements}
               onAutoSave={onAutoSave}
+              onBlur={onBlur}
               onCancelComment={toggleCommentAddForm.off}
               onClickAddComment={toggleCommentAddForm.on}
               onImageUpload={onImageUpload}

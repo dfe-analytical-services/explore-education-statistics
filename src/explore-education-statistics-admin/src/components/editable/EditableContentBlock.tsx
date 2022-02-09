@@ -24,7 +24,6 @@ interface EditableContentBlockProps {
   isEditing?: boolean;
   isSaving?: boolean;
   label: string;
-  handleBlur?: (isDirty: boolean) => void;
   hideLabel?: boolean;
   transformImageAttributes?: (
     attributes: Dictionary<string>,
@@ -32,6 +31,7 @@ interface EditableContentBlockProps {
   useMarkdown?: boolean;
   value: string;
   onAutoSave?: (value: string) => void;
+  onBlur?: (isDirty: boolean) => void;
   onCancel?: () => void;
   onDelete: () => void;
   onEditing: () => void;
@@ -47,12 +47,12 @@ const EditableContentBlock = ({
   isEditing,
   isSaving,
   label,
-  handleBlur,
   hideLabel = false,
   transformImageAttributes,
   useMarkdown,
   value,
   onAutoSave,
+  onBlur,
   onCancel,
   onDelete,
   onEditing,
@@ -108,11 +108,11 @@ const EditableContentBlock = ({
         allowComments={allowComments}
         content={content ? sanitizeHtml(content, sanitizeOptions) : ''} // NOTE: Sanitize to transform img src attribs
         label={label}
-        handleBlur={handleBlur}
         hideLabel={hideLabel}
         id={id}
         isSaving={isSaving}
         onAutoSave={onAutoSave}
+        onBlur={onBlur}
         onImageUpload={onImageUpload}
         onImageUploadCancel={onImageUploadCancel}
         onCancel={onCancel}

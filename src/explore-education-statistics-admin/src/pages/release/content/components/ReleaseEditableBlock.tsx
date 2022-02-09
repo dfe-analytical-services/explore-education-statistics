@@ -161,7 +161,6 @@ const ReleaseEditableBlock = ({
           <EditableContentBlock
             allowComments={allowComments}
             editable={editable && !isBrowser('IE')}
-            handleBlur={handleBlur}
             hideLabel
             id={blockId}
             isEditing={isEditing}
@@ -171,6 +170,7 @@ const ReleaseEditableBlock = ({
             useMarkdown={block.type === 'MarkDownBlock'}
             value={block.body}
             onAutoSave={handleSave}
+            onBlur={handleBlur}
             onSubmit={handleSubmit}
             onDelete={handleDelete}
             onEditing={toggleEditing.on}
