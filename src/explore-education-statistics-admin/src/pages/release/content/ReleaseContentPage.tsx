@@ -1,5 +1,6 @@
 import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
+import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
 import {
@@ -85,7 +86,9 @@ const ReleaseContentPageLoaded = () => {
                       {release.publication.title}
                     </h2>
 
-                    <ReleaseContent />
+                    <ReleaseContentHubContextProvider releaseId={release.id}>
+                      <ReleaseContent />
+                    </ReleaseContentHubContextProvider>
                   </>
                 )}
                 {editingMode === 'table-preview' && (

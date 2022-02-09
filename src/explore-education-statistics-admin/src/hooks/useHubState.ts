@@ -11,12 +11,18 @@ export interface HubState<THub extends Hub> {
  * Hook integrating a {@see Hub} class with React.
  */
 export default function useHubState<THub extends Hub = Hub>(
-  hub: THub,
+  factory: () => THub,
 ): HubState<THub> {
-  const [hubState, setHubState] = useState<HubState<THub>>({
-    hub,
-    status: hub.status(),
+  const [hubState, setHubState] = useState<HubState<THub>>(() => {
+    const hub = factory();
+
+    return {
+      hub,
+      status: hub.status(),
+    };
   });
+
+  const { hub } = hubState;
 
   useEffect(() => {
     // Set a new copy of the hub to avoid stale state

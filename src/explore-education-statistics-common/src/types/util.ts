@@ -56,3 +56,10 @@ export type NestedPartial<T> = {
   // eslint-disable-next-line @typescript-eslint/ban-types
   [P in keyof T]?: T[P] extends object | undefined ? NestedPartial<T[P]> : T[P];
 };
+
+/**
+ * Make readonly properties writable.
+ */
+export type Writeable<T> = {
+  -readonly [P in keyof T]: T[P];
+};
