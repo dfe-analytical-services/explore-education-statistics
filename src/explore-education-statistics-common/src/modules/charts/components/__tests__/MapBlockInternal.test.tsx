@@ -5,6 +5,7 @@ import {
   testMapTableDataMixed,
   testsMixedLocationsFullTableMeta,
   testsMixedLocationsTableData,
+  testsMixedLocationsTableDataWithLADs,
   testMixedLocationsAxes,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
 import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
@@ -170,9 +171,11 @@ describe('MapBlockInternal', () => {
       '2. Select a Local Authority District',
     );
 
-    expect(select.children[1]).toHaveTextContent('Leeds');
+    const groups = within(select).getAllByRole('group');
+    const group1Options = within(groups[0]).getAllByRole('option');
+    expect(group1Options[0]).toHaveTextContent('Leeds');
 
-    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[0]);
 
     const paths = container.querySelectorAll<HTMLElement>(
       '.leaflet-container svg path',
@@ -199,8 +202,10 @@ describe('MapBlockInternal', () => {
     const select = screen.getByLabelText(
       '2. Select a Local Authority District',
     );
+    const groups = within(select).getAllByRole('group');
+    const group1Options = within(groups[0]).getAllByRole('option');
 
-    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[0]);
 
     const indicators = screen.getAllByTestId('mapBlock-indicator');
 
@@ -252,8 +257,10 @@ describe('MapBlockInternal', () => {
     const select = screen.getByLabelText(
       '2. Select a Local Authority District',
     );
+    const groups = within(select).getAllByRole('group');
+    const group1Options = within(groups[0]).getAllByRole('option');
 
-    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[0]);
 
     const tile1 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
     expect(tile1.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
@@ -263,7 +270,7 @@ describe('MapBlockInternal', () => {
       '3.51%',
     );
 
-    userEvent.selectOptions(select, select.children[2] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[1]);
 
     const tile2 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
     expect(tile2.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
@@ -273,7 +280,7 @@ describe('MapBlockInternal', () => {
       '3.01%',
     );
 
-    userEvent.selectOptions(select, select.children[3] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[2]);
 
     const tile3 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
     expect(tile3.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
@@ -296,8 +303,10 @@ describe('MapBlockInternal', () => {
     const select = screen.getByLabelText(
       '2. Select a Local Authority District',
     );
+    const groups = within(select).getAllByRole('group');
+    const group1Options = within(groups[0]).getAllByRole('option');
 
-    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[0]);
 
     const paths = container.querySelectorAll<HTMLElement>(
       '.leaflet-container svg path',
@@ -305,7 +314,7 @@ describe('MapBlockInternal', () => {
 
     expect(paths[3]).toHaveClass('selected');
 
-    userEvent.selectOptions(select, select.children[0] as HTMLElement);
+    userEvent.selectOptions(select, within(select).getAllByRole('option')[0]);
     expect(paths[3]).not.toHaveClass('selected');
   });
 
@@ -341,7 +350,7 @@ describe('MapBlockInternal', () => {
       });
     });
 
-    test('includes all locations and is ungrouped if does not contain local authorities', async () => {
+    test('shows ungrouped location options if no local authorities', async () => {
       render(<MapBlockInternal {...testBlockProps} />);
 
       await waitFor(() => {
@@ -350,20 +359,20 @@ describe('MapBlockInternal', () => {
         );
 
         expect(select).toBeVisible();
-
-        expect(select.children).toHaveLength(4);
-        expect(select.children[0]).toHaveTextContent('None selected');
-        expect(select.children[1]).toHaveTextContent('Leeds');
-        expect(select.children[2]).toHaveTextContent('Manchester');
-        expect(select.children[3]).toHaveTextContent('Sheffield');
+        const options = within(select).getAllByRole('option');
+        expect(options).toHaveLength(4);
+        expect(options[0]).toHaveTextContent('None selected');
+        expect(options[1]).toHaveTextContent('Leeds');
+        expect(options[2]).toHaveTextContent('Manchester');
+        expect(options[3]).toHaveTextContent('Sheffield');
       });
     });
 
-    test('includes all locations and is grouped if contains local authorities', async () => {
+    test('shows grouped location options if there are local authorities', async () => {
       const testBlockProps2: MapBlockProps = {
         ...testMapConfiguration,
         id: 'testMap',
-        axes: testMixedLocationsAxes as MapBlockProps['axes'],
+        axes: testMixedLocationsAxes,
         legend: testMapConfiguration.legend as LegendConfiguration,
         meta: testsMixedLocationsFullTableMeta,
         data: testsMixedLocationsTableData,
@@ -383,24 +392,61 @@ describe('MapBlockInternal', () => {
       const groups = within(select).getAllByRole('group');
       expect(groups).toHaveLength(4);
 
+      expect(groups[0]).toHaveProperty('label', 'Region');
       const group1Options = within(groups[0]).getAllByRole('option');
       expect(group1Options).toHaveLength(2);
       expect(group1Options[0]).toHaveTextContent('North West');
       expect(group1Options[1]).toHaveTextContent('North East');
 
+      expect(groups[1]).toHaveProperty('label', 'Yorkshire and the Humber');
       const group2Options = within(groups[1]).getAllByRole('option');
       expect(group2Options).toHaveLength(2);
       expect(group2Options[0]).toHaveTextContent('Sheffield');
       expect(group2Options[1]).toHaveTextContent('Rotherham');
 
+      expect(groups[2]).toHaveProperty('label', 'North East');
       const group3Options = within(groups[2]).getAllByRole('option');
       expect(group3Options).toHaveLength(2);
       expect(group3Options[0]).toHaveTextContent('Newcastle upon Tyne');
       expect(group3Options[1]).toHaveTextContent('Darlington');
 
+      expect(groups[3]).toHaveProperty('label', 'Country');
       const group4Options = within(groups[3]).getAllByRole('option');
       expect(group4Options).toHaveLength(1);
       expect(group4Options[0]).toHaveTextContent('England');
+    });
+
+    test('shows grouped location options if there are local authority districts', async () => {
+      const testBlockProps2: MapBlockProps = {
+        ...testMapConfiguration,
+        id: 'testMap',
+        axes: testMixedLocationsAxes,
+        legend: testMapConfiguration.legend as LegendConfiguration,
+        meta: testsMixedLocationsFullTableMeta,
+        data: testsMixedLocationsTableDataWithLADs,
+      };
+
+      render(<MapBlockInternal {...testBlockProps2} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('2. Select a Local Authority District'),
+        ).toBeInTheDocument();
+      });
+      const select = screen.getByLabelText(
+        '2. Select a Local Authority District',
+      );
+
+      expect(select.children[0]).toHaveTextContent('None selected');
+
+      const groups = within(select).getAllByRole('group');
+      expect(groups).toHaveLength(1);
+
+      expect(groups[0]).toHaveProperty('label', 'Yorkshire and the Humber');
+      const group1Options = within(groups[0]).getAllByRole('option');
+      expect(group1Options).toHaveLength(2);
+      expect(group1Options[0]).toHaveTextContent('Rotherham LAD');
+      expect(group1Options[1]).toHaveTextContent('Sheffield LAD');
     });
   });
 });

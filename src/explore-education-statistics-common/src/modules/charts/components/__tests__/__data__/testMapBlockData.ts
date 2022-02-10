@@ -11,6 +11,7 @@ import {
   LocationFilter,
   TimePeriodFilter,
 } from '@common/modules/table-tool/types/filters';
+import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
 import produce from 'immer';
 
 export const testMapConfiguration: Chart = {
@@ -726,6 +727,20 @@ export const testsMixedLocationsFullTableMeta: FullTableMeta = {
       level: 'region',
       geoJson: [testGeoJsonFeature],
     }),
+    new LocationFilter({
+      value: 'sheffield-lad-code',
+      label: 'Sheffield LAD',
+      group: 'Yorkshire and the Humber',
+      level: 'localAuthorityDistrict',
+      geoJson: [testGeoJsonFeature],
+    }),
+    new LocationFilter({
+      value: 'rotherham-lad-code',
+      label: 'Rotherham LAD',
+      group: 'Yorkshire and the Humber',
+      level: 'localAuthorityDistrict',
+      geoJson: [testGeoJsonFeature],
+    }),
   ],
   timePeriodRange: [
     new TimePeriodFilter({
@@ -833,7 +848,48 @@ export const testsMixedLocationsTableData: TableDataResult[] = [
   },
 ];
 
-export const testMixedLocationsAxes = {
+export const testsMixedLocationsTableDataWithLADs: TableDataResult[] = [
+  {
+    filters: ['characteristic-total'],
+    geographicLevel: 'localAuthorityDistrict',
+    location: {
+      country: { code: 'england-code', name: 'England' },
+      region: {
+        code: 'yorkshire-humber-code',
+        name: 'Yorkshire and the Humber',
+      },
+      localAuthorityDistrict: {
+        code: 'sheffield-lad-code',
+        name: 'Sheffield LAD',
+      },
+    },
+    measures: {
+      'authorised-absence-rate': '4',
+    },
+    timePeriod: '2016_AY',
+  },
+  {
+    filters: ['characteristic-total'],
+    geographicLevel: 'localAuthorityDistrict',
+    location: {
+      country: { code: 'england-code', name: 'England' },
+      region: {
+        code: 'yorkshire-humber-code',
+        name: 'Yorkshire and the Humber',
+      },
+      localAuthorityDistrict: {
+        code: 'rotherham-lad-code',
+        name: 'Rotherham LAD',
+      },
+    },
+    measures: {
+      'authorised-absence-rate': '4',
+    },
+    timePeriod: '2016_AY',
+  },
+];
+
+export const testMixedLocationsAxes: MapBlockProps['axes'] = {
   major: {
     type: 'major',
     groupBy: 'locations',
@@ -844,5 +900,7 @@ export const testMixedLocationsAxes = {
         timePeriod: '2016_AY',
       },
     ],
+    referenceLines: [],
+    visible: true,
   },
 };

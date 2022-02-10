@@ -36,7 +36,6 @@ import classNames from 'classnames';
 import { Feature, FeatureCollection, Geometry } from 'geojson';
 import { Layer, Path, PathOptions, Polyline } from 'leaflet';
 import clamp from 'lodash/clamp';
-import { groupBy } from 'lodash';
 import keyBy from 'lodash/keyBy';
 import orderBy from 'lodash/orderBy';
 import times from 'lodash/times';
@@ -352,11 +351,15 @@ export const MapBlockInternal = ({
     );
   }, [dataSetCategoryConfigs]);
 
-  const shouldGroupLocationOptions = dataSetCategories.some(
-    element => element.filter.level === 'localAuthority',
-  );
+  const shouldGroupLocationOptions = useMemo(() => {
+    return dataSetCategories.some(
+      element =>
+        element.filter.level === 'localAuthority' ||
+        element.filter.level === 'localAuthorityDistrict',
+    );
+  }, [dataSetCategories]);
 
-  // If no LAs don't group the locations.
+  // If there are no LAs or LADs don't group the locations.
   const locationOptions = useMemo(() => {
     if (shouldGroupLocationOptions) {
       return undefined;
@@ -370,30 +373,26 @@ export const MapBlockInternal = ({
     );
   }, [dataSetCategories, shouldGroupLocationOptions]);
 
-  // If has LAs, group them by region and group any others by level
+  // If there are LAs or LADs, group them by region and group any others by level
   const groupedLocationOptions = useMemo(() => {
     if (!shouldGroupLocationOptions) {
       return undefined;
     }
-    const groupedLocations = groupBy(dataSetCategories, dataSetCategory =>
-      dataSetCategory.filter.level === 'localAuthority'
-        ? dataSetCategory.filter.group
-        : dataSetCategory.filter.level,
-    );
-    return Object.fromEntries(
-      Object.entries(groupedLocations).map(group => {
-        const key =
-          group[1][0].filter.level === 'localAuthority'
-            ? group[0]
-            : locationLevelsMap[group[0]].label;
-        const options = group[1].map(dataSetCategory => {
-          return {
-            label: dataSetCategory.filter.label,
-            value: dataSetCategory.filter.id,
-          };
+    return dataSetCategories.reduce<Dictionary<SelectOption[]>>(
+      (acc, { filter }) => {
+        const groupLabel =
+          filter.level === 'localAuthority' ||
+          filter.level === 'localAuthorityDistrict'
+            ? (filter.group as string)
+            : locationLevelsMap[filter.level].label;
+
+        (acc[groupLabel] ??= []).push({
+          label: filter.label,
+          value: filter.id,
         });
-        return [key, options];
-      }),
+        return acc;
+      },
+      {},
     );
   }, [dataSetCategories, shouldGroupLocationOptions]);
 
