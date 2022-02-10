@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Castle.Core.Internal;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
@@ -216,9 +216,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
         {
             var contextId = Guid.NewGuid().ToString();
 
-            var email = "inviteduser@example.com";
-            var firstName = "FirstName";
-            var lastName = "LastName";
+            const string email = "inviteduser@example.com";
+            const string firstName = "FirstName";
+            const string lastName = "LastName";
             
             var claimsPrincipal = CreateClaimsPrincipal(email, firstName, lastName);
 
@@ -427,14 +427,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
             SignInResult? signInResult = null)
         {
             var contextId = Guid.NewGuid().ToString();
-            var emailAddress = "existinguser@example.com";
+            const string emailAddress = "existinguser@example.com";
 
             var claimsPrincipal = CreateClaimsPrincipal(
                 emailAddress,
                 "FirstName",
                 "LastName");
 
-            var newProviderKey = "NewProviderKey";
+            const string newProviderKey = "NewProviderKey";
 
             var userManager = new Mock<IUserManagerDelegate>(Strict);
             var signInManager = new Mock<ISignInManagerDelegate>(Strict);
