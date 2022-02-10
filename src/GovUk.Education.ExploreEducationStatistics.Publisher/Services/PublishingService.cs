@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     new IBlobStorageService.CopyDirectoryOptions
                     {
                         DestinationConnectionString = _publicStorageConnectionString,
-                        SetAttributesCallbackAsync = destination =>
+                        SetAttributesCallbackAsync = (source, destination) =>
                             SetPublishedBlobAttributesCallback(destination, release.PublishScheduled!.Value),
                         ShouldTransferCallbackAsync = (source, _) =>
                             // Filter by blobs with matching file paths
@@ -167,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 new IBlobStorageService.CopyDirectoryOptions
                 {
                     DestinationConnectionString = _publicStorageConnectionString,
-                    SetAttributesCallbackAsync = destination =>
+                    SetAttributesCallbackAsync = (source, destination) =>
                         SetPublishedBlobAttributesCallback(destination, DateTime.UtcNow),
                     ShouldTransferCallbackAsync = (source, _) =>
                         // Filter by blobs with matching file paths

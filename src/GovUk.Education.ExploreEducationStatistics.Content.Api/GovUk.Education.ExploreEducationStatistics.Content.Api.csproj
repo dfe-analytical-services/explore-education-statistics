@@ -12,12 +12,12 @@
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
         <PackageReference Include="IsExternalInit" Version="1.0.2" PrivateAssets="all" />
         <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.18.0" />
-        <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.1.7" />
-        <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.1.7" />
+        <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
+        <PackageReference Include="Microsoft.Azure.Storage.Blob" Version="11.2.3" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.2" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.2" />
         <PackageReference Include="Microsoft.Extensions.Logging.AzureAppServices" Version="6.0.2" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.18" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.2" />
         <PackageReference Include="NWebsec.AspNetCore.Middleware" Version="2.0.0" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="5.4.1" />
     </ItemGroup>

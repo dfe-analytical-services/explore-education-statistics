@@ -518,7 +518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             // Require publication / release / contact / graph to be able to work out:
             // If the release is the latest
             // The contact
-            // TODO: Refactor using AsSplitQuery()
+            // TODO: EES-3164 Refactor using AsSplitQuery()
             await _context.Entry(release)
                 .Reference(r => r.Publication)
                 .LoadAsync();
