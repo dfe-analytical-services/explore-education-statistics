@@ -6,7 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Repository
 {

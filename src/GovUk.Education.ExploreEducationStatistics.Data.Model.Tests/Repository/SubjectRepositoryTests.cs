@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 {
@@ -26,13 +26,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddAsync(releaseSubject);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var releaseRepository = new Mock<IReleaseRepository>();
 
@@ -62,13 +62,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddAsync(releaseSubject);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var releaseService = new Mock<IReleaseRepository>();
 
@@ -101,13 +101,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddAsync(releaseSubject);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var releaseRepository = new Mock<IReleaseRepository>();
 
@@ -131,13 +131,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             var subject = new Subject();
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddAsync(subject);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectService(context);
                 var result = await service.Get(subject.Id);
@@ -153,7 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         {
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectService(context);
                 var result = await service.Get(Guid.NewGuid());
@@ -176,13 +176,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddAsync(releaseSubject);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectService(context);
                 var result = await service.GetPublicationIdForSubject(releaseSubject.SubjectId);
@@ -196,7 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         {
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectService(context);
 
@@ -220,13 +220,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 await context.AddAsync(releaseSubject);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectService(context);
                 var result = await service.FindPublicationIdForSubject(releaseSubject.SubjectId);
@@ -240,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         {
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(contextId))
+            await using (var context = InMemoryStatisticsDbContext(contextId))
             {
                 var service = BuildSubjectService(context);
                 var result = await service.FindPublicationIdForSubject(Guid.NewGuid());

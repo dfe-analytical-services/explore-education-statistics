@@ -2,7 +2,7 @@
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
 
-namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
+namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils
 {
     public static class StatisticsDbUtils
     {

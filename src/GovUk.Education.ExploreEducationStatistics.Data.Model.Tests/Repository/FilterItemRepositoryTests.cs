@@ -2,11 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 {
@@ -60,13 +60,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.Filter.AddRangeAsync(filterCharacteristic, filterSchoolType);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var context = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var repository = BuildFilterItemRepository(context);
                 var filterItemIds = new List<Guid>
@@ -109,13 +109,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.Filter.AddRangeAsync(filter);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var context = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var repository = BuildFilterItemRepository(context);
                 var result = await repository.CountFilterItemsByFilter(new List<Guid>());
@@ -143,13 +143,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.Filter.AddRangeAsync(filter);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var context = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var context = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var repository = BuildFilterItemRepository(context);
 
