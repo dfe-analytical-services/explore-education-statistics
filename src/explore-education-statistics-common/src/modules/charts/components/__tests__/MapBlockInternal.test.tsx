@@ -392,28 +392,28 @@ describe('MapBlockInternal', () => {
       const groups = within(select).getAllByRole('group');
       expect(groups).toHaveLength(4);
 
-      expect(groups[0]).toHaveProperty('label', 'Region');
+      expect(groups[0]).toHaveProperty('label', 'Country');
       const group1Options = within(groups[0]).getAllByRole('option');
-      expect(group1Options).toHaveLength(2);
-      expect(group1Options[0]).toHaveTextContent('North West');
-      expect(group1Options[1]).toHaveTextContent('North East');
+      expect(group1Options).toHaveLength(1);
+      expect(group1Options[0]).toHaveTextContent('England');
 
-      expect(groups[1]).toHaveProperty('label', 'Yorkshire and the Humber');
+      expect(groups[1]).toHaveProperty('label', 'North East');
       const group2Options = within(groups[1]).getAllByRole('option');
       expect(group2Options).toHaveLength(2);
-      expect(group2Options[0]).toHaveTextContent('Sheffield');
-      expect(group2Options[1]).toHaveTextContent('Rotherham');
+      expect(group2Options[0]).toHaveTextContent('Darlington');
+      expect(group2Options[1]).toHaveTextContent('Newcastle upon Tyne');
 
-      expect(groups[2]).toHaveProperty('label', 'North East');
+      expect(groups[2]).toHaveProperty('label', 'Yorkshire and the Humber');
       const group3Options = within(groups[2]).getAllByRole('option');
       expect(group3Options).toHaveLength(2);
-      expect(group3Options[0]).toHaveTextContent('Newcastle upon Tyne');
-      expect(group3Options[1]).toHaveTextContent('Darlington');
+      expect(group3Options[0]).toHaveTextContent('Rotherham');
+      expect(group3Options[1]).toHaveTextContent('Sheffield');
 
-      expect(groups[3]).toHaveProperty('label', 'Country');
+      expect(groups[3]).toHaveProperty('label', 'Region');
       const group4Options = within(groups[3]).getAllByRole('option');
-      expect(group4Options).toHaveLength(1);
-      expect(group4Options[0]).toHaveTextContent('England');
+      expect(group4Options).toHaveLength(2);
+      expect(group4Options[0]).toHaveTextContent('North East');
+      expect(group4Options[1]).toHaveTextContent('North West');
     });
 
     test('shows grouped location options if there are local authority districts', async () => {
@@ -445,8 +445,8 @@ describe('MapBlockInternal', () => {
       expect(groups[0]).toHaveProperty('label', 'Yorkshire and the Humber');
       const group1Options = within(groups[0]).getAllByRole('option');
       expect(group1Options).toHaveLength(2);
-      expect(group1Options[0]).toHaveTextContent('Rotherham LAD');
-      expect(group1Options[1]).toHaveTextContent('Sheffield LAD');
+      expect(group1Options[0]).toHaveTextContent('Sheffield LAD');
+      expect(group1Options[1]).toHaveTextContent('Rotherham LAD');
     });
   });
 });
