@@ -9,7 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
         [Fact]
         public async Task Login_EmailClaimNotAvailable()
         {
-            var claimsPrincipal = AuthorizationHandlersTestUtil.CreateClaimsPrincipal(
+            var claimsPrincipal = ClaimsPrincipalUtils.CreateClaimsPrincipal(
                 Guid.NewGuid(),
                 new Claim(ClaimTypes.GivenName, "FirstName"),
                 new Claim(ClaimTypes.Surname, "LastName"));
@@ -532,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
 
         private static ClaimsPrincipal CreateClaimsPrincipal(string emailAddress, string firstName, string lastName)
         {
-            return AuthorizationHandlersTestUtil.CreateClaimsPrincipal(
+            return ClaimsPrincipalUtils.CreateClaimsPrincipal(
                 Guid.NewGuid(),
                 new Claim(ClaimTypes.Email, emailAddress),
                 new Claim(ClaimTypes.GivenName, firstName),
