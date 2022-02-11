@@ -122,7 +122,7 @@ describe('PreReleaseTableToolPage', () => {
           name: 'sess_authorised',
         },
       ],
-      locationsHierarchical: {
+      locations: {
         localAuthority: [
           { label: 'Barnet', value: 'barnet' },
           { label: 'Barnsley', value: 'barnsley' },

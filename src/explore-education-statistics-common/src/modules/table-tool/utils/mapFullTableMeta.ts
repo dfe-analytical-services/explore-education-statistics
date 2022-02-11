@@ -7,10 +7,9 @@ import {
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataSubjectMeta } from '@common/services/tableBuilderService';
 
-export default function mapFullTableMeta({
-  locationsHierarchical,
-  ...subjectMeta
-}: TableDataSubjectMeta): FullTableMeta {
+export default function mapFullTableMeta(
+  subjectMeta: TableDataSubjectMeta,
+): FullTableMeta {
   const filters = Object.values(subjectMeta.filters).reduce<
     FullTableMeta['filters']
   >((acc, category) => {
@@ -32,7 +31,7 @@ export default function mapFullTableMeta({
     return acc;
   }, {});
 
-  const locationEntries = Object.entries(locationsHierarchical);
+  const locationEntries = Object.entries(subjectMeta.locations);
   const hasNestedLocations = locationEntries.some(([, levelOptions]) =>
     levelOptions.some(levelOption => levelOption.options),
   );

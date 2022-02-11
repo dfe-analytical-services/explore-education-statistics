@@ -34,7 +34,7 @@ describe('KeyStat', () => {
           },
         },
       },
-      locationsHierarchical: {
+      locations: {
         country: [
           {
             label: 'England',

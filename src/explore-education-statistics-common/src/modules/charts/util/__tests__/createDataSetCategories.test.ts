@@ -67,7 +67,7 @@ describe('createDataSetCategories', () => {
           name: 'sess_overall',
         },
       ],
-      locationsHierarchical: {
+      locations: {
         localAuthority: [
           { label: 'Barnet', value: 'barnet' },
           { label: 'Barnsley', value: 'barnsley' },
@@ -1198,7 +1198,7 @@ describe('createDataSetCategories', () => {
             name: 'sess_authorised',
           },
         ],
-        locationsHierarchical: {
+        locations: {
           country: [{ label: 'England', value: 'E92000001' }],
           region: [{ label: 'North East', value: 'E12000001' }],
         },

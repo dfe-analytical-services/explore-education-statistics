@@ -85,7 +85,7 @@ describe('getDefaultTableHeadersConfig', () => {
           decimalPlaces: 2,
         },
       ],
-      locationsHierarchical: {
+      locations: {
         localAuthority: [
           { value: 'barnet', label: 'Barnet' },
           { value: 'barnsley', label: 'Barnsley' },
@@ -387,7 +387,7 @@ describe('getDefaultTableHeadersConfig', () => {
             decimalPlaces: 2,
           },
         ],
-        locationsHierarchical: {
+        locations: {
           localAuthority: [{ value: 'barnsley', label: 'Barnsley' }],
         },
       },

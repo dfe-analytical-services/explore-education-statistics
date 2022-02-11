@@ -139,7 +139,7 @@ describe('mapTableHeadersConfig', () => {
           decimalPlaces: 2,
         },
       ],
-      locationsHierarchical: {
+      locations: {
         localAuthority: [
           { value: 'E09000003', label: 'Barnet' },
           { value: 'E08000016', label: 'Barnsley' },
@@ -266,7 +266,7 @@ describe('mapTableHeadersConfig', () => {
         subjectName: '',
         filters: {},
         footnotes: [],
-        locationsHierarchical: {
+        locations: {
           localAuthority: [
             {
               label: 'Barnet (local authority)',

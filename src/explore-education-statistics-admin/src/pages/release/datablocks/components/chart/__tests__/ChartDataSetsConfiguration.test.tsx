@@ -20,7 +20,7 @@ describe('ChartDataSetsConfiguration', () => {
     geoJsonAvailable: false,
     footnotes: [],
     boundaryLevels: [],
-    locationsHierarchical: {
+    locations: {
       localAuthority: [
         { label: 'Barnet', value: 'barnet' },
         { label: 'Barnsley', value: 'barnsley' },

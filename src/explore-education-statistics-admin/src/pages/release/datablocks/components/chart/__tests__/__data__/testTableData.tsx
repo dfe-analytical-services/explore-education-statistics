@@ -62,7 +62,7 @@ export const testTableData: TableDataResponse = {
         name: 'sess_overall',
       },
     ],
-    locationsHierarchical: {
+    locations: {
       localAuthority: [
         { label: 'Barnet', value: 'barnet' },
         { label: 'Barnsley', value: 'barnsley' },

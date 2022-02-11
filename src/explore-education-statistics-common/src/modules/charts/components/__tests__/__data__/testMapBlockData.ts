@@ -125,7 +125,7 @@ export const testMapTableData: TableDataResponse = {
         name: 'sess_overall_percent',
       },
     ],
-    locationsHierarchical: {
+    locations: {
       localAuthorityDistrict: [
         {
           geoJson: [
@@ -420,7 +420,7 @@ export const testMapTableData: TableDataResponse = {
 };
 
 export const testMapTableDataRegion = produce(testMapTableData, draft => {
-  draft.subjectMeta.locationsHierarchical = {
+  draft.subjectMeta.locations = {
     region: [
       {
         geoJson: [
@@ -528,7 +528,7 @@ export const testMapTableDataRegion = produce(testMapTableData, draft => {
 });
 
 export const testMapTableDataMixed = produce(testMapTableData, draft => {
-  draft.subjectMeta.locationsHierarchical = {
+  draft.subjectMeta.locations = {
     localAuthority: [
       {
         geoJson: [

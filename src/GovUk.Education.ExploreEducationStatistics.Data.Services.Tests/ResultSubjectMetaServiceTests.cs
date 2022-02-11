@@ -188,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Empty(viewModel.Filters);
                 Assert.Empty(viewModel.Footnotes);
                 Assert.Empty(viewModel.Indicators);
-                Assert.Empty(viewModel.LocationsHierarchical);
+                Assert.Empty(viewModel.Locations);
                 Assert.Empty(viewModel.BoundaryLevels);
                 Assert.Empty(viewModel.TimePeriodRange);
                 Assert.Equal(publication.Title, viewModel.PublicationName);
@@ -571,7 +571,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var viewModel = result.AssertRight();
 
-                var locationViewModels = viewModel.LocationsHierarchical;
+                var locationViewModels = viewModel.Locations;
 
                 // Result has Country, Region and Local Authority levels
                 Assert.Equal(3, locationViewModels.Count);
@@ -854,7 +854,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.True(viewModel.GeoJsonAvailable);
 
-                var locationViewModels = viewModel.LocationsHierarchical;
+                var locationViewModels = viewModel.Locations;
 
                 // Result has Country and Region levels
                 Assert.Equal(2, locationViewModels.Count);
@@ -1091,7 +1091,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.True(viewModel.GeoJsonAvailable);
 
-                var locationViewModels = viewModel.LocationsHierarchical;
+                var locationViewModels = viewModel.Locations;
 
                 // Result only has a Region level
                 Assert.Single(locationViewModels);
@@ -1278,7 +1278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var viewModel = result.AssertRight();
 
-                var locationViewModels = viewModel.LocationsHierarchical;
+                var locationViewModels = viewModel.Locations;
 
                 Assert.Single(locationViewModels);
 
@@ -1466,7 +1466,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var viewModel = result.AssertRight();
 
-                var locationViewModels = viewModel.LocationsHierarchical;
+                var locationViewModels = viewModel.Locations;
 
                 Assert.Single(locationViewModels);
 
@@ -1634,7 +1634,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var viewModel = result.AssertRight();
 
-                var locationViewModels = viewModel.LocationsHierarchical;
+                var locationViewModels = viewModel.Locations;
 
                 Assert.Single(locationViewModels);
 
@@ -1841,7 +1841,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var viewModel = result.AssertRight();
 
-                var locationViewModels = viewModel.LocationsHierarchical;
+                var locationViewModels = viewModel.Locations;
 
                 // Result has Region and Local Authority levels
                 Assert.Equal(2, locationViewModels.Count);
