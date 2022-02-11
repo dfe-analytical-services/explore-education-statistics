@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -68,20 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .OnSuccess(
                     async release =>
                     {
-                        string filename;
-
-                        if (fileIds != null)
-                        {
-                            // Create a hash just so that we have some uniqueness
-                            // to attach to the end of the file name.
-                            var fileIdsHash = GetFileIdsHash(fileIds);
-                            filename = $"{release.Publication.Slug}_{release.Slug}_{fileIdsHash}.zip";
-                        }
-                        else
-                        {
-                            filename = $"{release.Publication.Slug}_{release.Slug}.zip";
-                        }
-
+                        var filename = $"{release.Publication.Slug}_{release.Slug}.zip";
                         Response.Headers.Add(HeaderNames.ContentDisposition, @$"attachment; filename=""{filename}""");
                         Response.Headers.Add(HeaderNames.ContentType, MediaTypeNames.Application.Octet);
 
@@ -111,14 +97,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                         }
                     }
                 );
-        }
-
-        private static string GetFileIdsHash(IList<Guid> fileIds)
-        {
-            return fileIds.Select(id => id.ToString())
-                .OrderBy(id => id)
-                .JoinToString(',')
-                .ToMd5Hash();
         }
 
         [HttpGet("release/{releaseId}/file/{fileId}")]
