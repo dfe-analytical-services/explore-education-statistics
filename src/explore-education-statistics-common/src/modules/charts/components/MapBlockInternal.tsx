@@ -351,17 +351,50 @@ export const MapBlockInternal = ({
     );
   }, [dataSetCategoryConfigs]);
 
+  const shouldGroupLocationOptions = useMemo(() => {
+    return dataSetCategories.some(
+      element =>
+        element.filter.level === 'localAuthority' ||
+        element.filter.level === 'localAuthorityDistrict',
+    );
+  }, [dataSetCategories]);
+
+  // If there are no LAs or LADs don't group the locations.
   const locationOptions = useMemo(() => {
-    const locations = orderBy(
+    if (shouldGroupLocationOptions) {
+      return undefined;
+    }
+    return orderBy(
       dataSetCategories.map(dataSetCategory => ({
         label: dataSetCategory.filter.label,
         value: dataSetCategory.filter.id,
       })),
       ['label'],
     );
-    locations.unshift({ label: 'None selected', value: '' });
-    return locations;
-  }, [dataSetCategories]);
+  }, [dataSetCategories, shouldGroupLocationOptions]);
+
+  // If there are LAs or LADs, group them by region and group any others by level
+  const groupedLocationOptions = useMemo(() => {
+    if (!shouldGroupLocationOptions) {
+      return undefined;
+    }
+    return dataSetCategories.reduce<Dictionary<SelectOption[]>>(
+      (acc, { filter }) => {
+        const groupLabel =
+          filter.level === 'localAuthority' ||
+          filter.level === 'localAuthorityDistrict'
+            ? (filter.group as string)
+            : locationLevelsMap[filter.level].label;
+
+        (acc[groupLabel] ??= []).push({
+          label: filter.label,
+          value: filter.id,
+        });
+        return acc;
+      },
+      {},
+    );
+  }, [dataSetCategories, shouldGroupLocationOptions]);
 
   const locationType = useMemo(() => {
     const levels = dataSetCategories.map(category => category.filter.level);
@@ -583,7 +616,9 @@ export const MapBlockInternal = ({
               label={`2. Select ${locationType.prefix} ${locationType.label}`}
               value={selectedFeature?.id?.toString()}
               options={locationOptions}
+              optGroups={groupedLocationOptions}
               order={FormSelect.unordered}
+              placeholder="None selected"
               onChange={e => {
                 const feature = geometry?.features.find(
                   feat => feat.id === e.currentTarget.value,

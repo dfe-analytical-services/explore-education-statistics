@@ -3,10 +3,13 @@ import {
   testMapTableData,
   testMapTableDataRegion,
   testMapTableDataMixed,
+  testsMixedLocationsFullTableMeta,
+  testsMixedLocationsTableData,
+  testsMixedLocationsTableDataWithLADs,
+  testMixedLocationsAxes,
 } from '@common/modules/charts/components/__tests__/__data__/testMapBlockData';
-import MapBlock, {
-  MapBlockProps,
-} from '@common/modules/charts/components/MapBlock';
+import { MapBlockProps } from '@common/modules/charts/components/MapBlock';
+import { MapBlockInternal } from '@common/modules/charts/components/MapBlockInternal';
 import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { within } from '@testing-library/dom';
@@ -15,7 +18,7 @@ import produce from 'immer';
 import React from 'react';
 import userEvent from '@testing-library/user-event';
 
-describe('MapBlock', () => {
+describe('MapBlockInternal', () => {
   const testFullTable = mapFullTable(testMapTableData);
   const testBlockProps: MapBlockProps = {
     ...testMapConfiguration,
@@ -29,7 +32,7 @@ describe('MapBlock', () => {
   };
 
   test('renders legends and polygons correctly', async () => {
-    const { container } = render(<MapBlock {...testBlockProps} />);
+    const { container } = render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       const paths = container.querySelectorAll<HTMLElement>(
@@ -76,7 +79,7 @@ describe('MapBlock', () => {
     );
 
     render(
-      <MapBlock
+      <MapBlockInternal
         {...testBlockProps}
         meta={fullTable.subjectMeta}
         data={fullTable.results}
@@ -96,7 +99,7 @@ describe('MapBlock', () => {
   });
 
   test('includes all data sets in select', async () => {
-    render(<MapBlock {...testBlockProps} />);
+    render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       const select = screen.getByLabelText('1. Select data to view');
@@ -113,26 +116,8 @@ describe('MapBlock', () => {
     });
   });
 
-  test('includes all locations in select', async () => {
-    render(<MapBlock {...testBlockProps} />);
-
-    await waitFor(() => {
-      const select = screen.getByLabelText(
-        '2. Select a Local Authority District',
-      );
-
-      expect(select).toBeVisible();
-
-      expect(select.children).toHaveLength(4);
-      expect(select.children[0]).toHaveTextContent('None selected');
-      expect(select.children[1]).toHaveTextContent('Leeds');
-      expect(select.children[2]).toHaveTextContent('Manchester');
-      expect(select.children[3]).toHaveTextContent('Sheffield');
-    });
-  });
-
   test('changing selected data set changes legends and polygons', async () => {
-    const { container } = render(<MapBlock {...testBlockProps} />);
+    const { container } = render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       const select = screen.getByLabelText('1. Select data to view');
@@ -174,7 +159,7 @@ describe('MapBlock', () => {
   });
 
   test('changing selected location focuses the correct polygon', async () => {
-    const { container } = render(<MapBlock {...testBlockProps} />);
+    const { container } = render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -186,9 +171,11 @@ describe('MapBlock', () => {
       '2. Select a Local Authority District',
     );
 
-    expect(select.children[1]).toHaveTextContent('Leeds');
+    const groups = within(select).getAllByRole('group');
+    const group1Options = within(groups[0]).getAllByRole('option');
+    expect(group1Options[0]).toHaveTextContent('Leeds');
 
-    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[0]);
 
     const paths = container.querySelectorAll<HTMLElement>(
       '.leaflet-container svg path',
@@ -204,7 +191,7 @@ describe('MapBlock', () => {
   });
 
   test('changing selected location renders its indicator tiles', async () => {
-    render(<MapBlock {...testBlockProps} />);
+    render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -215,8 +202,10 @@ describe('MapBlock', () => {
     const select = screen.getByLabelText(
       '2. Select a Local Authority District',
     );
+    const groups = within(select).getAllByRole('group');
+    const group1Options = within(groups[0]).getAllByRole('option');
 
-    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[0]);
 
     const indicators = screen.getAllByTestId('mapBlock-indicator');
 
@@ -252,7 +241,7 @@ describe('MapBlock', () => {
     );
 
     render(
-      <MapBlock
+      <MapBlockInternal
         {...testBlockProps}
         meta={fullTable.subjectMeta}
         data={fullTable.results}
@@ -268,8 +257,10 @@ describe('MapBlock', () => {
     const select = screen.getByLabelText(
       '2. Select a Local Authority District',
     );
+    const groups = within(select).getAllByRole('group');
+    const group1Options = within(groups[0]).getAllByRole('option');
 
-    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[0]);
 
     const tile1 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
     expect(tile1.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
@@ -279,7 +270,7 @@ describe('MapBlock', () => {
       '3.51%',
     );
 
-    userEvent.selectOptions(select, select.children[2] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[1]);
 
     const tile2 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
     expect(tile2.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
@@ -289,7 +280,7 @@ describe('MapBlock', () => {
       '3.01%',
     );
 
-    userEvent.selectOptions(select, select.children[3] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[2]);
 
     const tile3 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
     expect(tile3.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
@@ -301,7 +292,7 @@ describe('MapBlock', () => {
   });
 
   test('reseting the map when select None Selected', async () => {
-    const { container } = render(<MapBlock {...testBlockProps} />);
+    const { container } = render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
       expect(
@@ -312,8 +303,10 @@ describe('MapBlock', () => {
     const select = screen.getByLabelText(
       '2. Select a Local Authority District',
     );
+    const groups = within(select).getAllByRole('group');
+    const group1Options = within(groups[0]).getAllByRole('option');
 
-    userEvent.selectOptions(select, select.children[1] as HTMLElement);
+    userEvent.selectOptions(select, group1Options[0]);
 
     const paths = container.querySelectorAll<HTMLElement>(
       '.leaflet-container svg path',
@@ -321,7 +314,7 @@ describe('MapBlock', () => {
 
     expect(paths[3]).toHaveClass('selected');
 
-    userEvent.selectOptions(select, select.children[0] as HTMLElement);
+    userEvent.selectOptions(select, within(select).getAllByRole('option')[0]);
     expect(paths[3]).not.toHaveClass('selected');
   });
 
@@ -334,7 +327,7 @@ describe('MapBlock', () => {
         draft.data = testFullTableRegion.results;
       });
 
-      render(<MapBlock {...testBlockPropsRegion} />);
+      render(<MapBlockInternal {...testBlockPropsRegion} />);
 
       await waitFor(() => {
         expect(screen.getByLabelText('2. Select a Region')).toBeInTheDocument();
@@ -342,20 +335,118 @@ describe('MapBlock', () => {
     });
 
     test('shows the default label if the data set contains multiple types', async () => {
-      const testFullTableRegion = mapFullTable(testMapTableDataMixed);
-
-      const testBlockPropsRegion = produce(testBlockProps, draft => {
-        draft.meta = testFullTableRegion.subjectMeta;
-        draft.data = testFullTableRegion.results;
+      const testFullTableMixed = mapFullTable(testMapTableDataMixed);
+      const testBlockPropsMixed = produce(testBlockProps, draft => {
+        draft.meta = testFullTableMixed.subjectMeta;
+        draft.data = testFullTableMixed.results;
       });
 
-      render(<MapBlock {...testBlockPropsRegion} />);
+      render(<MapBlockInternal {...testBlockPropsMixed} />);
 
       await waitFor(() => {
         expect(
           screen.getByLabelText('2. Select a location'),
         ).toBeInTheDocument();
       });
+    });
+
+    test('shows ungrouped location options if no local authorities', async () => {
+      render(<MapBlockInternal {...testBlockProps} />);
+
+      await waitFor(() => {
+        const select = screen.getByLabelText(
+          '2. Select a Local Authority District',
+        );
+
+        expect(select).toBeVisible();
+        const options = within(select).getAllByRole('option');
+        expect(options).toHaveLength(4);
+        expect(options[0]).toHaveTextContent('None selected');
+        expect(options[1]).toHaveTextContent('Leeds');
+        expect(options[2]).toHaveTextContent('Manchester');
+        expect(options[3]).toHaveTextContent('Sheffield');
+      });
+    });
+
+    test('shows grouped location options if there are local authorities', async () => {
+      const testBlockProps2: MapBlockProps = {
+        ...testMapConfiguration,
+        id: 'testMap',
+        axes: testMixedLocationsAxes,
+        legend: testMapConfiguration.legend as LegendConfiguration,
+        meta: testsMixedLocationsFullTableMeta,
+        data: testsMixedLocationsTableData,
+      };
+
+      render(<MapBlockInternal {...testBlockProps2} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('2. Select a location'),
+        ).toBeInTheDocument();
+      });
+      const select = screen.getByLabelText('2. Select a location');
+
+      expect(select.children[0]).toHaveTextContent('None selected');
+
+      const groups = within(select).getAllByRole('group');
+      expect(groups).toHaveLength(4);
+
+      expect(groups[0]).toHaveProperty('label', 'Country');
+      const group1Options = within(groups[0]).getAllByRole('option');
+      expect(group1Options).toHaveLength(1);
+      expect(group1Options[0]).toHaveTextContent('England');
+
+      expect(groups[1]).toHaveProperty('label', 'North East');
+      const group2Options = within(groups[1]).getAllByRole('option');
+      expect(group2Options).toHaveLength(2);
+      expect(group2Options[0]).toHaveTextContent('Darlington');
+      expect(group2Options[1]).toHaveTextContent('Newcastle upon Tyne');
+
+      expect(groups[2]).toHaveProperty('label', 'Yorkshire and the Humber');
+      const group3Options = within(groups[2]).getAllByRole('option');
+      expect(group3Options).toHaveLength(2);
+      expect(group3Options[0]).toHaveTextContent('Rotherham');
+      expect(group3Options[1]).toHaveTextContent('Sheffield');
+
+      expect(groups[3]).toHaveProperty('label', 'Region');
+      const group4Options = within(groups[3]).getAllByRole('option');
+      expect(group4Options).toHaveLength(2);
+      expect(group4Options[0]).toHaveTextContent('North East');
+      expect(group4Options[1]).toHaveTextContent('North West');
+    });
+
+    test('shows grouped location options if there are local authority districts', async () => {
+      const testBlockProps2: MapBlockProps = {
+        ...testMapConfiguration,
+        id: 'testMap',
+        axes: testMixedLocationsAxes,
+        legend: testMapConfiguration.legend as LegendConfiguration,
+        meta: testsMixedLocationsFullTableMeta,
+        data: testsMixedLocationsTableDataWithLADs,
+      };
+
+      render(<MapBlockInternal {...testBlockProps2} />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('2. Select a Local Authority District'),
+        ).toBeInTheDocument();
+      });
+      const select = screen.getByLabelText(
+        '2. Select a Local Authority District',
+      );
+
+      expect(select.children[0]).toHaveTextContent('None selected');
+
+      const groups = within(select).getAllByRole('group');
+      expect(groups).toHaveLength(1);
+
+      expect(groups[0]).toHaveProperty('label', 'Yorkshire and the Humber');
+      const group1Options = within(groups[0]).getAllByRole('option');
+      expect(group1Options).toHaveLength(2);
+      expect(group1Options[0]).toHaveTextContent('Sheffield LAD');
+      expect(group1Options[1]).toHaveTextContent('Rotherham LAD');
     });
   });
 });
