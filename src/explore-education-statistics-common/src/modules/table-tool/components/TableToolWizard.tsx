@@ -172,8 +172,11 @@ const TableToolWizard = ({
 
     updateState(draft => {
       draft.subjectMeta = nextSubjectMeta;
-
       draft.query.subjectId = selectedSubjectId;
+      draft.query.indicators = [];
+      draft.query.filters = [];
+      draft.query.locations = {};
+      draft.query.timePeriod = undefined;
     });
   };
 
@@ -195,10 +198,35 @@ const TableToolWizard = ({
       subjectId: state.query.subjectId,
     });
 
+    const { timePeriod } = state.query;
+
+    // Check if selected time period is in the time period options so can reset it if not.
+    const hasStartTimePeriod = nextSubjectMeta.timePeriod.options.some(
+      option =>
+        option.code === timePeriod?.startCode &&
+        option.year === timePeriod.startYear,
+    );
+    const hasEndTimePeriod = nextSubjectMeta.timePeriod.options.some(
+      option =>
+        option.code === timePeriod?.endCode &&
+        option.year === timePeriod.endYear,
+    );
+
     updateState(draft => {
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
 
       draft.query.locations = locations;
+
+      if (timePeriod && hasStartTimePeriod && hasEndTimePeriod) {
+        draft.query.timePeriod = {
+          startYear: hasStartTimePeriod ? timePeriod.startYear : 0,
+          startCode: hasStartTimePeriod ? timePeriod.startCode : '',
+          endYear: hasEndTimePeriod ? timePeriod.endYear : 0,
+          endCode: hasEndTimePeriod ? timePeriod.endCode : '',
+        };
+      } else {
+        draft.query.timePeriod = undefined;
+      }
     });
   };
 
@@ -231,10 +259,31 @@ const TableToolWizard = ({
       },
     });
 
+    const indicatorValues = new Set(
+      Object.values(nextSubjectMeta.indicators).flatMap(indicator =>
+        indicator.options.map(option => option.value),
+      ),
+    );
+    const filteredIndicators = state.query.indicators.filter(indicator =>
+      indicatorValues.has(indicator),
+    );
+
+    const filterValues = new Set(
+      Object.values(nextSubjectMeta.filters).flatMap(filterGroup =>
+        Object.values(filterGroup.options).flatMap(filter =>
+          filter.options.map(option => option.value),
+        ),
+      ),
+    );
+    const filteredFilters = state.query.filters.filter(filter =>
+      filterValues.has(filter),
+    );
+
     updateState(draft => {
       draft.subjectMeta.indicators = nextSubjectMeta.indicators;
       draft.subjectMeta.filters = nextSubjectMeta.filters;
-
+      draft.query.indicators = filteredIndicators;
+      draft.query.filters = filteredFilters;
       draft.query.timePeriod = {
         startYear,
         startCode,
@@ -355,9 +404,7 @@ const TableToolWizard = ({
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
-                  initialValues={{
-                    timePeriod: state.query.timePeriod,
-                  }}
+                  initialValues={state.query.timePeriod}
                   options={state.subjectMeta.timePeriod.options}
                   onSubmit={handleTimePeriodFormSubmit}
                 />
