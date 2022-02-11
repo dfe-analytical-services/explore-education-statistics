@@ -4,8 +4,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 .Select(
                     claim =>
                     {
-                        var user = CreateClaimsPrincipal(
+                        var user = ClaimsPrincipalUtils.CreateClaimsPrincipal(
                             Guid.NewGuid(),
                             new Claim(claim.ToString(), "")
                         );
@@ -127,26 +127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 Assert.False(authContext.HasSucceeded, scenario.UnexpectedPassMessage);
             }
-        }
-
-        public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId)
-        {
-            return CreateClaimsPrincipal(userId, new Claim[] { });
-        }
-
-        public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params Claim[] additionalClaims)
-        {
-            var identity = new ClaimsIdentity();
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId.ToString()));
-            identity.AddClaims(additionalClaims);
-            var user = new ClaimsPrincipal(identity);
-            return user;
-        }
-
-        public static ClaimsPrincipal CreateClaimsPrincipal(Guid userId, params SecurityClaimTypes[] additionalClaims)
-        {
-            return CreateClaimsPrincipal(userId,
-                additionalClaims.Select(c => new Claim(c.ToString(), "")).ToArray());
         }
 
         public static void ForEachSecurityClaim(Action<SecurityClaimTypes> action)
