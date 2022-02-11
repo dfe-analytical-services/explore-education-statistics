@@ -60,7 +60,9 @@ Add summary content to release
     user waits until element contains    id:releaseSummary    This section is empty
     user clicks button    Edit block    id:releaseSummary
     user presses keys    Test intro text for ${PUBLICATION_NAME}
+    user sets focus to element    xpath://button[text()="Save & close"]    id:releaseSummary
     user clicks button    Save & close    id:releaseSummary
+    user waits until parent does not contain element    id:releaseSummary    xpath://button[text()="Save & close"]
     user waits until element contains    id:releaseSummary    Test intro text for ${PUBLICATION_NAME}
 
 # TODO: Add comment to summary content

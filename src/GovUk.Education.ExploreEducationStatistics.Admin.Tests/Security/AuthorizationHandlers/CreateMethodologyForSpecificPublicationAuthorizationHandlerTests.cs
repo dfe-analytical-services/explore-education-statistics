@@ -37,7 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Id = Guid.NewGuid(),
             Methodologies = ListOf(new PublicationMethodology
             {
-                Owner = true
+                Owner = true,
+                MethodologyId = Guid.NewGuid(),
             })
         };
 
@@ -46,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Id = Guid.NewGuid(),
             Methodologies = ListOf(new PublicationMethodology
             {
-                Owner = false
+                Owner = false,
+                MethodologyId = Guid.NewGuid(),
             })
         };
 

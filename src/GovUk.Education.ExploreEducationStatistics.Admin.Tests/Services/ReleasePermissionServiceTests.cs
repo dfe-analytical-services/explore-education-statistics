@@ -753,6 +753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user3.Id, userReleaseRoles[1].UserId);
 
                 var userReleaseInvites = await contentDbContext.UserReleaseInvites
+                    .ToAsyncEnumerable()
                     .ToListAsync();
 
                 Assert.Single(userReleaseInvites); // user1's invite remains

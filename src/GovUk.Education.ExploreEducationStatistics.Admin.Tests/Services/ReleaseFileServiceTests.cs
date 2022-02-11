@@ -28,8 +28,8 @@ using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockFormTestUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -2832,7 +2832,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.NotNull(releaseFile);
-                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile.File.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile!.File.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, releaseFile.File.CreatedById);
             }
 

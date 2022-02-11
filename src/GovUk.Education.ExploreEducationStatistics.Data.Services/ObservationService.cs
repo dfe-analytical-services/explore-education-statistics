@@ -287,8 +287,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     StatisticsDbContext context, 
                     CancellationToken cancellationToken) where TEntity : class
                 {
+                    var options = new TempTableCreationOptions
+                    {
+                       TableNameProvider = new DefaultTempTableNameProvider(),
+                    };
+
                     await context.CreateTempTableAsync<TEntity>(
-                        new DefaultTempTableNameProvider(), true, cancellationToken);
+                        options,
+                        cancellationToken);
                 }
 
                 public async Task<ITempTableQuery<TEntity>> CreateTemporaryTableAndPopulate<TEntity>(

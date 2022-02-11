@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = Data
+                Type = FileType.Data
             };
 
             Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/", dataFile.BatchesPath());
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = Data
+                Type = FileType.Data
             };
 
             Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/{dataFile.Id}_000999",
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = Data
+                Type = FileType.Data
             };
 
             var imageFile = new File
@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = Data
+                Type = FileType.Data
             };
 
             var imageFile = new File

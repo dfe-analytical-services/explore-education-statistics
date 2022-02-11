@@ -22,8 +22,8 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {

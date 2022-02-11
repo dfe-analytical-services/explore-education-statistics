@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -15,17 +16,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
     public class MatchedObservation
     {
         public Guid Id { get; }
-        
+
         public MatchedObservation(Guid id)
         {
             Id = id;
         }
     }
-    
+
     public class IdTempTable
     {
         public Guid Id { get; }
-        
+
         public IdTempTable(Guid id)
         {
             Id = id;
@@ -49,10 +50,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             return Id.GetHashCode();
         }
     }
-    
+
     public class StatisticsDbContext : DbContext
     {
-
         public StatisticsDbContext()
         {
             // We intentionally don't run `Configure` here as Moq would call this constructor
@@ -115,8 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         public DbSet<ReleaseSubject> ReleaseSubject { get; set; } = null!;
         public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
-        
-        public DbSet<MatchedObservation> MatchedObservations { get; set; }
+        public DbSet<MatchedObservation> MatchedObservations => this.TempTableSet<MatchedObservation>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -231,7 +230,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureObservationFilterItem(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ObservationFilterItem>()
-                .HasKey(item => new {item.ObservationId, item.FilterItemId});
+                .HasKey(item => new { item.ObservationId, item.FilterItemId });
 
             modelBuilder.Entity<ObservationFilterItem>()
                 .HasOne(observationFilterItem => observationFilterItem.Observation)
@@ -254,8 +253,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureObservationRowResultTempTable(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .ConfigureTempTableEntity<MatchedObservation>(isKeyless: false)
-                .HasKey("Id");
+                .ConfigureTempTableEntity<MatchedObservation>(isKeyless: false,
+                    builder => builder
+                        .HasKey(matchedObservation => matchedObservation.Id));
         }
 
         private static void ConfigureUnit(ModelBuilder modelBuilder)
@@ -287,7 +287,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureReleaseSubject(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ReleaseSubject>()
-                .HasKey(item => new {item.ReleaseId, item.SubjectId});
+                .HasKey(item => new { item.ReleaseId, item.SubjectId });
 
             modelBuilder.Entity<ReleaseSubject>()
                 .HasOne(r => r.Release)
@@ -303,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureReleaseFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ReleaseFootnote>()
-                .HasKey(item => new {item.ReleaseId, item.FootnoteId});
+                .HasKey(item => new { item.ReleaseId, item.FootnoteId });
 
             modelBuilder.Entity<ReleaseFootnote>()
                 .HasOne(rf => rf.Release)
@@ -371,7 +371,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureFilterFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FilterFootnote>()
-                .HasKey(item => new {item.FilterId, item.FootnoteId});
+                .HasKey(item => new { item.FilterId, item.FootnoteId });
 
             modelBuilder.Entity<FilterFootnote>()
                 .HasOne(filterFootnote => filterFootnote.Filter)
@@ -388,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureFilterGroupFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FilterGroupFootnote>()
-                .HasKey(item => new {item.FilterGroupId, item.FootnoteId});
+                .HasKey(item => new { item.FilterGroupId, item.FootnoteId });
 
             modelBuilder.Entity<FilterGroupFootnote>()
                 .HasOne(filterGroupFootnote => filterGroupFootnote.FilterGroup)
@@ -405,7 +405,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureFilterItemFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<FilterItemFootnote>()
-                .HasKey(item => new {item.FilterItemId, item.FootnoteId});
+                .HasKey(item => new { item.FilterItemId, item.FootnoteId });
 
             modelBuilder.Entity<FilterItemFootnote>()
                 .HasOne(filterItemFootnote => filterItemFootnote.FilterItem)
@@ -422,14 +422,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureIdTempTable(ModelBuilder modelBuilder)
         {
             modelBuilder
-                .ConfigureTempTableEntity<IdTempTable>(isKeyless: false)
-                .HasKey("Id");
+                .ConfigureTempTableEntity<IdTempTable>(isKeyless: false,
+                    builder => builder.HasKey(idTempTable => idTempTable.Id));
         }
 
         private static void ConfigureIndicatorFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<IndicatorFootnote>()
-                .HasKey(item => new {item.IndicatorId, item.FootnoteId});
+                .HasKey(item => new { item.IndicatorId, item.FootnoteId });
 
             modelBuilder.Entity<IndicatorFootnote>()
                 .HasOne(indicatorFootnote => indicatorFootnote.Indicator)
@@ -446,7 +446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         private static void ConfigureSubjectFootnote(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<SubjectFootnote>()
-                .HasKey(item => new {item.SubjectId, item.FootnoteId});
+                .HasKey(item => new { item.SubjectId, item.FootnoteId });
 
             modelBuilder.Entity<SubjectFootnote>()
                 .HasOne(subjectFootnote => subjectFootnote.Subject)

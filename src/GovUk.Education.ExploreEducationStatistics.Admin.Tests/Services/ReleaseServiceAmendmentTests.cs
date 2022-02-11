@@ -21,7 +21,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 

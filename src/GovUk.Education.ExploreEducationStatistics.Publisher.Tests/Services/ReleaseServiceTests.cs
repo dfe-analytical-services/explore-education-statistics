@@ -25,9 +25,9 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -854,14 +854,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var keyStatisticsSection = result.KeyStatisticsSection;
                 Assert.NotNull(keyStatisticsSection);
-                Assert.Equal(Release2KeyStatsSection.Id, keyStatisticsSection!.Id);
+                Assert.Equal(Release2KeyStatsSection.Id, keyStatisticsSection.Id);
                 var keyStatisticsSectionContent = keyStatisticsSection.Content;
                 Assert.Single(keyStatisticsSectionContent);
                 Assert.Equal(Release2KeyStatsDataBlock.Id, keyStatisticsSectionContent[0].Id);
 
                 var summarySection = result.SummarySection;
                 Assert.NotNull(summarySection);
-                Assert.Equal(Release2SummarySection.Id, summarySection!.Id);
+                Assert.Equal(Release2SummarySection.Id, summarySection.Id);
                 var summarySectionContent = summarySection.Content;
                 Assert.NotNull(summarySectionContent);
                 Assert.Equal(3, summarySectionContent.Count);
@@ -1077,14 +1077,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var keyStatisticsSection = result.KeyStatisticsSection;
                 Assert.NotNull(keyStatisticsSection);
-                Assert.Equal(Release1KeyStatsSection.Id, keyStatisticsSection!.Id);
+                Assert.Equal(Release1KeyStatsSection.Id, keyStatisticsSection.Id);
                 var keyStatisticsSectionContent = keyStatisticsSection.Content;
                 Assert.Single(keyStatisticsSectionContent);
                 Assert.Equal(Release1KeyStatsDataBlock.Id, keyStatisticsSectionContent[0].Id);
 
                 var summarySection = result.SummarySection;
                 Assert.NotNull(summarySection);
-                Assert.Equal(Release1SummarySection.Id, summarySection!.Id);
+                Assert.Equal(Release1SummarySection.Id, summarySection.Id);
                 var summarySectionContent = summarySection.Content;
                 Assert.NotNull(summarySectionContent);
                 Assert.Equal(3, summarySectionContent.Count);
@@ -1440,7 +1440,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 Assert.Equal(published, actualContentRelease.Published);
                 Assert.Equal(published, actualContentRelease.Publication.Published);
-                Assert.Equal(published, actualStatisticsRelease.Published);
+                Assert.Equal(published, actualStatisticsRelease!.Published);
 
                 Assert.True(actualContentRelease.DataLastPublished.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished!.Value).Milliseconds, 0,
@@ -1576,7 +1576,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 Assert.Equal(previousContentRelease.Published.Value, actualContentRelease.Published);
                 Assert.Equal(previousContentRelease.Published.Value, actualContentRelease.Publication.Published);
-                Assert.Equal(previousContentRelease.Published.Value, actualStatisticsRelease.Published);
+                Assert.Equal(previousContentRelease.Published.Value, actualStatisticsRelease!.Published);
 
                 Assert.True(actualContentRelease.DataLastPublished.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(actualContentRelease.DataLastPublished!.Value).Milliseconds, 0,

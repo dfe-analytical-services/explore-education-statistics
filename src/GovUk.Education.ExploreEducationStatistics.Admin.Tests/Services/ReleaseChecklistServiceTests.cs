@@ -20,6 +20,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
@@ -95,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddRangeAsync(
                     releaseContentSection1,
@@ -109,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 methodologyVersionRepository
                     .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
@@ -176,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddRangeAsync(release);
                 await context.SaveChangesAsync();
@@ -186,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 methodologyVersionRepository
                     .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
@@ -239,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddRangeAsync(release);
                 await context.SaveChangesAsync();
@@ -251,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var subject = new Subject
                 {
@@ -363,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddRangeAsync(release);
                 await context.SaveChangesAsync();
@@ -373,7 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 methodologyVersionRepository
                     .Setup(mock => mock.GetLatestVersionByPublication(release.PublicationId))
@@ -509,7 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddRangeAsync(
                     releaseContentSection1,
@@ -525,7 +526,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var subject = new Subject
                 {
@@ -606,13 +607,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var contextId = Guid.NewGuid().ToString();
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(release);
                 await context.SaveChangesAsync();
             }
 
-            await using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var context = InMemoryContentDbContext(contextId))
             {
                 var service = BuildReleaseChecklistService(context);
                 var result = await service.GetChecklist(Guid.NewGuid());

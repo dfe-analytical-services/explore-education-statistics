@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         builder =>
                         {
                             builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model");
-                            builder.AddTempTableSupport();
+                            builder.AddBulkOperationSupport();
                         })
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
