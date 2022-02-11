@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
@@ -123,10 +124,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .ReturnsAsync(_publicationId);
 
             subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(_publicationId);
-
-            subjectRepository
                 .Setup(s => s.IsSubjectForLatestPublishedRelease(subject.Id))
                 .ReturnsAsync(true);
 
@@ -150,7 +147,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             Assert.Equal(Guid.Parse(blobPath), result.Id);
             Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
             Assert.False(result.Invalidated);
-            Assert.Equal(_publicationId, result.Query.PublicationId);
         }
 
         [Fact]
@@ -200,10 +196,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .ReturnsAsync(subject);
 
             subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(_publicationId);
-
-            subjectRepository
                 .Setup(s => s.IsSubjectForLatestPublishedRelease(subject.Id))
                 .ReturnsAsync(true);
 
@@ -225,7 +217,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             Assert.Equal(Guid.Parse(blobPath), result.Id);
             Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
             Assert.False(result.Invalidated);
-            Assert.Equal(_publicationId, result.Query.PublicationId);
         }
 
         [Fact]
@@ -263,10 +254,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.IsSubjectForLatestPublishedRelease(subject.Id))
                 .ReturnsAsync(true);
 
-            subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(_publicationId);
-
             var service = BuildService(blobStorageService: blobStorageService.Object,
                 subjectRepository: subjectRepository.Object);
 
@@ -279,7 +266,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             Assert.Equal(permalink.Id, result.Id);
             Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
             Assert.False(result.Invalidated);
-            Assert.Equal(_publicationId, result.Query.PublicationId);
         }
 
         [Fact]
@@ -295,7 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             };
 
             // Setup a list of legacy locations to be added to the Permalink table subject meta during serialization
-            var legacyLocations = new List<ObservationalUnitMetaViewModel>
+            var legacyLocations = new List<LegacyLocationAttributeViewModel>
             {
                 new()
                 {
@@ -352,10 +338,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             subjectRepository
                 .Setup(s => s.IsSubjectForLatestPublishedRelease(subject.Id))
                 .ReturnsAsync(true);
-
-            subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(_publicationId);
 
             var service = BuildService(blobStorageService: blobStorageService.Object,
                 subjectRepository: subjectRepository.Object);
@@ -436,10 +418,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.Get(permalink.Query.SubjectId))
                 .ReturnsAsync((Subject?) null);
 
-            subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(permalink.Query.SubjectId))
-                .ReturnsAsync((Guid?) null);
-
             var service = BuildService(blobStorageService: blobStorageService.Object,
                 subjectRepository: subjectRepository.Object);
 
@@ -450,9 +428,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 subjectRepository);
 
             Assert.Equal(permalink.Id, result.Id);
-            // Expect invalidated Permalink and missing Publication Id
+            // Expect invalidated Permalink
             Assert.True(result.Invalidated);
-            Assert.Null(result.Query.PublicationId);
         }
 
         [Fact]
@@ -490,10 +467,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.IsSubjectForLatestPublishedRelease(subject.Id))
                 .ReturnsAsync(false);
 
-            subjectRepository
-                .Setup(s => s.FindPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(_publicationId);
-
             var service = BuildService(blobStorageService: blobStorageService.Object,
                 subjectRepository: subjectRepository.Object);
 
@@ -506,7 +479,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             Assert.Equal(permalink.Id, result.Id);
             // Expect invalidated Permalink
             Assert.True(result.Invalidated);
-            Assert.Equal(_publicationId, result.Query.PublicationId);
         }
 
         private static PermalinkService BuildService(

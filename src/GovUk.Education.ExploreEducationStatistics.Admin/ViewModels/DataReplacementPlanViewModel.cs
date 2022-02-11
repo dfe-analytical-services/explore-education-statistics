@@ -264,36 +264,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         }
     }
 
-    public class ObservationalUnitReplacementViewModel
+    public class LocationAttributeReplacementViewModel : TargetableReplacementViewModel
     {
         public string Code { get; }
-        public string Label { get; }
-        public string Target { get; }
 
-        public bool Valid => !Target.IsNullOrEmpty();
-
-        public ObservationalUnitReplacementViewModel(string code, string label, string target)
+        public LocationAttributeReplacementViewModel(
+            Guid id,
+            string code,
+            string label,
+            Guid? target) : base(id, label, target)
         {
             Code = code;
-            Label = label;
-            Target = target;
         }
     }
 
     public class LocationReplacementViewModel
     {
         public string Label { get; }
-        public IEnumerable<ObservationalUnitReplacementViewModel> ObservationalUnits { get; }
-        public bool Valid => ObservationalUnits.All(location => location.Valid);
-
-        [JsonIgnore] public bool Any => ObservationalUnits.Any();
+        public IEnumerable<LocationAttributeReplacementViewModel> LocationAttributes { get; }
+        public bool Valid => LocationAttributes.All(location => location.Valid);
 
         public LocationReplacementViewModel(
             string label,
-            IEnumerable<ObservationalUnitReplacementViewModel> observationalUnits)
+            IEnumerable<LocationAttributeReplacementViewModel> locationAttributes)
         {
             Label = label;
-            ObservationalUnits = observationalUnits;
+            LocationAttributes = locationAttributes;
         }
     }
 

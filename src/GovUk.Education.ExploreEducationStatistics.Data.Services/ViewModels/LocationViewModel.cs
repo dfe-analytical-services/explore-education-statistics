@@ -14,12 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
         public CodeNameViewModel? MultiAcademyTrust { get; init; }
         public CodeNameViewModel? OpportunityArea { get; init; }
         public CodeNameViewModel? ParliamentaryConstituency { get; init; }
+        public CodeNameViewModel? PlanningArea { get; init; }
         public CodeNameViewModel? Provider { get; init; }
         public CodeNameViewModel? Region { get; init; }
         public CodeNameViewModel? RscRegion { get; init; }
         public CodeNameViewModel? School { get; init; }
         public CodeNameViewModel? Sponsor { get; init; }
         public CodeNameViewModel? Ward { get; init; }
-        public CodeNameViewModel? PlanningArea { get; init; }
     }
 }

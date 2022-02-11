@@ -1,15 +1,11 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 {
     public record LocationQuery
     {
-        [JsonConverter(typeof(StringEnumConverter))]
-        public GeographicLevel? GeographicLevel { get; set; }
         public List<string>? Country { get; set; }
         public List<string>? EnglishDevolvedArea { get; set; }
         public List<string>? Institution { get; set; }
@@ -38,7 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         /// <param name="query"></param>
         public LocationQuery(LocationQuery query)
         {
-            GeographicLevel = query.GeographicLevel;
             Country = query.Country?.ToList();
             EnglishDevolvedArea = query.EnglishDevolvedArea?.ToList();
             Institution = query.Institution?.ToList();
@@ -56,16 +51,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
             School = query.School?.ToList();
             Sponsor = query.Sponsor?.ToList();
             Ward = query.Ward?.ToList();
-        }
-
-        public int CountItems()
-        {
-            return GetType()
-                .GetProperties()
-                .Where(property => property.PropertyType == typeof(List<string>))
-                .Select(property => property.GetValue(this))
-                .Cast<List<string>>()
-                .Sum(collection => collection?.Count ?? 0);
         }
     }
 }

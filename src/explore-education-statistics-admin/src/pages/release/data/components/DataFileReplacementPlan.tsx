@@ -158,7 +158,7 @@ const DataFileReplacementPlan = ({
                           ([levelKey, level]) => (
                             <SummaryListItem key={levelKey} term={level.label}>
                               <ul className="govuk-list">
-                                {level.observationalUnits.map(location => (
+                                {level.locationAttributes.map(location => (
                                   <li key={location.code}>
                                     {location.label}
                                     {!location.valid && notPresentTag}

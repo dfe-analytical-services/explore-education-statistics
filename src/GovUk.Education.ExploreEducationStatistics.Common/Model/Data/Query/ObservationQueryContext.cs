@@ -12,8 +12,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public IEnumerable<Guid> Filters { get; set; }
         public long? BoundaryLevel { get; set; }
         public IEnumerable<Guid> Indicators { get; set; }
+        public List<Guid> LocationIds { get; set; } = new();
+        [Obsolete("Legacy Location field that exists in queries of historical Permalinks", false)]
         public LocationQuery Locations { get; set; }
-        public IEnumerable<Guid> LocationIds { get; set; }
         public bool? IncludeGeoJson { get; set; }
 
         public ObservationQueryContext Clone()
@@ -39,8 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
                 $"{nameof(Filters)}: [{(Filters == null ? string.Empty : Filters.JoinToString(", "))}], " +
                 $"{nameof(BoundaryLevel)}: {BoundaryLevel}, " +
                 $"{nameof(Indicators)}: [{(Indicators == null ? string.Empty : Indicators.JoinToString(", "))}], " +
-                $"{nameof(Locations)}: {Locations}, " +
-                $"{nameof(LocationIds)}: [{(LocationIds == null ? string.Empty : LocationIds.JoinToString(", "))}], " +
+                $"{nameof(LocationIds)}: [{LocationIds.JoinToString(", ")}], " +
                 $"{nameof(IncludeGeoJson)}: {IncludeGeoJson}";
         }
     }

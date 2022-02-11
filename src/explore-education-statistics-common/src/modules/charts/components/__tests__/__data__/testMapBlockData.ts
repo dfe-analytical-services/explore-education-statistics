@@ -212,8 +212,9 @@ export const testMapTableData: TableDataResponse = {
               },
             },
           ],
+          id: 'leeds-id',
           label: 'Leeds',
-          value: 'E08000035',
+          value: 'leeds',
         },
         {
           geoJson: [
@@ -272,8 +273,9 @@ export const testMapTableData: TableDataResponse = {
               },
             },
           ],
+          id: 'manchester-id',
           label: 'Manchester',
-          value: 'E08000003',
+          value: 'manchester',
         },
         {
           geoJson: [
@@ -345,8 +347,9 @@ export const testMapTableData: TableDataResponse = {
               },
             },
           ],
+          id: 'sheffield-id',
           label: 'Sheffield',
-          value: 'E08000019',
+          value: 'sheffield',
         },
       ],
     },
@@ -370,12 +373,7 @@ export const testMapTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'localAuthorityDistrict',
-      location: {
-        country: { code: 'E92000001', name: 'England' },
-        localAuthority: { code: '383', name: 'Leeds' },
-        localAuthorityDistrict: { code: 'E08000035', name: 'Leeds' },
-        region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-      },
+      locationId: 'leeds-id',
       measures: {
         'authorised-absence-rate': '3.5',
         'overall-absence-rate': '4.8',
@@ -386,12 +384,7 @@ export const testMapTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'localAuthorityDistrict',
-      location: {
-        country: { code: 'E92000001', name: 'England' },
-        localAuthority: { code: '352', name: 'Manchester' },
-        localAuthorityDistrict: { code: 'E08000003', name: 'Manchester' },
-        region: { code: 'E12000002', name: 'North West' },
-      },
+      locationId: 'manchester-id',
       measures: {
         'authorised-absence-rate': '3',
         'overall-absence-rate': '4.7',
@@ -402,12 +395,7 @@ export const testMapTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'localAuthorityDistrict',
-      location: {
-        country: { code: 'E92000001', name: 'England' },
-        localAuthority: { code: '373', name: 'Sheffield' },
-        localAuthorityDistrict: { code: 'E08000019', name: 'Sheffield' },
-        region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-      },
+      locationId: 'sheffield-id',
       measures: {
         'authorised-absence-rate': '4',
         'overall-absence-rate': '5.1',
@@ -426,7 +414,7 @@ export const testMapTableDataRegion = produce(testMapTableData, draft => {
           {
             type: 'Feature',
             properties: {
-              code: 'region-1-value',
+              code: 'region-1-code',
               lat: 53.8227005,
               long: -1.50735998,
               name: 'Region 1',
@@ -437,15 +425,16 @@ export const testMapTableDataRegion = produce(testMapTableData, draft => {
             },
           },
         ],
+        id: 'region-1-id',
         label: 'Region 1',
-        value: 'region-1-value',
+        value: 'region-1-code',
       },
       {
         geoJson: [
           {
             type: 'Feature',
             properties: {
-              code: 'region-2-value',
+              code: 'region-2-code',
               lat: 53.4701004,
               long: -2.23358989,
               name: 'Region 2',
@@ -456,15 +445,16 @@ export const testMapTableDataRegion = produce(testMapTableData, draft => {
             },
           },
         ],
+        id: 'region-2-id',
         label: 'Region 2',
-        value: 'region-2-value',
+        value: 'region-2-code',
       },
       {
         geoJson: [
           {
             type: 'Feature',
             properties: {
-              code: 'region-3-value',
+              code: 'region-3-code',
               lat: 53.40359879,
               long: -1.54253995,
               name: 'Region 3',
@@ -475,8 +465,9 @@ export const testMapTableDataRegion = produce(testMapTableData, draft => {
             },
           },
         ],
+        id: 'region-3-id',
         label: 'Region 3',
-        value: 'region-3-value',
+        value: 'region-3-code',
       },
     ],
   };
@@ -484,10 +475,7 @@ export const testMapTableDataRegion = produce(testMapTableData, draft => {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'region',
-      location: {
-        country: { code: 'E92000001', name: 'England' },
-        region: { code: 'region-1-value', name: 'Region 1' },
-      },
+      locationId: 'region-1-id',
       measures: {
         'authorised-absence-rate': '3.5',
         'overall-absence-rate': '4.8',
@@ -498,10 +486,7 @@ export const testMapTableDataRegion = produce(testMapTableData, draft => {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'region',
-      location: {
-        country: { code: 'E92000001', name: 'England' },
-        region: { code: 'region-2-value', name: 'Region 2' },
-      },
+      locationId: 'region-2-id',
       measures: {
         'authorised-absence-rate': '3',
         'overall-absence-rate': '4.7',
@@ -512,10 +497,7 @@ export const testMapTableDataRegion = produce(testMapTableData, draft => {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'region',
-      location: {
-        country: { code: 'E92000001', name: 'England' },
-        region: { code: 'region-3-value', name: 'Region 3' },
-      },
+      locationId: 'region-3-id',
       measures: {
         'authorised-absence-rate': '4',
         'overall-absence-rate': '5.1',
@@ -534,10 +516,10 @@ export const testMapTableDataMixed = produce(testMapTableData, draft => {
           {
             type: 'Feature',
             properties: {
-              code: 'la-1-value',
+              code: 'la-1-code',
               lat: 53.8227005,
               long: -1.50735998,
-              name: 'Region 1',
+              name: 'LA 1',
             },
             geometry: {
               type: 'Polygon',
@@ -545,8 +527,9 @@ export const testMapTableDataMixed = produce(testMapTableData, draft => {
             },
           },
         ],
+        id: 'la-1-id',
         label: 'LA 1',
-        value: 'la-1-value',
+        value: 'la-1-code',
       },
     ],
     country: [
@@ -555,7 +538,7 @@ export const testMapTableDataMixed = produce(testMapTableData, draft => {
           {
             type: 'Feature',
             properties: {
-              code: 'country-1-value',
+              code: 'country-1-code',
               lat: 53.4701004,
               long: -2.23358989,
               name: 'Country 1',
@@ -566,8 +549,9 @@ export const testMapTableDataMixed = produce(testMapTableData, draft => {
             },
           },
         ],
-        label: 'Region 2',
-        value: 'region-2-value',
+        id: 'country-1-id',
+        label: 'Country 1',
+        value: 'country-1-code',
       },
     ],
     region: [
@@ -576,7 +560,7 @@ export const testMapTableDataMixed = produce(testMapTableData, draft => {
           {
             type: 'Feature',
             properties: {
-              code: 'region-3-value',
+              code: 'region-3-code',
               lat: 53.40359879,
               long: -1.54253995,
               name: 'Region 3',
@@ -587,8 +571,9 @@ export const testMapTableDataMixed = produce(testMapTableData, draft => {
             },
           },
         ],
+        id: 'region-3-id',
         label: 'Region 3',
-        value: 'region-3-value',
+        value: 'region-3-code',
       },
     ],
   };
@@ -596,11 +581,7 @@ export const testMapTableDataMixed = produce(testMapTableData, draft => {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'localAuthority',
-      location: {
-        country: { code: 'country-1-value', name: 'Country' },
-        region: { code: 'region-1-value', name: 'Region 1' },
-        localAuthority: { code: 'la-1-value', name: 'LA 1' },
-      },
+      locationId: 'la-1-id',
       measures: {
         'authorised-absence-rate': '3.5',
         'overall-absence-rate': '4.8',
@@ -611,9 +592,7 @@ export const testMapTableDataMixed = produce(testMapTableData, draft => {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'country',
-      location: {
-        country: { code: 'country-1-value', name: 'Country' },
-      },
+      locationId: 'country-1-id',
       measures: {
         'authorised-absence-rate': '3',
         'overall-absence-rate': '4.7',
@@ -624,10 +603,7 @@ export const testMapTableDataMixed = produce(testMapTableData, draft => {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'region',
-      location: {
-        country: { code: 'country-1-value', name: 'Country' },
-        region: { code: 'region-3-value', name: 'Region 3' },
-      },
+      locationId: 'region-3-id',
       measures: {
         'authorised-absence-rate': '4',
         'overall-absence-rate': '5.1',
@@ -678,63 +654,63 @@ export const testsMixedLocationsFullTableMeta: FullTableMeta = {
   ],
   locations: [
     new LocationFilter({
-      value: 'england-code',
+      value: 'england-id',
       label: 'England',
       group: 'England',
       level: 'country',
       geoJson: [testGeoJsonFeature],
     }),
     new LocationFilter({
-      value: 'darlington-code',
+      value: 'darlington-id',
       label: 'Darlington',
       level: 'localAuthority',
       group: 'North East',
       geoJson: [testGeoJsonFeature],
     }),
     new LocationFilter({
-      value: 'newcastle-code',
+      value: 'newcastle-id',
       label: 'Newcastle upon Tyne',
       group: 'North East',
       level: 'localAuthority',
       geoJson: [testGeoJsonFeature],
     }),
     new LocationFilter({
-      value: 'rotherham-code',
+      value: 'rotherham-id',
       label: 'Rotherham',
       group: 'Yorkshire and the Humber',
       level: 'localAuthority',
       geoJson: [testGeoJsonFeature],
     }),
     new LocationFilter({
-      value: 'sheffield-code',
+      value: 'sheffield-id',
       label: 'Sheffield',
       group: 'Yorkshire and the Humber',
       level: 'localAuthority',
       geoJson: [testGeoJsonFeature],
     }),
     new LocationFilter({
-      value: 'north-east-code',
+      value: 'north-east-id',
       label: 'North East',
       group: 'North East',
       level: 'region',
       geoJson: [testGeoJsonFeature],
     }),
     new LocationFilter({
-      value: 'north-west-code',
+      value: 'north-west-id',
       label: 'North West',
       group: 'North West',
       level: 'region',
       geoJson: [testGeoJsonFeature],
     }),
     new LocationFilter({
-      value: 'sheffield-lad-code',
+      value: 'sheffield-lad-id',
       label: 'Sheffield LAD',
       group: 'Yorkshire and the Humber',
       level: 'localAuthorityDistrict',
       geoJson: [testGeoJsonFeature],
     }),
     new LocationFilter({
-      value: 'rotherham-lad-code',
+      value: 'rotherham-lad-id',
       label: 'Rotherham LAD',
       group: 'Yorkshire and the Humber',
       level: 'localAuthorityDistrict',
@@ -755,9 +731,7 @@ export const testsMixedLocationsTableData: TableDataResult[] = [
   {
     filters: ['characteristic-total'],
     geographicLevel: 'country',
-    location: {
-      country: { code: 'england-code', name: 'England' },
-    },
+    locationId: 'england-id',
     measures: {
       'authorised-absence-rate': '3.5',
     },
@@ -766,10 +740,7 @@ export const testsMixedLocationsTableData: TableDataResult[] = [
   {
     filters: ['characteristic-total'],
     geographicLevel: 'region',
-    location: {
-      country: { code: 'england-code', name: 'England' },
-      region: { code: 'north-east-code', name: 'North East' },
-    },
+    locationId: 'north-east-id',
     measures: {
       'authorised-absence-rate': '3',
     },
@@ -778,10 +749,7 @@ export const testsMixedLocationsTableData: TableDataResult[] = [
   {
     filters: ['characteristic-total'],
     geographicLevel: 'region',
-    location: {
-      country: { code: 'england-code', name: 'England' },
-      region: { code: 'north-west-code', name: 'North West' },
-    },
+    locationId: 'north-west-id',
     measures: {
       'authorised-absence-rate': '4',
     },
@@ -790,14 +758,7 @@ export const testsMixedLocationsTableData: TableDataResult[] = [
   {
     filters: ['characteristic-total'],
     geographicLevel: 'localAuthority',
-    location: {
-      country: { code: 'england-code', name: 'England' },
-      region: {
-        code: 'yorkshire-humber-code',
-        name: 'Yorkshire and the Humber',
-      },
-      localAuthority: { code: 'rotherham-code', name: 'Rotherham' },
-    },
+    locationId: 'rotherham-id',
     measures: {
       'authorised-absence-rate': '4',
     },
@@ -806,14 +767,7 @@ export const testsMixedLocationsTableData: TableDataResult[] = [
   {
     filters: ['characteristic-total'],
     geographicLevel: 'localAuthority',
-    location: {
-      country: { code: 'england-code', name: 'England' },
-      region: {
-        code: 'yorkshire-humber-code',
-        name: 'Yorkshire and the Humber',
-      },
-      localAuthority: { code: 'sheffield-code', name: 'Sheffield' },
-    },
+    locationId: 'sheffield-id',
     measures: {
       'authorised-absence-rate': '4',
     },
@@ -822,11 +776,7 @@ export const testsMixedLocationsTableData: TableDataResult[] = [
   {
     filters: ['characteristic-total'],
     geographicLevel: 'localAuthority',
-    location: {
-      country: { code: 'england-code', name: 'England' },
-      region: { code: 'north-east-code', name: 'North East' },
-      localAuthority: { code: 'newcastle-code', name: 'Newcastle upon Tyne' },
-    },
+    locationId: 'newcastle-id',
     measures: {
       'authorised-absence-rate': '4',
     },
@@ -835,11 +785,7 @@ export const testsMixedLocationsTableData: TableDataResult[] = [
   {
     filters: ['characteristic-total'],
     geographicLevel: 'localAuthority',
-    location: {
-      country: { code: 'england-code', name: 'England' },
-      region: { code: 'north-east-code', name: 'North East' },
-      localAuthority: { code: 'darlington-code', name: 'Darlington' },
-    },
+    locationId: 'darlington-id',
     measures: {
       'authorised-absence-rate': '4',
     },
@@ -851,17 +797,7 @@ export const testsMixedLocationsTableDataWithLADs: TableDataResult[] = [
   {
     filters: ['characteristic-total'],
     geographicLevel: 'localAuthorityDistrict',
-    location: {
-      country: { code: 'england-code', name: 'England' },
-      region: {
-        code: 'yorkshire-humber-code',
-        name: 'Yorkshire and the Humber',
-      },
-      localAuthorityDistrict: {
-        code: 'sheffield-lad-code',
-        name: 'Sheffield LAD',
-      },
-    },
+    locationId: 'sheffield-lad-id',
     measures: {
       'authorised-absence-rate': '4',
     },
@@ -870,17 +806,7 @@ export const testsMixedLocationsTableDataWithLADs: TableDataResult[] = [
   {
     filters: ['characteristic-total'],
     geographicLevel: 'localAuthorityDistrict',
-    location: {
-      country: { code: 'england-code', name: 'England' },
-      region: {
-        code: 'yorkshire-humber-code',
-        name: 'Yorkshire and the Humber',
-      },
-      localAuthorityDistrict: {
-        code: 'rotherham-lad-code',
-        name: 'Rotherham LAD',
-      },
-    },
+    locationId: 'rotherham-lad-id',
     measures: {
       'authorised-absence-rate': '4',
     },

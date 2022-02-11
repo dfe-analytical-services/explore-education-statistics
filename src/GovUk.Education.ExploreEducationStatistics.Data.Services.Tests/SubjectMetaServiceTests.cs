@@ -229,8 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         new List<string>
                         {
                             "Country",
-                            "Region",
-                            "LocalAuthority"
+                            "Region"
                         }
                     }
                 }
@@ -399,8 +398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         new List<string>
                         {
                             "Country",
-                            "Region",
-                            "LocalAuthority"
+                            "Region"
                         }
                     }
                 }
@@ -741,8 +739,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             GeographicLevel.LocalAuthority,
                             new List<string>
                             {
-                                "Region",
-                                "LocalAuthority"
+                                "Region"
                             }
                         }
                     }
@@ -804,7 +801,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Single(locationViewModels);
                 Assert.True(locationViewModels.ContainsKey("localAuthority"));
 
-                // Expect a hierarchy of Region-LA within the Local Authority level
+                // Expect a hierarchy of Region within the Local Authority level
                 var localAuthorities = locationViewModels["localAuthority"];
                 var laOption1 = Assert.Single(localAuthorities.Options);
                 Assert.NotNull(laOption1);
@@ -897,8 +894,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         GeographicLevel.LocalAuthority,
                         new List<string>
                         {
-                            "Region",
-                            "LocalAuthority"
+                            "Region"
                         }
                     }
                 }
@@ -1015,14 +1011,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Id = Guid.NewGuid()
             };
 
+            var location1 = new Location
+            {
+                Id = Guid.NewGuid(),
+                LocalAuthority = _blackpool
+            };
+
+            var location2 = new Location
+            {
+                Id = Guid.NewGuid(),
+                LocalAuthority = _derby
+            };
+
+            var location3 = new Location
+            {
+                Id = Guid.NewGuid(),
+                Country = _england
+            };
+
+            var location4 = new Location
+            {
+                Id = Guid.NewGuid(),
+                LocalAuthority = _nottingham
+            };
+
+            var location5 = new Location
+            {
+                Id = Guid.NewGuid(),
+                LocalAuthority = _sunderland
+            };
+
             var query = new ObservationQueryContext
             {
                 SubjectId = subject.Id,
-                Locations = new LocationQuery
-                {
-                    Country = ListOf(_england.Code)!,
-                    LocalAuthority = ListOf(_blackpool.Code, _derby.Code)!
-                }
+                LocationIds = ListOf(location1.Id, location2.Id, location3.Id)
             };
 
             var observations = ListOf(
@@ -1030,28 +1052,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        LocalAuthority = _blackpool
-                    }
+                    Location = location1
                 },
                 new Observation
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        LocalAuthority = _derby
-                    }
+                    Location = location2
                 },
                 new Observation
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        Country = _england
-                    }
+                    Location = location3
                 });
 
             var observationsWithDifferentLocations = ListOf(
@@ -1059,19 +1072,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        LocalAuthority = _nottingham
-                    }
+                    Location = location4
                 },
                 new Observation
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        LocalAuthority = _sunderland
-                    }
+                    Location = location5
                 });
 
             var observationsFromAnotherSubject = ListOf(
@@ -1079,19 +1086,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        LocalAuthority = _derby
-                    }
+                    Location = location2
                 },
                 new Observation
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        Country = _england
-                    }
+                    Location = location3
                 });
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -1159,10 +1160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var query = new ObservationQueryContext
             {
                 SubjectId = subject.Id,
-                Locations = new LocationQuery
-                {
-                    Country = ListOf(_england.Code)!
-                },
+                LocationIds = ListOf(Guid.NewGuid()),
                 TimePeriod = new TimePeriodQuery
                 {
                     StartYear = 2012,
@@ -1362,7 +1360,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var query = new ObservationQueryContext
             {
                 SubjectId = subject.Id,
-                Locations = null,
+                LocationIds = new List<Guid>(),
                 TimePeriod = null
             };
 

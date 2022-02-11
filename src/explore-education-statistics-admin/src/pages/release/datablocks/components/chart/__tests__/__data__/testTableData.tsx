@@ -64,8 +64,8 @@ export const testTableData: TableDataResponse = {
     ],
     locations: {
       localAuthority: [
-        { label: 'Barnet', value: 'barnet' },
-        { label: 'Barnsley', value: 'barnsley' },
+        { id: 'barnet', label: 'Barnet', value: 'barnet' },
+        { id: 'barnsley', label: 'Barnsley', value: 'barnsley' },
       ],
     },
     boundaryLevels: [],
@@ -81,9 +81,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnet', name: 'Barnet' },
-      },
+      locationId: 'barnet',
       measures: {
         'authorised-absence-sessions': '2613',
         'overall-absence-sessions': '3134',
@@ -93,9 +91,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-black-total', 'state-funded-primary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnet', name: 'Barnet' },
-      },
+      locationId: 'barnet',
       measures: {
         'authorised-absence-sessions': '30364',
         'overall-absence-sessions': '40327',
@@ -105,9 +101,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnsley', name: 'Barnsley' },
-      },
+      locationId: 'barnsley',
       measures: {
         'authorised-absence-sessions': 'x',
         'overall-absence-sessions': 'x',
@@ -117,9 +111,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnsley', name: 'Barnsley' },
-      },
+      locationId: 'barnsley',
       measures: {
         'authorised-absence-sessions': '479',
         'overall-absence-sessions': '843',
@@ -129,9 +121,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnet', name: 'Barnet' },
-      },
+      locationId: 'barnet',
       measures: {
         'authorised-absence-sessions': '1939',
         'overall-absence-sessions': '2269',
@@ -141,9 +131,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnet', name: 'Barnet' },
-      },
+      locationId: 'barnet',
       measures: {
         'authorised-absence-sessions': '26594',
         'overall-absence-sessions': '37084',
@@ -153,9 +141,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnsley', name: 'Barnsley' },
-      },
+      locationId: 'barnsley',
       measures: {
         'authorised-absence-sessions': '19',
         'overall-absence-sessions': '35',
@@ -165,9 +151,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-black-total', 'state-funded-primary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnsley', name: 'Barnsley' },
-      },
+      locationId: 'barnsley',
       measures: {
         'authorised-absence-sessions': '939',
         'overall-absence-sessions': '1268',
@@ -177,9 +161,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnet', name: 'Barnet' },
-      },
+      locationId: 'barnet',
       measures: {
         'authorised-absence-sessions': '27833',
         'overall-absence-sessions': '38130',
@@ -189,9 +171,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnsley', name: 'Barnsley' },
-      },
+      locationId: 'barnsley',
       measures: {
         'authorised-absence-sessions': '39',
         'overall-absence-sessions': '83',
@@ -201,9 +181,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-black-total', 'state-funded-primary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnet', name: 'Barnet' },
-      },
+      locationId: 'barnet',
       measures: {
         'authorised-absence-sessions': '31322',
         'overall-absence-sessions': '41228',
@@ -213,9 +191,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnet', name: 'Barnet' },
-      },
+      locationId: 'barnet',
       measures: {
         'authorised-absence-sessions': '2652',
         'overall-absence-sessions': '3093',
@@ -225,9 +201,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnet', name: 'Barnet' },
-      },
+      locationId: 'barnet',
       measures: {
         'authorised-absence-sessions': '1856',
         'overall-absence-sessions': '2125',
@@ -237,9 +211,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnsley', name: 'Barnsley' },
-      },
+      locationId: 'barnsley',
       measures: {
         'authorised-absence-sessions': '745',
         'overall-absence-sessions': '1105',
@@ -249,9 +221,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-black-total', 'state-funded-primary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnsley', name: 'Barnsley' },
-      },
+      locationId: 'barnsley',
       measures: {
         'authorised-absence-sessions': '825',
         'overall-absence-sessions': '1003',
@@ -261,9 +231,7 @@ export const testTableData: TableDataResponse = {
     {
       filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
       geographicLevel: 'localAuthority',
-      location: {
-        localAuthority: { code: 'barnsley', name: 'Barnsley' },
-      },
+      locationId: 'barnsley',
       measures: {
         'authorised-absence-sessions': '4',
         'overall-absence-sessions': '4',

@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Id = Guid.NewGuid()
         };
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_DataBlockNotFound()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             result.AssertNotFound();
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_SubjectNotFound()
         {
             var dataBlock = new DataBlock
@@ -107,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_DataBlockHasNoLocations()
         {
             var dataBlock = new DataBlock
@@ -162,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_HappyPath()
         {
             // Some filter and indicator id's that we expect to remain consistent
@@ -509,7 +509,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_QueryHasDuplicateLocationCodes()
         {
             // Test scenario where data block contains duplicate codes
@@ -574,7 +574,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_QueryHasDuplicateLocationCodesTransformedToMultipleIds()
         {
             // Test that where multiple locations exist for the Subject with duplicate codes that
@@ -695,7 +695,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_QueryHasCodeNotInSubjectLocations_FailsToMigrate()
         {
             var location1 = new Location
@@ -757,7 +757,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_TableHeadersAreTransformedToMultipleHeaders()
         {
             // Test that table header configuration containing School or Provider locations are transformed into
@@ -928,7 +928,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_TableHeaderHasCodeNotInSubjectLocations_FailsToMigrate()
         {
             var location1 = new Location
@@ -1002,7 +1002,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_TableHeaderHasDuplicateLocationsCodeNotInRowsOrRowGroups_FailsToMigrate()
         {
             // A check of Prod data reveals there's no locations in Column/ColumnGroup headers for Provider/School level data.
@@ -1100,7 +1100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_TableHeaderHasDuplicateLocationsCodeNotSchoolOrProvider_FailsToMigrate()
         {
             // Assert the migration fails if there's a duplicate location code in a table header that's not a School or Provider
@@ -1199,7 +1199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_ChartMajorAxisHasCodeNotInSubjectLocations_FailsToMigrate()
         {
             var location1 = new Location
@@ -1300,7 +1300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_ChartLegendHasCodeNotInSubjectLocations_FailsToMigrate()
         {
             var location1 = new Location
@@ -1401,7 +1401,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_ChartMajorAxisHasDuplicateLocationCode_FailsToMigrate()
         {
             // A check of Prod data reveals there's no charts for Provider/School level data.
@@ -1525,7 +1525,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
+        [Fact(Skip = "Skip until removed by EES-3212")]
         public async Task Migrate_ChartLegendHasDuplicateLocationCode_FailsToMigrate()
         {
             // A check of Prod data reveals there's no charts for Provider/School level data.

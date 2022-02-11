@@ -124,8 +124,8 @@ describe('PreReleaseTableToolPage', () => {
       ],
       locations: {
         localAuthority: [
-          { label: 'Barnet', value: 'barnet' },
-          { label: 'Barnsley', value: 'barnsley' },
+          { id: 'barnet', label: 'Barnet', value: 'barnet' },
+          { id: 'barnsley', label: 'Barnsley', value: 'barnsley' },
         ],
       },
       boundaryLevels: [],
@@ -138,9 +138,7 @@ describe('PreReleaseTableToolPage', () => {
       {
         filters: ['state-funded-primary'],
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: { code: 'barnet', name: 'Barnet' },
-        },
+        locationId: 'barnet',
         measures: {
           'authorised-absence-sessions': '2613',
         },
@@ -149,9 +147,7 @@ describe('PreReleaseTableToolPage', () => {
       {
         filters: ['state-funded-secondary'],
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: { code: 'barnsley', name: 'Barnsley' },
-        },
+        locationId: 'barnsley',
         measures: {
           'authorised-absence-sessions': 'x',
         },
@@ -160,9 +156,7 @@ describe('PreReleaseTableToolPage', () => {
       {
         filters: ['state-funded-secondary'],
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: { code: 'barnet', name: 'Barnet' },
-        },
+        locationId: 'barnet',
         measures: {
           'authorised-absence-sessions': '1939',
         },
@@ -171,9 +165,7 @@ describe('PreReleaseTableToolPage', () => {
       {
         filters: ['state-funded-primary'],
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: { code: 'barnsley', name: 'Barnsley' },
-        },
+        locationId: 'barnsley',
         measures: {
           'authorised-absence-sessions': '39',
         },
@@ -255,9 +247,7 @@ describe('PreReleaseTableToolPage', () => {
         endYear: 2014,
         endCode: 'AY',
       },
-      locations: {
-        localAuthority: ['barnet', 'barnsley'],
-      },
+      locationIds: ['barnet', 'barnsley'],
     },
   };
 

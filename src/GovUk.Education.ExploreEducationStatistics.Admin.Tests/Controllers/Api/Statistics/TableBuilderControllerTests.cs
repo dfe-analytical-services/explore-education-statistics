@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
@@ -44,15 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     {
                         Guid.NewGuid()
                     },
-                    LocationId = Guid.NewGuid(),
-                    Location = new LocationViewModel
-                    {
-                        Country = new CodeNameViewModel
-                        {
-                            Code = "code",
-                            Name = "name"
-                        }
-                    },
+                    LocationId = new Guid(),
                     Measures = new Dictionary<Guid, string>
                     {
                         { Guid.NewGuid(), "value" }

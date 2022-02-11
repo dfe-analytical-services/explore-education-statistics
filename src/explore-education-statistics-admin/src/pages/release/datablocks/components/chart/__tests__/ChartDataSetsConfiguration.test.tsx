@@ -22,8 +22,8 @@ describe('ChartDataSetsConfiguration', () => {
     boundaryLevels: [],
     locations: {
       localAuthority: [
-        { label: 'Barnet', value: 'barnet' },
-        { label: 'Barnsley', value: 'barnsley' },
+        { id: 'barnet', label: 'Barnet', value: 'barnet' },
+        { id: 'barnsley', label: 'Barnsley', value: 'barnsley' },
       ],
     },
     timePeriodRange: [

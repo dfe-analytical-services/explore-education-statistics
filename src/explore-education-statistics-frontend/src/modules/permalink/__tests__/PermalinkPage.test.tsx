@@ -18,21 +18,6 @@ describe('PermalinkPage', () => {
         rows: [{ type: 'Indicator', value: 'authorised-absence-sessions' }],
       },
     },
-    query: {
-      includeGeoJson: false,
-      subjectId: 'subject-1',
-      locations: {
-        localAuthority: ['barnet'],
-      },
-      timePeriod: {
-        startYear: 2020,
-        startCode: 'AY',
-        endYear: 2020,
-        endCode: 'AY',
-      },
-      filters: ['gender-female'],
-      indicators: ['authorised-absence-sessions'],
-    },
     fullTable: {
       subjectMeta: {
         publicationName: 'Test publication',
@@ -84,12 +69,7 @@ describe('PermalinkPage', () => {
           measures: {
             'authorised-absence-sessions': '123',
           },
-          location: {
-            localAuthority: {
-              name: 'Barnet',
-              code: 'barnet',
-            },
-          },
+          locationId: 'barnet',
           geographicLevel: 'localAuthority',
           filters: ['gender-female'],
         },

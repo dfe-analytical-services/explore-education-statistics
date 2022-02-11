@@ -97,12 +97,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_primary'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          location: {
-            country: {
-              code: 'england',
-              name: 'England',
-            },
-          },
+          locationId: 'england',
           measures: {
             authAbsRate: '111',
             authAbsSess: '222',
@@ -112,12 +107,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_secondary'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          location: {
-            country: {
-              code: 'england',
-              name: 'England',
-            },
-          },
+          locationId: 'england',
           measures: {
             authAbsRate: '333',
             authAbsSess: '444',
@@ -127,12 +117,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_primary'],
           timePeriod: '2015_AY',
           geographicLevel: 'localAuthority',
-          location: {
-            localAuthority: {
-              code: 'barnsley',
-              name: 'Barnsley',
-            },
-          },
+          locationId: 'barnsley',
           measures: {
             authAbsRate: '555',
             authAbsSess: '666',
@@ -142,12 +127,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_secondary'],
           timePeriod: '2015_AY',
           geographicLevel: 'localAuthority',
-          location: {
-            localAuthority: {
-              code: 'barnsley',
-              name: 'Barnsley',
-            },
-          },
+          locationId: 'barnsley',
           measures: {
             authAbsRate: '777',
             authAbsSess: '888',
@@ -207,12 +187,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_primary'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          location: {
-            country: {
-              code: 'england',
-              name: 'England',
-            },
-          },
+          locationId: 'england',
           measures: {
             authAbsRate: '111',
           },
@@ -221,12 +196,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_secondary'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          location: {
-            country: {
-              code: 'england',
-              name: 'England',
-            },
-          },
+          locationId: 'england',
           measures: {
             authAbsSess: '222',
           },
@@ -277,12 +247,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_primary'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          location: {
-            country: {
-              code: 'england',
-              name: 'England',
-            },
-          },
+          locationId: 'england',
           measures: {
             authAbsRate: '111',
             authAbsSess: '222',
@@ -323,12 +288,7 @@ describe('getCsvData', () => {
           filters: ['gender_female'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          location: {
-            country: {
-              code: 'england',
-              name: 'England',
-            },
-          },
+          locationId: 'england',
           measures: {
             authAbsSess: '111',
           },
@@ -355,12 +315,7 @@ describe('getCsvData', () => {
           filters: ['gender_female'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          location: {
-            country: {
-              code: 'england',
-              name: 'England',
-            },
-          },
+          locationId: 'england',
           measures: {
             authAbsRate: '12300000',
             authAbsSess: '44255667.2356',
@@ -388,12 +343,7 @@ describe('getCsvData', () => {
           filters: ['gender_female'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          location: {
-            country: {
-              code: 'england',
-              name: 'England',
-            },
-          },
+          locationId: 'england',
           measures: {
             authAbsRate: '13.4',
             authAbsSess: 'x',
