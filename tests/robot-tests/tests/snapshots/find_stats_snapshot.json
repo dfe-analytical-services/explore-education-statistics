@@ -3,59 +3,87 @@
     "theme_heading": "Children's social care",
     "topics": [
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Characteristics of children in need"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Characteristics of children in need"
+              }
+            ]
           }
         ],
         "topic_heading": "Children in need and child protection"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Children looked after in England including adoptions"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Children looked after in England including adoptions"
+              }
+            ]
           }
         ],
         "topic_heading": "Children looked after"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Children's social work workforce"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Children's social work workforce"
+              }
+            ]
           }
         ],
         "topic_heading": "Children's social work workforce"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Outcomes for children in need, including children looked after by local authorities in England"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Outcomes for children in need, including children looked after by local authorities in England"
+              }
+            ]
           },
           {
-            "on_ees": true,
-            "publication_heading": "Outcomes of children in need, including looked after children"
+            "publication_type_heading": "Ad hoc statistics",
+            "publications": [
+              {
+                "publication_heading": "Outcomes of children in need, including looked after children"
+              }
+            ]
           }
         ],
         "topic_heading": "Outcomes for children in social care"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Children accommodated in secure children's homes"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Children accommodated in secure children's homes"
+              }
+            ]
           }
         ],
         "topic_heading": "Secure children's homes"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Serious incident notifications"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Serious incident notifications"
+              }
+            ]
           }
         ],
         "topic_heading": "Serious incident notifications"
@@ -66,46 +94,66 @@
     "theme_heading": "COVID-19",
     "topics": [
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Attendance in education and early years settings during the coronavirus (COVID-19) pandemic"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Attendance in education and early years settings during the coronavirus (COVID-19) pandemic"
+              }
+            ]
           }
         ],
         "topic_heading": "Attendance"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "CO2 monitors: cumulative delivery statistics"
+            "publication_type_heading": "Management information",
+            "publications": [
+              {
+                "publication_heading": "CO2 monitors: cumulative delivery statistics"
+              }
+            ]
           }
         ],
         "topic_heading": "CO2 monitors"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Coronavirus (COVID-19) Reporting in Higher Education Providers"
+            "publication_type_heading": "Ad hoc statistics",
+            "publications": [
+              {
+                "publication_heading": "Coronavirus (COVID-19) Reporting in Higher Education Providers"
+              }
+            ]
           }
         ],
         "topic_heading": "Confirmed cases reported by Higher Education providers"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Laptops and tablets data"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Laptops and tablets data"
+              }
+            ]
           }
         ],
         "topic_heading": "Devices"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "COVID mass testing data in education"
+            "publication_type_heading": "Ad hoc statistics",
+            "publications": [
+              {
+                "publication_heading": "COVID mass testing data in education"
+              }
+            ]
           }
         ],
         "topic_heading": "Testing"
@@ -116,35 +164,39 @@
     "theme_heading": "Destination of pupils and students",
     "topics": [
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "16-18 destination measures"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Key stage 4 destination measures"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Longer term destinations"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Progression to higher education or training"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "16-18 destination measures"
+              },
+              {
+                "publication_heading": "Key stage 4 destination measures"
+              },
+              {
+                "publication_heading": "Longer term destinations"
+              },
+              {
+                "publication_heading": "Progression to higher education or training"
+              }
+            ]
           }
         ],
         "topic_heading": "Destinations of key stage 4 and 16-18 pupils"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "NEET age 16 to 24"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Participation in education and training and employment"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "NEET age 16 to 24"
+              },
+              {
+                "publication_heading": "Participation in education and training and employment"
+              }
+            ]
           }
         ],
         "topic_heading": "NEET and participation"
@@ -155,32 +207,43 @@
     "theme_heading": "Early years",
     "topics": [
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Education provision: children under 5 years of age"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Education provision: children under 5 years of age"
+              }
+            ]
           }
         ],
         "topic_heading": "Childcare and early years"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Early years foundation stage profile results"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Early years foundation stage profile results"
+              }
+            ]
           }
         ],
         "topic_heading": "Early years foundation stage profile"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": false,
-            "publication_heading": "Childcare and early years provider survey"
-          },
-          {
-            "on_ees": false,
-            "publication_heading": "Childcare and early years survey of parents"
+            "publication_type_heading": "Not yet on this service",
+            "publications": [
+              {
+                "publication_heading": "Childcare and early years provider survey"
+              },
+              {
+                "publication_heading": "Childcare and early years survey of parents"
+              }
+            ]
           }
         ],
         "topic_heading": "Early years surveys"
@@ -191,27 +254,33 @@
     "theme_heading": "Finance and funding",
     "topics": [
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "LA and school expenditure"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Planned LA and school expenditure"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "School funding statistics"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "LA and school expenditure"
+              },
+              {
+                "publication_heading": "Planned LA and school expenditure"
+              },
+              {
+                "publication_heading": "School funding statistics"
+              }
+            ]
           }
         ],
         "topic_heading": "Local authority and school finance"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Student loan forecasts for England"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Student loan forecasts for England"
+              }
+            ]
           }
         ],
         "topic_heading": "Student loan forecasts"
@@ -222,44 +291,62 @@
     "theme_heading": "Further education",
     "topics": [
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": false,
-            "publication_heading": "FE choices learner satisfaction survey"
+            "publication_type_heading": "Not yet on this service",
+            "publications": [
+              {
+                "publication_heading": "FE choices learner satisfaction survey"
+              }
+            ]
           }
         ],
         "topic_heading": "FE choices"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Apprenticeships and traineeships"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Apprenticeships and traineeships"
+              },
+              {
+                "publication_heading": "Apprenticeships in England by industry characteristics "
+              },
+              {
+                "publication_heading": "Further education and skills"
+              }
+            ]
           },
           {
-            "on_ees": true,
-            "publication_heading": "Apprenticeships in England by industry characteristics "
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Further education and skills"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Skills Bootcamps outcomes"
+            "publication_type_heading": "Ad hoc statistics",
+            "publications": [
+              {
+                "publication_heading": "Skills Bootcamps outcomes"
+              }
+            ]
           }
         ],
         "topic_heading": "Further education and skills"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "FE learners going into employment and learning destinations by local authority district"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Further education: outcome-based success measures"
+              }
+            ]
           },
           {
-            "on_ees": true,
-            "publication_heading": "Further education: outcome-based success measures"
+            "publication_type_heading": "Ad hoc statistics",
+            "publications": [
+              {
+                "publication_heading": "FE learners going into employment and learning destinations by local authority district"
+              }
+            ]
           }
         ],
         "topic_heading": "Further education outcomes"
@@ -270,58 +357,75 @@
     "theme_heading": "Higher education",
     "topics": [
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "UK revenue from education related exports and transnational education activity"
+            "publication_type_heading": "Experimental statistics",
+            "publications": [
+              {
+                "publication_heading": "UK revenue from education related exports and transnational education activity"
+              }
+            ]
           }
         ],
         "topic_heading": "Education exports"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Graduate labour market statistics"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Graduate outcomes (LEO)"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Graduate outcomes (LEO): postgraduate outcomes"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Graduate outcomes (LEO): Provider level data"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Graduate labour market statistics"
+              },
+              {
+                "publication_heading": "Graduate outcomes (LEO)"
+              },
+              {
+                "publication_heading": "Graduate outcomes (LEO): postgraduate outcomes"
+              },
+              {
+                "publication_heading": "Graduate outcomes (LEO): Provider level data"
+              }
+            ]
           }
         ],
         "topic_heading": "Higher education graduate employment and earnings"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Participation measures in higher education"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Participation measures in higher education"
+              }
+            ]
           }
         ],
         "topic_heading": "Participation measures in higher education"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Higher Level Learners in England"
+            "publication_type_heading": "Ad hoc statistics",
+            "publications": [
+              {
+                "publication_heading": "Higher Level Learners in England"
+              }
+            ]
           }
         ],
         "topic_heading": "Skills Bill: Higher level learners"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Widening participation in higher education"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Widening participation in higher education"
+              }
+            ]
           }
         ],
         "topic_heading": "Widening participation in higher education"
@@ -332,119 +436,167 @@
     "theme_heading": "Pupils and schools",
     "topics": [
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Academy transfers and funding"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Academy transfers and funding"
+              }
+            ]
           }
         ],
         "topic_heading": "Academy transfers"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Admission appeals in England"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Admission appeals in England"
+              }
+            ]
           }
         ],
         "topic_heading": "Admission appeals"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Permanent exclusions and suspensions in England"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Permanent exclusions and suspensions in England"
+              }
+            ]
           }
         ],
         "topic_heading": "Exclusions"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Parental responsibility measures"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Parental responsibility measures"
+              }
+            ]
           }
         ],
         "topic_heading": "Parental responsibility measures"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Pupil absence in schools in England"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Pupil absence in schools in England: autumn and spring terms"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Pupil absence in schools in England: autumn term"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Pupil absence in schools in England"
+              },
+              {
+                "publication_heading": "Pupil absence in schools in England: autumn and spring terms"
+              },
+              {
+                "publication_heading": "Pupil absence in schools in England: autumn term"
+              }
+            ]
           }
         ],
         "topic_heading": "Pupil absence"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "National pupil projections"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "National pupil projections"
+              }
+            ]
           }
         ],
         "topic_heading": "Pupil projections"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Free school meals: Autumn term"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Schools, pupils and their characteristics"
+              }
+            ]
           },
           {
-            "on_ees": true,
-            "publication_heading": "Schools, pupils and their characteristics"
+            "publication_type_heading": "Ad hoc statistics",
+            "publications": [
+              {
+                "publication_heading": "Free school meals: Autumn term"
+              }
+            ]
           }
         ],
         "topic_heading": "School and pupil numbers"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Secondary and primary school applications and offers"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Secondary and primary school applications and offers"
+              }
+            ]
           }
         ],
         "topic_heading": "School applications"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": " School places sufficiency survey"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Local authority school places scorecards"
+              },
+              {
+                "publication_heading": "School capacity"
+              }
+            ]
           },
           {
-            "on_ees": true,
-            "publication_heading": "Local authority school places scorecards"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "School capacity"
+            "publication_type_heading": "Ad hoc statistics",
+            "publications": [
+              {
+                "publication_heading": " School places sufficiency survey"
+              }
+            ]
           }
         ],
         "topic_heading": "School capacity"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Education, health and care plans"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Education, health and care plans"
+              },
+              {
+                "publication_heading": "Special educational needs in England"
+              }
+            ]
           },
           {
-            "on_ees": true,
-            "publication_heading": "Special educational needs in England"
-          },
-          {
-            "on_ees": false,
-            "publication_heading": "Special educational needs: analysis and summary of data sources"
+            "publication_type_heading": "Not yet on this service",
+            "publications": [
+              {
+                "publication_heading": "Special educational needs: analysis and summary of data sources"
+              }
+            ]
           }
         ],
         "topic_heading": "Special educational needs (SEN)"
@@ -455,49 +607,72 @@
     "theme_heading": "School and college outcomes and performance",
     "topics": [
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "A level and other 16 to 18 results"
-          },
-          {
-            "on_ees": true,
-            "publication_heading": "Level 2 and 3 attainment by young people aged 19"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "A level and other 16 to 18 results"
+              },
+              {
+                "publication_heading": "Level 2 and 3 attainment by young people aged 19"
+              }
+            ]
           }
         ],
         "topic_heading": "16 to 19 attainment"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Key stage 4 performance"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Key stage 4 performance"
+              }
+            ]
           },
           {
-            "on_ees": false,
-            "publication_heading": "Multi-academy trust performance measures at key stage 4"
+            "publication_type_heading": "Not yet on this service",
+            "publications": [
+              {
+                "publication_heading": "Multi-academy trust performance measures at key stage 4"
+              }
+            ]
           }
         ],
         "topic_heading": "GCSEs (key stage 4)"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": false,
-            "publication_heading": "Phonics screening check and key stage 1 assessments"
+            "publication_type_heading": "Not yet on this service",
+            "publications": [
+              {
+                "publication_heading": "Phonics screening check and key stage 1 assessments"
+              }
+            ]
           }
         ],
         "topic_heading": "Key stage 1"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Multi-academy trust performance measures at key stage 2"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Multi-academy trust performance measures at key stage 2"
+              }
+            ]
           },
           {
-            "on_ees": false,
-            "publication_heading": "National curriculum assessments at key stage 2"
+            "publication_type_heading": "Not yet on this service",
+            "publications": [
+              {
+                "publication_heading": "National curriculum assessments at key stage 2"
+              }
+            ]
           }
         ],
         "topic_heading": "Key stage 2"
@@ -508,27 +683,38 @@
     "theme_heading": "Teachers and school workforce",
     "topics": [
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Initial Teacher Training Census"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Initial Teacher Training Census"
+              },
+              {
+                "publication_heading": "Initial teacher training performance profiles"
+              }
+            ]
           },
           {
-            "on_ees": true,
-            "publication_heading": "Initial teacher training performance profiles"
-          },
-          {
-            "on_ees": false,
-            "publication_heading": "TSM and initial teacher training allocations"
+            "publication_type_heading": "Not yet on this service",
+            "publications": [
+              {
+                "publication_heading": "TSM and initial teacher training allocations"
+              }
+            ]
           }
         ],
         "topic_heading": "Initial teacher training (ITT)"
       },
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "School workforce in England"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "School workforce in England"
+              }
+            ]
           }
         ],
         "topic_heading": "School workforce"
@@ -539,10 +725,14 @@
     "theme_heading": "UK education and training statistics",
     "topics": [
       {
-        "publications": [
+        "publication_types": [
           {
-            "on_ees": true,
-            "publication_heading": "Education and training statistics for the UK"
+            "publication_type_heading": "National and official statistics",
+            "publications": [
+              {
+                "publication_heading": "Education and training statistics for the UK"
+              }
+            ]
           }
         ],
         "topic_heading": "UK education and training statistics"
