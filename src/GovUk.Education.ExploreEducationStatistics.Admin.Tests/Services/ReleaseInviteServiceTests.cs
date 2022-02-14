@@ -1,7 +1,6 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -20,6 +19,7 @@ using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
@@ -318,11 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     publicationId: publication.Id,
                     releaseIds: ListOf(release1.Id, release2.Id));
 
-                var actionResult = result.AssertLeft();
-                Assert.IsType<BadRequestObjectResult>(actionResult);
-                var badRequestObjectResult = (BadRequestObjectResult)actionResult;
-                var validationProblemDetails = (ValidationProblemDetails)badRequestObjectResult.Value;
-                Assert.Equal("USER_ALREADY_HAS_RELEASE_ROLE_INVITES", validationProblemDetails.Errors[""].First());
+                result.AssertBadRequest(UserAlreadyHasReleaseRoleInvites);
             }
 
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -411,12 +407,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     email: "test@test.com",
                     publicationId: publication.Id,
                     releaseIds: ListOf(release1.Id, release2.Id));
-
-                var actionResult = result.AssertLeft();
-                Assert.IsType<BadRequestObjectResult>(actionResult);
-                var badRequestObjectResult = (BadRequestObjectResult)actionResult;
-                var validationProblemDetails = (ValidationProblemDetails)badRequestObjectResult.Value;
-                Assert.Equal("USER_ALREADY_HAS_RELEASE_ROLES", validationProblemDetails.Errors[""].First());
+                
+                result.AssertBadRequest(UserAlreadyHasReleaseRoles);
             }
 
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -657,12 +649,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     email: "test@test.com",
                     publicationId: publication1.Id,
                     releaseIds: ListOf(release1.Id, release2.Id));
-
-                var actionResult = result.AssertLeft();
-                Assert.IsType<BadRequestObjectResult>(actionResult);
-                var badRequestObjectResult = (BadRequestObjectResult)actionResult;
-                var validationProblemDetails = (ValidationProblemDetails)badRequestObjectResult.Value;
-                Assert.Equal("NOT_ALL_RELEASES_BELONG_TO_PUBLICATION", validationProblemDetails.Errors[""].First());
+                
+                result.AssertBadRequest(NotAllReleasesBelongToPublication);
             }
 
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -765,7 +753,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.RemoveByPublication(
                     email: "test@test.com",
                     publicationId: publication1.Id,
-                    releaseRole: ReleaseRole.Contributor);
+                    releaseRole: Contributor);
 
                 result.AssertRight();
             }
@@ -815,7 +803,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.RemoveByPublication(
                     email: "test@test.com",
                     publicationId: Guid.NewGuid(),
-                    releaseRole: ReleaseRole.Contributor);
+                    releaseRole: Contributor);
 
                 result.AssertNotFound();
             }
@@ -853,7 +841,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.RemoveByPublication(
                     email: "test@test.com",
                     publicationId: publication.Id,
-                    releaseRole: ReleaseRole.Contributor);
+                    releaseRole: Contributor);
 
                 result.AssertRight();
             }

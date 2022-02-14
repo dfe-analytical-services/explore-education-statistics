@@ -26,8 +26,8 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'emails',
     messages: {
-      INVALID_EMAIL_ADDRESS: 'Enter only @education.gov.uk email addresses',
-      NO_INVITABLE_EMAILS:
+      InvalidEmailAddress: 'Enter only @education.gov.uk email addresses',
+      NoInvitableEmails:
         'All of the email addresses have already been invited or accepted',
     },
   }),

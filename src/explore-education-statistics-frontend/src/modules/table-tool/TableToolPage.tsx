@@ -137,7 +137,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
           subjectName: string,
         ) => {
           switch (errorCode) {
-            case 'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE': {
+            case 'QueryExceedsMaxAllowableTableSize': {
               logEvent({
                 category: 'Table tool size error',
                 action: 'Table exceeded maximum size',
@@ -145,7 +145,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
               });
               break;
             }
-            case 'REQUEST_CANCELLED': {
+            case 'RequestCancelled': {
               logEvent({
                 category: 'Table tool query timeout error',
                 action: 'Table exceeded maximum timeout duration',

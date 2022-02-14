@@ -1,5 +1,8 @@
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
-import { Release } from '@admin/services/releaseService';
+import {
+  Release,
+  ReleaseChecklistErrorCode,
+} from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -20,13 +23,17 @@ import {
   parsePartialDateToLocalDate,
   PartialDate,
 } from '@common/utils/date/partialDate';
-import { mapFieldErrors } from '@common/validation/serverValidations';
+import {
+  mapFallbackFieldError,
+  mapFieldErrors,
+} from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import ModalConfirm from '@common/components/ModalConfirm';
 import { endOfDay, format, isValid, parseISO } from 'date-fns';
 import { Formik } from 'formik';
 import React, { useState } from 'react';
 import { StringSchema } from 'yup';
+import { keyBy, mapValues } from 'lodash';
 
 export interface ReleaseStatusFormValues {
   publishMethod?: 'Scheduled' | 'Immediate';
@@ -43,31 +50,29 @@ const errorMappings = [
   mapFieldErrors<ReleaseStatusFormValues>({
     target: 'approvalStatus',
     messages: {
-      APPROVED_RELEASE_MUST_HAVE_PUBLISH_SCHEDULED_DATE:
+      ApprovedReleaseMustHavePublishScheduledDate:
         'Enter a publish scheduled date before approving',
-      PUBLISHED_RELEASE_CANNOT_BE_UNAPPROVED:
+      PublishedReleaseCannotBeUnapproved:
         'Release has already been published and cannot be un-approved',
-      PUBLIC_META_GUIDANCE_REQUIRED:
-        'All public data guidance must be populated before the release can be approved',
-      PUBLIC_PRE_RELEASE_ACCESS_LIST_REQUIRED:
-        'Public pre-release access list is required before the release can be approved',
-      DATA_FILE_REPLACEMENTS_MUST_BE_COMPLETED:
-        'Pending data file replacements that are in progress must be completed or cancelled before the release can be approved',
-      DATA_FILE_IMPORTS_MUST_BE_COMPLETED:
-        'All data file imports must be completed before the release can be approved',
-      METHODOLOGY_MUST_BE_APPROVED:
-        "The publication's methodology must be approved before the release can be approved",
-      RELEASE_NOTE_REQUIRED:
-        'A public release note must be added for this amendment before it can be approved',
+      ...mapValues(
+        keyBy(ReleaseChecklistErrorCode, value => value),
+        _ => 'Resolve all errors in the publishing checklist',
+      ),
     },
   }),
   mapFieldErrors<ReleaseStatusFormValues>({
     target: 'nextReleaseDate',
     messages: {
-      PARTIAL_DATE_NOT_VALID: 'Enter a valid date',
+      PartialDateNotValid: 'Enter a valid date',
     },
   }),
 ];
+
+const fallbackErrorMapping = mapFallbackFieldError<ReleaseStatusFormValues>({
+  target: 'approvalStatus',
+  fallbackMessage:
+    'There was a problem changing the approval status of this release',
+});
 
 interface Props {
   release: Release;
@@ -101,6 +106,7 @@ const ReleaseStatusForm = ({
       });
     },
     errorMappings,
+    fallbackErrorMapping,
   );
 
   return (

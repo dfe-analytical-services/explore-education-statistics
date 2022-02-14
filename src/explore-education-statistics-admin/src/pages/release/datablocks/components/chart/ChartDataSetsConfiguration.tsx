@@ -46,7 +46,7 @@ const ChartDataSetsConfiguration = ({
   onChange,
 }: Props) => {
   const { forms, updateForm, submit } = useChartBuilderFormsContext();
-  const [isReordering, toggleIsReordering] = useToggle(false);
+  const [isReordering] = useToggle(false);
 
   const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
     meta.indicators,

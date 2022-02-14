@@ -24,7 +24,7 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'userEmail',
     messages: {
-      USER_ALREADY_EXISTS: 'User already exists',
+      UserAlreadyExists: 'User already exists',
     },
   }),
 ];

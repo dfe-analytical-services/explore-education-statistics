@@ -1,7 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -13,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         // TODO EES-919 - return ActionResults rather than ValidationResults
         public static ValidationResult ValidationResult(ValidationErrorMessages message)
         {
-            return new ValidationResult(message.ToString().ScreamingSnakeCase());
+            return new ValidationResult(message.ToString());
         }
 
         // TODO EES-919 - return ActionResults rather than ValidationResults - as this work is done,
@@ -29,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
 
             foreach (var message in messages)
             {
-                errors.AddModelError(string.Empty, message.ToString().ScreamingSnakeCase());
+                errors.AddModelError(string.Empty, message.ToString());
             }
 
             return new BadRequestObjectResult(new ValidationProblemDetails(errors));
