@@ -614,7 +614,7 @@ describe('ReleaseStatusForm', () => {
           expect(screen.getByText('There is a problem')).toBeInTheDocument();
           const errorLink = screen.getByRole('link', {
             name:
-              'There was a problem changing the approval status of this release',
+              'There was a problem updating the approval status of this release',
           }) as HTMLAnchorElement;
           expect(errorLink).toBeInTheDocument();
           expect(errorLink).toHaveAttribute(

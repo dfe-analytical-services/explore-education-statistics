@@ -71,7 +71,7 @@ const errorMappings = [
 const fallbackErrorMapping = mapFallbackFieldError<ReleaseStatusFormValues>({
   target: 'approvalStatus',
   fallbackMessage:
-    'There was a problem changing the approval status of this release',
+    'There was a problem updating the approval status of this release',
 });
 
 interface Props {
