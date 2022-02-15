@@ -81,21 +81,28 @@ def print_to_console(text):
     print(text)
 
 
-def write_block_to_file(block_id, release_id, subject_id, request_dict, status_code, response_time, response_dict):
+def write_block_to_file(
+        block_guid,
+        release_guid,
+        subject_guid,
+        request_dict,
+        status_code,
+        response_time,
+        response_dict):
     try:
-        with open(f'{results_dir}/block_{block_id}', 'w') as block_file:
+        with open(f'{results_dir}/block_{block_guid}', 'w') as block_file:
             block_file.write(
-                f'block: {block_id}\n'
-                f'release: {release_id}\n'
-                f'subject: {subject_id}\n'
+                f'block: {block_guid}\n'
+                f'release: {release_guid}\n'
+                f'subject: {subject_guid}\n'
                 f'request:\n{json.dumps(request_dict, sort_keys=True, indent=2)}\n'
                 f'response status: {status_code}\n'
                 f'time for response: {response_time}\n'
                 f'response:\n{json.dumps(response_dict, sort_keys=True, indent=2)}'
             )
-        print_to_console(f'Successfully processed block {block_id} for subject {subject_id}!')
+        print_to_console(f'Successfully processed block {block_guid} for subject {subject_guid}!')
     except Exception as exception:
-        print_to_console(f'block_file.write failed with block {block_id} subject {subject_id}\n'
+        print_to_console(f'block_file.write failed with block {block_guid} subject {subject_guid}\n'
                          f'Response: {json.dumps(response_dict)}\n Exception: {exception}')
 
 
@@ -111,31 +118,31 @@ start_time = time.perf_counter()
 for datablock in datablocks:
     time.sleep(args.sleep_duration)
 
-    blockId = datablock[0]
-    releaseId = datablock[1]
-    subjectId = datablock[2]
-    queryDict = json.loads(datablock[3])
+    block_id = datablock[0]
+    release_id = datablock[1]
+    subject_id = datablock[2]
+    query_dict = json.loads(datablock[3])
 
     if args.stage == "table":
-        url = f'{data_api_url}/tablebuilder/release/{releaseId}'
+        url = f'{data_api_url}/tablebuilder/release/{release_id}'
 
     if args.stage == "filters":
         url = f'{data_api_url}/meta/subject'
-        queryDict.pop("Filters")
-        queryDict.pop("Indicators")
+        query_dict.pop("Filters")
+        query_dict.pop("Indicators")
 
     if args.stage == "time_periods":
         url = f'{data_api_url}/meta/subject'
-        queryDict.pop("Filters")
-        queryDict.pop("Indicators")
-        queryDict.pop("TimePeriod")
+        query_dict.pop("Filters")
+        query_dict.pop("Indicators")
+        query_dict.pop("TimePeriod")
 
     def write_this_block(status_code, response_time, response_dict):
         write_block_to_file(
-            block_id=blockId,
-            release_id=releaseId,
-            subject_id=subjectId,
-            request_dict=queryDict,
+            block_guid=block_id,
+            release_guid=release_id,
+            subject_guid=subject_id,
+            request_dict=query_dict,
             status_code=status_code,
             response_time=response_time,
             response_dict=response_dict,
@@ -145,17 +152,17 @@ for datablock in datablocks:
     try:
         resp = requests.post(url=url,
                              headers={'Content-Type': 'application/json'},
-                             data=json.dumps(queryDict),
+                             data=json.dumps(query_dict),
                              timeout=60)
     except requests.Timeout as e:
-        print_to_console(f'request timeout with block {blockId} subject {subjectId}, {e}')
+        print_to_console(f'request timeout with block {block_id} subject {subject_id}, {e}')
         write_this_block(
             status_code=-1,
             response_time=-1,
             response_dict={'error': f'request timeout, {e}'})
         continue
     except Exception as e:
-        print_to_console(f'request exception with block {blockId} subject {subjectId}, {e}')
+        print_to_console(f'request exception with block {block_id} subject {subject_id}, {e}')
         write_this_block(
             status_code=-1,
             response_time=-1,
@@ -164,9 +171,9 @@ for datablock in datablocks:
     block_time_end = time.perf_counter()
 
     try:
-        jsonResponse = json.loads(resp.text)
+        json_response = json.loads(resp.text)
     except Exception as e:
-        print_to_console(f'json.loads(resp.text) failed with block {blockId} subject {subjectId}, {e}')
+        print_to_console(f'Failed to convert response text to json with block {block_id} subject {subject_id}, {e}')
         write_this_block(
             status_code=resp.status_code,
             response_time=block_time_end - block_time_start,
@@ -176,7 +183,7 @@ for datablock in datablocks:
     write_this_block(
         status_code=resp.status_code,
         response_time=block_time_end - block_time_start,
-        response_dict=jsonResponse)
+        response_dict=json_response)
 
 end_time = time.perf_counter()
 print_to_console(f'Total time: {end_time - start_time}')
