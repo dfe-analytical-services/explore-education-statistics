@@ -42,7 +42,7 @@ const baseErrorMappings = (
           DataFileCannotBeEmpty: 'Choose a ZIP data file that is not empty',
           DataFilenameCannotContainSpacesOrSpecialCharacters:
             'ZIP data filename cannot contain spaces or special characters',
-          MatadataFileCannotBeEmpty:
+          MetadataFileCannotBeEmpty:
             'Choose a ZIP metadata file that is not empty',
           MetaFilenameCannotContainSpacesOrSpecialCharacters:
             'ZIP metadata filename cannot contain spaces or special characters',

@@ -579,15 +579,16 @@ describe('ReleaseStatusForm', () => {
 
         await waitFor(() => {
           expect(screen.getByText('There is a problem')).toBeInTheDocument();
-          const errorLink = screen.getByRole('link', {
-            name: 'Resolve all errors in the publishing checklist',
-          });
-          expect(errorLink).toBeInTheDocument();
-          expect(errorLink).toHaveAttribute(
-            'href',
-            '#releaseStatusForm-approvalStatus',
-          );
         });
+
+        const errorLink = screen.getByRole('link', {
+          name: 'Resolve all errors in the publishing checklist',
+        });
+
+        expect(errorLink).toHaveAttribute(
+          'href',
+          '#releaseStatusForm-approvalStatus',
+        );
       });
     });
 
@@ -612,16 +613,17 @@ describe('ReleaseStatusForm', () => {
 
         await waitFor(() => {
           expect(screen.getByText('There is a problem')).toBeInTheDocument();
-          const errorLink = screen.getByRole('link', {
-            name:
-              'There was a problem updating the approval status of this release',
-          }) as HTMLAnchorElement;
-          expect(errorLink).toBeInTheDocument();
-          expect(errorLink).toHaveAttribute(
-            'href',
-            '#releaseStatusForm-approvalStatus',
-          );
         });
+
+        const errorLink = screen.getByRole('link', {
+          name:
+            'There was a problem updating the approval status of this release',
+        });
+
+        expect(errorLink).toHaveAttribute(
+          'href',
+          '#releaseStatusForm-approvalStatus',
+        );
       },
     );
 
