@@ -3,6 +3,7 @@ import {
   convertServerFieldErrors,
   mapFieldErrors,
   FieldMessageMapper,
+  mapFallbackFieldError,
 } from '@common/validation/serverValidations';
 
 describe('serverValidations', () => {
@@ -11,13 +12,13 @@ describe('serverValidations', () => {
       const mapper = mapFieldErrors({
         target: 'test',
         messages: {
-          TEST_CODE: 'Test message',
+          TestCode: 'Test message',
         },
       });
 
       expect(
         mapper({
-          message: 'TEST_CODE',
+          message: 'TestCode',
         }),
       ).toEqual<ReturnType<FieldMessageMapper>>({
         targetField: 'test',
@@ -30,14 +31,14 @@ describe('serverValidations', () => {
         target: 'test',
         source: 'test2',
         messages: {
-          TEST_CODE: 'Test message',
+          TestCode: 'Test message',
         },
       });
 
       expect(
         mapper({
           sourceField: 'test2',
-          message: 'TEST_CODE',
+          message: 'TestCode',
         }),
       ).toEqual<ReturnType<FieldMessageMapper>>({
         targetField: 'test',
@@ -66,7 +67,7 @@ describe('serverValidations', () => {
       const mapper = mapFieldErrors({
         target: 'test',
         messages: {
-          TEST_CODE: 'Test message',
+          TestCode: 'Test message',
         },
       });
 
@@ -86,7 +87,7 @@ describe('serverValidations', () => {
         target: 'test',
         source: 'test2',
         messages: {
-          TEST_CODE: 'Test message',
+          TestCode: 'Test message',
         },
       });
 
@@ -99,14 +100,14 @@ describe('serverValidations', () => {
 
       expect(
         mapper({
-          message: 'TEST_CODE',
+          message: 'TestCode',
         }),
       ).toBeUndefined();
 
       expect(
         mapper({
           sourceField: 'test3',
-          message: 'TEST_CODE',
+          message: 'TestCode',
         }),
       ).toBeUndefined();
     });
@@ -179,7 +180,7 @@ describe('serverValidations', () => {
       const fieldErrors = convertServerFieldErrors(
         {
           errors: {
-            test: ['TEST_CODE'],
+            test: ['TestCode'],
           },
           status: 400,
           title: 'Something went wrong',
@@ -188,13 +189,13 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'test',
             messages: {
-              TEST_CODE: 'Test message',
+              TestCode: 'Test message',
             },
           }),
           mapFieldErrors({
             target: 'test',
             messages: {
-              TEST_CODE: 'Test message 2',
+              TestCode: 'Test message 2',
             },
           }),
         ],
@@ -209,8 +210,8 @@ describe('serverValidations', () => {
       const fieldErrors = convertServerFieldErrors<Dictionary<string>>(
         {
           errors: {
-            test1: ['TEST_CODE'],
-            test2: ['TEST_CODE'],
+            test1: ['TestCode'],
+            test2: ['TestCode'],
           },
           status: 400,
           title: 'Something went wrong',
@@ -219,13 +220,13 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'test1',
             messages: {
-              TEST_CODE: 'Test message',
+              TestCode: 'Test message',
             },
           }),
           mapFieldErrors({
             target: 'test2',
             messages: {
-              TEST_CODE: 'Test message 2',
+              TestCode: 'Test message 2',
             },
           }),
         ],
@@ -241,7 +242,7 @@ describe('serverValidations', () => {
       const fieldErrors = convertServerFieldErrors<Dictionary<string>>(
         {
           errors: {
-            '': ['TEST_CODE'],
+            '': ['TestCode'],
           },
           status: 400,
           title: 'Something went wrong',
@@ -250,13 +251,13 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'test1',
             messages: {
-              TEST_CODE: 'Test message',
+              TestCode: 'Test message',
             },
           }),
           mapFieldErrors({
             target: 'test2',
             messages: {
-              TEST_CODE: 'Test message 2',
+              TestCode: 'Test message 2',
             },
           }),
         ],
@@ -272,7 +273,7 @@ describe('serverValidations', () => {
       const fieldErrors = convertServerFieldErrors(
         {
           errors: {
-            'test.nestedField.here': ['TEST_CODE'],
+            'test.nestedField.here': ['TestCode'],
           },
           status: 400,
           title: 'Something went wrong',
@@ -281,7 +282,7 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'test.nestedField.here',
             messages: {
-              TEST_CODE: 'Test message',
+              TestCode: 'Test message',
             },
           }),
         ],
@@ -300,7 +301,7 @@ describe('serverValidations', () => {
       const fieldErrors = convertServerFieldErrors(
         {
           errors: {
-            '': ['TEST_CODE'],
+            '': ['TestCode'],
           },
           status: 400,
           title: 'Something went wrong',
@@ -309,7 +310,7 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'test.nestedField.here',
             messages: {
-              TEST_CODE: 'Test message',
+              TestCode: 'Test message',
             },
           }),
         ],
@@ -328,7 +329,7 @@ describe('serverValidations', () => {
       const fieldErrors = convertServerFieldErrors(
         {
           errors: {
-            'test[1]': ['TEST_CODE'],
+            'test[1]': ['TestCode'],
           },
           status: 400,
           title: 'Something went wrong',
@@ -337,7 +338,7 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'test[1]',
             messages: {
-              TEST_CODE: 'Test message',
+              TestCode: 'Test message',
             },
           }),
         ],
@@ -352,7 +353,7 @@ describe('serverValidations', () => {
       const fieldErrors = convertServerFieldErrors(
         {
           errors: {
-            '': ['TEST_CODE'],
+            '': ['TestCode'],
           },
           status: 400,
           title: 'Something went wrong',
@@ -361,7 +362,7 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'test[1]',
             messages: {
-              TEST_CODE: 'Test message',
+              TestCode: 'Test message',
             },
           }),
         ],
@@ -376,8 +377,8 @@ describe('serverValidations', () => {
       const fieldErrors = convertServerFieldErrors<Dictionary<string>>(
         {
           errors: {
-            TestField: ['TEST_CODE'],
-            test_field_2: ['TEST_CODE'],
+            TestField: ['TestCode'],
+            test_field_2: ['TestCode'],
           },
           status: 400,
           title: 'Something went wrong',
@@ -386,13 +387,13 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'testField',
             messages: {
-              TEST_CODE: 'Test message',
+              TestCode: 'Test message',
             },
           }),
           mapFieldErrors({
             target: 'testField2',
             messages: {
-              TEST_CODE: 'Test message 2',
+              TestCode: 'Test message 2',
             },
           }),
         ],
@@ -408,8 +409,8 @@ describe('serverValidations', () => {
       const fieldErrors = convertServerFieldErrors<Dictionary<string>>(
         {
           errors: {
-            'Test.Field.Here': ['TEST_CODE'],
-            'test.field_2.here': ['TEST_CODE'],
+            'Test.Field.Here': ['TestCode'],
+            'test.field_2.here': ['TestCode'],
           },
           status: 400,
           title: 'Something went wrong',
@@ -418,13 +419,13 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'test.field.here',
             messages: {
-              TEST_CODE: 'Test message',
+              TestCode: 'Test message',
             },
           }),
           mapFieldErrors({
             target: 'test.field2.here',
             messages: {
-              TEST_CODE: 'Test message 2',
+              TestCode: 'Test message 2',
             },
           }),
         ],
@@ -446,8 +447,8 @@ describe('serverValidations', () => {
       const fieldErrors = convertServerFieldErrors<Dictionary<string>>(
         {
           errors: {
-            'TestField[1]': ['TEST_CODE'],
-            'test.field_2[1]': ['TEST_CODE'],
+            'TestField[1]': ['TestCode'],
+            'test.field_2[1]': ['TestCode'],
           },
           status: 400,
           title: 'Something went wrong',
@@ -456,13 +457,13 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'testField[1]',
             messages: {
-              TEST_CODE: 'Test message',
+              TestCode: 'Test message',
             },
           }),
           mapFieldErrors({
             target: 'test.field2[1]',
             messages: {
-              TEST_CODE: 'Test message 2',
+              TestCode: 'Test message 2',
             },
           }),
         ],
@@ -480,7 +481,7 @@ describe('serverValidations', () => {
       const fieldErrors = convertServerFieldErrors<Dictionary<string>>(
         {
           errors: {
-            test1: ['TEST_CODE'],
+            test1: ['TestCode'],
             test2: ['Not a test code'],
           },
           status: 400,
@@ -490,13 +491,13 @@ describe('serverValidations', () => {
           mapFieldErrors({
             target: 'test1',
             messages: {
-              TEST_CODE: 'Test message',
+              TestCode: 'Test message',
             },
           }),
           mapFieldErrors({
             target: 'test2',
             messages: {
-              TEST_CODE: 'Test message 2',
+              TestCode: 'Test message 2',
             },
           }),
         ],
@@ -508,11 +509,45 @@ describe('serverValidations', () => {
       });
     });
 
+    test('returns fallback message mapped to field if no other mappings match', () => {
+      const fieldErrors = convertServerFieldErrors<Dictionary<string>>(
+        {
+          errors: {
+            '': ['UnmappedTestCode'],
+          },
+          status: 400,
+          title: 'Something went wrong',
+        },
+        [
+          mapFieldErrors({
+            target: 'test1',
+            messages: {
+              TestCode: 'Test message',
+            },
+          }),
+          mapFieldErrors({
+            target: 'test2',
+            messages: {
+              TestCode: 'Test message 2',
+            },
+          }),
+        ],
+        mapFallbackFieldError({
+          target: 'test1',
+          fallbackMessage: 'Fallback message',
+        }),
+      );
+
+      expect(fieldErrors).toEqual({
+        test1: 'Fallback message',
+      });
+    });
+
     test('returns unmapped field errors when no mappers match', () => {
       const fieldErrors = convertServerFieldErrors(
         {
           errors: {
-            test: ['TEST_CODE'],
+            test: ['TestCode'],
           },
           status: 400,
           title: 'Something went wrong',
@@ -528,14 +563,14 @@ describe('serverValidations', () => {
             target: 'test',
             source: 'wrongField',
             messages: {
-              TEST_CODE: 'Test message 2',
+              TestCode: 'Test message 2',
             },
           }),
         ],
       );
 
       expect(fieldErrors).toEqual({
-        test: 'TEST_CODE',
+        test: 'TestCode',
       });
     });
   });

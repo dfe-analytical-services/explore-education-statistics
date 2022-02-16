@@ -78,6 +78,25 @@ export function mapFieldErrors<FormValues>(options: {
   };
 }
 
+/**
+ * Add a generic fallback message that targets the
+ * `target` form field if no other error handlers
+ * have handled the error.
+ */
+export function mapFallbackFieldError<FormValues>(options: {
+  target: FieldName<FormValues>;
+  fallbackMessage: string;
+}): FieldMessageMapper<FormValues> {
+  const { target, fallbackMessage } = options;
+
+  return _ => {
+    return {
+      targetField: target,
+      message: fallbackMessage,
+    };
+  };
+}
+
 function normalizeField(fieldName: string): string {
   const path = toPath(fieldName);
 
@@ -99,6 +118,7 @@ function normalizeField(fieldName: string): string {
 export function convertServerFieldErrors<FormValues>(
   response: ServerValidationErrorResponse,
   messageMappers: FieldMessageMapper<FormValues>[] = [],
+  fallbackMapper?: FieldMessageMapper<FormValues>,
 ): FormikErrors<FormValues> {
   return Object.entries(response.errors).reduce<FormikErrors<FormValues>>(
     (acc, [source, messages]) => {
@@ -123,6 +143,12 @@ export function convertServerFieldErrors<FormValues>(
           });
         } else if (sourceField) {
           set(acc, sourceField, message);
+        } else if (fallbackMapper) {
+          const mappedFallback = fallbackMapper(error);
+          if (mappedFallback) {
+            const { targetField, message: mappedMessage } = mappedFallback;
+            set(acc, targetField, mappedMessage);
+          }
         }
       });
 

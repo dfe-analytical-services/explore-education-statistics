@@ -43,8 +43,8 @@ export type FilterFormSubmitHandler = (values: FormValues) => void;
 const formId = 'filtersForm';
 
 const TableQueryErrorCodes = [
-  'QUERY_EXCEEDS_MAX_ALLOWABLE_TABLE_SIZE',
-  'REQUEST_CANCELLED',
+  'QueryExceedsMaxAllowableTableSize',
+  'RequestCancelled',
 ] as const;
 
 export type TableQueryErrorCode = typeof TableQueryErrorCodes[number];

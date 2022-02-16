@@ -26,7 +26,7 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'timePeriodCoverageStartYear',
     messages: {
-      SLUG_NOT_UNIQUE:
+      SlugNotUnique:
         'Choose a unique combination of time period and start year',
     },
   }),

@@ -28,7 +28,7 @@ const updateRoleFormErrorMappings = [
   mapFieldErrors<UpdateRoleFormValues>({
     target: 'selectedRoleId',
     messages: {
-      ROLE_DOES_NOT_EXIST: 'Role does not exist',
+      RoleDoesNotExist: 'Role does not exist',
     },
   }),
 ];
@@ -37,7 +37,7 @@ const addReleaseFormErrorMappings = [
   mapFieldErrors<AddReleaseRoleFormValues>({
     target: 'selectedReleaseRole',
     messages: {
-      USER_ALREADY_HAS_RESOURCE_ROLE: 'The user already has this release role',
+      UserAlreadyHasResourceRole: 'The user already has this release role',
     },
   }),
 ];
@@ -46,8 +46,7 @@ const addPublicationFormErrorMappings = [
   mapFieldErrors<AddPublicationRoleFormValues>({
     target: 'selectedPublicationRole',
     messages: {
-      USER_ALREADY_HAS_RESOURCE_ROLE:
-        'The user already has this publication role',
+      UserAlreadyHasResourceRole: 'The user already has this publication role',
     },
   }),
 ];

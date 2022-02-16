@@ -364,51 +364,6 @@ Test
             }
         }
 
-        public class ScreamingSnakeCaseTests
-        {
-            [Fact]
-            public void NullStringsCanBeScreamingSnakeCased()
-            {
-                string? input = null;
-                Assert.Null(input!.ScreamingSnakeCase());
-            }
-
-            [Fact]
-            public void EmptyStringCanBeScreamingSnakeCased()
-            {
-                Assert.Equal(string.Empty, string.Empty.ScreamingSnakeCase());
-            }
-
-            [Fact]
-            public void AcronymsAreAlreadyScreamingSnakeCased()
-            {
-                Assert.Equal("ABC", "ABC".ScreamingSnakeCase());
-            }
-
-            [Fact]
-            public void CamelCasedStringsAreScreamingSnakeCased()
-            {
-                Assert.Equal("FOO", "foo".ScreamingSnakeCase());
-                Assert.Equal("CAMEL_CASE_STRING", "camelCaseString".ScreamingSnakeCase());
-            }
-
-            [Fact]
-            public void UnderscoreSeparatedStringsAreScreamingSnakeCased()
-            {
-                Assert.Equal("FOO_BAR", "foo_bar".ScreamingSnakeCase());
-                Assert.Equal("FOO_BAR", "foo_Bar".ScreamingSnakeCase());
-                Assert.Equal("FOO_BAR", "Foo_Bar".ScreamingSnakeCase());
-                Assert.Equal("FOO_BAR", "FOO_Bar".ScreamingSnakeCase());
-            }
-
-            [Fact]
-            public void PascalCasedStringsAreScreamingSnakeCased()
-            {
-                Assert.Equal("FOO_BAR", "FooBar".ScreamingSnakeCase());
-                Assert.Equal("FOO_BAR", "FooBAr".ScreamingSnakeCase());
-            }
-        }
-
         public class ToMd5HashTests
         {
             [Fact]

@@ -35,10 +35,10 @@ export const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'file',
     messages: {
-      FILE_TYPE_INVALID: 'The infographic must be an image',
-      CANNOT_OVERWRITE_FILE: 'The infographic does not have a unique filename',
-      FILE_CANNOT_BE_EMPTY: 'The infographic cannot be an empty file',
-      FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+      FileTypeInvalid: 'The infographic must be an image',
+      CannotOverwriteFile: 'The infographic does not have a unique filename',
+      FileCannotBeEmpty: 'The infographic cannot be an empty file',
+      FilenameCannotContainSpacesOrSpecialCharacters:
         'The infographic filename cannot contain spaces or special characters',
     },
   }),

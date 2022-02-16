@@ -4,7 +4,6 @@ import _metaService, {
 import { render, screen, waitFor, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
-import { IdTitlePair } from 'src/services/types/common';
 import { releaseTypes } from '@common/services/types/releaseType';
 import userEvent from '@testing-library/user-event';
 import ReleaseSummaryForm, {

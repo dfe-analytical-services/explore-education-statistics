@@ -122,28 +122,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return input;
         }
 
-        public static string SnakeCase(this string input)
-        {
-            if (input.IsNullOrEmpty())
-            {
-                return input;
-            }
-
-            input = Regex.Replace(input, "(([^_A-Z])([A-Z]))", "$2_$3");
-
-            return input.TrimStart('_').ToLower();
-        }
-
-        public static string ScreamingSnakeCase(this string input)
-        {
-            if (input.IsNullOrEmpty())
-            {
-                return input;
-            }
-
-            return SnakeCase(input).ToUpper();
-        }
-
         public static string ToMd5Hash(this string input, Encoding? encoding = null)
         {
             using var md5 = MD5.Create();
