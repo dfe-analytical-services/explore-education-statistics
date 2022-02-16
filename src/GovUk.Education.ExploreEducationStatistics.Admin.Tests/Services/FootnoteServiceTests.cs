@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -445,9 +446,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(newFootnote1.Id)
                     .Returns(newFootnote2.Id);
 
+                var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+                dataBlockService.Setup(mock => mock.InvalidateCachedDataBlocks(amendment.Id))
+                    .Returns(Task.CompletedTask);
+
                 var service = SetupFootnoteService(
                     statisticsDbContext,
                     contentDbContext,
+                    dataBlockService: dataBlockService.Object,
                     footnoteRepository: footnoteRepository.Object,
                     guidGenerator: guidGenerator.Object);
 
@@ -543,6 +550,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IUserService userService = null,
+            IDataBlockService dataBlockService = null,
             IFootnoteRepository footnoteRepository = null,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null,
             IGuidGenerator guidGenerator = null)
@@ -553,6 +561,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 statisticsDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
+                dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 footnoteRepository ?? new FootnoteRepository(statisticsDbContext),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 guidGenerator ?? new SequentialGuidGenerator()
