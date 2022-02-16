@@ -67,13 +67,11 @@ data_api_url = data_api_urls[args.env]
 date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 results_dir = f'results_{args.env}_{args.stage}_{date}'
 
-datablocks = []
-
 if not os.path.exists(results_dir):
     os.makedirs(results_dir)
 
-with open(f'{results_dir}/console_output', 'w') as file:
-    file.write('Console output: \n\n')
+with open(f'{results_dir}/console_output', 'w') as output_file:
+    output_file.write('Console output:\n\n')
 
 output_file = open(f'{results_dir}/console_output', 'a')
 
@@ -83,94 +81,109 @@ def print_to_console(text):
     print(text)
 
 
-with open(args.datablocks_csv, 'r') as input:
-    csv_reader = csv.reader(input, delimiter=',')
+def write_block_to_file(
+        block_guid,
+        release_guid,
+        subject_guid,
+        request_dict,
+        status_code,
+        response_time,
+        response_dict):
+    try:
+        with open(f'{results_dir}/block_{block_guid}', 'w') as block_file:
+            block_file.write(
+                f'block: {block_guid}\n'
+                f'release: {release_guid}\n'
+                f'subject: {subject_guid}\n'
+                f'request:\n{json.dumps(request_dict, sort_keys=True, indent=2)}\n'
+                f'response status: {status_code}\n'
+                f'time for response: {response_time}\n'
+                f'response:\n{json.dumps(response_dict, sort_keys=True, indent=2)}'
+            )
+        print_to_console(f'Successfully processed block {block_guid} for subject {subject_guid}!')
+    except Exception as exception:
+        print_to_console(f'block_file.write failed with block {block_guid} subject {subject_guid}\n'
+                         f'Response: {json.dumps(response_dict)}\n Exception: {exception}')
+
+
+datablocks = []
+with open(args.datablocks_csv, 'r') as csv_file:
+    csv_reader = csv.reader(csv_file, delimiter=',')
     for row in csv_reader:
+        if row[0] == "ContentBlockId":
+            continue
         datablocks.append(row)
 
 start_time = time.perf_counter()
 for datablock in datablocks:
-    if datablock[0] == 'ContentBlockId':
-        continue
+    time.sleep(args.sleep_duration)
 
-    global queryDict
-    global url
-
-    guid = datablock[0]
-    releaseId = datablock[1]
-    subjectId = datablock[2]
-    queryDict = json.loads(datablock[3])
+    block_id = datablock[0]
+    release_id = datablock[1]
+    subject_id = datablock[2]
+    query_dict = json.loads(datablock[3])
 
     if args.stage == "table":
-        url = f'{data_api_url}/tablebuilder/release/{releaseId}'
+        url = f'{data_api_url}/tablebuilder/release/{release_id}'
 
     if args.stage == "filters":
-        queryDict.pop("Filters")
-        queryDict.pop("Indicators")
         url = f'{data_api_url}/meta/subject'
+        query_dict.pop("Filters")
+        query_dict.pop("Indicators")
 
     if args.stage == "time_periods":
-        queryDict.pop("Filters")
-        queryDict.pop("Indicators")
-        queryDict.pop("TimePeriod")
         url = f'{data_api_url}/meta/subject'
+        query_dict.pop("Filters")
+        query_dict.pop("Indicators")
+        query_dict.pop("TimePeriod")
 
-    query = json.dumps(queryDict, sort_keys=True, indent=2)
-
-    assert url is not None
-    assert query is not None
-
-    if os.path.exists(f'{results_dir}/block_{guid}'):
-        continue
-
-    headers = {
-        'Content-Type': 'application/json'
-    }
+    def write_this_block(status_code, response_time, response_dict):
+        write_block_to_file(
+            block_guid=block_id,
+            release_guid=release_id,
+            subject_guid=subject_id,
+            request_dict=query_dict,
+            status_code=status_code,
+            response_time=response_time,
+            response_dict=response_dict,
+        )
 
     block_time_start = time.perf_counter()
     try:
         resp = requests.post(url=url,
-                             headers=headers,
-                             data=query,
-                             timeout=120)
+                             headers={'Content-Type': 'application/json'},
+                             data=json.dumps(query_dict),
+                             timeout=60)
+    except requests.Timeout as e:
+        print_to_console(f'request timeout with block {block_id} subject {subject_id}, {e}')
+        write_this_block(
+            status_code=-1,
+            response_time=-1,
+            response_dict={'error': f'request timeout, {e}'})
+        continue
     except Exception as e:
-        print_to_console(f'request exception with block {guid} subject {subjectId}\nException: {e}')
-        jsonResponse = {'error': f'request exception thrown, {e}'}
+        print_to_console(f'request exception with block {block_id} subject {subject_id}, {e}')
+        write_this_block(
+            status_code=-1,
+            response_time=-1,
+            response_dict={'error': f'request exception thrown, {e}'})
+        continue
     block_time_end = time.perf_counter()
 
-    if resp.status_code != 200:
-        print_to_console(
-            f'Response status wasn\'t 200 for block {guid} '
-            f'subject {subjectId}'
-            f'{resp.text}'
-        )
-
     try:
-        jsonResponse = json.loads(resp.text)
+        json_response = json.loads(resp.text)
     except Exception as e:
-        print_to_console(f'json.loads(resp.text) failed with block {guid} '
-                         f'subject {subjectId}\n'
-                         f'Exception: {e}')
-        jsonResponse = {'error': f'Failed to process response text, Exception: {e}'}
+        print_to_console(f'Failed to convert response text to json with block {block_id} subject {subject_id}, {e}')
+        write_this_block(
+            status_code=resp.status_code,
+            response_time=block_time_end - block_time_start,
+            response_dict={'error': f'Failed to process response text, {e}'})
+        continue
 
-    try:
-        with open(f'{results_dir}/block_{guid}', 'w') as file:
-            file.write(
-                f'block: {guid}\n'
-                f'release: {releaseId}\n'
-                f'subject: {subjectId}\n'
-                f'query:\n'
-                f'{query}\n'
-                f'response status: {resp.status_code}\n'
-                f'time for response: {block_time_end - block_time_start}\n'
-                f'response:\n{json.dumps(jsonResponse, sort_keys=True, indent=2)}'
-            )
-        print_to_console(f'Successfully processed block {guid} for subject {subjectId}!')
-    except BaseException:
-        print_to_console(f'file.write failed with block {guid} '
-                         f'subject {subjectId}\n{resp.text}')
-
-    time.sleep(args.sleep_duration)
+    write_this_block(
+        status_code=resp.status_code,
+        response_time=block_time_end - block_time_start,
+        response_dict=json_response)
 
 end_time = time.perf_counter()
 print_to_console(f'Total time: {end_time - start_time}')
