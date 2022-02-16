@@ -2,7 +2,10 @@
     "version": "2.0",
     "logging": {
         "logLevel": {
-            "default": "Information"
+            "default": "Warning",
+            "Microsoft": "Warning",
+            "Function": "Information",
+            "GovUk.Education.ExploreEducationStatistics": "Information"
         }
     }
 }
