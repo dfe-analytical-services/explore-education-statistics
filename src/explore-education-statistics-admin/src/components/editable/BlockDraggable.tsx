@@ -28,8 +28,11 @@ const BlockDraggable = ({ draggable, draggableId, index, children }: Props) => (
           [styles.isDragging]: snapshot.isDragging,
         })}
       >
-        {draggable && <span className={styles.dragHandle}>☰</span>}
-
+        <span
+          className={classNames({
+            [styles.dragHandle]: draggable,
+          })}
+        />
         {children}
       </div>
     )}
