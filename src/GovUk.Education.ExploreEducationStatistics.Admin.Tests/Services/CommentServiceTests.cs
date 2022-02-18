@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -155,10 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     contentBlockId: Guid.NewGuid(),
                     new CommentSaveRequest {Content = "New comment"});
 
-                var actionResult = result.AssertLeft();
-                Assert.IsType<BadRequestObjectResult>(actionResult);
-                var details = (ValidationProblemDetails) ((BadRequestObjectResult) actionResult).Value;
-                Assert.Equal("CONTENT_BLOCK_NOT_FOUND", details.Errors[""].First());
+                result.AssertBadRequest(ContentBlockNotFound);
             }
         }
 

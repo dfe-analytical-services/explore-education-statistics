@@ -1,5 +1,8 @@
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
-import { Release } from '@admin/services/releaseService';
+import {
+  Release,
+  ReleaseChecklistErrorCode,
+} from '@admin/services/releaseService';
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { format } from 'date-fns';
@@ -557,34 +560,72 @@ describe('ReleaseStatusForm', () => {
       });
     });
 
-    test('shows mapped server validation error from failed `onSubmit`', async () => {
-      const handleSubmit = jest.fn().mockImplementation(() => {
-        throw createServerValidationErrorMock([
-          'PUBLIC_META_GUIDANCE_REQUIRED',
-        ]);
-      });
+    ReleaseChecklistErrorCode.forEach(checklistError => {
+      test(`shows generic checklist error message from failed \`onSubmit\` with \`${checklistError}\` error code`, async () => {
+        const handleSubmit = jest.fn().mockImplementation(() => {
+          throw createServerValidationErrorMock([checklistError]);
+        });
 
-      render(
-        <ReleaseStatusForm
-          release={testRelease}
-          statusPermissions={testStatusPermissions}
-          onCancel={noop}
-          onSubmit={handleSubmit}
-        />,
-      );
+        render(
+          <ReleaseStatusForm
+            release={testRelease}
+            statusPermissions={testStatusPermissions}
+            onCancel={noop}
+            onSubmit={handleSubmit}
+          />,
+        );
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+        userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
-      await waitFor(() => {
-        expect(screen.getByText('There is a problem')).toBeInTheDocument();
-        expect(
-          screen.getByRole('link', {
-            name:
-              'All public data guidance must be populated before the release can be approved',
-          }),
-        ).toBeInTheDocument();
+        await waitFor(() => {
+          expect(screen.getByText('There is a problem')).toBeInTheDocument();
+        });
+
+        const errorLink = screen.getByRole('link', {
+          name: 'Resolve all errors in the publishing checklist',
+        });
+
+        expect(errorLink).toHaveAttribute(
+          'href',
+          '#releaseStatusForm-approvalStatus',
+        );
       });
     });
+
+    test(
+      'shows fallback error message mapped to `approvalStatus` field when receiving unmapped server ' +
+        'validation error from failed `onSubmit`',
+      async () => {
+        const handleSubmit = jest.fn().mockImplementation(() => {
+          throw createServerValidationErrorMock(['UnexpectedError']);
+        });
+
+        render(
+          <ReleaseStatusForm
+            release={testRelease}
+            statusPermissions={testStatusPermissions}
+            onCancel={noop}
+            onSubmit={handleSubmit}
+          />,
+        );
+
+        userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+
+        await waitFor(() => {
+          expect(screen.getByText('There is a problem')).toBeInTheDocument();
+        });
+
+        const errorLink = screen.getByRole('link', {
+          name:
+            'There was a problem updating the approval status of this release',
+        });
+
+        expect(errorLink).toHaveAttribute(
+          'href',
+          '#releaseStatusForm-approvalStatus',
+        );
+      },
+    );
 
     test('submits successfully with updated values and Draft status', async () => {
       const handleSubmit = jest.fn();

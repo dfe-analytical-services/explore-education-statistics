@@ -1619,7 +1619,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     OwningPublicationTitle = "Pupil absence statistics: methodology",
                     Publications = ListOf(new PublicationMethodology
                     {
-                        MethodologyId = methodologyId
+                        MethodologyId = methodologyId,
+                        PublicationId = Guid.NewGuid(),
+
                     })
                 }
             };

@@ -32,7 +32,7 @@ export function deduplicateTableDataLocations(
   }
 
   const { subjectMeta } = tableData;
-  const { locationsHierarchical } = subjectMeta;
+  const { locations } = subjectMeta;
 
   const deduplicatedOptions: LocationOption[] = [];
 
@@ -53,40 +53,31 @@ export function deduplicateTableDataLocations(
     return mergedOption;
   };
 
-  const mergedLocations = mapValues(
-    locationsHierarchical,
-    (levelOptions, level) => {
-      const hasNestedOptions = levelOptions.some(location => location.options);
+  const mergedLocations = mapValues(locations, (levelOptions, level) => {
+    const hasNestedOptions = levelOptions.some(location => location.options);
 
-      if (hasNestedOptions) {
-        return levelOptions.map(location => {
-          const options = location.options ?? [];
-          const optionsGroupedByValue = groupBy(
-            options,
-            option => option.value,
-          );
+    if (hasNestedOptions) {
+      return levelOptions.map(location => {
+        const options = location.options ?? [];
+        const optionsGroupedByValue = groupBy(options, option => option.value);
 
-          const mergedOptions = Object.values(optionsGroupedByValue).flatMap(
-            mergeGroupedOptions(level),
-          );
+        const mergedOptions = Object.values(optionsGroupedByValue).flatMap(
+          mergeGroupedOptions(level),
+        );
 
-          return {
-            ...location,
-            options: mergedOptions,
-          };
-        });
-      }
+        return {
+          ...location,
+          options: mergedOptions,
+        };
+      });
+    }
 
-      const optionsGroupedByValue = groupBy(
-        levelOptions,
-        option => option.value,
-      );
+    const optionsGroupedByValue = groupBy(levelOptions, option => option.value);
 
-      return Object.values(optionsGroupedByValue).flatMap(
-        mergeGroupedOptions(level),
-      );
-    },
-  );
+    return Object.values(optionsGroupedByValue).flatMap(
+      mergeGroupedOptions(level),
+    );
+  });
 
   const mergedResults = combineMeasuresWithDuplicateLocationCodes(
     tableData.results,
@@ -97,7 +88,7 @@ export function deduplicateTableDataLocations(
     ...tableData,
     subjectMeta: {
       ...subjectMeta,
-      locationsHierarchical: mergedLocations,
+      locations: mergedLocations,
     },
     results: mergedResults,
   };

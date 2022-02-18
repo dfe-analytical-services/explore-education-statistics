@@ -787,7 +787,7 @@ check that variable is not empty
     END
 
 user waits until table tool wizard step is available
-    [Arguments]    ${step_number}    ${table_tool_step_title}    ${wait}=${timeout}
+    [Arguments]    ${step_number}    ${table_tool_step_title}    ${wait}=%{WAIT_MEDIUM}
     user waits until page contains element    xpath://*[@data-testid="wizardStep-${step_number}"]    ${wait}
     user waits until page does not contain element    xpath://*[@data-testid="wizardStep-${step_number}" and @hidden]
     ...    ${wait}

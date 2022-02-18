@@ -179,7 +179,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyNote>()
                 .HasOne(m => m.UpdatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired(false);
 
             modelBuilder.Entity<Publication>()
                 .Property(p => p.LegacyPublicationUrl)

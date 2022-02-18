@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 {
                     new(1234, "boundary")
                 },
-                LocationsHierarchical = new Dictionary<string, List<LocationAttributeViewModel>>
+                Locations = new Dictionary<string, List<LocationAttributeViewModel>>
                 {
                     {
                         "location", new List<LocationAttributeViewModel>

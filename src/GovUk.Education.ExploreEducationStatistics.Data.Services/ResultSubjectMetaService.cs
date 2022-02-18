@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Footnotes = footnoteViewModels,
                         GeoJsonAvailable = locationsHelper.GeoJsonAvailable,
                         Indicators = indicatorViewModels,
-                        LocationsHierarchical = locationViewModels,
+                        Locations = locationViewModels,
                         BoundaryLevels = locationsHelper.GetBoundaryLevelViewModels(),
                         PublicationName = publicationTitle,
                         SubjectName = subjectName,

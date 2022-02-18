@@ -66,16 +66,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         private static void AssertBadRequestWithValidationErrors(this object result, params Enum[] expectedValidationErrors)
         {
             var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
-            var validationProblem = Assert.IsAssignableFrom<ValidationProblemDetails>(badRequest?.Value);
+            var validationProblem = Assert.IsAssignableFrom<ValidationProblemDetails>(badRequest.Value);
 
-            Assert.True(validationProblem != null && validationProblem.Errors.ContainsKey(string.Empty));
+            Assert.NotNull(validationProblem);
+            Assert.True(validationProblem.Errors.ContainsKey(string.Empty));
 
             var globalErrors = validationProblem.Errors[string.Empty];
 
             Assert.Equal(expectedValidationErrors.Length, globalErrors.Length);
 
             expectedValidationErrors.ForEach(message =>
-                Assert.Contains(message.ToString().ScreamingSnakeCase(), globalErrors));
+                Assert.Contains(message.ToString(), globalErrors));
         }
     }
 }

@@ -7,7 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
 {
@@ -94,14 +94,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 await statisticsDbContext.Observation.AddRangeAsync(subject1Observations);
                 await statisticsDbContext.Observation.AddRangeAsync(subject2Observations);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var repository = BuildRepository(statisticsDbContext);
 

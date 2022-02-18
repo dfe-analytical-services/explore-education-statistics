@@ -100,19 +100,21 @@ const FormSelect = ({
             </option>
           ))}
         {optGroups &&
-          Object.keys(optGroups).map(group => (
-            <optgroup key={`group-${group}`} label={group}>
-              {optGroups[group].map(option => (
-                <option
-                  key={`value-${option.value}`}
-                  value={option.value}
-                  style={option.style}
-                >
-                  {option.label}
-                </option>
-              ))}
-            </optgroup>
-          ))}
+          Object.keys(optGroups)
+            .sort()
+            .map(group => (
+              <optgroup key={group} label={group}>
+                {optGroups[group].map(option => (
+                  <option
+                    key={`value-${option.value}`}
+                    value={option.value}
+                    style={option.style}
+                  >
+                    {option.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
       </select>
     </>
   );

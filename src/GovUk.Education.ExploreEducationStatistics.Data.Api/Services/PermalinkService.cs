@@ -5,13 +5,12 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
 using Newtonsoft.Json;
@@ -76,7 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             return await _tableBuilderService.Query(releaseId, request.Query).OnSuccess(async result =>
             {
-                var permalink = new Permalink(request.Configuration, result, request.Query);
+                var permalinkTableResult = new PermalinkTableBuilderResult(result);
+                var permalink = new Permalink(request.Configuration, permalinkTableResult, request.Query);
                 await _blobStorageService.UploadAsJson(containerName: Permalinks,
                     path: permalink.Id.ToString(),
                     content: permalink,
@@ -116,9 +116,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             JsonObjectContract contract = base.CreateObjectContract(objectType);
 
-            if (objectType == typeof(ResultSubjectMetaViewModel))
+            if (objectType == typeof(PermalinkResultSubjectMeta))
             {
-                contract.Converter = new ResultSubjectMetaViewModelJsonConverter();
+                contract.Converter = new PermalinkResultSubjectMetaJsonConverter();
             }
 
             return contract;

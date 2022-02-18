@@ -30,23 +30,23 @@ const baseErrorMappings = (
       mapFieldErrors<DataFileUploadFormValues>({
         target: 'zipFile',
         messages: {
-          DATA_FILE_MUST_BE_ZIP_FILE: 'Choose a valid ZIP file',
-          DATA_ZIP_FILE_CAN_ONLY_CONTAIN_TWO_FILES:
+          DataFileMustBeZipFile: 'Choose a valid ZIP file',
+          DataZipFileCanOnlyContainTwoFiles:
             'ZIP file can only contain two CSV files',
-          DATA_ZIP_FILE_DOES_NOT_CONTAIN_CSV_FILES:
+          DataZipFileDoesNotContainCsvFiles:
             'ZIP file does not contain any CSV files',
-          DATA_ZIP_FILE_ALREADY_EXISTS: 'ZIP file already exists',
-          CANNOT_OVERWRITE_DATA_FILE: 'Choose a unique ZIP data file name',
-          DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME:
+          DataZipFileAlreadyExists: 'ZIP file already exists',
+          CannotOverwriteDataFile: 'Choose a unique ZIP data file name',
+          DataAndMetadataFilesCannotHaveTheSameName:
             'ZIP data and metadata filenames cannot be the same',
-          DATA_FILE_CANNOT_BE_EMPTY: 'Choose a ZIP data file that is not empty',
-          DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+          DataFileCannotBeEmpty: 'Choose a ZIP data file that is not empty',
+          DataFilenameCannotContainSpacesOrSpecialCharacters:
             'ZIP data filename cannot contain spaces or special characters',
-          METADATA_FILE_CANNOT_BE_EMPTY:
+          MetadataFileCannotBeEmpty:
             'Choose a ZIP metadata file that is not empty',
-          META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+          MetaFilenameCannotContainSpacesOrSpecialCharacters:
             'ZIP metadata filename cannot contain spaces or special characters',
-          META_FILE_IS_INCORRECTLY_NAMED:
+          MetaFileIsIncorrectlyNamed:
             'ZIP metadata filename must end with .meta.csv',
         },
       }),
@@ -57,28 +57,25 @@ const baseErrorMappings = (
     mapFieldErrors<DataFileUploadFormValues>({
       target: 'dataFile',
       messages: {
-        CANNOT_OVERWRITE_DATA_FILE: 'Choose a unique data file name',
-        DATA_AND_METADATA_FILES_CANNOT_HAVE_THE_SAME_NAME:
+        CannotOverwriteDataFile: 'Choose a unique data file name',
+        DataAndMetadataFilesCannotHaveTheSameName:
           'Choose a different file name for data and metadata files',
-        DATA_FILE_CANNOT_BE_EMPTY: 'Choose a data file that is not empty',
-        DATA_FILE_MUST_BE_CSV_FILE:
-          'Data file must be a CSV with UTF-8 encoding',
-        DATA_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+        DataFileCannotBeEmpty: 'Choose a data file that is not empty',
+        DataFileMustBeCsvFile: 'Data file must be a CSV with UTF-8 encoding',
+        DataFilenameCannotContainSpacesOrSpecialCharacters:
           'Data filename cannot contain spaces or special characters',
-        DATA_FILE_ALREADY_UPLOADED: 'Data file has already been uploaded',
+        DataFileAlreadyUploaded: 'Data file has already been uploaded',
       },
     }),
     mapFieldErrors<DataFileUploadFormValues>({
       target: 'metadataFile',
       messages: {
-        METADATA_FILE_CANNOT_BE_EMPTY:
-          'Choose a metadata file that is not empty',
-        META_FILE_MUST_BE_CSV_FILE:
+        MetadataFileCannotBeEmpty: 'Choose a metadata file that is not empty',
+        MetaFileMustBeCsvFile:
           'Metadata file must be a CSV with UTF-8 encoding',
-        META_FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+        MetaFilenameCannotContainSpacesOrSpecialCharacters:
           'Metadata filename cannot contain spaces or special characters',
-        META_FILE_IS_INCORRECTLY_NAMED:
-          'Metadata filename is incorrectly named',
+        MetaFileIsIncorrectlyNamed: 'Metadata filename is incorrectly named',
       },
     }),
   ];

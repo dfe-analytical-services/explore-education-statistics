@@ -122,14 +122,17 @@ export interface ReleaseStageStatuses {
   lastUpdated?: string;
 }
 
+export const ReleaseChecklistErrorCode = [
+  'DataFileImportsMustBeCompleted',
+  'DataFileReplacementsMustBeCompleted',
+  'PublicDataGuidanceRequired',
+  'ReleaseNoteRequired',
+  'EmptyContentSectionExists',
+  'GenericSectionsContainEmptyHtmlBlock',
+] as const;
+
 export type ReleaseChecklistError = {
-  code:
-    | 'DataFileImportsMustBeCompleted'
-    | 'DataFileReplacementsMustBeCompleted'
-    | 'PublicDataGuidanceRequired'
-    | 'ReleaseNoteRequired'
-    | 'EmptyContentSectionExists'
-    | 'GenericSectionsContainEmptyHtmlBlock';
+  code: typeof ReleaseChecklistErrorCode[number];
 };
 
 export type ReleaseChecklistWarning =

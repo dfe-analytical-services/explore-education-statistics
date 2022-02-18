@@ -2,7 +2,6 @@
 using System;
 using System.Linq;
 using System.Net;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Validators
             var problemDetails = new ValidationProblemDetails(
                 errors.ToDictionary(
                     _ => string.Empty,
-                    error => new[] {error.ScreamingSnakeCase()}))
+                    error => new[] {error}))
             {
                 Status = (int) HttpStatusCode.BadRequest,
                 Detail = "Please refer to the errors property for additional details"

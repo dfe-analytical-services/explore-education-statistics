@@ -107,11 +107,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
                     return true;
                 }
 
+                if (result == Task.CompletedTask)
+                {
+                    result = null;
+                    return false;
+                }
+
                 if (result is Task task)
                 {
                     try
                     {
                         task.Wait();
+
                     }
                     catch (AggregateException)
                     {

@@ -1,5 +1,16 @@
-import { TableDataResponse } from '@common/services/tableBuilderService';
+import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import {
+  GeoJsonFeature,
+  TableDataResponse,
+  TableDataResult,
+} from '@common/services/tableBuilderService';
 import { Chart } from '@common/services/types/blocks';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/table-tool/types/filters';
 import produce from 'immer';
 
 export const testMapConfiguration: Chart = {
@@ -113,7 +124,7 @@ export const testMapTableData: TableDataResponse = {
         name: 'sess_overall_percent',
       },
     ],
-    locationsHierarchical: {
+    locations: {
       localAuthorityDistrict: [
         {
           geoJson: [
@@ -408,7 +419,7 @@ export const testMapTableData: TableDataResponse = {
 };
 
 export const testMapTableDataRegion = produce(testMapTableData, draft => {
-  draft.subjectMeta.locationsHierarchical = {
+  draft.subjectMeta.locations = {
     region: [
       {
         geoJson: [
@@ -516,7 +527,7 @@ export const testMapTableDataRegion = produce(testMapTableData, draft => {
 });
 
 export const testMapTableDataMixed = produce(testMapTableData, draft => {
-  draft.subjectMeta.locationsHierarchical = {
+  draft.subjectMeta.locations = {
     localAuthority: [
       {
         geoJson: [
@@ -626,3 +637,253 @@ export const testMapTableDataMixed = produce(testMapTableData, draft => {
     },
   ];
 });
+
+const testGeoJsonFeature: GeoJsonFeature = {
+  type: 'Feature',
+  geometry: { type: 'Polygon', coordinates: [] },
+  properties: {
+    code: '',
+    name: '',
+    lat: 1,
+    long: 2,
+  },
+};
+
+export const testsMixedLocationsFullTableMeta: FullTableMeta = {
+  geoJsonAvailable: false,
+  publicationName: 'Pupil absence in schools in England',
+  subjectName: 'Absence by characteristic',
+  footnotes: [],
+  boundaryLevels: [],
+  filters: {
+    Characteristic: {
+      name: 'Characteristic total',
+      options: [
+        new CategoryFilter({
+          value: 'characteristic-total',
+          label: 'Total',
+          group: 'Gender',
+          category: 'Characteristic',
+        }),
+      ],
+    },
+  },
+  indicators: [
+    new Indicator({
+      label: 'Authorised absence rate',
+      value: 'authorised-absence-rate',
+      unit: '%',
+      name: 'sess_authorised_percent',
+    }),
+  ],
+  locations: [
+    new LocationFilter({
+      value: 'england-code',
+      label: 'England',
+      group: 'England',
+      level: 'country',
+      geoJson: [testGeoJsonFeature],
+    }),
+    new LocationFilter({
+      value: 'darlington-code',
+      label: 'Darlington',
+      level: 'localAuthority',
+      group: 'North East',
+      geoJson: [testGeoJsonFeature],
+    }),
+    new LocationFilter({
+      value: 'newcastle-code',
+      label: 'Newcastle upon Tyne',
+      group: 'North East',
+      level: 'localAuthority',
+      geoJson: [testGeoJsonFeature],
+    }),
+    new LocationFilter({
+      value: 'rotherham-code',
+      label: 'Rotherham',
+      group: 'Yorkshire and the Humber',
+      level: 'localAuthority',
+      geoJson: [testGeoJsonFeature],
+    }),
+    new LocationFilter({
+      value: 'sheffield-code',
+      label: 'Sheffield',
+      group: 'Yorkshire and the Humber',
+      level: 'localAuthority',
+      geoJson: [testGeoJsonFeature],
+    }),
+    new LocationFilter({
+      value: 'north-east-code',
+      label: 'North East',
+      group: 'North East',
+      level: 'region',
+      geoJson: [testGeoJsonFeature],
+    }),
+    new LocationFilter({
+      value: 'north-west-code',
+      label: 'North West',
+      group: 'North West',
+      level: 'region',
+      geoJson: [testGeoJsonFeature],
+    }),
+    new LocationFilter({
+      value: 'sheffield-lad-code',
+      label: 'Sheffield LAD',
+      group: 'Yorkshire and the Humber',
+      level: 'localAuthorityDistrict',
+      geoJson: [testGeoJsonFeature],
+    }),
+    new LocationFilter({
+      value: 'rotherham-lad-code',
+      label: 'Rotherham LAD',
+      group: 'Yorkshire and the Humber',
+      level: 'localAuthorityDistrict',
+      geoJson: [testGeoJsonFeature],
+    }),
+  ],
+  timePeriodRange: [
+    new TimePeriodFilter({
+      code: 'AY',
+      year: 2016,
+      label: '2016/17',
+      order: 0,
+    }),
+  ],
+};
+
+export const testsMixedLocationsTableData: TableDataResult[] = [
+  {
+    filters: ['characteristic-total'],
+    geographicLevel: 'country',
+    location: {
+      country: { code: 'england-code', name: 'England' },
+    },
+    measures: {
+      'authorised-absence-rate': '3.5',
+    },
+    timePeriod: '2016_AY',
+  },
+  {
+    filters: ['characteristic-total'],
+    geographicLevel: 'region',
+    location: {
+      country: { code: 'england-code', name: 'England' },
+      region: { code: 'north-east-code', name: 'North East' },
+    },
+    measures: {
+      'authorised-absence-rate': '3',
+    },
+    timePeriod: '2016_AY',
+  },
+  {
+    filters: ['characteristic-total'],
+    geographicLevel: 'region',
+    location: {
+      country: { code: 'england-code', name: 'England' },
+      region: { code: 'north-west-code', name: 'North West' },
+    },
+    measures: {
+      'authorised-absence-rate': '4',
+    },
+    timePeriod: '2016_AY',
+  },
+  {
+    filters: ['characteristic-total'],
+    geographicLevel: 'localAuthority',
+    location: {
+      country: { code: 'england-code', name: 'England' },
+      region: {
+        code: 'yorkshire-humber-code',
+        name: 'Yorkshire and the Humber',
+      },
+      localAuthority: { code: 'rotherham-code', name: 'Rotherham' },
+    },
+    measures: {
+      'authorised-absence-rate': '4',
+    },
+    timePeriod: '2016_AY',
+  },
+  {
+    filters: ['characteristic-total'],
+    geographicLevel: 'localAuthority',
+    location: {
+      country: { code: 'england-code', name: 'England' },
+      region: {
+        code: 'yorkshire-humber-code',
+        name: 'Yorkshire and the Humber',
+      },
+      localAuthority: { code: 'sheffield-code', name: 'Sheffield' },
+    },
+    measures: {
+      'authorised-absence-rate': '4',
+    },
+    timePeriod: '2016_AY',
+  },
+  {
+    filters: ['characteristic-total'],
+    geographicLevel: 'localAuthority',
+    location: {
+      country: { code: 'england-code', name: 'England' },
+      region: { code: 'north-east-code', name: 'North East' },
+      localAuthority: { code: 'newcastle-code', name: 'Newcastle upon Tyne' },
+    },
+    measures: {
+      'authorised-absence-rate': '4',
+    },
+    timePeriod: '2016_AY',
+  },
+  {
+    filters: ['characteristic-total'],
+    geographicLevel: 'localAuthority',
+    location: {
+      country: { code: 'england-code', name: 'England' },
+      region: { code: 'north-east-code', name: 'North East' },
+      localAuthority: { code: 'darlington-code', name: 'Darlington' },
+    },
+    measures: {
+      'authorised-absence-rate': '4',
+    },
+    timePeriod: '2016_AY',
+  },
+];
+
+export const testsMixedLocationsTableDataWithLADs: TableDataResult[] = [
+  {
+    filters: ['characteristic-total'],
+    geographicLevel: 'localAuthorityDistrict',
+    location: {
+      country: { code: 'england-code', name: 'England' },
+      region: {
+        code: 'yorkshire-humber-code',
+        name: 'Yorkshire and the Humber',
+      },
+      localAuthorityDistrict: {
+        code: 'sheffield-lad-code',
+        name: 'Sheffield LAD',
+      },
+    },
+    measures: {
+      'authorised-absence-rate': '4',
+    },
+    timePeriod: '2016_AY',
+  },
+  {
+    filters: ['characteristic-total'],
+    geographicLevel: 'localAuthorityDistrict',
+    location: {
+      country: { code: 'england-code', name: 'England' },
+      region: {
+        code: 'yorkshire-humber-code',
+        name: 'Yorkshire and the Humber',
+      },
+      localAuthorityDistrict: {
+        code: 'rotherham-lad-code',
+        name: 'Rotherham LAD',
+      },
+    },
+    measures: {
+      'authorised-absence-rate': '4',
+    },
+    timePeriod: '2016_AY',
+  },
+];

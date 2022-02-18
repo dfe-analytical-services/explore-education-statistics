@@ -19,6 +19,7 @@ import reorder from '@common/utils/reorder';
 import { Formik } from 'formik';
 import difference from 'lodash/difference';
 import mapValues from 'lodash/mapValues';
+import orderBy from 'lodash/orderBy';
 import React, { ReactNode, useEffect, useMemo } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import classNames from 'classnames';
@@ -116,7 +117,6 @@ const ChartDataSetsConfiguration = ({
             indicatorOptions,
             values,
           });
-
           selectedDataSets.forEach(newDataSet => {
             if (
               dataSets.find(dataSet => {
@@ -136,9 +136,15 @@ const ChartDataSetsConfiguration = ({
             }
           });
 
-          if (onChange) {
-            onChange([...dataSets, ...selectedDataSets]);
-          }
+          const updatedDataSets = [...dataSets, ...selectedDataSets].map(
+            (dataSet, index) => {
+              return {
+                ...dataSet,
+                order: index,
+              };
+            },
+          );
+          onChange(updatedDataSets);
         }}
       >
         {() => (
@@ -211,28 +217,37 @@ const ChartDataSetsConfiguration = ({
                 dataSets,
                 result.source.index,
                 result.destination.index,
-              );
+              ).map((dataSet, index) => {
+                return {
+                  ...dataSet,
+                  order: index,
+                };
+              });
               onChange(reorderedDataSets);
             }}
           >
-            <Droppable droppableId="droppable" isDropDisabled={!isReordering}>
+            <Droppable droppableId="dataSets" isDropDisabled={!isReordering}>
               {(droppableProvided, droppableSnapshot) => (
                 <table>
                   <thead>
                     <tr>
                       <th>Data set</th>
-                      <th>
-                        <VisuallyHidden>Actions</VisuallyHidden>
-                      </th>
+                      {!isReordering && (
+                        <th>
+                          <VisuallyHidden>Actions</VisuallyHidden>
+                        </th>
+                      )}
                     </tr>
                   </thead>
                   <tbody
+                    // eslint-disable-next-line react/jsx-props-no-spreading
+                    {...droppableProvided.droppableProps}
                     ref={droppableProvided.innerRef}
                     className={classNames({
                       [styles.dropArea]: droppableSnapshot.isDraggingOver,
                     })}
                   >
-                    {dataSets.map((dataSet, index) => {
+                    {orderBy(dataSets, 'order').map((dataSet, index) => {
                       const expandedDataSet = expandDataSet(dataSet, meta);
                       const label = generateDataSetLabel(expandedDataSet);
                       const key = generateDataSetKey(dataSet);
@@ -253,31 +268,31 @@ const ChartDataSetsConfiguration = ({
                               className={classNames(styles.item, {
                                 [styles.isDragging]:
                                   draggableSnapshot.isDragging,
+                                [styles.isReordering]: isReordering,
                               })}
                               ref={draggableProvided.innerRef}
                             >
-                              <td>{label}</td>
                               <td
-                                className={classNames('dfe-align--right', {
-                                  [styles.isReordering]: isReordering,
+                                className={classNames({
+                                  [styles.labelReordering]: isReordering,
                                 })}
                               >
-                                {!isReordering && (
+                                {label}
+                              </td>
+                              {!isReordering && (
+                                <td className="dfe-align--right">
                                   <ButtonText
                                     className="govuk-!-margin-bottom-0"
                                     onClick={() => {
-                                      if (onChange) {
-                                        const nextDataSets = [...dataSets];
-                                        nextDataSets.splice(index, 1);
-
-                                        onChange(nextDataSets);
-                                      }
+                                      const nextDataSets = [...dataSets];
+                                      nextDataSets.splice(index, 1);
+                                      onChange(nextDataSets);
                                     }}
                                   >
                                     Remove
                                   </ButtonText>
-                                )}
-                              </td>
+                                </td>
+                              )}
                             </tr>
                           )}
                         </Draggable>
@@ -291,33 +306,37 @@ const ChartDataSetsConfiguration = ({
           </DragDropContext>
 
           <div className="dfe-flex dfe-justify-content--space-between">
-            <ChartBuilderSaveActions
-              formId={formId}
-              formKey="dataSets"
-              onClick={() => {
-                if (!forms.dataSets) {
-                  return;
+            <div className="dfe-flex-grow--1">
+              <ChartBuilderSaveActions
+                formId={formId}
+                formKey="dataSets"
+                onClick={() => {
+                  if (!forms.dataSets) {
+                    return;
+                  }
+
+                  updateForm({
+                    formKey: 'dataSets',
+                    submitCount: forms.dataSets.submitCount + 1,
+                  });
+
+                  submit();
+                }}
+              >
+                {buttons}
+              </ChartBuilderSaveActions>
+            </div>
+            {dataSets.length > 1 && (
+              <Button
+                className="dfe-align-self-end govuk-!-margin-left-2"
+                variant="secondary"
+                onClick={
+                  isReordering ? toggleIsReordering.off : toggleIsReordering.on
                 }
-
-                updateForm({
-                  formKey: 'dataSets',
-                  submitCount: forms.dataSets.submitCount + 1,
-                });
-
-                submit();
-              }}
-            >
-              {buttons}
-            </ChartBuilderSaveActions>
-            {/* EES-2556
-             <Button
-              variant="secondary"
-              onClick={
-                isReordering ? toggleIsReordering.off : toggleIsReordering.on
-              }
-            >
-              {isReordering ? 'Finish reordering' : 'Reorder data sets'}
-            </Button> */}
+              >
+                {isReordering ? 'Finish reordering' : 'Reorder data sets'}
+              </Button>
+            )}
           </div>
         </>
       )}

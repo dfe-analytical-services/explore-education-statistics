@@ -28,11 +28,11 @@ export const errorMappings = [
   mapFieldErrors<InviteContributorFormValues>({
     target: 'releaseIds',
     messages: {
-      NOT_ALL_RELEASES_BELONG_TO_PUBLICATION:
+      NotAllReleasesBelongToPublication:
         "Some of the releases don't belong to the publication",
-      USER_ALREADY_HAS_RELEASE_ROLE_INVITES:
+      UserAlreadyHasReleaseRoleInvites:
         'The user has already been invited with these permissions',
-      USER_ALREADY_HAS_RELEASE_ROLES: 'The user already has these permissions',
+      UserAlreadyHasReleaseRoles: 'The user already has these permissions',
     },
   }),
 ];

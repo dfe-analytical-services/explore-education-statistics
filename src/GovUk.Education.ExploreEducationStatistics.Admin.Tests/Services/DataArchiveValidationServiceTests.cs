@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -35,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             Assert.True(result.IsRight);
 
-            MockUtils.VerifyAllMocks(fileTypeService);
+            VerifyAllMocks(fileTypeService);
         }
 
         [Fact]
@@ -54,13 +54,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Returns(() => true);
 
             var result = service.ValidateDataArchiveFile(Guid.NewGuid(), archive).Result;
-
-            Assert.True(result.IsLeft);
-            Assert.IsAssignableFrom<BadRequestObjectResult>(result.Left);
-            var details = (ValidationProblemDetails) ((BadRequestObjectResult) result.Left).Value;
-            Assert.Equal("DATA_ZIP_FILE_DOES_NOT_CONTAIN_CSV_FILES", details.Errors[""].First());
-
-            MockUtils.VerifyAllMocks(fileTypeService);
+            VerifyAllMocks(fileTypeService);
+            
+            result.AssertBadRequest(DataZipFileDoesNotContainCsvFiles);
         }
 
         private static IFormFile CreateFormFileFromResource(string fileName)

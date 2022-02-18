@@ -62,20 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .OnSuccess(
                     async release =>
                     {
-                        string filename;
-
-                        if (fileIds is not null)
-                        {
-                            // Create a hash just so that we have some uniqueness
-                            // to attach to the end of the file name.
-                            var fileIdsHash = GetFileIdsHash(fileIds);
-                            filename = $"{release.Publication.Slug}_{release.Slug}_{fileIdsHash}.zip";
-                        }
-                        else
-                        {
-                            filename = $"{release.Publication.Slug}_{release.Slug}.zip";
-                        }
-
+                        var filename = $"{release.Publication.Slug}_{release.Slug}.zip";
                         Response.Headers.Add(HeaderNames.ContentDisposition, @$"attachment; filename=""{filename}""");
                         Response.Headers.Add(HeaderNames.ContentType, MediaTypeNames.Application.Octet);
 
@@ -106,14 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     }
                 );
 
-        }
-
-        private static string GetFileIdsHash(IList<Guid> fileIds)
-        {
-            return fileIds.Select(id => id.ToString())
-                .OrderBy(id => id)
-                .JoinToString(',')
-                .ToMd5Hash();
         }
     }
 }

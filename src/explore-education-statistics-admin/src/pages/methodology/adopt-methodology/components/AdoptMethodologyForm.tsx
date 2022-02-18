@@ -21,7 +21,7 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'methodologyId',
     messages: {
-      CANNOT_ADOPT_METHODOLOGY_ALREADY_LINKED_TO_PUBLICATION:
+      CannotAdoptMethodologyAlreadyLinkedToPublication:
         'Select a methodology that has not already been adopted by this publication',
     },
   }),

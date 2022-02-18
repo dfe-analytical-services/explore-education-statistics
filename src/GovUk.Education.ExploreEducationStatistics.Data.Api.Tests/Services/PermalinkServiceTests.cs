@@ -85,7 +85,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Id = Guid.NewGuid()
             };
 
-            var tableResult = new TableBuilderResultViewModel();
+            var tableResult = new TableBuilderResultViewModel
+            {
+                SubjectMeta = new ResultSubjectMetaViewModel()
+            };
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
@@ -102,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     Capture.With(blobPathCapture),
                     It.Is<Permalink>(p =>
                         p.Configuration.Equals(request.Configuration) &&
-                        p.FullTable.Equals(tableResult) &&
+                        p.FullTable.IsDeepEqualTo(new PermalinkTableBuilderResult(tableResult)) &&
                         p.Query.Equals(request.Query)),
                     It.IsAny<JsonSerializerSettings>()))
                 .Returns(Task.CompletedTask);
@@ -168,7 +171,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var releaseId = Guid.NewGuid();
 
-            var tableResult = new TableBuilderResultViewModel();
+            var tableResult = new TableBuilderResultViewModel
+            {
+                SubjectMeta = new ResultSubjectMetaViewModel()
+            };
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
@@ -184,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     Capture.With(blobPathCapture),
                     It.Is<Permalink>(p =>
                         p.Configuration.Equals(request.Configuration) &&
-                        p.FullTable.Equals(tableResult) &&
+                        p.FullTable.IsDeepEqualTo(new PermalinkTableBuilderResult(tableResult)) &&
                         p.Query.Equals(request.Query)),
                     It.IsAny<JsonSerializerSettings>()))
                 .Returns(Task.CompletedTask);
@@ -232,9 +238,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var permalink = new Permalink(
                 new TableBuilderConfiguration(),
-                new TableBuilderResultViewModel
+                new PermalinkTableBuilderResult
                 {
-                    SubjectMeta = new ResultSubjectMetaViewModel()
+                    SubjectMeta = new PermalinkResultSubjectMeta()
                 },
                 new ObservationQueryContext
                 {
@@ -280,8 +286,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         public async Task Get_LegacyLocationsFieldIsTransformed()
         {
             // Until old Permalinks are migrated to permanently transform their legacy 'Locations' field,
-            // test that legacy locations are transformed to 'LocationsHierarchical',
-            // ensuring that consumers are aware of them when accessing the new field.
+            // test that legacy locations are transformed to 'LocationsHierarchical' and then mapped to 'Locations'
+            // in the view model.
 
             var subject = new Subject
             {
@@ -316,9 +322,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var permalink = new Permalink(
                 new TableBuilderConfiguration(),
-                new TableBuilderResultViewModel
+                new PermalinkTableBuilderResult
                 {
-                    SubjectMeta = new ResultSubjectMetaViewModel()
+                    SubjectMeta = new PermalinkResultSubjectMeta()
                 },
                 new ObservationQueryContext
                 {
@@ -364,11 +370,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var subjectMeta = result.FullTable.SubjectMeta;
 
-            // Expect Locations to have been transformed to LocationsHierarchical
-            Assert.Single(subjectMeta.LocationsHierarchical);
-            Assert.True(subjectMeta.LocationsHierarchical.ContainsKey("localAuthority"));
+            // Expect Locations to have been transformed
+            Assert.Single(subjectMeta.Locations);
+            Assert.True(subjectMeta.Locations.ContainsKey("localAuthority"));
 
-            var localAuthorities = subjectMeta.LocationsHierarchical["localAuthority"];
+            var localAuthorities = subjectMeta.Locations["localAuthority"];
             Assert.Equal(3, localAuthorities.Count);
 
             Assert.Equal(legacyLocations[0].Label, localAuthorities[0].Label);
@@ -409,9 +415,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         {
             var permalink = new Permalink(
                 new TableBuilderConfiguration(),
-                new TableBuilderResultViewModel
+                new PermalinkTableBuilderResult
                 {
-                    SubjectMeta = new ResultSubjectMetaViewModel()
+                    SubjectMeta = new PermalinkResultSubjectMeta()
                 },
                 new ObservationQueryContext
                 {
@@ -459,9 +465,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var permalink = new Permalink(
                 new TableBuilderConfiguration(),
-                new TableBuilderResultViewModel
+                new PermalinkTableBuilderResult
                 {
-                    SubjectMeta = new ResultSubjectMetaViewModel()
+                    SubjectMeta = new PermalinkResultSubjectMeta()
                 },
                 new ObservationQueryContext
                 {

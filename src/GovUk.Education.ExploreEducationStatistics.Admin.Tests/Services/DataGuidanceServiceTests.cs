@@ -23,7 +23,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -187,14 +187,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupService(contentDbContext: contentDbContext);
+            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            var service = SetupService(contentDbContext: contentDbContext);
 
-                var result = await service.Get(Guid.NewGuid());
+            var result = await service.Get(Guid.NewGuid());
 
-                result.AssertNotFound();
-            }
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -202,20 +200,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupService(contentDbContext: contentDbContext);
+            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            var service = SetupService(contentDbContext: contentDbContext);
 
-                var result = await service.Update(
-                    Guid.NewGuid(),
-                    new DataGuidanceUpdateViewModel
-                    {
-                        Content = "Updated Release Guidance",
-                        Subjects = new List<DataGuidanceUpdateSubjectViewModel>()
-                    });
+            var result = await service.Update(
+                Guid.NewGuid(),
+                new DataGuidanceUpdateViewModel
+                {
+                    Content = "Updated Release Guidance",
+                    Subjects = new List<DataGuidanceUpdateSubjectViewModel>()
+                });
 
-                result.AssertNotFound();
-            }
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -270,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 Assert.Equal("Updated Release Guidance",
-                    (await contentDbContext.Releases.FindAsync(release.Id)).DataGuidance);
+                    (await contentDbContext.Releases.FindAsync(release.Id))?.DataGuidance);
             }
         }
 
@@ -351,7 +347,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 Assert.Equal("Updated Release Guidance",
-                    (await contentDbContext.Releases.FindAsync(release.Id)).DataGuidance);
+                    (await contentDbContext.Releases.FindAsync(release.Id))?.DataGuidance);
             }
         }
 
@@ -482,7 +478,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Assert.Equal("Release Guidance Updated",
                     (await contentDbContext.Releases
-                        .FindAsync(contentRelease.Id)).DataGuidance);
+                        .FindAsync(contentRelease.Id))?.DataGuidance);
 
                 // Assert only one Subject has been updated
                 Assert.Equal("Subject 1 Guidance Updated",
@@ -666,11 +662,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Assert.Equal("Version 1 Release Guidance",
                     (await contentDbContext.Releases
-                        .FindAsync(contentReleaseVersion1.Id)).DataGuidance);
+                        .FindAsync(contentReleaseVersion1.Id))?.DataGuidance);
 
                 Assert.Equal("Version 2 Release Guidance Updated",
                     (await contentDbContext.Releases
-                        .FindAsync(contentReleaseVersion2.Id)).DataGuidance);
+                        .FindAsync(contentReleaseVersion2.Id))?.DataGuidance);
 
                 // Assert the same Subject on version 1 hasn't been affected
                 Assert.Equal("Version 1 Subject 1 Guidance",
@@ -701,15 +697,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupService(contentDbContext: contentDbContext,
-                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object);
+            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            var service = SetupService(contentDbContext: contentDbContext,
+                dataGuidanceSubjectService: dataGuidanceSubjectService.Object);
 
-                var result = await service.Validate(Guid.NewGuid());
+            var result = await service.Validate(Guid.NewGuid());
 
-                result.AssertNotFound();
-            }
+            result.AssertNotFound();
         }
 
         [Fact]

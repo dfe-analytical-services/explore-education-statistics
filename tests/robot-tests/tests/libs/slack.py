@@ -67,9 +67,7 @@ def _tests_failed():
 
 
 def send_slack_report(env: str, suite: str):
-
     attachments = _generate_slack_attachments(env, suite)
-    data = {"attachments": attachments}
 
     webhook_url = os.getenv('SLACK_TEST_REPORT_WEBHOOK_URL')
     slack_bot_token = os.getenv('SLACK_BOT_TOKEN')
@@ -79,7 +77,7 @@ def send_slack_report(env: str, suite: str):
 
     response = requests.post(
         url=webhook_url,
-        data=json.dumps(data), headers={'Content-Type': 'application/json'}
+        data=json.dumps({"attachments": attachments}), headers={'Content-Type': 'application/json'}
     )
     assert response.status_code == 200, print(f"Response wasn't 200, it was {response}")
 
@@ -98,4 +96,4 @@ def send_slack_report(env: str, suite: str):
         except SlackApiError as e:
             print(f'Error uploading test report: {e}')
         os.remove('UI-test-report.zip')
-    print('Sent UI test report to #build')
+        print('Sent UI test report to #build')

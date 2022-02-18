@@ -81,7 +81,7 @@ describe('expandDataSet', () => {
           name: 'sess_authorised_percent',
         },
       ],
-      locationsHierarchical: {
+      locations: {
         localAuthority: [
           { label: 'Barnsley', value: 'E08000016' },
           { label: 'Barnet', value: 'E09000003' },

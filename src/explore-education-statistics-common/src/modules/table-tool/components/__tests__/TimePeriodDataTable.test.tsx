@@ -242,7 +242,7 @@ describe('TimePeriodDataTable', () => {
             decimalPlaces: 1,
           },
         ],
-        locationsHierarchical: {
+        locations: {
           country: [{ value: 'E92000001', label: 'England' }],
         },
         boundaryLevels: [],
@@ -334,7 +334,7 @@ describe('TimePeriodDataTable', () => {
             decimalPlaces: 1,
           },
         ],
-        locationsHierarchical: {
+        locations: {
           country: [{ value: 'E92000001', label: 'England' }],
         },
         boundaryLevels: [],
@@ -418,7 +418,7 @@ describe('TimePeriodDataTable', () => {
             unit: '%',
           },
         ],
-        locationsHierarchical: {
+        locations: {
           country: [{ value: 'E92000001', label: 'England' }],
         },
         boundaryLevels: [],
@@ -504,7 +504,7 @@ describe('TimePeriodDataTable', () => {
           },
         ],
         // Contains a mixture of hierarchical (LAs) and flat (country) locations
-        locationsHierarchical: {
+        locations: {
           country: [{ value: 'england', label: 'England' }],
           localAuthority: [
             {

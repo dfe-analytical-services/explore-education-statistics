@@ -17,6 +17,7 @@ function useFormSubmit<FormValues>(
   errorMappers:
     | FieldMessageMapper<FormValues>[]
     | ((values: FormValues) => FieldMessageMapper<FormValues>[]) = [],
+  fallbackErrorMapper?: FieldMessageMapper<FormValues>,
 ) {
   const { handleError } = useErrorControl();
 
@@ -31,6 +32,7 @@ function useFormSubmit<FormValues>(
             typeof errorMappers === 'function'
               ? errorMappers(values)
               : errorMappers,
+            fallbackErrorMapper,
           );
 
           if (Object.values(errors).length) {
@@ -43,7 +45,7 @@ function useFormSubmit<FormValues>(
         }
       }
     },
-    [onSubmit, handleError, errorMappers],
+    [onSubmit, handleError, errorMappers, fallbackErrorMapper],
   );
 }
 
