@@ -21,6 +21,7 @@
         <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
         <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
         <PackageReference Include="Microsoft.Azure.Storage.Queue" Version="11.2.3" />
+        <PackageReference Include="System.Linq.Async" Version="5.1.0" />
         <PackageReference Include="System.Net.NameResolution" Version="4.3.0" />
         <PackageReference Include="Mime" Version="3.1.0" />
         <PackageReference Include="Mime-Detective" Version="0.0.6-beta5" />

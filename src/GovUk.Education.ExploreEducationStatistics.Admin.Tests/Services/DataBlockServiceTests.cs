@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -801,13 +802,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var dataBlocks = context.DataBlocks.ToList();
 
-                Assert.Single(dataBlocks);
-
-                var dataBlock = dataBlocks[0];
+                var dataBlock = Assert.Single(dataBlocks);
 
                 // Validate Created date is in the DB, even if not returned in result
                 Assert.True(dataBlock.Created.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(dataBlock.Created.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(dataBlock.Created!.Value).Milliseconds, 0, 1500);
 
                 Assert.Equal(createRequest.Heading, dataBlock.Heading);
                 Assert.Equal(createRequest.Name, dataBlock.Name);
@@ -824,8 +823,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .FirstOrDefaultAsync(r => r.Id == release.Id);
 
                 Assert.NotNull(savedRelease);
-                Assert.Single(savedRelease.ContentBlocks);
+                Assert.Single(savedRelease!.ContentBlocks);
                 Assert.Equal(dataBlock, savedRelease.ContentBlocks[0].ContentBlock);
+
+                // EES-3167 Check the migration flag is false
+                Assert.False(dataBlock.LocationsMigrated);
             }
         }
 
@@ -962,6 +964,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Width = 500,
                     }
                 },
+                // EES-3167 Set the flag on this data block as though it's already been migrated
+                // After the update it will need migrating again so this flag should get reset
+                LocationsMigrated = true
             };
             
             var releaseContentBlock = new ReleaseContentBlock
@@ -1042,8 +1047,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlock.Id);
 
-                Assert.Equal(updateRequest.Heading, updatedDataBlock?.Heading);
-                Assert.Equal(updateRequest.Name, updatedDataBlock?.Name);
+                Assert.Equal(updateRequest.Heading, updatedDataBlock!.Heading);
+                Assert.Equal(updateRequest.Name, updatedDataBlock.Name);
                 Assert.Equal(updateRequest.HighlightName, updatedDataBlock.HighlightName);
                 Assert.Equal(updateRequest.HighlightDescription, updatedDataBlock.HighlightDescription);
                 Assert.Equal(updateRequest.Source, updatedDataBlock.Source);
@@ -1051,6 +1056,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 updateRequest.Query.AssertDeepEqualTo(updatedDataBlock.Query);
                 updateRequest.Table.AssertDeepEqualTo(updatedDataBlock.Table);
                 updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
+
+                // EES-3167 Check the migration flag has been reset after the update
+                Assert.False(updatedDataBlock.LocationsMigrated);
             }
         }
 
@@ -1146,10 +1154,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var updatedDataBlock = await context.DataBlocks.FindAsync(dataBlock.Id);
 
-                Assert.Equal(updateRequest.Heading, updatedDataBlock?.Heading);
-                updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock?.Charts);
+                Assert.Equal(updateRequest.Heading, updatedDataBlock!.Heading);
+                updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
 
-                Assert.Single(updatedDataBlock?.Charts);
+                Assert.Single(updatedDataBlock.Charts);
                 Assert.Equal(updateRequest.Heading, updatedDataBlock.Charts[0].Title);
             }
         }
@@ -1267,14 +1275,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private DataBlockService BuildDataBlockService(
-            ContentDbContext contentDbContext = null,
-            IPersistenceHelper<ContentDbContext> persistenceHelper = null,
-            IReleaseFileService releaseFileService = null,
-            IReleaseContentBlockRepository releaseContentBlockRepository = null,
-            IUserService userService = null,
-            IBlobCacheService cacheService = null,
-            ICacheKeyService cacheKeyService = null)
+        private static DataBlockService BuildDataBlockService(
+            ContentDbContext? contentDbContext = null,
+            IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
+            IReleaseFileService? releaseFileService = null,
+            IReleaseContentBlockRepository? releaseContentBlockRepository = null,
+            IUserService? userService = null,
+            IBlobCacheService? cacheService = null,
+            ICacheKeyService? cacheKeyService = null)
         {
             var service = new DataBlockService(
                 contentDbContext ?? Mock.Of<ContentDbContext>(Strict),

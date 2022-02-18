@@ -110,8 +110,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     ))
                 .AddScoped<IFilterRepository, FilterRepository>()
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
-                .AddScoped<IIndicatorRepository, IndicatorRepository>();
+                .AddScoped<IIndicatorRepository, IndicatorRepository>()
 
+                // Services temporarily added to migrate data blocks for EES-3167.
+                .AddScoped<ILocationRepository, LocationRepository>()
+                .AddScoped<IDataBlockMigrationService, DataBlockMigrationService>();
+
+            AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
             AddPersistenceHelper<PublicStatisticsDbContext>(builder.Services);
         }
