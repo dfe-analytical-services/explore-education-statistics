@@ -47,6 +47,7 @@ import React, {
   useState,
 } from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
+import { uniq } from 'lodash';
 
 interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -397,7 +398,9 @@ export const MapBlockInternal = ({
   }, [dataSetCategories, shouldGroupLocationOptions]);
 
   const locationType = useMemo(() => {
-    const levels = dataSetCategories.map(category => category.filter.level);
+    const levels = uniq(
+      dataSetCategories.map(category => category.filter.level),
+    );
     return !levels.every(level => level === levels[0]) ||
       !locationLevelsMap[levels[0]]
       ? { label: 'location', prefix: 'a' }

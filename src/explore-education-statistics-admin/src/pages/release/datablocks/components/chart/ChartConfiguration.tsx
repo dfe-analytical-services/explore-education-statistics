@@ -5,9 +5,8 @@ import Effect from '@common/components/Effect';
 import {
   Form,
   FormFieldRadioGroup,
+  FormFieldSelect,
   FormFieldTextInput,
-  FormGroup,
-  FormSelect,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
@@ -137,11 +136,26 @@ const ChartConfiguration = ({
       });
     }
 
+    if (definition.type === 'map' && meta.boundaryLevels) {
+      schema = schema.shape({
+        boundaryLevel: Yup.number()
+          .oneOf(meta.boundaryLevels.map(level => level.id))
+          .required('Choose a boundary level'),
+      });
+    }
+
     return schema;
-  }, [definition.capabilities.stackable, definition.type]);
+  }, [definition.capabilities.stackable, definition.type, meta.boundaryLevels]);
 
   const initialValues = useMemo<FormValues>(() => {
-    return pick(chartOptions, Object.keys(validationSchema.fields));
+    // TODO DW - include boundaryLevel as optional param in ChartOptions as per file and fileId?
+    return pick(
+      {
+        boundaryLevel,
+        ...chartOptions,
+      },
+      Object.keys(validationSchema.fields),
+    );
   }, [chartOptions, validationSchema]);
 
   const normalizeValues = useCallback(
@@ -277,27 +291,27 @@ const ChartConfiguration = ({
             )}
 
             {definition.type === 'map' && meta.boundaryLevels && (
-              <FormGroup>
-                <FormSelect
-                  id={`${formId}-boundaryLevel`}
-                  label="Select a version of geographical data to use"
-                  name="boundaryLevel"
-                  order={[]}
-                  value={boundaryLevel?.toString()}
-                  options={[
-                    { label: 'Latest', value: '' },
-                    ...meta.boundaryLevels.map(({ id, label }) => ({
-                      value: id,
-                      label,
-                    })),
-                  ]}
-                  onChange={e => {
-                    if (onBoundaryLevelChange) {
-                      onBoundaryLevelChange(e.target.value);
-                    }
-                  }}
-                />
-              </FormGroup>
+              <FormFieldSelect
+                id={`${formId}-boundaryLevel`}
+                label="Select a version of geographical data to use"
+                name="boundaryLevel"
+                order={[]}
+                options={[
+                  {
+                    label: 'Please select',
+                    value: '',
+                  },
+                  ...meta.boundaryLevels.map(({ id, label }) => ({
+                    value: id,
+                    label,
+                  })),
+                ]}
+                onChange={e => {
+                  if (onBoundaryLevelChange) {
+                    onBoundaryLevelChange(e.target.value);
+                  }
+                }}
+              />
             )}
 
             {definition.type !== 'map' && (
