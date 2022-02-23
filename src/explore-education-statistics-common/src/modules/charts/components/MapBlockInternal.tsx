@@ -287,13 +287,14 @@ function generateGeometryAndLegend(
 }
 
 export interface MapBlockProps extends ChartProps {
-  id: string;
-  position?: { lat: number; lng: number };
-  maxBounds?: LatLngBounds;
-  legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;
   };
+  boundaryLevel: number;
+  id: string;
+  legend: LegendConfiguration;
+  maxBounds?: LatLngBounds;
+  position?: { lat: number; lng: number };
 }
 
 export const MapBlockInternal = ({

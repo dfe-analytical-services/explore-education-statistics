@@ -49,7 +49,6 @@ const replaceNewLines = (event: ChangeEvent<HTMLTextAreaElement>) => {
 };
 
 interface Props {
-  boundaryLevel?: number;
   buttons?: ReactNode;
   chartOptions: ChartOptions;
   definition: ChartDefinition;
@@ -63,7 +62,6 @@ interface Props {
 const formId = 'chartConfigurationForm';
 
 const ChartConfiguration = ({
-  boundaryLevel,
   buttons,
   chartOptions,
   definition,
@@ -136,7 +134,7 @@ const ChartConfiguration = ({
       });
     }
 
-    if (definition.type === 'map' && meta.boundaryLevels) {
+    if (definition.type === 'map' && meta.boundaryLevels?.length) {
       schema = schema.shape({
         boundaryLevel: Yup.number()
           .oneOf(meta.boundaryLevels.map(level => level.id))
@@ -149,13 +147,7 @@ const ChartConfiguration = ({
 
   const initialValues = useMemo<FormValues>(() => {
     // TODO DW - include boundaryLevel as optional param in ChartOptions as per file and fileId?
-    return pick(
-      {
-        boundaryLevel,
-        ...chartOptions,
-      },
-      Object.keys(validationSchema.fields),
-    );
+    return pick(chartOptions, Object.keys(validationSchema.fields));
   }, [chartOptions, validationSchema]);
 
   const normalizeValues = useCallback(
@@ -164,6 +156,9 @@ const ChartConfiguration = ({
       // values from overwriting existing values
       return merge({}, chartOptions, values, {
         width: parseNumber(values.width),
+        boundaryLevel: values.boundaryLevel
+          ? parseNumber(values.boundaryLevel)
+          : undefined,
       });
     },
     [chartOptions],
@@ -290,7 +285,7 @@ const ChartConfiguration = ({
               />
             )}
 
-            {definition.type === 'map' && meta.boundaryLevels && (
+            {definition.type === 'map' && meta.boundaryLevels?.length && (
               <FormFieldSelect
                 id={`${formId}-boundaryLevel`}
                 label="Select a version of geographical data to use"

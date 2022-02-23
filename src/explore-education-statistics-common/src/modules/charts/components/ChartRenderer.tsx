@@ -69,19 +69,15 @@ function ChartRenderer({
     type === 'map' &&
     footnotes.findIndex(footnote => footnote.id === boundaryFootnoteId) === -1
   ) {
-    const boundaryFootnoteLabel = `The boundary data used in this map includes${meta.boundaryLevels
-      .map((value, index, array) => {
-        let separator = index === 0 ? ' ' : ', ';
-        if (array.length - 1 === index && array.length > 1) {
-          separator = ' and ';
-        }
-        return `${separator}${value.label}`;
-      })
-      .join('')}`;
-    footnotes.push({
-      id: boundaryFootnoteId,
-      label: boundaryFootnoteLabel,
-    });
+    const selectedBoundaryLevel = meta.boundaryLevels.find(
+      boundaryLevel => boundaryLevel.id === props.boundaryLevel,
+    );
+    if (selectedBoundaryLevel) {
+      footnotes.push({
+        id: boundaryFootnoteId,
+        label: `This map uses the boundary data ${selectedBoundaryLevel.label}`,
+      });
+    }
   }
 
   if (data && meta && data.length > 0) {
