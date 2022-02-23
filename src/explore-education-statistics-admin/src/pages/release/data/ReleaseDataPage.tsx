@@ -2,6 +2,7 @@ import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext'
 import ReleaseDataUploadsSection from '@admin/pages/release/data/components/ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from '@admin/pages/release/data/components/ReleaseFileUploadsSection';
 import ReleaseDataGuidanceSection from '@admin/pages/release/data/components/ReleaseDataGuidanceSection';
+import ReleaseDataReorderSection from '@admin/pages/release/data/components/ReleaseDataReorderSection';
 import permissionService from '@admin/services/permissionService';
 import { DataFile } from '@admin/services/releaseDataFileService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -65,6 +66,13 @@ const ReleaseDataPage = () => {
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
+        {/* EES-1243 
+        <TabsSection id="test-id" title="Reorder filters and indicators">
+          <ReleaseDataReorderSection
+            releaseId={releaseId}
+            canUpdateRelease={canUpdateRelease}
+          />
+        </TabsSection> */}
       </Tabs>
     </LoadingSpinner>
   );
