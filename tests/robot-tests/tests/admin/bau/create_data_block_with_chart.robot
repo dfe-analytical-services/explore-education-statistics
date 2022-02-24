@@ -2,6 +2,7 @@
 Library             Collections
 Library             ../../libs/admin_api.py
 Resource            ../../libs/admin-common.robot
+Resource            ../../libs/common.robot
 Resource            ../../libs/admin/manage-content-common.robot
 Resource            ../../libs/charts.robot
 
@@ -16,6 +17,8 @@ ${TOPIC_NAME}=              %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=        UI tests - create data block with chart %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}=          UI test data block
 ${CONTENT_SECTION_NAME}=    Test data block section
+${FOOTNOTE_1}=              Test footnote from bau
+${FOOTNOTE_UPDATED}=        Updated test footnote from bau
 
 *** Test Cases ***
 Create test publication and release via API
@@ -26,6 +29,22 @@ Upload subject
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    Academic Year 2025/26 (not Live)
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+
+Navigate to 'Footnotes' page
+    user waits for page to finish loading
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+
+Create footnote
+    user waits until page contains link    Create footnote
+    user clicks link    Create footnote
+    user waits until page does not contain loading spinner
+    user clicks footnote subject radio    UI test subject    Applies to all data
+    user clicks element    id:footnoteForm-content
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_1}
+    user clicks radio    Applies to all data
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes    %{WAIT_SMALL}
 
 Start creating a data block
     user clicks link    Data blocks
@@ -82,7 +101,6 @@ Create table
     ...    Admission Numbers for 'UI test subject' in Bolton 001, Bolton 002, Bolton 003, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2020
 
 Validate table rows
-    # broken
     user checks table column heading contains    1    1    Admission Numbers
 
     ${row}=    user gets row number with heading    Bolton 001
@@ -177,10 +195,50 @@ Embed data block into release content
     user clicks button    Add data block
     user chooses and embeds data block    ${DATABLOCK_NAME}
 
+Check footnote is displayed in content Tab
+    user checks accordion section contains x blocks    ${CONTENT_SECTION_NAME}    1    id:releaseMainContent
+
+    user scrolls to element    id:releaseMainContent
+
+    user checks list has x items    testid:footnotes    1
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_1}
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_1}
+
+Update footnote
+    [Documentation]    EES-3136
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+    user clicks link    Edit footnote    testid:Footnote - ${FOOTNOTE_1}
+
+    user waits until h2 is visible    Edit footnote
+    user enters text into element    label:Footnote    ${FOOTNOTE_UPDATED}
+    user clicks button    Save footnote
+    user waits until page contains    ${FOOTNOTE_UPDATED}
+    user checks page does not contain    ${FOOTNOTE_1}
+
+Navigate to content tab
+    user clicks link    Content
+    user waits until h2 is visible    ${PUBLICATION_NAME}
+
+Check updated footnote is displayed in content Tab
+    [Documentation]    EES-3136
+    [Tags]    Failing
+    user clicks button    Test data block section
+    ${section}=    user gets accordion section content element    Test data block section
+    ...    //*[@data-testid="editableAccordionSection"]
+    user scrolls to element    ${section}
+
+    user scrolls to element    //*[@data-testid="editableAccordionSection"]//*[@data-testid="footnotes"]
+
+    user checks list has x items    testid:footnotes    1
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_UPDATED}
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_UPDATE}
+
 Validate embedded table rows
     ${datablock}=    set variable    //*[@data-testid="Data block - ${DATABLOCK_NAME}"]
-    # Need to scroll to block to load it
-    user scrolls to element    ${datablock}
+    user scrolls to element    id:releaseMainContent
+
+    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
     ${table}=    set variable    ${datablock} >> css:table
     user waits until page contains element    ${table}    30
