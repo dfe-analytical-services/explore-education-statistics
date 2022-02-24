@@ -9,10 +9,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 {
     public record ObservationViewModel
     {
+        public Guid Id { get; set; }
+
         public List<Guid> Filters { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
         public GeographicLevel GeographicLevel { get; set; }
+
+        public Guid LocationId { get; set; }
 
         public LocationViewModel Location { get; set; }
 
