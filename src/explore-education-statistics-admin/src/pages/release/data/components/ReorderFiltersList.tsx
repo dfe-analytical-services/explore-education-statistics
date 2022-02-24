@@ -113,7 +113,7 @@ const testSubjectMeta: SubjectMeta = {
 
 interface UpdatedFilter {
   id?: string;
-  filterGroups: { id?: string; filterItems: (string | undefined)[] }[];
+  filterGroups: { id?: string; filterItems: (string | undefined)[] }[]; // EES-1243 - won't need the undefined when ids exist
 }
 export type UpdateFiltersRequest = UpdatedFilter[];
 

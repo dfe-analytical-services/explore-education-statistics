@@ -30,12 +30,8 @@ const ReleaseDataReorderSection = ({ releaseId, canUpdateRelease }: Props) => {
     () => tableBuilderService.listReleaseSubjects(releaseId),
     [releaseId],
   );
-  const [reorderingFilters, setReorderingFilters] = useState<
-    Subject | undefined
-  >();
-  const [reorderingIndicators, setReorderingIndicators] = useState<
-    Subject | undefined
-  >();
+  const [reorderingFilters, setReorderingFilters] = useState<Subject>();
+  const [reorderingIndicators, setReorderingIndicators] = useState<Subject>();
 
   const handleSaveFilters = (updatedFilters: UpdateFiltersRequest) => {
     setReorderingFilters(undefined);
@@ -52,8 +48,9 @@ const ReleaseDataReorderSection = ({ releaseId, canUpdateRelease }: Props) => {
       <InsetText>
         <h3>Before you start</h3>
         <p>
-          Reorder the groups and options for filters and indicators here. This
-          order will be reflected in the table tool on the public website.
+          Reorder the groups and options for filters and indicators on this
+          page. This order will be reflected in the table tool on the public
+          website.
         </p>
       </InsetText>
 
