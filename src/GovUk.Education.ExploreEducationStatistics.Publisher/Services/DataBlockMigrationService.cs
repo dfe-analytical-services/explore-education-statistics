@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -292,7 +293,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             );
         }
 
-        private static TableBuilderConfiguration MigrateTableConfig(
+        private static TableBuilderConfiguration? MigrateTableConfig(
             DataBlock dataBlock,
             IReadOnlyDictionary<GeographicLevel, Dictionary<string, List<Guid>>> locationsMap)
         {
@@ -399,13 +400,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                                         // | 2016 | Provider B (1000000) |
                                         // If the query is for 2015 to 2016 the rendered table currently has one merged row Provider A (1000000) / Provider B (1000000).
                                         // After the migration to id's it will render with two rows Provider A (1000000) and Provider B (1000000),
-                                        // so one table row needs to become two table row headers.
+                                        // so one table row header needs to become two table row headers.
                                         // BUT
-                                        // If the query is for 2015 OR 2016 (but not both), the table is currently rendering one row,
+                                        // If the query is for 2015 OR 2016 (not both), the table is currently rendering one row,
                                         // either Provider A (1000000) for 2015 or Provider B (1000000) for 2016.
                                         // After the migration to id's it will continue to render one row and inserting new table headers would corrupt the table.
 
-                                        // A check of Prod data reveals that where there's Provider level data with duplicates that they are being used as table highlights
+                                        // A check of Prod data reveals that where there's Provider level data with duplicates, that they are being used as table highlights
                                         // rather than embedded tables in content, and they are making all time periods and filters available.
                                         // Therefore proceed by inserting additional headers here but recommend these tables are
                                         // visually tested before and after we switch to using location id's.
