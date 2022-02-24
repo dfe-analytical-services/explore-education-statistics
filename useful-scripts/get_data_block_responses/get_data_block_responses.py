@@ -172,8 +172,13 @@ for datablock in datablocks:
 
     try:
         json_response = json.loads(resp.text)
+        if json_response['results']:
+            for result in json_response['results']:
+                result.pop('location', None)
+
     except Exception as e:
-        print_to_console(f'Failed to convert response text to json with block {block_id} subject {subject_id}, {e}')
+        print_to_console(
+            f'Failed to convert response text to json with block {block_id} subject {subject_id}, {e}. status code: {resp.status_code}')
         write_this_block(
             status_code=resp.status_code,
             response_time=block_time_end - block_time_start,
