@@ -419,7 +419,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                                         // Since what we do above for Rows/RowGroups is not completely safe let's limit creating extra headers for ColumnGroups / Columns.
                                         // Fail the migration here with an exception so we can investigate.
                                         throw new InvalidOperationException(
-                                            $"Only expecting one location id for data block '{dataBlockId}' {tableHeaderField} with level '{geographicLevel}' and code '{tableHeader.Value}'"
+                                            $"Only expecting one location id for data block '{dataBlockId}' {tableHeaderField} table header with level '{geographicLevel}' and code '{tableHeader.Value}'"
                                         );
                                     default:
                                         throw new ArgumentOutOfRangeException(nameof(tableHeaderField),
@@ -429,7 +429,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                                 // Only expecting multiple location id's for Provider/School level data
                                 // Fail the migration here with an exception so we can investigate.
                                 throw new InvalidOperationException(
-                                    $"Only expecting one location id for data block '{dataBlockId}' {tableHeaderField} with level '{geographicLevel}' and code '{tableHeader.Value}'"
+                                    $"Only expecting one location id for data block '{dataBlockId}' {tableHeaderField} table header with level '{geographicLevel}' and code '{tableHeader.Value}'"
                                 );
                         }
                     }
