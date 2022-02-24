@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public void FastTrackViewModel_SerialiseAndDeserialise()
+        public void FastTrackViewModel_SerialiseAndDeserialize()
         {
             var original = new FastTrackViewModel
             {
@@ -172,10 +172,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     {
                         new()
                         {
+                            Id = Guid.NewGuid(),
                             Filters = new List<Guid>
                             {
                                 Guid.NewGuid()
                             },
+                            LocationId = Guid.NewGuid(),
                             Location = new LocationViewModel
                             {
                                 Country = new CodeNameViewModel

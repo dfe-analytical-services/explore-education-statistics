@@ -39,10 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             {
                 new()
                 {
+                    Id = Guid.NewGuid(),
                     Filters = new List<Guid>
                     {
                         Guid.NewGuid()
                     },
+                    LocationId = Guid.NewGuid(),
                     Location = new LocationViewModel
                     {
                         Country = new CodeNameViewModel
