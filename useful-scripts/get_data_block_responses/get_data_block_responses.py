@@ -172,6 +172,7 @@ for datablock in datablocks:
 
     try:
         json_response = json.loads(resp.text)
+
     except Exception as e:
         print_to_console(f'Failed to convert response text to json with block {block_id} subject {subject_id}, {e}')
         write_this_block(
@@ -183,7 +184,7 @@ for datablock in datablocks:
     write_this_block(
         status_code=resp.status_code,
         response_time=block_time_end - block_time_start,
-        response_dict=json_response)
+        response_dict=json_response.pop('location', None))
 
 end_time = time.perf_counter()
 print_to_console(f'Total time: {end_time - start_time}')
