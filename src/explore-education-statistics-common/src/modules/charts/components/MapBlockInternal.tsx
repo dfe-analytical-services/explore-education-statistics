@@ -417,6 +417,14 @@ export const MapBlockInternal = ({
   const selectedDataSetConfiguration =
     dataSetCategoryConfigs[selectedDataSetKey];
 
+  const selectedDataSet =
+    selectedFeature?.properties?.dataSets[selectedDataSetKey];
+
+  const {
+    config: selectedDataSetConfig,
+    dataSet: expandedSelectedDataSet,
+  } = dataSetCategoryConfigs[selectedDataSetKey];
+
   // initialise
   useEffect(() => {
     import('@common/modules/charts/files/ukGeoJson.json').then(imported => {
@@ -545,21 +553,13 @@ export const MapBlockInternal = ({
 
       featureLayer.bindTooltip(() => {
         if (feature.properties) {
-          const items = Object.entries(feature.properties.dataSets).map(
-            ([dataSetKey, dataSet]) => {
-              const dataSetConfig = dataSetCategoryConfigs[dataSetKey];
-
-              return (
-                `<li>` +
-                `${dataSetConfig.config.label}: ${formatPretty(
-                  dataSet.value,
-                  dataSetConfig.dataSet.indicator.unit,
-                  dataSetConfig.dataSet.indicator.decimalPlaces,
-                )}` +
-                `</li>`
-              );
-            },
+          const dataSetConfig = dataSetCategoryConfigs[selectedDataSetKey];
+          const dataSetValue = formatPretty(
+            feature.properties.dataSets[selectedDataSetKey].value,
+            dataSetConfig.dataSet.indicator.unit,
+            dataSetConfig.dataSet.indicator.decimalPlaces,
           );
+          const content = `${dataSetConfig.config.label}: ${dataSetValue}`;
 
           const mapWidth = mapRef.current?.container?.clientWidth;
 
@@ -571,9 +571,7 @@ export const MapBlockInternal = ({
           return (
             `<div class="${styles.tooltip}" style="${tooltipStyle}">` +
             `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
-            `<ul class="${
-              styles.tooltipList
-            }" data-testid="chartTooltip-items">${items.join('')}</ul>` +
+            `<p class="${styles.tooltipContent}" data-testid="chartTooltip-contents">${content}</p>` +
             `</div>`
           );
         }
@@ -581,7 +579,7 @@ export const MapBlockInternal = ({
         return '';
       });
     },
-    [dataSetCategoryConfigs],
+    [dataSetCategoryConfigs, selectedDataSetKey],
   );
 
   if (
@@ -685,7 +683,7 @@ export const MapBlockInternal = ({
           )}
         </div>
         {selectedDataSetConfiguration && (
-          <div className="govuk-grid-column-one-third" aria-live="assertive">
+          <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s">
               Key to {selectedDataSetConfiguration?.config?.label}
             </h3>
@@ -707,48 +705,35 @@ export const MapBlockInternal = ({
                 </li>
               ))}
             </ul>
+
+            <div
+              aria-live="polite"
+              className="govuk-!-margin-top-5"
+              data-testId="mapBlock-indicator"
+            >
+              {selectedFeature && (
+                <>
+                  <h3 className="govuk-heading-s">
+                    {selectedFeature?.properties.name}
+                  </h3>
+
+                  {selectedDataSet && (
+                    <KeyStatTile
+                      testId="mapBlock-indicatorTile"
+                      title={selectedDataSetConfig.label}
+                      value={formatPretty(
+                        selectedDataSet.value,
+                        expandedSelectedDataSet.indicator.unit,
+                        expandedSelectedDataSet.indicator.decimalPlaces,
+                      )}
+                    />
+                  )}
+                </>
+              )}
+            </div>
           </div>
         )}
       </div>
-
-      {selectedDataSetConfiguration && selectedFeature && (
-        <>
-          <h3 className="govuk-heading-m">
-            {selectedFeature?.properties.name}
-          </h3>
-
-          {selectedFeature?.properties?.dataSets && selectedDataSetKey && (
-            <KeyStatContainer>
-              {Object.entries(selectedFeature?.properties.dataSets).map(
-                ([dataSetKey, dataSet]) => {
-                  if (!dataSetCategoryConfigs[dataSetKey]) {
-                    return null;
-                  }
-
-                  const {
-                    config,
-                    dataSet: expandedDataSet,
-                  } = dataSetCategoryConfigs[dataSetKey];
-
-                  return (
-                    <KeyStatColumn key={dataSetKey} testId="mapBlock-indicator">
-                      <KeyStatTile
-                        testId="mapBlock-indicatorTile"
-                        title={config.label}
-                        value={formatPretty(
-                          dataSet.value,
-                          expandedDataSet.indicator.unit,
-                          expandedDataSet.indicator.decimalPlaces,
-                        )}
-                      />
-                    </KeyStatColumn>
-                  );
-                },
-              )}
-            </KeyStatContainer>
-          )}
-        </>
-      )}
     </>
   );
 };

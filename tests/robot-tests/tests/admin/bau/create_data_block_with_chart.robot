@@ -645,18 +645,9 @@ Validate basic geographic chart preview
     user chooses select option    id:chartBuilderPreview-map-selectedLocation    Nailsea Youngwood
 
     user mouses over selected map feature    id:chartBuilderPreview
-    user checks chart tooltip label contains    id:chartBuilderPreview    Nailsea Youngwood
-    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions in 2005: 3,612
-    user checks chart tooltip item contains    id:chartBuilderPreview    2    Admissions in 2010: 9,304
-    user checks chart tooltip item contains    id:chartBuilderPreview    3    Admissions in 2011: 9,603
-    user checks chart tooltip item contains    id:chartBuilderPreview    4    Admissions in 2012: 8,150
-    user checks chart tooltip item contains    id:chartBuilderPreview    5    Admissions in 2016: 4,198
+    user checks map tooltip label contains    id:chartBuilderPreview    Nailsea Youngwood
 
-    user checks map chart indicator tile contains    id:chartBuilderPreview    1    Admissions in 2005    3,612
-    user checks map chart indicator tile contains    id:chartBuilderPreview    2    Admissions in 2010    9,304
-    user checks map chart indicator tile contains    id:chartBuilderPreview    3    Admissions in 2011    9,603
-    user checks map chart indicator tile contains    id:chartBuilderPreview    4    Admissions in 2012    8,150
-    user checks map chart indicator tile contains    id:chartBuilderPreview    5    Admissions in 2016    4,198
+    user checks map chart indicator tile contains    id:chartBuilderPreview    Admissions in 2005    3,612
 
 Save and validate geographic chart embeds correctly
     user scrolls to the bottom of the page
@@ -680,18 +671,9 @@ Save and validate geographic chart embeds correctly
     user chooses select option    ${datablock} >> name:selectedLocation    Nailsea Youngwood
 
     user mouses over selected map feature    ${datablock}
-    user checks chart tooltip label contains    ${datablock}    Nailsea Youngwood
-    user checks chart tooltip item contains    ${datablock}    1    Admissions in 2005: 3,612
-    user checks chart tooltip item contains    ${datablock}    2    Admissions in 2010: 9,304
-    user checks chart tooltip item contains    ${datablock}    3    Admissions in 2011: 9,603
-    user checks chart tooltip item contains    ${datablock}    4    Admissions in 2012: 8,150
-    user checks chart tooltip item contains    ${datablock}    5    Admissions in 2016: 4,198
+    user checks map tooltip label contains    ${datablock}    Nailsea Youngwood
 
-    user checks map chart indicator tile contains    ${datablock}    1    Admissions in 2005    3,612
-    user checks map chart indicator tile contains    ${datablock}    2    Admissions in 2010    9,304
-    user checks map chart indicator tile contains    ${datablock}    3    Admissions in 2011    9,603
-    user checks map chart indicator tile contains    ${datablock}    4    Admissions in 2012    8,150
-    user checks map chart indicator tile contains    ${datablock}    5    Admissions in 2016    4,198
+    user checks map chart indicator tile contains    ${datablock}    Admissions in 2005    3,612
 
 Configure basic infographic chart
     user navigates to admin frontend    ${DATABLOCK_URL}

@@ -141,11 +141,26 @@ user checks chart tooltip item contains
     user waits until element is visible    ${element}
     user waits until element contains    ${element}    ${text}
 
-user checks map chart indicator tile contains
-    [Arguments]    ${locator}    ${number}    ${title}    ${value}
+user checks map tooltip label contains
+    [Arguments]    ${locator}    ${text}
+    user waits until parent contains element    ${locator}    css:[data-testid="chartTooltip-label"]
+    ${element}=    get child element    ${locator}    css:[data-testid="chartTooltip-label"]
+    user waits until element is visible    ${element}
+    user waits until element contains    ${element}    ${text}
+
+user checks map tooltip item contains
+    [Arguments]    ${locator}    ${text}
     user waits until parent contains element    ${locator}
-    ...    css:[data-testid="mapBlock-indicator"]:nth-of-type(${number})
-    ${indicator}=    get child element    ${locator}    css:[data-testid="mapBlock-indicator"]:nth-of-type(${number})
+    ...    css:[data-testid="chartTooltip-content"])
+    ${element}=    get child element    ${locator}    css:[data-testid="chartTooltip-content"])
+    user waits until element is visible    ${element}
+    user waits until element contains    ${element}    ${text}
+
+user checks map chart indicator tile contains
+    [Arguments]    ${locator}    ${title}    ${value}
+    user waits until parent contains element    ${locator}
+    ...    css:[data-testid="mapBlock-indicator"]
+    ${indicator}=    get child element    ${locator}    css:[data-testid="mapBlock-indicator"]
 
     ${indicator_title}=    get child element    ${indicator}    css:[data-testid="mapBlock-indicatorTile-title"]
     user waits until element is visible    ${indicator_title}
