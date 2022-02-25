@@ -359,6 +359,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
 
+            // EES-3167 Configuration for temporary data block fields for the migration from Location codes to id's.
+            modelBuilder.Entity<DataBlock>()
+                .Property(block => block.ChartsMigrated)
+                .HasColumnName("DataBlock_ChartsMigrated")
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<IChart>>(v));
+            modelBuilder.Entity<DataBlock>()
+                .Property(block => block.QueryMigrated)
+                .HasColumnName("DataBlock_QueryMigrated")
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
+            modelBuilder.Entity<DataBlock>()
+                .Property(block => block.TableMigrated)
+                .HasColumnName("DataBlock_TableMigrated")
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v));
+            modelBuilder.Entity<DataBlock>()
+                .Property(block => block.LocationsMigrated)
+                .HasColumnName("DataBlock_LocationsMigrated")
+                .HasDefaultValue(false)
+                .IsRequired();
+
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Charts)
                 .HasColumnName("DataBlock_Charts")

@@ -398,6 +398,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
             services.AddTransient<IStorageQueueService, StorageQueueService>(s =>
                 new StorageQueueService(Configuration.GetValue<string>("CoreStorage")));
+            services.AddTransient<IDataBlockMigrationService, DataBlockMigrationService>(provider =>
+                new DataBlockMigrationService(
+                    context: provider.GetRequiredService<ContentDbContext>(),
+                    storageQueueService: new StorageQueueService(Configuration.GetValue<string>("PublisherStorage")),
+                    userService: provider.GetRequiredService<IUserService>(),
+                    logger: provider.GetRequiredService<ILogger<DataBlockMigrationService>>()));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);

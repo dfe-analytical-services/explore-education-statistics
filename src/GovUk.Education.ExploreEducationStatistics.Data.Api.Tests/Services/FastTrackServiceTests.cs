@@ -51,7 +51,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 TableHeaders = new TableHeaders
                 {
-                    Rows = new []{ new TableHeader("table header 1", TableHeaderType.Filter) }
+                    Rows = new List<TableHeader>
+                    {
+                        new("table header 1", TableHeaderType.Filter)
+                    }
                 }
             }, new ObservationQueryContext
             {

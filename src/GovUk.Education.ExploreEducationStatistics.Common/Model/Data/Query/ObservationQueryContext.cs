@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
@@ -17,8 +18,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
 
         public ObservationQueryContext Clone()
         {
-            var clone = MemberwiseClone() as ObservationQueryContext;
-            return clone;
+            return new ObservationQueryContext
+            {
+                SubjectId = SubjectId,
+                TimePeriod = TimePeriod?.Clone(),
+                Filters = Filters?.ToList(),
+                BoundaryLevel = BoundaryLevel,
+                Indicators = Indicators?.ToList(),
+                Locations = Locations == null ? null : Locations with { },
+                LocationIds = LocationIds?.ToList(),
+                IncludeGeoJson = IncludeGeoJson
+            };
         }
 
         public override string ToString()

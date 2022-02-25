@@ -28,6 +28,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
             EndCode = endCode;
         }
 
+        public TimePeriodQuery Clone()
+        {
+            return (TimePeriodQuery)MemberwiseClone();
+        }
+
         public override string ToString()
         {
             return $"{nameof(StartYear)}: {StartYear}, " +

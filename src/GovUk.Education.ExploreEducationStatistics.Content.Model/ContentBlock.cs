@@ -127,6 +127,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public DataBlockSummary Summary { get; set; }
 
         public TableBuilderConfiguration Table { get; set; }
+
+        // EES-3167 Temporary fields used for the migration from Location codes to id's.
+        public List<IChart> ChartsMigrated { get; set; } = new();
+        public ObservationQueryContext QueryMigrated { get; set; }
+        public TableBuilderConfiguration TableMigrated { get; set; }
+        public bool LocationsMigrated { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Field)]
