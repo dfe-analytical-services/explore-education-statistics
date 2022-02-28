@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -57,6 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model.Data.Que
             };
 
             var clone = original.Clone();
+
+            clone.AssertDeepEqualTo(original);
 
             clone.SubjectId = Guid.NewGuid();
             clone.BoundaryLevel = 2;
