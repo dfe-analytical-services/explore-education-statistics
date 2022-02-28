@@ -2,6 +2,8 @@ import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrappe
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useReleaseContentHubContext } from '@admin/contexts/ReleaseContentHubContext';
+import useBlockLock from '@admin/hooks/useBlockLock';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
 import {
@@ -14,12 +16,11 @@ import releaseContentCommentService, {
 import { Comment, EditableBlock } from '@admin/services/types/content';
 import Gate from '@common/components/Gate';
 import useAsyncCallback from '@common/hooks/useAsyncCallback';
-import useToggle from '@common/hooks/useToggle';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
 import isBrowser from '@common/utils/isBrowser';
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { generatePath } from 'react-router';
 
 interface Props {
@@ -54,8 +55,7 @@ const ReleaseEditableBlock = ({
     updateUnresolvedComments,
     updateUnsavedCommentDeletions,
   } = useEditingContext();
-
-  const [isEditing, toggleEditing] = useToggle(false);
+  const { hub } = useReleaseContentHubContext();
 
   const getChartFile = useGetChartFile(releaseId);
 
@@ -67,10 +67,51 @@ const ReleaseEditableBlock = ({
     releaseId,
   });
 
+  const {
+    isLocking,
+    isLockedByOtherUser,
+    isLockedByUser,
+    locked,
+    lockedBy,
+    startLock,
+    setLock,
+  } = useBlockLock({
+    getLock: async () => hub.lockContentBlock(block.id),
+    initialLock: {
+      locked: block.locked,
+      lockedUntil: block.lockedUntil,
+      lockedBy: block.lockedBy,
+    },
+  });
+
+  useEffect(() => {
+    const onContentBlockLocked = hub.onContentBlockLocked(event => {
+      if (event.id === block.id) {
+        setLock({
+          locked: event.locked,
+          lockedUntil: event.lockedUntil,
+          lockedBy: event.lockedBy,
+        });
+      }
+    });
+
+    const onContentBlockUnlocked = hub.onContentBlockUnlocked(event => {
+      if (event.id === block.id) {
+        setLock(undefined);
+      }
+    });
+
+    return () => {
+      onContentBlockLocked.unsubscribe();
+      onContentBlockUnlocked.unsubscribe();
+    };
+  }, [block.id, hub, setLock]);
+
   const [{ isLoading: isSaving }, handleSave] = useAsyncCallback(
     async (content: string) => {
       const contentWithPlaceholders = insertReleaseIdPlaceholders(content);
       await onSave(block.id, contentWithPlaceholders);
+
       removeUnsavedBlock(block.id);
     },
     [],
@@ -81,9 +122,11 @@ const ReleaseEditableBlock = ({
       await handleSave(content);
 
       clearUnsavedCommentDeletions(block.id);
-      toggleEditing.off();
+
+      await hub.unlockContentBlock(block.id);
+      setLock(undefined);
     },
-    [handleSave, clearUnsavedCommentDeletions, block.id, toggleEditing],
+    [handleSave, clearUnsavedCommentDeletions, block.id, hub, setLock],
   );
 
   const handleDelete = useCallback(() => {
@@ -99,13 +142,16 @@ const ReleaseEditableBlock = ({
     [addUnsavedBlock, block.id],
   );
 
-  const handleSaveComment = async (comment: AddComment) =>
-    releaseContentCommentService.addContentSectionComment(
-      releaseId,
-      sectionId,
-      block.id,
-      comment,
-    );
+  const handleSaveComment = useCallback(
+    async (comment: AddComment) =>
+      releaseContentCommentService.addContentSectionComment(
+        releaseId,
+        sectionId,
+        block.id,
+        comment,
+      ),
+    [block.id, releaseId, sectionId],
+  );
 
   const handleDeletePendingComment = useCallback(
     async (commentId: string) =>
@@ -148,7 +194,7 @@ const ReleaseEditableBlock = ({
         </div>
       );
     case 'HtmlBlock':
-    case 'MarkDownBlock':
+    case 'MarkDownBlock': {
       return (
         <CommentsContextProvider
           comments={block.comments}
@@ -163,9 +209,12 @@ const ReleaseEditableBlock = ({
             editable={editable && !isBrowser('IE')}
             hideLabel
             id={blockId}
-            isEditing={isEditing}
+            isEditing={isLockedByUser}
+            isLoading={isLocking}
             isSaving={isSaving}
             label="Content block"
+            locked={locked}
+            lockedBy={isLockedByOtherUser ? lockedBy : undefined}
             transformImageAttributes={transformImageAttributes}
             useMarkdown={block.type === 'MarkDownBlock'}
             value={block.body}
@@ -173,7 +222,7 @@ const ReleaseEditableBlock = ({
             onBlur={handleBlur}
             onSubmit={handleSubmit}
             onDelete={handleDelete}
-            onEditing={toggleEditing.on}
+            onEditing={startLock}
             onImageUpload={allowImages ? handleImageUpload : undefined}
             onImageUploadCancel={
               allowImages ? handleImageUploadCancel : undefined
@@ -181,6 +230,7 @@ const ReleaseEditableBlock = ({
           />
         </CommentsContextProvider>
       );
+    }
     default:
       return <div>Unable to edit content</div>;
   }

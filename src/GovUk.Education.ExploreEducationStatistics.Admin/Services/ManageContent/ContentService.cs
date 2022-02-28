@@ -514,7 +514,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .ThenInclude(join => join.ContentSection)
                     .ThenInclude(section => section.Content)
                     .ThenInclude(content => content.Comments)
-                    .ThenInclude(comment => comment.ResolvedBy);
+                    .ThenInclude(comment => comment.ResolvedBy)
+                .Include(r => r.Content)
+                    .ThenInclude(join => join.ContentSection)
+                    .ThenInclude(section => section.Content)
+                    .ThenInclude(content => content.LockedBy);
         }
 
         private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExists(

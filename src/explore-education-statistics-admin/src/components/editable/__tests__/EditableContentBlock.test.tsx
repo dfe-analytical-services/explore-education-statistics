@@ -87,6 +87,45 @@ Test paragraph
     ).not.toBeInTheDocument();
   });
 
+  test('renders locked version correctly', () => {
+    render(
+      <EditableContentBlock
+        id="test-id"
+        label="Block content"
+        value="<p>Test content</p>"
+        locked="2022-02-16T12:00:00Z"
+        lockedBy={{
+          displayName: 'Jane Doe',
+          email: 'jane@test.com',
+          id: 'user-1',
+        }}
+        onEditing={noop}
+        onCancel={noop}
+        onSubmit={noop}
+        onDelete={noop}
+      />,
+    );
+
+    expect(
+      screen.getByText('Test content', { selector: 'p' }),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Edit block' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove block' }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByText(
+        'Jane Doe (jane@test.com) is currently editing this block (last updated 12:00)',
+      ),
+    );
+
+    expect(screen.getByText('Jane Doe is editing')).toBeInTheDocument();
+  });
+
   test('renders non-editable version with markdown content correctly', () => {
     render(
       <EditableContentBlock

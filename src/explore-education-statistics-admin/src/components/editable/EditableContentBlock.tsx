@@ -1,7 +1,9 @@
+import EditableBlockLockedMessage from '@admin/components/editable/EditableBlockLockedMessage';
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentForm from '@admin/components/editable/EditableContentForm';
 import styles from '@admin/components/editable/EditableContentBlock.module.scss';
+import { UserDetails } from '@admin/services/types/user';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -22,8 +24,11 @@ interface EditableContentBlockProps {
   editable?: boolean;
   id: string;
   isEditing?: boolean;
+  isLoading?: boolean;
   isSaving?: boolean;
   label: string;
+  locked?: string;
+  lockedBy?: UserDetails;
   hideLabel?: boolean;
   transformImageAttributes?: (
     attributes: Dictionary<string>,
@@ -44,9 +49,12 @@ const EditableContentBlock = ({
   allowComments = false,
   editable = true,
   id,
+  isLoading,
   isEditing,
   isSaving,
   label,
+  locked,
+  lockedBy,
   hideLabel = false,
   transformImageAttributes,
   useMarkdown,
@@ -102,7 +110,7 @@ const EditableContentBlock = ({
     };
   }, [transformImageAttributes]);
 
-  if (isEditing) {
+  if (isEditing && !lockedBy) {
     return (
       <EditableContentForm
         allowComments={allowComments}
@@ -121,11 +129,14 @@ const EditableContentBlock = ({
     );
   }
 
+  const isEditable = editable && !lockedBy;
+
   return (
     <>
       {allowComments && comments.length > 0 && (
         <div className={styles.commentsButtonContainer}>
           <Button
+            disabled={!isEditable}
             variant="secondary"
             testId="view-comments"
             onClick={onEditing}
@@ -140,18 +151,28 @@ const EditableContentBlock = ({
           </Button>
         </div>
       )}
+
+      {locked && lockedBy && (
+        <EditableBlockLockedMessage locked={locked} lockedBy={lockedBy} />
+      )}
+
       <EditableBlockWrapper
-        onEdit={editable ? onEditing : undefined}
-        onDelete={editable ? onDelete : undefined}
+        isLoading={isLoading}
+        onEdit={isEditable ? onEditing : undefined}
+        onDelete={isEditable ? onDelete : undefined}
       >
         <div
           className={classNames(styles.preview, {
             [styles.readOnly]: !isEditing,
+            [styles.locked]: !!lockedBy,
           })}
         >
-          {editable ? (
+          {isEditable ? (
             // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-            <div className={styles.editButton} onClick={onEditing}>
+            <div
+              className={styles.editButton}
+              onClick={isLoading ? undefined : onEditing}
+            >
               <ContentHtml
                 html={content || '<p>This section is empty</p>'}
                 sanitizeOptions={sanitizeOptions}
@@ -162,6 +183,12 @@ const EditableContentBlock = ({
               html={content || '<p>This section is empty</p>'}
               sanitizeOptions={sanitizeOptions}
             />
+          )}
+
+          {lockedBy && (
+            <span className={styles.lockedMessage}>
+              {`${lockedBy.displayName} is editing`}
+            </span>
           )}
         </div>
       </EditableBlockWrapper>

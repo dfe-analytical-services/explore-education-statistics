@@ -2,12 +2,14 @@ import ButtonLink from '@admin/components/ButtonLink';
 import styles from '@admin/components/editable/EditableBlockWrapper.module.scss';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
 import useToggle from '@common/hooks/useToggle';
 import React, { ReactNode } from 'react';
 
 export interface EditableBlockProps {
   dataBlockEditLink?: string;
+  isLoading?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
 }
@@ -15,6 +17,7 @@ export interface EditableBlockProps {
 const EditableBlockWrapper = ({
   children,
   dataBlockEditLink,
+  isLoading = false,
   onEdit,
   onDelete,
 }: EditableBlockProps & { children: ReactNode }) => {
@@ -25,8 +28,19 @@ const EditableBlockWrapper = ({
       <div className={styles.block}>{children}</div>
 
       <ButtonGroup className={styles.buttons}>
+        <LoadingSpinner
+          loading={isLoading}
+          inline
+          hideText
+          size="md"
+          text="Loading block editor"
+        />
         {onEdit && (
-          <Button variant="secondary" onClick={() => onEdit()}>
+          <Button
+            disabled={isLoading}
+            variant="secondary"
+            onClick={() => onEdit()}
+          >
             Edit block
           </Button>
         )}
@@ -39,7 +53,11 @@ const EditableBlockWrapper = ({
 
         {onDelete && (
           <>
-            <Button variant="warning" onClick={toggleConfirmDelete.on}>
+            <Button
+              disabled={isLoading}
+              variant="warning"
+              onClick={toggleConfirmDelete.on}
+            >
               Remove block
             </Button>
 

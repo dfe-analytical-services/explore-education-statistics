@@ -1,3 +1,4 @@
+import { UserDetails } from '@admin/services/types/user';
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 
 export interface Comment {
@@ -23,10 +24,16 @@ export interface Comment {
 
 export type EditableContentBlock = ContentBlock & {
   comments: Comment[];
+  locked?: string;
+  lockedUntil?: string;
+  lockedBy?: UserDetails;
 };
 
 export type EditableDataBlock = DataBlock & {
   comments: Comment[];
+  locked?: string;
+  lockedUntil?: string;
+  lockedBy?: UserDetails;
 };
 
 export type EditableBlock = EditableContentBlock | EditableDataBlock;

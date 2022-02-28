@@ -5,6 +5,7 @@ import permissionService, {
 import logger from '@common/services/logger';
 import React, {
   createContext,
+  ReactElement,
   ReactNode,
   useContext,
   useEffect,
@@ -122,4 +123,18 @@ export const AuthContextProvider = ({ children }: Props) => {
 export function useAuthContext(): AuthContextState {
   const context = useContext(AuthContext);
   return context ?? {};
+}
+
+interface AuthContextTestProviderProps {
+  children: ReactNode;
+  user: User;
+}
+
+export function AuthContextTestProvider({
+  children,
+  user,
+}: AuthContextTestProviderProps): ReactElement {
+  return (
+    <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
+  );
 }
