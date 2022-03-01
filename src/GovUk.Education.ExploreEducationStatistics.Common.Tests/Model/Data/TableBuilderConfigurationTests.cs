@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Xunit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model.Data
@@ -40,6 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model.Data
             };
 
             var clone = original.Clone();
+
+            clone.AssertDeepEqualTo(original);
 
             clone.TableHeaders.Columns[0].Value = "updated";
             clone.TableHeaders.Rows[0].Value = "updated";
