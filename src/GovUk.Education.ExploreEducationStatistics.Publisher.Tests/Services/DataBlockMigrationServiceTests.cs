@@ -510,8 +510,76 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         [Fact]
+        public async Task Migrate_QueryHasDuplicateLocationCodes()
+        {
+            // Test scenario where data block contains duplicate codes
+
+            var location1 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
+
+            var dataBlock = new DataBlock
+            {
+                Charts = new List<IChart>(),
+                Table = new TableBuilderConfiguration(),
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = _subject.Id,
+                    Locations = new LocationQuery
+                    {
+                        Country = ListOf(_england.Code!, _england.Code!, _england.Code!)
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.DataBlocks.AddAsync(dataBlock);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
+            locationRepository.Setup(mock => mock.GetDistinctForSubject(_subject.Id))
+                .ReturnsAsync(ListOf(location1));
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    locationRepository: locationRepository.Object);
+
+                var result = await service.Migrate(dataBlock.Id);
+
+                MockUtils.VerifyAllMocks(locationRepository);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                var after = await contentDbContext.DataBlocks.SingleAsync(db => db.Id == dataBlock.Id);
+
+                VerifyOriginalFieldsAreUntouched(dataBlock, after);
+                Assert.True(after.LocationsMigrated);
+
+                Assert.Null(after.QueryMigrated.Locations);
+                // Assert that the duplicate codes have been resolved to a single id
+                var locationId = Assert.Single(after.QueryMigrated.LocationIds);
+                Assert.Equal(location1.Id, locationId);
+            }
+        }
+
+        [Fact]
         public async Task Migrate_QueryHasDuplicateLocationCodesTransformedToMultipleIds()
         {
+            // Test that where multiple locations exist for the Subject with duplicate codes that
+            // where those codes are in a query that they get transformed to *all* the id's
+
             var location1 = new Location
             {
                 Id = Guid.NewGuid(),
