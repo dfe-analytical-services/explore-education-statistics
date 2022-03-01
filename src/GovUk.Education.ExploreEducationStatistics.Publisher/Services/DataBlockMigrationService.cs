@@ -130,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 // Iterate over every level and lookup any codes that exist in that field 
                 EnumUtil.GetEnumValues<GeographicLevel>().ForEach(geographicLevel =>
                 {
-                    var codes = GetQueryLocationCodesForLevel(dataBlock.Query.Locations, geographicLevel);
+                    var codes = GetDistinctQueryLocationCodesForLevel(dataBlock.Query.Locations, geographicLevel);
                     if (codes.Any())
                     {
                         var targets = locationsMap.GetValueOrDefault(geographicLevel) ??
@@ -447,7 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             return migrated;
         }
 
-        private static List<string> GetQueryLocationCodesForLevel(
+        private static List<string> GetDistinctQueryLocationCodesForLevel(
             LocationQuery locations,
             GeographicLevel geographicLevel)
         {
@@ -461,7 +461,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var codes = (
                 queryProperty.GetMethod.Invoke(locations, new object[] { }) as IEnumerable<string> ??
                 new List<string>()
-            ).ToList();
+            ).Distinct().ToList();
 
             return codes;
         }
