@@ -21,10 +21,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public ObservationViewModel BuildResult(Observation observation, IEnumerable<Guid> indicators)
         {
-            return new()
+            return new ObservationViewModel
             {
+                Id = observation.Id,
                 Filters = FilterItems(observation),
                 GeographicLevel = observation.Location.GeographicLevel,
+                LocationId = observation.LocationId,
                 Location = _mapper.Map<LocationViewModel>(observation.Location),
                 Measures = Measures(observation, indicators.ToList()),
                 TimePeriod = observation.GetTimePeriod()

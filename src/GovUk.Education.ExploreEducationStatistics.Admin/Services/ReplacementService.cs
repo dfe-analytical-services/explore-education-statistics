@@ -598,6 +598,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             _contentDbContext.Update(dataBlock);
 
+            // EES-3167 If the query, table and charts fields have already been cloned to temporary fields
+            // for the locations migration then those fields will become stale as a result of this replacement
+            // so reset the migration flag.
+            dataBlock.LocationsMigrated = false;
+
             dataBlock.Query.SubjectId = replacementSubjectId;
             ReplaceDataBlockQueryFilters(replacementPlan, dataBlock);
             ReplaceDataBlockQueryIndicators(replacementPlan, dataBlock);

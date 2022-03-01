@@ -2830,7 +2830,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }
                         }
                     }
-                }
+                },
+                // EES-3167 Set the flag on this data block as though it's already been migrated
+                // After the replacement it will need migrating again so this flag should get reset
+                LocationsMigrated = true
             };
 
             var releaseContentBlock = new ReleaseContentBlock
@@ -3033,6 +3036,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(chartLegendItem.DataSet.Filters);
                 Assert.Equal(replacementFilterItem1.Id, chartLegendItem.DataSet.Filters[0]);
                 Assert.Equal(replacementIndicator.Id, chartLegendItem.DataSet.Indicator);
+
+                // EES-3167 Check the migration flag has been reset after the replacement
+                Assert.False(replacedDataBlock.LocationsMigrated);
 
                 var replacedFootnoteForFilter = await GetFootnoteById(statisticsDbContext, footnoteForFilter.Id);
                 Assert.NotNull(replacedFootnoteForFilter);

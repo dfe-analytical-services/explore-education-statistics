@@ -9,16 +9,30 @@ import argparse
 """
 To generate datablocks.csv, use this SQL query against the Content DB:
 
-SELECT ContentBlock.Id AS ContentBlockId, Releases.Id AS ReleaseId, JSON_VALUE([DataBlock_Query], '$.SubjectId') AS SubjectId, ContentBlock.DataBlock_Query AS Query
-  FROM ContentBlock
-  JOIN ReleaseContentBlocks ON ContentBlock.Id = ReleaseContentBlocks.ContentBlockId
-  JOIN Releases ON ReleaseContentBlocks.ReleaseId = Releases.Id
-  Where ContentBlock.Type = 'DataBlock'
+SELECT ContentBlock.Id                              AS ContentBlockId,
+       Releases.Id                                  AS ReleaseId,
+       JSON_VALUE([DataBlock_Query], '$.SubjectId') AS SubjectId,
+       ContentBlock.DataBlock_Query                 AS Query
+FROM ContentBlock
+JOIN ReleaseContentBlocks ON ContentBlock.Id = ReleaseContentBlocks.ContentBlockId
+JOIN Releases ON ReleaseContentBlocks.ReleaseId = Releases.Id
+WHERE ContentBlock.Type = 'DataBlock'
   AND Releases.Published IS NOT NULL
-  AND SoftDeleted = 0
+  AND Releases.SoftDeleted = 0
+  -- Restrict DataBlocks that aren't featured tables or linked to content sections
   AND (ContentSectionId IS NOT NULL
-	   OR (DataBlock_HighlightName IS NOT NULL
-	       AND DataBlock_HighlightName != ''));
+    OR (DataBlock_HighlightName IS NOT NULL
+        AND DataBlock_HighlightName <> ''))
+  -- Restrict DataBlocks that aren't from the latest published Release
+  AND NOT EXISTS(
+    SELECT 1
+    FROM Releases PublicationReleases
+    WHERE PublicationReleases.PublicationId = Releases.PublicationId
+      AND PublicationReleases.Published IS NOT NULL
+      AND PublicationReleases.SoftDeleted = 0
+      AND PublicationReleases.Id <> Releases.Id
+      AND PublicationReleases.PreviousVersionId = Releases.Id
+  );
 
 And then save the results as a CSV in MS SQL Server Management Studio.
 Place it in the same directory as this script.
@@ -172,8 +186,13 @@ for datablock in datablocks:
 
     try:
         json_response = json.loads(resp.text)
+        if json_response['results']:
+            for result in json_response['results']:
+                result.pop('location', None)
+
     except Exception as e:
-        print_to_console(f'Failed to convert response text to json with block {block_id} subject {subject_id}, {e}')
+        print_to_console(
+            f'Failed to convert response text to json with block {block_id} subject {subject_id}, {e}. status code: {resp.status_code}')
         write_this_block(
             status_code=resp.status_code,
             response_time=block_time_end - block_time_start,

@@ -28,6 +28,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public List<string>? Sponsor { get; set; }
         public List<string>? Ward { get; set; }
 
+        public LocationQuery()
+        {
+        }
+
+        /// <summary>
+        /// Copy constructor
+        /// </summary>
+        /// <param name="query"></param>
+        public LocationQuery(LocationQuery query)
+        {
+            GeographicLevel = query.GeographicLevel;
+            Country = query.Country?.ToList();
+            EnglishDevolvedArea = query.EnglishDevolvedArea?.ToList();
+            Institution = query.Institution?.ToList();
+            LocalAuthority = query.LocalAuthority?.ToList();
+            LocalAuthorityDistrict = query.LocalAuthorityDistrict?.ToList();
+            LocalEnterprisePartnership = query.LocalEnterprisePartnership?.ToList();
+            MultiAcademyTrust = query.MultiAcademyTrust?.ToList();
+            MayoralCombinedAuthority = query.MayoralCombinedAuthority?.ToList();
+            OpportunityArea = query.OpportunityArea?.ToList();
+            ParliamentaryConstituency = query.ParliamentaryConstituency?.ToList();
+            Provider = query.Provider?.ToList();
+            PlanningArea = query.PlanningArea?.ToList();
+            Region = query.Region?.ToList();
+            RscRegion = query.RscRegion?.ToList();
+            School = query.School?.ToList();
+            Sponsor = query.Sponsor?.ToList();
+            Ward = query.Ward?.ToList();
+        }
+
         public int CountItems()
         {
             return GetType()

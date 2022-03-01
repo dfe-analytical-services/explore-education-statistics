@@ -10,6 +10,7 @@ import {
 export interface FilterOption {
   label: string;
   value: string;
+  id?: string; // EES-1243 - not optional when backend done?
 }
 
 export interface IndicatorOption extends FilterOption {
@@ -24,11 +25,15 @@ export interface TimePeriodOption {
   year: number;
 }
 
+export interface FilterOptionGroup {
+  id?: string; // EES-1243 - not optional when backend done?
+  label: string;
+  options: FilterOption[];
+  order?: number; // EES-1243 - not optional when backend done?
+}
+
 export interface GroupedFilterOptions {
-  [groupKey: string]: {
-    label: string;
-    options: FilterOption[];
-  };
+  [groupKey: string]: FilterOptionGroup;
 }
 
 export interface BoundaryLevel {
@@ -92,13 +97,17 @@ export interface SubjectMeta {
   filters: Dictionary<{
     legend: string;
     hint?: string;
+    id?: string; // EES-1243 - not optional when backend done?
     options: GroupedFilterOptions;
+    order?: number; // EES-1243 - not optional when backend done?
     totalValue?: string;
     name: string;
   }>;
   indicators: Dictionary<{
+    id?: string; // EES-1243 - not optional when backend done?
     label: string;
     options: IndicatorOption[];
+    order?: number; // EES-1243 - not optional when backend done?
   }>;
   locations: Dictionary<{
     legend: string;

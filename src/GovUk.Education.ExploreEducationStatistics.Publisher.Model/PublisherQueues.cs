@@ -12,5 +12,10 @@
         public const string PublishTaxonomyQueue = "publish-taxonomy";
         public const string RetryStageQueue = "retry";
         public const string NotifyChangeQueue = "notify";
+
+        /**
+         * Temporary queue used to migrate data blocks for EES-3167.
+         */
+        public const string MigrateDataBlocksQueue = "migrate-datablocks";
     }
 }

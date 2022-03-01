@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿#nullable enable
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Azure.Storage;
@@ -28,13 +30,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             await queue.AddMessageAsync(ToCloudQueueMessage(value));
         }
 
-        public async Task AddMessages(string queueName, IEnumerable<object> values)
+        public async Task AddMessages<T>(string queueName, List<T> values)
         {
             var queue = await GetQueueReferenceAsync(queueName);
-            foreach (var value in values)
-            {
-                await queue.AddMessageAsync(ToCloudQueueMessage(value));
-            }
+            await values
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async value => { await queue.AddMessageAsync(ToCloudQueueMessage(value)); });
+        }
+
+        public async Task<int?> GetApproximateMessageCount(string queueName)
+        {
+            var queue = await GetQueueReferenceAsync(queueName);
+            await queue.FetchAttributesAsync();
+            return queue.ApproximateMessageCount;
         }
 
         public async Task Clear(string queueName)
