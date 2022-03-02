@@ -414,16 +414,10 @@ export const MapBlockInternal = ({
 
   const [legendEntries, setLegendEntries] = useState<LegendEntry[]>([]);
 
-  const selectedDataSetConfiguration =
-    dataSetCategoryConfigs[selectedDataSetKey];
+  const selectedDataSetConfig = dataSetCategoryConfigs[selectedDataSetKey];
 
   const selectedDataSet =
     selectedFeature?.properties?.dataSets[selectedDataSetKey];
-
-  const {
-    config: selectedDataSetConfig,
-    dataSet: expandedSelectedDataSet,
-  } = dataSetCategoryConfigs[selectedDataSetKey];
 
   // initialise
   useEffect(() => {
@@ -455,14 +449,11 @@ export const MapBlockInternal = ({
 
   // Rebuild the geometry if the selection has changed
   useEffect(() => {
-    if (dataSetCategories.length && selectedDataSetConfiguration) {
+    if (dataSetCategories.length && selectedDataSetConfig) {
       const {
         geometry: newGeometry,
         legend: newLegendEntries,
-      } = generateGeometryAndLegend(
-        selectedDataSetConfiguration,
-        dataSetCategories,
-      );
+      } = generateGeometryAndLegend(selectedDataSetConfig, dataSetCategories);
 
       setGeometry(newGeometry);
       setLegendEntries(newLegendEntries);
@@ -471,7 +462,7 @@ export const MapBlockInternal = ({
     dataSetCategories,
     dataSetCategoryConfigs,
     meta,
-    selectedDataSetConfiguration,
+    selectedDataSetConfig,
     selectedDataSetKey,
   ]);
 
@@ -553,13 +544,12 @@ export const MapBlockInternal = ({
 
       featureLayer.bindTooltip(() => {
         if (feature.properties) {
-          const dataSetConfig = dataSetCategoryConfigs[selectedDataSetKey];
           const dataSetValue = formatPretty(
             feature.properties.dataSets[selectedDataSetKey].value,
-            dataSetConfig.dataSet.indicator.unit,
-            dataSetConfig.dataSet.indicator.decimalPlaces,
+            selectedDataSetConfig.dataSet.indicator.unit,
+            selectedDataSetConfig.dataSet.indicator.decimalPlaces,
           );
-          const content = `${dataSetConfig.config.label}: ${dataSetValue}`;
+          const content = `${selectedDataSetConfig.config.label}: ${dataSetValue}`;
 
           const mapWidth = mapRef.current?.container?.clientWidth;
 
@@ -682,10 +672,10 @@ export const MapBlockInternal = ({
             </Map>
           )}
         </div>
-        {selectedDataSetConfiguration && (
+        {selectedDataSetConfig && (
           <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s">
-              Key to {selectedDataSetConfiguration?.config?.label}
+              Key to {selectedDataSetConfig?.config?.label}
             </h3>
             <ul className="govuk-list">
               {legendEntries.map(({ min, max, colour }) => (
@@ -709,7 +699,7 @@ export const MapBlockInternal = ({
             <div
               aria-live="polite"
               className="govuk-!-margin-top-5"
-              data-testId="mapBlock-indicator"
+              data-testid="mapBlock-indicator"
             >
               {selectedFeature && (
                 <>
@@ -720,11 +710,11 @@ export const MapBlockInternal = ({
                   {selectedDataSet && (
                     <KeyStatTile
                       testId="mapBlock-indicatorTile"
-                      title={selectedDataSetConfig.label}
+                      title={selectedDataSetConfig.config.label}
                       value={formatPretty(
                         selectedDataSet.value,
-                        expandedSelectedDataSet.indicator.unit,
-                        expandedSelectedDataSet.indicator.decimalPlaces,
+                        selectedDataSetConfig.dataSet.indicator.unit,
+                        selectedDataSetConfig.dataSet.indicator.decimalPlaces,
                       )}
                     />
                   )}
