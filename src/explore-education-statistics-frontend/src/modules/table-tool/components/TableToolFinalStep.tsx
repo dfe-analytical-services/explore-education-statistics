@@ -24,6 +24,7 @@ interface TableToolFinalStepProps {
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   selectedPublication: SelectedPublication;
+  onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
 }
 
 const TableToolFinalStep = ({
@@ -31,12 +32,13 @@ const TableToolFinalStep = ({
   tableHeaders,
   query,
   selectedPublication,
+  onReorderTableHeaders,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [hasTableError, toggleHasTableError] = useToggle(false);
   const [currentTableHeaders, setCurrentTableHeaders] = useState<
     TableHeadersConfig
-  >();
+  >(tableHeaders);
 
   useEffect(() => {
     setCurrentTableHeaders(tableHeaders);
@@ -77,8 +79,9 @@ const TableToolFinalStep = ({
     >
       <TableHeadersForm
         initialValues={currentTableHeaders}
-        onSubmit={tableHeaderConfig => {
-          setCurrentTableHeaders(tableHeaderConfig);
+        onSubmit={nextTableHeaders => {
+          setCurrentTableHeaders(nextTableHeaders);
+          onReorderTableHeaders(nextTableHeaders);
           if (dataTableRef.current) {
             dataTableRef.current.scrollIntoView({
               behavior: 'smooth',

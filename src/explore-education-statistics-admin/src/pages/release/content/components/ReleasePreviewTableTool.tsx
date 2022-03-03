@@ -102,7 +102,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
                 {highlight.name}
               </ButtonText>
             )}
-            finalStep={({ response, query }) => (
+            finalStep={({ query, table, tableHeaders, onReorder }) => (
               <WizardStep>
                 {wizardStepProps => (
                   <>
@@ -110,12 +110,13 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
                       Explore data
                     </WizardStepHeading>
 
-                    {query && response && (
+                    {query && table && tableHeaders && (
                       <ReleasePreviewTableToolFinalStep
                         publication={publication as BasicPublicationDetails}
                         query={query}
-                        table={response.table}
-                        tableHeaders={response.tableHeaders}
+                        table={table}
+                        tableHeaders={tableHeaders}
+                        onReorderTableHeaders={onReorder}
                       />
                     )}
                   </>

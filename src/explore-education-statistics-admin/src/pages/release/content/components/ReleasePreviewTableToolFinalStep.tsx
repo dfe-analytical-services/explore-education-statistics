@@ -14,17 +14,19 @@ interface ReleasePreviewTableToolFinalStepProps {
   query: ReleaseTableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
+  onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
 }
 const ReleasePreviewTableToolFinalStep = ({
   publication,
   query,
   table,
   tableHeaders,
+  onReorderTableHeaders,
 }: ReleasePreviewTableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [currentTableHeaders, setCurrentTableHeaders] = useState<
     TableHeadersConfig
-  >();
+  >(tableHeaders);
 
   useEffect(() => {
     setCurrentTableHeaders(tableHeaders);
@@ -51,8 +53,9 @@ const ReleasePreviewTableToolFinalStep = ({
     <div className="govuk-!-margin-bottom-4">
       <TableHeadersForm
         initialValues={currentTableHeaders}
-        onSubmit={tableHeaderConfig => {
-          setCurrentTableHeaders(tableHeaderConfig);
+        onSubmit={nextTableHeaders => {
+          setCurrentTableHeaders(nextTableHeaders);
+          onReorderTableHeaders(nextTableHeaders);
 
           if (dataTableRef.current) {
             dataTableRef.current.scrollIntoView({

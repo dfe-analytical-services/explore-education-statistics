@@ -34,6 +34,7 @@ interface DataBlockSourceWizardFinalStepProps {
   query: ReleaseTableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
+  onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
   onSave: DataBlockSourceWizardSaveHandler;
 }
 
@@ -42,14 +43,13 @@ const DataBlockSourceWizardFinalStep = ({
   query,
   table,
   tableHeaders,
+  onReorderTableHeaders,
   onSave,
 }: DataBlockSourceWizardFinalStepProps) => {
   const dataTableRef = createRef<HTMLTableElement>();
-
   const [currentTableHeaders, setCurrentTableHeaders] = useState<
     TableHeadersConfig
   >(tableHeaders);
-
   const [captionTitle, setCaptionTitle] = useState<string>(
     dataBlock?.heading ?? '',
   );
@@ -80,7 +80,7 @@ const DataBlockSourceWizardFinalStep = ({
           id="dataBlockSourceWizard-tableHeadersForm"
           onSubmit={async nextTableHeaders => {
             setCurrentTableHeaders(nextTableHeaders);
-
+            onReorderTableHeaders(nextTableHeaders);
             if (dataTableRef.current) {
               dataTableRef.current.scrollIntoView({
                 behavior: 'smooth',
@@ -144,7 +144,7 @@ const DataBlockSourceWizard = ({
         hidePublicationSelectionStage
         initialState={tableToolState}
         showTableQueryErrorDownload={false}
-        finalStep={({ response, query }) => (
+        finalStep={({ query, table, tableHeaders, onReorder }) => (
           <WizardStep size="l">
             {wizardStepProps => (
               <>
@@ -152,12 +152,13 @@ const DataBlockSourceWizard = ({
                   {dataBlock ? 'Update data block' : 'Create data block'}
                 </WizardStepHeading>
 
-                {query && response && (
+                {query && table && tableHeaders && (
                   <DataBlockSourceWizardFinalStepWrapped
                     dataBlock={dataBlock}
                     query={query}
-                    table={response.table}
-                    tableHeaders={response.tableHeaders}
+                    table={table}
+                    tableHeaders={tableHeaders}
+                    onReorderTableHeaders={onReorder}
                     onSave={onSave}
                   />
                 )}

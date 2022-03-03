@@ -124,7 +124,7 @@ const PreReleaseTableToolPage = ({
                 {highlight.name}
               </Link>
             )}
-            finalStep={({ response, query }) => (
+            finalStep={({ query, table, tableHeaders, onReorder }) => (
               <WizardStep>
                 {wizardStepProps => (
                   <>
@@ -132,13 +132,14 @@ const PreReleaseTableToolPage = ({
                       Explore data
                     </WizardStepHeading>
 
-                    {response && query && (
+                    {table && tableHeaders && query && (
                       <PreReleaseTableToolFinalStep
                         publication={publication}
                         query={query}
                         releaseId={releaseId}
-                        table={response.table}
-                        tableHeaders={response.tableHeaders}
+                        table={table}
+                        tableHeaders={tableHeaders}
+                        onReorderTableHeaders={onReorder}
                       />
                     )}
                   </>

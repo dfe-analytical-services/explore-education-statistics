@@ -18,6 +18,7 @@ interface TableToolFinalStepProps {
   releaseId: string;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
+  onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
 }
 
 const PreReleaseTableToolFinalStep = ({
@@ -26,11 +27,12 @@ const PreReleaseTableToolFinalStep = ({
   releaseId,
   table,
   tableHeaders,
+  onReorderTableHeaders,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [currentTableHeaders, setCurrentTableHeaders] = useState<
     TableHeadersConfig
-  >();
+  >(tableHeaders);
 
   useEffect(() => {
     setCurrentTableHeaders(tableHeaders);
@@ -40,9 +42,9 @@ const PreReleaseTableToolFinalStep = ({
     <div className="govuk-!-margin-bottom-4">
       <TableHeadersForm
         initialValues={currentTableHeaders}
-        onSubmit={tableHeaderConfig => {
-          setCurrentTableHeaders(tableHeaderConfig);
-
+        onSubmit={nextTableHeaders => {
+          setCurrentTableHeaders(nextTableHeaders);
+          onReorderTableHeaders(nextTableHeaders);
           if (dataTableRef.current) {
             dataTableRef.current.scrollIntoView({
               behavior: 'smooth',
