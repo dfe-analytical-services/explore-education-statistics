@@ -7,11 +7,13 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -389,6 +391,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var releaseId = Guid.NewGuid();
 
+            var publication = new Publication
+            {
+                Slug = "publication-slug",
+            };
+            var supersededPublication = new Publication
+            {
+                Slug = "superseded-publication",
+                SupersededBy = publication,
+            };
+
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
@@ -401,20 +413,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 .Returns(Task.CompletedTask);
 
             publicBlobCacheService.Setup(mock =>
-                    mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                    mock.DeleteItem(new PublicationCacheKey(publication.Slug)))
+                .Returns(Task.CompletedTask);
+
+            publicBlobCacheService.Setup(mock =>
+                    mock.DeleteItem(new PublicationCacheKey(supersededPublication.Slug)))
                 .Returns(Task.CompletedTask);
 
             releaseService.Setup(mock =>
                     mock.SetPublishedDates(releaseId, It.IsAny<DateTime>()))
                 .Returns(Task.CompletedTask);
 
-            var service = BuildPublishingService(publicBlobStorageService: publicBlobStorageService.Object,
-                publicBlobCacheService: publicBlobCacheService.Object,
-                releaseService: releaseService.Object);
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(publication, supersededPublication);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            await service.PublishStagedReleaseContent(releaseId, "publication-slug");
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService, publicBlobCacheService, releaseService);
+                var service = BuildPublishingService(
+                    contentDbContext: contentDbContext,
+                    publicBlobStorageService: publicBlobStorageService.Object,
+                    publicBlobCacheService: publicBlobCacheService.Object,
+                    releaseService: releaseService.Object);
+
+                await service.PublishStagedReleaseContent(releaseId, publication.Slug);
+
+                MockUtils.VerifyAllMocks(publicBlobStorageService, publicBlobCacheService, releaseService);
+            }
         }
 
         private static PublishingService BuildPublishingService(
@@ -425,6 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             IMethodologyService? methodologyService = null,
             IPublicationService? publicationService = null,
             IReleaseService? releaseService = null,
+            ContentDbContext? contentDbContext = null,
             ILogger<PublishingService>? logger = null)
         {
             return new PublishingService(
@@ -435,6 +465,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 methodologyService ?? Mock.Of<IMethodologyService>(MockBehavior.Strict),
                 publicationService ?? Mock.Of<IPublicationService>(MockBehavior.Strict),
                 releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict),
+                contentDbContext ?? Mock.Of<ContentDbContext>(MockBehavior.Strict),
                 logger ?? Mock.Of<ILogger<PublishingService>>(MockBehavior.Strict)
             );
         }

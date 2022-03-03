@@ -22,6 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
     public class ReleaseService : IReleaseService
     {
+        private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IFileStorageService _fileStorageService;
         private readonly IMethodologyService _methodologyService;
@@ -30,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly IMapper _mapper;
 
         public ReleaseService(
+            ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IFileStorageService fileStorageService,
             IMethodologyService methodologyService,
@@ -38,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             IMapper mapper)
 
         {
+            _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _fileStorageService = fileStorageService;
             _methodologyService = methodologyService;
@@ -90,14 +93,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .Where(p => p.Slug == publicationSlug)
                 )
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(
-                    // TODO: @MarkFix EES-3149 Releases belonging to superseded publication shouldn't have "latest data" label
-                    publication => publication.Releases
-                        .Where(release => release.IsLatestPublishedVersionOfRelease())
-                        .OrderByDescending(r => r.Year)
-                        .ThenByDescending(r => r.TimePeriodCoverage)
-                        .Select(release => new ReleaseSummaryViewModel(release))
-                        .ToList()
+                .OnSuccess(publication =>
+                    {
+                        var releases = publication.Releases
+                            .Where(release => release.IsLatestPublishedVersionOfRelease())
+                            .OrderByDescending(r => r.Year)
+                            .ThenByDescending(r => r.TimePeriodCoverage)
+                            .Select(release => new ReleaseSummaryViewModel(release))
+                            .ToList();
+
+                        if (IsSuperseded(publication))
+                        {
+                            releases.ForEach(r => r.IsSuperseded = true);
+                        }
+
+                        return releases;
+                    }
                 );
         }
 
@@ -108,6 +119,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 ? PublicContentReleasePath(publicationSlug, releaseSlug)
                 : PublicContentLatestReleasePath(publicationSlug);
             return _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
+        }
+
+        private bool IsSuperseded(Publication publication)
+        {
+        return publication.SupersededById != null
+               // To be superseded, superseding publication must have Live release
+               && _contentDbContext.Releases
+                   .Where(r => r.PublicationId == publication.SupersededById)
+                   .ToList()
+                   .Any(r => r.Live);
         }
     }
 }

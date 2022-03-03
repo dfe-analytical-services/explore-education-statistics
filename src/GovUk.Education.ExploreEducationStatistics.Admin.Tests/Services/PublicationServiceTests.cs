@@ -701,6 +701,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Title = "New topic"
             };
 
+            var supersedingPublicationToRemove = new Publication
+            {
+                Slug = "superseding-to-remove-slug",
+            };
+
             var publication = new Publication
             {
                 Slug = "old-title",
@@ -717,15 +722,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamEmail = "old.smith@test.com",
                 },
                 Published = new DateTime(2020, 8, 12),
+                SupersededBy = supersedingPublicationToRemove,
+            };
+
+            var supersededPublication = new Publication
+            {
+                Slug = "superseded-slug",
+                SupersededBy = publication,
             };
 
             var contextId = Guid.NewGuid().ToString();
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                context.Add(topic);
-                context.Add(publication);
-
+                context.AddRange(topic, publication, supersedingPublicationToRemove, supersededPublication);
                 await context.SaveChangesAsync();
             }
 
@@ -742,14 +752,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(Task.CompletedTask);
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData)))
                     .Returns(Task.CompletedTask);
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.NotSuperseded)))
+                    .Returns(Task.CompletedTask);
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestDataNotSuperseded)))
+                    .Returns(Task.CompletedTask);
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationCacheKey(publication.Slug)))
+                    .Returns(Task.CompletedTask);
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationCacheKey(supersedingPublicationToRemove.Slug)))
+                    .Returns(Task.CompletedTask);
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationCacheKey(supersededPublication.Slug)))
                     .Returns(Task.CompletedTask);
 
                 var publicationService = BuildPublicationService(context,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     publicBlobCacheService: publicBlobCacheService.Object);
 
-                // Expect the title to change but not the slug, as the Publication is already published. 
+                // Expect the title to change but not the slug, as the Publication is already published.
                 methodologyVersionRepository
                     .Setup(s => s.PublicationTitleChanged(
                         publication.Id,
@@ -771,7 +789,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TeamName = "Test team",
                             TeamEmail = "john.smith@test.com",
                         },
-                        TopicId = topic.Id
+                        TopicId = topic.Id,
+                        SupersededById = Guid.NewGuid(), // no action necessary when adding a new superseding publication
                     }
                 );
 

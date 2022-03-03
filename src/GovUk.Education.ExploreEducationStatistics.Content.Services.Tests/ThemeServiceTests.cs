@@ -131,6 +131,107 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
+        public async Task GetPublicationTree_NotSuperseded()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                Slug = "publication-a",
+                LegacyPublicationUrl = new Uri("https://legacy.url/")
+            };
+            var supersedingPublication = new Publication
+            {
+                Releases = new List<Release> { new Release { Published = DateTime.UtcNow } },
+            };
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                Slug = "publication-b",
+                SupersededBy = supersedingPublication,
+            };
+            var publicationC = new Publication
+            {
+                Title = "Publication C",
+                Slug = "publication-c",
+                LegacyPublicationUrl = new Uri("https://legacy.url/")
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Summary = "Theme A summary",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        // Publications are in random order
+                        // to check that ordering is done by title
+                        Publications = ListOf(publicationB, publicationC, publicationA)
+                    },
+                },
+            };
+
+            var releases = new List<Release>
+            {
+                new()
+                {
+                    Publication = publicationA,
+                    ReleaseName = "2020",
+                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                    Type = ReleaseType.OfficialStatistics,
+                    Published = new DateTime(2020, 1, 1),
+                },
+                new()
+                {
+                    Publication = publicationB,
+                    ReleaseName = "2020",
+                    TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                    Type = ReleaseType.NationalStatistics,
+                    Published = new DateTime(2020, 2, 1),
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(theme);
+                await context.AddRangeAsync(releases);
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree(PublicationTreeFilter.NotSuperseded);
+
+                Assert.Single(result);
+                Assert.Equal("Theme A", result[0].Title);
+                Assert.Equal("Theme A summary", result[0].Summary);
+
+                Assert.Single(result[0].Topics);
+                Assert.Equal("Topic A", result[0].Topics[0].Title);
+
+                var publications = result[0].Topics[0].Publications;
+
+                Assert.Equal(2, publications.Count);
+                Assert.Equal("publication-a", publications[0].Slug);
+                Assert.Equal("Publication A", publications[0].Title);
+                Assert.Equal(PublicationType.NationalAndOfficial, publications[0].Type);
+                // Publication has a legacy url but it's not set because Releases exist
+                Assert.Null(publications[0].LegacyPublicationUrl);
+
+                Assert.Equal("publication-c", publications[1].Slug);
+                Assert.Equal("Publication C", publications[1].Title);
+                Assert.Equal(PublicationType.Legacy, publications[1].Type);
+                Assert.Equal("https://legacy.url/", publications[1].LegacyPublicationUrl);
+            }
+        }
+
+        [Fact]
         public async Task GetPublicationTree_MultipleThemesTopics()
         {
             var publicationA = new Publication
@@ -1835,6 +1936,116 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("Publication B", publications[1].Title);
                 Assert.Equal(PublicationType.NationalAndOfficial, publications[1].Type);
                 Assert.Null(publications[1].LegacyPublicationUrl);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_LatestDataNotSuperseded()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                Slug = "publication-a",
+                Releases = new List<Release> { new() },
+            };
+            var supersedingPublication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    new()
+                    {
+                        Published = DateTime.UtcNow,
+                    }
+                }
+            };
+            var publicationB = new Publication
+            {
+                Title = "Publication B",
+                Slug = "publication-b",
+                SupersededBy = supersedingPublication,
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Summary = "Theme A summary",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        // Publications are in random order
+                        // to check that ordering is done by title
+                        Publications = ListOf(publicationB, publicationA)
+                    },
+                },
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                new()
+                {
+                    Release = new Release
+                    {
+                        Publication = publicationA,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Type = ReleaseType.OfficialStatistics,
+                        Published = new DateTime(2020, 1, 1),
+                    },
+                    File = new File
+                    {
+                        Type = FileType.Data
+                    }
+                },
+                new()
+                {
+                    Release = new Release
+                    {
+                        Publication = publicationB,
+                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                        ReleaseName = "2020",
+                        Type = ReleaseType.NationalStatistics,
+                        Published = new DateTime(2020, 2, 1),
+                    },
+                    File = new File
+                    {
+                        Type = FileType.Data
+                    }
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddAsync(theme);
+                await context.AddRangeAsync(releaseFiles);
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree(
+                    PublicationTreeFilter.LatestDataNotSuperseded);
+
+                Assert.Single(result);
+                Assert.Equal("Theme A", result[0].Title);
+                Assert.Equal("Theme A summary", result[0].Summary);
+
+                Assert.Single(result[0].Topics);
+                Assert.Equal("Topic A", result[0].Topics[0].Title);
+
+                var publications = result[0].Topics[0].Publications;
+
+                Assert.Single(publications);
+                Assert.Equal("publication-a", publications[0].Slug);
+                Assert.Equal("Publication A", publications[0].Title);
+                Assert.Equal(PublicationType.NationalAndOfficial, publications[0].Type);
+                Assert.Null(publications[0].LegacyPublicationUrl);
             }
         }
 

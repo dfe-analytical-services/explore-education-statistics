@@ -145,6 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var originalTitle = publication.Title;
                     var originalSlug = publication.Slug;
+                    var originalSupersededById = publication.SupersededById;
 
                     if (!publication.Live) {
 
@@ -162,6 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     publication.TopicId = updatedPublication.TopicId;
                     publication.ExternalMethodology = updatedPublication.ExternalMethodology;
                     publication.Updated = DateTime.UtcNow;
+                    publication.SupersededById = updatedPublication.SupersededById;
 
                     // Add new contact if it doesn't exist, otherwise replace existing
                     // contact that is shared with another publication with a new
@@ -193,8 +195,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         await _context.SaveChangesAsync();
 
                         await DeleteCachedTaxonomyBlobs();
+
                         await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
-                        // TODO: @MarkFix EES-3149 Need to handle superseded publication.json cache files here too?
+
+                        var supersededPublications = await _context.Publications
+                            .Where(p =>
+                                p.SupersededById == publication.Id
+                                // in case removing superseding release
+                                || (originalSupersededById != publication.SupersededById
+                                    && p.Id == originalSupersededById))
+                                // NOTE: If publication.SupersededById newly set, no need to remove cache blob for
+                                // publication with Id of publication.SupersededById
+                            .ToListAsync();
+                        foreach (var p in supersededPublications)
+                        {
+                            await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(p.Slug));
+                        }
                     }
 
                     return await GetPublication(publication.Id);
@@ -207,6 +223,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey());
             await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
             await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
+            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestDataNotSuperseded));
+            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.NotSuperseded));
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateSelectedTopic(

@@ -18,13 +18,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services;
 
 public class PublicationService : IPublicationService
 {
+    private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
     private readonly IMapper _mapper;
 
     public PublicationService(
+        ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
         IMapper mapper)
     {
+        _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
         _mapper = mapper;
     }
@@ -47,6 +50,7 @@ public class PublicationService : IPublicationService
                 var (publication, latestRelease) = tuple;
                 var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
                 publicationViewModel.LatestReleaseId = latestRelease.Id;
+                publicationViewModel.IsSuperseded = IsSuperseded(publication);
                 publicationViewModel.Releases = ListPublishedReleases(publication);
                 return publicationViewModel;
             });
@@ -54,7 +58,6 @@ public class PublicationService : IPublicationService
 
     private static Either<ActionResult, Release> GetLatestRelease(Publication publication)
     {
-        // TODO: @MarkFix EES-3149 exclude releases belonging to superseded publication here
         return publication.LatestPublishedRelease() ?? new Either<ActionResult, Release>(new NotFoundResult());
     }
 
@@ -65,5 +68,15 @@ public class PublicationService : IPublicationService
             .ThenByDescending(release => release.TimePeriodCoverage)
             .ToList();
         return _mapper.Map<List<ReleaseTitleViewModel>>(releases);
+    }
+
+    private bool IsSuperseded(Publication publication)
+    {
+        return publication.SupersededById != null
+               // To be superseded, superseding publication must have Live release
+               && _contentDbContext.Releases
+                   .Where(r => r.PublicationId == publication.SupersededById)
+                   .ToList()
+                   .Any(r => r.Live);
     }
 }

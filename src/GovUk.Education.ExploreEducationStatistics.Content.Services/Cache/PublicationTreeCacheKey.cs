@@ -23,6 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache
             {
                 PublicationTreeFilter.AnyData => "publication-tree-any-data.json",
                 PublicationTreeFilter.LatestData => "publication-tree-latest-data.json",
+                PublicationTreeFilter.LatestDataNotSuperseded => "publication-tree-latest-data-not-superseded.json",
+                PublicationTreeFilter.NotSuperseded => "publication-tree-not-superseded.json",
                 null => "publication-tree.json",
                 _ => throw new ArgumentOutOfRangeException(nameof(filter), filter, null)
             };

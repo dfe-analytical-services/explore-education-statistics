@@ -291,6 +291,7 @@ export const testPublicationRelease: Release = {
     ],
   },
   latestRelease: true,
+  isSuperseded: false,
   relatedInformation: [],
   type: 'NationalStatistics',
   updates: [],

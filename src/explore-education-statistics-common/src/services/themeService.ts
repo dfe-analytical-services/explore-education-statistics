@@ -33,7 +33,11 @@ export interface Theme<PublicationNode = PublicationSummary> {
 export type MethodologyTheme = Theme<PublicationMethodologySummary>;
 
 interface ListThemesOptions {
-  publicationFilter?: 'LatestData' | 'AnyData';
+  publicationFilter?:
+    | 'LatestData'
+    | 'LatestDataNotSuperseded'
+    | 'AnyData'
+    | 'NotSuperseded';
 }
 
 const themeService = {

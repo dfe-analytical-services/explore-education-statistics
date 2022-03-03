@@ -88,9 +88,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                                                         && await HasAnyDataFiles(release));
 
                 case PublicationTreeFilter.LatestData:
+                {
                     var latestLiveRelease = publication.LatestPublishedRelease();
-
                     return latestLiveRelease != null && await HasAnyDataFiles(latestLiveRelease);
+                }
+
+                case PublicationTreeFilter.LatestDataNotSuperseded:
+                {
+                    var latestLiveRelease = publication.LatestPublishedRelease();
+                    return latestLiveRelease != null
+                           && await HasAnyDataFiles(latestLiveRelease)
+                           && !IsSuperseded(publication);
+                }
+
+                case PublicationTreeFilter.NotSuperseded:
+                    return (!string.IsNullOrEmpty(publication.LegacyPublicationUrl?.ToString()) ||
+                            publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease()))
+                           && !IsSuperseded(publication);
 
                 case null:
                     return !string.IsNullOrEmpty(publication.LegacyPublicationUrl?.ToString()) ||
@@ -98,6 +112,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 default:
                     throw new ArgumentOutOfRangeException(nameof(filter), filter, null);
             }
+        }
+
+        private bool IsSuperseded(Publication publication)
+        {
+            return publication.SupersededById != null
+                   && _contentDbContext.Releases
+                       .Include(r => r.Publication)
+                       .Where(r => r.PublicationId == publication.SupersededById)
+                       .ToList()
+                       .Any(r => r.IsLatestPublishedVersionOfRelease());
         }
 
         private async Task<bool> HasAnyDataFiles(Release release)

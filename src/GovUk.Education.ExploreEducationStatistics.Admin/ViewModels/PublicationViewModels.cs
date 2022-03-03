@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static System.String;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.NamingUtils;
@@ -29,6 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public Guid ThemeId { get; set; }
 
         public ContactViewModel Contact { get; set; }
+
+        public Guid? SupersededById { get; set; }
     }
 
     public class PublicationSaveViewModel
@@ -48,5 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
             get => IsNullOrEmpty(_slug) ? SlugFromTitle(Title) : _slug;
             set => _slug = value;
         }
+
+        public Guid? SupersededById { get; set; }
     }
 }

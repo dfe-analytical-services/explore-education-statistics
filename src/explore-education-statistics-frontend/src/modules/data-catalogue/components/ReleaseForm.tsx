@@ -47,9 +47,10 @@ const ReleaseForm = ({
       options.map(option => {
         return {
           label: option.title,
-          hint: option.latestRelease ? (
-            <Tag strong>This is the latest data</Tag>
-          ) : undefined,
+          hint:
+            option.latestRelease && !option.isSuperseded ? (
+              <Tag strong>This is the latest data</Tag>
+            ) : undefined,
           inlineHint: true,
           value: option.id,
         };

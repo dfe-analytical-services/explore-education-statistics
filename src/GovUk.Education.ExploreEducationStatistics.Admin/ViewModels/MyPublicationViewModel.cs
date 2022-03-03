@@ -26,6 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
 
+        public Guid? SupersededById { get; set; }
+
         public PermissionsSet Permissions { get; set; }
 
         public class PermissionsSet

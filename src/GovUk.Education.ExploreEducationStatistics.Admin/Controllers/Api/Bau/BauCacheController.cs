@@ -86,6 +86,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             {
                 PublicationTreeCacheKey.GetKey(PublicationTreeFilter.AnyData),
                 PublicationTreeCacheKey.GetKey(PublicationTreeFilter.LatestData),
+                PublicationTreeCacheKey.GetKey(PublicationTreeFilter.LatestDataNotSuperseded),
+                PublicationTreeCacheKey.GetKey(PublicationTreeFilter.NotSuperseded),
                 PublicationTreeCacheKey.GetKey(),
                 AllMethodologiesCacheKey.GetKey()
             };
