@@ -67,6 +67,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentPublicationParentPath(slug, prefix)}/publication.json";
         }
 
+        public static string PublicContentPublicationTitlePath(string slug, string prefix = null)
+        {
+            return $"{PublicContentPublicationParentPath(slug, prefix)}/publication-title.json";
+        }
+
         public static string PublicContentLatestReleasePath(string slug, string prefix = null)
         {
             return $"{PublicContentPublicationParentPath(slug, prefix)}/latest-release.json";

@@ -7,8 +7,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -29,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPublishingService _publishingService;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
+        private readonly IBlobCacheService _publicBlobCacheService;
 
         public PublicationService(ContentDbContext context,
             IMapper mapper,
@@ -36,7 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IPublicationRepository publicationRepository,
             IPublishingService publishingService,
-            IMethodologyVersionRepository methodologyVersionRepository)
+            IMethodologyVersionRepository methodologyVersionRepository,
+            IBlobCacheService publicBlobCacheService)
         {
             _context = context;
             _mapper = mapper;
@@ -45,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _publicationRepository = publicationRepository;
             _publishingService = publishingService;
             _methodologyVersionRepository = methodologyVersionRepository;
+            _publicBlobCacheService = publicBlobCacheService;
         }
 
         public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
@@ -185,6 +190,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (publication.Live)
                     {
                         await _publishingService.PublicationChanged(publication.Id);
+
+                        // @MarkFix cache file might not exist?
+                        await _publicBlobCacheService.DeleteItem(new PublicationTitleCacheKey(publication.Slug));
                     }
 
                     return await GetPublication(publication.Id);
