@@ -207,7 +207,7 @@ Validate accordion sections order
 
     user scrolls to element    id:help-and-support
     user checks accordion is in position    Methodology    1    id:help-and-support
-    user checks accordion is in position    Official Statistics    2    id:help-and-support
+    user checks accordion is in position    Official statistics    2    id:help-and-support
     user checks accordion is in position    Contact us    3    id:help-and-support
 
     user checks there are x accordion sections    3    id:help-and-support

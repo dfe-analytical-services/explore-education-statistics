@@ -14,6 +14,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React, { ReactNode } from 'react';
 import AdHocOfficialStatisticsSection from '@common/modules/find-statistics/components/AdHocOfficialStatisticsSection';
 import ExperimentalStatisticsSection from '@common/modules/find-statistics/components/ExperimentalStatisticsSection';
+import ManagementInformationSection from '@common/modules/find-statistics/components/ManageInformationSection';
 
 interface Props {
   includeAnalytics?: boolean;
@@ -70,26 +71,31 @@ const PublicationReleaseHelpAndSupportSection = ({
           </AccordionSection>
         )}
         {releaseType === 'NationalStatistics' && (
-          <AccordionSection heading="National Statistics" headingTag="h3">
+          <AccordionSection heading="National statistics" headingTag="h3">
             <NationalStatisticsSection />
           </AccordionSection>
         )}
         {releaseType === 'OfficialStatistics' && (
-          <AccordionSection heading="Official Statistics" headingTag="h3">
+          <AccordionSection heading="Official statistics" headingTag="h3">
             <OfficialStatisticsSection />
           </AccordionSection>
         )}
         {releaseType === 'AdHocStatistics' && (
           <AccordionSection
-            heading="Ad hoc Official Statistics"
+            heading="Ad hoc official statistics"
             headingTag="h3"
           >
             <AdHocOfficialStatisticsSection />
           </AccordionSection>
         )}
         {releaseType === 'ExperimentalStatistics' && (
-          <AccordionSection heading="Experimental Statistics" headingTag="h3">
+          <AccordionSection heading="Experimental statistics" headingTag="h3">
             <ExperimentalStatisticsSection />
+          </AccordionSection>
+        )}
+        {releaseType === 'ManagementInformation' && (
+          <AccordionSection heading="Management information" headingTag="h3">
+            <ManagementInformationSection />
           </AccordionSection>
         )}
         <AccordionSection
