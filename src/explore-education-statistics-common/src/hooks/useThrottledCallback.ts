@@ -1,22 +1,22 @@
 import useMountedRef from '@common/hooks/useMountedRef';
 import { useCallback, useEffect, useRef } from 'react';
 
-export type UseDebouncedCallbackReturn<Args extends unknown[]> = [
+export type UseThrottledCallbackReturn<Args extends unknown[]> = [
   (...args: Args) => void,
   () => void,
 ];
 
 /**
- * Debounce a {@param callback} so that it will only run
- * after a specified {@param timeout} has passed (in milliseconds).
+ * Throttles a {@param callback} so that it can only run *once*
+ * until a {@param timeout} has passed (in milliseconds).
  *
- * If the debounced callback is run again, it will reset the
- * current timeout and start again with the new callback arguments.
+ * If the throttled callback is run again before the timeout
+ * has elapsed, the callback cannot be triggered until it is over.
  */
-export default function useDebouncedCallback<Args extends unknown[] = []>(
+export default function useThrottledCallback<Args extends unknown[] = []>(
   callback: (...args: Args) => void,
   timeout = 0,
-): UseDebouncedCallbackReturn<Args> {
+): UseThrottledCallbackReturn<Args> {
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>();
   const callbackRef = useRef(callback);
   const mountedRef = useMountedRef();
@@ -26,7 +26,7 @@ export default function useDebouncedCallback<Args extends unknown[] = []>(
   const run = useCallback(
     (...args: Args) => {
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current);
+        return;
       }
 
       timeoutRef.current = setTimeout(() => {
