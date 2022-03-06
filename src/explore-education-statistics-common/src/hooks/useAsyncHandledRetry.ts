@@ -1,5 +1,4 @@
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
-import { AsyncStateSetterParam } from '@common/hooks/useAsyncCallback';
 import useAsyncRetry, { AsyncRetryState } from '@common/hooks/useAsyncRetry';
 import { OmitStrict } from '@common/types';
 import pick from 'lodash/pick';
@@ -21,6 +20,10 @@ export type AsyncHandledRetryState<T> = OmitStrict<
   setState: (state: AsyncHandledRetryStateSetterParam<T>) => void;
 };
 
+export interface UseAsyncHandledRetryOptions<T> {
+  initialState?: AsyncHandledRetryStateSetterParam<T>;
+}
+
 /**
  * Wrapper around {@see useAsyncRetry} that automatically handles
  * API errors using the global {@see ErrorControlContext}.
@@ -31,17 +34,11 @@ export type AsyncHandledRetryState<T> = OmitStrict<
 export default function useAsyncHandledRetry<T>(
   task: () => Promise<T>,
   deps: DependencyList = [],
-  initialState: AsyncHandledRetryStateSetterParam<T> = {
-    isLoading: true,
-  },
+  options?: UseAsyncHandledRetryOptions<T>,
 ): AsyncHandledRetryState<T> {
   const { handleError } = useErrorControl();
 
-  const { error, setState, ...state } = useAsyncRetry(
-    task,
-    deps,
-    pick(initialState, ['value', 'isLoading']) as AsyncStateSetterParam<T>,
-  );
+  const { error, setState, ...state } = useAsyncRetry(task, deps, options);
 
   useEffect(() => {
     if (error) {
@@ -54,7 +51,10 @@ export default function useAsyncHandledRetry<T>(
       ...state,
       setState: nextState => {
         setState(
-          pick(nextState, ['value', 'isLoading']) as AsyncStateSetterParam<T>,
+          pick(nextState, [
+            'value',
+            'isLoading',
+          ]) as AsyncHandledRetryStateSetterParam<T>,
         );
       },
     };
