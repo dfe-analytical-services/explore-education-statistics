@@ -103,13 +103,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Content = AsList<ContentBlock>(
                                 new HtmlBlock
                                 {
-                                    Created = new DateTime(2001, 1, 1)
+                                    Body = "Test html block 1"
                                 },
                                 new HtmlBlock
                                 {
-                                    Created = new DateTime(2002, 2, 2)
+                                    Body = "Test html block 2"
                                 },
-                                new DataBlock()
+                                new DataBlock
+                                {
+                                    Name = "Test data block 1"
+                                }
                             )
                         }
                     },
@@ -122,13 +125,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             Content = AsList<ContentBlock>(
                                 new HtmlBlock
                                 {
-                                    Created = new DateTime(2003, 3, 3)
+                                    Body = "Test html block 3"
                                 },
                                 new HtmlBlock
                                 {
-                                    Created = new DateTime(2004, 4, 4)
+                                    Body = "Test html block 4"
                                 },
-                                new DataBlock()
+                                new DataBlock
+                                {
+                                    Name = "Test data block 2"
+                                }
                             )
                         }
                     }
@@ -148,9 +154,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetContentBlocks<HtmlBlock>(release.Id);
 
-                Assert.True(result.IsRight);
-
-                var contentBlocks = result.Right;
+                var contentBlocks = result.AssertRight();
 
                 Assert.Equal(4, contentBlocks.Count);
                 Assert.Equal(release.Content[0].ContentSection.Content[0].Id, contentBlocks[0].Id);
@@ -158,10 +162,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Content[1].ContentSection.Content[0].Id, contentBlocks[2].Id);
                 Assert.Equal(release.Content[1].ContentSection.Content[1].Id, contentBlocks[3].Id);
 
-                Assert.Equal(new DateTime(2001, 1, 1), contentBlocks[0].Created);
-                Assert.Equal(new DateTime(2002, 2, 2), contentBlocks[1].Created);
-                Assert.Equal(new DateTime(2003, 3, 3), contentBlocks[2].Created);
-                Assert.Equal(new DateTime(2004, 4, 4), contentBlocks[3].Created);
+                Assert.Equal("Test html block 1", contentBlocks[0].Body);
+                Assert.Equal("Test html block 2", contentBlocks[1].Body);
+                Assert.Equal("Test html block 3", contentBlocks[2].Body);
+                Assert.Equal("Test html block 4", contentBlocks[3].Body);
             }
         }
 

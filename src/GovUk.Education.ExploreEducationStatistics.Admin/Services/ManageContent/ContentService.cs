@@ -484,9 +484,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private static ContentBlock CreateContentBlockForType(ContentBlockType type)
         {
             var classType = GetContentBlockClassTypeFromEnumValue(type);
-            var newContentBlock = (ContentBlock) Activator.CreateInstance(classType);
-            newContentBlock.Created = DateTime.UtcNow;
-            return newContentBlock;
+            return (ContentBlock) Activator.CreateInstance(classType);
         }
 
         private List<IContentBlockViewModel> OrderedContentBlocks(ContentSection section)

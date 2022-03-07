@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220307121659_EES2823AddContentBlockLockedAndUpdated")]
+    partial class EES2823AddContentBlockLockedAndUpdated
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -506,9 +508,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid?>("SupersededById")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -522,8 +521,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasKey("Id");
 
                     b.HasIndex("ContactId");
-
-                    b.HasIndex("SupersededById");
 
                     b.HasIndex("TopicId");
 
@@ -943,6 +940,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Charts");
 
+                    b.Property<string>("ChartsMigrated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("DataBlock_ChartsMigrated");
+
                     b.Property<string>("Heading")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
@@ -956,6 +958,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_HighlightName");
 
+                    b.Property<bool>("LocationsMigrated")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false)
+                        .HasColumnName("DataBlock_LocationsMigrated");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -965,11 +973,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Query");
 
+                    b.Property<string>("QueryMigrated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("DataBlock_QueryMigrated");
+
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Summary")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Summary");
 
@@ -977,6 +991,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Table");
+
+                    b.Property<string>("TableMigrated")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("DataBlock_TableMigrated");
 
                     b.HasDiscriminator().HasValue("DataBlock");
                 });
@@ -1212,10 +1231,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .WithMany()
                         .HasForeignKey("ContactId");
 
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Publication", "SupersededBy")
-                        .WithMany()
-                        .HasForeignKey("SupersededById");
-
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.Topic", "Topic")
                         .WithMany("Publications")
                         .HasForeignKey("TopicId")
@@ -1246,8 +1261,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Navigation("Contact");
 
                     b.Navigation("ExternalMethodology");
-
-                    b.Navigation("SupersededBy");
 
                     b.Navigation("Topic");
                 });
