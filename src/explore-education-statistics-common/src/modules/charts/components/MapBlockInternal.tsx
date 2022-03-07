@@ -414,8 +414,10 @@ export const MapBlockInternal = ({
 
   const [legendEntries, setLegendEntries] = useState<LegendEntry[]>([]);
 
-  const selectedDataSetConfiguration =
-    dataSetCategoryConfigs[selectedDataSetKey];
+  const selectedDataSetConfig = dataSetCategoryConfigs[selectedDataSetKey];
+
+  const selectedDataSet =
+    selectedFeature?.properties?.dataSets[selectedDataSetKey];
 
   // initialise
   useEffect(() => {
@@ -447,14 +449,11 @@ export const MapBlockInternal = ({
 
   // Rebuild the geometry if the selection has changed
   useEffect(() => {
-    if (dataSetCategories.length && selectedDataSetConfiguration) {
+    if (dataSetCategories.length && selectedDataSetConfig) {
       const {
         geometry: newGeometry,
         legend: newLegendEntries,
-      } = generateGeometryAndLegend(
-        selectedDataSetConfiguration,
-        dataSetCategories,
-      );
+      } = generateGeometryAndLegend(selectedDataSetConfig, dataSetCategories);
 
       setGeometry(newGeometry);
       setLegendEntries(newLegendEntries);
@@ -463,7 +462,7 @@ export const MapBlockInternal = ({
     dataSetCategories,
     dataSetCategoryConfigs,
     meta,
-    selectedDataSetConfiguration,
+    selectedDataSetConfig,
     selectedDataSetKey,
   ]);
 
@@ -545,21 +544,12 @@ export const MapBlockInternal = ({
 
       featureLayer.bindTooltip(() => {
         if (feature.properties) {
-          const items = Object.entries(feature.properties.dataSets).map(
-            ([dataSetKey, dataSet]) => {
-              const dataSetConfig = dataSetCategoryConfigs[dataSetKey];
-
-              return (
-                `<li>` +
-                `${dataSetConfig.config.label}: ${formatPretty(
-                  dataSet.value,
-                  dataSetConfig.dataSet.indicator.unit,
-                  dataSetConfig.dataSet.indicator.decimalPlaces,
-                )}` +
-                `</li>`
-              );
-            },
+          const dataSetValue = formatPretty(
+            feature.properties.dataSets[selectedDataSetKey].value,
+            selectedDataSetConfig.dataSet.indicator.unit,
+            selectedDataSetConfig.dataSet.indicator.decimalPlaces,
           );
+          const content = `${selectedDataSetConfig.config.label}: ${dataSetValue}`;
 
           const mapWidth = mapRef.current?.container?.clientWidth;
 
@@ -571,9 +561,7 @@ export const MapBlockInternal = ({
           return (
             `<div class="${styles.tooltip}" style="${tooltipStyle}">` +
             `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
-            `<ul class="${
-              styles.tooltipList
-            }" data-testid="chartTooltip-items">${items.join('')}</ul>` +
+            `<p class="${styles.tooltipContent}" data-testid="chartTooltip-contents">${content}</p>` +
             `</div>`
           );
         }
@@ -581,7 +569,7 @@ export const MapBlockInternal = ({
         return '';
       });
     },
-    [dataSetCategoryConfigs],
+    [dataSetCategoryConfigs, selectedDataSetKey],
   );
 
   if (
@@ -684,10 +672,10 @@ export const MapBlockInternal = ({
             </Map>
           )}
         </div>
-        {selectedDataSetConfiguration && (
-          <div className="govuk-grid-column-one-third" aria-live="assertive">
+        {selectedDataSetConfig && (
+          <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s">
-              Key to {selectedDataSetConfiguration?.config?.label}
+              Key to {selectedDataSetConfig?.config?.label}
             </h3>
             <ul className="govuk-list">
               {legendEntries.map(({ min, max, colour }) => (
@@ -707,48 +695,35 @@ export const MapBlockInternal = ({
                 </li>
               ))}
             </ul>
+
+            <div
+              aria-live="polite"
+              className="govuk-!-margin-top-5"
+              data-testid="mapBlock-indicator"
+            >
+              {selectedFeature && (
+                <>
+                  <h3 className="govuk-heading-s">
+                    {selectedFeature?.properties.name}
+                  </h3>
+
+                  {selectedDataSet && (
+                    <KeyStatTile
+                      testId="mapBlock-indicatorTile"
+                      title={selectedDataSetConfig.config.label}
+                      value={formatPretty(
+                        selectedDataSet.value,
+                        selectedDataSetConfig.dataSet.indicator.unit,
+                        selectedDataSetConfig.dataSet.indicator.decimalPlaces,
+                      )}
+                    />
+                  )}
+                </>
+              )}
+            </div>
           </div>
         )}
       </div>
-
-      {selectedDataSetConfiguration && selectedFeature && (
-        <>
-          <h3 className="govuk-heading-m">
-            {selectedFeature?.properties.name}
-          </h3>
-
-          {selectedFeature?.properties?.dataSets && selectedDataSetKey && (
-            <KeyStatContainer>
-              {Object.entries(selectedFeature?.properties.dataSets).map(
-                ([dataSetKey, dataSet]) => {
-                  if (!dataSetCategoryConfigs[dataSetKey]) {
-                    return null;
-                  }
-
-                  const {
-                    config,
-                    dataSet: expandedDataSet,
-                  } = dataSetCategoryConfigs[dataSetKey];
-
-                  return (
-                    <KeyStatColumn key={dataSetKey} testId="mapBlock-indicator">
-                      <KeyStatTile
-                        testId="mapBlock-indicatorTile"
-                        title={config.label}
-                        value={formatPretty(
-                          dataSet.value,
-                          expandedDataSet.indicator.unit,
-                          expandedDataSet.indicator.decimalPlaces,
-                        )}
-                      />
-                    </KeyStatColumn>
-                  );
-                },
-              )}
-            </KeyStatContainer>
-          )}
-        </>
-      )}
     </>
   );
 };

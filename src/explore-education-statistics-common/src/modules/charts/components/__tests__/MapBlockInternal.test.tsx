@@ -205,7 +205,7 @@ describe('MapBlockInternal', () => {
     expect(paths[3]).toHaveClass('selected');
   });
 
-  test('changing selected location renders its indicator tiles', async () => {
+  test('changing selected location renders its indicator tile', async () => {
     render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {
@@ -222,26 +222,14 @@ describe('MapBlockInternal', () => {
 
     userEvent.selectOptions(select, group1Options[0]);
 
-    const indicators = screen.getAllByTestId('mapBlock-indicator');
+    const indicator = screen.getByTestId('mapBlock-indicator');
+    const tile = within(indicator);
 
-    expect(indicators).toHaveLength(2);
-
-    const tile1 = within(indicators[0]);
-
-    expect(tile1.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
+    expect(tile.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
     );
-    expect(tile1.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
+    expect(tile.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
       '3.5%',
-    );
-
-    const tile2 = within(indicators[1]);
-
-    expect(tile2.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
-      'Overall absence rate (2016/17)',
-    );
-    expect(tile2.getByTestId('mapBlock-indicatorTile-value')).toHaveTextContent(
-      '4.8%',
     );
   });
 
@@ -277,7 +265,7 @@ describe('MapBlockInternal', () => {
 
     userEvent.selectOptions(select, group1Options[0]);
 
-    const tile1 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
+    const tile1 = within(screen.getByTestId('mapBlock-indicator'));
     expect(tile1.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
     );
@@ -287,7 +275,7 @@ describe('MapBlockInternal', () => {
 
     userEvent.selectOptions(select, group1Options[1]);
 
-    const tile2 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
+    const tile2 = within(screen.getByTestId('mapBlock-indicator'));
     expect(tile2.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
     );
@@ -297,7 +285,7 @@ describe('MapBlockInternal', () => {
 
     userEvent.selectOptions(select, group1Options[2]);
 
-    const tile3 = within(screen.getAllByTestId('mapBlock-indicator')[0]);
+    const tile3 = within(screen.getByTestId('mapBlock-indicator'));
     expect(tile3.getByTestId('mapBlock-indicatorTile-title')).toHaveTextContent(
       'Authorised absence rate (2016/17)',
     );

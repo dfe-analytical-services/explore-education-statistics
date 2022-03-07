@@ -36,11 +36,11 @@ user waits until element does not contain infographic chart
 
 user waits until element contains chart tooltip
     [Arguments]    ${locator}
-    user waits until parent contains element    ${locator}    css:[data-testid="chartTooltip"]
+    user waits until parent contains element    ${locator}    testid:chartTooltip
 
 user waits until element does not contain chart tooltip
     [Arguments]    ${locator}
-    user waits until parent does not contain element    ${locator}    css:[data-testid="chartTooltip"]
+    user waits until parent does not contain element    ${locator}    testid:chartTooltip
 
 user checks chart title contains
     [Arguments]    ${locator}    ${text}
@@ -121,15 +121,15 @@ user mouses over chart bar
 
 user mouses over selected map feature
     [Arguments]    ${locator}
-    user waits until parent contains element    ${locator}    css:[data-testid="mapBlock-selectedFeature"]
-    ${element}=    get child element    ${locator}    css:[data-testid="mapBlock-selectedFeature"]
+    user waits until parent contains element    ${locator}    testid:mapBlock-selectedFeature
+    ${element}=    get child element    ${locator}    testid:mapBlock-selectedFeature
     user waits until element is visible    ${element}
     user mouses over element    ${element}
 
 user checks chart tooltip label contains
     [Arguments]    ${locator}    ${text}
-    user waits until parent contains element    ${locator}    css:[data-testid="chartTooltip-label"]
-    ${element}=    get child element    ${locator}    css:[data-testid="chartTooltip-label"]
+    user waits until parent contains element    ${locator}    testid:chartTooltip-label
+    ${element}=    get child element    ${locator}    testid:chartTooltip-label
     user waits until element is visible    ${element}
     user waits until element contains    ${element}    ${text}
 
@@ -141,17 +141,32 @@ user checks chart tooltip item contains
     user waits until element is visible    ${element}
     user waits until element contains    ${element}    ${text}
 
-user checks map chart indicator tile contains
-    [Arguments]    ${locator}    ${number}    ${title}    ${value}
-    user waits until parent contains element    ${locator}
-    ...    css:[data-testid="mapBlock-indicator"]:nth-of-type(${number})
-    ${indicator}=    get child element    ${locator}    css:[data-testid="mapBlock-indicator"]:nth-of-type(${number})
+user checks map tooltip label contains
+    [Arguments]    ${locator}    ${text}
+    user waits until parent contains element    ${locator}    testid:chartTooltip-label
+    ${element}=    get child element    ${locator}    testid:chartTooltip-label
+    user waits until element is visible    ${element}
+    user waits until element contains    ${element}    ${text}
 
-    ${indicator_title}=    get child element    ${indicator}    css:[data-testid="mapBlock-indicatorTile-title"]
+user checks map tooltip item contains
+    [Arguments]    ${locator}    ${text}
+    user waits until parent contains element    ${locator}
+    ...    testid:chartTooltip-content
+    ${element}=    get child element    ${locator}    testid:chartTooltip-content
+    user waits until element is visible    ${element}
+    user waits until element contains    ${element}    ${text}
+
+user checks map chart indicator tile contains
+    [Arguments]    ${locator}    ${title}    ${value}
+    user waits until parent contains element    ${locator}
+    ...    testid:mapBlock-indicator
+    ${indicator}=    get child element    ${locator}    testid:mapBlock-indicator
+
+    ${indicator_title}=    get child element    ${indicator}    testid:mapBlock-indicatorTile-title
     user waits until element is visible    ${indicator_title}
     user waits until element contains    ${indicator_title}    ${title}
 
-    ${indicator_value}=    get child element    ${indicator}    css:[data-testid="mapBlock-indicatorTile-value"]
+    ${indicator_value}=    get child element    ${indicator}    testid:mapBlock-indicatorTile-value
     user waits until element is visible    ${indicator_value}
     user waits until element contains    ${indicator_value}    ${value}
 

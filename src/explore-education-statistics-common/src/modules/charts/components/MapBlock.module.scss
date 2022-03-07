@@ -25,19 +25,9 @@
   width: 100%;
 }
 
-.tooltipList {
-  list-style: none;
+.tooltipContent {
+  font-size: 0.9rem;
   margin-bottom: 0;
-  padding-left: 0;
-
-  li {
-    font-size: 0.9rem;
-    margin-bottom: govuk-spacing(2);
-  }
-
-  li:last-of-type {
-    margin-bottom: 0;
-  }
 }
 
 .legend {
