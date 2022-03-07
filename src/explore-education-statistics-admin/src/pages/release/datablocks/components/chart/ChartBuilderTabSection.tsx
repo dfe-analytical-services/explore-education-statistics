@@ -113,14 +113,7 @@ const ChartBuilderTabSection = ({
       releaseId={releaseId}
       data={table.results}
       meta={meta}
-      initialChart={
-        dataBlock.charts[0].type === 'map'
-          ? {
-              ...dataBlock.charts[0],
-              boundaryLevel: query.boundaryLevel ?? 0,
-            }
-          : dataBlock.charts[0]
-      }
+      initialChart={dataBlock.charts[0]}
       tableTitle={dataBlock.heading}
       onChartSave={handleChartSave}
       onChartDelete={handleChartDelete}

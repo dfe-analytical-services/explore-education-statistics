@@ -20,7 +20,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public ObservationQueryContext Query { get; set; }
 
-        public List<IChart> Charts { get; set; }
+        public List<IChart> Charts
+        {
+            get => Charts;
+            set
+            {
+                value.ForEach(chart =>
+                {
+                    if (chart.Type == ChartType.Map)
+                    {
+                        var mapChart = chart as MapChart;
+                        mapChart.BoundaryLevel = Query.BoundaryLevel ?? -1;
+                    }
+                }); 
+            }
+        }
 
         public DataBlockSummaryViewModel Summary { get; set; }
 

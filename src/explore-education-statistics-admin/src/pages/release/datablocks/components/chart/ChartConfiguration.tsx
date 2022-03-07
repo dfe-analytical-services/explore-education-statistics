@@ -135,11 +135,11 @@ const ChartConfiguration = ({
     }
 
     if (definition.type === 'map' && meta.boundaryLevels?.length) {
-      schema = schema.shape({
-        boundaryLevel: Yup.number()
-          .oneOf(meta.boundaryLevels.map(level => level.id))
-          .required('Choose a boundary level'),
-      });
+      // schema = schema.shape({
+      //   boundaryLevel: Yup.number()
+      //     .oneOf(meta.boundaryLevels.map(level => level.id))
+      //     .required('Choose a boundary level'),
+      // });
     }
 
     return schema;
