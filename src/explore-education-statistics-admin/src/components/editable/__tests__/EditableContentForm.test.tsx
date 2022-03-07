@@ -68,7 +68,7 @@ describe('EditableContentForm', () => {
       ).not.toBeInTheDocument();
     });
 
-    test('shows validation error if submit the form with no content', async () => {
+    test('shows validation error if the form is submitted with no content', async () => {
       const handleSubmit = jest.fn();
       render(
         <EditableContentForm
@@ -92,8 +92,9 @@ describe('EditableContentForm', () => {
       });
     });
 
-    test('calls handle submit with the content when submit the form', async () => {
+    test('calls `onSubmit` handler with the content when form is submitted', async () => {
       const handleSubmit = jest.fn();
+
       render(
         <EditableContentForm
           content="Test content"
@@ -109,6 +110,88 @@ describe('EditableContentForm', () => {
       await waitFor(() => {
         expect(handleSubmit).toHaveBeenCalledWith('Test content');
       });
+    });
+
+    test('calls `onAction` handler when user performs action within form', () => {
+      const handleAction = jest.fn();
+
+      render(
+        <EditableContentForm
+          content="Test content"
+          id="block-id"
+          label="Form label"
+          onAction={handleAction}
+          onCancel={noop}
+          onSubmit={noop}
+        />,
+      );
+
+      expect(handleAction).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('textbox'));
+
+      expect(handleAction).toHaveBeenCalledTimes(1);
+    });
+
+    test('calls `onAction` handler only once within the `actionThrottle` time', async () => {
+      jest.useFakeTimers();
+
+      const handleAction = jest.fn();
+
+      render(
+        <EditableContentForm
+          actionThrottle={1_000}
+          content="Test content"
+          id="block-id"
+          label="Form label"
+          onAction={handleAction}
+          onCancel={noop}
+          onSubmit={noop}
+        />,
+      );
+
+      expect(handleAction).not.toHaveBeenCalled();
+
+      const textbox = screen.getByRole('textbox');
+
+      userEvent.click(textbox);
+      expect(handleAction).toHaveBeenCalledTimes(1);
+
+      jest.advanceTimersByTime(500);
+
+      await userEvent.type(textbox, 'Test');
+      expect(handleAction).toHaveBeenCalledTimes(1);
+
+      jest.advanceTimersByTime(500);
+      expect(handleAction).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
+    });
+
+    test('calls `onIdle` handler when user has been idle for specified `idleTimeout`', () => {
+      jest.useFakeTimers();
+
+      const handleIdle = jest.fn();
+
+      render(
+        <EditableContentForm
+          content="Test content"
+          id="block-id"
+          idleTimeout={5000}
+          label="Form label"
+          onCancel={noop}
+          onSubmit={noop}
+          onIdle={handleIdle}
+        />,
+      );
+
+      expect(handleIdle).not.toHaveBeenCalled();
+
+      jest.advanceTimersByTime(5000);
+
+      expect(handleIdle).toHaveBeenCalledTimes(1);
+
+      jest.useRealTimers();
     });
   });
 

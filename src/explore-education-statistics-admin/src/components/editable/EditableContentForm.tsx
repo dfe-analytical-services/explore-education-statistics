@@ -14,47 +14,67 @@ import { Form } from '@common/components/form';
 import useToggle from '@common/hooks/useToggle';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import classNames from 'classnames';
 import { Formik } from 'formik';
 import React, { useCallback, useRef } from 'react';
-import classNames from 'classnames';
+import { useIdleTimer } from 'react-idle-timer';
 
 interface FormValues {
   content: string;
 }
 
 export interface Props {
+  actionThrottle?: number;
   allowComments?: boolean;
   content: string;
   hideLabel?: boolean;
   id: string;
+  idleTimeout?: number;
   isSaving?: boolean;
   label: string;
+  onAction?: () => void;
   onAutoSave?: (content: string) => void;
   onBlur?: (isDirty: boolean) => void;
   onCancel?: () => void;
+  onIdle?: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
   onSubmit: (content: string) => void;
 }
 
 const EditableContentForm = ({
+  actionThrottle = 5_000,
   allowComments = false,
   content,
   hideLabel = false,
   id,
+  idleTimeout = 600_000,
   isSaving = false,
   label,
+  onAction,
   onAutoSave,
   onBlur,
   onCancel,
+  onIdle,
   onImageUpload,
   onImageUploadCancel,
   onSubmit,
 }: Props) => {
   const { comments, clearPendingDeletions } = useCommentsContext();
+
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
-  const blockId = id.replace('block-', '');
+
+  useIdleTimer({
+    element: containerRef.current ?? document,
+    // Disable cross tab in tests as it seems to
+    // prevent idle callback from being triggered.
+    crossTab: process.env.NODE_ENV !== 'test',
+    throttle: actionThrottle,
+    timeout: idleTimeout,
+    onAction,
+    onIdle,
+  });
 
   const validateElements = useCallback((elements: Element[]) => {
     let error: string | undefined;
@@ -70,6 +90,8 @@ const EditableContentForm = ({
 
     return error;
   }, []);
+
+  const blockId = id.replace('block-', '');
 
   return (
     <div className={styles.container} ref={containerRef}>

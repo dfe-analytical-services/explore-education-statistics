@@ -73,10 +73,14 @@ const ReleaseEditableBlock = ({
     isLockedByUser,
     locked,
     lockedBy,
-    startLock,
+    lockThrottle,
+    endLock,
     setLock,
+    startLock,
+    refreshLock,
   } = useBlockLock({
-    getLock: async () => hub.lockContentBlock(block.id),
+    getLock: () => hub.lockContentBlock(block.id),
+    unlock: () => hub.unlockContentBlock(block.id),
     initialLock: {
       locked: block.locked,
       lockedUntil: block.lockedUntil,
@@ -122,11 +126,9 @@ const ReleaseEditableBlock = ({
       await handleSave(content);
 
       clearUnsavedCommentDeletions(block.id);
-
-      await hub.unlockContentBlock(block.id);
-      setLock(undefined);
+      await endLock();
     },
-    [handleSave, clearUnsavedCommentDeletions, block.id, hub, setLock],
+    [handleSave, clearUnsavedCommentDeletions, block.id, endLock],
   );
 
   const handleDelete = useCallback(() => {
@@ -205,6 +207,7 @@ const ReleaseEditableBlock = ({
           onUpdateUnsavedCommentDeletions={updateUnsavedCommentDeletions}
         >
           <EditableContentBlock
+            actionThrottle={lockThrottle}
             allowComments={allowComments}
             editable={editable && !isBrowser('IE')}
             hideLabel
@@ -218,8 +221,10 @@ const ReleaseEditableBlock = ({
             transformImageAttributes={transformImageAttributes}
             useMarkdown={block.type === 'MarkDownBlock'}
             value={block.body}
+            onActive={refreshLock}
             onAutoSave={handleSave}
             onBlur={handleBlur}
+            onIdle={endLock}
             onSubmit={handleSubmit}
             onDelete={handleDelete}
             onEditing={startLock}

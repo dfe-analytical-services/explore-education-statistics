@@ -267,6 +267,70 @@ describe('ReleaseEditableBlock', () => {
     ).not.toBeDisabled();
   });
 
+  test('does not revert to editable state after editing block and clicking `Save and close`', async () => {
+    mockDate.set('2022-02-16T12:05:00Z');
+
+    jest
+      .spyOn(connectionMock, 'state', 'get')
+      .mockReturnValue(HubConnectionState.Connected);
+
+    connectionMock.invoke.mockResolvedValue(() => Promise.resolve());
+
+    render(
+      <ReleaseEditableBlock
+        publicationId="publication-1"
+        releaseId="release-1"
+        sectionId="section-1"
+        block={{
+          ...testHtmlBlock,
+          locked: '2022-02-16T12:00:00Z',
+          lockedUntil: '2022-02-16T12:10:00Z',
+          lockedBy: testCurrentUser,
+        }}
+        onSave={noop}
+        onDelete={noop}
+      />,
+    );
+
+    expect(screen.getByText('Save & close')).toBeInTheDocument();
+
+    await userEvent.type(screen.getByRole('textbox'), 'test');
+
+    userEvent.click(screen.getByRole('button', { name: 'Save & close' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Edit block')).toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('button', { name: 'Edit block' }),
+    ).not.toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Remove block' }),
+    ).not.toBeDisabled();
+
+    jest.useFakeTimers();
+
+    // After editing the block, another timeout triggers to refresh
+    // the lock, but we shouldn't action this if the user has already
+    // returned to the read-only state (as they have finished editing).
+    jest.advanceTimersByTime(15_000);
+
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Save & close' }),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Edit block' }),
+    ).not.toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Remove block' }),
+    ).not.toBeDisabled();
+
+    jest.useRealTimers();
+  });
+
   test('renders locked state when already locked by other user', () => {
     mockDate.set('2022-02-16T12:09:00Z');
 
@@ -402,6 +466,84 @@ describe('ReleaseEditableBlock', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('renders unlocked state when current user is idle for too long', async () => {
+    mockDate.set('2022-02-16T12:00:00Z');
+
+    jest.useFakeTimers();
+
+    jest
+      .spyOn(connectionMock, 'state', 'get')
+      .mockReturnValue(HubConnectionState.Connected);
+
+    render(
+      <ReleaseEditableBlock
+        publicationId="publication-1"
+        releaseId="release-1"
+        sectionId="section-1"
+        block={{
+          ...testHtmlBlock,
+          locked: '2022-02-16T12:00:00Z',
+          lockedUntil: '2022-02-16T12:20:00Z',
+          lockedBy: testCurrentUser,
+        }}
+        onSave={noop}
+        onDelete={noop}
+      />,
+    );
+
+    expect(
+      screen.queryByText(/This block was locked for editing/),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Edit block' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove block' }),
+    ).not.toBeInTheDocument();
+
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Save & close' }),
+    ).toBeInTheDocument();
+
+    expect(connectionMock.invoke).not.toHaveBeenCalled();
+
+    // User has been idle and lock is removed
+    jest.advanceTimersByTime(600_000);
+
+    mockDate.set('2022-02-16T12:10:00Z');
+
+    await waitFor(() => {
+      expect(connectionMock.invoke).toHaveBeenCalledTimes(1);
+      expect(connectionMock.invoke).toHaveBeenLastCalledWith<
+        Parameters<typeof connectionMock.invoke>
+      >('UnlockContentBlock', { id: testHtmlBlock.id });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText('Edit block')).toBeInTheDocument();
+    });
+
+    expect(
+      screen.queryByText(/This block was locked for editing/),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Edit block' }),
+    ).not.toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: 'Remove block' }),
+    ).not.toBeDisabled();
+
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Save & close' }),
+    ).not.toBeInTheDocument();
+
+    jest.useRealTimers();
+  });
+
   test('re-renders locked state when other user renews their lock', async () => {
     mockDate.set('2022-02-16T12:00:00Z');
 
@@ -485,6 +627,96 @@ describe('ReleaseEditableBlock', () => {
     expect(
       screen.queryByRole('button', { name: 'Save & close' }),
     ).not.toBeInTheDocument();
+  });
+
+  test('re-renders locked state when current user interacts with block before expiry', async () => {
+    // Lock is about to expire
+    mockDate.set('2022-02-16T12:09:00Z');
+
+    jest.useFakeTimers();
+
+    jest
+      .spyOn(connectionMock, 'state', 'get')
+      .mockReturnValue(HubConnectionState.Connected);
+
+    connectionMock.invoke.mockImplementation(methodName => {
+      if (methodName === 'LockContentBlock') {
+        return Promise.resolve<ReleaseContentBlockLockEvent>({
+          id: 'block-1',
+          releaseId: 'release-1',
+          sectionId: 'section-1',
+          locked: '2022-02-16T12:00:00Z',
+          lockedUntil: '2022-02-16T12:20:00Z',
+          lockedBy: testCurrentUser,
+        });
+      }
+
+      return Promise.resolve();
+    });
+
+    render(
+      <ReleaseEditableBlock
+        publicationId="publication-1"
+        releaseId="release-1"
+        sectionId="section-1"
+        block={{
+          ...testHtmlBlock,
+          locked: '2022-02-16T12:00:00Z',
+          lockedUntil: '2022-02-16T12:10:00Z',
+          lockedBy: testCurrentUser,
+        }}
+        onSave={noop}
+        onDelete={noop}
+      />,
+    );
+
+    expect(
+      screen.queryByText(/This block was locked for editing/),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Edit block' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove block' }),
+    ).not.toBeInTheDocument();
+
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Save & close' }),
+    ).toBeInTheDocument();
+
+    expect(connectionMock.invoke).not.toHaveBeenCalled();
+
+    // Interact with textbox
+    await userEvent.type(screen.getByRole('textbox'), 'Test text');
+
+    jest.advanceTimersByTime(60_000);
+
+    await waitFor(() => {
+      expect(connectionMock.invoke).toHaveBeenCalledTimes(1);
+      expect(connectionMock.invoke).toHaveBeenLastCalledWith<
+        Parameters<typeof connectionMock.invoke>
+      >('LockContentBlock', { id: testHtmlBlock.id });
+    });
+
+    expect(
+      screen.queryByText(/This block was locked for editing/),
+    ).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Edit block' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove block' }),
+    ).not.toBeInTheDocument();
+
+    expect(screen.getByRole('textbox')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Save & close' }),
+    ).toBeInTheDocument();
+
+    jest.useRealTimers();
   });
 
   test('renders locked state when other user starts editing', async () => {

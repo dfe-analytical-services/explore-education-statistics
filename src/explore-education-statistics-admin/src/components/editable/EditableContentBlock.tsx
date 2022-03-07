@@ -20,9 +20,11 @@ import classNames from 'classnames';
 import React, { useMemo } from 'react';
 
 interface EditableContentBlockProps {
+  actionThrottle?: number;
   allowComments?: boolean;
   editable?: boolean;
   id: string;
+  idleTimeout?: number;
   isEditing?: boolean;
   isLoading?: boolean;
   isSaving?: boolean;
@@ -35,20 +37,24 @@ interface EditableContentBlockProps {
   ) => Dictionary<string>;
   useMarkdown?: boolean;
   value: string;
+  onActive?: () => void;
   onAutoSave?: (value: string) => void;
   onBlur?: (isDirty: boolean) => void;
   onCancel?: () => void;
   onDelete: () => void;
   onEditing: () => void;
+  onIdle?: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
   onSubmit: (value: string) => void;
 }
 
 const EditableContentBlock = ({
+  actionThrottle,
   allowComments = false,
   editable = true,
   id,
+  idleTimeout,
   isLoading,
   isEditing,
   isSaving,
@@ -59,11 +65,13 @@ const EditableContentBlock = ({
   transformImageAttributes,
   useMarkdown,
   value,
+  onActive,
   onAutoSave,
   onBlur,
   onCancel,
   onDelete,
   onEditing,
+  onIdle,
   onImageUpload,
   onImageUploadCancel,
   onSubmit,
@@ -113,14 +121,18 @@ const EditableContentBlock = ({
   if (isEditing && !lockedBy) {
     return (
       <EditableContentForm
+        actionThrottle={actionThrottle}
         allowComments={allowComments}
         content={content ? sanitizeHtml(content, sanitizeOptions) : ''} // NOTE: Sanitize to transform img src attribs
         label={label}
         hideLabel={hideLabel}
         id={id}
+        idleTimeout={idleTimeout}
         isSaving={isSaving}
+        onAction={onActive}
         onAutoSave={onAutoSave}
         onBlur={onBlur}
+        onIdle={onIdle}
         onImageUpload={onImageUpload}
         onImageUploadCancel={onImageUploadCancel}
         onCancel={onCancel}
