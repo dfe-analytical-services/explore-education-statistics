@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System.Linq;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
@@ -37,6 +38,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
                         methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
 
             CreateMap<Publication, PublicationSummaryViewModel>();
+
+            CreateMap<Publication, CachedPublicationViewModel>()
+                .ForMember(dest => dest.LegacyReleases,
+                    m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(l => l.Order)))
+                .ForMember(dest => dest.Releases, m => m.Ignore());
+
+            CreateMap<Release, CachedReleaseViewModel>()
+                .ForMember(dest => dest.CoverageTitle,
+                    m => m.MapFrom(release => release.TimePeriodCoverage.GetEnumLabel()))
+                .ForMember(dest => dest.Type,
+                    m => m.MapFrom(release => new ReleaseTypeViewModel
+                    {
+                        Title = release.Type.GetTitle()
+                    }))
+                .ForMember(
+                    dest => dest.Updates,
+                    m => m.MapFrom(r => r.Updates.OrderByDescending(update => update.On)))
+                .ForMember(
+                    dest => dest.Content,
+                    m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));
+
+            CreateMap<Topic, TopicViewModel>();
+
+            CreateMap<Theme, ThemeViewModel>();
+
+            CreateMap<Contact, ContactViewModel>();
+
+            CreateMap<Release, ReleaseTitleViewModel>();
+
+            CreateMap<LegacyRelease, LegacyReleaseViewModel>();
+
+            CreateMap<ExternalMethodology, ExternalMethodologyViewModel>();
         }
 
         private void CreateContentBlockMap()

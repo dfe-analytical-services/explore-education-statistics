@@ -111,7 +111,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             foreach (var publication in publications)
             {
                 var releases = publication.Releases.Where(release => release.IsLatestPublishedVersionOfRelease());
-                await CachePublication(publication.Id, context);
                 await CacheLatestRelease(publication, context);
                 foreach (var release in releases)
                 {
@@ -134,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var publication in publications)
             {
-                await CachePublication(publication.Id, context, releaseIds);
+                // @MarkFix delete relevant publication.jsons here?
                 await CacheLatestRelease(publication, context, releaseIds);
                 foreach (var release in releases)
                 {
@@ -148,8 +147,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var publication = await _publicationService.Get(publicationId);
 
-            await CachePublication(publication.Id, context);
             await _publicationService.SetPublishedDate(publication.Id, context.Published);
+
+            // @MarkFix delete relevant publication.jsons here?
 
             // Invalidate the various cached trees in case any
             // publications/methodologies are affected by the changes
@@ -179,12 +179,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             var viewModel = await _releaseService.GetLatestReleaseViewModel(publication.Id, includedReleaseIds, context);
             await Upload(prefix => PublicContentLatestReleasePath(publication.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
-        }
-
-        private async Task CachePublication(Guid publicationId, PublishContext context, params Guid[] includedReleaseIds)
-        {
-            var viewModel = await _publicationService.GetViewModel(publicationId, includedReleaseIds);
-            await Upload(prefix => PublicContentPublicationPath(viewModel.Slug, prefix), context, viewModel, _jsonSerializerSettingsCamelCase);
         }
 
         private async Task CacheRelease(Release release, PublishContext context)

@@ -1,8 +1,8 @@
 ﻿#nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -15,6 +15,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
@@ -24,37 +25,77 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly IFileStorageService _fileStorageService;
         private readonly IMethodologyService _methodologyService;
         private readonly IUserService _userService;
+        private readonly IPublicationService _publicationService;
+        private readonly IMapper _mapper;
 
         public ReleaseService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IFileStorageService fileStorageService,
             IMethodologyService methodologyService,
-            IUserService userService)
+            IUserService userService,
+            IPublicationService publicationService,
+            IMapper mapper)
+
         {
             _persistenceHelper = persistenceHelper;
             _fileStorageService = fileStorageService;
             _methodologyService = methodologyService;
             _userService = userService;
+            _publicationService = publicationService;
+            _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> Get(string publicationPath, string releasePath)
+        public async Task<Either<ActionResult, ReleaseViewModel>> Get(string publicationSlug, string? releaseSlug = null)
         {
-            return await CreateFromCachedPublicationAndRelease(publicationPath, releasePath,
-                    (publication, release) => new ReleaseViewModel(release, publication))
-                .OnSuccessCombineWith(model => _methodologyService.GetSummariesByPublication(model.Publication.Id))
-                .OnSuccess(viewModelAndMethodologies =>
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(query => query
+                    .Where(p => p.Slug == publicationSlug))
+                .OnSuccess(publication => _methodologyService.GetSummariesByPublication(publication.Id))
+                .OnSuccess(async methodologies =>
                 {
-                    var (viewModel, methodologies) = viewModelAndMethodologies;
-                    viewModel.Publication.Methodologies = methodologies;
-                    return viewModel;
+                    var publicationTask = _publicationService.GetViewModel(publicationSlug);
+                    var releaseTask = CreatedFromCachedRelease(publicationSlug, releaseSlug);
+
+                    await Task.WhenAll(publicationTask, releaseTask);
+
+                    if (releaseTask.Result.IsRight
+                        && releaseTask.Result.Right is not null
+                        && publicationTask.Result.IsRight
+                        && publicationTask.Result.Right is not null)
+                    {
+                        var result = new Either<ActionResult, ReleaseViewModel>(new ReleaseViewModel(
+                            _mapper.Map<CachedReleaseViewModel>(releaseTask.Result.Right),
+                            _mapper.Map<CachedPublicationViewModel>(publicationTask.Result.Right)
+                        ));
+
+                        result.Right.Publication.Methodologies = methodologies;
+                        return result;
+                    }
+
+                    return new NotFoundResult();
                 });
         }
 
-        public async Task<Either<ActionResult, ReleaseSummaryViewModel>> GetSummary(string publicationPath,
-            string releasePath)
+        public async Task<Either<ActionResult, ReleaseSummaryViewModel>> GetSummary(string publicationSlug,
+            string? releaseSlug)
         {
-            return await CreateFromCachedPublicationAndRelease(publicationPath, releasePath,
-                (publication, release) => new ReleaseSummaryViewModel(release, publication));
+            var publicationTask = _publicationService.GetViewModel(publicationSlug);
+            var releaseTask = CreatedFromCachedRelease(publicationSlug, releaseSlug);
+
+            await Task.WhenAll(publicationTask, releaseTask);
+
+            if (releaseTask.Result.IsRight
+                && releaseTask.Result.Right is not null
+                && publicationTask.Result.IsRight
+                && publicationTask.Result.Right is not null)
+            {
+                return new ReleaseSummaryViewModel(
+                    _mapper.Map<CachedReleaseViewModel>(releaseTask.Result.Right),
+                    _mapper.Map<CachedPublicationViewModel>(publicationTask.Result.Right)
+                );
+            }
+
+            return new NotFoundResult();
         }
 
         public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug)
@@ -66,6 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 )
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(
+                    // @MarkFix EES-3149 Superseded releases shouldn't have "latest data" label
                     publication => publication.Releases
                         .Where(release => release.IsLatestPublishedVersionOfRelease())
                         .OrderByDescending(r => r.Year)
@@ -75,26 +117,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 );
         }
 
-        private async Task<Either<ActionResult, T>> CreateFromCachedPublicationAndRelease<T>(
-            string publicationPath,
-            string releasePath,
-            Func<CachedPublicationViewModel, CachedReleaseViewModel, T> func)
+        public Task<Either<ActionResult, CachedReleaseViewModel?>> CreatedFromCachedRelease(
+            string publicationSlug, string? releaseSlug = null)
         {
-            var publicationTask = _fileStorageService.GetDeserialized<CachedPublicationViewModel>(publicationPath);
-            var releaseTask = _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
-
-            await Task.WhenAll(publicationTask, releaseTask);
-
-            if (releaseTask.Result.IsRight && publicationTask.Result.IsRight)
-            {
-                if (publicationTask.Result.Right is not null
-                    && releaseTask.Result.Right is not null)
-                {
-                    return func.Invoke(publicationTask.Result.Right, releaseTask.Result.Right);
-                }
-            }
-
-            return new NotFoundResult();
+            var releasePath = releaseSlug != null
+                ? PublicContentReleasePath(publicationSlug, releaseSlug)
+                : PublicContentLatestReleasePath(publicationSlug);
+            return _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
         }
     }
 }

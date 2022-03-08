@@ -193,6 +193,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         // @MarkFix cache file might not exist?
                         await _publicBlobCacheService.DeleteItem(new PublicationTitleCacheKey(publication.Slug));
+
+                        // @MarkFix EES-3149 Need to handle superseded publication.json cache files here too?
                     }
 
                     return await GetPublication(publication.Id);
