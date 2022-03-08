@@ -6,6 +6,7 @@ Library     Collections
 Library     file_operations.py
 Library     utilities.py
 Library     fail_fast.py
+Library     visual.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
 
@@ -814,3 +815,12 @@ lookup or return webelement
         ${element}=    get child element    ${parent}    ${selector_or_webelement}
     END
     [Return]    ${element}
+
+user takes screenshot of element
+    [Arguments]
+    ...    ${selector_or_webelement}
+    ...    ${filename}
+    ...    ${wait}=${timeout}
+    ...    ${limit}=None
+    ${element}=    lookup or return webelement    ${selector_or_webelement}
+    take screenshot of element    ${element}    ${filename}
