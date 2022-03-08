@@ -22,7 +22,7 @@ WHERE ContentBlock.Type = 'DataBlock'
   AND (
     -- Include DataBlocks that are linked to Content Sections
     ContentSectionId IS NOT NULL
-    -- Include DataBlocks that are linked to Content Sections
+    -- Include DataBlocks that are Featured Tables
     OR (DataBlock_HighlightName IS NOT NULL
         AND DataBlock_HighlightName <> ''))
   -- Include only DataBlocks that are from the latest published Release
