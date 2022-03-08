@@ -19,11 +19,13 @@ JOIN Releases ON ReleaseContentBlocks.ReleaseId = Releases.Id
 WHERE ContentBlock.Type = 'DataBlock'
   AND Releases.Published IS NOT NULL
   AND Releases.SoftDeleted = 0
-  -- Restrict DataBlocks that aren't featured tables or linked to content sections
-  AND (ContentSectionId IS NOT NULL
+  AND (
+    -- Include DataBlocks that are linked to Content Sections
+    ContentSectionId IS NOT NULL
+    -- Include DataBlocks that are linked to Content Sections
     OR (DataBlock_HighlightName IS NOT NULL
         AND DataBlock_HighlightName <> ''))
-  -- Restrict DataBlocks that aren't from the latest published Release
+  -- Include only DataBlocks that are from the latest published Release
   AND NOT EXISTS(
     SELECT 1
     FROM Releases PublicationReleases
@@ -40,7 +42,8 @@ Place it in the same directory as this script.
 Find blocks that took over 10 seconds to respond:
 grep -r "time for response: [0-9][0-9][0-9]*" * | awk '{split($0,a,":"); print a[1];}' | zip -@ test.zip
 
-Compare two result directories for differences, but ignoring response time (and any responses that are both Not Found responses, as they contain unique traceIds):
+Compare two result directories for differences, but ignoring response time (and any responses that are both Not Found
+responses, as they contain unique traceIds):
 diff -I"^time for response:.*" -I "Not Found" -r results_dev1/ results_dev2/
 """
 
@@ -80,9 +83,14 @@ data_api_url = data_api_urls[args.env]
 
 date = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
 results_dir = f'results_{args.env}_{args.stage}_{date}'
+requests_dir = f'{results_dir}/requests'
+responses_dir = f'{results_dir}/responses'
 
-if not os.path.exists(results_dir):
-    os.makedirs(results_dir)
+if not os.path.exists(requests_dir):
+    os.makedirs(requests_dir)
+
+if not os.path.exists(responses_dir):
+    os.makedirs(responses_dir)
 
 with open(f'{results_dir}/console_output', 'w') as output_file:
     output_file.write('Console output:\n\n')
@@ -104,22 +112,30 @@ def write_block_to_file(
         response_time,
         response_dict):
     try:
-        with open(f'{results_dir}/block_{block_guid}', 'w') as block_file:
-            block_file.write(
-                f'block: {block_guid}\n'
-                f'release: {release_guid}\n'
-                f'subject: {subject_guid}\n'
-                f'request:\n{json.dumps(request_dict, sort_keys=True, indent=2)}\n'
-                f'response status: {status_code}\n'
-                f'time for response: {response_time}\n'
-                f'response:\n{json.dumps(response_dict, sort_keys=True, indent=2)}'
-            )
+        with open(f'{responses_dir}/block_{block_guid}_response', 'w') as block_response_file:
+            with open(f'{requests_dir}/block_{block_guid}_request', 'w') as block_request_file:
+                block_request_file.write(
+                    f'block: {block_guid}\n'
+                    f'release: {release_guid}\n'
+                    f'subject: {subject_guid}\n'
+                    f'request:\n{json.dumps(request_dict, sort_keys=True, indent=2)}'
+                )
+                block_response_file.write(
+                    f'block: {block_guid}\n'
+                    f'release: {release_guid}\n'
+                    f'subject: {subject_guid}\n'
+                    f'response status: {status_code}\n'
+                    f'time for response: {response_time}\n'
+                    f'response:\n{json.dumps(response_dict, sort_keys=True, indent=2)}'
+                )
         print_to_console(f'Successfully processed block {block_guid} for subject {subject_guid}!')
     except Exception as exception:
         print_to_console(f'block_file.write failed with block {block_guid} subject {subject_guid}\n'
                          f'Response: {json.dumps(response_dict)}\n Exception: {exception}')
 
 
+processed = 0
+processed_successfully = 0
 datablocks = []
 with open(args.datablocks_csv, 'r') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
@@ -130,6 +146,7 @@ with open(args.datablocks_csv, 'r') as csv_file:
 
 start_time = time.perf_counter()
 for datablock in datablocks:
+    processed += 1
     time.sleep(args.sleep_duration)
 
     block_id = datablock[0]
@@ -184,6 +201,7 @@ for datablock in datablocks:
         continue
     block_time_end = time.perf_counter()
 
+    json_response = None
     try:
         json_response = json.loads(resp.text)
         if json_response['results']:
@@ -196,8 +214,11 @@ for datablock in datablocks:
         write_this_block(
             status_code=resp.status_code,
             response_time=block_time_end - block_time_start,
-            response_dict={'error': f'Failed to process response text, {e}'})
+            response_dict={'error': f'Failed to process response text, exception {e}\n\nResponse:\n\n{json_response}'})
         continue
+
+    if resp.status_code == 200:
+        processed_successfully += 1
 
     write_this_block(
         status_code=resp.status_code,
@@ -205,6 +226,15 @@ for datablock in datablocks:
         response_dict=json_response)
 
 end_time = time.perf_counter()
-print_to_console(f'Total time: {end_time - start_time}')
-print_to_console(f'Sleep time: {args.sleep_duration * len(datablocks)}')
-print_to_console(f'Total minus sleep time: {(end_time - start_time) - (args.sleep_duration * len(datablocks))}')
+processing_time = round(end_time - start_time)
+sleep_time = args.sleep_duration * len(datablocks)
+processing_time_minus_sleep_time = round(processing_time - sleep_time)
+
+print_to_console(f'Total processed: {processed}')
+print_to_console(f'Total successes: {processed_successfully}')
+print_to_console(f'Total failures: {processed - processed_successfully}')
+print_to_console(f'Total time: {processing_time} seconds')
+print_to_console(f'Sleep time: {sleep_time} seconds')
+print_to_console(f'Total minus sleep time: {processing_time_minus_sleep_time} seconds')
+print_to_console(
+    f'Average processing time per block: {round(processing_time_minus_sleep_time / len(datablocks), 2)} seconds')
