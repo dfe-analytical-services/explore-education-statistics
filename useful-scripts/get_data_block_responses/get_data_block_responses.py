@@ -44,7 +44,7 @@ grep -r "time for response: [0-9][0-9][0-9]*" * | awk '{split($0,a,":"); print a
 
 Compare two result directories for differences, but ignoring response time (and any responses that are both Not Found
 responses, as they contain unique traceIds):
-diff -I"^time for response:.*" -I "Not Found" -r results_dev1/ results_dev2/
+diff -I"^time for response:.*" -I "Not Found" -r results_dev1/responses results_dev2/responses
 """
 
 parser = argparse.ArgumentParser(prog="python get_data_block_responses.py",
