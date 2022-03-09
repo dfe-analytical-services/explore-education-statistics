@@ -83,8 +83,8 @@ describe('expandDataSet', () => {
       ],
       locations: {
         localAuthority: [
-          { label: 'Barnsley', value: 'E08000016' },
-          { label: 'Barnet', value: 'E09000003' },
+          { id: 'barnsley', label: 'Barnsley', value: 'barnsley' },
+          { id: 'barnet', label: 'Barnet', value: 'barnet' },
         ],
       },
       boundaryLevels: [
@@ -115,7 +115,7 @@ describe('expandDataSet', () => {
       timePeriod: '2014_AY',
       location: {
         level: 'localAuthority',
-        value: 'E09000003',
+        value: 'barnet',
       },
     };
 
@@ -150,7 +150,7 @@ describe('expandDataSet', () => {
       }),
       location: new LocationFilter({
         level: 'localAuthority',
-        value: 'E09000003',
+        value: 'barnet',
         label: 'Barnet',
       }),
     });
@@ -163,7 +163,7 @@ describe('expandDataSet', () => {
       timePeriod: '2014_AY',
       location: {
         level: 'localAuthority',
-        value: 'E09000003',
+        value: 'barnet',
       },
     };
 
@@ -179,7 +179,7 @@ describe('expandDataSet', () => {
       timePeriod: '2014_AY',
       location: {
         level: 'localAuthority',
-        value: 'E09000003',
+        value: 'barnet',
       },
     };
 

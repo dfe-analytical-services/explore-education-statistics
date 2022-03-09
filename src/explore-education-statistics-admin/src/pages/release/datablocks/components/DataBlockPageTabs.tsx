@@ -66,7 +66,7 @@ const DataBlockPageTabs = ({
           releaseId,
           subjectId: '',
           includeGeoJson: false,
-          locations: {},
+          locationIds: [],
           filters: [],
           indicators: [],
         },

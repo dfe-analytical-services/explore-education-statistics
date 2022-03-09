@@ -114,7 +114,7 @@ const TableToolWizard = ({
       subjectId: '',
       indicators: [],
       filters: [],
-      locations: {},
+      locationIds: [],
     },
     ...initialState,
   });
@@ -175,7 +175,7 @@ const TableToolWizard = ({
       draft.query.subjectId = selectedSubjectId;
       draft.query.indicators = [];
       draft.query.filters = [];
-      draft.query.locations = {};
+      draft.query.locationIds = [];
       draft.query.timePeriod = undefined;
     });
   };
@@ -191,10 +191,10 @@ const TableToolWizard = ({
   };
 
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
-    locations,
+    locationIds,
   }) => {
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-      locations,
+      locationIds,
       subjectId: state.query.subjectId,
     });
 
@@ -215,7 +215,7 @@ const TableToolWizard = ({
     updateState(draft => {
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
 
-      draft.query.locations = locations;
+      draft.query.locationIds = locationIds;
 
       if (timePeriod && hasStartTimePeriod && hasEndTimePeriod) {
         draft.query.timePeriod = {
@@ -231,11 +231,11 @@ const TableToolWizard = ({
   };
 
   const handleTimePeriodStepBack = async () => {
-    const { subjectId, locations } = state.query;
+    const { subjectId, locationIds } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
       subjectId,
-      locations,
+      locationIds,
     });
 
     updateState(draft => {
@@ -248,8 +248,7 @@ const TableToolWizard = ({
     const [endYear, endCode] = parseYearCodeTuple(values.end);
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-      locations: state.query.locations,
-      geographicLevel: state.query.geographicLevel,
+      locationIds: state.query.locationIds,
       subjectId: state.query.subjectId,
       timePeriod: {
         startYear,
@@ -294,11 +293,11 @@ const TableToolWizard = ({
   };
 
   const handleFiltersStepBack = async () => {
-    const { subjectId, locations, timePeriod } = state.query;
+    const { subjectId, locationIds, timePeriod } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
       subjectId,
-      locations,
+      locationIds,
       timePeriod,
     });
 
@@ -394,7 +393,7 @@ const TableToolWizard = ({
               {stepProps => (
                 <LocationFiltersForm
                   {...stepProps}
-                  initialValues={state.query.locations}
+                  initialValues={state.query.locationIds}
                   options={state.subjectMeta.locations}
                   onSubmit={handleLocationFiltersFormSubmit}
                 />

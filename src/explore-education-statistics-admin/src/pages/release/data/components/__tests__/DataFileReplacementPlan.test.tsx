@@ -163,7 +163,7 @@ describe('DataReplacementPlan', () => {
           Country: {
             label: 'Country',
             valid: true,
-            observationalUnits: [
+            locationAttributes: [
               {
                 code: 'england',
                 label: 'England',
@@ -175,7 +175,7 @@ describe('DataReplacementPlan', () => {
           LocalAuthority: {
             label: 'Local Authority',
             valid: false,
-            observationalUnits: [
+            locationAttributes: [
               {
                 code: 'barnsley',
                 label: 'Barnsley',

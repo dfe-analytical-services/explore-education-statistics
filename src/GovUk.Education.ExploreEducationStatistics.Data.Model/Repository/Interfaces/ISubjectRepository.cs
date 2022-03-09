@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
@@ -12,7 +11,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
         Task<Subject?> Get(Guid subjectId);
 
         Task<Guid> GetPublicationIdForSubject(Guid subjectId);
-
-        Task<Guid?> FindPublicationIdForSubject(Guid subjectId);
     }
 }

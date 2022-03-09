@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
@@ -143,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
                 var result = await service.Get(subject.Id);
 
                 Assert.NotNull(result);
-                Assert.Equal(subject.Id, result.Id);
+                Assert.Equal(subject.Id, result!.Id);
             }
         }
 
@@ -206,52 +207,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
             }
         }
 
-        [Fact]
-        public async Task FindPublicationForSubject()
-        {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release
-                {
-                    PublicationId = Guid.NewGuid(),
-                },
-                Subject = new Subject()
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                await context.AddAsync(releaseSubject);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                var service = BuildSubjectService(context);
-                var result = await service.FindPublicationIdForSubject(releaseSubject.SubjectId);
-
-                Assert.Equal(releaseSubject.Release.PublicationId, result);
-            }
-        }
-
-        [Fact]
-        public async Task FindPublicationForSubject_NotFoundReturnsNull()
-        {
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryStatisticsDbContext(contextId))
-            {
-                var service = BuildSubjectService(context);
-                var result = await service.FindPublicationIdForSubject(Guid.NewGuid());
-
-                Assert.Null(result);
-            }
-        }
-
-        private SubjectRepository BuildSubjectService(
+        private static SubjectRepository BuildSubjectService(
             StatisticsDbContext statisticsDbContext,
-            IReleaseRepository releaseRepository = null)
+            IReleaseRepository? releaseRepository = null)
         {
             return new SubjectRepository(
                 statisticsDbContext,

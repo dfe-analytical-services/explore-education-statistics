@@ -17,8 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         ///   "Hierarchies": {
         ///     "LocalAuthority": [
         ///       "Country",
-        ///       "Region",
-        ///       "LocalAuthority"
+        ///       "Region"
         ///     ]
         ///   }
         /// }

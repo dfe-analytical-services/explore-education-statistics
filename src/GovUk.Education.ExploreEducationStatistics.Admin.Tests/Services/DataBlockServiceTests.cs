@@ -826,8 +826,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(savedRelease!.ContentBlocks);
                 Assert.Equal(dataBlock, savedRelease.ContentBlocks[0].ContentBlock);
 
-                // EES-3167 Check the migration flag is false
-                Assert.False(dataBlock.LocationsMigrated);
+                // TODO EES-3212 Remove this
+                // Should be true now that data blocks are being created with location id's
+                Assert.True(dataBlock.LocationsMigrated);
             }
         }
 
@@ -947,11 +948,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         Rows = new List<TableHeader>
                         {
-                            new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
+                            new(Guid.NewGuid().ToString(), TableHeaderType.Indicator)
                         },
                         Columns = new List<TableHeader>
                         {
-                            new TableHeader(Guid.NewGuid().ToString(), TableHeaderType.Filter)
+                            new(Guid.NewGuid().ToString(), TableHeaderType.Filter)
                         }
                     }
                 },
@@ -963,10 +964,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Height = 400,
                         Width = 500,
                     }
-                },
-                // EES-3167 Set the flag on this data block as though it's already been migrated
-                // After the update it will need migrating again so this flag should get reset
-                LocationsMigrated = true
+                }
             };
             
             var releaseContentBlock = new ReleaseContentBlock
@@ -1056,9 +1054,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 updateRequest.Query.AssertDeepEqualTo(updatedDataBlock.Query);
                 updateRequest.Table.AssertDeepEqualTo(updatedDataBlock.Table);
                 updateRequest.Charts.AssertDeepEqualTo(updatedDataBlock.Charts);
-
-                // EES-3167 Check the migration flag has been reset after the update
-                Assert.False(updatedDataBlock.LocationsMigrated);
             }
         }
 

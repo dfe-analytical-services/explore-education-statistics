@@ -72,10 +72,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             };
         }
 
-        protected static IEnumerable<T> DeduplicateLocationViewModels<T>(
-            IEnumerable<T> viewModels) where T : LabelValue
+        protected static IEnumerable<LocationAttributeViewModel> DeduplicateLocationViewModels(
+            IEnumerable<LocationAttributeViewModel> viewModels)
         {
             var list = viewModels.ToList();
+
+            // TODO EES-2954 SOW8 Review if these cases are still applicable and enhance if necessary
 
             /*
              The list of Location attributes should in theory already be unique.
@@ -110,16 +112,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             {
                 if (case1.Contains(value))
                 {
-                    switch (value)
-                    {
-                        case ObservationalUnitMetaViewModel viewModel:
-                            viewModel.Label += $" ({viewModel.Level.GetEnumLabel()})";
-                            break;
-                        case LocationAttributeViewModel viewModel:
-                            viewModel.Label += $" ({viewModel.Level})";
-                            break;
-                    }
-
+                    value.Label += $" ({value.Level})";
                 }
 
                 if (case2.Contains(value))

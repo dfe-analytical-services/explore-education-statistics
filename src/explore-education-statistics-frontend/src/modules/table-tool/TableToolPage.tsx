@@ -94,7 +94,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         subjectId: '',
         indicators: [],
         filters: [],
-        locations: {},
+        locationIds: [],
       },
       selectedPublication,
     };

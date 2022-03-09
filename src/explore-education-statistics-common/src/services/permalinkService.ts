@@ -1,6 +1,7 @@
 import { dataApi } from '@common/services/api';
 import { TableDataQuery } from '@common/services/tableBuilderService';
 import { ConfiguredTable } from '@common/services/types/table';
+import deduplicatePermalinkLocations from '@common/services/util/permalinkServiceUtils';
 
 export type Permalink = ConfiguredTable & {
   invalidated: boolean;
@@ -41,7 +42,7 @@ export default {
     }
     return dataApi.post(`/permalink`, query);
   },
-  getPermalink(publicationSlug: string): Promise<Permalink> {
-    return dataApi.get(`/permalink/${publicationSlug}`);
+  async getPermalink(id: string): Promise<Permalink> {
+    return deduplicatePermalinkLocations(await dataApi.get(`/permalink/${id}`));
   },
 };

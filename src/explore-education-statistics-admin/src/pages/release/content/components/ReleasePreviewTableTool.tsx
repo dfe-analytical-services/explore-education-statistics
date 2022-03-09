@@ -77,7 +77,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
         subjectId: '',
         indicators: [],
         filters: [],
-        locations: {},
+        locationIds: [],
       },
     };
   }, [releaseId, featuredTableId]);

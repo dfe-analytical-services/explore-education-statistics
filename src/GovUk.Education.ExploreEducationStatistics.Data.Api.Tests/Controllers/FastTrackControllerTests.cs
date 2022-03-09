@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public void FastTrackViewModel_SerialiseAndDeserialize()
+        public void FastTrackViewModel_SerializeAndDeserialize()
         {
             var original = new FastTrackViewModel
             {
@@ -131,12 +131,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                     {
                         Guid.NewGuid(),
                     },
-                    Locations = new LocationQuery
+                    LocationIds = new List<Guid>
                     {
-                        Country = new List<string>
-                        {
-                            "England"
-                        }
+                        Guid.NewGuid()
                     },
                     PublicationId = Guid.NewGuid(),
                     BoundaryLevel = 1234,
@@ -178,14 +175,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                                 Guid.NewGuid()
                             },
                             LocationId = Guid.NewGuid(),
-                            Location = new LocationViewModel
-                            {
-                                Country = new CodeNameViewModel
-                                {
-                                    Code = "code",
-                                    Name = "name"
-                                }
-                            },
                             Measures = new Dictionary<Guid, string>
                             {
                                 {

@@ -465,8 +465,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         new List<string>
                         {
                             "Country",
-                            "Region",
-                            "LocalAuthority"
+                            "Region"
                         }
                     }
                 }
@@ -704,8 +703,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         GeographicLevel.Region,
                         new List<string>
                         {
-                            "Country",
-                            "Region"
+                            "Country"
                         }
                     }
                 }
@@ -958,8 +956,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         GeographicLevel.Region,
                         new List<string>
                         {
-                            "Country",
-                            "Region"
+                            "Country"
                         }
                     }
                 }
@@ -1356,8 +1353,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         GeographicLevel.LocalAuthority,
                         new List<string>
                         {
-                            "Region",
-                            "LocalAuthority"
+                            "Region"
                         }
                     }
                 }
@@ -1730,8 +1726,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         GeographicLevel.LocalAuthority,
                         new List<string>
                         {
-                            "Region",
-                            "LocalAuthority"
+                            "Region"
                         }
                     }
                 }

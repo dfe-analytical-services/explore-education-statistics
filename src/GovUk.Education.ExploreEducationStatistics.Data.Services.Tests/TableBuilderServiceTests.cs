@@ -13,7 +13,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.Extensions.Options;
@@ -57,13 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 SubjectId = releaseSubject.Subject.Id,
                 Indicators = new[] {indicator1Id, indicator2Id,},
-                Locations = new LocationQuery
-                {
-                    Country = new List<string>
-                    {
-                        "england"
-                    }
-                },
+                LocationIds = ListOf(location1Id, location2Id, location3Id),
                 TimePeriod = new TimePeriodQuery
                 {
                     StartYear = 2019,
@@ -338,23 +331,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             };
 
-            var filterItem1Id = Guid.NewGuid();
-            var filterItem2Id = Guid.NewGuid();
-            var indicator1Id = Guid.NewGuid();
-            var indicator2Id = Guid.NewGuid();
-
             var query = new ObservationQueryContext
             {
                 SubjectId = releaseSubject.Subject.Id,
-                Filters = new[] {filterItem1Id, filterItem2Id},
-                Indicators = new[] {indicator1Id, indicator2Id},
-                Locations = new LocationQuery
-                {
-                    Country = new List<string>
-                    {
-                        "england"
-                    }
-                },
+                Filters = new[] {Guid.NewGuid(), Guid.NewGuid()},
+                Indicators = new[] {Guid.NewGuid(), Guid.NewGuid()},
+                LocationIds = ListOf(Guid.NewGuid()),
                 TimePeriod = new TimePeriodQuery
                 {
                     StartYear = 2019,
@@ -450,13 +432,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 SubjectId = releaseSubject.Subject.Id,
                 Indicators = new[] { indicator1Id, indicator2Id, },
-                Locations = new LocationQuery
-                {
-                    Country = new List<string>
-                    {
-                        "england"
-                    }
-                },
+                LocationIds = ListOf(location1Id, location2Id, location3Id),
                 TimePeriod = new TimePeriodQuery
                 {
                     StartYear = 2019,
@@ -690,23 +666,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 },
             };
 
-            var filterItem1Id = Guid.NewGuid();
-            var filterItem2Id = Guid.NewGuid();
-            var indicator1Id = Guid.NewGuid();
-            var indicator2Id = Guid.NewGuid();
-
             var query = new ObservationQueryContext
             {
                 SubjectId = releaseSubject.Subject.Id,
-                Filters = new[] {filterItem1Id, filterItem2Id},
-                Indicators = new[] {indicator1Id, indicator2Id},
-                Locations = new LocationQuery
-                {
-                    Country = new List<string>
-                    {
-                        "england"
-                    }
-                },
+                Filters = new[] {Guid.NewGuid(), Guid.NewGuid()},
+                Indicators = new[] {Guid.NewGuid(), Guid.NewGuid()},
+                LocationIds = ListOf(Guid.NewGuid()),
                 TimePeriod = new TimePeriodQuery
                 {
                     StartYear = 2019,
@@ -796,7 +761,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 resultSubjectMetaService ?? Mock.Of<IResultSubjectMetaService>(Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
                 userService ?? AlwaysTrueUserService().Object,
-                resultBuilder ?? new ResultBuilder(DataServiceMapperUtils.DataServiceMapper()),
+                resultBuilder ?? new ResultBuilder(),
                 releaseRepository ?? Mock.Of<IReleaseRepository>(Strict),
                 options ?? DefaultOptions()
             );

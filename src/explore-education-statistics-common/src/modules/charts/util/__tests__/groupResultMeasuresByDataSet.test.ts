@@ -6,12 +6,7 @@ describe('groupResultMeasuresByDataSet', () => {
     const resultMeasures = groupResultMeasuresByDataSet([
       {
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: {
-            code: 'barnet',
-            name: 'Barnet',
-          },
-        },
+        locationId: 'location-1',
         timePeriod: '2018_AY',
         measures: {
           'indicator-1': '1000',
@@ -21,12 +16,7 @@ describe('groupResultMeasuresByDataSet', () => {
       },
       {
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: {
-            code: 'barnsley',
-            name: 'Barnsley',
-          },
-        },
+        locationId: 'location-2',
         timePeriod: '2018_AY',
         measures: {
           'indicator-1': '3000',
@@ -39,7 +29,7 @@ describe('groupResultMeasuresByDataSet', () => {
     expect(resultMeasures).toEqual({
       [LocationFilter.createId({
         level: 'localAuthority',
-        value: 'barnet',
+        value: 'location-1',
       })]: {
         '2018_AY': {
           'filter-1': {
@@ -52,7 +42,7 @@ describe('groupResultMeasuresByDataSet', () => {
       },
       [LocationFilter.createId({
         level: 'localAuthority',
-        value: 'barnsley',
+        value: 'location-2',
       })]: {
         '2018_AY': {
           'filter-1': {
@@ -70,12 +60,7 @@ describe('groupResultMeasuresByDataSet', () => {
     const resultMeasures = groupResultMeasuresByDataSet([
       {
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: {
-            code: 'barnet',
-            name: 'Barnet',
-          },
-        },
+        locationId: 'location-1',
         timePeriod: '2018_AY',
         measures: {
           'indicator-1': '1000',
@@ -85,12 +70,7 @@ describe('groupResultMeasuresByDataSet', () => {
       },
       {
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: {
-            code: 'barnet',
-            name: 'Barnet',
-          },
-        },
+        locationId: 'location-1',
         timePeriod: '2019_AY',
         measures: {
           'indicator-1': '3000',
@@ -103,7 +83,7 @@ describe('groupResultMeasuresByDataSet', () => {
     expect(resultMeasures).toEqual({
       [LocationFilter.createId({
         level: 'localAuthority',
-        value: 'barnet',
+        value: 'location-1',
       })]: {
         '2018_AY': {
           'filter-1': {
@@ -129,12 +109,7 @@ describe('groupResultMeasuresByDataSet', () => {
     const resultMeasures = groupResultMeasuresByDataSet([
       {
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: {
-            code: 'barnet',
-            name: 'Barnet',
-          },
-        },
+        locationId: 'location-1',
         timePeriod: '2018_AY',
         measures: {
           'indicator-1': '1000',
@@ -144,12 +119,7 @@ describe('groupResultMeasuresByDataSet', () => {
       },
       {
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: {
-            code: 'barnet',
-            name: 'Barnet',
-          },
-        },
+        locationId: 'location-1',
         timePeriod: '2018_AY',
         measures: {
           'indicator-1': '3000',
@@ -162,7 +132,7 @@ describe('groupResultMeasuresByDataSet', () => {
     expect(resultMeasures).toEqual({
       [LocationFilter.createId({
         level: 'localAuthority',
-        value: 'barnet',
+        value: 'location-1',
       })]: {
         '2018_AY': {
           'filter-1': {
@@ -184,12 +154,7 @@ describe('groupResultMeasuresByDataSet', () => {
     const resultMeasures = groupResultMeasuresByDataSet([
       {
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: {
-            code: 'barnet',
-            name: 'Barnet',
-          },
-        },
+        locationId: 'location-1',
         timePeriod: '2018_AY',
         measures: {
           'indicator-1': '1000',
@@ -199,12 +164,7 @@ describe('groupResultMeasuresByDataSet', () => {
       },
       {
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: {
-            code: 'barnet',
-            name: 'Barnet',
-          },
-        },
+        locationId: 'location-1',
         timePeriod: '2018_AY',
         measures: {
           'indicator-3': '3000',
@@ -217,7 +177,7 @@ describe('groupResultMeasuresByDataSet', () => {
     expect(resultMeasures).toEqual({
       [LocationFilter.createId({
         level: 'localAuthority',
-        value: 'barnet',
+        value: 'location-1',
       })]: {
         '2018_AY': {
           'filter-1': {

@@ -156,7 +156,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             return TableBuilderUtils.MaximumTableCellCount(
                 countOfIndicators: queryContext.Indicators.Count(),
-                countOfLocations: queryContext.Locations?.CountItems() ?? (queryContext.LocationIds?.Count() ?? 0),
+                countOfLocations: queryContext.LocationIds.Count,
                 countOfTimePeriods: TimePeriodUtil.Range(queryContext.TimePeriod).Count,
                 countsOfFilterItemsByFilter: countsOfFilterItemsByFilter
             );

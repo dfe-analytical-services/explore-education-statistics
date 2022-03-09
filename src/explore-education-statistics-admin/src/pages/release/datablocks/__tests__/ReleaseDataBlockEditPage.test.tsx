@@ -48,9 +48,7 @@ describe('ReleaseDataBlockEditPage', () => {
     query: {
       includeGeoJson: false,
       subjectId: 'subject-1',
-      locations: {
-        localAuthority: ['barnet'],
-      },
+      locationIds: ['barnet'],
       timePeriod: {
         startYear: 2020,
         startCode: 'AY',

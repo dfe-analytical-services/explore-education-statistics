@@ -32,7 +32,7 @@ export interface IndicatorGroupReplacement {
 export interface LocationReplacement {
   valid: boolean;
   label: string;
-  observationalUnits: {
+  locationAttributes: {
     code: string;
     label: string;
     target?: string;

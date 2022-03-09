@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -10,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public ILocationAttribute Attribute { get; init; }
 
         public List<LocationAttributeNode> Children { get; init; } = new();
+
+        public Guid? LocationId { get; set; }
 
         public bool IsLeaf => Children.Count == 0;
 
