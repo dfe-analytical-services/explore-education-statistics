@@ -762,7 +762,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(_england.Code, dataBlockLocationPlan.Code);
                 Assert.Equal(_england.Name, dataBlockLocationPlan.Label);
-                Assert.Empty(dataBlockLocationPlan.Target);
+                Assert.Empty(dataBlockLocationPlan.TargetCode);
+                Assert.Empty(dataBlockLocationPlan.TargetName);
                 Assert.False(dataBlockLocationPlan.Valid);
 
                 Assert.NotNull(dataBlockPlan.TimePeriods);
@@ -2224,7 +2225,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(_england.Code, dataBlockLocationPlan.Code);
                 Assert.Equal(_england.Name, dataBlockLocationPlan.Label);
-                Assert.Equal(_england.Code, dataBlockLocationPlan.Target);
+                Assert.Equal(_england.Code, dataBlockLocationPlan.TargetCode);
+                Assert.Equal(_england.Name, dataBlockLocationPlan.TargetName);
                 Assert.True(dataBlockLocationPlan.Valid);
 
                 Assert.NotNull(dataBlockPlan.TimePeriods);
