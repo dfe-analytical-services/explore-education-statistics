@@ -336,6 +336,9 @@ Configure basic line chart
     user chooses select option    id:chartDataSetsConfigurationForm-location    Nailsea Youngwood
     user clicks button    Add data set
 
+    user clicks link    Legend
+    user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
+
 Validate basic line chart preview
     user waits until element contains line chart    id:chartBuilderPreview
 
