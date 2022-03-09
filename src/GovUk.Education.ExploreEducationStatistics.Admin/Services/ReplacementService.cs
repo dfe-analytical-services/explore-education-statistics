@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
@@ -533,9 +532,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
 
             var locations = _locationRepository.GetLocationAttributes(geographicLevel, originalCodes);
-            var replacementLocations = replacementSubjectMeta.ObservationalUnits
-                .GetValueOrDefault(geographicLevel)
-                ?.ToDictionary(location => location.Code) ?? new Dictionary<string, ILocationAttribute>();
+            var replacementLocations = replacementSubjectMeta
+                .ObservationalUnits
+                .GetValueOrDefault(geographicLevel) ?? new List<ILocationAttribute>();
 
             return new LocationReplacementViewModel(
                 label: geographicLevel.GetEnumLabel(),
@@ -547,12 +546,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private static ObservationalUnitReplacementViewModel ValidateLocationForReplacement(
             ILocationAttribute location,
-            IReadOnlyDictionary<string, ILocationAttribute> replacementLocations)
+            IEnumerable<ILocationAttribute> replacementLocations)
         {
+            var replacementLocation = replacementLocations
+                .SingleOrDefault(replacement => 
+                    replacement.Name == location.Name 
+                    && replacement.Code == location.Code);
+            
             return new ObservationalUnitReplacementViewModel(
                 label: location.Name,
                 code: location.Code,
-                target: replacementLocations.GetValueOrDefault(location.Code)?.Code ?? string.Empty
+                targetCode: replacementLocation?.Code ?? string.Empty,
+                targetName: replacementLocation?.Name ?? string.Empty
             );
         }
 
