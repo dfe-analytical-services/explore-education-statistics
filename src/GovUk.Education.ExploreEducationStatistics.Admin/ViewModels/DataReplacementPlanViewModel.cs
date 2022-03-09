@@ -268,15 +268,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public string Code { get; }
         public string Label { get; }
-        public string Target { get; }
+        public string TargetCode { get; }
+        
+        public string TargetName { get; }
 
-        public bool Valid => !Target.IsNullOrEmpty();
+        public bool Valid => !TargetCode.IsNullOrEmpty() && !TargetName.IsNullOrEmpty();
 
-        public ObservationalUnitReplacementViewModel(string code, string label, string target)
+        public ObservationalUnitReplacementViewModel(string code, string label, string targetCode, string targetName)
         {
             Code = code;
             Label = label;
-            Target = target;
+            TargetCode = targetCode;
+            TargetName = targetName;
         }
     }
 
