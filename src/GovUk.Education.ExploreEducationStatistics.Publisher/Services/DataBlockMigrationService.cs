@@ -56,7 +56,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                             _contentDbContext.DataBlocks.Update(dataBlock);
                             dataBlock.QueryMigrated = MigrateQuery(dataBlock, locationsMap);
                             dataBlock.ChartsMigrated = MigrateCharts(dataBlock, locationsMap);
+
+                            var tableHeaderCountBefore = CountTableHeaders(dataBlock.Table);
                             dataBlock.TableMigrated = MigrateTableConfig(dataBlock, locationsMap);
+                            var tableHeaderCountAfter = CountTableHeaders(dataBlock.TableMigrated);
+                            // Flag whether the table header count has changed as a result of additional headers
+                            // being inserted. Tables that have extra headers need checking carefully.
+                            // Also allows us to know in advance of testing which tables we expect visual differences for.
+                            dataBlock.TableHeaderCountChanged = tableHeaderCountBefore != tableHeaderCountAfter;
+
                             dataBlock.LocationsMigrated = true;
                             await _contentDbContext.SaveChangesAsync();
                         });
@@ -464,6 +472,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             ).Distinct().ToList();
 
             return codes;
+        }
+
+        private static int CountTableHeaders(TableBuilderConfiguration? table)
+        {
+            if (table == null)
+            {
+                return 0;
+            }
+
+            var tableHeaders = table.TableHeaders;
+
+            var count = tableHeaders.ColumnGroups.Sum(group => group.Count);
+            count += tableHeaders.Columns.Count;
+            count += tableHeaders.RowGroups.Sum(group => group.Count);
+            count += tableHeaders.Rows.Count;
+            return count;
         }
 
         private enum TableHeaderField
