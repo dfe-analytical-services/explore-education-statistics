@@ -112,22 +112,23 @@ def write_block_to_file(
         response_time,
         response_dict):
     try:
+        with open(f'{requests_dir}/block_{block_guid}_request', 'w') as block_request_file:
+            block_request_file.write(
+                f'block: {block_guid}\n'
+                f'release: {release_guid}\n'
+                f'subject: {subject_guid}\n'
+                f'request:\n{json.dumps(request_dict, sort_keys=True, indent=2)}'
+            )
+
         with open(f'{responses_dir}/block_{block_guid}_response', 'w') as block_response_file:
-            with open(f'{requests_dir}/block_{block_guid}_request', 'w') as block_request_file:
-                block_request_file.write(
-                    f'block: {block_guid}\n'
-                    f'release: {release_guid}\n'
-                    f'subject: {subject_guid}\n'
-                    f'request:\n{json.dumps(request_dict, sort_keys=True, indent=2)}'
-                )
-                block_response_file.write(
-                    f'block: {block_guid}\n'
-                    f'release: {release_guid}\n'
-                    f'subject: {subject_guid}\n'
-                    f'response status: {status_code}\n'
-                    f'time for response: {response_time}\n'
-                    f'response:\n{json.dumps(response_dict, sort_keys=True, indent=2)}'
-                )
+            block_response_file.write(
+                f'block: {block_guid}\n'
+                f'release: {release_guid}\n'
+                f'subject: {subject_guid}\n'
+                f'response status: {status_code}\n'
+                f'time for response: {response_time}\n'
+                f'response:\n{json.dumps(response_dict, sort_keys=True, indent=2)}'
+            )
         print_to_console(f'Successfully processed block {block_guid} for subject {subject_guid}!')
     except Exception as exception:
         print_to_console(f'block_file.write failed with block {block_guid} subject {subject_guid}\n'
