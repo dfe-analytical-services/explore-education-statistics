@@ -53,8 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OnSuccess(publication => _methodologyService.GetSummariesByPublication(publication.Id))
                 .OnSuccess(async methodologies =>
                 {
-                    var publicationTask = _publicationService.GetViewModel(publicationSlug);
-                    var releaseTask = CreatedFromCachedRelease(publicationSlug, releaseSlug);
+                    var publicationTask = _publicationService.Get(publicationSlug);
+                    var releaseTask = FetchCachedRelease(publicationSlug, releaseSlug);
 
                     await Task.WhenAll(publicationTask, releaseTask);
 
@@ -79,8 +79,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public async Task<Either<ActionResult, ReleaseSummaryViewModel>> GetSummary(string publicationSlug,
             string? releaseSlug)
         {
-            var publicationTask = _publicationService.GetViewModel(publicationSlug);
-            var releaseTask = CreatedFromCachedRelease(publicationSlug, releaseSlug);
+            var publicationTask = _publicationService.Get(publicationSlug);
+            var releaseTask = FetchCachedRelease(publicationSlug, releaseSlug);
 
             await Task.WhenAll(publicationTask, releaseTask);
 
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 );
         }
 
-        public Task<Either<ActionResult, CachedReleaseViewModel?>> CreatedFromCachedRelease(
+        public Task<Either<ActionResult, CachedReleaseViewModel?>> FetchCachedRelease(
             string publicationSlug, string? releaseSlug = null)
         {
             var releasePath = releaseSlug != null

@@ -43,8 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             string publicationSlug,
             string? releaseSlug = null)
         {
-            var publicationTask = _publicationService.GetViewModel(publicationSlug);
-            var releaseTask = _releaseService.CreatedFromCachedRelease(publicationSlug, releaseSlug);
+            var publicationTask = _publicationService.Get(publicationSlug);
+            var releaseTask = _releaseService.FetchCachedRelease(publicationSlug, releaseSlug);
 
             await Task.WhenAll(publicationTask, releaseTask);
 

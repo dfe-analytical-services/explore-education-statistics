@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {

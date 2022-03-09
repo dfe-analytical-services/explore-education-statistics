@@ -26,8 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         public async Task<Either<ActionResult, DataGuidanceViewModel>> Get(string publicationSlug, string? releaseSlug = null)
         {
-            var publicationTask = _publicationService.GetViewModel(publicationSlug);
-            var releaseTask = _releaseService.CreatedFromCachedRelease(publicationSlug, releaseSlug);
+            var publicationTask = _publicationService.Get(publicationSlug);
+            var releaseTask = _releaseService.FetchCachedRelease(publicationSlug, releaseSlug);
 
             await Task.WhenAll(publicationTask, releaseTask);
 

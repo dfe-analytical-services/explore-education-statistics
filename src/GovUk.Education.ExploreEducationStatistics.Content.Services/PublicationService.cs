@@ -32,7 +32,7 @@ public class PublicationService : IPublicationService
     }
 
     [BlobCache(typeof(PublicationCacheKey))]
-    public async Task<Either<ActionResult, CachedPublicationViewModel>> GetViewModel(string publicationSlug)
+    public async Task<Either<ActionResult, CachedPublicationViewModel>> Get(string publicationSlug)
     {
         return await _contentPersistenceHelper
             .CheckEntityExists<Publication>(query => query
@@ -49,7 +49,7 @@ public class PublicationService : IPublicationService
                     .OnSuccess(latestRelease =>
                     {
                         publicationViewModel.LatestReleaseId = latestRelease.Id;
-                        publicationViewModel.Releases = GetReleaseViewModels(publication.Id);
+                        publicationViewModel.Releases = ListReleases(publication.Id);
                         return publicationViewModel;
                     });
             });
@@ -77,7 +77,7 @@ public class PublicationService : IPublicationService
         return release;
     }
 
-    private List<ReleaseTitleViewModel> GetReleaseViewModels(Guid publicationId)
+    private List<ReleaseTitleViewModel> ListReleases(Guid publicationId)
     {
         var releases = _contentDbContext.Releases
             .Include(r => r.Publication)
