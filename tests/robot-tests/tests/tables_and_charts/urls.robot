@@ -11,4 +11,5 @@ Test Setup          fail test fast if required
 
 *** Test Cases ***
 Test
-    get datablock urls
+    get content block urls
+    get fast track urls
