@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -30,7 +31,7 @@ public class PublicationService : IPublicationService
         _mapper = mapper;
     }
 
-    // @MarkFix BlobCache with this
+    [BlobCache(typeof(PublicationCacheKey))]
     public async Task<Either<ActionResult, CachedPublicationViewModel>> GetViewModel(string publicationSlug)
     {
         return await _contentPersistenceHelper

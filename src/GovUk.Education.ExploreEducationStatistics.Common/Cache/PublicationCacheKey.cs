@@ -4,11 +4,11 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 {
-    public record PublicationTitleCacheKey(string PublicationSlug) : IBlobCacheKey
+    public record PublicationCacheKey(string PublicationSlug) : IBlobCacheKey
     {
         private string PublicationSlug { get; } = PublicationSlug;
 
-        public string Key => FileStoragePathUtils.PublicContentPublicationTitlePath(PublicationSlug);
+        public string Key => FileStoragePathUtils.PublicContentPublicationPath(PublicationSlug);
 
         public IBlobContainer Container => BlobContainers.PublicContent;
     }
