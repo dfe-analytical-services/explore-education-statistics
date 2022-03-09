@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
+using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -10,6 +12,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using Microsoft.AspNetCore.SignalR;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
@@ -460,12 +464,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper = null,
             IReleaseContentSectionRepository releaseContentSectionRepository = null,
+            IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext = null,
             IUserService userService = null)
         {
             return new ContentService(
                 contentDbContext,
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 releaseContentSectionRepository ?? new ReleaseContentSectionRepository(contentDbContext),
+                hubContext ?? Mock.Of<IHubContext<ReleaseContentHub, IReleaseContentHubClient>>(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 AdminMapper()
             );

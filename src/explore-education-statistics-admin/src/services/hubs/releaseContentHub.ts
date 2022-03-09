@@ -1,4 +1,5 @@
 import createConnection from '@admin/services/hubs/utils/createConnection';
+import { EditableBlock } from '@admin/services/types/content';
 import { UserDetails } from '@admin/services/types/user';
 import Hub, { Subscription } from './utils/Hub';
 
@@ -53,6 +54,12 @@ export class ReleaseContentHub extends Hub {
     callback: (event: ReleaseContentBlockUnlockEvent) => void,
   ): Subscription {
     return this.subscribe('ContentBlockUnlocked', callback);
+  }
+
+  onContentBlockUpdated(
+    callback: (block: EditableBlock) => void,
+  ): Subscription {
+    return this.subscribe('ContentBlockUpdated', callback);
   }
 }
 

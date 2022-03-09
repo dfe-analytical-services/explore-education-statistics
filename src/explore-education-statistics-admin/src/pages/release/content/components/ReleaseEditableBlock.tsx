@@ -7,6 +7,7 @@ import useBlockLock from '@admin/hooks/useBlockLock';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import { ContentSectionKeys } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
+import { useReleaseContentDispatch } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
 import {
   releaseDataBlockEditRoute,
@@ -60,6 +61,8 @@ const ReleaseEditableBlock = ({
     updateContentSectionBlock,
     deleteContentSectionBlock,
   } = useReleaseContentActions();
+  const dispatch = useReleaseContentDispatch();
+
   const { hub } = useReleaseContentHubContext();
 
   const getChartFile = useGetChartFile(releaseId);
@@ -110,11 +113,28 @@ const ReleaseEditableBlock = ({
       }
     });
 
+    const onContentBlockUpdated = hub.onContentBlockUpdated(event => {
+      if (event.id === block.id) {
+        dispatch({
+          type: 'UPDATE_BLOCK_FROM_SECTION',
+          payload: {
+            block: event,
+            meta: {
+              blockId: block.id,
+              sectionId,
+              sectionKey,
+            },
+          },
+        });
+      }
+    });
+
     return () => {
       onContentBlockLocked.unsubscribe();
       onContentBlockUnlocked.unsubscribe();
+      onContentBlockUpdated.unsubscribe();
     };
-  }, [block.id, hub, setLock]);
+  }, [block.id, dispatch, hub, sectionId, sectionKey, setLock]);
 
   const [{ isLoading: isSaving }, handleSave] = useAsyncCallback(
     async (content: string) => {

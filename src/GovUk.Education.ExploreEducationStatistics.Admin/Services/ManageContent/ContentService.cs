@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
+using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -14,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -27,18 +30,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IReleaseContentSectionRepository _releaseContentSectionRepository;
+        private readonly IHubContext<ReleaseContentHub, IReleaseContentHubClient> _hubContext;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
         public ContentService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IReleaseContentSectionRepository releaseContentSectionRepository,
+            IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext,
             IUserService userService,
             IMapper mapper)
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
             _releaseContentSectionRepository = releaseContentSectionRepository;
+            _hubContext = hubContext;
             _userService = userService;
             _mapper = mapper;
         }
@@ -303,7 +309,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         DataBlock _ => ValidationActionResult(IncorrectContentBlockTypeForUpdate),
                         _ => throw new ArgumentOutOfRangeException()
                     };
-                });
+                })
+                .OnSuccessDo(block => _hubContext.Clients.Group(releaseId.ToString()).ContentBlockUpdated(block));
         }
 
         public async Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocks<T>(Guid releaseId)

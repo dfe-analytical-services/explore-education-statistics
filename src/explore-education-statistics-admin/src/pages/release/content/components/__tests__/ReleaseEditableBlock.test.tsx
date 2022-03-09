@@ -1,14 +1,15 @@
 import { AuthContextTestProvider } from '@admin/contexts/AuthContext';
 import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
+import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
+import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseContentBlockLockEvent } from '@admin/services/hubs/releaseContentHub';
 import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
+import { GlobalPermissions } from '@admin/services/permissionService';
 import _releaseContentService, {
   EditableRelease,
 } from '@admin/services/releaseContentService';
 import { EditableBlock } from '@admin/services/types/content';
-import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
-import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import { UserDetails } from '@admin/services/types/user';
 import mockDate from '@common-test/mockDate';
 import { HubConnectionState } from '@microsoft/signalr';
@@ -20,9 +21,8 @@ import {
   within,
 } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import React, { ReactNode } from 'react';
 import noop from 'lodash/noop';
-import { GlobalPermissions } from 'src/services/permissionService';
+import React, { ReactNode } from 'react';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
 jest.mock('@admin/services/releaseContentService');
