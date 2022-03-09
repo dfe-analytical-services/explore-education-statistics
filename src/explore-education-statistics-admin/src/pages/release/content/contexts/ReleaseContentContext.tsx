@@ -8,22 +8,26 @@ import remove from 'lodash/remove';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer } from 'use-immer';
 
-export type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
+export type ReleaseContentContextDispatch = (
+  action: ReleaseDispatchAction,
+) => void;
 
-export type ReleaseContextState = {
+export interface ReleaseContentContextState {
   release: EditableRelease;
   canUpdateRelease: boolean;
   availableDataBlocks: DataBlock[];
-};
-const ReleaseStateContext = createContext<ReleaseContextState | undefined>(
-  undefined,
-);
-const ReleaseDispatchContext = createContext<
-  ReleaseContextDispatch | undefined
+}
+
+const ReleaseContentStateContext = createContext<
+  ReleaseContentContextState | undefined
+>(undefined);
+
+const ReleaseContentDispatchContext = createContext<
+  ReleaseContentContextDispatch | undefined
 >(undefined);
 
 export const releaseReducer: Reducer<
-  ReleaseContextState,
+  ReleaseContentContextState,
   ReleaseDispatchAction
 > = (draft, action) => {
   switch (action.type) {
@@ -111,7 +115,6 @@ export const releaseReducer: Reducer<
         );
       }
 
-      // comments needs initialising to array as will be undefined if empty
       const newBlock: EditableBlock = {
         ...block,
         comments: block.comments || [],
@@ -203,10 +206,13 @@ export const releaseReducer: Reducer<
 
 interface ReleaseProviderProps {
   children: ReactNode;
-  value: ReleaseContextState;
+  value: ReleaseContentContextState;
 }
 
-function ReleaseContentProvider({ children, value }: ReleaseProviderProps) {
+export function ReleaseContentProvider({
+  children,
+  value,
+}: ReleaseProviderProps) {
   const [state, dispatch] = useLoggedImmerReducer(
     'Release',
     releaseReducer,
@@ -214,32 +220,26 @@ function ReleaseContentProvider({ children, value }: ReleaseProviderProps) {
   );
 
   return (
-    <ReleaseStateContext.Provider value={state}>
-      <ReleaseDispatchContext.Provider value={dispatch}>
+    <ReleaseContentStateContext.Provider value={state}>
+      <ReleaseContentDispatchContext.Provider value={dispatch}>
         {children}
-      </ReleaseDispatchContext.Provider>
-    </ReleaseStateContext.Provider>
+      </ReleaseContentDispatchContext.Provider>
+    </ReleaseContentStateContext.Provider>
   );
 }
 
-function useReleaseContentState() {
-  const context = useContext(ReleaseStateContext);
+export function useReleaseContentState(): ReleaseContentContextState {
+  const context = useContext(ReleaseContentStateContext);
   if (context === undefined) {
     throw new Error('useReleaseState must be used within a ReleaseProvider');
   }
   return context;
 }
 
-function useReleaseContentDispatch() {
-  const context = useContext(ReleaseDispatchContext);
+export function useReleaseContentDispatch(): ReleaseContentContextDispatch {
+  const context = useContext(ReleaseContentDispatchContext);
   if (context === undefined) {
     throw new Error('useReleaseDispatch must be used within a ReleaseProvider');
   }
   return context;
 }
-
-export {
-  ReleaseContentProvider,
-  useReleaseContentState,
-  useReleaseContentDispatch,
-};

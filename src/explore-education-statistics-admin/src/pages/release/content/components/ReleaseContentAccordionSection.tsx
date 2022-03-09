@@ -82,31 +82,6 @@ const ReleaseContentAccordionSection = ({
     [actions, release.id, sectionId, sectionContent.length],
   );
 
-  const updateBlock = useCallback(
-    async (blockId: string, bodyContent: string) => {
-      await actions.updateContentSectionBlock({
-        releaseId: release.id,
-        sectionId,
-        blockId,
-        sectionKey: 'content',
-        bodyContent,
-      });
-    },
-    [actions, release.id, sectionId],
-  );
-
-  const removeBlock = useCallback(
-    async (blockId: string) => {
-      await actions.deleteContentSectionBlock({
-        releaseId: release.id,
-        sectionId,
-        blockId,
-        sectionKey: 'content',
-      });
-    },
-    [actions, release.id, sectionId],
-  );
-
   const reorderBlocks = useCallback(async () => {
     const order = blocks.reduce<Dictionary<number>>((acc, block, newIndex) => {
       acc[block.id] = newIndex;
@@ -182,12 +157,11 @@ const ReleaseContentAccordionSection = ({
                 allowImages
                 block={block}
                 sectionId={sectionId}
+                sectionKey="content"
                 editable={!isReordering}
                 publicationId={release.publication.id}
                 releaseId={release.id}
                 visible={open}
-                onSave={updateBlock}
-                onDelete={removeBlock}
               />
             )}
           />

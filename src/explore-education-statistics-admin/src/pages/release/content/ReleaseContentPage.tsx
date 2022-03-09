@@ -5,7 +5,7 @@ import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
 import {
   ReleaseContentProvider,
-  ReleaseContextState,
+  ReleaseContentContextState,
   useReleaseContentState,
 } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
@@ -111,7 +111,9 @@ const ReleaseContentPage = ({
 }: RouteComponentProps<ReleaseRouteParams>) => {
   const { releaseId } = match.params;
 
-  const { value, isLoading } = useAsyncRetry<ReleaseContextState>(async () => {
+  const { value, isLoading } = useAsyncRetry<
+    ReleaseContentContextState
+  >(async () => {
     const {
       release,
       availableDataBlocks,

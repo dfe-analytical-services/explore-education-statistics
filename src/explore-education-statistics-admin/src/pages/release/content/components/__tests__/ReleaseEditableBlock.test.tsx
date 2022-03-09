@@ -3,7 +3,9 @@ import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContent
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
 import { ReleaseContentBlockLockEvent } from '@admin/services/hubs/releaseContentHub';
 import connectionMock from '@admin/services/hubs/utils/__mocks__/connectionMock';
-import { EditableRelease } from '@admin/services/releaseContentService';
+import _releaseContentService, {
+  EditableRelease,
+} from '@admin/services/releaseContentService';
 import { EditableBlock } from '@admin/services/types/content';
 import { ReleaseContentProvider } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
@@ -23,6 +25,11 @@ import noop from 'lodash/noop';
 import { GlobalPermissions } from 'src/services/permissionService';
 
 jest.mock('@admin/services/hubs/utils/createConnection');
+jest.mock('@admin/services/releaseContentService');
+
+const releaseContentService = _releaseContentService as jest.Mocked<
+  typeof _releaseContentService
+>;
 
 describe('ReleaseEditableBlock', () => {
   const testHtmlBlock: EditableBlock = {
@@ -52,9 +59,8 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={testHtmlBlock}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -87,6 +93,7 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={{
           ...testHtmlBlock,
           body: `
@@ -96,8 +103,6 @@ describe('ReleaseEditableBlock', () => {
           <img alt="Test image 2" src="https://test/some-image-url.jpg" srcset="${image2SrcSet}" />
           `,
         }}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -130,14 +135,13 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={{
           ...testHtmlBlock,
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testCurrentUser,
         }}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -186,9 +190,8 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={testHtmlBlock}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -236,14 +239,13 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={{
           ...testHtmlBlock,
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testCurrentUser,
         }}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -281,14 +283,13 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={{
           ...testHtmlBlock,
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testCurrentUser,
         }}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -339,14 +340,13 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={{
           ...testHtmlBlock,
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testOtherUser,
         }}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -378,14 +378,13 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={{
           ...testHtmlBlock,
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testOtherUser,
         }}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -415,14 +414,13 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={{
           ...testHtmlBlock,
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testOtherUser,
         }}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -480,14 +478,13 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={{
           ...testHtmlBlock,
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:20:00Z',
           lockedBy: testCurrentUser,
         }}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -566,14 +563,13 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={{
           ...testHtmlBlock,
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testOtherUser,
         }}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -659,14 +655,13 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={{
           ...testHtmlBlock,
           locked: '2022-02-16T12:00:00Z',
           lockedUntil: '2022-02-16T12:10:00Z',
           lockedBy: testCurrentUser,
         }}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -739,9 +734,8 @@ describe('ReleaseEditableBlock', () => {
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={testHtmlBlock}
-        onSave={noop}
-        onDelete={noop}
       />,
     );
 
@@ -785,20 +779,15 @@ describe('ReleaseEditableBlock', () => {
   });
 
   test('clicking `Remove block` button shows confirmation modal', () => {
-    const handleDelete = jest.fn();
-
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={testHtmlBlock}
-        onSave={noop}
-        onDelete={handleDelete}
       />,
     );
-
-    expect(handleDelete).toHaveBeenCalledTimes(0);
 
     userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
 
@@ -809,21 +798,20 @@ describe('ReleaseEditableBlock', () => {
     ).toBeInTheDocument();
   });
 
-  test('confirming removal of block calls `onDelete` handler', () => {
-    const handleDelete = jest.fn();
-
+  test('confirming removal of block calls service to delete block', () => {
     render(
       <ReleaseEditableBlock
         publicationId="publication-1"
         releaseId="release-1"
         sectionId="section-1"
+        sectionKey="content"
         block={testHtmlBlock}
-        onSave={noop}
-        onDelete={handleDelete}
       />,
     );
 
-    expect(handleDelete).toHaveBeenCalledTimes(0);
+    expect(
+      releaseContentService.deleteContentSectionBlock,
+    ).not.toHaveBeenCalled();
 
     userEvent.click(screen.getByRole('button', { name: 'Remove block' }));
 
@@ -831,8 +819,14 @@ describe('ReleaseEditableBlock', () => {
 
     userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
-    expect(handleDelete).toHaveBeenCalledTimes(1);
-    expect(handleDelete).toHaveBeenCalledWith('block-1');
+    expect(
+      releaseContentService.deleteContentSectionBlock,
+    ).toHaveBeenCalledTimes(1);
+    expect(
+      releaseContentService.deleteContentSectionBlock,
+    ).toHaveBeenCalledWith<
+      Parameters<typeof releaseContentService.deleteContentSectionBlock>
+    >('release-1', 'section-1', 'block-1');
   });
 
   function render(

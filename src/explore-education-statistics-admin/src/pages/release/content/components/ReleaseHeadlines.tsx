@@ -36,31 +36,6 @@ const ReleaseHeadlines = ({ release }: Props) => {
     });
   }, [actions, release.id, release.headlinesSection.id]);
 
-  const updateBlock = useCallback(
-    async (blockId, bodyContent) => {
-      await actions.updateContentSectionBlock({
-        releaseId: release.id,
-        sectionId: release.headlinesSection.id,
-        blockId,
-        sectionKey: 'headlinesSection',
-        bodyContent,
-      });
-    },
-    [actions, release.id, release.headlinesSection.id],
-  );
-
-  const removeBlock = useCallback(
-    async (blockId: string) => {
-      await actions.deleteContentSectionBlock({
-        releaseId: release.id,
-        sectionId: release.headlinesSection.id,
-        blockId,
-        sectionKey: 'headlinesSection',
-      });
-    },
-    [actions, release.id, release.headlinesSection.id],
-  );
-
   const headlinesTab = (
     <TabsSection title="Headlines">
       <section id="releaseHeadlines-keyStatistics">
@@ -80,8 +55,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
               publicationId={release.publication.id}
               releaseId={release.id}
               sectionId={release.headlinesSection.id}
-              onSave={updateBlock}
-              onDelete={removeBlock}
+              sectionKey="headlinesSection"
             />
           )}
         />

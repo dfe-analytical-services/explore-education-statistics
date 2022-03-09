@@ -5,6 +5,8 @@ import { useEditingContext } from '@admin/contexts/EditingContext';
 import { useReleaseContentHubContext } from '@admin/contexts/ReleaseContentHubContext';
 import useBlockLock from '@admin/hooks/useBlockLock';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
+import { ContentSectionKeys } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
+import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
 import {
   releaseDataBlockEditRoute,
@@ -31,9 +33,8 @@ interface Props {
   publicationId: string;
   releaseId: string;
   sectionId: string;
+  sectionKey: ContentSectionKeys;
   visible?: boolean;
-  onDelete: (blockId: string) => void;
-  onSave: (blockId: string, content: string) => void;
 }
 
 const ReleaseEditableBlock = ({
@@ -44,9 +45,8 @@ const ReleaseEditableBlock = ({
   publicationId,
   releaseId,
   sectionId,
+  sectionKey,
   visible,
-  onDelete,
-  onSave,
 }: Props) => {
   const {
     addUnsavedBlock,
@@ -55,6 +55,11 @@ const ReleaseEditableBlock = ({
     updateUnresolvedComments,
     updateUnsavedCommentDeletions,
   } = useEditingContext();
+
+  const {
+    updateContentSectionBlock,
+    deleteContentSectionBlock,
+  } = useReleaseContentActions();
   const { hub } = useReleaseContentHubContext();
 
   const getChartFile = useGetChartFile(releaseId);
@@ -113,12 +118,24 @@ const ReleaseEditableBlock = ({
 
   const [{ isLoading: isSaving }, handleSave] = useAsyncCallback(
     async (content: string) => {
-      const contentWithPlaceholders = insertReleaseIdPlaceholders(content);
-      await onSave(block.id, contentWithPlaceholders);
+      await updateContentSectionBlock({
+        releaseId,
+        sectionId,
+        sectionKey,
+        blockId: block.id,
+        bodyContent: insertReleaseIdPlaceholders(content),
+      });
 
       removeUnsavedBlock(block.id);
     },
-    [],
+    [
+      block.id,
+      updateContentSectionBlock,
+      removeUnsavedBlock,
+      releaseId,
+      sectionId,
+      sectionKey,
+    ],
   );
 
   const handleSubmit = useCallback(
@@ -131,9 +148,14 @@ const ReleaseEditableBlock = ({
     [handleSave, clearUnsavedCommentDeletions, block.id, endLock],
   );
 
-  const handleDelete = useCallback(() => {
-    onDelete(block.id);
-  }, [block.id, onDelete]);
+  const handleDelete = useCallback(async () => {
+    await deleteContentSectionBlock({
+      releaseId,
+      sectionId,
+      sectionKey,
+      blockId: block.id,
+    });
+  }, [block.id, deleteContentSectionBlock, releaseId, sectionId, sectionKey]);
 
   const handleBlur = useCallback(
     (isDirty: boolean) => {

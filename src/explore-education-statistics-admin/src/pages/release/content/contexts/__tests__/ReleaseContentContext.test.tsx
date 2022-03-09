@@ -1,5 +1,5 @@
 import {
-  ReleaseContextState,
+  ReleaseContentContextState,
   releaseReducer as originalReleaseReducer,
 } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseDispatchAction } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
@@ -39,7 +39,7 @@ const basicDataBlock: DataBlock = {
 };
 
 const releaseReducer = (
-  initial: ReleaseContextState,
+  initial: ReleaseContentContextState,
   action: ReleaseDispatchAction,
 ) => produce(initial, draft => originalReleaseReducer(draft, action));
 
