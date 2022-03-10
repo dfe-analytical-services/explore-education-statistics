@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
@@ -44,33 +44,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var publicationId = Guid.NewGuid();
             var releaseId = Guid.NewGuid();
 
-            const string publicationPath = "test-publication";
-            const string releasePath = "2016-17";
+            const string publicationSlug = "test-publication";
+            const string releaseSlug = "2016-17";
 
-            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
             var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
+            var publicationService = new Mock<Content.Services.Interfaces.IPublicationService>(MockBehavior.Strict);
+            var releaseService = new Mock<Content.Services.Interfaces.IReleaseService>(MockBehavior.Strict);
 
             var service = SetupService(
-                fileStorageService: fileStorageService.Object,
-                dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
+                publicationService: publicationService.Object,
+                releaseService: releaseService.Object
             );
 
-            fileStorageService.Setup(
-                    mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath)
-                )
+            publicationService.Setup(mock => mock.Get(publicationSlug))
                 .ReturnsAsync(
                     new CachedPublicationViewModel
                     {
                         Id = publicationId,
                         Title = "Test publication",
-                        Slug = "test-publication",
-                        LatestReleaseId = releaseId
+                        Slug = publicationSlug,
                     }
                 );
-
-            fileStorageService.Setup(
-                    mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath)
-                )
+            releaseService.Setup(mock => mock.FetchCachedRelease(publicationSlug, releaseSlug))
                 .ReturnsAsync(
                     new CachedReleaseViewModel(releaseId)
                     {
@@ -89,14 +85,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 )
                 .ReturnsAsync(DataGuidanceSubjects);
 
-            var result = await service.Get(publicationPath, releasePath);
+            var result = await service.Get(publicationSlug, releaseSlug);
 
-            fileStorageService.Verify(
-                mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath),
+            publicationService.Verify(
+                mock => mock.Get(publicationSlug),
                 Times.Once
             );
-            fileStorageService.Verify(
-                mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath),
+
+            releaseService.Verify(
+                mock => mock.FetchCachedRelease(publicationSlug, releaseSlug),
                 Times.Once
             );
 
@@ -119,88 +116,81 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task Get_NotFoundForPublicationPath()
+        public async Task Get_NotFoundForPublicationSlug()
         {
-            const string publicationPath = "incorrect-publication-path";
-            const string releasePath = "2016-17";
+            const string publicationSlug = "incorrect-publication-slug";
+            const string releaseSlug = "2016-17";
 
-            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
             var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
+            var publicationService = new Mock<Content.Services.Interfaces.IPublicationService>(MockBehavior.Strict);
+            var releaseService = new Mock<Content.Services.Interfaces.IReleaseService>(MockBehavior.Strict);
 
             var service = SetupService(
-                fileStorageService: fileStorageService.Object,
-                dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
+                publicationService: publicationService.Object,
+                releaseService: releaseService.Object
             );
 
-            fileStorageService.Setup(
-                    mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath)
-                )
-                .ReturnsAsync(new NotFoundResult());
+            publicationService.Setup(mock => mock.Get(publicationSlug))
+                .ReturnsAsync(
+                    new NotFoundResult()
+                );
 
-            fileStorageService.Setup(
-                    mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath)
-                )
-                .ReturnsAsync(new CachedReleaseViewModel(Guid.NewGuid())
-                {
-                    Title = "2016-17",
-                    Slug = "2016-17",
-                    DataGuidance = "Release Guidance"
-                });
+            releaseService.Setup(mock => mock.FetchCachedRelease(publicationSlug, releaseSlug))
+                .ReturnsAsync(
+                    new CachedReleaseViewModel(Guid.NewGuid())
+                );
 
-            var result = await service.Get(publicationPath, releasePath);
+            var result = await service.Get( publicationSlug, releaseSlug);
 
-            fileStorageService.Verify(
-                mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath),
+            publicationService.Verify(
+                mock => mock.Get(publicationSlug),
                 Times.Once
             );
-            fileStorageService.Verify(
-                mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath),
+
+            releaseService.Verify(
+                mock => mock.FetchCachedRelease(publicationSlug, releaseSlug),
                 Times.Once
             );
 
             result.AssertNotFound();
         }
 
-        [Fact]
-        public async Task Get_NotFoundForReleasePath()
+        [Fact] // @MarkFix
+        public async Task Get_NotFoundForReleaseSlug()
         {
-            const string publicationPath = "test-publication";
-            const string releasePath = "incorrect-release-path";
+            const string publicationSlug = "test-publication";
+            const string releaseSlug = "incorrect-release-slug";
 
-            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
             var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
+            var publicationService = new Mock<Content.Services.Interfaces.IPublicationService>(MockBehavior.Strict);
+            var releaseService = new Mock<Content.Services.Interfaces.IReleaseService>(MockBehavior.Strict);
 
             var service = SetupService(
-                fileStorageService: fileStorageService.Object,
-                dataGuidanceSubjectService: dataGuidanceSubjectService.Object
+                dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
+                publicationService: publicationService.Object,
+                releaseService: releaseService.Object
             );
 
-            fileStorageService.Setup(
-                    mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath)
-                )
+            publicationService.Setup(mock => mock.Get(publicationSlug))
                 .ReturnsAsync(
-                    new CachedPublicationViewModel
-                    {
-                        Id = Guid.NewGuid(),
-                        Title = "Test publication",
-                        Slug = "test-publication",
-                        LatestReleaseId = Guid.NewGuid()
-                    }
+                    new CachedPublicationViewModel()
                 );
 
-            fileStorageService.Setup(
-                    mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath)
-                )
-                .ReturnsAsync(new NotFoundResult());
+            releaseService.Setup(mock => mock.FetchCachedRelease(publicationSlug, releaseSlug))
+                .ReturnsAsync(
+                    new NotFoundResult()
+                );
 
-            var result = await service.Get(publicationPath, releasePath);
+            var result = await service.Get(publicationSlug, releaseSlug);
 
-            fileStorageService.Verify(
-                mock => mock.GetDeserialized<CachedPublicationViewModel>(publicationPath),
+            publicationService.Verify(
+                mock => mock.Get(publicationSlug),
                 Times.Once
             );
-            fileStorageService.Verify(
-                mock => mock.GetDeserialized<CachedReleaseViewModel>(releasePath),
+
+            releaseService.Verify(
+                mock => mock.FetchCachedRelease(publicationSlug, releaseSlug),
                 Times.Once
             );
 
@@ -208,12 +198,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         private static DataGuidanceService SetupService(
-            IFileStorageService? fileStorageService = null,
-            IDataGuidanceSubjectService? dataGuidanceSubjectService = null)
+            IDataGuidanceSubjectService? dataGuidanceSubjectService = null,
+            Content.Services.Interfaces.IPublicationService? publicationService = null,
+            Content.Services.Interfaces.IReleaseService? releaseService = null)
         {
             return new DataGuidanceService(
-                fileStorageService ?? Mock.Of<IFileStorageService>(),
-                dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>()
+                dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>(),
+                publicationService ?? Mock.Of<Content.Services.Interfaces.IPublicationService>(),
+                releaseService ?? Mock.Of<Content.Services.Interfaces.IReleaseService>()
             );
         }
     }

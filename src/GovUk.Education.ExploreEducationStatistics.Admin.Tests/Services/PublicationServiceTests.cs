@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -510,7 +511,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Do an in depth check of the saved release
                 var createdPublication = await context.Publications.FindAsync(publicationViewModel.Id);
-                Assert.False(createdPublication.Live);
+
+                Assert.NotNull(createdPublication);
+                Assert.False(createdPublication!.Live);
                 Assert.Equal("test-publication", createdPublication.Slug);
                 Assert.False(createdPublication.Updated.HasValue);
                 Assert.Equal("Test publication", createdPublication.Title);
@@ -660,7 +663,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Do an in depth check of the saved release
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
-                Assert.False(updatedPublication.Live);
+
+                Assert.NotNull(updatedPublication);
+                Assert.False(updatedPublication!.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
                 Assert.Equal("new-title", updatedPublication.Slug);
@@ -753,7 +758,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Do an in depth check of the saved release
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
-                Assert.True(updatedPublication.Live);
+
+                Assert.NotNull(updatedPublication);
+                Assert.True(updatedPublication!.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
                 // Slug remains unchanged
@@ -879,7 +886,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
 
-                Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
+                Assert.NotNull(updatedPublication);
+                Assert.Equal("John Smith", updatedPublication!.Contact.ContactName);
                 Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
                 Assert.Equal("Test team", updatedPublication.Contact.TeamName);
                 Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
@@ -943,7 +951,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
 
-                Assert.NotEqual(sharedContact.Id, updatedPublication.Contact.Id);
+                Assert.NotNull(updatedPublication);
+                Assert.NotEqual(sharedContact.Id, updatedPublication!.Contact.Id);
                 Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
                 Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
                 Assert.Equal("Test team", updatedPublication.Contact.TeamName);
@@ -1318,20 +1327,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static PublicationService BuildPublicationService(ContentDbContext context,
+        private static PublicationService BuildPublicationService(
+            ContentDbContext context,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
             IPublishingService? publishingService = null,
-            IMethodologyVersionRepository? methodologyVersionRepository = null)
+            IMethodologyVersionRepository? methodologyVersionRepository = null,
+            IBlobCacheService? publicBlobCacheService = null)
         {
             return new(
                 context,
                 AdminMapper(),
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object, 
-                publicationRepository ?? new Mock<IPublicationRepository>().Object,
-                publishingService ?? new Mock<IPublishingService>().Object, 
-                methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object);
+                publicationRepository ?? Mock.Of<IPublicationRepository>(),
+                publishingService ?? Mock.Of<IPublishingService>(),
+                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(),
+                publicBlobCacheService ?? Mock.Of<IBlobCacheService>());
         }
     }
 }

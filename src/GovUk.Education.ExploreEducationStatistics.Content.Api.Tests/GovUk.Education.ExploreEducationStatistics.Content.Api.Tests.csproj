@@ -22,6 +22,7 @@
     <ItemGroup>
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Api\GovUk.Education.ExploreEducationStatistics.Content.Api.csproj" />
         <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Common.Tests\GovUk.Education.ExploreEducationStatistics.Common.Tests.csproj" />
+        <ProjectReference Include="..\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests\GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.csproj" />
     </ItemGroup>
 
 </Project>

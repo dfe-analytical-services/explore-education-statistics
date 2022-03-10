@@ -26,14 +26,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
         private readonly IPublishingService _publishingService;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IBlobCacheService _publicBlobCacheService;
 
-        public PublicationService(ContentDbContext context,
+        public PublicationService(
+            ContentDbContext context,
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,

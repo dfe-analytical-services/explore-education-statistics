@@ -1,8 +1,8 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
@@ -11,7 +11,6 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
@@ -219,8 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             PublicationBRelease1
         );
 
-        // @MarkFix unit test fix
-        //[Fact]
+        //[Fact] // @MarkFix move to Content.Services.PublicationService
         //public async Task GetViewModel()
         //{
         //    var contextId = Guid.NewGuid().ToString();
@@ -241,9 +239,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         //        releaseService.Setup(s => s.GetLatestRelease(PublicationA.Id, Enumerable.Empty<Guid>()))
         //            .ReturnsAsync(PublicationARelease1V1);
 
-        //        var service = BuildPublicationService(context, releaseService: releaseService.Object);
+        //        var service = BuildPublicationService(context);
 
-        //        var result = await service.GetViewModel(PublicationA.Id, Enumerable.Empty<Guid>());
+        //        var result = await service.Get(PublicationA.Id);
 
         //        Assert.Equal(PublicationA.Id, result.Id);
         //        Assert.Equal("Publication A", result.Title);
@@ -478,14 +476,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         }
 
         private PublicationService BuildPublicationService(
-            ContentDbContext contentDbContext,
-            IMapper mapper = null,
-            IReleaseService releaseService = null
+            ContentDbContext contentDbContext
         ) {
             return new(
-                contentDbContext: contentDbContext,
-                mapper: mapper ?? MapperForProfile<MappingProfiles>(),
-                releaseService: releaseService ?? new Mock<IReleaseService>().Object
+                contentDbContext: contentDbContext
             );
         }
     }
