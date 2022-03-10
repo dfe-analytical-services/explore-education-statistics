@@ -276,6 +276,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     _context.Update(publication);
                     await _context.SaveChangesAsync();
 
+                    await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
+
                     return _mapper.Map<List<LegacyReleaseViewModel>>(
                         publication.LegacyReleases.OrderByDescending(release => release.Order)
                     );
