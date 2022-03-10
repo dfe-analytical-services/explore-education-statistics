@@ -28,7 +28,8 @@ class DataBlockRow:
             highlight_name,
             subject_id,
             chart_title,
-            chart_type):
+            chart_type,
+            table_config):
 
         self.publication_id = publication_id.lower()
         self.chart_type = chart_type
@@ -42,6 +43,7 @@ class DataBlockRow:
         self.release_id = release_id.lower()
         self.content_block_id = content_block_id.lower()
         self.content_section_heading = content_section_heading
+        self.table_config = table_config is not None
 
         if self.content_section_type is None:
             self.type = DataBlockType.FAST_TRACK
@@ -84,7 +86,8 @@ with open('local-datablocks.csv', 'r', encoding='utf-8-sig') as csv_file:
             read_cell(row[8]),
             read_cell(row[9]),
             read_cell(row[10]),
-            read_cell(row[11])))
+            read_cell(row[11]),
+            read_cell(row[12])))
 
 
 def get_content_blocks():

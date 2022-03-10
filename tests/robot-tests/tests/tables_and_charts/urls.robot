@@ -14,7 +14,9 @@ Test
     ${content_blocks_info}=    get content blocks
 
     FOR    ${content_block}    IN    @{content_blocks_info}
-        IF    "${content_block.type}" == "DataBlockType.FAST_TRACK"
+        IF    ${content_block.table_config} is ${FALSE}
+            Log to console    Skipping Content Block ${content_block.content_block_id}
+        ELSE IF    "${content_block.type}" == "DataBlockType.FAST_TRACK"
             Check Fast Track Table    ${content_block}
         ELSE IF    "${content_block.type}" == "DataBlockType.CONTENT_BLOCK"
             Check Content Block Table    ${content_block}
@@ -43,8 +45,15 @@ Check Content Block Table
 
     user navigates to public frontend    ${content_block.content_url}
     ${accordion}=    user opens accordion section    ${content_block.content_section_heading}    id:content
+    user scrolls to accordion section content    ${content_block.content_section_heading}    id:content
+    user waits until parent contains element    ${accordion}    id:dataBlock-${content_block.content_block_id}
+    ${data_block}=    get child element    ${accordion}    id:dataBlock-${content_block.content_block_id}
+    user waits until parent contains element    ${data_block}    id:dataBlock-${content_block.content_block_id}-tables-tab
+    ${data_block_table_tab}=    get child element    ${data_block}
+    ...    id:dataBlock-${content_block.content_block_id}-tables-tab
+    user clicks element    ${data_block_table_tab}
     ${filepath}=    user takes screenshot of element
-    ...    ${accordion}
+    ...    ${data_block}
     ...    ${content_block.content_block_id}-table.png
     log content block details    ${content_block}    Content Block    ${filepath}
 
