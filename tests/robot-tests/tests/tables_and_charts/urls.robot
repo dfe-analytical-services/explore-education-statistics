@@ -40,8 +40,13 @@ Check Fast Track Table
 
 Check Content Block Table
     [Arguments]    ${content_block}
-    Log to console    Content Block Table
-    log content block details    ${content_block}    Content Block    asdf
+
+    user navigates to public frontend    ${content_block.content_url}
+    ${accordion}=    user opens accordion section    ${content_block.content_section_heading}    id:content
+    ${filepath}=    user takes screenshot of element
+    ...    ${accordion}
+    ...    ${content_block.content_block_id}-table.png
+    log content block details    ${content_block}    Content Block    ${filepath}
 
 Check Secondary Stats Table
     [Arguments]    ${content_block}
@@ -59,11 +64,8 @@ Check Secondary Stats Table
 Check Key Stats Table
     [Arguments]    ${content_block}
     user navigates to public frontend    ${content_block.content_url}
-    user waits until page contains element    id:releaseHeadlines-summary-tab
-    user scrolls to element    id:releaseHeadlines-summary-tab
-    capture large screenshot
-    capture html
-
+    user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
+    user waits until page contains element    id:releaseHeadlines-tables-tab
     user waits until page contains element    testid:keyStat-dataBlockId-${content_block.content_block_id}
 
     ${filepath}=    user takes screenshot of element
