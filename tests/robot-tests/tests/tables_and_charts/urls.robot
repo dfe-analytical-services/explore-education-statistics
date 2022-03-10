@@ -14,17 +14,16 @@ Test
     ${content_blocks_info}=    get content blocks
 
     FOR    ${content_block}    IN    @{content_blocks_info}
-#    IF    "${content_block.type}" == "DataBlockType.FAST_TRACK"
-#    Check Fast Track Table    ${content_block}
-#    ELSE IF    "${content_block.type}" == "DataBlockType.CONTENT_BLOCK"
-#    Check Content Block Table    ${content_block}
-#    ELSE IF    "${content_block.type}" == "DataBlockType.SECONDARY_STATS"
-#    Check Secondary Stats Table    ${content_block}
-#    ELSE
-        IF    "${content_block.type}" == "DataBlockType.KEY_STATS"
+        IF    "${content_block.type}" == "DataBlockType.FAST_TRACK"
+            Check Fast Track Table    ${content_block}
+        ELSE IF    "${content_block.type}" == "DataBlockType.CONTENT_BLOCK"
+            Check Content Block Table    ${content_block}
+        ELSE IF    "${content_block.type}" == "DataBlockType.SECONDARY_STATS"
+            Check Secondary Stats Table    ${content_block}
+        ELSE IF    "${content_block.type}" == "DataBlockType.KEY_STATS"
             Check Key Stats Table    ${content_block}
-#    ELSE
-#    Fail    Unhandled Data Block Type ${content_block.type}
+        ELSE
+            Fail    Unhandled Data Block Type ${content_block.type}
         END
     END
 
@@ -42,6 +41,7 @@ Check Fast Track Table
 Check Content Block Table
     [Arguments]    ${content_block}
     Log to console    Content Block Table
+    log content block details    ${content_block}    Content Block    asdf
 
 Check Secondary Stats Table
     [Arguments]    ${content_block}
