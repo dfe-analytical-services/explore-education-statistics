@@ -652,7 +652,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>());
 
             mocks.locationRepository
-                .Setup(s => s.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Setup(s => s.GetLocationAttributes(
+                    GeographicLevel.Country, 
+                    new[] {CountryCodeEngland}, 
+                    originalSubject.Id))
                 .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -1109,7 +1112,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             mocks.locationRepository
-                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Setup(service => service.GetLocationAttributes(
+                    GeographicLevel.Country, 
+                    new[] {CountryCodeEngland}, 
+                    originalSubject.Id))
                 .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -1375,7 +1381,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             mocks.locationRepository
-                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Setup(service => service.GetLocationAttributes(
+                    GeographicLevel.Country, 
+                    new[] {CountryCodeEngland}, 
+                    originalSubject.Id))
                 .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -1666,7 +1675,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             mocks.locationRepository
-                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Setup(service => service.GetLocationAttributes(
+                    GeographicLevel.Country, 
+                    new[] {CountryCodeEngland}, 
+                    originalSubject.Id))
                 .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -2079,7 +2091,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             mocks.locationRepository
-                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Setup(service => service.GetLocationAttributes(
+                    GeographicLevel.Country, 
+                    new[] {CountryCodeEngland}, 
+                    originalSubject.Id))
                 .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -2458,7 +2473,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(new Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>());
 
             mocks.locationRepository
-                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Setup(service => service.GetLocationAttributes(
+                    GeographicLevel.Country, 
+                    new[] {CountryCodeEngland}, 
+                    originalSubject.Id))
                 .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -2900,7 +2918,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 });
 
             mocks.locationRepository
-                .Setup(service => service.GetLocationAttributes(GeographicLevel.Country, new[] {CountryCodeEngland}))
+                .Setup(service => service.GetLocationAttributes(
+                    GeographicLevel.Country, 
+                    new[] {CountryCodeEngland}, 
+                    originalSubject.Id))
                 .Returns(ListOf(_england));
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
