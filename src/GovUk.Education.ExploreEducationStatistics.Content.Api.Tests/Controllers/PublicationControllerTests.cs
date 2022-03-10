@@ -2,15 +2,13 @@
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
@@ -21,55 +19,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var publicationId = Guid.NewGuid();
 
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(new Publication
+            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
+
+            publicationService.Setup(mock => mock.Get("publication-a"))
+                .ReturnsAsync(new CachedPublicationViewModel
                 {
                     Id = publicationId,
-                    Slug = "publication-a",
-                    Title = "Test title"
+                    Title = "Test title",
                 });
-                await contentDbContext.SaveChangesAsync();
-            }
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var controller = BuildPublicationController(contentDbContext);
+            var controller = BuildPublicationController(publicationService.Object);
 
-                var publicationTitleViewModel = (await controller.GetPublicationTitle("publication-a")).Value;
+            var publicationTitleViewModel = (await controller.GetPublicationTitle("publication-a")).Value;
 
-                Assert.NotNull(publicationTitleViewModel);
-                Assert.IsType<PublicationTitleViewModel>(publicationTitleViewModel);
-                Assert.Equal(publicationId, publicationTitleViewModel!.Id);
-                Assert.Equal("Test title", publicationTitleViewModel.Title);
+            Assert.NotNull(publicationTitleViewModel);
+            Assert.IsType<PublicationTitleViewModel>(publicationTitleViewModel);
+            Assert.Equal(publicationId, publicationTitleViewModel!.Id);
+            Assert.Equal("Test title", publicationTitleViewModel.Title);
 
-                MockUtils.VerifyAllMocks();
-            }
+            MockUtils.VerifyAllMocks();
         }
 
         [Fact]
         public async Task GetPublicationTitle_NotFound()
         {
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
-            var controller = BuildPublicationController(contentDbContext);
+            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
+
+            publicationService.Setup(mock => mock.Get("missing-publication"))
+                .ReturnsAsync(new NotFoundResult());
+
+            var controller = BuildPublicationController(publicationService.Object);
 
             var result = await controller.GetPublicationTitle("missing-publication");
 
             Assert.IsType<NotFoundResult>(result.Result);
 
-            MockUtils.VerifyAllMocks();
+            MockUtils.VerifyAllMocks(publicationService);
         }
 
         private static PublicationController BuildPublicationController(
-            ContentDbContext? contentDbContext = null
+            IPublicationService? publicationService = null
         )
         {
             return new PublicationController(
-                contentDbContext != null
-                    ? new PersistenceHelper<ContentDbContext>(contentDbContext)
-                    : Mock.Of<IPersistenceHelper<ContentDbContext>>()
+                publicationService ?? Mock.Of<IPublicationService>()
             );
         }
     }
