@@ -430,8 +430,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return GetEnumValues<GeographicLevel>()
                 .ToDictionary(geographicLevel => geographicLevel.ToString(),
                     geographicLevel =>
-                        ValidateLocationLevelForReplacement(dataBlock.Query.Locations,
+                        ValidateLocationLevelForReplacement(
+                            dataBlock.Query.Locations,
                             geographicLevel,
+                            dataBlock.Query.SubjectId,
                             replacementSubjectMeta))
                 .Filter(pair => pair.Value.Any);
         }
@@ -506,9 +508,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             );
         }
 
-        private LocationReplacementViewModel ValidateLocationLevelForReplacement(
-            LocationQuery locationQuery,
+        private LocationReplacementViewModel ValidateLocationLevelForReplacement(LocationQuery locationQuery,
             GeographicLevel geographicLevel,
+            Guid subjectId,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             var queryProperty = typeof(LocationQuery).GetProperty(geographicLevel.ToString());
@@ -531,7 +533,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
             }
 
-            var locations = _locationRepository.GetLocationAttributes(geographicLevel, originalCodes);
+            var locations = _locationRepository.GetLocationAttributes(
+                geographicLevel, 
+                originalCodes,
+                subjectId);
+            
             var replacementLocations = replacementSubjectMeta
                 .ObservationalUnits
                 .GetValueOrDefault(geographicLevel) ?? new List<ILocationAttribute>();
