@@ -13,8 +13,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 
         Task<Dictionary<GeographicLevel, IEnumerable<ILocationAttribute>>> GetLocationAttributes(Guid subjectId);
 
-        IEnumerable<ILocationAttribute> GetLocationAttributes(
-            GeographicLevel level,
-            IEnumerable<string> codes);
+        IEnumerable<ILocationAttribute> GetLocationAttributes(GeographicLevel level,
+            IEnumerable<string> codes, Guid subjectId);
     }
 }
