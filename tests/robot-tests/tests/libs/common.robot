@@ -823,4 +823,5 @@ user takes screenshot of element
     ...    ${wait}=${timeout}
     ...    ${limit}=None
     ${element}=    lookup or return webelement    ${selector_or_webelement}
-    take screenshot of element    ${element}    ${filename}
+    ${filepath}=    take screenshot of element    ${element}    ${filename}
+    [Return]    ${filepath}

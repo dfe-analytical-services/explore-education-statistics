@@ -4,6 +4,7 @@ import styles from './KeyStatTile.module.scss';
 
 interface Props {
   children?: ReactNode;
+  dataBlockId: string;
   isReordering?: boolean;
   testId?: string;
   title: string;
@@ -13,6 +14,7 @@ interface Props {
 
 const KeyStatTile = ({
   children,
+  dataBlockId,
   isReordering = false,
   testId = 'keyStatTile',
   titleTag: TitleElement = 'h3',
@@ -24,6 +26,7 @@ const KeyStatTile = ({
       className={classNames(styles.tile, {
         [styles.reordering]: isReordering,
       })}
+      data-testid={`${testId}-dataBlockId-${dataBlockId}`}
     >
       <TitleElement className="govuk-heading-s" data-testid={`${testId}-title`}>
         {title}

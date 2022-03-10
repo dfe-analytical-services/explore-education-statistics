@@ -709,6 +709,7 @@ export const MapBlockInternal = ({
 
                   {selectedDataSet && (
                     <KeyStatTile
+                      dataBlockId={id}
                       testId="mapBlock-indicatorTile"
                       title={selectedDataSetConfig.config.label}
                       value={formatPretty(

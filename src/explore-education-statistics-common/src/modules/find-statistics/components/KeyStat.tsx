@@ -58,6 +58,7 @@ const KeyStat = ({
         {keyStat && (
           <>
             <KeyStatTile
+              dataBlockId={dataBlockId}
               title={keyStat.title}
               value={keyStat.value}
               testId={testId}
