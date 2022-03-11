@@ -1,9 +1,10 @@
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { fireEvent, render } from '@testing-library/react';
 
 describe('toHaveScrolledIntoView', () => {
   test('asserts that element scrolls into view successfully', () => {
-    const { getByText } = render(
+    render(
       <div>
         <div id="test">Test element</div>
 
@@ -22,17 +23,17 @@ describe('toHaveScrolledIntoView', () => {
       </div>,
     );
 
-    const element = getByText('Test element');
+    const element = screen.getByText('Test element');
 
     expect(element).not.toHaveScrolledIntoView();
 
-    fireEvent.click(getByText('Scroll to element'));
+    userEvent.click(screen.getByText('Scroll to element'));
 
     expect(element).toHaveScrolledIntoView();
   });
 
   test('throws when assertions are incorrect', () => {
-    const { getByText } = render(
+    render(
       <div>
         <div id="test">Test element</div>
 
@@ -51,11 +52,11 @@ describe('toHaveScrolledIntoView', () => {
       </div>,
     );
 
-    const element = getByText('Test element');
+    const element = screen.getByText('Test element');
 
     expect(() => expect(element).toHaveScrolledIntoView()).toThrow();
 
-    fireEvent.click(getByText('Scroll to element'));
+    userEvent.click(screen.getByText('Scroll to element'));
 
     expect(() => expect(element).not.toHaveScrolledIntoView()).toThrow();
   });
