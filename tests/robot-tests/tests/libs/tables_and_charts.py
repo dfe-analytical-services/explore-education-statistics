@@ -43,7 +43,8 @@ class DataBlockRow:
         self.release_id = release_id.lower()
         self.content_block_id = content_block_id.lower()
         self.content_section_heading = content_section_heading
-        self.table_config = table_config is not None
+        self.has_table_config = table_config is not None
+        self.has_chart_config = chart_type is not None
 
         if self.content_section_type is None:
             self.type = DataBlockType.FAST_TRACK
