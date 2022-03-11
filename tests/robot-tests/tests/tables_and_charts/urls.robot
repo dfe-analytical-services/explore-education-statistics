@@ -75,7 +75,7 @@ Check Content Block Table
         highlight element    ${data_block}
         ${chart_filepath}=    user takes screenshot of element
         ...    ${data_block}
-        ...    ${content_block.content_block_id}-chart.png
+        ...    ${content_block.content_block_id}-${content_block.chart_type}-chart.png
 
     END
     log content block details    ${content_block}    Content Block    ${table_filepath}    ${chart_filepath}
