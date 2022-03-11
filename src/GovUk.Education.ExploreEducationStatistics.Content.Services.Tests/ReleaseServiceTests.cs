@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -20,6 +19,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
@@ -62,7 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 .ReturnsAsync(AsList(methodology));
 
             fileStorageService
-                .Setup(mock => mock.GetDeserialized<CachedReleaseViewModel>("publications/publication-a/releases/2016.json"))
+                .Setup(mock =>
+                    mock.GetDeserialized<CachedReleaseViewModel>("publications/publication-a/releases/2016.json"))
                 .ReturnsAsync(
                     new CachedReleaseViewModel(releaseId)
                     {
@@ -94,7 +95,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.Get(publicationSlug, releaseSlug);
 
-                MockUtils.VerifyAllMocks(methodologyService, publicationService, fileStorageService);
+                VerifyAllMocks(methodologyService, publicationService, fileStorageService);
 
                 var releaseViewModel = result.AssertRight();
 
@@ -176,12 +177,150 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.Get(publicationSlug, releaseSlug);
 
-                MockUtils.VerifyAllMocks(fileStorageService, methodologyService);
+                VerifyAllMocks(publicationService, fileStorageService, methodologyService);
 
                 result.AssertNotFound();
             }
         }
 
+        [Fact]
+        public async Task GetSummary()
+        {
+            var publicationId = Guid.NewGuid();
+            var releaseId = Guid.NewGuid();
+
+            const string publicationSlug = "publication-a";
+            const string releaseSlug = "2016";
+
+            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+
+            publicationService.Setup(mock => mock.Get(publicationSlug))
+                .ReturnsAsync(
+                    new CachedPublicationViewModel
+                    {
+                        Id = publicationId,
+                        Releases = new List<ReleaseTitleViewModel>
+                        {
+                            new() { Id = releaseId }
+                        }
+                    }
+                );
+
+            fileStorageService
+                .Setup(mock =>
+                    mock.GetDeserialized<CachedReleaseViewModel>("publications/publication-a/releases/2016.json"))
+                .ReturnsAsync(
+                    new CachedReleaseViewModel(releaseId)
+                    {
+                        Type = new ReleaseTypeViewModel
+                        {
+                            Title = "National Statistics"
+                        }
+                    }
+                );
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(new Publication
+                {
+                    Id = publicationId,
+                    Slug = publicationSlug,
+                });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseService(
+                    contentDbContext: contentDbContext,
+                    publicationService: publicationService.Object,
+                    fileStorageService: fileStorageService.Object
+                );
+
+                var result = await service.GetSummary(publicationSlug, releaseSlug);
+
+                VerifyAllMocks(publicationService, fileStorageService);
+
+                var releaseSummaryViewModel = result.AssertRight();
+
+                Assert.Equal(ReleaseType.NationalStatistics, releaseSummaryViewModel.Type);
+
+                var publication = releaseSummaryViewModel.Publication;
+                Assert.NotNull(publication);
+                Assert.Equal(publicationId, publication!.Id);
+            }
+        }
+
+        [Fact]
+        public async Task GetSummary_PublicationNotFound()
+        {
+            const string publicationSlug = "publication-a";
+            const string releaseSlug = "2016";
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
+            var service = SetupReleaseService(contentDbContext);
+
+            var result = await service.GetSummary(publicationSlug, releaseSlug);
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task GetSummary_ReleaseNotFound()
+        {
+            var publicationId = Guid.NewGuid();
+            var releaseId = Guid.NewGuid();
+
+            const string publicationSlug = "publication-a";
+            const string releaseSlug = "2016";
+
+            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
+            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+
+            publicationService.Setup(mock => mock.Get(publicationSlug))
+                .ReturnsAsync(
+                    new CachedPublicationViewModel
+                    {
+                        Id = publicationId,
+                        Releases = new List<ReleaseTitleViewModel>
+                        {
+                            new() { Id = releaseId }
+                        }
+                    }
+                );
+
+            fileStorageService
+                .Setup(s => s.GetDeserialized<CachedReleaseViewModel>(It.IsAny<string>()))
+                .ReturnsAsync(new NotFoundResult());
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(new Publication
+                {
+                    Id = publicationId,
+                    Slug = publicationSlug,
+                });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseService(
+                    contentDbContext: contentDbContext,
+                    publicationService: publicationService.Object,
+                    fileStorageService: fileStorageService.Object);
+
+                var result = await service.GetSummary(publicationSlug, releaseSlug);
+
+                VerifyAllMocks(publicationService, fileStorageService);
+
+                result.AssertNotFound();
+            }
+        }
         [Fact]
         public async Task List()
         {
@@ -382,7 +521,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     : new PersistenceHelper<ContentDbContext>(contentDbContext),
                 fileStorageService ?? Mock.Of<IFileStorageService>(),
                 methodologyService ?? Mock.Of<IMethodologyService>(),
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                userService ?? AlwaysTrueUserService().Object,
                 publicationService ?? Mock.Of<IPublicationService>(),
                 mapper ?? MapperUtils.MapperForProfile<MappingProfiles>()
             );

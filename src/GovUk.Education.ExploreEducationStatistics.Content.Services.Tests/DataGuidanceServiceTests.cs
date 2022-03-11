@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
@@ -102,6 +103,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Times.Once
             );
 
+            VerifyAllMocks(publicationService, releaseService, dataGuidanceSubjectService);
+
             Assert.True(result.IsRight);
 
             Assert.Equal(releaseId, result.Right.Id);
@@ -153,10 +156,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Times.Once
             );
 
+            VerifyAllMocks(publicationService, releaseService);
+
             result.AssertNotFound();
         }
 
-        [Fact] // @MarkFix
+        [Fact]
         public async Task Get_NotFoundForReleaseSlug()
         {
             const string publicationSlug = "test-publication";
@@ -193,6 +198,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 mock => mock.FetchCachedRelease(publicationSlug, releaseSlug),
                 Times.Once
             );
+
+            VerifyAllMocks(publicationService, releaseService);
 
             result.AssertNotFound();
         }

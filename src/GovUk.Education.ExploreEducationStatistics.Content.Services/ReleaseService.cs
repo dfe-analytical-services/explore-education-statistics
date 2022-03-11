@@ -79,23 +79,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public async Task<Either<ActionResult, ReleaseSummaryViewModel>> GetSummary(string publicationSlug,
             string? releaseSlug)
         {
-            var publicationTask = _publicationService.Get(publicationSlug);
-            var releaseTask = FetchCachedRelease(publicationSlug, releaseSlug);
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(query => query
+                    .Where(p => p.Slug == publicationSlug))
+                .OnSuccess(async _ =>
+                {
+                    var publicationTask = _publicationService.Get(publicationSlug);
+                    var releaseTask = FetchCachedRelease(publicationSlug, releaseSlug);
 
-            await Task.WhenAll(publicationTask, releaseTask);
+                    await Task.WhenAll(publicationTask, releaseTask);
 
-            if (releaseTask.Result.IsRight
-                && releaseTask.Result.Right is not null
-                && publicationTask.Result.IsRight
-                && publicationTask.Result.Right is not null)
-            {
-                return new ReleaseSummaryViewModel(
-                    _mapper.Map<CachedReleaseViewModel>(releaseTask.Result.Right),
-                    _mapper.Map<CachedPublicationViewModel>(publicationTask.Result.Right)
-                );
-            }
+                    if (releaseTask.Result.IsRight
+                        && releaseTask.Result.Right is not null
+                        && publicationTask.Result.IsRight
+                        && publicationTask.Result.Right is not null)
+                    {
+                        return new Either<ActionResult, ReleaseSummaryViewModel>(new ReleaseSummaryViewModel(
+                            _mapper.Map<CachedReleaseViewModel>(releaseTask.Result.Right),
+                            _mapper.Map<CachedPublicationViewModel>(publicationTask.Result.Right)
+                        ));
+                    }
 
-            return new NotFoundResult();
+                    return new NotFoundResult();
+                });
         }
 
         public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug)

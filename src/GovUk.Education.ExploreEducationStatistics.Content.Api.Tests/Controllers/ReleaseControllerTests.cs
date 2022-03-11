@@ -87,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             MockUtils.VerifyAllMocks(releaseService);
         }
 
-        [Fact] // @MarkFix
+        [Fact]
         public async Task GetLatestReleaseSummary()
         {
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);

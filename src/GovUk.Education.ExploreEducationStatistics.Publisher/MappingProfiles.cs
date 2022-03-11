@@ -2,6 +2,7 @@ using System.Linq;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher
@@ -22,17 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             CreateMap<ContentSection, ContentSectionViewModel>().ForMember(dest => dest.Content,
                 m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
-            //CreateMap<ExternalMethodology, ExternalMethodologyViewModel>(); // @MarkFix remove map?
-
-            //CreateMap<LegacyRelease, LegacyReleaseViewModel>(); // @MarkFix remove map?
-
-            //CreateMap<Publication, PublicationTitleViewModel>();  // @MarkFix remove map?
-
-            //CreateMap<Publication, CachedPublicationViewModel>()  // @MarkFix remove map?
-            //    .ForMember(dest => dest.LegacyReleases,
-            //        m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(l => l.Order)))
-            //    .ForMember(dest => dest.Releases, m => m.Ignore());
-
             CreateMap<Release, CachedReleaseViewModel>()
                 .ForMember(dest => dest.CoverageTitle,
                     m => m.MapFrom(release => release.TimePeriodCoverage.GetEnumLabel()))
@@ -47,12 +37,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .ForMember(
                     dest => dest.Content,
                     m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));
-
-            //CreateMap<Release, ReleaseTitleViewModel>();  // @MarkFix remove map?
-
-            //CreateMap<Theme, ThemeViewModel>();  // @MarkFix remove map?
-
-            //CreateMap<Topic, TopicViewModel>();  // @MarkFix remove map?
 
             CreateMap<Update, ReleaseNoteViewModel>();
         }
