@@ -89,7 +89,7 @@ describe('DownloadStep', () => {
   } as ReleaseSummary;
 
   test('renders with downloads', () => {
-    const { container } = render(
+    render(
       <DownloadStep {...wizardProps} subjects={testSubjects} onSubmit={noop} />,
     );
 
@@ -111,7 +111,7 @@ describe('DownloadStep', () => {
       downloadsGroup.getByLabelText('Another Subject (csv, 20 Mb)'),
     );
 
-    const subject2Hint = within(getDescribedBy(container, downloads[0]));
+    const subject2Hint = within(getDescribedBy(downloads[0]));
     expect(
       within(subject2Hint.getByTestId('Content')).getByText(
         'Some content here 2',
@@ -130,7 +130,7 @@ describe('DownloadStep', () => {
     expect(downloads[1]).toEqual(
       downloadsGroup.getByLabelText('Subject 1 (csv, 10 Mb)'),
     );
-    const subject1Hint = within(getDescribedBy(container, downloads[1]));
+    const subject1Hint = within(getDescribedBy(downloads[1]));
     expect(
       within(subject1Hint.getByTestId('Content')).getByText(
         'Some content here 1',
@@ -150,7 +150,7 @@ describe('DownloadStep', () => {
       downloadsGroup.getByLabelText('Subject 3 (csv, 30 Mb)'),
     );
 
-    const subject3Hint = within(getDescribedBy(container, downloads[2]));
+    const subject3Hint = within(getDescribedBy(downloads[2]));
     expect(
       within(subject3Hint.getByTestId('Content')).getByText(
         'Some content here 3',
