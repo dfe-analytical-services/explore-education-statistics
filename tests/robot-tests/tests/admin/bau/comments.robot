@@ -87,7 +87,10 @@ Add review comment for first content block
     user waits until page contains element
     ...    testid:comment-textarea    5
     user presses keys    This section needs fixing    testid:comment-textarea
+    # ensure 'Set page view' box doesn't intercept button click
+    user scrolls down    100
     user clicks button    Add comment
+    user clicks button    Save & close
 
 Switch to analyst1 and navigate to release
     [Tags]    HappyPath

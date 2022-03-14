@@ -79,10 +79,10 @@ Add Useful information related page link to release
     user clicks button    Add related page link
     user enters text into element    id:relatedPageForm-description    Test link one
     user enters text into element    id:relatedPageForm-url    http://test1.example.com/test1
-    user clicks button    Create link
+    user clicks element    //button[text()="Create link"]    //*[@id="relatedPageForm"]
+    user checks page does not contain element    id:${SECONDARY_STATS_TABLE_TAB_ID}
 
 Add secondary statistics
-    user waits until page does not contain element    //*[@id="${SECONDARY_STATS_TABLE_TAB_ID}"]    %{WAIT_MEDIUM}
     user clicks button    Add secondary stats
     user waits until page contains element    name:selectedDataBlock    %{WAIT_MEDIUM}
     user checks select contains x options    name:selectedDataBlock    5

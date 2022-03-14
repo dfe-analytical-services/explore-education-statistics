@@ -134,6 +134,7 @@ user chooses and embeds data block
     [Arguments]
     ...    ${datablock_name}
     user chooses select option    css:select[name="selectedDataBlock"]    ${datablock_name}
+    user waits until button is enabled    Embed    %{WAIT_SMALL}
     user clicks button    Embed
     user waits until page does not contain button    Embed    %{WAIT_MEDIUM}
     user waits until page does not contain loading spinner
