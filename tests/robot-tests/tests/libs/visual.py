@@ -1,5 +1,5 @@
 from selenium.webdriver.remote.webelement import WebElement
-from os import getcwd
+from os import getcwd, path, pardir, makedirs
 from robot.libraries.BuiltIn import BuiltIn
 from logging import warning
 
@@ -39,6 +39,8 @@ def capture_large_screenshot():
 
 @with_maximised_browser
 def take_screenshot_of_element(element: WebElement, filename: str):
-    filepath = f'{getcwd()}/test-results/{filename}'
+    filepath = f'{getcwd()}/{filename}'
+    folder = path.abspath(path.join(filepath, pardir))
+    makedirs(folder, exist_ok=True)
     element.screenshot(filepath)
     return f'file://{filepath}'

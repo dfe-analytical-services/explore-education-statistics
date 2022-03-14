@@ -10,6 +10,13 @@ Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+*** Variables ***
+${SNAPSHOT_FOLDER}=             snapshots/after
+${KEY_STATS_FOLDER}=            key-stats
+${SECONDARY_STATS_FOLDER}=      secondary-stats
+${CONTENT_SECTIONS_FOLDER}=     content-sections
+${FAST_TRACKS_FOLDER}=          fast-tracks
+
 *** Test Cases ***
 Test
     ${releases}=    get releases
@@ -59,9 +66,8 @@ Check Fast Track Table
     [Arguments]    ${content_block}
     user navigates to public frontend    ${content_block.content_url}
     user waits until page contains element    id:tableToolWizard
-    ${filepath}=    user takes screenshot of element
-    ...    id:tableToolWizard
-    ...    ${content_block.content_block_id}-table.png
+    ${filepath}=    user takes screenshot of element    id:tableToolWizard
+    ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${FAST_TRACKS_FOLDER}/${content_block.content_block_id}-table.png
     log content block details    ${content_block}    Fast Track    ${filepath}
     # TODO charts
 
@@ -76,10 +82,9 @@ Check Content Block Table
     ${data_block_table_tab}=    get child element    ${data_block}
     ...    id:dataBlock-${content_block.content_block_id}-tables-tab
     user clicks element    ${data_block_table_tab}
-    highlight element    ${data_block}
-    ${table_filepath}=    user takes screenshot of element
-    ...    ${data_block}
-    ...    ${content_block.content_block_id}-table.png
+#    highlight element    ${data_block}
+    ${table_filepath}=    user takes screenshot of element    ${data_block}
+    ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${CONTENT_SECTIONS_FOLDER}/${content_block.content_block_id}-table.png
     ${chart_filepath}=    Set Variable
     IF    ${content_block.has_chart_config} is ${TRUE}
         ${data_block_chart_tab}=    get child element    ${data_block}
@@ -87,10 +92,9 @@ Check Content Block Table
         user clicks element    ${data_block_chart_tab}
         user waits for chart to appear    ${content_block.chart_type}    ${data_block}
         ${data_block}=    get child element    ${accordion}    id:dataBlock-${content_block.content_block_id}
-        highlight element    ${data_block}
-        ${chart_filepath}=    user takes screenshot of element
-        ...    ${data_block}
-        ...    ${content_block.content_block_id}-${content_block.chart_type}-chart.png
+#    highlight element    ${data_block}
+        ${chart_filepath}=    user takes screenshot of element    ${data_block}
+        ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${CONTENT_SECTIONS_FOLDER}/${content_block.content_block_id}-${content_block.chart_type}-chart.png
     END
     log content block details    ${content_block}    Content Block    ${table_filepath}    ${chart_filepath}
 
@@ -101,18 +105,16 @@ Check Secondary Stats Table
     user scrolls to element    id:releaseHeadlines-tables-tab
     user clicks element    id:releaseHeadlines-tables-tab
     user waits until page contains element    testid:dataTableCaption
-    ${filepath}=    user takes screenshot of element
-    ...    id:releaseHeadlines-tables
-    ...    ${content_block.content_block_id}-table.png
+    ${filepath}=    user takes screenshot of element    id:releaseHeadlines-tables
+    ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${SECONDARY_STATS_FOLDER}/${content_block.content_block_id}-table.png
     log content block details    ${content_block}    Secondary Stats Table    ${filepath}
     # TODO charts
 
 Check Key Stats Table
     [Arguments]    ${content_block}
     user waits until page contains element    testid:keyStat-dataBlockId-${content_block.content_block_id}
-    ${filepath}=    user takes screenshot of element
-    ...    testid:keyStat-dataBlockId-${content_block.content_block_id}
-    ...    ${content_block.content_block_id}-table.png
+    ${filepath}=    user takes screenshot of element    testid:keyStat-dataBlockId-${content_block.content_block_id}
+    ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${KEY_STATS_FOLDER}/${content_block.content_block_id}-table.png
     log content block details    ${content_block}    Key Stats Table    ${filepath}
     # TODO charts
 
