@@ -63,6 +63,35 @@ class DataBlockRow:
             self.content_url = f'{public_url}/find-statistics/{self.publication_slug}/{self.release_slug}'
 
 
+class Release:
+    def __init__(
+            self,
+            publication_id,
+            publication_slug,
+            release_id,
+            release_slug,
+            key_stat_blocks,
+            secondary_stat_blocks,
+            content_section_blocks,
+            fast_track_blocks,
+            permalink_blocks):
+        self.publication_id = publication_id
+        self.publication_slug = publication_slug
+        self.release_slug = release_slug
+        self.release_id = release_id
+        self.key_stat_blocks = key_stat_blocks
+        self.secondary_stat_blocks = secondary_stat_blocks
+        self.content_section_blocks = content_section_blocks
+        self.fast_track_blocks = fast_track_blocks
+        self.permalink_blocks = permalink_blocks
+        self.url = f'{public_url}/find-statistics/{self.publication_slug}/{self.release_slug}'
+        self.has_key_stat_blocks = bool(key_stat_blocks)
+        self.has_secondary_stat_blocks = bool(secondary_stat_blocks)
+        self.has_content_section_blocks = bool(content_section_blocks)
+        self.has_fast_track_blocks = bool(fast_track_blocks)
+        self.has_permalinks = bool(permalink_blocks)
+
+
 content_blocks = []
 
 
@@ -91,5 +120,25 @@ with open('local-datablocks.csv', 'r', encoding='utf-8-sig') as csv_file:
             read_cell(row[12])))
 
 
-def get_content_blocks():
-    return content_blocks
+def get_releases():
+    release_ids = set(map(lambda block: block.release_id, content_blocks))
+
+    def create_release(release_id):
+        release_blocks = list(filter(lambda block: block.release_id == release_id, content_blocks))
+        key_stats = list(filter(lambda block: block.type == DataBlockType.KEY_STATS, release_blocks))
+        secondary_stats = list(filter(lambda block: block.type == DataBlockType.SECONDARY_STATS, release_blocks))
+        content_section_blocks = list(filter(lambda block: block.type == DataBlockType.CONTENT_BLOCK, release_blocks))
+        fast_tracks = list(filter(lambda block: block.type == DataBlockType.FAST_TRACK, release_blocks))
+        permalinks = []
+        return Release(
+            release_blocks[0].publication_id,
+            release_blocks[0].publication_slug,
+            release_blocks[0].release_id,
+            release_blocks[0].release_slug,
+            key_stats,
+            secondary_stats,
+            content_section_blocks,
+            fast_tracks,
+            permalinks)
+
+    return map(create_release, release_ids)

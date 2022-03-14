@@ -12,39 +12,61 @@ Test Setup          fail test fast if required
 
 *** Test Cases ***
 Test
-    ${content_blocks_info}=    get content blocks
+    ${releases}=    get releases
 
-    FOR    ${content_block}    IN    @{content_blocks_info}
-        IF    ${content_block.has_table_config} is ${FALSE}
-            Log to console    Skipping Content Block ${content_block.content_block_id}
-        ELSE IF    "${content_block.type}" == "DataBlockType.FAST_TRACK"
-            Check Fast Track Table    ${content_block}
-        ELSE IF    "${content_block.type}" == "DataBlockType.CONTENT_BLOCK"
-            Check Content Block Table    ${content_block}
-        ELSE IF    "${content_block.type}" == "DataBlockType.SECONDARY_STATS"
-            Check Secondary Stats Table    ${content_block}
-        ELSE IF    "${content_block.type}" == "DataBlockType.KEY_STATS"
-            Check Key Stats Table    ${content_block}
-        ELSE
-            Fail    Unhandled Data Block Type ${content_block.type}
-        END
+    FOR    ${release}    IN    @{releases}
+        Check release    ${release}
     END
 
 *** Keywords ***
+Check release
+    [Arguments]    ${release}
+
+    user navigates to public frontend    ${release.url}
+
+    IF    ${release.has_key_stat_blocks} is ${TRUE}
+        user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
+        user waits until page contains element    id:releaseHeadlines-tables-tab
+
+        FOR    ${content_block}    IN    @{release.key_stat_blocks}
+            check key stats table    ${content_block}
+        END
+    END
+
+    IF    ${release.has_secondary_stat_blocks} is ${TRUE}
+        FOR    ${content_block}    IN    @{release.secondary_stat_blocks}
+            check secondary stats table    ${content_block}
+        END
+    END
+
+    IF    ${release.has_content_section_blocks} is ${TRUE}
+        FOR    ${content_block}    IN    @{release.content_section_blocks}
+            IF    ${content_block.has_table_config} is ${TRUE}
+                check content block table    ${content_block}
+            END
+        END
+    END
+
+    IF    ${release.has_fast_track_blocks} is ${TRUE}
+        FOR    ${content_block}    IN    @{release.fast_track_blocks}
+            check fast track table    ${content_block}
+        END
+    END
+
+    # TODO permalinks
+
 Check Fast Track Table
     [Arguments]    ${content_block}
-
     user navigates to public frontend    ${content_block.content_url}
     user waits until page contains element    id:tableToolWizard
     ${filepath}=    user takes screenshot of element
     ...    id:tableToolWizard
     ...    ${content_block.content_block_id}-table.png
     log content block details    ${content_block}    Fast Track    ${filepath}
+    # TODO charts
 
 Check Content Block Table
     [Arguments]    ${content_block}
-
-    user navigates to public frontend    ${content_block.content_url}
     ${accordion}=    user opens accordion section    ${content_block.content_section_heading}    id:content
     user scrolls to accordion section content    ${content_block.content_section_heading}    id:content
     user waits until parent contains element    ${accordion}    id:dataBlock-${content_block.content_block_id}
@@ -63,27 +85,17 @@ Check Content Block Table
         ${data_block_chart_tab}=    get child element    ${data_block}
         ...    id:dataBlock-${content_block.content_block_id}-charts-tab
         user clicks element    ${data_block_chart_tab}
-        IF    "${content_block.chart_type}" == "map"
-            user waits until element contains map chart    ${data_block}
-            user waits until page does not contain loading spinner
-        END
-        IF    "${content_block.chart_type}" == "line"
-            user waits until element contains line chart    ${data_block}
-            user waits until page does not contain loading spinner
-        END
+        user waits for chart to appear    ${content_block.chart_type}    ${data_block}
         ${data_block}=    get child element    ${accordion}    id:dataBlock-${content_block.content_block_id}
         highlight element    ${data_block}
         ${chart_filepath}=    user takes screenshot of element
         ...    ${data_block}
         ...    ${content_block.content_block_id}-${content_block.chart_type}-chart.png
-
     END
     log content block details    ${content_block}    Content Block    ${table_filepath}    ${chart_filepath}
 
 Check Secondary Stats Table
     [Arguments]    ${content_block}
-
-    user navigates to public frontend    ${content_block.content_url}
     user scrolls to element    id:content
     user waits until page contains element    id:releaseHeadlines-tables-tab
     user scrolls to element    id:releaseHeadlines-tables-tab
@@ -93,18 +105,16 @@ Check Secondary Stats Table
     ...    id:releaseHeadlines-tables
     ...    ${content_block.content_block_id}-table.png
     log content block details    ${content_block}    Secondary Stats Table    ${filepath}
+    # TODO charts
 
 Check Key Stats Table
     [Arguments]    ${content_block}
-    user navigates to public frontend    ${content_block.content_url}
-    user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
-    user waits until page contains element    id:releaseHeadlines-tables-tab
     user waits until page contains element    testid:keyStat-dataBlockId-${content_block.content_block_id}
-
     ${filepath}=    user takes screenshot of element
     ...    testid:keyStat-dataBlockId-${content_block.content_block_id}
     ...    ${content_block.content_block_id}-table.png
     log content block details    ${content_block}    Key Stats Table    ${filepath}
+    # TODO charts
 
 Log Content Block Details
     [Arguments]
@@ -121,3 +131,21 @@ Log Content Block Details
         Log to console    \tChart snapshot:\t\t ${chart_snapshot_filepath}
     END
     Log to console    \n\t=====================================================================\n\n\n
+
+user waits for chart to appear
+    [Arguments]    ${chart_type}    ${data_block}
+    IF    "${chart_type}" == "map"
+        user waits until element contains map chart    ${data_block}
+        sleep    1
+    ELSE IF    "${chart_type}" == "line"
+        user waits until element contains line chart    ${data_block}
+    ELSE IF    "${chart_type}" == "infographic"
+        user waits until element contains infographic chart    ${data_block}
+    ELSE IF    "${chart_type}" == "verticalbar"
+        user waits until element contains bar chart    ${data_block}
+    ELSE IF    "${chart_type}" == "horizontalbar"
+        user waits until element contains bar chart    ${data_block}
+    ELSE
+        Fail    Unhandled chart type ${chart_type}
+    END
+    user waits until page does not contain loading spinner
