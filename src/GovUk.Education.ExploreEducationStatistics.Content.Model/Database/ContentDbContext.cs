@@ -379,6 +379,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v));
             modelBuilder.Entity<DataBlock>()
+                .Property(block => block.TableHeaderCountChanged)
+                .HasColumnName("DataBlock_TableHeaderCountChanged")
+                .HasDefaultValue(false)
+                .IsRequired();
+            modelBuilder.Entity<DataBlock>()
                 .Property(block => block.LocationsMigrated)
                 .HasColumnName("DataBlock_LocationsMigrated")
                 .HasDefaultValue(false)

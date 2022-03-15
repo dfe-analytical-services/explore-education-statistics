@@ -104,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 VerifyOriginalFieldsAreUntouched(dataBlock, after);
                 Assert.False(after.LocationsMigrated);
+                Assert.False(after.TableHeaderCountChanged);
             }
         }
 
@@ -159,6 +160,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Empty(after.TableMigrated.TableHeaders.Rows);
                 Assert.Empty(after.TableMigrated.TableHeaders.ColumnGroups);
                 Assert.Empty(after.TableMigrated.TableHeaders.RowGroups);
+
+                Assert.False(after.TableHeaderCountChanged);
             }
         }
 
@@ -506,6 +509,84 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(TableHeaderType.Location, after.TableMigrated.TableHeaders.Rows[3].Type);
                 Assert.Equal("localAuthority", after.TableMigrated.TableHeaders.Rows[3].Level);
                 Assert.Equal(location4.Id, Guid.Parse(after.TableMigrated.TableHeaders.Rows[3].Value));
+
+                Assert.False(after.TableHeaderCountChanged);
+            }
+        }
+
+        [Fact]
+        public async Task Migrate_QueryHasLaWithNoCodesOnlyOldCodes()
+        {
+            // Location with a null code and an old code
+            var location1 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = _england,
+                LocalAuthority = new LocalAuthority(code: null, oldCode: "oldCode1", "LA 1")
+            };
+
+            // Location with an empty code and an old code
+            var location2 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = _england,
+                LocalAuthority = new LocalAuthority(code: "", oldCode: "oldCode2", "LA 2")
+            };
+
+            var dataBlock = new DataBlock
+            {
+                Charts = new List<IChart>(),
+                Table = new TableBuilderConfiguration(),
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = _subject.Id,
+                    Locations = new LocationQuery
+                    {
+                        LocalAuthority = ListOf("oldCode1", "oldCode2")
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.DataBlocks.AddAsync(dataBlock);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
+            locationRepository.Setup(mock => mock.GetDistinctForSubject(_subject.Id))
+                .ReturnsAsync(ListOf(location1, location2));
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    locationRepository: locationRepository.Object);
+
+                var result = await service.Migrate(dataBlock.Id);
+
+                MockUtils.VerifyAllMocks(locationRepository);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                var after = await contentDbContext.DataBlocks.SingleAsync(db => db.Id == dataBlock.Id);
+
+                VerifyOriginalFieldsAreUntouched(dataBlock, after);
+                Assert.True(after.LocationsMigrated);
+
+                Assert.Null(after.QueryMigrated.Locations);
+                Assert.Equal(2, after.QueryMigrated.LocationIds.Count());
+                Assert.Contains(location1.Id, after.QueryMigrated.LocationIds);
+                Assert.Contains(location2.Id, after.QueryMigrated.LocationIds);
+
+                Assert.False(after.TableHeaderCountChanged);
             }
         }
 
@@ -571,6 +652,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 // Assert that the duplicate codes have been resolved to a single id
                 var locationId = Assert.Single(after.QueryMigrated.LocationIds);
                 Assert.Equal(location1.Id, locationId);
+
+                Assert.False(after.TableHeaderCountChanged);
             }
         }
 
@@ -692,6 +775,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 // Assert locations with the same codes are also included
                 Assert.Contains(location3Duplicate.Id, after.QueryMigrated.LocationIds);
                 Assert.Contains(location4Duplicate.Id, after.QueryMigrated.LocationIds);
+
+                Assert.False(after.TableHeaderCountChanged);
             }
         }
 
@@ -925,6 +1010,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(TableHeaderType.Location, rows[1].Type);
                 Assert.Equal("school", rows[1].Level);
                 Assert.Equal(location4Duplicate.Id, Guid.Parse(rows[1].Value));
+
+                Assert.True(after.TableHeaderCountChanged);
             }
         }
 
@@ -1675,6 +1762,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Assert.Empty(after.ChartsMigrated);
             Assert.Null(after.QueryMigrated);
             Assert.Null(after.TableMigrated);
+            Assert.False(after.TableHeaderCountChanged);
         }
 
         private IPersistenceHelper<StatisticsDbContext> DefaultStatisticsPersistenceHelper()

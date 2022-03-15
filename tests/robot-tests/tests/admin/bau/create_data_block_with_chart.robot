@@ -16,6 +16,8 @@ ${TOPIC_NAME}=              %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=        UI tests - create data block with chart %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}=          UI test data block
 ${CONTENT_SECTION_NAME}=    Test data block section
+${FOOTNOTE_1}=              Test footnote from bau
+${FOOTNOTE_UPDATED}=        Updated test footnote from bau
 
 *** Test Cases ***
 Create test publication and release via API
@@ -26,6 +28,22 @@ Upload subject
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    Academic Year 2025/26 (not Live)
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+
+Navigate to 'Footnotes' page
+    user waits for page to finish loading
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+
+Create footnote
+    user waits until page contains link    Create footnote
+    user clicks link    Create footnote
+    user waits until page does not contain loading spinner
+    user clicks footnote subject radio    UI test subject    Applies to all data
+    user clicks element    id:footnoteForm-content
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_1}
+    user clicks radio    Applies to all data
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes    %{WAIT_SMALL}
 
 Start creating a data block
     user clicks link    Data blocks
@@ -82,7 +100,6 @@ Create table
     ...    Admission Numbers for 'UI test subject' in Bolton 001, Bolton 002, Bolton 003, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2020
 
 Validate table rows
-    # broken
     user checks table column heading contains    1    1    Admission Numbers
 
     ${row}=    user gets row number with heading    Bolton 001
@@ -177,10 +194,47 @@ Embed data block into release content
     user clicks button    Add data block
     user chooses and embeds data block    ${DATABLOCK_NAME}
 
+Check footnote is displayed in content Tab
+    user checks accordion section contains x blocks    ${CONTENT_SECTION_NAME}    1    id:releaseMainContent
+
+    user scrolls to element    id:releaseMainContent
+
+    user checks list has x items    testid:footnotes    1
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_1}
+
+Update footnote
+    [Documentation]    EES-3136
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+    user clicks link    Edit footnote    testid:Footnote - ${FOOTNOTE_1}
+
+    user waits until h2 is visible    Edit footnote
+    user enters text into element    label:Footnote    ${FOOTNOTE_UPDATED}
+    user clicks button    Save footnote
+    user waits until page contains    ${FOOTNOTE_UPDATED}
+    user checks page does not contain    ${FOOTNOTE_1}
+
+Navigate to content tab
+    user clicks link    Content
+    user waits until h2 is visible    ${PUBLICATION_NAME}
+
+Check updated footnote is displayed in content Tab
+    [Documentation]    EES-3136
+    [Tags]    Failing
+    user clicks button    Test data block section
+    ${section}=    user gets accordion section content element    Test data block section
+    ...    //*[@data-testid="editableAccordionSection"]
+
+    user scrolls to element    //*[@data-testid="editableAccordionSection"]//*[@data-testid="footnotes"]
+
+    user checks list has x items    testid:footnotes    1
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_UPDATED}
+
 Validate embedded table rows
     ${datablock}=    set variable    //*[@data-testid="Data block - ${DATABLOCK_NAME}"]
-    # Need to scroll to block to load it
-    user scrolls to element    ${datablock}
+    user scrolls to element    id:releaseMainContent
+
+    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
     ${table}=    set variable    ${datablock} >> css:table
     user waits until page contains element    ${table}    30
@@ -282,38 +336,45 @@ Configure basic line chart
     user chooses select option    id:chartDataSetsConfigurationForm-location    Nailsea Youngwood
     user clicks button    Add data set
 
+    user clicks link    Legend
+    user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
+
 Validate basic line chart preview
-    ${preview}=    set variable    id:chartBuilderPreview
-    user waits until element contains line chart    ${preview}
+    user waits until element contains line chart    id:chartBuilderPreview
 
-    user checks chart title contains    ${preview}    Test chart title
-    user checks chart legend item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood)
+    user checks chart title contains    id:chartBuilderPreview    Test chart title
+    user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
 
-    user checks chart height    ${preview}    400
-    user checks chart width    ${preview}    900
+    user checks chart height    id:chartBuilderPreview    400
+    user checks chart width    id:chartBuilderPreview    900
 
-    user checks chart y axis ticks    ${preview}    0    2,500    5,000    7,500    10,000
-    user checks chart x axis ticks    ${preview}    2005    2010    2011    2012    2016
+    user checks chart y axis ticks    id:chartBuilderPreview    0    2,500    5,000    7,500    10,000
+    user checks chart x axis ticks    id:chartBuilderPreview    2005    2010    2011    2012    2016
 
-    user mouses over line chart point    ${preview}    1    1
-    user checks chart tooltip label contains    ${preview}    2005
-    user checks chart tooltip item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood): 3,612
+    user mouses over line chart point    id:chartBuilderPreview    1    1
+    user checks chart tooltip label contains    id:chartBuilderPreview    2005
+    user checks chart tooltip item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers (Nailsea Youngwood): 3,612
 
-    user mouses over line chart point    ${preview}    1    2
-    user checks chart tooltip label contains    ${preview}    2010
-    user checks chart tooltip item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood): 9,304
+    user mouses over line chart point    id:chartBuilderPreview    1    2
+    user checks chart tooltip label contains    id:chartBuilderPreview    2010
+    user checks chart tooltip item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers (Nailsea Youngwood): 9,304
 
-    user mouses over line chart point    ${preview}    1    3
-    user checks chart tooltip label contains    ${preview}    2011
-    user checks chart tooltip item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood): 9,603
+    user mouses over line chart point    id:chartBuilderPreview    1    3
+    user checks chart tooltip label contains    id:chartBuilderPreview    2011
+    user checks chart tooltip item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers (Nailsea Youngwood): 9,603
 
-    user mouses over line chart point    ${preview}    1    4
-    user checks chart tooltip label contains    ${preview}    2012
-    user checks chart tooltip item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood): 8,150
+    user mouses over line chart point    id:chartBuilderPreview    1    4
+    user checks chart tooltip label contains    id:chartBuilderPreview    2012
+    user checks chart tooltip item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers (Nailsea Youngwood): 8,150
 
-    user mouses over line chart point    ${preview}    1    5
-    user checks chart tooltip label contains    ${preview}    2016
-    user checks chart tooltip item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood): 4,198
+    user mouses over line chart point    id:chartBuilderPreview    1    5
+    user checks chart tooltip label contains    id:chartBuilderPreview    2016
+    user checks chart tooltip item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers (Nailsea Youngwood): 4,198
 
 Save chart and validate marked as 'Has chart' in data blocks list
     user clicks link    Chart configuration
@@ -390,38 +451,37 @@ Change vertical bar chart legend
     user enters text into element    id:chartLegendConfigurationForm-items-0-label    Admissions
 
 Validate basic vertical bar chart preview
-    ${preview}=    set variable    id:chartBuilderPreview
-    user waits until element does not contain line chart    ${preview}
-    user waits until element contains bar chart    ${preview}
+    user waits until element does not contain line chart    id:chartBuilderPreview
+    user waits until element contains bar chart    id:chartBuilderPreview
 
-    user checks chart title contains    ${preview}    Test chart title
-    user checks chart legend item contains    ${preview}    1    Admissions
+    user checks chart title contains    id:chartBuilderPreview    Test chart title
+    user checks chart legend item contains    id:chartBuilderPreview    1    Admissions
 
-    user checks chart height    ${preview}    500
-    user checks chart width    ${preview}    800
+    user checks chart height    id:chartBuilderPreview    500
+    user checks chart width    id:chartBuilderPreview    800
 
-    user checks chart y axis ticks    ${preview}    0    2,500    5,000    7,500    10,000
-    user checks chart x axis ticks    ${preview}    2005    2010    2011    2012    2016
+    user checks chart y axis ticks    id:chartBuilderPreview    0    2,500    5,000    7,500    10,000
+    user checks chart x axis ticks    id:chartBuilderPreview    2005    2010    2011    2012    2016
 
-    user mouses over chart bar    ${preview}    1
-    user checks chart tooltip label contains    ${preview}    2005
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 3,612
+    user mouses over chart bar    id:chartBuilderPreview    1
+    user checks chart tooltip label contains    id:chartBuilderPreview    2005
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 3,612
 
-    user mouses over chart bar    ${preview}    2
-    user checks chart tooltip label contains    ${preview}    2010
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 9,304
+    user mouses over chart bar    id:chartBuilderPreview    2
+    user checks chart tooltip label contains    id:chartBuilderPreview    2010
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 9,304
 
-    user mouses over chart bar    ${preview}    3
-    user checks chart tooltip label contains    ${preview}    2011
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 9,603
+    user mouses over chart bar    id:chartBuilderPreview    3
+    user checks chart tooltip label contains    id:chartBuilderPreview    2011
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 9,603
 
-    user mouses over chart bar    ${preview}    4
-    user checks chart tooltip label contains    ${preview}    2012
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 8,150
+    user mouses over chart bar    id:chartBuilderPreview    4
+    user checks chart tooltip label contains    id:chartBuilderPreview    2012
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 8,150
 
-    user mouses over chart bar    ${preview}    5
-    user checks chart tooltip label contains    ${preview}    2016
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 4,198
+    user mouses over chart bar    id:chartBuilderPreview    5
+    user checks chart tooltip label contains    id:chartBuilderPreview    2016
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 4,198
 
 Save and validate vertical bar chart embeds correctly
     # Transient React error that happens locally & on dev sometimes: TypeError: Cannot read property '_leaflet_pos' of undefined
@@ -477,37 +537,36 @@ Configure basic horizontal bar chart
     user configures basic chart    Horizontal bar    600    700
 
 Validate basic horizontal bar chart preview
-    ${preview}=    set variable    id:chartBuilderPreview
-    user waits until element contains bar chart    ${preview}
+    user waits until element contains bar chart    id:chartBuilderPreview
 
-    user checks chart title contains    ${preview}    Test chart title
-    user checks chart legend item contains    ${preview}    1    Admissions
+    user checks chart title contains    id:chartBuilderPreview    Test chart title
+    user checks chart legend item contains    id:chartBuilderPreview    1    Admissions
 
-    user checks chart x axis ticks    ${preview}    0    2,500    5,000    7,500    10,000
-    user checks chart y axis ticks    ${preview}    2005    2010    2011    2012    2016
+    user checks chart x axis ticks    id:chartBuilderPreview    0    2,500    5,000    7,500    10,000
+    user checks chart y axis ticks    id:chartBuilderPreview    2005    2010    2011    2012    2016
 
-    user checks chart height    ${preview}    600
-    user checks chart width    ${preview}    700
+    user checks chart height    id:chartBuilderPreview    600
+    user checks chart width    id:chartBuilderPreview    700
 
-    user mouses over chart bar    ${preview}    1
-    user checks chart tooltip label contains    ${preview}    2005
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 3,612
+    user mouses over chart bar    id:chartBuilderPreview    1
+    user checks chart tooltip label contains    id:chartBuilderPreview    2005
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 3,612
 
-    user mouses over chart bar    ${preview}    2
-    user checks chart tooltip label contains    ${preview}    2010
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 9,304
+    user mouses over chart bar    id:chartBuilderPreview    2
+    user checks chart tooltip label contains    id:chartBuilderPreview    2010
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 9,304
 
-    user mouses over chart bar    ${preview}    3
-    user checks chart tooltip label contains    ${preview}    2011
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 9,603
+    user mouses over chart bar    id:chartBuilderPreview    3
+    user checks chart tooltip label contains    id:chartBuilderPreview    2011
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 9,603
 
-    user mouses over chart bar    ${preview}    4
-    user checks chart tooltip label contains    ${preview}    2012
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 8,150
+    user mouses over chart bar    id:chartBuilderPreview    4
+    user checks chart tooltip label contains    id:chartBuilderPreview    2012
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 8,150
 
-    user mouses over chart bar    ${preview}    5
-    user checks chart tooltip label contains    ${preview}    2016
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 4,198
+    user mouses over chart bar    id:chartBuilderPreview    5
+    user checks chart tooltip label contains    id:chartBuilderPreview    2016
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 4,198
 
 Save and validate horizontal bar chart embeds correctly
     user clicks link    Chart configuration
@@ -580,28 +639,18 @@ Change geographic chart legend
     user waits until page does not contain loading spinner
 
 Validate basic geographic chart preview
-    ${preview}=    set variable    id:chartBuilderPreview
-    user waits until element does not contain bar chart    ${preview}
-    user waits until element contains map chart    ${preview}
+    user waits until element does not contain bar chart    id:chartBuilderPreview
+    user waits until element contains map chart    id:chartBuilderPreview
 
-    user checks map chart height    ${preview}    700
-    user checks map chart width    ${preview}    600
+    user checks map chart height    id:chartBuilderPreview    700
+    user checks map chart width    id:chartBuilderPreview    600
 
-    user chooses select option    ${preview}-map-selectedLocation    Nailsea Youngwood
+    user chooses select option    id:chartBuilderPreview-map-selectedLocation    Nailsea Youngwood
 
-    user mouses over selected map feature    ${preview}
-    user checks chart tooltip label contains    ${preview}    Nailsea Youngwood
-    user checks chart tooltip item contains    ${preview}    1    Admissions in 2005: 3,612
-    user checks chart tooltip item contains    ${preview}    2    Admissions in 2010: 9,304
-    user checks chart tooltip item contains    ${preview}    3    Admissions in 2011: 9,603
-    user checks chart tooltip item contains    ${preview}    4    Admissions in 2012: 8,150
-    user checks chart tooltip item contains    ${preview}    5    Admissions in 2016: 4,198
+    user mouses over selected map feature    id:chartBuilderPreview
+    user checks map tooltip label contains    id:chartBuilderPreview    Nailsea Youngwood
 
-    user checks map chart indicator tile contains    ${preview}    1    Admissions in 2005    3,612
-    user checks map chart indicator tile contains    ${preview}    2    Admissions in 2010    9,304
-    user checks map chart indicator tile contains    ${preview}    3    Admissions in 2011    9,603
-    user checks map chart indicator tile contains    ${preview}    4    Admissions in 2012    8,150
-    user checks map chart indicator tile contains    ${preview}    5    Admissions in 2016    4,198
+    user checks map chart indicator tile contains    id:chartBuilderPreview    Admissions in 2005    3,612
 
 Save and validate geographic chart embeds correctly
     user scrolls to the bottom of the page
@@ -625,18 +674,9 @@ Save and validate geographic chart embeds correctly
     user chooses select option    ${datablock} >> name:selectedLocation    Nailsea Youngwood
 
     user mouses over selected map feature    ${datablock}
-    user checks chart tooltip label contains    ${datablock}    Nailsea Youngwood
-    user checks chart tooltip item contains    ${datablock}    1    Admissions in 2005: 3,612
-    user checks chart tooltip item contains    ${datablock}    2    Admissions in 2010: 9,304
-    user checks chart tooltip item contains    ${datablock}    3    Admissions in 2011: 9,603
-    user checks chart tooltip item contains    ${datablock}    4    Admissions in 2012: 8,150
-    user checks chart tooltip item contains    ${datablock}    5    Admissions in 2016: 4,198
+    user checks map tooltip label contains    ${datablock}    Nailsea Youngwood
 
-    user checks map chart indicator tile contains    ${datablock}    1    Admissions in 2005    3,612
-    user checks map chart indicator tile contains    ${datablock}    2    Admissions in 2010    9,304
-    user checks map chart indicator tile contains    ${datablock}    3    Admissions in 2011    9,603
-    user checks map chart indicator tile contains    ${datablock}    4    Admissions in 2012    8,150
-    user checks map chart indicator tile contains    ${datablock}    5    Admissions in 2016    4,198
+    user checks map chart indicator tile contains    ${datablock}    Admissions in 2005    3,612
 
 Configure basic infographic chart
     user navigates to admin frontend    ${DATABLOCK_URL}

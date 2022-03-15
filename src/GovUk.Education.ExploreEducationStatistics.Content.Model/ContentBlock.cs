@@ -132,6 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public List<IChart> ChartsMigrated { get; set; } = new();
         public ObservationQueryContext QueryMigrated { get; set; }
         public TableBuilderConfiguration TableMigrated { get; set; }
+        public bool TableHeaderCountChanged { get; set; }
         public bool LocationsMigrated { get; set; }
     }
 
