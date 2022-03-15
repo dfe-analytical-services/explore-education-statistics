@@ -68,8 +68,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 .ToList();
         }
 
+        public List<Release> GetPublishedReleases()
+        {
+            return Releases
+                .Where(r => IsLatestPublishedVersionOfRelease(r))
+                .ToList();
+        }
+
         private bool IsLatestPublishedVersionOfRelease(Release release)
         {
+            if (Releases == null || !Releases.Any())
+            {
+                throw new ArgumentException(
+                    "Releases must be hydrated to test the latest published version");
+            }
+
             return
                 // Release itself must be live
                 release.Live

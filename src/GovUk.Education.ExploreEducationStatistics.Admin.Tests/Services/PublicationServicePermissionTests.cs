@@ -296,7 +296,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Mock<IMapper>,
                 Mock<IUserService> userService,
                 Mock<IPublicationRepository> publicationRepository,
-                Mock<IPublishingService> publishingService,
                 Mock<IMethodologyVersionRepository> methodologyVersionRepository,
                 Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,
                 Mock<IBlobCacheService> publicBlobCacheService) mocks)
@@ -307,7 +306,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 mapper,
                 userService,
                 publicationRepository,
-                publishingService,
                 methodologyVersionRepository,
                 persistenceHelper,
                 publicBlobCacheService
@@ -319,7 +317,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 persistenceHelper.Object,
                 userService.Object,
                 publicationRepository.Object, 
-                publishingService.Object, 
                 methodologyVersionRepository.Object,
                 publicBlobCacheService.Object);
         }
@@ -328,7 +325,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<IMapper> Mapper,
             Mock<IUserService> UserService,
             Mock<IPublicationRepository> PublicationRepository,
-            Mock<IPublishingService> PublishingService,
             Mock<IMethodologyVersionRepository> MethodologyVersionRepository,
             Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelper,
             Mock<IBlobCacheService> PublicBlobCacheService) Mocks()
@@ -342,7 +338,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IMapper>(),
                 MockUtils.AlwaysTrueUserService(),
                 new Mock<IPublicationRepository>(),
-                new Mock<IPublishingService>(),
                 new Mock<IMethodologyVersionRepository>(),
                 persistenceHelper,
                 new Mock<IBlobCacheService>());

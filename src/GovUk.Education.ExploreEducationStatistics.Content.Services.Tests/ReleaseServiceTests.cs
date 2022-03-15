@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             publicationService.Setup(mock => mock.Get(publicationSlug))
                 .ReturnsAsync(
-                    new CachedPublicationViewModel
+                    new PublicationViewModel
                     {
                         Id = publicationId,
                         Releases = new List<ReleaseTitleViewModel>
@@ -117,7 +117,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
-            var service = SetupReleaseService(contentDbContext);
+
+            var publicationService = new PublicationService(
+                new PersistenceHelper<ContentDbContext>(contentDbContext),
+                MapperUtils.MapperForProfile<MappingProfiles>()
+            );
+
+            var service = SetupReleaseService(contentDbContext,
+                publicationService: publicationService);
 
             var result = await service.Get(publicationSlug, releaseSlug);
 
@@ -139,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             publicationService.Setup(mock => mock.Get(publicationSlug))
                 .ReturnsAsync(
-                    new CachedPublicationViewModel
+                    new PublicationViewModel
                     {
                         Id = publicationId,
                         Releases = new List<ReleaseTitleViewModel>
@@ -197,7 +204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             publicationService.Setup(mock => mock.Get(publicationSlug))
                 .ReturnsAsync(
-                    new CachedPublicationViewModel
+                    new PublicationViewModel
                     {
                         Id = publicationId,
                         Releases = new List<ReleaseTitleViewModel>
@@ -282,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             publicationService.Setup(mock => mock.Get(publicationSlug))
                 .ReturnsAsync(
-                    new CachedPublicationViewModel
+                    new PublicationViewModel
                     {
                         Id = publicationId,
                         Releases = new List<ReleaseTitleViewModel>

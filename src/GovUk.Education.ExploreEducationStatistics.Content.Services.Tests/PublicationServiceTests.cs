@@ -199,7 +199,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             IMapper? mapper = null)
         {
             return new(
-                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentDbContext is null
                     ? Mock.Of<IPersistenceHelper<ContentDbContext>>()
                     : new PersistenceHelper<ContentDbContext>(contentDbContext),

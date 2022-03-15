@@ -49,8 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string releaseSlug = "2016-17";
 
             var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
-            var publicationService = new Mock<Content.Services.Interfaces.IPublicationService>(MockBehavior.Strict);
-            var releaseService = new Mock<Content.Services.Interfaces.IReleaseService>(MockBehavior.Strict);
+            var publicationService = new Mock<Interfaces.IPublicationService>(MockBehavior.Strict);
+            var releaseService = new Mock<Interfaces.IReleaseService>(MockBehavior.Strict);
 
             var service = SetupService(
                 dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
@@ -60,14 +60,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             publicationService.Setup(mock => mock.Get(publicationSlug))
                 .ReturnsAsync(
-                    new CachedPublicationViewModel
+                    new PublicationViewModel
                     {
                         Id = publicationId,
                         Title = "Test publication",
                         Slug = publicationSlug,
                     }
                 );
-            releaseService.Setup(mock => mock.FetchCachedRelease(publicationSlug, releaseSlug))
+            releaseService.Setup(mock => mock.GetCachedRelease(publicationSlug, releaseSlug))
                 .ReturnsAsync(
                     new CachedReleaseViewModel(releaseId)
                     {
@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             );
 
             releaseService.Verify(
-                mock => mock.FetchCachedRelease(publicationSlug, releaseSlug),
+                mock => mock.GetCachedRelease(publicationSlug, releaseSlug),
                 Times.Once
             );
 
@@ -125,8 +125,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string releaseSlug = "2016-17";
 
             var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
-            var publicationService = new Mock<Content.Services.Interfaces.IPublicationService>(MockBehavior.Strict);
-            var releaseService = new Mock<Content.Services.Interfaces.IReleaseService>(MockBehavior.Strict);
+            var publicationService = new Mock<Interfaces.IPublicationService>(MockBehavior.Strict);
+            var releaseService = new Mock<Interfaces.IReleaseService>(MockBehavior.Strict);
 
             var service = SetupService(
                 dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     new NotFoundResult()
                 );
 
-            releaseService.Setup(mock => mock.FetchCachedRelease(publicationSlug, releaseSlug))
+            releaseService.Setup(mock => mock.GetCachedRelease(publicationSlug, releaseSlug))
                 .ReturnsAsync(
                     new CachedReleaseViewModel(Guid.NewGuid())
                 );
@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             );
 
             releaseService.Verify(
-                mock => mock.FetchCachedRelease(publicationSlug, releaseSlug),
+                mock => mock.GetCachedRelease(publicationSlug, releaseSlug),
                 Times.Once
             );
 
@@ -168,8 +168,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             const string releaseSlug = "incorrect-release-slug";
 
             var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
-            var publicationService = new Mock<Content.Services.Interfaces.IPublicationService>(MockBehavior.Strict);
-            var releaseService = new Mock<Content.Services.Interfaces.IReleaseService>(MockBehavior.Strict);
+            var publicationService = new Mock<Interfaces.IPublicationService>(MockBehavior.Strict);
+            var releaseService = new Mock<Interfaces.IReleaseService>(MockBehavior.Strict);
 
             var service = SetupService(
                 dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
@@ -179,10 +179,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             publicationService.Setup(mock => mock.Get(publicationSlug))
                 .ReturnsAsync(
-                    new CachedPublicationViewModel()
+                    new PublicationViewModel()
                 );
 
-            releaseService.Setup(mock => mock.FetchCachedRelease(publicationSlug, releaseSlug))
+            releaseService.Setup(mock => mock.GetCachedRelease(publicationSlug, releaseSlug))
                 .ReturnsAsync(
                     new NotFoundResult()
                 );
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             );
 
             releaseService.Verify(
-                mock => mock.FetchCachedRelease(publicationSlug, releaseSlug),
+                mock => mock.GetCachedRelease(publicationSlug, releaseSlug),
                 Times.Once
             );
 
@@ -206,13 +206,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
         private static DataGuidanceService SetupService(
             IDataGuidanceSubjectService? dataGuidanceSubjectService = null,
-            Content.Services.Interfaces.IPublicationService? publicationService = null,
-            Content.Services.Interfaces.IReleaseService? releaseService = null)
+            Interfaces.IPublicationService? publicationService = null,
+            Interfaces.IReleaseService? releaseService = null)
         {
             return new DataGuidanceService(
                 dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>(),
-                publicationService ?? Mock.Of<Content.Services.Interfaces.IPublicationService>(),
-                releaseService ?? Mock.Of<Content.Services.Interfaces.IReleaseService>()
+                publicationService ?? Mock.Of<Interfaces.IPublicationService>(),
+                releaseService ?? Mock.Of<Interfaces.IReleaseService>()
             );
         }
     }

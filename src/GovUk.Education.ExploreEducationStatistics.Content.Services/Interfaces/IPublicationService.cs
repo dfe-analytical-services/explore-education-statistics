@@ -8,5 +8,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 
 public interface IPublicationService
 {
-    public Task<Either<ActionResult, CachedPublicationViewModel>> Get(string publicationSlug);
+    public Task<Either<ActionResult, PublicationViewModel>> Get(string publicationSlug);
 }

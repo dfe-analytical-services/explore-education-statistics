@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -389,6 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var releaseId = Guid.NewGuid();
 
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Default);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             publicBlobStorageService.Setup(mock => mock.MoveDirectory(PublicContent,
@@ -403,17 +405,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 .Returns(Task.CompletedTask);
 
             var service = BuildPublishingService(publicBlobStorageService: publicBlobStorageService.Object,
+                publicBlobCacheService: publicBlobCacheService.Object,
                 releaseService: releaseService.Object);
 
-            await service.PublishStagedReleaseContent(releaseId);
+            await service.PublishStagedReleaseContent(releaseId, "publication-slug");
 
-            MockUtils.VerifyAllMocks(publicBlobStorageService, releaseService);
+            publicBlobCacheService.Verify(mock =>
+                    mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
+                Times.Once);
+
+            MockUtils.VerifyAllMocks(publicBlobStorageService, publicBlobCacheService, releaseService);
         }
 
         private static PublishingService BuildPublishingService(
             string? publicStorageConnectionString = null,
             IBlobStorageService? privateBlobStorageService = null,
             IBlobStorageService? publicBlobStorageService = null,
+            IBlobCacheService? publicBlobCacheService = null,
             IMethodologyService? methodologyService = null,
             IPublicationService? publicationService = null,
             IReleaseService? releaseService = null,
@@ -423,6 +431,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 publicStorageConnectionString ?? "",
                 privateBlobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
                 publicBlobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
+                publicBlobCacheService ?? Mock.Of<IBlobCacheService>(MockBehavior.Strict),
                 methodologyService ?? Mock.Of<IMethodologyService>(MockBehavior.Strict),
                 publicationService ?? Mock.Of<IPublicationService>(MockBehavior.Strict),
                 releaseService ?? Mock.Of<IReleaseService>(MockBehavior.Strict),

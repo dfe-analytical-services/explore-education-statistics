@@ -16,6 +16,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -756,6 +758,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
                 
+                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<AllMethodologiesCacheKey>()),
+                    Times.Once);
+                publicBlobCacheService.Verify(mock => mock.DeleteItem(new PublicationTreeCacheKey(null)),
+                    Times.Once);
+                publicBlobCacheService.Verify(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData)),
+                    Times.Once);
+                publicBlobCacheService.Verify(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData)),
+                    Times.Once);
                 publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
                     Times.Once);
 
@@ -1404,7 +1414,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             ContentDbContext context,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
-            IPublishingService? publishingService = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
             IBlobCacheService? publicBlobCacheService = null)
         {
@@ -1414,7 +1423,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object, 
                 publicationRepository ?? Mock.Of<IPublicationRepository>(),
-                publishingService ?? Mock.Of<IPublishingService>(),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(),
                 publicBlobCacheService ?? Mock.Of<IBlobCacheService>());
         }

@@ -57,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public ReleaseViewModel(
             CachedReleaseViewModel release,
-            CachedPublicationViewModel publication)
+            PublicationViewModel publication)
         {
             Id = release.Id;
             Title = release.Title;
@@ -83,17 +83,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
                 .Where(model => Id != model.Id)
                 .ToList();
 
-            Publication = new PublicationViewModel(
-                publication.Id,
-                publication.Title,
-                publication.Slug,
-                publication.LatestReleaseId,
-                otherReleases,
-                publication.LegacyReleases,
-                publication.Topic,
-                publication.Contact,
-                publication.ExternalMethodology
-            );
+            Publication = new PublicationViewModel
+            {
+                Id = publication.Id,
+                Title = publication.Title,
+                Slug = publication.Slug,
+                LatestReleaseId = publication.LatestReleaseId,
+                Releases = otherReleases,
+                LegacyReleases = publication.LegacyReleases,
+                Topic = publication.Topic,
+                Contact = publication.Contact,
+                ExternalMethodology = publication.ExternalMethodology
+            };
         }
 
         /// TODO EES-3127 Remove the backwards compatibility of CachedReleaseViewModel.Type.

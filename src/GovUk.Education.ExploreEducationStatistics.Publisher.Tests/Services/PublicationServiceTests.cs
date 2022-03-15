@@ -346,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
 
                 Assert.NotNull(contentPublication);
-                Assert.Equal(publication.Id, contentPublication.Id);
+                Assert.Equal(publication.Id, contentPublication!.Id);
                 Assert.Equal("Test publication", contentPublication.Title);
                 Assert.Equal("test-publication", contentPublication.Slug);
                 Assert.Equal(publishDate, contentPublication.Published);
@@ -388,7 +388,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
 
                 Assert.NotNull(contentPublication);
-                Assert.Equal(publication.Id, contentPublication.Id);
+                Assert.Equal(publication.Id, contentPublication!.Id);
                 Assert.Equal("Test publication", contentPublication.Title);
                 Assert.Equal("test-publication", contentPublication.Slug);
                 Assert.Equal(publishDate, contentPublication.Published);

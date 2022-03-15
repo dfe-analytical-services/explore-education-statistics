@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 
         Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> List(string publicationSlug);
 
-        Task<Either<ActionResult, CachedReleaseViewModel?>> FetchCachedRelease(
+        Task<Either<ActionResult, CachedReleaseViewModel?>> GetCachedRelease(
             string publicationSlug,
             string? releaseSlug = null);
     }

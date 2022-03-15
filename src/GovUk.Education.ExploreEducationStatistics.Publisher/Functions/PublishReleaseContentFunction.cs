@@ -1,8 +1,10 @@
 ﻿#nullable enable
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
@@ -10,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.Azure.WebJobs;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
@@ -18,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     // ReSharper disable once UnusedType.Global
     public class PublishReleaseContentFunction
     {
+        private readonly ContentDbContext _contentDbContext;
         private readonly IBlobCacheService _blobCacheService;
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
@@ -25,12 +29,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
         public PublishReleaseContentFunction(
+            ContentDbContext contentDbContext,
             IBlobCacheService blobCacheService,
             IContentService contentService,
             INotificationsService notificationsService,
             IReleaseService releaseService,
             IReleasePublishingStatusService releasePublishingStatusService)
         {
+            _contentDbContext = contentDbContext;
             _blobCacheService = blobCacheService;
             _contentService = contentService;
             _notificationsService = notificationsService;
@@ -81,6 +87,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
                 await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
                 await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
+
+                var release = await _contentDbContext.Releases
+                    .Include(r => r.Publication)
+                    .Where(r => r.Id == message.ReleaseId)
+                    .SingleAsync();
+                await _blobCacheService.DeleteItem(new PublicationCacheKey(release.Publication.Slug));
+                // @MarkFix EES-3149 Delete superseded publication's cache here too?
 
                 await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
                 await _contentService.DeletePreviousVersionsContent(message.ReleaseId);

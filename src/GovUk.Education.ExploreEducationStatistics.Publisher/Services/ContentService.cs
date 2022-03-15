@@ -133,9 +133,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var publication in publications)
             {
-                await _blobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
-                // @MarkFix EES-3149 Delete superseded publication's cache here too?
-
                 await CacheLatestRelease(publication, context, releaseIds);
                 foreach (var release in releases)
                 {
@@ -143,20 +140,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     await CacheRelease(release, context);
                 }
             }
-        }
-
-        public async Task UpdatePublication(PublishContext context, Guid publicationId)
-        {
-            var publication = await _publicationService.Get(publicationId);
-
-            await _publicationService.SetPublishedDate(publication.Id, context.Published);
-
-            await _blobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
-            // @MarkFix EES-3149 Delete superseded publication's cache here too?
-
-            // Invalidate the various cached trees in case any
-            // publications/methodologies are affected by the changes
-            await DeleteCachedTaxonomyBlobs();
         }
 
         public async Task DeleteCachedTaxonomyBlobs()

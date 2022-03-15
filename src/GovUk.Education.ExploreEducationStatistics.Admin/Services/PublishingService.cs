@@ -116,25 +116,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         /// <summary>
-        /// Notify the Publisher that there has been a change to the Publication.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="oldSlug"></param>
-        /// <returns></returns>
-        public async Task<Either<ActionResult, Unit>> PublicationChanged(Guid id)
-        {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(id)
-                .OnSuccessVoid(async release =>
-                {
-                    await _storageQueueService.AddMessageAsync(
-                        PublishPublicationQueue, new PublishPublicationMessage(id));
-
-                    _logger.LogTrace("Sent message for Publication: {0}", id);
-                });
-        }
-
-        /// <summary>
         /// Notify the Publisher that there has been a change to the
         /// taxonomy, such as themes and topics.
         /// </summary>

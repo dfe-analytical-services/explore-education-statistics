@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
 
             publicationService.Setup(mock => mock.Get("publication-a"))
-                .ReturnsAsync(new CachedPublicationViewModel
+                .ReturnsAsync(new PublicationViewModel
                 {
                     Id = publicationId,
                     Title = "Test title",

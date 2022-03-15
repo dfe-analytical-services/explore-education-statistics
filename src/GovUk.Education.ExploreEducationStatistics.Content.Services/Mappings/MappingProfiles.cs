@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
 
             CreateMap<Publication, PublicationSummaryViewModel>();
 
-            CreateMap<Publication, CachedPublicationViewModel>()
+            CreateMap<Publication, PublicationViewModel>()
                 .ForMember(dest => dest.LegacyReleases,
                     m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(l => l.Order)))
                 .ForMember(dest => dest.Releases, m => m.Ignore());

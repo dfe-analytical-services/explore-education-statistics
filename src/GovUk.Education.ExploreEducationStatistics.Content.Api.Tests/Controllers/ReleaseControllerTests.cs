@@ -171,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                         Title = "National Statistics"
                     }
                 },
-                new CachedPublicationViewModel
+                new PublicationViewModel
                 {
                     Releases = AsList(new ReleaseTitleViewModel
                     {
@@ -192,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                         Title = "National Statistics"
                     }
                 },
-                new CachedPublicationViewModel
+                new PublicationViewModel
                 {
                     Releases = AsList(new ReleaseTitleViewModel
                     {

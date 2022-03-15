@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             string? releaseSlug = null)
         {
             var publicationTask = _publicationService.Get(publicationSlug);
-            var releaseTask = _releaseService.FetchCachedRelease(publicationSlug, releaseSlug);
+            var releaseTask = _releaseService.GetCachedRelease(publicationSlug, releaseSlug);
 
             await Task.WhenAll(publicationTask, releaseTask);
 

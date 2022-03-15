@@ -11,13 +11,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
     public class DataGuidanceService : IDataGuidanceService
     {
         private readonly IDataGuidanceSubjectService _dataGuidanceSubjectService;
-        private readonly Content.Services.Interfaces.IPublicationService _publicationService;
-        private readonly Content.Services.Interfaces.IReleaseService _releaseService;
+        private readonly Interfaces.IPublicationService _publicationService;
+        private readonly Interfaces.IReleaseService _releaseService;
 
         public DataGuidanceService(
             IDataGuidanceSubjectService dataGuidanceSubjectService,
-            Content.Services.Interfaces.IPublicationService publicationService,
-            Content.Services.Interfaces.IReleaseService releaseService)
+            Interfaces.IPublicationService publicationService,
+            Interfaces.IReleaseService releaseService)
         {
             _dataGuidanceSubjectService = dataGuidanceSubjectService;
             _publicationService = publicationService;
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public async Task<Either<ActionResult, DataGuidanceViewModel>> Get(string publicationSlug, string? releaseSlug = null)
         {
             var publicationTask = _publicationService.Get(publicationSlug);
-            var releaseTask = _releaseService.FetchCachedRelease(publicationSlug, releaseSlug);
+            var releaseTask = _releaseService.GetCachedRelease(publicationSlug, releaseSlug);
 
             await Task.WhenAll(publicationTask, releaseTask);
 

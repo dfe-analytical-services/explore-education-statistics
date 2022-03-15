@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                                 Title = r.Publication.Topic.Theme.Title
                             }
                         },
-                        OtherReleases = r.Publication.Releases
+                        Releases = r.Publication.Releases
                             .FindAll(otherRelease => r.Id != otherRelease.Id &&
                                                      IsLatestVersionOfRelease(r.Publication.Releases, otherRelease.Id))
                             .OrderByDescending(otherRelease => otherRelease.Year)

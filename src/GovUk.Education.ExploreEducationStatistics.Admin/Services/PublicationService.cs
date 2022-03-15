@@ -14,6 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -29,7 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
-        private readonly IPublishingService _publishingService;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IBlobCacheService _publicBlobCacheService;
 
@@ -39,7 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IPublicationRepository publicationRepository,
-            IPublishingService publishingService,
             IMethodologyVersionRepository methodologyVersionRepository,
             IBlobCacheService publicBlobCacheService)
         {
@@ -48,7 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _publicationRepository = publicationRepository;
-            _publishingService = publishingService;
             _methodologyVersionRepository = methodologyVersionRepository;
             _publicBlobCacheService = publicBlobCacheService;
         }
@@ -190,15 +189,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (publication.Live)
                     {
-                        await _publishingService.PublicationChanged(publication.Id);
+                        publication.Published = DateTime.UtcNow;
+                        await _context.SaveChangesAsync();
 
+                        await DeleteCachedTaxonomyBlobs();
                         await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
-
                         // @MarkFix EES-3149 Need to handle superseded publication.json cache files here too?
                     }
 
                     return await GetPublication(publication.Id);
                 });
+        }
+
+        private async Task DeleteCachedTaxonomyBlobs()
+        {
+            await _publicBlobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
+            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateSelectedTopic(

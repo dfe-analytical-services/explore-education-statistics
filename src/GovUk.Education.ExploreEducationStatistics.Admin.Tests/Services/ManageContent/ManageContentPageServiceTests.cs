@@ -296,7 +296,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("Legacy 2017/18", contentPublicationLegacyReleases[1].Description);
                 Assert.Equal("https://legacy-2017-18", contentPublicationLegacyReleases[1].Url);
 
-                var contentPublicationOtherReleases = contentPublication.OtherReleases;
+                var contentPublicationOtherReleases = contentPublication.Releases;
                 Assert.Single(contentPublicationOtherReleases);
                 Assert.Equal(otherRelease.Id, contentPublicationOtherReleases[0].Id);
                 Assert.Equal("2019-20", contentPublicationOtherReleases[0].Slug);
