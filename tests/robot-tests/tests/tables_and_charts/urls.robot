@@ -22,16 +22,22 @@ Test
     ${releases}=    get releases
 
     FOR    ${release}    IN    @{releases}
-        Check release    ${release}
+        run keyword and ignore error    Check release    ${release}
     END
 
 *** Keywords ***
 Check release
     [Arguments]    ${release}
 
+    Log to console    \n\n\t=====================================================================\n
+    Log to console    \tProcessing release ${release.url}
+
     user navigates to public frontend    ${release.url}
 
     IF    ${release.has_key_stat_blocks} is ${TRUE}
+
+        Log to console    \n\tCapturing Key Stats:
+
         user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
         user waits until page contains element    id:releaseHeadlines-tables-tab
 
@@ -41,12 +47,16 @@ Check release
     END
 
     IF    ${release.has_secondary_stat_blocks} is ${TRUE}
+        Log to console    \n\tCapturing Secondary Stats:
+
         FOR    ${content_block}    IN    @{release.secondary_stat_blocks}
             check secondary stats table    ${content_block}
         END
     END
 
     IF    ${release.has_content_section_blocks} is ${TRUE}
+        Log to console    \n\tCapturing Content Section Data Blocks:
+
         FOR    ${content_block}    IN    @{release.content_section_blocks}
             IF    ${content_block.has_table_config} is ${TRUE}
                 check content block table    ${content_block}
@@ -55,10 +65,14 @@ Check release
     END
 
     IF    ${release.has_fast_track_blocks} is ${TRUE}
+        Log to console    \n\tCapturing Fast Tracks:
+
         FOR    ${content_block}    IN    @{release.fast_track_blocks}
             check fast track table    ${content_block}
         END
     END
+
+#    Log to console    \n=====================================================================\n
 
     # TODO permalinks
 
@@ -124,15 +138,17 @@ Log Content Block Details
     ...    ${type_description}
     ...    ${table_snapshot_filepath}
     ...    ${chart_snapshot_filepath}=
-    Log to console    \n\n\n\t=====================================================================\n
-    Log to console    \tId:\t\t\t ${content_block.content_block_id}
-    Log to console    \tType:\t\t\t ${type_description}
-    Log to console    \tURL:\t\t\t ${content_block.content_url}
-    Log to console    \tTable snapshot:\t\t ${table_snapshot_filepath}
+#    Log to console    \n\n\n\t=====================================================================\n
+#    Log to console    \tId:\t\t\t ${content_block.content_block_id}
+#    Log to console    \tType:\t\t\t ${type_description}
+#    Log to console    \tURL:\t\t\t ${content_block.content_url}
+#    Log to console    \t\tTable snapshot:\t\t ${table_snapshot_filepath}
+    Log to console    \t\tTable snapshot taken for block ${content_block.content_block_id}
     IF    "${chart_snapshot_filepath}" != ""
-        Log to console    \tChart snapshot:\t\t ${chart_snapshot_filepath}
+        Log to console    \t\tChart snapshot taken for block ${content_block.content_block_id}
+#    Log to console    \t\tChart snapshot:\t\t ${chart_snapshot_filepath}
     END
-    Log to console    \n\t=====================================================================\n\n\n
+#    Log to console    \n\t=====================================================================\n\n\n
 
 user waits for chart to appear
     [Arguments]    ${chart_type}    ${data_block}

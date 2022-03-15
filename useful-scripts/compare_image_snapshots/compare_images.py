@@ -84,24 +84,29 @@ def compare_images(
     # images, ensuring that the difference image is returned
     (score, diff_image) = compare_ssim(image1, image2, full=True)
     diff_image = (diff_image * 255).astype("uint8")
-    print("SSIM: {}".format(score))
 
-    # threshold the difference image, followed by finding contours to
-    # obtain the regions of the two input images that differ
-    thresh = cv2.threshold(diff_image, 0, 255,
-                           cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-    contours = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-                                cv2.CHAIN_APPROX_SIMPLE)
-    contours = imutils.grab_contours(contours)
+    if score < (1 - diff_threshold):
+        print(
+            f"Visual difference detected in snapshot {os.path.basename(first_filepath)} - similarity : {format(score)}")
 
-    # loop over the contours
-    for contour in contours:
-        # compute the bounding box of the contour and then draw the
-        # bounding box on both input images to represent where the two
-        # images differ
-        (x, y, w, h) = cv2.boundingRect(contour)
-        cv2.rectangle(image1_resized, (x, y), (x + w, y + h), (0, 0, 255), 2)
-        cv2.rectangle(image2_resized, (x, y), (x + w, y + h), (0, 0, 255), 2)
+        # threshold the difference image, followed by finding contours to
+        # obtain the regions of the two input images that differ
+        thresh = cv2.threshold(diff_image, 0, 255,
+                               cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+        contours = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
+                                    cv2.CHAIN_APPROX_SIMPLE)
+        contours = imutils.grab_contours(contours)
+
+        # loop over the contours
+        for contour in contours:
+            # compute the bounding box of the contour and then draw the
+            # bounding box on both input images to represent where the two
+            # images differ
+            (x, y, w, h) = cv2.boundingRect(contour)
+            cv2.rectangle(image1_resized, (x, y), (x + w, y + h), (0, 0, 255), 2)
+            cv2.rectangle(image2_resized, (x, y), (x + w, y + h), (0, 0, 255), 2)
+    else:
+        print(f"No visual difference detected in snapshot {os.path.basename(first_filepath)}")
 
     if score < (1 - diff_threshold) and diff_filepath:
         os.makedirs(f'{os.path.dirname(diff_filepath)}', exist_ok=True)

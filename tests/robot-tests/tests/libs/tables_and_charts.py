@@ -101,7 +101,7 @@ def read_cell(cell_value):
     return cell_value
 
 
-with open('local-datablocks.csv', 'r', encoding='utf-8-sig') as csv_file:
+with open('local-datablocks-migrated.csv', 'r', encoding='utf-8-sig') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     for row in csv_reader:
         content_blocks.append(DataBlockRow(
