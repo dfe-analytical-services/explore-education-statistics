@@ -243,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         Region = _eastMidlands
                     }
                 });
-            
+
             var options = Options.Create(new LocationsOptions
             {
                 Hierarchies = new Dictionary<GeographicLevel, List<string>>
@@ -386,74 +386,88 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseId = Guid.NewGuid();
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
+
+            var location1 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
+
+            var location2 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Region,
+                Country = _england,
+                Region = _northEast
+            };
+
+            var location3 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Region,
+                Country = _england,
+                Region = _northWest
+            };
+
+            var location4 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Region,
+                Country = _england,
+                Region = _eastMidlands
+            };
+
+            var location5 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = _england,
+                Region = _eastMidlands,
+                LocalAuthority = _derby
+            };
+
+            var location6 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = _england,
+                Region = _eastMidlands,
+                LocalAuthority = _nottingham
+            };
+
             var observations = ListOf(
                 // No hierarchy in Country level data
                 new Observation
                 {
-                    Location = new Location
-                    {
-                        GeographicLevel = GeographicLevel.Country,
-                        Country = _england,
-                    }
+                    Location = location1
                 },
                 // No hierarchy in Regional level data
                 new Observation
                 {
-                    Location = new Location
-                    {
-                        GeographicLevel = GeographicLevel.Region,
-                        Country = _england,
-                        Region = _northWest
-                    }
+                    Location = location3
                 },
                 new Observation
                 {
-                    Location = new Location
-                    {
-                        GeographicLevel = GeographicLevel.Region,
-                        Country = _england,
-                        Region = _northEast
-                    }
+                    Location = location2
                 },
                 // A duplicate Location is here
                 new Observation
                 {
-                    Location = new Location
-                    {
-                        GeographicLevel = GeographicLevel.Region,
-                        Country = _england,
-                        Region = _northEast
-                    }
+                    Location = location3
                 },
                 new Observation
                 {
-                    Location = new Location
-                    {
-                        GeographicLevel = GeographicLevel.Region,
-                        Country = _england,
-                        Region = _eastMidlands
-                    }
+                    Location = location4
                 },
                 // Country-Region-LA hierarchy in the LA level data
                 new Observation
                 {
-                    Location = new Location
-                    {
-                        GeographicLevel = GeographicLevel.LocalAuthority,
-                        Country = _england,
-                        Region = _eastMidlands,
-                        LocalAuthority = _derby
-                    }
+                    Location = location5
                 },
                 new Observation
                 {
-                    Location = new Location
-                    {
-                        GeographicLevel = GeographicLevel.LocalAuthority,
-                        Country = _england,
-                        Region = _eastMidlands,
-                        LocalAuthority = _nottingham
-                    }
+                    Location = location6
                 });
 
             var options = Options.Create(new LocationsOptions
@@ -583,7 +597,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var countryOption1 = Assert.Single(countries);
                 Assert.NotNull(countryOption1);
-                Assert.Equal(_england.Name, countryOption1!.Label);
+                Assert.Equal(location1.Id, countryOption1.Id);
+                Assert.Equal(_england.Name, countryOption1.Label);
                 Assert.Equal(_england.Code, countryOption1.Value);
                 Assert.Null(countryOption1.GeoJson);
                 Assert.Null(countryOption1.Level);
@@ -596,16 +611,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var regionOption1 = regions[0];
                 var regionOption2 = regions[1];
                 var regionOption3 = regions[2];
-                Assert.Null(countryOption1.GeoJson);
+                Assert.Equal(location2.Id, regionOption1.Id);
+                Assert.Null(regionOption1.GeoJson);
                 Assert.Equal(_northEast.Name, regionOption1.Label);
                 Assert.Equal(_northEast.Code, regionOption1.Value);
                 Assert.Null(regionOption1.Level);
                 Assert.Null(regionOption1.Options);
+                Assert.Equal(location3.Id, regionOption2.Id);
                 Assert.Null(regionOption2.GeoJson);
                 Assert.Equal(_northWest.Name, regionOption2.Label);
                 Assert.Equal(_northWest.Code, regionOption2.Value);
                 Assert.Null(regionOption2.Level);
                 Assert.Null(regionOption2.Options);
+                Assert.Equal(location4.Id, regionOption3.Id);
                 Assert.Null(regionOption3.GeoJson);
                 Assert.Equal(_eastMidlands.Name, regionOption3.Label);
                 Assert.Equal(_eastMidlands.Code, regionOption3.Value);
@@ -617,13 +635,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var laOption1 = Assert.Single(localAuthorities);
                 Assert.NotNull(laOption1);
-                Assert.Equal(_england.Name, laOption1!.Label);
+                Assert.Null(laOption1.Id);
+                Assert.Equal(_england.Name, laOption1.Label);
                 Assert.Equal(_england.Code, laOption1.Value);
                 Assert.Equal("country", laOption1.Level);
                 Assert.NotNull(laOption1.Options);
 
                 var laOption1SubOption1 = Assert.Single(laOption1.Options!);
                 Assert.NotNull(laOption1SubOption1);
+                Assert.Null(laOption1SubOption1.Id);
                 Assert.Equal(_eastMidlands.Name, laOption1SubOption1!.Label);
                 Assert.Equal(_eastMidlands.Code, laOption1SubOption1.Value);
                 Assert.Equal("region", laOption1SubOption1.Level);
@@ -631,12 +651,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(2, laOption1SubOption1.Options!.Count);
 
                 var laOption1SubOption1SubOption1 = laOption1SubOption1.Options[0];
+                Assert.Equal(location5.Id, laOption1SubOption1SubOption1.Id);
                 Assert.Equal(_derby.Name, laOption1SubOption1SubOption1.Label);
                 Assert.Equal(_derby.Code, laOption1SubOption1SubOption1.Value);
                 Assert.Null(laOption1SubOption1SubOption1.Level);
                 Assert.Null(laOption1SubOption1SubOption1.Options);
 
                 var laOption1SubOption1SubOption2 = laOption1SubOption1.Options[1];
+                Assert.Equal(location6.Id, laOption1SubOption1SubOption2.Id);
                 Assert.Equal(_nottingham.Name, laOption1SubOption1SubOption2.Label);
                 Assert.Equal(_nottingham.Code, laOption1SubOption1SubOption2.Value);
                 Assert.Null(laOption1SubOption1SubOption2.Level);
@@ -655,13 +677,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var releaseId = Guid.NewGuid();
-            
+
             var observations = ListOf(
                 // No hierarchy in Country level data
                 new Observation
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.Country,
                         Country = _england,
                     }
@@ -671,6 +694,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.Region,
                         Country = _england,
                         Region = _northEast
@@ -680,6 +704,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.Region,
                         Country = _england,
                         Region = _northWest
@@ -689,6 +714,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.Region,
                         Country = _england,
                         Region = _eastMidlands
@@ -863,8 +889,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var countries = locationViewModels["country"];
 
                 var countryOption1 = Assert.Single(countries);
+                Assert.Equal(observations[0].Location.Id, countryOption1.Id);
                 Assert.NotNull(countryOption1);
-                Assert.Equal(_england.Name, countryOption1!.Label);
+                Assert.Equal(_england.Name, countryOption1.Label);
                 Assert.Equal(_england.Code, countryOption1.Value);
                 Assert.NotNull(countryOption1.GeoJson);
                 Assert.Null(countryOption1.Level);
@@ -876,7 +903,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 // Country option that groups the Regions does not have GeoJson
                 var regionOption1 = Assert.Single(regions);
                 Assert.NotNull(regionOption1);
-                Assert.Equal(_england.Name, regionOption1!.Label);
+                Assert.Null(regionOption1.Id);
+                Assert.Equal(_england.Name, regionOption1.Label);
                 Assert.Equal(_england.Code, regionOption1.Value);
                 Assert.Null(regionOption1.GeoJson);
                 Assert.Equal("country", regionOption1.Level);
@@ -885,6 +913,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 // Each Region option should have GeoJson
                 var regionOption1SubOption1 = regionOption1.Options[0];
+                Assert.Equal(observations[1].Location.Id, regionOption1SubOption1.Id);
                 Assert.Equal(_northEast.Name, regionOption1SubOption1.Label);
                 Assert.Equal(_northEast.Code, regionOption1SubOption1.Value);
                 Assert.NotNull(regionOption1SubOption1.GeoJson);
@@ -892,6 +921,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Null(regionOption1SubOption1.Options);
 
                 var regionOption1SubOption2 = regionOption1.Options[1];
+                Assert.Equal(observations[2].Location.Id, regionOption1SubOption2.Id);
                 Assert.Equal(_northWest.Name, regionOption1SubOption2.Label);
                 Assert.Equal(_northWest.Code, regionOption1SubOption2.Value);
                 Assert.NotNull(regionOption1SubOption2.GeoJson);
@@ -899,6 +929,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Null(regionOption1SubOption2.Options);
 
                 var regionOption1SubOption3 = regionOption1.Options[2];
+                Assert.Equal(observations[3].Location.Id, regionOption1SubOption3.Id);
                 Assert.Equal(_eastMidlands.Name, regionOption1SubOption3.Label);
                 Assert.Equal(_eastMidlands.Code, regionOption1SubOption3.Value);
                 Assert.NotNull(regionOption1SubOption3.GeoJson);
@@ -924,6 +955,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.Region,
                         Country = _england,
                         Region = _northEast
@@ -933,6 +965,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.Region,
                         Country = _england,
                         Region = _northWest
@@ -942,6 +975,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.Region,
                         Country = _england,
                         Region = _eastMidlands
@@ -1100,7 +1134,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 // Country option that groups the Regions does not have GeoJson
                 var regionOption1 = Assert.Single(regions);
                 Assert.NotNull(regionOption1);
-                Assert.Equal(_england.Name, regionOption1!.Label);
+                Assert.Null(regionOption1.Id);
+                Assert.Equal(_england.Name, regionOption1.Label);
                 Assert.Equal(_england.Code, regionOption1.Value);
                 Assert.Null(regionOption1.GeoJson);
                 Assert.Equal("country", regionOption1.Level);
@@ -1109,6 +1144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 // Each Region option should have GeoJson
                 var regionOption1SubOption1 = regionOption1.Options[0];
+                Assert.Equal(observations[0].Location.Id, regionOption1SubOption1.Id);
                 Assert.Equal(_northEast.Name, regionOption1SubOption1.Label);
                 Assert.Equal(_northEast.Code, regionOption1SubOption1.Value);
                 Assert.NotNull(regionOption1SubOption1.GeoJson);
@@ -1116,6 +1152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Null(regionOption1SubOption1.Options);
 
                 var regionOption1SubOption2 = regionOption1.Options[1];
+                Assert.Equal(observations[1].Location.Id, regionOption1SubOption2.Id);
                 Assert.Equal(_northWest.Name, regionOption1SubOption2.Label);
                 Assert.Equal(_northWest.Code, regionOption1SubOption2.Value);
                 Assert.NotNull(regionOption1SubOption2.GeoJson);
@@ -1123,6 +1160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Null(regionOption1SubOption2.Options);
 
                 var regionOption1SubOption3 = regionOption1.Options[2];
+                Assert.Equal(observations[2].Location.Id, regionOption1SubOption3.Id);
                 Assert.Equal(_eastMidlands.Name, regionOption1SubOption3.Label);
                 Assert.Equal(_eastMidlands.Code, regionOption1SubOption3.Value);
                 Assert.NotNull(regionOption1SubOption3.GeoJson);
@@ -1142,12 +1180,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var releaseId = Guid.NewGuid();
-            
+
             var observations = ListOf(
                 new Observation
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.LocalAuthority,
                         LocalAuthority = _derby
                     }
@@ -1156,6 +1195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.LocalAuthority,
                         LocalAuthority = _derbyDupe
                     }
@@ -1164,6 +1204,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.LocalAuthority,
                         LocalAuthority = _nottingham
                     }
@@ -1204,7 +1245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             boundaryLevelRepository
                 .Setup(s => s.FindLatestByGeographicLevel(It.IsAny<GeographicLevel>()))
-                .Returns((BoundaryLevel?) null);
+                .Returns((BoundaryLevel?)null);
 
             boundaryLevelRepository
                 .Setup(s => s.FindByGeographicLevels(
@@ -1285,18 +1326,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 // There are two locations with a label of Derby, so we
                 // de-duplicate these by appending the code (which is unique).
+                Assert.Equal(observations[0].Location.Id, laOption1.Id);
                 Assert.Equal("Derby (E06000015)", laOption1.Label);
                 Assert.Equal(_derby.Code, laOption1.Value);
                 Assert.Null(laOption1.Level);
                 Assert.Null(laOption1.Options);
 
                 var laOption2 = localAuthorities[1];
+                Assert.Equal(observations[1].Location.Id, laOption2.Id);
                 Assert.Equal("Derby (E06000016)", laOption2.Label);
                 Assert.Equal(_derbyDupe.Code, laOption2.Value);
                 Assert.Null(laOption2.Level);
                 Assert.Null(laOption2.Options);
 
                 var laOption3 = localAuthorities[2];
+                Assert.Equal(observations[2].Location.Id, laOption3.Id);
                 Assert.Equal(_nottingham.Name, laOption3.Label);
                 Assert.Equal(_nottingham.Code, laOption3.Value);
                 Assert.Null(laOption3.Level);
@@ -1321,6 +1365,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.LocalAuthority,
                         Region = _eastMidlands,
                         LocalAuthority = _derby
@@ -1330,6 +1375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.LocalAuthority,
                         Region = _eastMidlands,
                         LocalAuthority = _derbyDupe
@@ -1339,6 +1385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.LocalAuthority,
                         Region = _eastMidlands,
                         LocalAuthority = _nottingham
@@ -1391,7 +1438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             boundaryLevelRepository
                 .Setup(s => s.FindLatestByGeographicLevel(It.IsAny<GeographicLevel>()))
-                .Returns((BoundaryLevel?) null);
+                .Returns((BoundaryLevel?)null);
 
             boundaryLevelRepository
                 .Setup(s => s.FindByGeographicLevels(
@@ -1471,6 +1518,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var laOption1 = Assert.Single(localAuthorities);
                 Assert.NotNull(laOption1);
+                Assert.Null(laOption1.Id);
                 Assert.Equal(_eastMidlands.Name, laOption1!.Label);
                 Assert.Equal(_eastMidlands.Code, laOption1.Value);
                 Assert.Equal("region", laOption1.Level);
@@ -1481,18 +1529,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 // There are two locations with a label of Derby, so we
                 // de-duplicate these by appending the code (which is unique).
+                Assert.Equal(observations[0].Location.Id, laOption1SubOption1.Id);
                 Assert.Equal("Derby (E06000015)", laOption1SubOption1.Label);
                 Assert.Equal(_derby.Code, laOption1SubOption1.Value);
                 Assert.Null(laOption1SubOption1.Level);
                 Assert.Null(laOption1SubOption1.Options);
 
                 var laOption1SubOption2 = laOption1.Options[1];
+                Assert.Equal(observations[1].Location.Id, laOption1SubOption2.Id);
                 Assert.Equal("Derby (E06000016)", laOption1SubOption2.Label);
                 Assert.Equal(_derbyDupe.Code, laOption1SubOption2.Value);
                 Assert.Null(laOption1SubOption2.Level);
                 Assert.Null(laOption1SubOption2.Options);
 
                 var laOption1SubOption3 = laOption1.Options[2];
+                Assert.Equal(observations[2].Location.Id, laOption1SubOption3.Id);
                 Assert.Equal(_nottingham.Name, laOption1SubOption3.Label);
                 Assert.Equal(_nottingham.Code, laOption1SubOption3.Value);
                 Assert.Null(laOption1SubOption3.Level);
@@ -1518,6 +1569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.LocalAuthority,
                         LocalAuthority = _cheshireOldCode
                     }
@@ -1526,6 +1578,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.LocalAuthority,
                         LocalAuthority = _derby
                     }
@@ -1639,6 +1692,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 // This Cheshire LA does not have a new code, so we fallback to
                 // providing its old code the option value.
                 var laOption1 = localAuthorities[0];
+                Assert.Equal(observations[0].Location.Id, laOption1.Id);
                 Assert.Equal(_cheshireOldCode.Name, laOption1.Label);
                 Assert.Equal(_cheshireOldCode.OldCode, laOption1.Value);
                 Assert.Null(laOption1.Level);
@@ -1656,13 +1710,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             };
 
             var releaseId = Guid.NewGuid();
-            
+
             var observations = ListOf(
                 // Flat Regions
                 new Observation
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.Region,
                         Country = _england,
                         Region = _northWest
@@ -1672,6 +1727,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.Region,
                         Country = _england,
                         Region = _northEast
@@ -1681,6 +1737,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.Region,
                         Country = _england,
                         Region = _eastMidlands
@@ -1691,6 +1748,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.LocalAuthority,
                         Country = _england,
                         Region = _northWest,
@@ -1701,6 +1759,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.LocalAuthority,
                         Country = _england,
                         Region = _eastMidlands,
@@ -1711,6 +1770,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Location = new Location
                     {
+                        Id = Guid.NewGuid(),
                         GeographicLevel = GeographicLevel.LocalAuthority,
                         Country = _england,
                         Region = _northEast,
@@ -1848,12 +1908,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var regionOption2 = regions[1];
                 var regionOption3 = regions[2];
 
+                Assert.Equal(observations[1].Location.Id, regionOption1.Id);
                 Assert.Equal(_northEast.Name, regionOption1.Label);
                 Assert.Equal(_northEast.Code, regionOption1.Value);
 
+                Assert.Equal(observations[0].Location.Id, regionOption2.Id);
                 Assert.Equal(_northWest.Name, regionOption2.Label);
                 Assert.Equal(_northWest.Code, regionOption2.Value);
 
+                Assert.Equal(observations[2].Location.Id, regionOption3.Id);
                 Assert.Equal(_eastMidlands.Name, regionOption3.Label);
                 Assert.Equal(_eastMidlands.Code, regionOption3.Value);
 
@@ -1863,6 +1926,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var laOption1 = localAuthorities[0];
                 Assert.NotNull(laOption1);
+                Assert.Null(laOption1.Id);
                 Assert.Equal(_northEast.Name, laOption1.Label);
                 Assert.Equal(_northEast.Code, laOption1.Value);
                 Assert.Equal("region", laOption1.Level);
@@ -1870,6 +1934,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var laOption2 = localAuthorities[1];
                 Assert.NotNull(laOption2);
+                Assert.Null(laOption2.Id);
                 Assert.Equal(_northWest.Name, laOption2.Label);
                 Assert.Equal(_northWest.Code, laOption2.Value);
                 Assert.Equal("region", laOption2.Level);
@@ -1877,6 +1942,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var laOption3 = localAuthorities[2];
                 Assert.NotNull(laOption3);
+                Assert.Null(laOption3.Id);
                 Assert.Equal(_eastMidlands.Name, laOption3.Label);
                 Assert.Equal(_eastMidlands.Code, laOption3.Value);
                 Assert.Equal("region", laOption3.Level);
