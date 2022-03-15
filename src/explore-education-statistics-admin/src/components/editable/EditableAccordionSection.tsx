@@ -8,6 +8,7 @@ import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { FormTextInput } from '@common/components/form';
 import ModalConfirm from '@common/components/ModalConfirm';
+import Tooltip from '@common/components/Tooltip';
 import useToggle from '@common/hooks/useToggle';
 import classNames from 'classnames';
 import React, {
@@ -27,6 +28,8 @@ export interface DraggableAccordionSectionProps {
 export interface EditableAccordionSectionProps extends AccordionSectionProps {
   id: string;
   headerButtons?: ReactNode;
+  disabledHeadingChangeTooltip?: string;
+  disabledRemoveSectionTooltip?: string;
   onHeadingChange: (heading: string) => void;
   onRemoveSection?: () => void;
 }
@@ -34,12 +37,14 @@ export interface EditableAccordionSectionProps extends AccordionSectionProps {
 const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
   const {
     children,
+    disabledHeadingChangeTooltip,
+    disabledRemoveSectionTooltip,
     heading,
+    headerButtons,
+    headingTag = 'h2',
     id,
     onHeadingChange,
     onRemoveSection,
-    headerButtons,
-    headingTag = 'h2',
     ...restProps
   } = props;
 
@@ -149,25 +154,46 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
                   {isEditingHeading ? (
                     <Button onClick={saveHeading}>Save section title</Button>
                   ) : (
-                    <Button
-                      type="button"
-                      onClick={toggleEditingHeading}
-                      variant="secondary"
+                    <Tooltip
+                      text={disabledHeadingChangeTooltip}
+                      enabled={!!disabledHeadingChangeTooltip}
                     >
-                      Edit section title
-                    </Button>
+                      {({ ref }) => (
+                        <Button
+                          ariaDisabled={!!disabledHeadingChangeTooltip}
+                          type="button"
+                          ref={ref}
+                          variant="secondary"
+                          onClick={toggleEditingHeading}
+                        >
+                          Edit section title
+                        </Button>
+                      )}
+                    </Tooltip>
                   )}
 
                   {headerButtons}
 
                   {onRemoveSection && (
                     <>
-                      <Button onClick={toggleRemoveModal.on} variant="warning">
-                        Remove this section
-                      </Button>
+                      <Tooltip
+                        text={disabledRemoveSectionTooltip}
+                        enabled={!!disabledRemoveSectionTooltip}
+                      >
+                        {({ ref }) => (
+                          <Button
+                            ariaDisabled={!!disabledRemoveSectionTooltip}
+                            ref={ref}
+                            variant="warning"
+                            onClick={toggleRemoveModal.on}
+                          >
+                            Remove this section
+                          </Button>
+                        )}
+                      </Tooltip>
 
                       <ModalConfirm
-                        title="Are you sure?"
+                        title="Removing section"
                         open={showRemoveModal}
                         onConfirm={onRemoveSection}
                         onExit={toggleRemoveModal.off}

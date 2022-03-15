@@ -20,8 +20,13 @@ $locked-border-width: 4px;
   min-height: 2.2rem;
 }
 
+.editable {
+  cursor: pointer;
+}
+
 .locked {
   border: $locked-border-width solid govuk-colour('orange');
+  cursor: not-allowed;
 }
 
 .lockedMessage {
@@ -32,14 +37,6 @@ $locked-border-width: 4px;
   padding: govuk-spacing(1) govuk-spacing(2);
   position: absolute;
   right: -#{$locked-border-width};
-}
-
-.editButton {
-  cursor: pointer;
-
-  &:focus {
-    @include govuk-focused-text;
-  }
 }
 
 .commentsButtonContainer {

@@ -75,6 +75,23 @@ const ReleaseEditableBlock = ({
     releaseId,
   });
 
+  const updateBlock = useCallback(
+    (nextBlock: EditableBlock) => {
+      dispatch({
+        type: 'UPDATE_BLOCK_FROM_SECTION',
+        payload: {
+          block: nextBlock,
+          meta: {
+            blockId: block.id,
+            sectionId,
+            sectionKey,
+          },
+        },
+      });
+    },
+    [block.id, dispatch, sectionId, sectionKey],
+  );
+
   const {
     isLocking,
     isLockedByOtherUser,
@@ -104,28 +121,30 @@ const ReleaseEditableBlock = ({
           lockedUntil: event.lockedUntil,
           lockedBy: event.lockedBy,
         });
+
+        updateBlock({
+          ...block,
+          ...event,
+        });
       }
     });
 
     const onContentBlockUnlocked = hub.onContentBlockUnlocked(event => {
       if (event.id === block.id) {
         setLock(undefined);
+
+        updateBlock({
+          ...block,
+          locked: undefined,
+          lockedBy: undefined,
+          lockedUntil: undefined,
+        });
       }
     });
 
-    const onContentBlockUpdated = hub.onContentBlockUpdated(event => {
-      if (event.id === block.id) {
-        dispatch({
-          type: 'UPDATE_BLOCK_FROM_SECTION',
-          payload: {
-            block: event,
-            meta: {
-              blockId: block.id,
-              sectionId,
-              sectionKey,
-            },
-          },
-        });
+    const onContentBlockUpdated = hub.onContentBlockUpdated(updatedBlock => {
+      if (updatedBlock.id === block.id) {
+        updateBlock(updatedBlock);
       }
     });
 
@@ -134,7 +153,7 @@ const ReleaseEditableBlock = ({
       onContentBlockUnlocked.unsubscribe();
       onContentBlockUpdated.unsubscribe();
     };
-  }, [block.id, dispatch, hub, sectionId, sectionKey, setLock]);
+  }, [block, hub, setLock, updateBlock]);
 
   const [{ isLoading: isSaving }, handleSave] = useAsyncCallback(
     async (content: string) => {

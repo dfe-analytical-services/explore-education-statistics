@@ -357,11 +357,11 @@ describe('ReleaseEditableBlock', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.queryByRole('button', { name: 'Edit block' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: 'Edit block' }),
+    ).toBeAriaDisabled();
     expect(
-      screen.queryByRole('button', { name: 'Remove block' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: 'Remove block' }),
+    ).toBeAriaDisabled();
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(
@@ -432,10 +432,10 @@ describe('ReleaseEditableBlock', () => {
 
     expect(
       screen.queryByRole('button', { name: 'Edit block' }),
-    ).not.toBeInTheDocument();
+    ).toBeAriaDisabled();
     expect(
       screen.queryByRole('button', { name: 'Remove block' }),
-    ).not.toBeInTheDocument();
+    ).toBeAriaDisabled();
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(
@@ -453,10 +453,10 @@ describe('ReleaseEditableBlock', () => {
 
     expect(
       screen.getByRole('button', { name: 'Edit block' }),
-    ).not.toBeDisabled();
+    ).not.toBeAriaDisabled();
     expect(
       screen.getByRole('button', { name: 'Remove block' }),
-    ).not.toBeDisabled();
+    ).not.toBeAriaDisabled();
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(
@@ -580,11 +580,11 @@ describe('ReleaseEditableBlock', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.queryByRole('button', { name: 'Edit block' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: 'Edit block' }),
+    ).toBeAriaDisabled();
     expect(
-      screen.queryByRole('button', { name: 'Remove block' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: 'Remove block' }),
+    ).toBeAriaDisabled();
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(
@@ -613,11 +613,11 @@ describe('ReleaseEditableBlock', () => {
     });
 
     expect(
-      screen.queryByRole('button', { name: 'Edit block' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: 'Edit block' }),
+    ).toBeAriaDisabled();
     expect(
-      screen.queryByRole('button', { name: 'Remove block' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: 'Remove block' }),
+    ).toBeAriaDisabled();
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(
@@ -766,11 +766,11 @@ describe('ReleaseEditableBlock', () => {
     });
 
     expect(
-      screen.queryByRole('button', { name: 'Edit block' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: 'Edit block' }),
+    ).toBeAriaDisabled();
     expect(
-      screen.queryByRole('button', { name: 'Remove block' }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: 'Remove block' }),
+    ).toBeAriaDisabled();
 
     expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
     expect(

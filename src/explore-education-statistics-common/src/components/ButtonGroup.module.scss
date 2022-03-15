@@ -6,24 +6,24 @@
   flex-direction: column;
   margin-bottom: govuk-spacing(6);
 
-  > button,
-  > a {
+  > a,
+  > button {
     margin-bottom: govuk-spacing(4);
-    margin-right: 0;
-  }
-
-  > :last-child {
-    margin-right: 0;
+    margin-left: 0;
   }
 
   // stylelint-disable-next-line order/order
   @include govuk-media-query($from: tablet) {
     flex-direction: row;
 
-    > button,
-    > a {
+    > a,
+    > button {
       margin-bottom: 0;
-      margin-right: govuk-spacing(2);
+      margin-left: govuk-spacing(2);
     }
+  }
+
+  > :first-child {
+    margin-left: 0;
   }
 }

@@ -55,7 +55,6 @@ const ReleaseContentAccordion = ({
         <ReleaseContentAccordionSection
           key={section.id}
           id={`${id}-${section.id}`}
-          release={release}
           section={section}
         />
       ))}

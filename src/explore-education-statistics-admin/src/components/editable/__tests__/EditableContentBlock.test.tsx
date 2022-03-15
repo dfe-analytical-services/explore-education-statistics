@@ -1,6 +1,7 @@
 import { testComments } from '@admin/components/comments/__data__/testComments';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
+import { getDescribedBy } from '@common-test/queries';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -110,12 +111,19 @@ Test paragraph
       screen.getByText('Test content', { selector: 'p' }),
     ).toBeInTheDocument();
 
-    expect(
-      screen.queryByRole('button', { name: 'Edit block' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Remove block' }),
-    ).not.toBeInTheDocument();
+    const editButton = screen.getByRole('button', { name: 'Edit block' });
+
+    expect(editButton).toBeAriaDisabled();
+    expect(getDescribedBy(editButton)).toHaveTextContent(
+      'This block is being edited by Jane Doe',
+    );
+
+    const removeButton = screen.getByRole('button', { name: 'Remove block' });
+
+    expect(removeButton).toBeAriaDisabled();
+    expect(getDescribedBy(removeButton)).toHaveTextContent(
+      'This block is being edited by Jane Doe',
+    );
 
     expect(
       screen.getByText(

@@ -11,6 +11,7 @@ import {
 import toHtml from '@admin/utils/markdown/toHtml';
 import Button from '@common/components/Button';
 import ContentHtml from '@common/components/ContentHtml';
+import Tooltip from '@common/components/Tooltip';
 import { Dictionary } from '@common/types';
 import sanitizeHtml, {
   defaultSanitizeOptions,
@@ -141,26 +142,35 @@ const EditableContentBlock = ({
     );
   }
 
-  const isEditable = editable && !lockedBy;
+  const isEditable = editable && !isLoading && !lockedBy;
+
+  const disabledTooltip = lockedBy
+    ? `This block is being edited by ${lockedBy?.displayName}`
+    : undefined;
 
   return (
     <>
       {allowComments && comments.length > 0 && (
         <div className={styles.commentsButtonContainer}>
-          <Button
-            disabled={!isEditable}
-            variant="secondary"
-            testId="view-comments"
-            onClick={onEditing}
-          >
-            View comments
-            <br />
-            <span className="govuk-!-margin-top-1 govuk-body-s">
-              {`(${
-                comments.filter(comment => !comment.resolved).length
-              } unresolved)`}
-            </span>
-          </Button>
+          <Tooltip text={disabledTooltip} enabled={!!disabledTooltip}>
+            {({ ref }) => (
+              <Button
+                ariaDisabled={!!disabledTooltip}
+                ref={ref}
+                testId="view-comments"
+                variant="secondary"
+                onClick={onEditing}
+              >
+                View comments
+                <br />
+                <span className="govuk-!-margin-top-1 govuk-body-s">
+                  {`(${
+                    comments.filter(comment => !comment.resolved).length
+                  } unresolved)`}
+                </span>
+              </Button>
+            )}
+          </Tooltip>
         </div>
       )}
 
@@ -170,39 +180,34 @@ const EditableContentBlock = ({
 
       <EditableBlockWrapper
         isLoading={isLoading}
-        onEdit={isEditable ? onEditing : undefined}
-        onDelete={isEditable ? onDelete : undefined}
+        lockedBy={lockedBy}
+        onEdit={editable ? onEditing : undefined}
+        onDelete={editable ? onDelete : undefined}
       >
-        <div
-          className={classNames(styles.preview, {
-            [styles.readOnly]: !isEditing,
-            [styles.locked]: !!lockedBy,
-          })}
-        >
-          {isEditable ? (
-            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
+        <Tooltip enabled={!!lockedBy} followMouse text={disabledTooltip}>
+          {({ ref }) => (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
             <div
-              className={styles.editButton}
-              onClick={isLoading ? undefined : onEditing}
+              className={classNames(styles.preview, {
+                [styles.readOnly]: !isEditing,
+                [styles.editable]: isEditable,
+                [styles.locked]: !!lockedBy,
+              })}
+              ref={ref}
+              onClick={isEditable ? onEditing : undefined}
             >
               <ContentHtml
                 html={content || '<p>This section is empty</p>'}
                 sanitizeOptions={sanitizeOptions}
               />
+              {lockedBy && (
+                <span className={styles.lockedMessage}>
+                  {`${lockedBy.displayName} is editing`}
+                </span>
+              )}
             </div>
-          ) : (
-            <ContentHtml
-              html={content || '<p>This section is empty</p>'}
-              sanitizeOptions={sanitizeOptions}
-            />
           )}
-
-          {lockedBy && (
-            <span className={styles.lockedMessage}>
-              {`${lockedBy.displayName} is editing`}
-            </span>
-          )}
-        </div>
+        </Tooltip>
       </EditableBlockWrapper>
     </>
   );
