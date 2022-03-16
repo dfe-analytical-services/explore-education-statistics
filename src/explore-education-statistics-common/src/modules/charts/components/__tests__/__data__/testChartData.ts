@@ -92,6 +92,7 @@ export const testChartConfiguration: Chart = {
   alt: 'Some alt text',
   height: 300,
   width: 600,
+  includeNonNumericalData: false,
 };
 
 export const testChartTableData: TableDataResponse = {

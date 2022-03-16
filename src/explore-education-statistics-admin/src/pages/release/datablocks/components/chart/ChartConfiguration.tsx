@@ -104,6 +104,7 @@ const ChartConfiguration = ({
         .required('Enter chart height')
         .positive('Chart height must be positive'),
       width: Yup.number().positive('Chart width must be positive'),
+      includeNonNumericalData: Yup.boolean(),
     });
 
     if (definition.capabilities.stackable) {
@@ -295,6 +296,15 @@ const ChartConfiguration = ({
                       onBoundaryLevelChange(e.target.value);
                     }
                   }}
+                />
+              </FormGroup>
+            )}
+
+            {definition.type !== 'map' && (
+              <FormGroup>
+                <FormFieldCheckbox
+                  name="includeNonNumericalData"
+                  label="Include data sets with non-numerical values"
                 />
               </FormGroup>
             )}

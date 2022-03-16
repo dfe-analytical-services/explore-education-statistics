@@ -59,6 +59,7 @@ const defaultOptions: ChartOptions = {
   title: '',
   titleType: 'default',
   alt: '',
+  includeNonNumericalData: false,
 };
 
 const defaultLegend: LegendConfiguration = {

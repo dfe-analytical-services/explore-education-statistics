@@ -52,6 +52,7 @@ const HorizontalBarBlock = ({
   stacked = false,
   axes,
   legend,
+  includeNonNumericalData,
 }: HorizontalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
 
@@ -68,6 +69,7 @@ const HorizontalBarBlock = ({
     axes.major,
     data,
     meta,
+    includeNonNumericalData,
   );
 
   const chartData = dataSetCategories.map(toChartData);

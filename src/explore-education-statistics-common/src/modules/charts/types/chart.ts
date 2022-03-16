@@ -76,6 +76,7 @@ export interface ChartProps {
   width?: number;
   axes: AxesConfiguration;
   legend?: LegendConfiguration;
+  includeNonNumericalData: boolean;
 }
 
 export interface StackedBarProps extends ChartProps {
@@ -104,6 +105,7 @@ export interface ChartDefinitionOptions {
   title?: string;
   titleType: 'default' | 'alternative';
   alt: string;
+  includeNonNumericalData: boolean;
 }
 
 export interface ChartDefinition {

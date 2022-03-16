@@ -1341,6 +1341,168 @@ describe('createDataSetCategories', () => {
     expect(dataSetCategories[1].filter.label).toBe('State-funded secondary');
   });
 
+  test('includes datasets with NaN vales when includeNaNValues is true', () => {
+    const axisConfiguration: AxisConfiguration = {
+      type: 'major',
+      groupBy: 'timePeriod',
+      sortBy: 'name',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnsley',
+          },
+          timePeriod: '2014_AY',
+        },
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnsley',
+          },
+          timePeriod: '2015_AY',
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      min: 0,
+    };
+
+    const fullTable = mapFullTable(testTable);
+
+    const dataSetCategories = createDataSetCategories(
+      axisConfiguration,
+      fullTable.results,
+      fullTable.subjectMeta,
+      true,
+    );
+
+    expect(dataSetCategories).toHaveLength(2);
+
+    expect(dataSetCategories[0].filter.label).toBe('2014/15');
+
+    const dataSets1 = Object.entries(dataSetCategories[0].dataSets);
+    expect(dataSets1).toHaveLength(1);
+
+    const [[dataSet1Key, dataSet1]] = dataSets1;
+    expect(JSON.parse(dataSet1Key)).toEqual({
+      indicator: 'authorised-absence-sessions',
+      filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      location: {
+        level: 'localAuthority',
+        value: 'barnsley',
+      },
+    });
+    expect(dataSet1.value).toBe(null);
+    expect(dataSet1.dataSet).toEqual<DataSet>({
+      indicator: 'authorised-absence-sessions',
+      filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      location: {
+        level: 'localAuthority',
+        value: 'barnsley',
+      },
+      timePeriod: '2014_AY',
+    });
+
+    expect(dataSetCategories[1].filter.label).toBe('2015/16');
+
+    const dataSets2 = Object.entries(dataSetCategories[1].dataSets);
+    expect(dataSets2).toHaveLength(1);
+
+    const [[dataSet2Key, dataSet2]] = dataSets2;
+    expect(JSON.parse(dataSet2Key)).toEqual({
+      indicator: 'authorised-absence-sessions',
+      filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      location: {
+        level: 'localAuthority',
+        value: 'barnsley',
+      },
+    });
+    expect(dataSet2.value).toBe(4);
+    expect(dataSet2.dataSet).toEqual<DataSet>({
+      indicator: 'authorised-absence-sessions',
+      filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      location: {
+        level: 'localAuthority',
+        value: 'barnsley',
+      },
+      timePeriod: '2015_AY',
+    });
+  });
+
+  test('excludes datasets with NaN values when includeNaNValues is false', () => {
+    const axisConfiguration: AxisConfiguration = {
+      type: 'major',
+      groupBy: 'timePeriod',
+      sortBy: 'name',
+      sortAsc: true,
+      dataSets: [
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnsley',
+          },
+          timePeriod: '2014_AY',
+        },
+        {
+          indicator: 'authorised-absence-sessions',
+          filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+          location: {
+            level: 'localAuthority',
+            value: 'barnsley',
+          },
+          timePeriod: '2015_AY',
+        },
+      ],
+      referenceLines: [],
+      visible: true,
+      unit: '',
+      min: 0,
+    };
+
+    const fullTable = mapFullTable(testTable);
+
+    const dataSetCategories = createDataSetCategories(
+      axisConfiguration,
+      fullTable.results,
+      fullTable.subjectMeta,
+    );
+
+    expect(dataSetCategories).toHaveLength(1);
+
+    expect(dataSetCategories[0].filter.label).toBe('2015/16');
+
+    const dataSets = Object.entries(dataSetCategories[0].dataSets);
+    expect(dataSets).toHaveLength(1);
+
+    const [[dataSetKey, dataSet]] = dataSets;
+    expect(JSON.parse(dataSetKey)).toEqual({
+      indicator: 'authorised-absence-sessions',
+      filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      location: {
+        level: 'localAuthority',
+        value: 'barnsley',
+      },
+    });
+    expect(dataSet.value).toBe(4);
+    expect(dataSet.dataSet).toEqual<DataSet>({
+      indicator: 'authorised-absence-sessions',
+      filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      location: {
+        level: 'localAuthority',
+        value: 'barnsley',
+      },
+      timePeriod: '2015_AY',
+    });
+  });
+
   describe('ordering data sets with `order` property', () => {
     const testOrderedAxisConfiguration: AxisConfiguration = {
       type: 'major',

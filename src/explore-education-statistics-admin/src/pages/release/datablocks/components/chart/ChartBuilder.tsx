@@ -394,6 +394,9 @@ const ChartBuilder = ({
                         definition={definition}
                         data={data}
                         meta={meta}
+                        includeNonNumericalData={
+                          options?.includeNonNumericalData ?? false
+                        }
                         onChange={handleAxisConfigurationChange}
                         onSubmit={actions.updateChartAxis}
                       />

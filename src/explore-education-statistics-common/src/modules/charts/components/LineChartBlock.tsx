@@ -84,6 +84,7 @@ const LineChartBlock = ({
   axes,
   legend,
   width,
+  includeNonNumericalData,
 }: LineChartProps) => {
   const [legendProps, renderLegend] = useLegend();
 
@@ -100,6 +101,7 @@ const LineChartBlock = ({
     axes.major,
     data,
     meta,
+    includeNonNumericalData,
   );
 
   const chartData = dataSetCategories.map(toChartData);
