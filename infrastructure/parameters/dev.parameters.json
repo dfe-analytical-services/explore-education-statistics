@@ -72,7 +72,7 @@
        "value": "dev"
     },
     "maxContentDbSizeBytes": {
-      "value": 322122547200
+      "value": 1073741824
     },
     "maxStatsDbSizeBytes": {
       "value": 322122547200
