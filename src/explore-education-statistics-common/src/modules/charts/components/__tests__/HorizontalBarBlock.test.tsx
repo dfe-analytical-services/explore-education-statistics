@@ -232,7 +232,6 @@ describe('HorizontalBarBlock', () => {
         meta={invalidMeta}
         axes={invalidAxes}
         legend={invalidLegend}
-        includeNonNumericalData={false}
       />,
     );
     expect(container).toHaveTextContent('Unable to render chart');

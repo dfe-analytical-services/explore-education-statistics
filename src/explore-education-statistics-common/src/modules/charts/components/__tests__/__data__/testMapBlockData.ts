@@ -73,7 +73,6 @@ export const testMapConfiguration: Chart = {
   title: '',
   alt: '',
   height: 600,
-  includeNonNumericalData: false,
 };
 
 export const testMapTableData: TableDataResponse = {

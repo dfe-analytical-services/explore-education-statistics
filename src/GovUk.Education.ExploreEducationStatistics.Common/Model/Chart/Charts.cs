@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         string Alt { get; set; }
         int Height { get; set; }
         int? Width { get; set; }
-        bool? IncludeNonNumericalData { get; set; }
+        bool IncludeNonNumericData { get; set; }
 
         Dictionary<string, ChartAxisConfiguration>? Axes { get; set; }
         public ChartLegend? Legend { get; set; }
@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public string Alt { get; set; }
         public int Height { get; set; }
         public int? Width { get; set; }
-        public bool? IncludeNonNumericalData { get; set; }
+        public bool IncludeNonNumericData { get; set; } = false;
 
         public abstract ChartType Type { get; }
 

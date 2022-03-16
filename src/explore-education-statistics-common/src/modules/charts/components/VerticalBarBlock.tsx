@@ -53,7 +53,7 @@ const VerticalBarBlock = ({
   axes,
   stacked,
   legend,
-  includeNonNumericalData,
+  includeNonNumericData,
 }: VerticalBarProps) => {
   const [legendProps, renderLegend] = useLegend();
   if (
@@ -69,7 +69,7 @@ const VerticalBarBlock = ({
     axes.major,
     data,
     meta,
-    includeNonNumericalData,
+    includeNonNumericData,
   );
 
   const chartData = dataSetCategories.map(toChartData);

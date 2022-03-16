@@ -84,7 +84,6 @@ describe('chartBuilderReducer', () => {
         title: '',
         titleType: 'default',
         alt: '',
-        includeNonNumericalData: false,
       },
     };
 
@@ -110,7 +109,6 @@ describe('chartBuilderReducer', () => {
         title: '',
         titleType: 'default',
         alt: '',
-        includeNonNumericalData: false,
       });
     });
 
@@ -136,7 +134,6 @@ describe('chartBuilderReducer', () => {
           title: 'Some title',
           titleType: 'alternative',
           alt: 'Some alt',
-          includeNonNumericalData: false,
         },
         legend: {
           position: 'bottom',
@@ -169,7 +166,6 @@ describe('chartBuilderReducer', () => {
         title: 'Some title',
         titleType: 'alternative',
         alt: 'Some alt',
-        includeNonNumericalData: false,
       });
       expect(nextState.legend).toEqual<LegendConfiguration>({
         position: 'bottom',
@@ -286,7 +282,6 @@ describe('chartBuilderReducer', () => {
         title: '',
         titleType: 'default',
         alt: '',
-        includeNonNumericalData: false,
       },
     };
 
@@ -358,7 +353,6 @@ describe('chartBuilderReducer', () => {
         title: '',
         titleType: 'default',
         alt: '',
-        includeNonNumericalData: false,
       },
     };
 
@@ -371,7 +365,6 @@ describe('chartBuilderReducer', () => {
           title: 'Test title',
           titleType: 'alternative',
           alt: 'Test alt',
-          includeNonNumericalData: false,
         },
       };
 
@@ -383,7 +376,6 @@ describe('chartBuilderReducer', () => {
         title: 'Test title',
         titleType: 'alternative',
         alt: 'Test alt',
-        includeNonNumericalData: false,
       });
     });
 
@@ -396,7 +388,6 @@ describe('chartBuilderReducer', () => {
           titleType: 'default',
           alt: '',
           stacked: true,
-          includeNonNumericalData: false,
         },
       };
 
@@ -408,7 +399,6 @@ describe('chartBuilderReducer', () => {
           title: '',
           titleType: 'default',
           alt: '',
-          includeNonNumericalData: false,
         },
       };
 
@@ -424,7 +414,6 @@ describe('chartBuilderReducer', () => {
         titleType: 'default',
         alt: '',
         stacked: true,
-        includeNonNumericalData: false,
       });
     });
 
@@ -437,7 +426,6 @@ describe('chartBuilderReducer', () => {
           title: '',
           titleType: 'default',
           alt: '',
-          includeNonNumericalData: false,
         },
       };
 
@@ -449,7 +437,6 @@ describe('chartBuilderReducer', () => {
           title: '',
           titleType: 'default',
           alt: '',
-          includeNonNumericalData: false,
         },
       };
 
@@ -463,7 +450,6 @@ describe('chartBuilderReducer', () => {
         title: '',
         titleType: 'default',
         alt: '',
-        includeNonNumericalData: false,
       });
     });
   });
@@ -484,7 +470,6 @@ describe('chartBuilderReducer', () => {
         title: '',
         titleType: 'default',
         alt: '',
-        includeNonNumericalData: false,
       },
     };
 
@@ -527,7 +512,6 @@ describe('chartBuilderReducer', () => {
           title: 'Something',
           titleType: 'alternative',
           alt: 'Some alt',
-          includeNonNumericalData: false,
         },
       };
 
@@ -606,7 +590,6 @@ describe('chartBuilderReducer', () => {
         height: 300,
         title: 'Table title',
         alt: '',
-        includeNonNumericalData: false,
       };
 
       const { result } = renderHook(() =>
@@ -666,7 +649,6 @@ describe('chartBuilderReducer', () => {
           title: 'Table title',
           titleType: 'default',
           alt: '',
-          includeNonNumericalData: false,
         },
         legend: {
           position: 'top',
@@ -714,7 +696,6 @@ describe('chartBuilderReducer', () => {
         height: 300,
         title: 'Table title',
         alt: '',
-        includeNonNumericalData: false,
       };
 
       const { result } = renderHook(() =>
@@ -768,7 +749,6 @@ describe('chartBuilderReducer', () => {
           title: 'Table title',
           titleType: 'default',
           alt: '',
-          includeNonNumericalData: false,
         },
         legend: {
           position: 'top',
@@ -810,7 +790,6 @@ describe('chartBuilderReducer', () => {
         height: 300,
         title: '',
         alt: '',
-        includeNonNumericalData: false,
       };
 
       const { result } = renderHook(() =>
@@ -886,7 +865,6 @@ describe('chartBuilderReducer', () => {
         height: 300,
         title: 'Chart title',
         alt: '',
-        includeNonNumericalData: false,
       };
 
       const { result } = renderHook(() =>
@@ -946,7 +924,6 @@ describe('chartBuilderReducer', () => {
           title: 'Chart title',
           titleType: 'alternative',
           alt: '',
-          includeNonNumericalData: false,
         },
         legend: {
           position: 'top',

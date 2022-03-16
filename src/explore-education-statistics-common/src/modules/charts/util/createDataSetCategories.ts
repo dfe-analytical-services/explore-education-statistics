@@ -312,7 +312,7 @@ export default function createDataSetCategories(
   axisConfiguration: AxisConfiguration,
   results: TableDataResult[],
   meta: FullTableMeta,
-  includeNaNValues = false,
+  includeNonNumericData = false,
 ): DataSetCategory[] {
   const categoryFilters = getCategoryFilters(axisConfiguration, meta);
   const childDataSets = getChildDataSets(axisConfiguration, meta);
@@ -329,18 +329,16 @@ export default function createDataSetCategories(
     const rawValue = get(measuresByDataSet, getIndicatorPath(dataSet));
     const value = Number(rawValue);
 
-    if (includeNaNValues && rawValue) {
-      return [
-        ...acc,
-        [childDataSet, Number.isNaN(value) ? null : value] as Pair<
-          ChildDataSet,
-          number
-        >,
-      ];
+    if (includeNonNumericData && rawValue) {
+      acc.push([childDataSet, Number.isNaN(value) ? null : value] as Pair<
+        ChildDataSet,
+        number
+      >);
+      return acc;
     }
 
     if (!Number.isNaN(value)) {
-      return [...acc, [childDataSet, value] as Pair<ChildDataSet, number>];
+      acc.push([childDataSet, value] as Pair<ChildDataSet, number>);
     }
 
     return acc;

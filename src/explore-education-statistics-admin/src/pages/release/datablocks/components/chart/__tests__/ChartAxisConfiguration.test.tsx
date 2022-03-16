@@ -75,7 +75,6 @@ describe('ChartAxisConfiguration', () => {
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
-          includeNonNumericalData={false}
           onChange={noop}
           onSubmit={noop}
         />
@@ -173,7 +172,6 @@ describe('ChartAxisConfiguration', () => {
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
-          includeNonNumericalData={false}
           onChange={noop}
           onSubmit={noop}
         />
@@ -210,7 +208,6 @@ describe('ChartAxisConfiguration', () => {
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
-          includeNonNumericalData={false}
           onChange={noop}
           onSubmit={noop}
         />
@@ -237,7 +234,6 @@ describe('ChartAxisConfiguration', () => {
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
-          includeNonNumericalData={false}
           onChange={noop}
           onSubmit={noop}
         />
@@ -266,7 +262,6 @@ describe('ChartAxisConfiguration', () => {
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
-          includeNonNumericalData={false}
           onChange={noop}
           onSubmit={handleSubmit}
         />
@@ -296,7 +291,6 @@ describe('ChartAxisConfiguration', () => {
           definition={verticalBarBlockDefinition}
           data={testTable.results}
           meta={testTable.subjectMeta}
-          includeNonNumericalData={false}
           onChange={noop}
           onSubmit={handleSubmit}
         />
@@ -347,7 +341,6 @@ describe('ChartAxisConfiguration', () => {
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
-            includeNonNumericalData={false}
             onChange={noop}
             onSubmit={handleSubmit}
           />
@@ -397,7 +390,6 @@ describe('ChartAxisConfiguration', () => {
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
-            includeNonNumericalData={false}
             onChange={noop}
             onSubmit={handleSubmit}
           />
@@ -453,7 +445,6 @@ describe('ChartAxisConfiguration', () => {
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
-            includeNonNumericalData={false}
             onChange={noop}
             onSubmit={handleSubmit}
           />
@@ -497,7 +488,6 @@ describe('ChartAxisConfiguration', () => {
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
-            includeNonNumericalData={false}
             onChange={noop}
             onSubmit={handleSubmit}
           />
@@ -565,7 +555,6 @@ describe('ChartAxisConfiguration', () => {
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
-            includeNonNumericalData={false}
             onChange={noop}
             onSubmit={handleSubmit}
           />
@@ -599,7 +588,6 @@ describe('ChartAxisConfiguration', () => {
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
-            includeNonNumericalData={false}
             onChange={noop}
             onSubmit={handleSubmit}
           />

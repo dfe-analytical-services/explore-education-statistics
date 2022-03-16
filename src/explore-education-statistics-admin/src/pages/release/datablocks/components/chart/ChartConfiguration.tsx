@@ -104,7 +104,7 @@ const ChartConfiguration = ({
         .required('Enter chart height')
         .positive('Chart height must be positive'),
       width: Yup.number().positive('Chart width must be positive'),
-      includeNonNumericalData: Yup.boolean(),
+      includeNonNumericData: Yup.boolean(),
     });
 
     if (definition.capabilities.stackable) {
@@ -303,7 +303,7 @@ const ChartConfiguration = ({
             {definition.type !== 'map' && (
               <FormGroup>
                 <FormFieldCheckbox
-                  name="includeNonNumericalData"
+                  name="includeNonNumericData"
                   label="Include data sets with non-numerical values"
                 />
               </FormGroup>

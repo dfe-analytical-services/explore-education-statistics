@@ -1341,7 +1341,7 @@ describe('createDataSetCategories', () => {
     expect(dataSetCategories[1].filter.label).toBe('State-funded secondary');
   });
 
-  test('includes datasets with NaN vales when includeNaNValues is true', () => {
+  test('includes datasets with NaN values when includeNonNumericData is true', () => {
     const axisConfiguration: AxisConfiguration = {
       type: 'major',
       groupBy: 'timePeriod',
@@ -1435,7 +1435,7 @@ describe('createDataSetCategories', () => {
     });
   });
 
-  test('excludes datasets with NaN values when includeNaNValues is false', () => {
+  test('excludes datasets with NaN values when includeNonNumericData is false', () => {
     const axisConfiguration: AxisConfiguration = {
       type: 'major',
       groupBy: 'timePeriod',

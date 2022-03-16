@@ -49,7 +49,7 @@ interface Props {
   definition: ChartDefinition;
   data: TableDataResult[];
   meta: FullTableMeta;
-  includeNonNumericalData: boolean;
+  includeNonNumericData?: boolean;
   onChange: (configuration: AxisConfiguration) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
@@ -61,7 +61,7 @@ const ChartAxisConfiguration = ({
   id,
   data,
   meta,
-  includeNonNumericalData,
+  includeNonNumericData,
   type,
   onChange,
   onSubmit,
@@ -81,8 +81,8 @@ const ChartAxisConfiguration = ({
       max: undefined,
     };
 
-    return createDataSetCategories(config, data, meta, includeNonNumericalData);
-  }, [configuration, data, meta, includeNonNumericalData, type]);
+    return createDataSetCategories(config, data, meta, includeNonNumericData);
+  }, [configuration, data, meta, includeNonNumericData, type]);
 
   const groupByOptions = useMemo<RadioOption<AxisGroupBy>[]>(() => {
     const options: RadioOption<AxisGroupBy>[] = [

@@ -78,7 +78,6 @@ describe('ReleaseDataBlockEditPage', () => {
         type: 'verticalbar',
         height: 300,
         width: 600,
-        includeNonNumericalData: false,
         axes: {
           major: {
             type: 'major',
