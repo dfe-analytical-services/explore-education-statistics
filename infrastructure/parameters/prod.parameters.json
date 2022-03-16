@@ -71,7 +71,10 @@
     "tableBuilderMaxTableCellsAllowed": {
       "value": 1000000
     },
-    "maxDbSizeBytes": {
+    "maxContentDbSizeBytes": {
+      "value": 2147483648
+    },
+    "maxStatsDbSizeBytes": {
       "value": 375809638400
     }
   }

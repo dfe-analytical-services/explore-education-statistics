@@ -558,7 +558,11 @@
       "type": "string",
       "defaultValue": "deploy"
     },
-    "maxDbSizeBytes": {
+    "maxContentDbSizeBytes": {
+      "type": "int",
+      "defaultValue": 1073741824
+    },
+    "maxStatsDbSizeBytes": {
       "type": "int",
       "defaultValue": 268435456000
     },
@@ -2034,7 +2038,7 @@
           "kind": "v12.0,user,vcore,serverless",
           "properties": {
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "[parameters('maxDbSizeBytes')]",
+            "maxSizeBytes": "[parameters('maxStatsDbSizeBytes')]",
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
             "readScale": "Disabled",
@@ -2073,7 +2077,7 @@
           "kind": "v12.0,user,vcore,serverless",
           "properties": {
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "1073741824",
+            "maxSizeBytes": "[parameters('maxContentDbSizeBytes')]",
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
             "readScale": "Disabled",
@@ -2283,7 +2287,7 @@
           "kind": "v12.0,user,vcore,serverless",
           "properties": {
             "collation": "SQL_Latin1_General_CP1_CI_AS",
-            "maxSizeBytes": "[parameters('maxDbSizeBytes')]",
+            "maxSizeBytes": "[parameters('maxStatsDbSizeBytes')]",
             "catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
             "zoneRedundant": false,
             "readScale": "Disabled",

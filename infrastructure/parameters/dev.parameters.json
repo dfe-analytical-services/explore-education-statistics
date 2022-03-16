@@ -71,7 +71,10 @@
     "branch": {
        "value": "dev"
     },
-    "maxDbSizeBytes": {
+    "maxContentDbSizeBytes": {
+      "value": 322122547200
+    },
+    "maxStatsDbSizeBytes": {
       "value": 322122547200
     },
     "dataFactoryConcurrency": {
