@@ -37,7 +37,7 @@ describe('KeyStat', () => {
       locations: {
         country: [
           {
-            id: 'england',
+            id: 'england-id',
             label: 'England',
             value: 'england',
           },
@@ -59,7 +59,7 @@ describe('KeyStat', () => {
       {
         filters: ['filter-1'],
         geographicLevel: 'country',
-        locationId: 'england',
+        locationId: 'england-id',
         timePeriod: '2020_AY',
         measures: {
           'indicator-1': '608180',
