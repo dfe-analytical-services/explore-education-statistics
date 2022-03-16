@@ -13,7 +13,7 @@ import utilities_init
 import os
 import re
 from urllib.parse import urlparse
-from visual import capture_large_screenshot
+import visual
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 element_finder = sl._element_finder
@@ -238,12 +238,12 @@ def prompt_to_continue():
 
 
 def capture_large_screenshot_and_prompt_to_continue():
-    capture_large_screenshot()
+    visual.capture_large_screenshot()
     prompt_to_continue()
 
 
 def capture_large_screenshot_and_html():
-    capture_large_screenshot()
+    visual.capture_large_screenshot()
     capture_html()
 
 

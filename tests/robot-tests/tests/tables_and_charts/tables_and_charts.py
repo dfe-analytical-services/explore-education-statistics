@@ -1,10 +1,9 @@
 import csv
 import os
-from logging import warning
 from enum import Enum
+from logging import warning
 
-assert os.getenv('PUBLIC_URL') is not None
-public_url = os.getenv('PUBLIC_URL')
+releases_by_url = {}
 
 
 class DataBlockType(Enum):
@@ -55,12 +54,12 @@ class DataBlockRow:
         elif self.content_section_type == 'KeyStatistics':
             self.type = DataBlockType.KEY_STATS
         else:
-            raise Error(f'Unhandled Content Section Type {self.content_section_type}')
+            raise Exception(f'Unhandled Content Section Type {self.content_section_type}')
 
         if self.type == DataBlockType.FAST_TRACK:
-            self.content_url = f'{public_url}/data-tables/fast-track/{self.content_block_id}'
+            self.content_url = f'/data-tables/fast-track/{self.content_block_id}'
         else:
-            self.content_url = f'{public_url}/find-statistics/{self.publication_slug}/{self.release_slug}'
+            self.content_url = f'/find-statistics/{self.publication_slug}/{self.release_slug}'
 
 
 class Release:
@@ -84,7 +83,7 @@ class Release:
         self.content_section_blocks = content_section_blocks
         self.fast_track_blocks = fast_track_blocks
         self.permalink_blocks = permalink_blocks
-        self.url = f'{public_url}/find-statistics/{self.publication_slug}/{self.release_slug}'
+        self.url = f'/find-statistics/{self.publication_slug}/{self.release_slug}'
         self.has_key_stat_blocks = bool(key_stat_blocks)
         self.has_secondary_stat_blocks = bool(secondary_stat_blocks)
         self.has_content_section_blocks = bool(content_section_blocks)
@@ -92,36 +91,35 @@ class Release:
         self.has_permalinks = bool(permalink_blocks)
 
 
-content_blocks = []
+def generate_releases(data_blocks_csv_filepath):
 
+    content_blocks = []
 
-def read_cell(cell_value):
-    if cell_value == 'NULL':
-        return None
-    return cell_value
+    def read_cell(cell_value):
+        if cell_value == 'NULL':
+            return None
+        return cell_value
 
+    with open(data_blocks_csv_filepath, 'r', encoding='utf-8-sig') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        next(csv_reader)
+        for row in csv_reader:
+            content_blocks.append(DataBlockRow(
+                read_cell(row[0]),
+                read_cell(row[1]),
+                read_cell(row[2]),
+                read_cell(row[3]),
+                read_cell(row[4]),
+                read_cell(row[5]),
+                read_cell(row[6]),
+                read_cell(row[7]),
+                read_cell(row[8]),
+                read_cell(row[9]),
+                read_cell(row[10]),
+                read_cell(row[11]),
+                read_cell(row[12])))
 
-with open('local-datablocks-migrated.csv', 'r', encoding='utf-8-sig') as csv_file:
-    csv_reader = csv.reader(csv_file, delimiter=',')
-    for row in csv_reader:
-        content_blocks.append(DataBlockRow(
-            read_cell(row[0]),
-            read_cell(row[1]),
-            read_cell(row[2]),
-            read_cell(row[3]),
-            read_cell(row[4]),
-            read_cell(row[5]),
-            read_cell(row[6]),
-            read_cell(row[7]),
-            read_cell(row[8]),
-            read_cell(row[9]),
-            read_cell(row[10]),
-            read_cell(row[11]),
-            read_cell(row[12])))
-
-
-def get_releases():
-    release_ids = set(map(lambda block: block.release_id, content_blocks))
+    release_ids = sorted(set(map(lambda block: block.release_id, content_blocks)))
 
     def create_release(release_id):
         release_blocks = list(filter(lambda block: block.release_id == release_id, content_blocks))
@@ -141,4 +139,15 @@ def get_releases():
             fast_tracks,
             permalinks)
 
-    return map(create_release, release_ids)
+    releases = map(create_release, release_ids)
+
+    for release in releases:
+        releases_by_url[release.url] = release
+
+
+def get_release_by_url(url: str):
+    return releases_by_url[url]
+
+
+def get_releases_by_url():
+    return releases_by_url

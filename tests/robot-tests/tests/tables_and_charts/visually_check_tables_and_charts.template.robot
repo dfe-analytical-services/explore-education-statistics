@@ -2,11 +2,11 @@
 Resource            ../libs/common.robot
 Resource            ../libs/charts.robot
 Library             ../libs/visual.py
-Library             ../libs/tables_and_charts.py
+Library             tables_and_charts.py
 
 Force Tags          GeneralPublic    Local
 
-Suite Setup         user opens the browser
+Suite Setup         do suite setup
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
@@ -18,12 +18,13 @@ ${CONTENT_SECTIONS_FOLDER}=     content-sections
 ${FAST_TRACKS_FOLDER}=          fast-tracks
 
 *** Test Cases ***
-Test
-    ${releases}=    get releases
+{{test_case_template}}
 
-    FOR    ${release}    IN    @{releases}
-        run keyword and ignore error    Check release    ${release}
-    END
+Check release {{release_url}}
+    ${release}=    get release by url    {{release_url}}
+    Check release    ${release}
+
+{{/test_case_template}}
 
 *** Keywords ***
 Check release
@@ -32,12 +33,13 @@ Check release
     Log to console    \n\n\t=====================================================================\n
     Log to console    \tProcessing release ${release.url}
 
-    user navigates to public frontend    ${release.url}
+    user navigates to public frontend    %{PUBLIC_URL}${release.url}
 
     IF    ${release.has_key_stat_blocks} is ${TRUE}
 
         Log to console    \n\tCapturing Key Stats:
 
+        user waits until page contains element    xpath://h2[contains(text(), "Headline facts and figures")]
         user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
         user waits until page contains element    id:releaseHeadlines-tables-tab
 
@@ -78,7 +80,7 @@ Check release
 
 Check Fast Track Table
     [Arguments]    ${content_block}
-    user navigates to public frontend    ${content_block.content_url}
+    user navigates to public frontend    %{PUBLIC_URL}${content_block.content_url}
     user waits until page contains element    id:tableToolWizard
     ${filepath}=    user takes screenshot of element    id:tableToolWizard
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${FAST_TRACKS_FOLDER}/${content_block.content_block_id}-table.png
@@ -167,3 +169,7 @@ user waits for chart to appear
         Fail    Unhandled chart type ${chart_type}
     END
     user waits until page does not contain loading spinner
+
+do suite setup
+    generate releases    {{datablocks_csv_filename}}
+    user opens the browser
