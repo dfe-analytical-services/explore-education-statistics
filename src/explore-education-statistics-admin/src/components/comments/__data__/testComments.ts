@@ -1,13 +1,13 @@
-import { Comment } from '@admin/services/types/content';
+import { Comment, CommentUser } from '@admin/services/types/content';
 
-export const testCommentUser1 = {
+export const testCommentUser1: CommentUser = {
   id: 'user-1',
   firstName: 'User',
   lastName: 'One',
   email: 'user.one@test.com',
 };
 
-export const testCommentUser2 = {
+export const testCommentUser2: CommentUser = {
   id: 'user-2',
   firstName: 'User',
   lastName: 'Two',

@@ -91,13 +91,11 @@ const EditableContentForm = ({
     return error;
   }, []);
 
-  const blockId = id.replace('block-', '');
-
   return (
     <div className={styles.container} ref={containerRef}>
       {showCommentAddForm && (
         <CommentAddForm
-          blockId={blockId}
+          baseId={id}
           containerRef={containerRef}
           onCancel={toggleCommentAddForm.off}
           onSave={toggleCommentAddForm.off}
@@ -108,9 +106,7 @@ const EditableContentForm = ({
           [styles.showCommentAddForm]: showCommentAddForm,
         })}
       >
-        {allowComments && comments.length > 0 && (
-          <CommentsList blockId={blockId} />
-        )}
+        {allowComments && comments.length > 0 && <CommentsList />}
       </div>
 
       <div className={styles.form}>
@@ -131,7 +127,6 @@ const EditableContentForm = ({
             <FormFieldEditor<FormValues>
               id={id}
               allowComments={allowComments}
-              blockId={blockId}
               focusOnInit
               hideLabel={hideLabel}
               label={label}

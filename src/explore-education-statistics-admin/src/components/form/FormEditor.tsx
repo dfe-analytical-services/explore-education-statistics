@@ -28,7 +28,6 @@ export type EditorElementsHandler = (elements: Element[]) => void;
 export interface FormEditorProps {
   allowComments?: boolean;
   allowedHeadings?: string[];
-  blockId?: string;
   error?: string;
   focusOnInit?: boolean;
   hideLabel?: boolean;
@@ -52,7 +51,6 @@ export interface FormEditorProps {
 const FormEditor = ({
   allowComments = false,
   allowedHeadings = defaultAllowedHeadings,
-  blockId,
   error,
   focusOnInit,
   hideLabel,
@@ -83,7 +81,6 @@ const FormEditor = ({
   const config = useCKEditorConfig({
     allowComments,
     allowedHeadings,
-    blockId,
     editorInstance,
     toolbarConfig,
     onAutoSave,

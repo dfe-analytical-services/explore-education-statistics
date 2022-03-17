@@ -1,13 +1,11 @@
 import {
   testComments,
   testCommentUser1,
-  testCommentUser2,
 } from '@admin/components/comments/__data__/testComments';
 import EditableContentForm from '@admin/components/editable/EditableContentForm';
 import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { AuthContext, User } from '@admin/contexts/AuthContext';
 import { GlobalPermissions } from '@admin/services/permissionService';
-import { Comment } from '@admin/services/types/content';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
@@ -196,15 +194,15 @@ describe('EditableContentForm', () => {
   });
 
   describe('comments list', () => {
-    test('renders the comments list if allowComments', () => {
+    test('renders comments correctly if `allowComments`', () => {
       render(
         <CommentsContextProvider
           comments={testComments}
-          onDeleteComment={jest.fn()}
-          onSaveComment={jest.fn()}
-          onSaveUpdatedComment={jest.fn()}
-          onUpdateUnresolvedComments={{ current: jest.fn() }}
-          onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
+          onDelete={noop}
+          onCreate={jest.fn()}
+          onUpdate={noop}
+          onPendingDelete={noop}
+          onPendingDeleteUndo={noop}
         >
           <EditableContentForm
             allowComments
@@ -216,13 +214,54 @@ describe('EditableContentForm', () => {
           />
         </CommentsContextProvider>,
       );
+
       const unresolvedComments = within(
         screen.getByTestId('unresolvedComments'),
-      ).getAllByRole('listitem');
+      ).getAllByTestId('comment');
+
       expect(unresolvedComments).toHaveLength(3);
+      expect(unresolvedComments[0]).toHaveTextContent('Comment 2 content');
+      expect(unresolvedComments[1]).toHaveTextContent('Comment 3 content');
+      expect(unresolvedComments[2]).toHaveTextContent('Comment 4 content');
+
+      const resolvedComments = within(
+        screen.getByTestId('resolvedComments'),
+      ).getAllByTestId('comment');
+
+      expect(resolvedComments).toHaveLength(2);
+      expect(resolvedComments[0]).toHaveTextContent('Comment 1 content');
+      expect(resolvedComments[1]).toHaveTextContent('Comment 5 content');
     });
 
-    test('removes comment from the list when its delete button is clicked', async () => {
+    test('does not renders the comments if `allowComments = false`', () => {
+      render(
+        <CommentsContextProvider
+          comments={testComments}
+          onDelete={noop}
+          onCreate={jest.fn()}
+          onUpdate={noop}
+          onPendingDelete={noop}
+          onPendingDeleteUndo={noop}
+        >
+          <EditableContentForm
+            content="Test content"
+            id="block-id"
+            label="Form label"
+            onCancel={noop}
+            onSubmit={noop}
+          />
+        </CommentsContextProvider>,
+      );
+
+      expect(
+        screen.queryByTestId('unresolvedComments'),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByTestId('resolvedComments')).not.toBeInTheDocument();
+    });
+
+    test('calls `onPendingDelete` handler when a comment delete button is clicked', async () => {
+      const handlePendingDelete = jest.fn();
+
       render(
         <AuthContext.Provider
           value={{
@@ -231,11 +270,11 @@ describe('EditableContentForm', () => {
         >
           <CommentsContextProvider
             comments={testComments}
-            onDeleteComment={jest.fn()}
-            onSaveComment={jest.fn()}
-            onSaveUpdatedComment={jest.fn()}
-            onUpdateUnresolvedComments={{ current: jest.fn() }}
-            onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
+            onDelete={noop}
+            onCreate={jest.fn()}
+            onUpdate={noop}
+            onPendingDelete={handlePendingDelete}
+            onPendingDeleteUndo={noop}
           >
             <EditableContentForm
               allowComments
@@ -249,11 +288,11 @@ describe('EditableContentForm', () => {
         </AuthContext.Provider>,
       );
 
+      expect(handlePendingDelete).not.toHaveBeenCalled();
+
       const unresolvedComments = within(
         screen.getByTestId('unresolvedComments'),
-      ).getAllByRole('listitem');
-      expect(unresolvedComments).toHaveLength(3);
-      expect(unresolvedComments[0]).toHaveTextContent('Comment 2 content');
+      ).getAllByTestId('comment');
 
       userEvent.click(
         within(unresolvedComments[0]).getByRole('button', {
@@ -262,29 +301,14 @@ describe('EditableContentForm', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByTestId('unresolvedComments')).toBeInTheDocument();
+        expect(handlePendingDelete).toHaveBeenCalledTimes(1);
+        expect(handlePendingDelete).toHaveBeenCalledWith(testComments[1].id);
       });
-      const updatedUnresolvedComments = within(
-        screen.getByTestId('unresolvedComments'),
-      ).getAllByRole('listitem');
-
-      expect(updatedUnresolvedComments).toHaveLength(2);
-      expect(updatedUnresolvedComments[0]).not.toHaveTextContent(
-        'Comment 2 content',
-      );
-      expect(updatedUnresolvedComments[0]).toHaveTextContent(
-        'Comment 3 content',
-      );
     });
 
-    test('moves the comment to the resolved list when Resolve is clicked', async () => {
-      const handleUpdateComment = jest.fn();
-      const resolvedComment: Comment = {
-        ...testComments[1],
-        resolved: '2021-11-30T13:55',
-        resolvedBy: testCommentUser2,
-      };
-      handleUpdateComment.mockResolvedValue(resolvedComment);
+    test('calls `onUpdate` handler when a comment is edited', async () => {
+      const handleUpdate = jest.fn();
+
       render(
         <AuthContext.Provider
           value={{
@@ -293,11 +317,11 @@ describe('EditableContentForm', () => {
         >
           <CommentsContextProvider
             comments={testComments}
-            onDeleteComment={jest.fn()}
-            onSaveComment={jest.fn()}
-            onSaveUpdatedComment={handleUpdateComment}
-            onUpdateUnresolvedComments={{ current: jest.fn() }}
-            onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
+            onDelete={noop}
+            onCreate={jest.fn()}
+            onUpdate={handleUpdate}
+            onPendingDelete={noop}
+            onPendingDeleteUndo={noop}
           >
             <EditableContentForm
               allowComments
@@ -310,49 +334,35 @@ describe('EditableContentForm', () => {
           </CommentsContextProvider>
         </AuthContext.Provider>,
       );
+
+      expect(handleUpdate).not.toHaveBeenCalled();
 
       const unresolvedComments = within(
         screen.getByTestId('unresolvedComments'),
-      ).getAllByRole('listitem');
+      ).getAllByTestId('comment');
 
-      expect(unresolvedComments).toHaveLength(3);
+      const comment = within(unresolvedComments[0]);
 
-      userEvent.click(
-        within(unresolvedComments[0]).getByRole('button', {
-          name: 'Resolve',
-        }),
+      userEvent.click(comment.getByRole('button', { name: 'Edit' }));
+      userEvent.clear(comment.getByRole('textbox'));
+      await userEvent.type(
+        comment.getByRole('textbox'),
+        'Test updated content',
       );
+
+      userEvent.click(comment.getByRole('button', { name: 'Update' }));
 
       await waitFor(() => {
-        expect(screen.getByTestId('unresolvedComments')).toBeInTheDocument();
+        expect(handleUpdate).toHaveBeenCalledTimes(1);
+        expect(handleUpdate).toHaveBeenCalledWith({
+          ...testComments[1],
+          content: 'Test updated content',
+        });
       });
-
-      expect(
-        within(screen.getByTestId('unresolvedComments')).getAllByRole(
-          'listitem',
-        ),
-      ).toHaveLength(2);
-
-      userEvent.click(
-        screen.getByRole('button', {
-          name: 'Resolved comments (3)',
-        }),
-      );
-
-      expect(
-        within(screen.getByTestId('resolvedComments')).getAllByRole('listitem'),
-      ).toHaveLength(3);
     });
 
-    test('moves the comment to the unresolved list when Unresolve is clicked', async () => {
-      const handleUpdateComment = jest.fn();
-      const unresolvedComment: Comment = {
-        ...testComments[0],
-        resolved: undefined,
-        resolvedBy: undefined,
-      };
-
-      handleUpdateComment.mockResolvedValue(unresolvedComment);
+    test('calls `onUpdate` handler when a comment is resolved', async () => {
+      const handleUpdate = jest.fn();
 
       render(
         <AuthContext.Provider
@@ -362,11 +372,11 @@ describe('EditableContentForm', () => {
         >
           <CommentsContextProvider
             comments={testComments}
-            onDeleteComment={jest.fn()}
-            onSaveComment={jest.fn()}
-            onSaveUpdatedComment={handleUpdateComment}
-            onUpdateUnresolvedComments={{ current: jest.fn() }}
-            onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
+            onDelete={noop}
+            onCreate={jest.fn()}
+            onUpdate={handleUpdate}
+            onPendingDelete={noop}
+            onPendingDeleteUndo={noop}
           >
             <EditableContentForm
               allowComments
@@ -380,37 +390,73 @@ describe('EditableContentForm', () => {
         </AuthContext.Provider>,
       );
 
-      userEvent.click(
-        screen.getByRole('button', {
-          name: 'Resolved comments (2)',
-        }),
+      expect(handleUpdate).not.toHaveBeenCalled();
+
+      const unresolvedComments = within(
+        screen.getByTestId('unresolvedComments'),
+      ).getAllByTestId('comment');
+
+      const comment = within(unresolvedComments[0]);
+
+      userEvent.click(comment.getByRole('button', { name: 'Resolve' }));
+
+      await waitFor(() => {
+        expect(handleUpdate).toHaveBeenCalledTimes(1);
+        expect(handleUpdate).toHaveBeenCalledWith({
+          ...testComments[1],
+          setResolved: true,
+        });
+      });
+    });
+
+    test('calls `onUpdate` handler when a comment is unresolved', async () => {
+      const handleUpdate = jest.fn();
+
+      render(
+        <AuthContext.Provider
+          value={{
+            user: testUser1,
+          }}
+        >
+          <CommentsContextProvider
+            comments={testComments}
+            onDelete={noop}
+            onCreate={jest.fn()}
+            onUpdate={handleUpdate}
+            onPendingDelete={noop}
+            onPendingDeleteUndo={noop}
+          >
+            <EditableContentForm
+              allowComments
+              content="Test content"
+              id="block-id"
+              label="Form label"
+              onCancel={noop}
+              onSubmit={noop}
+            />
+          </CommentsContextProvider>
+        </AuthContext.Provider>,
       );
+
+      expect(handleUpdate).not.toHaveBeenCalled();
 
       const resolvedComments = within(
         screen.getByTestId('resolvedComments'),
-      ).getAllByRole('listitem');
+      ).getAllByTestId('comment');
 
-      expect(resolvedComments).toHaveLength(2);
+      const comment = within(resolvedComments[0]);
 
       userEvent.click(
-        within(resolvedComments[0]).getByRole('button', {
-          name: 'Unresolve',
-        }),
+        comment.getByRole('button', { name: 'Unresolve', hidden: true }),
       );
 
       await waitFor(() => {
-        expect(screen.getByText('Resolved comments (1)')).toBeInTheDocument();
+        expect(handleUpdate).toHaveBeenCalledTimes(1);
+        expect(handleUpdate).toHaveBeenCalledWith({
+          ...testComments[0],
+          setResolved: false,
+        });
       });
-
-      expect(
-        within(screen.getByTestId('resolvedComments')).getAllByRole('listitem'),
-      ).toHaveLength(1);
-
-      expect(
-        within(screen.getByTestId('unresolvedComments')).getAllByRole(
-          'listitem',
-        ),
-      ).toHaveLength(4);
     });
   });
 });

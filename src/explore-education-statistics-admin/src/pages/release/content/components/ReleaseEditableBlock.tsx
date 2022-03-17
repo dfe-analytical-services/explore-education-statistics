@@ -13,9 +13,7 @@ import {
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
 } from '@admin/routes/releaseRoutes';
-import releaseContentCommentService, {
-  AddComment,
-} from '@admin/services/releaseContentCommentService';
+import { CommentCreate } from '@admin/services/releaseContentCommentService';
 import { Comment, EditableBlock } from '@admin/services/types/content';
 import Gate from '@common/components/Gate';
 import useAsyncCallback from '@common/hooks/useAsyncCallback';
@@ -58,8 +56,11 @@ const ReleaseEditableBlock = ({
   } = useEditingContext();
 
   const {
-    updateContentSectionBlock,
+    addBlockComment,
+    deleteBlockComment,
+    updateBlockComment,
     deleteContentSectionBlock,
+    updateContentSectionBlock,
   } = useReleaseContentActions();
   const dispatch = useReleaseContentDispatch();
 
@@ -78,7 +79,7 @@ const ReleaseEditableBlock = ({
   const updateBlock = useCallback(
     (nextBlock: EditableBlock) => {
       dispatch({
-        type: 'UPDATE_BLOCK_FROM_SECTION',
+        type: 'UPDATE_SECTION_BLOCK',
         payload: {
           block: nextBlock,
           meta: {
@@ -206,26 +207,69 @@ const ReleaseEditableBlock = ({
   );
 
   const handleSaveComment = useCallback(
-    async (comment: AddComment) =>
-      releaseContentCommentService.addContentSectionComment(
+    async (comment: CommentCreate) => {
+      const newComment = await addBlockComment({
         releaseId,
         sectionId,
-        block.id,
+        sectionKey,
+        blockId: block.id,
         comment,
-      ),
-    [block.id, releaseId, sectionId],
+      });
+
+      updateUnresolvedComments.current(block.id, newComment.id);
+
+      return newComment;
+    },
+    [
+      addBlockComment,
+      block.id,
+      releaseId,
+      sectionId,
+      sectionKey,
+      updateUnresolvedComments,
+    ],
   );
 
-  const handleDeletePendingComment = useCallback(
-    async (commentId: string) =>
-      releaseContentCommentService.deleteContentSectionComment(commentId),
-    [],
+  const handlePendingDeleteComment = useCallback(
+    (commentId: string) => {
+      updateUnsavedCommentDeletions.current(block.id, commentId);
+    },
+    [block.id, updateUnsavedCommentDeletions],
+  );
+
+  const handleDeleteComment = useCallback(
+    async (commentId: string) => {
+      await deleteBlockComment({
+        releaseId,
+        sectionId,
+        sectionKey,
+        blockId: block.id,
+        commentId,
+      });
+    },
+    [block.id, deleteBlockComment, releaseId, sectionId, sectionKey],
   );
 
   const handleSaveUpdatedComment = useCallback(
-    async (comment: Comment) =>
-      releaseContentCommentService.updateContentSectionComment(comment),
-    [],
+    async (comment: Comment) => {
+      await updateBlockComment({
+        releaseId,
+        sectionId,
+        sectionKey,
+        blockId: block.id,
+        comment,
+      });
+
+      updateUnresolvedComments.current(block.id, comment.id);
+    },
+    [
+      block.id,
+      releaseId,
+      sectionId,
+      sectionKey,
+      updateBlockComment,
+      updateUnresolvedComments,
+    ],
   );
 
   const blockId = `block-${block.id}`;
@@ -261,11 +305,11 @@ const ReleaseEditableBlock = ({
       return (
         <CommentsContextProvider
           comments={block.comments}
-          onDeleteComment={handleDeletePendingComment}
-          onSaveComment={handleSaveComment}
-          onSaveUpdatedComment={handleSaveUpdatedComment}
-          onUpdateUnresolvedComments={updateUnresolvedComments}
-          onUpdateUnsavedCommentDeletions={updateUnsavedCommentDeletions}
+          onDelete={handleDeleteComment}
+          onPendingDelete={handlePendingDeleteComment}
+          onPendingDeleteUndo={handlePendingDeleteComment}
+          onCreate={handleSaveComment}
+          onUpdate={handleSaveUpdatedComment}
         >
           <EditableContentBlock
             actionThrottle={lockThrottle}

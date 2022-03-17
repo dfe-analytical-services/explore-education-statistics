@@ -1,14 +1,17 @@
+import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import {
   ReleaseContentContextState,
   releaseReducer as originalReleaseReducer,
 } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseDispatchAction } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
 import {
+  Comment,
+  CommentUser,
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
+import { ContentSection } from '@common/services/publicationService';
 import { DataBlock, Table } from '@common/services/types/blocks';
-import { testEditableRelease } from '@admin/pages/release/__data__/testEditableRelease';
 import { produce } from 'immer';
 
 const emptyTable: Table = {
@@ -38,13 +41,29 @@ const basicDataBlock: DataBlock = {
   },
 };
 
+const testCommentUser: CommentUser = {
+  id: 'user-1',
+  firstName: 'Jane',
+  lastName: 'Doe',
+  email: 'jane@test.com',
+};
+
+const testComment: Comment = {
+  id: 'comment-1',
+  content: 'Comment 1 content',
+  createdBy: testCommentUser,
+  created: '2021-11-29T13:55',
+  resolved: '2021-11-30T13:55',
+  resolvedBy: testCommentUser,
+};
+
 const releaseReducer = (
   initial: ReleaseContentContextState,
   action: ReleaseDispatchAction,
 ) => produce(initial, draft => originalReleaseReducer(draft, action));
 
 describe('ReleaseContentContext', () => {
-  test('SET_AVAILABLE_DATABLOCKS sets datablocks', () => {
+  test('SET_AVAILABLE_DATABLOCKS sets data blocks', () => {
     expect(
       releaseReducer(
         {
@@ -64,11 +83,11 @@ describe('ReleaseContentContext', () => {
     });
   });
 
-  test('REMOVE_BLOCK_FROM_SECTION removes a block from a section', () => {
-    const sectionKey = 'keyStatisticsSection';
-    const keyStatsSection = testEditableRelease[sectionKey];
+  test('REMOVE_SECTION_BLOCK removes a block from a named section', () => {
+    const keyStatsSection = testEditableRelease.keyStatisticsSection;
     const removingBlockId = keyStatsSection.content[0].id;
-    const originalLength = keyStatsSection.content.length;
+
+    expect(testEditableRelease.keyStatisticsSection.content.length).toEqual(3);
 
     const { release } = releaseReducer(
       {
@@ -77,35 +96,28 @@ describe('ReleaseContentContext', () => {
         availableDataBlocks: [basicDataBlock],
       },
       {
-        type: 'REMOVE_BLOCK_FROM_SECTION',
+        type: 'REMOVE_SECTION_BLOCK',
         payload: {
           meta: {
             blockId: removingBlockId,
             sectionId: keyStatsSection.id,
-            sectionKey,
+            sectionKey: 'keyStatisticsSection',
           },
         },
       },
     );
 
-    expect(release?.keyStatisticsSection.content?.length).toEqual(
-      originalLength - 1,
-    );
-
-    expect(
-      release?.keyStatisticsSection.content?.filter(
-        block => block.id === removingBlockId,
-      ),
-    ).toHaveLength(0);
+    expect(release.keyStatisticsSection.content).toEqual([
+      keyStatsSection.content[1],
+      keyStatsSection.content[2],
+    ]);
   });
 
-  test('REMOVE_BLOCK_FROM_SECTION removes a block from content section', () => {
-    const sectionKey = 'content';
-    const releaseContent = testEditableRelease[sectionKey];
-    const removingBlockId = (releaseContent[0]
-      .content as EditableContentBlock[])[0].id;
-    const originalLength = (releaseContent[0].content as EditableContentBlock[])
-      .length;
+  test('REMOVE_SECTION_BLOCK removes a block from generic content section', () => {
+    const contentSection = testEditableRelease.content;
+    const removingBlockId = contentSection[0].content[0].id;
+
+    expect(contentSection[0].content).toHaveLength(2);
 
     const { release } = releaseReducer(
       {
@@ -114,30 +126,24 @@ describe('ReleaseContentContext', () => {
         availableDataBlocks: [basicDataBlock],
       },
       {
-        type: 'REMOVE_BLOCK_FROM_SECTION',
+        type: 'REMOVE_SECTION_BLOCK',
         payload: {
           meta: {
             blockId: removingBlockId,
-            sectionId: releaseContent[0].id,
-            sectionKey,
+            sectionId: contentSection[0].id,
+            sectionKey: 'content',
           },
         },
       },
     );
 
-    expect(release?.content[0].content?.length).toEqual(originalLength - 1);
-
-    expect(
-      release?.content[0].content?.filter(
-        block => block.id === removingBlockId,
-      ),
-    ).toHaveLength(0);
+    expect(release.content[0].content).toHaveLength(1);
+    expect(release.content[0].content).toEqual([contentSection[0].content[1]]);
   });
 
-  test('UPDATE_BLOCK_FROM_SECTION updates a block from section', () => {
-    const sectionKey = 'headlinesSection';
-    const section = testEditableRelease[sectionKey];
-    const blockToUpdate = (section.content as EditableContentBlock[])[0];
+  test('UPDATE_SECTION_BLOCK updates a block from named section', () => {
+    const section = testEditableRelease.headlinesSection;
+    const blockToUpdate = section.content[0];
 
     const newBody = 'This is some updated text!';
 
@@ -148,12 +154,12 @@ describe('ReleaseContentContext', () => {
         availableDataBlocks: [basicDataBlock],
       },
       {
-        type: 'UPDATE_BLOCK_FROM_SECTION',
+        type: 'UPDATE_SECTION_BLOCK',
         payload: {
           meta: {
             blockId: blockToUpdate.id,
             sectionId: section.id,
-            sectionKey,
+            sectionKey: 'headlinesSection',
           },
           block: {
             ...blockToUpdate,
@@ -163,16 +169,13 @@ describe('ReleaseContentContext', () => {
       },
     );
 
-    expect(
-      (release?.headlinesSection.content as EditableContentBlock[])[0].body,
-    ).toEqual(newBody);
+    expect(release.headlinesSection.content[0].body).toEqual(newBody);
   });
 
-  test('UPDATE_BLOCK_FROM_SECTION updates a block from a content section', () => {
-    const sectionKey = 'content';
+  test('UPDATE_SECTION_BLOCK updates a block from a generic content section', () => {
     const sectionId = testEditableRelease.content[0].id;
-    const blockToUpdate = (testEditableRelease.content[0]
-      .content as EditableContentBlock[])[0];
+    const blockToUpdate = testEditableRelease.content[0]
+      .content[0] as EditableContentBlock;
 
     const newBody = 'This is some updated text!';
 
@@ -183,12 +186,12 @@ describe('ReleaseContentContext', () => {
         availableDataBlocks: [basicDataBlock],
       },
       {
-        type: 'UPDATE_BLOCK_FROM_SECTION',
+        type: 'UPDATE_SECTION_BLOCK',
         payload: {
           meta: {
             blockId: blockToUpdate.id,
             sectionId,
-            sectionKey,
+            sectionKey: 'content',
           },
           block: {
             ...blockToUpdate,
@@ -199,13 +202,12 @@ describe('ReleaseContentContext', () => {
     );
 
     expect(
-      (release?.content[0].content as EditableContentBlock[])[0].body,
+      (release.content[0].content[0] as EditableContentBlock).body,
     ).toEqual(newBody);
   });
 
-  test('ADD_BLOCK_TO_SECTION adds a block to a section', () => {
-    const sectionKey = 'summarySection';
-    const section = testEditableRelease[sectionKey];
+  test('ADD_SECTION_BLOCK adds a block to a named section', () => {
+    const section = testEditableRelease.summarySection;
     const newBlock: EditableContentBlock = {
       id: '123',
       order: 0,
@@ -214,7 +216,7 @@ describe('ReleaseContentContext', () => {
       type: 'MarkDownBlock',
     };
 
-    const originalLength = section.content?.length || 0;
+    expect(section.content).toHaveLength(0);
 
     const { release } = releaseReducer(
       {
@@ -223,28 +225,21 @@ describe('ReleaseContentContext', () => {
         availableDataBlocks: [],
       },
       {
-        type: 'ADD_BLOCK_TO_SECTION',
+        type: 'ADD_SECTION_BLOCK',
         payload: {
           meta: {
             sectionId: section.id,
-            sectionKey,
+            sectionKey: 'summarySection',
           },
           block: newBlock,
         },
       },
     );
 
-    expect(release?.summarySection.content).toHaveLength(originalLength + 1);
-
-    expect(
-      (release?.summarySection.content as EditableContentBlock[])[
-        originalLength
-      ].id,
-    ).toEqual(newBlock.id);
+    expect(release.summarySection.content).toEqual([newBlock]);
   });
 
-  test('ADD_BLOCK_TO_SECTION adds a block to a content section', () => {
-    const sectionKey = 'content';
+  test('ADD_SECTION_BLOCK adds a block to a generic content section', () => {
     const section = testEditableRelease.content[0];
 
     const newBlock: EditableContentBlock = {
@@ -252,10 +247,10 @@ describe('ReleaseContentContext', () => {
       order: 0,
       body: 'This section is empty...',
       comments: [],
-      type: 'MarkDownBlock',
+      type: 'HtmlBlock',
     };
 
-    const originalLength = section.content?.length || 0;
+    expect(section.content).toHaveLength(2);
 
     const { release } = releaseReducer(
       {
@@ -264,31 +259,28 @@ describe('ReleaseContentContext', () => {
         availableDataBlocks: [basicDataBlock],
       },
       {
-        type: 'ADD_BLOCK_TO_SECTION',
+        type: 'ADD_SECTION_BLOCK',
         payload: {
           meta: {
             sectionId: section.id,
-            sectionKey,
+            sectionKey: 'content',
           },
           block: newBlock,
         },
       },
     );
 
-    expect(release?.content[0].content as EditableContentBlock[]).toHaveLength(
-      originalLength + 1,
-    );
-
-    expect(
-      (release?.content[0].content as EditableContentBlock[])[originalLength]
-        .id,
-    ).toEqual(newBlock.id);
+    expect(release.content[0].content).toEqual([
+      section.content[0],
+      section.content[1],
+      newBlock,
+    ]);
   });
 
   test("UPDATE_SECTION_CONTENT updates a section's content with new content", () => {
     const newContent: EditableBlock[] = [
       {
-        name: 'Test datablock',
+        name: 'Test data block',
         heading: "'prma' from 'My Pub' in England for 2017/18",
         source: '',
         query: {
@@ -317,7 +309,7 @@ describe('ReleaseContentContext', () => {
         comments: [],
       },
       {
-        type: 'MarkDownBlock',
+        type: 'HtmlBlock',
         id: 'eb809a91-af3d-438d-632c-08d7c408aca5',
         order: 1,
         body: '',
@@ -366,12 +358,20 @@ describe('ReleaseContentContext', () => {
       },
     );
 
-    expect(release?.content[0].content[0]).toEqual(newContent[0]);
-    expect(release?.content[0].content[1]).toEqual(newContent[1]);
+    expect(release.content[0].content[0]).toEqual(newContent[0]);
+    expect(release.content[0].content[1]).toEqual(newContent[1]);
   });
 
   test('ADD_CONTENT_SECTION adds a new section to release content', () => {
-    const originalLength = testEditableRelease.content.length;
+    expect(testEditableRelease.content).toHaveLength(2);
+
+    const newSection: ContentSection<EditableBlock> = {
+      heading: 'A new section',
+      id: 'new-section-1',
+      order: testEditableRelease.content.length,
+      content: [],
+    };
+
     const { release } = releaseReducer(
       {
         release: testEditableRelease,
@@ -381,29 +381,19 @@ describe('ReleaseContentContext', () => {
       {
         type: 'ADD_CONTENT_SECTION',
         payload: {
-          section: {
-            heading: 'A new section',
-            id: 'new-section-1',
-            order: testEditableRelease.content.length,
-            content: [],
-          },
+          section: newSection,
         },
       },
     );
 
-    expect(release?.content).toHaveLength(originalLength + 1);
-
-    expect(release?.content[originalLength].id).toEqual('new-section-1');
+    expect(release.content).toEqual([
+      testEditableRelease.content[0],
+      testEditableRelease.content[1],
+      newSection,
+    ]);
   });
 
   test("SET_CONTENT sets the release's content", () => {
-    const contentSectionsLength = testEditableRelease.content.length;
-    const contentSectionsReversed = testEditableRelease.content.map(
-      (section, index) => {
-        return { ...section, order: contentSectionsLength - (1 + index) };
-      },
-    );
-
     const { release } = releaseReducer(
       {
         release: testEditableRelease,
@@ -413,18 +403,28 @@ describe('ReleaseContentContext', () => {
       {
         type: 'SET_CONTENT',
         payload: {
-          content: contentSectionsReversed,
+          content: [
+            testEditableRelease.content[1],
+            testEditableRelease.content[0],
+          ],
         },
       },
     );
 
-    expect(release?.content[0].order).toEqual(contentSectionsLength - 1);
-    expect(release?.content[1].order).toEqual(contentSectionsLength - 2);
-    expect(release?.content).toHaveLength(contentSectionsLength);
+    expect(release.content).toEqual([
+      testEditableRelease.content[1],
+      testEditableRelease.content[0],
+    ]);
   });
 
-  test('UPDATE_CONTENT_SECTION updates a content section', () => {
-    const basicSection = testEditableRelease.content[0];
+  test('UPDATE_CONTENT_SECTION updates a generic content section', () => {
+    const section = testEditableRelease.content[0];
+
+    const updatedSection: ContentSection<EditableBlock> = {
+      ...section,
+      heading: 'updated heading',
+    };
+
     const { release } = releaseReducer(
       {
         release: testEditableRelease,
@@ -434,16 +434,197 @@ describe('ReleaseContentContext', () => {
       {
         type: 'UPDATE_CONTENT_SECTION',
         payload: {
-          meta: { sectionId: basicSection.id },
-          section: {
-            ...basicSection,
-            heading: 'updated heading',
-          },
+          meta: { sectionId: section.id },
+          section: updatedSection,
         },
       },
     );
 
-    expect(release?.content[0].id).toEqual(basicSection.id);
-    expect(release?.content[0].heading).toEqual('updated heading');
+    expect(release.content[0]).toEqual(updatedSection);
+  });
+
+  test('ADD_BLOCK_COMMENT adds a comment to named section block', () => {
+    const sectionId = testEditableRelease.keyStatisticsSection.id;
+    const block = testEditableRelease.keyStatisticsSection.content[0];
+
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'ADD_BLOCK_COMMENT',
+        payload: {
+          meta: {
+            blockId: block.id,
+            sectionId,
+            sectionKey: 'keyStatisticsSection',
+          },
+          comment: testComment,
+        },
+      },
+    );
+
+    expect(release.keyStatisticsSection.content[0].comments).toEqual([
+      ...block.comments,
+      testComment,
+    ]);
+  });
+
+  test('ADD_BLOCK_COMMENT adds a comment to generic content section block', () => {
+    const sectionId = testEditableRelease.content[0].id;
+    const block = testEditableRelease.content[0].content[0];
+
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'ADD_BLOCK_COMMENT',
+        payload: {
+          meta: {
+            blockId: block.id,
+            sectionId,
+            sectionKey: 'content',
+          },
+          comment: testComment,
+        },
+      },
+    );
+
+    expect(release.content[0].content[0].comments).toEqual([
+      ...block.comments,
+      testComment,
+    ]);
+  });
+
+  test('UPDATE_BLOCK_COMMENT updates a comment in named section block', () => {
+    const sectionId = testEditableRelease.keyStatisticsSection.id;
+    const block = testEditableRelease.keyStatisticsSection.content[0];
+
+    expect(block.comments).toHaveLength(1);
+
+    const updatedComment: Comment = {
+      ...block.comments[0],
+      content: 'Updated comment content',
+    };
+
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'UPDATE_BLOCK_COMMENT',
+        payload: {
+          meta: {
+            blockId: block.id,
+            sectionId,
+            sectionKey: 'keyStatisticsSection',
+          },
+          comment: updatedComment,
+        },
+      },
+    );
+
+    expect(release.keyStatisticsSection.content[0].comments).toEqual([
+      updatedComment,
+    ]);
+  });
+
+  test('UPDATE_BLOCK_COMMENT updates a comment in generic content section block', () => {
+    const sectionId = testEditableRelease.content[0].id;
+    const block = testEditableRelease.content[0].content[0];
+
+    expect(block.comments).toHaveLength(2);
+
+    const updatedComment: Comment = {
+      ...block.comments[1],
+      content: 'Updated comment content',
+    };
+
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'UPDATE_BLOCK_COMMENT',
+        payload: {
+          meta: {
+            blockId: block.id,
+            sectionId,
+            sectionKey: 'content',
+          },
+          comment: updatedComment,
+        },
+      },
+    );
+
+    expect(release.content[0].content[0].comments).toEqual([
+      block.comments[0],
+      updatedComment,
+    ]);
+  });
+
+  test('REMOVE_BLOCK_COMMENT removes a comment from named section block', () => {
+    const sectionId = testEditableRelease.keyStatisticsSection.id;
+    const block = testEditableRelease.keyStatisticsSection.content[0];
+
+    expect(block.comments).toHaveLength(1);
+
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'REMOVE_BLOCK_COMMENT',
+        payload: {
+          meta: {
+            blockId: block.id,
+            sectionId,
+            sectionKey: 'keyStatisticsSection',
+          },
+          commentId: block.comments[0].id,
+        },
+      },
+    );
+
+    expect(release.keyStatisticsSection.content[0].comments).toEqual([]);
+  });
+
+  test('UPDATE_BLOCK_COMMENT removes a comment from generic content section block', () => {
+    const sectionId = testEditableRelease.content[0].id;
+    const block = testEditableRelease.content[0].content[0];
+
+    expect(block.comments).toHaveLength(2);
+
+    const { release } = releaseReducer(
+      {
+        release: testEditableRelease,
+        canUpdateRelease: true,
+        availableDataBlocks: [basicDataBlock],
+      },
+      {
+        type: 'REMOVE_BLOCK_COMMENT',
+        payload: {
+          meta: {
+            blockId: block.id,
+            sectionId,
+            sectionKey: 'content',
+          },
+          commentId: block.comments[0].id,
+        },
+      },
+    );
+
+    expect(release.content[0].content[0].comments).toEqual([block.comments[1]]);
   });
 });

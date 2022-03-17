@@ -13,7 +13,6 @@ import React, { useRef } from 'react';
 export const elementsFieldName = (name: string) => `__${name}`;
 
 type Props<FormValues> = {
-  blockId?: string;
   formGroupClass?: string;
   id?: string;
   name: keyof FormValues | string;
@@ -23,13 +22,9 @@ type Props<FormValues> = {
     elements: Element[],
   ) => string | undefined | Promise<string | undefined>;
   onBlur?: (isDirty: boolean) => void;
-} & OmitStrict<
-  FormEditorProps,
-  'blockId' | 'id' | 'value' | 'onChange' | 'onBlur'
->;
+} & OmitStrict<FormEditorProps, 'id' | 'value' | 'onChange' | 'onBlur'>;
 
 function FormFieldEditor<T>({
-  blockId,
   error,
   formGroupClass,
   id,
@@ -69,7 +64,6 @@ function FormFieldEditor<T>({
               testId={testId}
               {...props}
               {...field}
-              blockId={blockId}
               id={id ? prefixFormId(id) : fieldId(name as string)}
               onBlur={() => {
                 form.setFieldTouched(name as string, true);

@@ -243,11 +243,11 @@ Test paragraph
       render(
         <CommentsContextProvider
           comments={testComments}
-          onDeleteComment={jest.fn()}
-          onSaveComment={jest.fn()}
-          onSaveUpdatedComment={jest.fn()}
-          onUpdateUnresolvedComments={{ current: jest.fn() }}
-          onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
+          onDelete={noop}
+          onCreate={jest.fn()}
+          onUpdate={noop}
+          onPendingDelete={noop}
+          onPendingDeleteUndo={noop}
         >
           <EditableContentBlock
             allowComments
@@ -273,11 +273,11 @@ Test paragraph
       render(
         <CommentsContextProvider
           comments={testComments}
-          onDeleteComment={jest.fn()}
-          onSaveComment={jest.fn()}
-          onSaveUpdatedComment={jest.fn()}
-          onUpdateUnresolvedComments={{ current: jest.fn() }}
-          onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
+          onDelete={noop}
+          onCreate={jest.fn()}
+          onUpdate={noop}
+          onPendingDelete={noop}
+          onPendingDeleteUndo={noop}
         >
           <EditableContentBlock
             allowComments

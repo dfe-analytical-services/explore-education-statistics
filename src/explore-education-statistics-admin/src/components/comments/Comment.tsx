@@ -12,10 +12,10 @@ import useToggle from '@common/hooks/useToggle';
 import React, { useEffect, useRef } from 'react';
 
 interface Props {
-  blockId: string;
   comment: CommentType;
 }
-const Comment = ({ blockId, comment }: Props) => {
+
+const Comment = ({ comment }: Props) => {
   const {
     content,
     created,
@@ -54,7 +54,7 @@ const Comment = ({ blockId, comment }: Props) => {
   };
 
   return (
-    <li className={styles.container}>
+    <li className={styles.container} data-testid="comment">
       <>
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div
@@ -127,7 +127,7 @@ const Comment = ({ blockId, comment }: Props) => {
               {resolved ? (
                 <ButtonText
                   onClick={async () => {
-                    await unresolveComment.current(blockId, comment.id, true);
+                    await unresolveComment.current(comment.id, true);
                   }}
                 >
                   Unresolve
@@ -136,7 +136,7 @@ const Comment = ({ blockId, comment }: Props) => {
                 <ButtonGroup className="govuk-!-margin-bottom-0">
                   <Button
                     onClick={async () => {
-                      await resolveComment.current(blockId, comment.id, true);
+                      await resolveComment.current(comment.id, true);
                     }}
                   >
                     Resolve
@@ -149,7 +149,7 @@ const Comment = ({ blockId, comment }: Props) => {
 
                       <ButtonText
                         onClick={async () => {
-                          removeComment.current(blockId, comment.id);
+                          removeComment.current(comment.id);
                         }}
                       >
                         Delete

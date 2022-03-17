@@ -17,7 +17,6 @@ import { MutableRefObject, useMemo } from 'react';
 const useCKEditorConfig = ({
   allowComments,
   allowedHeadings,
-  blockId,
   editorInstance,
   toolbarConfig = toolbarConfigs.full,
   onAutoSave,
@@ -28,7 +27,6 @@ const useCKEditorConfig = ({
 }: {
   allowComments?: boolean;
   allowedHeadings?: string[];
-  blockId?: string;
   editorInstance?: MutableRefObject<Editor | undefined>;
   toolbarConfig?: string[];
   onAutoSave?: (content: string) => void;
@@ -119,9 +117,9 @@ const useCKEditorConfig = ({
             },
             // Comment marker removed in the editor
             commentRemoved(markerId) {
-              if (editorInstance?.current && blockId) {
+              if (editorInstance?.current) {
                 const commentId = markerId.replace('comment:', '');
-                removeComment?.current(blockId, commentId);
+                removeComment?.current(commentId);
                 onAutoSave?.(editorInstance?.current.getData());
               }
             },
@@ -131,9 +129,6 @@ const useCKEditorConfig = ({
             },
             // Comment actions undone/redone in the editor
             undoRedoComment(type, markerId) {
-              if (!blockId) {
-                return;
-              }
               const commentId = markerId.startsWith('comment:')
                 ? markerId.replace('comment:', '')
                 : markerId.replace('resolvedcomment:', '');
@@ -141,19 +136,19 @@ const useCKEditorConfig = ({
               switch (type) {
                 case 'undoRemoveComment':
                 case 'redoAddComment':
-                  reAddComment.current(blockId, commentId);
+                  reAddComment.current(commentId);
                   break;
                 case 'undoAddComment':
                 case 'redoRemoveComment':
-                  removeComment.current(blockId, commentId);
+                  removeComment.current(commentId);
                   break;
                 case 'undoResolveComment':
                 case 'redoUnresolveComment':
-                  unresolveComment.current(blockId, commentId);
+                  unresolveComment.current(commentId);
                   break;
                 case 'undoUnresolveComment':
                 case 'redoResolveComment':
-                  resolveComment.current(blockId, commentId);
+                  resolveComment.current(commentId);
                   break;
                 default:
                   break;
@@ -176,7 +171,6 @@ const useCKEditorConfig = ({
   }, [
     allowComments,
     allowedHeadings,
-    blockId,
     editorInstance,
     hasImageUpload,
     onAutoSave,

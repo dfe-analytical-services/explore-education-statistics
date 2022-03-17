@@ -1,4 +1,5 @@
 import {
+  Comment,
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
@@ -14,36 +15,36 @@ export type ContentSectionKeys = keyof Pick<
   | 'content'
 >;
 
-type BlockMeta = {
+export interface BlockMeta {
   sectionId: string;
-  blockId: string;
   sectionKey: ContentSectionKeys;
-};
+  blockId: string;
+}
 
 type SectionMeta = Omit<BlockMeta, 'blockId'>;
 
-type SetAvailableDatablocks = {
+type SetAvailableDataBlocks = {
   type: 'SET_AVAILABLE_DATABLOCKS';
   payload: DataBlock[];
 };
 
-export type RemoveBlockFromSection = {
-  type: 'REMOVE_BLOCK_FROM_SECTION';
+export type RemoveSectionBlock = {
+  type: 'REMOVE_SECTION_BLOCK';
   payload: {
     meta: BlockMeta;
   };
 };
 
-export type UpdateBlockFromSection = {
-  type: 'UPDATE_BLOCK_FROM_SECTION';
+export type UpdateSectionBlock = {
+  type: 'UPDATE_SECTION_BLOCK';
   payload: {
     block: EditableBlock;
     meta: BlockMeta;
   };
 };
 
-export type AddBlockToSection = {
-  type: 'ADD_BLOCK_TO_SECTION';
+export type AddSectionBlock = {
+  type: 'ADD_SECTION_BLOCK';
   payload: {
     block: EditableBlock;
     meta: SectionMeta;
@@ -80,12 +81,39 @@ export type UpdateContentSection = {
   };
 };
 
+export type AddBlockComment = {
+  type: 'ADD_BLOCK_COMMENT';
+  payload: {
+    comment: Comment;
+    meta: BlockMeta;
+  };
+};
+
+export type UpdateBlockComment = {
+  type: 'UPDATE_BLOCK_COMMENT';
+  payload: {
+    comment: Comment;
+    meta: BlockMeta;
+  };
+};
+
+export type RemoveBlockComment = {
+  type: 'REMOVE_BLOCK_COMMENT';
+  payload: {
+    commentId: string;
+    meta: BlockMeta;
+  };
+};
+
 export type ReleaseDispatchAction =
-  | SetAvailableDatablocks
-  | RemoveBlockFromSection
-  | UpdateBlockFromSection
-  | AddBlockToSection
-  | UpdateSectionContent
+  | AddBlockComment
+  | AddSectionBlock
   | AddContentSection
+  | SetAvailableDataBlocks
   | SetReleaseContent
-  | UpdateContentSection;
+  | RemoveBlockComment
+  | RemoveSectionBlock
+  | UpdateBlockComment
+  | UpdateSectionBlock
+  | UpdateContentSection
+  | UpdateSectionContent;
