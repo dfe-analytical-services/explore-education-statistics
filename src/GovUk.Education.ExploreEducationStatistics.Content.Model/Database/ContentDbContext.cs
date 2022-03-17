@@ -354,30 +354,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Query)
-                .HasColumnName("DataBlock_Query")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
-
-            // EES-3167 Configuration for temporary data block fields for the migration from Location codes to id's.
-            modelBuilder.Entity<DataBlock>()
-                .Property(block => block.ChartsMigrated)
-                .HasColumnName("DataBlock_ChartsMigrated")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<List<IChart>>(v));
-            modelBuilder.Entity<DataBlock>()
-                .Property(block => block.QueryMigrated)
+                // TODO EES-3212 rename back to DataBlock_Query
                 .HasColumnName("DataBlock_QueryMigrated")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
-            modelBuilder.Entity<DataBlock>()
-                .Property(block => block.TableMigrated)
-                .HasColumnName("DataBlock_TableMigrated")
-                .HasConversion(
-                    v => JsonConvert.SerializeObject(v),
-                    v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v));
+
+            // TODO EES-3212 remove these temporary fields related to the migration from Location codes to id's.
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.TableHeaderCountChanged)
                 .HasColumnName("DataBlock_TableHeaderCountChanged")
@@ -386,12 +369,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.LocationsMigrated)
                 .HasColumnName("DataBlock_LocationsMigrated")
-                .HasDefaultValue(false)
+                .HasDefaultValue(true)
                 .IsRequired();
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Charts)
-                .HasColumnName("DataBlock_Charts")
+                // TODO EES-3212 rename back to DataBlock_Charts
+                .HasColumnName("DataBlock_ChartsMigrated")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<IChart>>(v));
@@ -405,7 +389,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Table)
-                .HasColumnName("DataBlock_Table")
+                // TODO EES-3212 rename this back to DataBlock_Table
+                .HasColumnName("DataBlock_TableMigrated")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v));

@@ -128,9 +128,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public TableBuilderConfiguration Table { get; set; }
 
-        // EES-3167 Temporary fields used for the migration from Location codes to id's.
+        // TODO EES-3212 Remove these temporary fields that were added for the migration from Location codes to id's.
+        [NotMapped]
         public List<IChart> ChartsMigrated { get; set; } = new();
+        [NotMapped]
         public ObservationQueryContext QueryMigrated { get; set; }
+        [NotMapped]
         public TableBuilderConfiguration TableMigrated { get; set; }
         public bool TableHeaderCountChanged { get; set; }
         public bool LocationsMigrated { get; set; }

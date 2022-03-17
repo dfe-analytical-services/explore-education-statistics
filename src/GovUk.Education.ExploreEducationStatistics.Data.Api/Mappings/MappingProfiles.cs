@@ -19,17 +19,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings
             // Null collections will be mapped to null collections instead of empty collections.
             AllowNullCollections = true;
 
+            ConfigureForFastTracks();
+            ConfigureForPermalinks();
+        }
+
+        private void ConfigureForFastTracks()
+        {
             CreateMap<FastTrack, FastTrackViewModel>();
+            CreateMap<ObservationQueryContext, TableBuilderQueryViewModel>();
+        }
 
+        private void ConfigureForPermalinks()
+        {
             CreateMap<Permalink, PermalinkViewModel>();
-
             CreateMap<PermalinkTableBuilderResult, TableBuilderResultViewModel>();
-
             CreateMap<PermalinkResultSubjectMeta, ResultSubjectMetaViewModel>()
                 .ForMember(dest => dest.Locations,
                     m => m.MapFrom(source => source.LocationsHierarchical));
-
-            CreateMap<ObservationQueryContext, TableBuilderQueryViewModel>();
         }
     }
 }

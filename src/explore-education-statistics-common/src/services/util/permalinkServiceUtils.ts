@@ -1,8 +1,7 @@
+import { Permalink } from '@common/services/permalinkService';
 import {
   FilterOption,
   LocationOption,
-  SubjectMeta,
-  TableDataResponse,
 } from '@common/services/tableBuilderService';
 import combineMeasuresWithDuplicateLocationCodes from '@common/services/util/combineMeasuresWithDuplicateLocationCodes';
 import groupBy from 'lodash/groupBy';
@@ -10,7 +9,7 @@ import mapValues from 'lodash/mapValues';
 import uniq from 'lodash/uniq';
 
 /**
- * Given a set of {@param tableData}, this function will merge any Locations
+ * Given a {@param permalink} with table data, this function will merge any Locations
  * that have duplicate codes and geographic levels into combined Locations with
  * a label derived from all of the distinct Location names.
  *
@@ -20,15 +19,24 @@ import uniq from 'lodash/uniq';
  *
  * This will merge not only the Locations in the TableDataSubjectMeta but also
  * the TableDataResults for those duplicate Locations, merging duplicate rows
- * into single rows with combined values derived form each duplicate Location.
+ * into single rows with combined values derived from each duplicate Location.
  *
- * @deprecated Remove in EES-2783
+ * Deduplication only has to be applied to historical Permalinks created prior to the
+ * switchover from Location codes to id's in EES-2955. That made it possible to query
+ * by Location id without returning other results for different Locations that share the
+ * same geographic level and code.
  */
-export function deduplicateTableDataLocations(
-  tableData: TableDataResponse,
-): TableDataResponse {
-  if (!tableData.subjectMeta) {
-    return tableData;
+function deduplicatePermalinkLocations(permalink: Permalink): Permalink {
+  const { fullTable: tableData } = permalink;
+
+  if (!tableData.subjectMeta || tableData.results.length === 0) {
+    return permalink;
+  }
+
+  // Absence of the 'location' field in the first result tells that this isn't a
+  // a historical Permalink which needs deduplication.
+  if (!tableData.results[0].location) {
+    return permalink;
   }
 
   const { subjectMeta } = tableData;
@@ -85,44 +93,15 @@ export function deduplicateTableDataLocations(
   );
 
   return {
-    ...tableData,
-    subjectMeta: {
-      ...subjectMeta,
-      locations: mergedLocations,
+    ...permalink,
+    fullTable: {
+      ...tableData,
+      subjectMeta: {
+        ...subjectMeta,
+        locations: mergedLocations,
+      },
+      results: mergedResults,
     },
-    results: mergedResults,
-  };
-}
-
-/**
- * Given {@param subjectMeta}, this function will merge any Locations that
- * have duplicate codes and geographic levels into combined Locations with a
- * label derived from all of the distinct Location names.
- *
- * E.g. if 2 Locations, Provider 1 and Provider 2 share the same geographic
- * level and code, this will merge those Locations into a single
- * Location with the label "Provider 1 / Provider 2", combining in
- * alphabetical order.
- *
- * @deprecated Remove in EES-2783
- */
-export function deduplicateSubjectMetaLocations(
-  subjectMeta: SubjectMeta,
-): SubjectMeta {
-  const mergedLocations = mapValues(subjectMeta.locations, level => {
-    const optionsGroupedByCode = groupBy(level.options, option => option.value);
-
-    return {
-      ...level,
-      options: Object.values(optionsGroupedByCode).flatMap(locations =>
-        mergeLocationLabels(locations),
-      ),
-    };
-  });
-
-  return {
-    ...subjectMeta,
-    locations: mergedLocations,
   };
 }
 
@@ -148,3 +127,5 @@ function mergeLocationLabels<T extends LocationOption | FilterOption>(
     label: distinctLabels.sort().join(' / '),
   };
 }
+
+export default deduplicatePermalinkLocations;

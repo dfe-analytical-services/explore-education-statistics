@@ -33,7 +33,7 @@ const basicDataBlock: DataBlock = {
   query: {
     filters: [],
     indicators: [],
-    locations: {},
+    locationIds: [],
     subjectId: 'subjectId',
   },
 };
@@ -306,9 +306,7 @@ describe('ReleaseContentContext', () => {
             '214f5fb8-c12b-411e-fdfb-08d7bec1dd71',
             '99f5bbc3-de9a-4831-fdf8-08d7bec1dd71',
           ],
-          locations: {
-            country: ['E92000001'],
-          },
+          locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
           includeGeoJson: true,
         },
         charts: [],

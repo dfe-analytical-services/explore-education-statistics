@@ -19,7 +19,7 @@ describe('getInitialStepSubjectMeta', () => {
       subjectId: '',
       filters: [],
       indicators: [],
-      locations: {},
+      locationIds: [],
     };
 
     expect(await getInitialStepSubjectMeta(query)).toEqual<
@@ -35,7 +35,7 @@ describe('getInitialStepSubjectMeta', () => {
       subjectId: '',
       filters: [],
       indicators: [],
-      locations: {},
+      locationIds: [],
     };
 
     expect(await getInitialStepSubjectMeta(query)).toEqual<
@@ -50,11 +50,13 @@ describe('getInitialStepSubjectMeta', () => {
       locations: {
         country: {
           legend: 'Country',
-          options: [{ value: 'england', label: 'England' }],
+          options: [{ id: 'england', value: 'england', label: 'England' }],
         },
         localAuthority: {
           legend: 'Local authority',
-          options: [{ value: 'sheffield', label: 'Sheffield' }],
+          options: [
+            { id: 'sheffield', value: 'sheffield', label: 'Sheffield' },
+          ],
         },
       },
       timePeriod: {
@@ -71,7 +73,7 @@ describe('getInitialStepSubjectMeta', () => {
     const query: ReleaseTableDataQuery = {
       releaseId: 'release-1',
       subjectId: 'subject-1',
-      locations: {},
+      locationIds: [],
       indicators: [],
       filters: [],
     };
@@ -105,9 +107,7 @@ describe('getInitialStepSubjectMeta', () => {
     const query: ReleaseTableDataQuery = {
       releaseId: 'release-1',
       subjectId: 'subject-1',
-      locations: {
-        country: ['england'],
-      },
+      locationIds: ['england'],
       indicators: [],
       filters: [],
     };
@@ -129,11 +129,13 @@ describe('getInitialStepSubjectMeta', () => {
       locations: {
         country: {
           legend: 'Country',
-          options: [{ value: 'england', label: 'England' }],
+          options: [{ id: 'england', value: 'england', label: 'England' }],
         },
         localAuthority: {
           legend: 'Local authority',
-          options: [{ value: 'sheffield', label: 'Sheffield' }],
+          options: [
+            { id: 'sheffield', value: 'sheffield', label: 'Sheffield' },
+          ],
         },
       },
       timePeriod: {
@@ -150,10 +152,7 @@ describe('getInitialStepSubjectMeta', () => {
     const query: ReleaseTableDataQuery = {
       releaseId: 'release-1',
       subjectId: 'subject-1',
-      locations: {
-        country: ['england'],
-        localAuthority: ['sheffield', 'barnsley'],
-      },
+      locationIds: ['england', 'sheffield', 'barnsley'],
       indicators: [],
       filters: [],
     };
@@ -190,7 +189,7 @@ describe('getInitialStepSubjectMeta', () => {
       locations: {
         country: {
           legend: 'Country',
-          options: [{ value: 'england', label: 'England' }],
+          options: [{ id: 'england', value: 'england', label: 'England' }],
         },
       },
       timePeriod: {
@@ -235,9 +234,7 @@ describe('getInitialStepSubjectMeta', () => {
     const query: ReleaseTableDataQuery = {
       releaseId: 'release-1',
       subjectId: 'subject-1',
-      locations: {
-        country: ['england'],
-      },
+      locationIds: ['england'],
       timePeriod: {
         startYear: 2018,
         startCode: 'AY',
@@ -255,12 +252,7 @@ describe('getInitialStepSubjectMeta', () => {
           measures: {
             'indicator-1': '123',
           },
-          location: {
-            country: {
-              name: 'England',
-              code: 'england',
-            },
-          },
+          locationId: 'england',
           geographicLevel: 'country',
           filters: ['filter-item-1'],
         },
@@ -272,7 +264,7 @@ describe('getInitialStepSubjectMeta', () => {
         footnotes: [],
         boundaryLevels: [],
         locations: {
-          country: [{ value: 'england', label: 'England' }],
+          country: [{ id: 'england', value: 'england', label: 'England' }],
         },
         timePeriodRange: [{ year: 2018, code: 'AY', label: '2018' }],
         indicators: [

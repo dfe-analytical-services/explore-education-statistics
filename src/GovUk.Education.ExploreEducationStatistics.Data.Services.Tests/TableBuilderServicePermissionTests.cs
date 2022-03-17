@@ -143,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 resultSubjectMetaService ?? Mock.Of<IResultSubjectMetaService>(MockBehavior.Strict),
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
                 userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
-                resultBuilder ?? new ResultBuilder(DataServiceMapperUtils.DataServiceMapper()),
+                resultBuilder ?? new ResultBuilder(),
                 releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict),
                 options ?? Options.Create(new TableBuilderOptions())
             );

@@ -243,7 +243,13 @@ describe('TimePeriodDataTable', () => {
           },
         ],
         locations: {
-          country: [{ value: 'E92000001', label: 'England' }],
+          country: [
+            {
+              id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              value: 'E92000001',
+              label: 'England',
+            },
+          ],
         },
         boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
@@ -255,7 +261,7 @@ describe('TimePeriodDataTable', () => {
         {
           filters: ['598ed9fd-b37e-4e08-baec-08d78f6f2c4d'],
           geographicLevel: 'country',
-          location: { country: { code: 'E92000001', name: 'England' } },
+          locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
           measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
           timePeriod: '2014_AY',
         },
@@ -273,7 +279,13 @@ describe('TimePeriodDataTable', () => {
           ],
         ],
         rowGroups: [
-          [{ value: 'E92000001', type: 'Location', level: 'country' }],
+          [
+            {
+              value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              type: 'Location',
+              level: 'country',
+            },
+          ],
         ],
         columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
@@ -335,7 +347,13 @@ describe('TimePeriodDataTable', () => {
           },
         ],
         locations: {
-          country: [{ value: 'E92000001', label: 'England' }],
+          country: [
+            {
+              id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              value: 'E92000001',
+              label: 'England',
+            },
+          ],
         },
         boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
@@ -347,7 +365,7 @@ describe('TimePeriodDataTable', () => {
         {
           filters: [],
           geographicLevel: 'country',
-          location: { country: { code: 'E92000001', name: 'England' } },
+          locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
           measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
           timePeriod: '2014_AY',
         },
@@ -358,7 +376,13 @@ describe('TimePeriodDataTable', () => {
       {
         columnGroups: [],
         rowGroups: [
-          [{ value: 'E92000001', level: 'country', type: 'Location' }],
+          [
+            {
+              value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              level: 'country',
+              type: 'Location',
+            },
+          ],
         ],
         columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
@@ -419,7 +443,13 @@ describe('TimePeriodDataTable', () => {
           },
         ],
         locations: {
-          country: [{ value: 'E92000001', label: 'England' }],
+          country: [
+            {
+              id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              value: 'E92000001',
+              label: 'England',
+            },
+          ],
         },
         boundaryLevels: [],
         publicationName: 'Pupil absence in schools in England',
@@ -431,7 +461,7 @@ describe('TimePeriodDataTable', () => {
         {
           filters: [],
           geographicLevel: 'country',
-          location: { country: { code: 'E92000001', name: 'England' } },
+          locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
           measures: { '6160c4f8-4c9f-40f0-a623-2a4f742860af': '18.3' },
           timePeriod: '2014_AY',
         },
@@ -442,7 +472,13 @@ describe('TimePeriodDataTable', () => {
       {
         columnGroups: [],
         rowGroups: [
-          [{ value: 'E92000001', type: 'Location', level: 'country' }],
+          [
+            {
+              value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              type: 'Location',
+              level: 'country',
+            },
+          ],
         ],
         columns: [{ value: '2014_AY', type: 'TimePeriod' }],
         rows: [
@@ -505,17 +541,37 @@ describe('TimePeriodDataTable', () => {
         ],
         // Contains a mixture of hierarchical (LAs) and flat (country) locations
         locations: {
-          country: [{ value: 'england', label: 'England' }],
+          country: [
+            {
+              id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              value: 'england',
+              label: 'England',
+            },
+          ],
           localAuthority: [
             {
               value: 'yorkshire',
               label: 'Yorkshire and the Humber',
-              options: [{ value: 'barnsley', label: 'Barnsley' }],
+              level: 'region',
+              options: [
+                {
+                  id: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+                  value: 'barnsley',
+                  label: 'Barnsley',
+                },
+              ],
             },
             {
               value: 'outer-london',
               label: 'Outer London',
-              options: [{ value: 'barnet', label: 'Barnet' }],
+              level: 'region',
+              options: [
+                {
+                  id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+                  value: 'barnet',
+                  label: 'Barnet',
+                },
+              ],
             },
           ],
         },
@@ -529,27 +585,21 @@ describe('TimePeriodDataTable', () => {
         {
           filters: [],
           geographicLevel: 'country',
-          location: {
-            country: { code: 'england', name: 'England' },
-          },
+          locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
           measures: { 'authorised-absence-rate': '18.3' },
           timePeriod: '2014_AY',
         },
         {
           filters: [],
           geographicLevel: 'localAuthority',
-          location: {
-            localAuthority: { code: 'barnet', name: 'Barnet' },
-          },
+          locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
           measures: { 'authorised-absence-rate': '20.2' },
           timePeriod: '2014_AY',
         },
         {
           filters: [],
           geographicLevel: 'localAuthority',
-          location: {
-            localAuthority: { code: 'barnsley', name: 'Barnsley' },
-          },
+          locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
           measures: { 'authorised-absence-rate': '21.5' },
           timePeriod: '2014_AY',
         },
@@ -561,9 +611,21 @@ describe('TimePeriodDataTable', () => {
         columnGroups: [],
         rowGroups: [
           [
-            { value: 'england', level: 'country', type: 'Location' },
-            { value: 'barnsley', level: 'localAuthority', type: 'Location' },
-            { value: 'barnet', level: 'localAuthority', type: 'Location' },
+            {
+              value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              level: 'country',
+              type: 'Location',
+            },
+            {
+              value: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+              level: 'localAuthority',
+              type: 'Location',
+            },
+            {
+              value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+              level: 'localAuthority',
+              type: 'Location',
+            },
           ],
         ],
         columns: [{ value: '2014_AY', type: 'TimePeriod' }],
@@ -669,8 +731,16 @@ describe('TimePeriodDataTable', () => {
       ],
       rowGroups: [
         [
-          { value: 'E08000026', type: 'Location', level: 'localAuthority' },
-          { value: 'E09000008', type: 'Location', level: 'localAuthority' },
+          {
+            value: '206db2c4-76f9-4dbd-9a96-6927480625ec',
+            type: 'Location',
+            level: 'localAuthority',
+          },
+          {
+            value: '5c067998-b851-4e03-83b3-c11f71c07a4d',
+            type: 'Location',
+            level: 'localAuthority',
+          },
         ],
         [
           {
@@ -749,8 +819,16 @@ describe('TimePeriodDataTable', () => {
       ],
       rowGroups: [
         [
-          { value: 'E08000026', type: 'Location', level: 'localAuthority' },
-          { value: 'E09000008', type: 'Location', level: 'localAuthority' },
+          {
+            value: '206db2c4-76f9-4dbd-9a96-6927480625ec',
+            type: 'Location',
+            level: 'localAuthority',
+          },
+          {
+            value: '5c067998-b851-4e03-83b3-c11f71c07a4d',
+            type: 'Location',
+            level: 'localAuthority',
+          },
         ],
         [
           {
@@ -821,8 +899,16 @@ describe('TimePeriodDataTable', () => {
       ],
       rowGroups: [
         [
-          { value: 'E08000026', type: 'Location', level: 'localAuthority' },
-          { value: 'E09000008', type: 'Location', level: 'localAuthority' },
+          {
+            value: '206db2c4-76f9-4dbd-9a96-6927480625ec',
+            type: 'Location',
+            level: 'localAuthority',
+          },
+          {
+            value: '5c067998-b851-4e03-83b3-c11f71c07a4d',
+            type: 'Location',
+            level: 'localAuthority',
+          },
         ],
         [
           {
@@ -885,8 +971,16 @@ describe('TimePeriodDataTable', () => {
       ],
       rowGroups: [
         [
-          { value: 'E08000026', type: 'Location', level: 'localAuthority' },
-          { value: 'E09000008', type: 'Location', level: 'localAuthority' },
+          {
+            value: '206db2c4-76f9-4dbd-9a96-6927480625ec',
+            type: 'Location',
+            level: 'localAuthority',
+          },
+          {
+            value: '5c067998-b851-4e03-83b3-c11f71c07a4d',
+            type: 'Location',
+            level: 'localAuthority',
+          },
         ],
         [
           {

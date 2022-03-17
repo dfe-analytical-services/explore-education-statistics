@@ -42,8 +42,6 @@ export type MeasurementsMergeStrategy = (
  * value will reside within a single table cell. By default this is by summing
  * any numerical values together or, if no numeric values exist, to display the
  * first non-numeric string.
- *
- * @deprecated Remove in EES-2783
  */
 export default function combineMeasuresWithDuplicateLocationCodes(
   results: TableDataResult[],
@@ -61,7 +59,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
   const [deduplicatedLocationsResults, unaffectedResults] = partition(
     results,
     result => {
-      const { code } = result.location[result.geographicLevel];
+      const { code } = result.location![result.geographicLevel];
       return deduplicatedLocations.find(
         dedupedLocations =>
           dedupedLocations.level === result.geographicLevel &&
@@ -82,7 +80,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
     result =>
       JSON.stringify({
         level: result.geographicLevel,
-        code: result.location[result.geographicLevel].code,
+        code: result.location![result.geographicLevel].code,
       }),
   );
 
@@ -91,7 +89,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
       const { level, code }: LocationGroupingKey = JSON.parse(key);
       const resultsGroupedByLocationName = groupBy(
         resultsForLocation,
-        r => r.location[level].name,
+        r => r.location![level].name,
       );
 
       // If there is only a single unique Location name for this combination of Level and Code, no combining of result

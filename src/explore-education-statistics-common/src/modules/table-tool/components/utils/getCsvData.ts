@@ -5,6 +5,7 @@ import {
   WorkerTimePeriodFilter,
   WorkerFullTable,
 } from '@common/modules/table-tool/types/workerFullTable';
+import { TableDataResult } from '@common/services/tableBuilderService';
 import cartesian from '@common/utils/cartesian';
 
 const EMPTY_CELL_TEXT = 'no data';
@@ -39,6 +40,23 @@ export default function getCsvData(fullTable: WorkerFullTable): string[][] {
     ...indicatorColumns,
   ];
 
+  const resultMatchesLocationFilter = (
+    result: TableDataResult,
+    location: WorkerLocationFilter,
+  ) => {
+    // Attempt to match on the legacy 'location' field that exists in table results
+    // of historical Permalinks created prior to EES-2955.
+    if (result.location) {
+      const { geographicLevel } = result;
+      return (
+        result.location[geographicLevel]?.code === location.value &&
+        geographicLevel === location.level
+      );
+    }
+
+    return result.locationId === location.value;
+  };
+
   const rows = cartesian<WorkerFilter>(
     locations,
     timePeriodRange,
@@ -53,15 +71,11 @@ export default function getCsvData(fullTable: WorkerFullTable): string[][] {
 
       const indicatorCells = indicators.map(indicator => {
         const matchingResult = results.find(result => {
-          const { geographicLevel } = result;
-
           return (
             filterOptions.every(filter =>
               result.filters.includes(filter.value),
             ) &&
-            result.location[geographicLevel] &&
-            result.location[geographicLevel].code === location.value &&
-            location.level === geographicLevel &&
+            resultMatchesLocationFilter(result, location) &&
             result.timePeriod === timePeriod.value
           );
         });

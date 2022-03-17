@@ -74,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                         .CountFilterItemsByFilter(dataBlock.Query.Filters);
 
                     var countOfIndicators = query.Indicators.Count();
-                    var countOfLocations = query.Locations.CountItems();
+                    var countOfLocations = query.LocationIds.Count;
                     var countOfTimePeriods = TimePeriodUtil.Range(query.TimePeriod).Count();
 
                     var maxTableCellCount = TableBuilderUtils.MaximumTableCellCount(

@@ -39,7 +39,7 @@ describe('DataTableCaption', () => {
     ],
     locations: [
       new LocationFilter({
-        value: 'E92000001',
+        value: 'england',
         label: 'England',
         level: 'country',
       }),
@@ -183,22 +183,22 @@ describe('DataTableCaption', () => {
       locations: [
         ...testfullTableMeta.locations,
         new LocationFilter({
-          value: 'E09000002',
+          value: 'barking-and-dagenham',
           label: 'Barking and Dagenham',
           level: 'localAuthority',
         }),
         new LocationFilter({
-          value: 'E09000003',
+          value: 'barnet',
           label: 'Barnet',
           level: 'localAuthority',
         }),
         new LocationFilter({
-          value: 'E07000223',
+          value: 'adur',
           label: 'Adur',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
-          value: 'E07000026',
+          value: 'allerdale',
           label: 'Allerdale',
           level: 'localAuthorityDistrict',
         }),
@@ -221,57 +221,57 @@ describe('DataTableCaption', () => {
       locations: [
         ...testfullTableMeta.locations,
         new LocationFilter({
-          value: 'E09000004',
+          value: 'eleven',
           label: 'Eleven',
           level: 'localAuthority',
         }),
         new LocationFilter({
-          value: 'E09000002',
+          value: 'ten',
           label: 'Ten',
           level: 'localAuthority',
         }),
         new LocationFilter({
-          value: 'E09000003',
+          value: 'nine',
           label: 'Nine',
           level: 'localAuthority',
         }),
         new LocationFilter({
-          value: 'E07000223',
+          value: 'eight',
           label: 'Eight',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
-          value: 'E07000026',
+          value: 'seven',
           label: 'Seven',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
-          value: 'E07000027',
+          value: 'one',
           label: 'One',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
-          value: 'E07000028',
+          value: 'two',
           label: 'Two',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
-          value: 'E07000029',
+          value: 'three',
           label: 'Three',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
-          value: 'E07000030',
+          value: 'four',
           label: 'Four',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
-          value: 'E07000031',
+          value: 'five',
           label: 'Five',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
-          value: 'E07000032',
+          value: 'six',
           label: 'Six',
           level: 'localAuthorityDistrict',
         }),

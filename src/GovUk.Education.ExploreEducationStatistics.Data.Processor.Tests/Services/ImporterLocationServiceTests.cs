@@ -74,8 +74,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(locationId, result.Id);
                 Assert.Equal(GeographicLevel.Country, result.GeographicLevel);
-                Assert.Equal(_england.Code, result.Country.Code);
-                Assert.Equal(_england.Name, result.Country.Name);
+                Assert.NotNull(result.Country);
+                Assert.Equal(_england.Code, result.Country!.Code);
+                Assert.Equal(_england.Name, result.Country!.Name);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -85,8 +86,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.NotNull(location);
                 Assert.Equal(locationId, location!.Id);
                 Assert.Equal(GeographicLevel.Country, location.GeographicLevel);
-                Assert.Equal(_england.Code, location.Country.Code);
-                Assert.Equal(_england.Name, location.Country.Name);
+                Assert.NotNull(location.Country);
+                Assert.Equal(_england.Code, location.Country!.Code);
+                Assert.Equal(_england.Name, location.Country!.Name);
             }
         }
 
@@ -118,11 +120,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(locationId, result.Id);
                 Assert.Equal(GeographicLevel.LocalAuthority, result.GeographicLevel);
-                Assert.Equal(_england.Code, result.Country.Code);
-                Assert.Equal(_england.Name, result.Country.Name);
-                Assert.Null(result.LocalAuthority.Code);
-                Assert.Equal("820", result.LocalAuthority.OldCode);
-                Assert.Equal("Bedfordshire", result.LocalAuthority.Name);
+                Assert.NotNull(result.Country);
+                Assert.Equal(_england.Code, result.Country!.Code);
+                Assert.Equal(_england.Name, result.Country!.Name);
+                Assert.NotNull(result.LocalAuthority);
+                Assert.Null(result.LocalAuthority!.Code);
+                Assert.Equal("820", result.LocalAuthority!.OldCode);
+                Assert.Equal("Bedfordshire", result.LocalAuthority!.Name);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -132,11 +136,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.NotNull(location);
                 Assert.Equal(locationId, location!.Id);
                 Assert.Equal(GeographicLevel.LocalAuthority, location.GeographicLevel);
-                Assert.Equal(_england.Code, location.Country.Code);
-                Assert.Equal(_england.Name, location.Country.Name);
-                Assert.Null(location.LocalAuthority.Code);
-                Assert.Equal("820", location.LocalAuthority.OldCode);
-                Assert.Equal("Bedfordshire", location.LocalAuthority.Name);
+                Assert.NotNull(location.Country);
+                Assert.Equal(_england.Code, location.Country!.Code);
+                Assert.Equal(_england.Name, location.Country!.Name);
+                Assert.NotNull(location.LocalAuthority);
+                Assert.Null(location.LocalAuthority!.Code);
+                Assert.Equal("820", location.LocalAuthority!.OldCode);
+                Assert.Equal("Bedfordshire", location.LocalAuthority!.Name);
             }
         }
 
@@ -176,17 +182,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(result1Id, result1.Id);
                 Assert.Equal(GeographicLevel.Region, result1.GeographicLevel);
-                Assert.Equal(_england.Code, result1.Country.Code);
-                Assert.Equal(_england.Name, result1.Country.Name);
-                Assert.Equal("1", result1.Region.Code);
-                Assert.Equal("North East", result1.Region.Name);
+                Assert.NotNull(result1.Country);
+                Assert.Equal(_england.Code, result1.Country!.Code);
+                Assert.Equal(_england.Name, result1.Country!.Name);
+                Assert.NotNull(result1.Region);
+                Assert.Equal("1", result1.Region!.Code);
+                Assert.Equal("North East", result1.Region!.Name);
 
                 Assert.Equal(result2Id, result2.Id);
                 Assert.Equal(GeographicLevel.Region, result2.GeographicLevel);
-                Assert.Equal(_england.Code, result2.Country.Code);
-                Assert.Equal(_england.Name, result2.Country.Name);
-                Assert.Equal("1", result2.Region.Code);
-                Assert.Equal("North West", result2.Region.Name);
+                Assert.NotNull(result2.Country);
+                Assert.Equal(_england.Code, result2.Country!.Code);
+                Assert.Equal(_england.Name, result2.Country!.Name);
+                Assert.NotNull(result2.Region);
+                Assert.Equal("1", result2.Region!.Code);
+                Assert.Equal("North West", result2.Region!.Name);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -197,17 +207,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(result1Id, locations[0].Id);
                 Assert.Equal(GeographicLevel.Region, locations[0].GeographicLevel);
-                Assert.Equal(_england.Code, locations[0].Country.Code);
-                Assert.Equal(_england.Name, locations[0].Country.Name);
-                Assert.Equal("1", locations[0].Region.Code);
-                Assert.Equal("North East", locations[0].Region.Name);
+                Assert.NotNull(locations[0].Country);
+                Assert.Equal(_england.Code, locations[0].Country!.Code);
+                Assert.Equal(_england.Name, locations[0].Country!.Name);
+                Assert.NotNull(locations[0].Region);
+                Assert.Equal("1", locations[0].Region!.Code);
+                Assert.Equal("North East", locations[0].Region!.Name);
 
                 Assert.Equal(result2Id, locations[1].Id);
                 Assert.Equal(GeographicLevel.Region, locations[1].GeographicLevel);
-                Assert.Equal(_england.Code, locations[1].Country.Code);
-                Assert.Equal(_england.Name, locations[1].Country.Name);
-                Assert.Equal("1", locations[1].Region.Code);
-                Assert.Equal("North West", locations[1].Region.Name);
+                Assert.NotNull(locations[1].Country);
+                Assert.Equal(_england.Code, locations[1].Country!.Code);
+                Assert.Equal(_england.Name, locations[1].Country!.Name);
+                Assert.NotNull(locations[1].Region);
+                Assert.Equal("1", locations[1].Region!.Code);
+                Assert.Equal("North West", locations[1].Region!.Name);
             }
         }
 
@@ -247,17 +261,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(result1Id, result1.Id);
                 Assert.Equal(GeographicLevel.Region, result1.GeographicLevel);
-                Assert.Equal(_england.Code, result1.Country.Code);
-                Assert.Equal(_england.Name, result1.Country.Name);
-                Assert.Equal("1", result1.Region.Code);
-                Assert.Equal("North East", result1.Region.Name);
+                Assert.NotNull(result1.Country);
+                Assert.Equal(_england.Code, result1.Country!.Code);
+                Assert.Equal(_england.Name, result1.Country!.Name);
+                Assert.NotNull(result1.Region);
+                Assert.Equal("1", result1.Region!.Code);
+                Assert.Equal("North East", result1.Region!.Name);
 
                 Assert.Equal(result2Id, result2.Id);
                 Assert.Equal(GeographicLevel.Region, result2.GeographicLevel);
-                Assert.Equal(_england.Code, result2.Country.Code);
-                Assert.Equal(_england.Name, result2.Country.Name);
-                Assert.Equal("2", result2.Region.Code);
-                Assert.Equal("North East", result2.Region.Name);
+                Assert.NotNull(result2.Country);
+                Assert.Equal(_england.Code, result2.Country!.Code);
+                Assert.Equal(_england.Name, result2.Country!.Name);
+                Assert.NotNull(result2.Region);
+                Assert.Equal("2", result2.Region!.Code);
+                Assert.Equal("North East", result2.Region!.Name);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -268,17 +286,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(result1Id, locations[0].Id);
                 Assert.Equal(GeographicLevel.Region, locations[0].GeographicLevel);
-                Assert.Equal(_england.Code, locations[0].Country.Code);
-                Assert.Equal(_england.Name, locations[0].Country.Name);
-                Assert.Equal("1", locations[0].Region.Code);
-                Assert.Equal("North East", locations[0].Region.Name);
+                Assert.NotNull(locations[0].Country);
+                Assert.Equal(_england.Code, locations[0].Country!.Code);
+                Assert.Equal(_england.Name, locations[0].Country!.Name);
+                Assert.NotNull(locations[0].Region);
+                Assert.Equal("1", locations[0].Region!.Code);
+                Assert.Equal("North East", locations[0].Region!.Name);
 
                 Assert.Equal(result2Id, locations[1].Id);
                 Assert.Equal(GeographicLevel.Region, locations[1].GeographicLevel);
-                Assert.Equal(_england.Code, locations[1].Country.Code);
-                Assert.Equal(_england.Name, locations[1].Country.Name);
-                Assert.Equal("2", locations[1].Region.Code);
-                Assert.Equal("North East", locations[1].Region.Name);
+                Assert.NotNull(locations[1].Country);
+                Assert.Equal(_england.Code, locations[1].Country!.Code);
+                Assert.Equal(_england.Name, locations[1].Country!.Name);
+                Assert.NotNull(locations[1].Region);
+                Assert.Equal("2", locations[1].Region!.Code);
+                Assert.Equal("North East", locations[1].Region!.Name);
             }
         }
 
@@ -318,19 +340,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(result1Id, result1.Id);
                 Assert.Equal(GeographicLevel.LocalAuthority, result1.GeographicLevel);
-                Assert.Equal(_england.Code, result1.Country.Code);
-                Assert.Equal(_england.Name, result1.Country.Name);
-                Assert.Equal("1", result1.LocalAuthority.Code);
-                Assert.Equal("100", result1.LocalAuthority.OldCode);
-                Assert.Equal("Westminster", result1.LocalAuthority.Name);
+                Assert.NotNull(result1.Country);
+                Assert.Equal(_england.Code, result1.Country!.Code);
+                Assert.Equal(_england.Name, result1.Country!.Name);
+                Assert.NotNull(result1.LocalAuthority);
+                Assert.Equal("1", result1.LocalAuthority!.Code);
+                Assert.Equal("100", result1.LocalAuthority!.OldCode);
+                Assert.Equal("Westminster", result1.LocalAuthority!.Name);
 
                 Assert.Equal(result2Id, result2.Id);
                 Assert.Equal(GeographicLevel.LocalAuthority, result2.GeographicLevel);
-                Assert.Equal(_england.Code, result2.Country.Code);
-                Assert.Equal(_england.Name, result2.Country.Name);
-                Assert.Equal("1", result2.LocalAuthority.Code);
-                Assert.Equal("101", result2.LocalAuthority.OldCode);
-                Assert.Equal("Westminster", result2.LocalAuthority.Name);
+                Assert.NotNull(result2.Country);
+                Assert.Equal(_england.Code, result2.Country!.Code);
+                Assert.Equal(_england.Name, result2.Country!.Name);
+                Assert.NotNull(result2.LocalAuthority);
+                Assert.Equal("1", result2.LocalAuthority!.Code);
+                Assert.Equal("101", result2.LocalAuthority!.OldCode);
+                Assert.Equal("Westminster", result2.LocalAuthority!.Name);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -341,19 +367,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(result1Id, locations[0].Id);
                 Assert.Equal(GeographicLevel.LocalAuthority, locations[0].GeographicLevel);
-                Assert.Equal(_england.Code, locations[0].Country.Code);
-                Assert.Equal(_england.Name, locations[0].Country.Name);
-                Assert.Equal("1", locations[0].LocalAuthority.Code);
-                Assert.Equal("100", locations[0].LocalAuthority.OldCode);
-                Assert.Equal("Westminster", locations[0].LocalAuthority.Name);
+                Assert.NotNull(locations[0].Country);
+                Assert.Equal(_england.Code, locations[0].Country!.Code);
+                Assert.Equal(_england.Name, locations[0].Country!.Name);
+                Assert.NotNull(locations[0].LocalAuthority);
+                Assert.Equal("1", locations[0].LocalAuthority!.Code);
+                Assert.Equal("100", locations[0].LocalAuthority!.OldCode);
+                Assert.Equal("Westminster", locations[0].LocalAuthority!.Name);
 
                 Assert.Equal(result2Id, locations[1].Id);
                 Assert.Equal(GeographicLevel.LocalAuthority, locations[1].GeographicLevel);
-                Assert.Equal(_england.Code, locations[1].Country.Code);
-                Assert.Equal(_england.Name, locations[1].Country.Name);
-                Assert.Equal("1", locations[1].LocalAuthority.Code);
-                Assert.Equal("101", locations[1].LocalAuthority.OldCode);
-                Assert.Equal("Westminster", locations[1].LocalAuthority.Name);
+                Assert.NotNull(locations[1].Country);
+                Assert.Equal(_england.Code, locations[1].Country!.Code);
+                Assert.Equal(_england.Name, locations[1].Country!.Name);
+                Assert.NotNull(locations[1].LocalAuthority);
+                Assert.Equal("1", locations[1].LocalAuthority!.Code);
+                Assert.Equal("101", locations[1].LocalAuthority!.OldCode);
+                Assert.Equal("Westminster", locations[1].LocalAuthority!.Name);
             }
         }
 
@@ -400,21 +430,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(result1Id, result1.Id);
                 Assert.Equal(GeographicLevel.LocalAuthority, result1.GeographicLevel);
-                Assert.Equal(_england.Code, result1.Country.Code);
-                Assert.Equal(_england.Name, result1.Country.Name);
-                Assert.Equal(localAuthority.Code, result1.LocalAuthority.Code);
-                Assert.Equal(localAuthority.Name, result1.LocalAuthority.Name);
-                Assert.Equal(localAuthorityDistrict.Code, result1.LocalAuthorityDistrict.Code);
-                Assert.Equal(localAuthorityDistrict.Name, result1.LocalAuthorityDistrict.Name);
+                Assert.NotNull(result1.Country);
+                Assert.Equal(_england.Code, result1.Country!.Code);
+                Assert.Equal(_england.Name, result1.Country!.Name);
+                Assert.NotNull(result1.LocalAuthority);
+                Assert.Equal(localAuthority.Code, result1.LocalAuthority!.Code);
+                Assert.Equal(localAuthority.Name, result1.LocalAuthority!.Name);
+                Assert.NotNull(result1.LocalAuthorityDistrict);
+                Assert.Equal(localAuthorityDistrict.Code, result1.LocalAuthorityDistrict!.Code);
+                Assert.Equal(localAuthorityDistrict.Name, result1.LocalAuthorityDistrict!.Name);
 
                 Assert.Equal(result2Id, result2.Id);
                 Assert.Equal(GeographicLevel.LocalAuthorityDistrict, result2.GeographicLevel);
-                Assert.Equal(_england.Code, result2.Country.Code);
-                Assert.Equal(_england.Name, result2.Country.Name);
-                Assert.Equal(localAuthority.Code, result2.LocalAuthority.Code);
-                Assert.Equal(localAuthority.Name, result2.LocalAuthority.Name);
-                Assert.Equal(localAuthorityDistrict.Code, result2.LocalAuthorityDistrict.Code);
-                Assert.Equal(localAuthorityDistrict.Name, result2.LocalAuthorityDistrict.Name);
+                Assert.NotNull(result2.Country);
+                Assert.Equal(_england.Code, result2.Country!.Code);
+                Assert.Equal(_england.Name, result2.Country!.Name);
+                Assert.NotNull(result2.LocalAuthority);
+                Assert.Equal(localAuthority.Code, result2.LocalAuthority!.Code);
+                Assert.Equal(localAuthority.Name, result2.LocalAuthority!.Name);
+                Assert.NotNull(result2.LocalAuthorityDistrict);
+                Assert.Equal(localAuthorityDistrict.Code, result2.LocalAuthorityDistrict!.Code);
+                Assert.Equal(localAuthorityDistrict.Name, result2.LocalAuthorityDistrict!.Name);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -425,21 +461,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(result1Id, locations[0].Id);
                 Assert.Equal(GeographicLevel.LocalAuthority, locations[0].GeographicLevel);
-                Assert.Equal(_england.Code, locations[0].Country.Code);
-                Assert.Equal(_england.Name, locations[0].Country.Name);
-                Assert.Equal(localAuthority.Code, locations[0].LocalAuthority.Code);
-                Assert.Equal(localAuthority.Name, locations[0].LocalAuthority.Name);
-                Assert.Equal(localAuthorityDistrict.Code, locations[0].LocalAuthorityDistrict.Code);
-                Assert.Equal(localAuthorityDistrict.Name, locations[0].LocalAuthorityDistrict.Name);
+                Assert.NotNull(locations[0].Country);
+                Assert.Equal(_england.Code, locations[0].Country!.Code);
+                Assert.Equal(_england.Name, locations[0].Country!.Name);
+                Assert.NotNull(locations[0].LocalAuthority);
+                Assert.Equal(localAuthority.Code, locations[0].LocalAuthority!.Code);
+                Assert.Equal(localAuthority.Name, locations[0].LocalAuthority!.Name);
+                Assert.NotNull(locations[0].LocalAuthorityDistrict);
+                Assert.Equal(localAuthorityDistrict.Code, locations[0].LocalAuthorityDistrict!.Code);
+                Assert.Equal(localAuthorityDistrict.Name, locations[0].LocalAuthorityDistrict!.Name);
 
                 Assert.Equal(result2Id, locations[1].Id);
                 Assert.Equal(GeographicLevel.LocalAuthorityDistrict, locations[1].GeographicLevel);
-                Assert.Equal(_england.Code, locations[1].Country.Code);
-                Assert.Equal(_england.Name, locations[1].Country.Name);
-                Assert.Equal(localAuthority.Code, locations[1].LocalAuthority.Code);
-                Assert.Equal(localAuthority.Name, locations[1].LocalAuthority.Name);
-                Assert.Equal(localAuthorityDistrict.Code, locations[1].LocalAuthorityDistrict.Code);
-                Assert.Equal(localAuthorityDistrict.Name, locations[1].LocalAuthorityDistrict.Name);
+                Assert.NotNull(locations[1].Country);
+                Assert.Equal(_england.Code, locations[1].Country!.Code);
+                Assert.Equal(_england.Name, locations[1].Country!.Name);
+                Assert.NotNull(locations[1].LocalAuthority);
+                Assert.Equal(localAuthority.Code, locations[1].LocalAuthority!.Code);
+                Assert.Equal(localAuthority.Name, locations[1].LocalAuthority!.Name);
+                Assert.NotNull(locations[1].LocalAuthorityDistrict);
+                Assert.Equal(localAuthorityDistrict.Code, locations[1].LocalAuthorityDistrict!.Code);
+                Assert.Equal(localAuthorityDistrict.Name, locations[1].LocalAuthorityDistrict!.Name);
             }
         }
 
@@ -481,17 +523,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(result1Id, result1.Id);
                 Assert.Equal(GeographicLevel.Provider, result1.GeographicLevel);
-                Assert.Equal(_england.Code, result1.Country.Code);
-                Assert.Equal(_england.Name, result1.Country.Name);
-                Assert.Equal(provider.Code, result1.Provider.Code);
-                Assert.Equal(provider.Name, result1.Provider.Name);
+                Assert.NotNull(result1.Country);
+                Assert.Equal(_england.Code, result1.Country!.Code);
+                Assert.Equal(_england.Name, result1.Country!.Name);
+                Assert.NotNull(result1.Provider);
+                Assert.Equal(provider.Code, result1.Provider!.Code);
+                Assert.Equal(provider.Name, result1.Provider!.Name);
 
                 Assert.Equal(result2Id, result2.Id);
                 Assert.Equal(GeographicLevel.Provider, result2.GeographicLevel);
-                Assert.Equal(_wales.Code, result2.Country.Code);
-                Assert.Equal(_wales.Name, result2.Country.Name);
-                Assert.Equal(provider.Code, result2.Provider.Code);
-                Assert.Equal(provider.Name, result2.Provider.Name);
+                Assert.NotNull(result2.Country);
+                Assert.Equal(_wales.Code, result2.Country!.Code);
+                Assert.Equal(_wales.Name, result2.Country!.Name);
+                Assert.NotNull(result2.Provider);
+                Assert.Equal(provider.Code, result2.Provider!.Code);
+                Assert.Equal(provider.Name, result2.Provider!.Name);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -502,17 +548,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
                 Assert.Equal(result1Id, locations[0].Id);
                 Assert.Equal(GeographicLevel.Provider, locations[0].GeographicLevel);
-                Assert.Equal(_england.Code, locations[0].Country.Code);
-                Assert.Equal(_england.Name, locations[0].Country.Name);
-                Assert.Equal(provider.Code, locations[0].Provider.Code);
-                Assert.Equal(provider.Name, locations[0].Provider.Name);
+                Assert.NotNull(locations[0].Country);
+                Assert.Equal(_england.Code, locations[0].Country!.Code);
+                Assert.Equal(_england.Name, locations[0].Country!.Name);
+                Assert.NotNull(locations[0].Provider);
+                Assert.Equal(provider.Code, locations[0].Provider!.Code);
+                Assert.Equal(provider.Name, locations[0].Provider!.Name);
 
                 Assert.Equal(result2Id, locations[1].Id);
                 Assert.Equal(GeographicLevel.Provider, locations[1].GeographicLevel);
-                Assert.Equal(_wales.Code, locations[1].Country.Code);
-                Assert.Equal(_wales.Name, locations[1].Country.Name);
-                Assert.Equal(provider.Code, locations[1].Provider.Code);
-                Assert.Equal(provider.Name, locations[1].Provider.Name);
+                Assert.NotNull(locations[1].Country);
+                Assert.Equal(_wales.Code, locations[1].Country!.Code);
+                Assert.Equal(_wales.Name, locations[1].Country!.Name);
+                Assert.NotNull(locations[1].Provider);
+                Assert.Equal(provider.Code, locations[1].Provider!.Code);
+                Assert.Equal(provider.Name, locations[1].Provider!.Name);
             }
         }
 
@@ -569,10 +619,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 Assert.Equal(2, locations.Count);
 
                 Assert.Equal(result1Id, locations[0].Id);
-                Assert.Equal("Sheffield City Region", locations[0].EnglishDevolvedArea.Name);
+                Assert.Equal("Sheffield City Region", locations[0].EnglishDevolvedArea!.Name);
 
                 Assert.Equal(result2Id, locations[1].Id);
-                Assert.Equal("SHEFFIELD CITY REGION", locations[1].EnglishDevolvedArea.Name);
+                Assert.Equal("SHEFFIELD CITY REGION", locations[1].EnglishDevolvedArea!.Name);
             }
         }
 

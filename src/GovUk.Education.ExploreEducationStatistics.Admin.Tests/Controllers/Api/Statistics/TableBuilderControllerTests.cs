@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
@@ -45,14 +46,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                         Guid.NewGuid()
                     },
                     LocationId = Guid.NewGuid(),
-                    Location = new LocationViewModel
-                    {
-                        Country = new CodeNameViewModel
-                        {
-                            Code = "code",
-                            Name = "name"
-                        }
-                    },
                     Measures = new Dictionary<Guid, string>
                     {
                         { Guid.NewGuid(), "value" }
@@ -166,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var result = await controller.Query(_releaseId, _query, cancellationToken);
             VerifyAllMocks(mocks);
-            
+
             result.AssertOkResult();
         }
 
@@ -174,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task QueryForDataBlock()
         {
             var cancellationToken = new CancellationToken();
-            
+
             var releaseContentBlock = new ReleaseContentBlock
             {
                 ReleaseId = _releaseId,
@@ -194,14 +187,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     Charts = new List<IChart>()
                 }
             };
-            
+
             var (controller, mocks) = BuildControllerAndDependencies();
 
             SetupCall(mocks.persistenceHelper, releaseContentBlock);
-            
+
             mocks.cacheService
                 .Setup(s => s.GetItem(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)), 
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
                     typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
 
@@ -223,7 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
                     _tableBuilderResults))
                 .Returns(Task.CompletedTask);
-            
+
             var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId, cancellationToken);
             VerifyAllMocks(mocks);
 
@@ -261,17 +254,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     }
                 }
             };
-            
+
             var (controller, mocks) = BuildControllerAndDependencies();
 
             SetupCall(mocks.persistenceHelper, releaseContentBlock);
-            
+
             mocks.cacheService
                 .Setup(s => s.GetItem(
-                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)), 
+                    ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
                     typeof(TableBuilderResultViewModel)))
                 .ReturnsAsync(null);
-            
+
             mocks.tableBuilderService
                 .Setup(
                     s =>
@@ -291,7 +284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     ItIs.DeepEqualTo(new DataBlockTableResultCacheKey(releaseContentBlock)),
                     _tableBuilderResults))
                 .Returns(Task.CompletedTask);
-            
+
             var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId);
             VerifyAllMocks(mocks);
 
@@ -302,7 +295,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         public async Task QueryForDataBlock_NotFound()
         {
             var (controller, mocks) = BuildControllerAndDependencies();
-            
+
             SetupCall<ContentDbContext, ReleaseContentBlock>(mocks.persistenceHelper, null);
 
             var result = await controller.QueryForDataBlock(_releaseId, _dataBlockId);
@@ -331,12 +324,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     Id = _dataBlockId,
                 }
             };
-            
+
             var (controller, mocks) = BuildControllerAndDependencies();
 
             SetupCall(mocks.persistenceHelper, releaseContentBlock);
 
-            var exception = await Assert.ThrowsAsync<TargetInvocationException>(() => controller.QueryForDataBlock(_releaseId, _dataBlockId));
+            var exception =
+                await Assert.ThrowsAsync<TargetInvocationException>(() =>
+                    controller.QueryForDataBlock(_releaseId, _dataBlockId));
             Assert.IsType<ArgumentException>(exception.InnerException);
         }
 
@@ -347,11 +342,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             converted.AssertDeepEqualTo(_tableBuilderResults);
         }
 
-        private (TableBuilderController controller, 
+        private (TableBuilderController controller,
             (
-                Mock<ITableBuilderService> tableBuilderService, 
-                Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,
-                Mock<IBlobCacheService> cacheService) mocks) 
+            Mock<ITableBuilderService> tableBuilderService,
+            Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,
+            Mock<IBlobCacheService> cacheService) mocks)
             BuildControllerAndDependencies()
         {
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);

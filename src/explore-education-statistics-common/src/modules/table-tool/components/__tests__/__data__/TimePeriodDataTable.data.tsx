@@ -68,8 +68,16 @@ export const testData1 = {
       ],
       locations: {
         localAuthority: [
-          { value: 'E09000003', label: 'Barnet' },
-          { value: 'E08000016', label: 'Barnsley' },
+          {
+            id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+            value: 'E09000003',
+            label: 'Barnet',
+          },
+          {
+            id: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+            value: 'E08000016',
+            label: 'Barnsley',
+          },
         ],
       },
       boundaryLevels: [],
@@ -87,11 +95,7 @@ export const testData1 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '33725',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '41239',
@@ -104,11 +108,7 @@ export const testData1 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '31241',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '41945',
@@ -121,11 +121,7 @@ export const testData1 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '442',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '788',
@@ -138,11 +134,7 @@ export const testData1 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '1582',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '2122',
@@ -155,11 +147,7 @@ export const testData1 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '481',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '752',
@@ -172,11 +160,7 @@ export const testData1 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '904',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '1215',
@@ -189,11 +173,7 @@ export const testData1 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '32125',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '39697',
@@ -206,11 +186,7 @@ export const testData1 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '31244',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '36083',
@@ -223,11 +199,7 @@ export const testData1 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '26594',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '37084',
@@ -240,11 +212,7 @@ export const testData1 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '30389',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '34689',
@@ -257,11 +225,7 @@ export const testData1 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '939',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '1268',
@@ -274,11 +238,7 @@ export const testData1 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '31322',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '41228',
@@ -291,11 +251,7 @@ export const testData1 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '1135',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '1512',
@@ -308,11 +264,7 @@ export const testData1 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '25741',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '33422',
@@ -325,11 +277,7 @@ export const testData1 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '745',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '1105',
@@ -342,11 +290,7 @@ export const testData1 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '274',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '571',
@@ -380,8 +324,16 @@ export const testData1 = {
         },
       ],
       [
-        { value: 'E09000003', type: 'Location', level: 'localAuthority' },
-        { value: 'E08000016', type: 'Location', level: 'localAuthority' },
+        {
+          value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+          type: 'Location',
+          level: 'localAuthority',
+        },
+        {
+          value: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+          type: 'Location',
+          level: 'localAuthority',
+        },
       ],
     ],
     columns: [
@@ -461,8 +413,16 @@ export const testData2 = {
       ],
       locations: {
         localAuthority: [
-          { value: 'E09000003', label: 'Barnet' },
-          { value: 'E08000016', label: 'Barnsley' },
+          {
+            id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+            value: 'E09000003',
+            label: 'Barnet',
+          },
+          {
+            id: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+            value: 'E08000016',
+            label: 'Barnsley',
+          },
         ],
       },
       boundaryLevels: [],
@@ -480,11 +440,7 @@ export const testData2 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '3.4' },
         timePeriod: '2014_AY',
       },
@@ -494,11 +450,7 @@ export const testData2 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '2.9' },
         timePeriod: '2013_AY',
       },
@@ -508,11 +460,7 @@ export const testData2 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '1.8' },
         timePeriod: '2013_AY',
       },
@@ -522,11 +470,7 @@ export const testData2 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '4.3' },
         timePeriod: '2014_AY',
       },
@@ -536,11 +480,7 @@ export const testData2 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '3.3' },
         timePeriod: '2013_AY',
       },
@@ -550,11 +490,7 @@ export const testData2 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '2.5' },
         timePeriod: '2013_AY',
       },
@@ -564,11 +500,7 @@ export const testData2 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '3.4' },
         timePeriod: '2013_AY',
       },
@@ -578,11 +510,7 @@ export const testData2 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '3.3' },
         timePeriod: '2014_AY',
       },
@@ -592,11 +520,7 @@ export const testData2 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '3' },
         timePeriod: '2014_AY',
       },
@@ -606,11 +530,7 @@ export const testData2 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '3.3' },
         timePeriod: '2013_AY',
       },
@@ -620,11 +540,7 @@ export const testData2 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '2.4' },
         timePeriod: '2014_AY',
       },
@@ -634,11 +550,7 @@ export const testData2 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '2.8' },
         timePeriod: '2014_AY',
       },
@@ -648,11 +560,7 @@ export const testData2 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '3.7' },
         timePeriod: '2013_AY',
       },
@@ -662,11 +570,7 @@ export const testData2 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '2.9' },
         timePeriod: '2013_AY',
       },
@@ -676,11 +580,7 @@ export const testData2 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '2.6' },
         timePeriod: '2014_AY',
       },
@@ -690,11 +590,7 @@ export const testData2 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '2.1' },
         timePeriod: '2014_AY',
       },
@@ -725,8 +621,16 @@ export const testData2 = {
         },
       ],
       [
-        { value: 'E09000003', type: 'Location', level: 'localAuthority' },
-        { value: 'E08000016', type: 'Location', level: 'localAuthority' },
+        {
+          value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+          type: 'Location',
+          level: 'localAuthority',
+        },
+        {
+          value: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+          type: 'Location',
+          level: 'localAuthority',
+        },
       ],
     ],
     columns: [
@@ -802,8 +706,16 @@ export const testData3 = {
       ],
       locations: {
         localAuthority: [
-          { value: 'E09000003', label: 'Barnet' },
-          { value: 'E08000016', label: 'Barnsley' },
+          {
+            id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+            value: 'E09000003',
+            label: 'Barnet',
+          },
+          {
+            id: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+            value: 'E08000016',
+            label: 'Barnsley',
+          },
         ],
       },
       boundaryLevels: [],
@@ -818,11 +730,7 @@ export const testData3 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '3.4' },
         timePeriod: '2014_AY',
       },
@@ -832,11 +740,7 @@ export const testData3 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '4.3' },
         timePeriod: '2014_AY',
       },
@@ -846,11 +750,7 @@ export const testData3 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '3.3' },
         timePeriod: '2014_AY',
       },
@@ -860,11 +760,7 @@ export const testData3 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '3' },
         timePeriod: '2014_AY',
       },
@@ -874,11 +770,7 @@ export const testData3 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '2.4' },
         timePeriod: '2014_AY',
       },
@@ -888,11 +780,7 @@ export const testData3 = {
           'd7e7e412-f462-444f-84ac-3454fa471cb8',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000003', name: 'Barnet' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '2.8' },
         timePeriod: '2014_AY',
       },
@@ -902,11 +790,7 @@ export const testData3 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '2.6' },
         timePeriod: '2014_AY',
       },
@@ -916,11 +800,7 @@ export const testData3 = {
           'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000016', name: 'Barnsley' },
-          region: { code: 'E12000003', name: 'Yorkshire and the Humber' },
-        },
+        locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
         measures: { 'f9ae4976-7cd3-4718-834a-09349b6eb377': '2.1' },
         timePeriod: '2014_AY',
       },
@@ -951,8 +831,16 @@ export const testData3 = {
         },
       ],
       [
-        { value: 'E09000003', type: 'Location', level: 'localAuthority' },
-        { value: 'E08000016', type: 'Location', level: 'localAuthority' },
+        {
+          value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+          type: 'Location',
+          level: 'localAuthority',
+        },
+        {
+          value: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+          type: 'Location',
+          level: 'localAuthority',
+        },
       ],
     ],
     columns: [{ value: '2014_AY', type: 'TimePeriod' }],
@@ -995,7 +883,13 @@ export const testDataNoFilters = {
         },
       ],
       locations: {
-        country: [{ value: 'E92000001', label: 'England' }],
+        country: [
+          {
+            id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+            value: 'E92000001',
+            label: 'England',
+          },
+        ],
       },
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
@@ -1010,7 +904,7 @@ export const testDataNoFilters = {
       {
         filters: [],
         geographicLevel: 'country',
-        location: { country: { code: 'E92000001', name: 'England' } },
+        locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
         measures: {
           '9cf0dcf1-367e-4207-2b50-08d78f6f2b08': '2453340',
           'd1c4a0be-8756-470d-2b51-08d78f6f2b08': '1397521',
@@ -1021,7 +915,7 @@ export const testDataNoFilters = {
       {
         filters: [],
         geographicLevel: 'country',
-        location: { country: { code: 'E92000001', name: 'England' } },
+        locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
         measures: {
           '9cf0dcf1-367e-4207-2b50-08d78f6f2b08': '2212399',
           'd1c4a0be-8756-470d-2b51-08d78f6f2b08': '1280964',
@@ -1032,7 +926,7 @@ export const testDataNoFilters = {
       {
         filters: [],
         geographicLevel: 'country',
-        location: { country: { code: 'E92000001', name: 'England' } },
+        locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
         measures: {
           '9cf0dcf1-367e-4207-2b50-08d78f6f2b08': '2637752',
           'd1c4a0be-8756-470d-2b51-08d78f6f2b08': '1488865',
@@ -1063,7 +957,15 @@ export const testDataNoFilters = {
         type: 'Indicator',
       },
     ],
-    rowGroups: [[{ value: 'E92000001', type: 'Location', level: 'country' }]],
+    rowGroups: [
+      [
+        {
+          value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+          type: 'Location',
+          level: 'country',
+        },
+      ],
+    ],
   } as UnmappedTableHeadersConfig,
 };
 
@@ -1131,8 +1033,16 @@ export const testDataFiltersWithNoResults = {
       ],
       locations: {
         localAuthority: [
-          { value: 'E08000026', label: 'Coventry' },
-          { value: 'E09000008', label: 'Croydon' },
+          {
+            id: '206db2c4-76f9-4dbd-9a96-6927480625ec',
+            value: 'E08000026',
+            label: 'Coventry',
+          },
+          {
+            id: '5c067998-b851-4e03-83b3-c11f71c07a4d',
+            value: 'E09000008',
+            label: 'Croydon',
+          },
         ],
       },
       boundaryLevels: [],
@@ -1151,11 +1061,7 @@ export const testDataFiltersWithNoResults = {
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000026', name: 'Coventry' },
-          region: { code: 'E12000005', name: 'West Midlands' },
-        },
+        locationId: '206db2c4-76f9-4dbd-9a96-6927480625ec',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '4185',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '5142',
@@ -1168,11 +1074,7 @@ export const testDataFiltersWithNoResults = {
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000008', name: 'Croydon' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: '5c067998-b851-4e03-83b3-c11f71c07a4d',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': 'x',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': 'x',
@@ -1185,11 +1087,7 @@ export const testDataFiltersWithNoResults = {
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000026', name: 'Coventry' },
-          region: { code: 'E12000005', name: 'West Midlands' },
-        },
+        locationId: '206db2c4-76f9-4dbd-9a96-6927480625ec',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '6492',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '7280',
@@ -1202,11 +1100,7 @@ export const testDataFiltersWithNoResults = {
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000008', name: 'Croydon' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: '5c067998-b851-4e03-83b3-c11f71c07a4d',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '4809',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '5076',
@@ -1219,11 +1113,7 @@ export const testDataFiltersWithNoResults = {
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000008', name: 'Croydon' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: '5c067998-b851-4e03-83b3-c11f71c07a4d',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '4179',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '4390',
@@ -1236,11 +1126,7 @@ export const testDataFiltersWithNoResults = {
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E08000026', name: 'Coventry' },
-          region: { code: 'E12000005', name: 'West Midlands' },
-        },
+        locationId: '206db2c4-76f9-4dbd-9a96-6927480625ec',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '5542',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '6493',
@@ -1253,11 +1139,7 @@ export const testDataFiltersWithNoResults = {
           'b3207d77-143b-43d5-8b48-32d29727e96f',
         ],
         geographicLevel: 'localAuthority',
-        location: {
-          country: { code: 'E92000001', name: 'England' },
-          localAuthority: { code: 'E09000008', name: 'Croydon' },
-          region: { code: 'E13000002', name: 'Outer London' },
-        },
+        locationId: '5c067998-b851-4e03-83b3-c11f71c07a4d',
         measures: {
           '0003d2ac-4425-4432-2afb-08d78f6f2b08': '5322',
           '829460cd-ae9e-4266-2aff-08d78f6f2b08': '5483',

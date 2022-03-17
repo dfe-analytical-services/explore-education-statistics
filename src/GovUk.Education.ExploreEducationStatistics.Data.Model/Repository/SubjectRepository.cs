@@ -49,14 +49,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .FirstAsync();
             return firstReleaseSubject.Release.PublicationId;
         }
-
-        public async Task<Guid?> FindPublicationIdForSubject(Guid subjectId)
-        {
-            var firstReleaseSubject = await _context.ReleaseSubject
-                .Include(rs => rs.Release)
-                .Where(rs => rs.SubjectId == subjectId)
-                .FirstOrDefaultAsync();
-            return firstReleaseSubject?.Release.PublicationId;
-        }
     }
 }

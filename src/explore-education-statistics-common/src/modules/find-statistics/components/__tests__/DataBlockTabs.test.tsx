@@ -36,7 +36,6 @@ describe('DataBlockTabs', () => {
     source: '',
     query: {
       subjectId: '1',
-      geographicLevel: 'country',
       timePeriod: {
         startYear: 2012,
         startCode: 'AY',
@@ -49,7 +48,7 @@ describe('DataBlockTabs', () => {
         'unauthorised-absence-rate',
         'overall-absence-rate',
       ],
-      locations: {},
+      locationIds: ['england'],
     },
     charts: [],
     table: {
@@ -91,7 +90,6 @@ describe('DataBlockTabs', () => {
     source: '',
     query: {
       subjectId: '1',
-      geographicLevel: 'country',
       timePeriod: {
         startYear: 2016,
         startCode: 'AY',
@@ -104,7 +102,7 @@ describe('DataBlockTabs', () => {
         'unauthorised-absence-rate',
         'overall-absence-rate',
       ],
-      locations: {},
+      locationIds: ['england'],
     },
     charts: [testMapConfiguration],
     table: {
@@ -414,8 +412,8 @@ describe('DataBlockTabs', () => {
       results: [
         {
           filters: ['characteristic-total', 'school-type-total'],
-          geographicLevel: 'Country',
-          location: { country: { code: 'E92000001', name: 'England' } },
+          geographicLevel: 'country',
+          locationId: 'england',
           measures: {
             'authorised-absence-sessions': '500000',
           },
@@ -434,7 +432,6 @@ describe('DataBlockTabs', () => {
             id: 'block-2-id',
             query: {
               subjectId: '1',
-              geographicLevel: 'country',
               timePeriod: {
                 startYear: 2018,
                 startCode: 'AY',
@@ -443,7 +440,7 @@ describe('DataBlockTabs', () => {
               },
               filters: ['characteristic-total', 'school-type-total'],
               indicators: ['authorised-absence-sessions'],
-              locations: {},
+              locationIds: ['england'],
             },
             table: {
               tableHeaders: {

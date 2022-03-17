@@ -3,10 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Converters
 {
@@ -19,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Converters
     /// meaning there's no overall change to the data of Permalinks except for moving it between fields and transformation of format.
     ///
     /// Permalinks created prior to the Table Result Subject Metadata changes of EES-2881 (BE) and EES-2777 (FE) have a
-    /// flat 'Locations' field in their JSON serialization of type <see cref="List{ObservationalUnitMetaViewModel}"/>.
+    /// flat 'Locations' field in their JSON serialization of type <see cref="List{T}"/>.
     ///
     /// Permalinks created afterwards, plus any created while the dedicated release toggle for that feature was turned on,
     /// have locations in field <see cref="ResultSubjectMetaViewModel.Locations">PermalinkResultSubjectMeta.LocationsHierarchical</see>.
@@ -51,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Converters
                 var locationsToken = token.SelectToken("Locations");
                 if (locationsToken is {Type: JTokenType.Array})
                 {
-                    var locations = locationsToken.ToObject<List<ObservationalUnitMetaViewModel>>();
+                    var locations = locationsToken.ToObject<List<LegacyLocationAttributeViewModel>>();
                     if (locations != null && locations.Any())
                     {
                         tableSubjectMeta.LocationsHierarchical = TransformLocations(locations);
@@ -70,7 +74,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Converters
         }
 
         private static Dictionary<string, List<LocationAttributeViewModel>> TransformLocations(
-            List<ObservationalUnitMetaViewModel> locations)
+            List<LegacyLocationAttributeViewModel> locations)
         {
             var result = locations
                 .GroupBy(location => location.Level)
@@ -84,5 +88,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Converters
                         }).ToList());
             return result;
         }
+    }
+
+    /// <summary>
+    /// Legacy locations view model used in table result subject meta data of historical Permalinks.
+    /// </summary>
+    public record LegacyLocationAttributeViewModel : LabelValue
+    {
+        [JsonConverter(typeof(StringEnumConverter), typeof(CamelCaseNamingStrategy))]
+        public GeographicLevel Level { get; set; }
+
+        public dynamic GeoJson { get; set; }
     }
 }

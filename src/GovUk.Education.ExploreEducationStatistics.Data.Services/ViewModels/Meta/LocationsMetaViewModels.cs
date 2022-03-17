@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
@@ -12,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Me
 
     public record LocationAttributeViewModel : LabelValue
     {
+        public Guid? Id { get; set; }
+
         public dynamic? GeoJson { get; init; }
 
         public string? Level { get; init; }
