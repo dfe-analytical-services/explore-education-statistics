@@ -312,6 +312,7 @@ export default function createDataSetCategories(
   axisConfiguration: AxisConfiguration,
   results: TableDataResult[],
   meta: FullTableMeta,
+  includeNonNumericData = false,
 ): DataSetCategory[] {
   const categoryFilters = getCategoryFilters(axisConfiguration, meta);
   const childDataSets = getChildDataSets(axisConfiguration, meta);
@@ -321,18 +322,27 @@ export default function createDataSetCategories(
   // allow result lookups to be MUCH faster.
   const measuresByDataSet = groupResultMeasuresByDataSet(results);
 
-  const childDataSetsWithValues: Pair<
-    ChildDataSet,
-    number
-  >[] = dedupedChildDataSets
-    .map(childDataSet => {
-      const { dataSet } = childDataSet;
+  const childDataSetsWithValues = dedupedChildDataSets.reduce<
+    Pair<ChildDataSet, number>[]
+  >((acc, childDataSet) => {
+    const { dataSet } = childDataSet;
+    const rawValue = get(measuresByDataSet, getIndicatorPath(dataSet));
+    const value = Number(rawValue);
 
-      const value = Number(get(measuresByDataSet, getIndicatorPath(dataSet)));
+    if (includeNonNumericData && rawValue) {
+      acc.push([childDataSet, Number.isNaN(value) ? null : value] as Pair<
+        ChildDataSet,
+        number
+      >);
+      return acc;
+    }
 
-      return [childDataSet, value] as Pair<ChildDataSet, number>;
-    })
-    .filter(([, value]) => !Number.isNaN(value));
+    if (!Number.isNaN(value)) {
+      acc.push([childDataSet, value] as Pair<ChildDataSet, number>);
+    }
+
+    return acc;
+  }, []);
 
   const dataSetCategories = categoryFilters
     .map(filter => {
