@@ -57,7 +57,7 @@ const LocationFiltersForm = ({
 
   const formOptions = useMemo(() => Object.entries(options), [options]);
 
-  // Key options by their id to make future lookups faster/easier.
+  // Key options by level and then by id to make future lookups faster/easier.
   const keyedOptions = useMemo(
     () =>
       mapValues(options, level =>
@@ -77,6 +77,8 @@ const LocationFiltersForm = ({
     [options],
   );
 
+  // A single option exists when there's a single level
+  // and a single key in the dictionary of options for that level.
   const hasSingleOption =
     levelKeys.length === 1 &&
     Object.keys(keyedOptions[levelKeys[0]]).length === 1;
@@ -186,7 +188,7 @@ const LocationFiltersForm = ({
           (locations, level) =>
             locations.reduce<FilterOption[]>((acc, value) => {
               const levelOptions = keyedOptions[level];
-              if (levelOptions[value]) {
+              if (levelOptions && levelOptions[value]) {
                 acc.push(levelOptions[value]);
               }
 
