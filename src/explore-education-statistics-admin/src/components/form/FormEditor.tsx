@@ -173,6 +173,7 @@ const FormEditor = ({
       if (!commentsPlugin.current || !currentInteraction) {
         return;
       }
+
       switch (currentInteraction.type) {
         case 'adding':
           commentsPlugin.current.addCommentMarker(currentInteraction.id);
@@ -203,11 +204,7 @@ const FormEditor = ({
     }
 
     updateMarker();
-    if (editorInstance.current) {
-      onAutoSave?.(editorInstance.current.getData());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentInteraction]);
+  }, [currentInteraction, setMarkersOrder]);
 
   const isReadOnly = isBrowser('IE');
 
