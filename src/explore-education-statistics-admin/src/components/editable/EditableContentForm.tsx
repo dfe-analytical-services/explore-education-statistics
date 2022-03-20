@@ -11,11 +11,13 @@ import CommentsList from '@admin/components/comments/CommentsList';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
+import useAsyncCallback from '@common/hooks/useAsyncCallback';
 import useToggle from '@common/hooks/useToggle';
+import logger from '@common/services/logger';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import classNames from 'classnames';
-import { Formik } from 'formik';
+import { Formik, FormikHelpers } from 'formik';
 import React, { useCallback, useRef } from 'react';
 import { useIdleTimer } from 'react-idle-timer';
 
@@ -30,7 +32,6 @@ export interface Props {
   hideLabel?: boolean;
   id: string;
   idleTimeout?: number;
-  isSaving?: boolean;
   label: string;
   onAction?: () => void;
   onAutoSave?: (content: string) => void;
@@ -49,7 +50,6 @@ const EditableContentForm = ({
   hideLabel = false,
   id,
   idleTimeout = 600_000,
-  isSaving = false,
   label,
   onAction,
   onAutoSave,
@@ -91,6 +91,29 @@ const EditableContentForm = ({
     return error;
   }, []);
 
+  const [
+    { isLoading: isAutoSaving, error: autoSaveError },
+    handleAutoSave,
+  ] = useAsyncCallback(
+    async (nextContent: string) => {
+      await onAutoSave?.(nextContent);
+    },
+    [onAutoSave],
+  );
+
+  const handleSubmit = useCallback(
+    async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
+      try {
+        await onSubmit(values.content);
+        await clearPendingDeletions?.();
+      } catch (err) {
+        logger.error(err);
+        helpers.setFieldError('content', 'Could not save content');
+      }
+    },
+    [clearPendingDeletions, onSubmit],
+  );
+
   return (
     <div className={styles.container} ref={containerRef}>
       {showCommentAddForm && (
@@ -118,47 +141,50 @@ const EditableContentForm = ({
           validationSchema={Yup.object({
             content: Yup.string().required('Enter content'),
           })}
-          onSubmit={async values => {
-            await clearPendingDeletions?.();
-            onSubmit(values.content);
-          }}
+          onSubmit={handleSubmit}
         >
-          <Form id={`${id}-form`}>
-            <FormFieldEditor<FormValues>
-              id={id}
-              allowComments={allowComments}
-              focusOnInit
-              hideLabel={hideLabel}
-              label={label}
-              name="content"
-              validateElements={validateElements}
-              onAutoSave={onAutoSave}
-              onBlur={onBlur}
-              onCancelComment={toggleCommentAddForm.off}
-              onClickAddComment={toggleCommentAddForm.on}
-              onImageUpload={onImageUpload}
-              onImageUploadCancel={onImageUploadCancel}
-            />
+          {form => {
+            const isSaving = form.isSubmitting || isAutoSaving;
 
-            <ButtonGroup>
-              <Button type="submit" disabled={isSaving}>
-                {onAutoSave ? 'Save & close' : 'Save'}
-              </Button>
-              {!onAutoSave && onCancel && (
-                <Button variant="secondary" onClick={onCancel}>
-                  Cancel
-                </Button>
-              )}
+            return (
+              <Form id={`${id}-form`}>
+                <FormFieldEditor<FormValues>
+                  allowComments={allowComments}
+                  error={autoSaveError ? 'Could not save content' : undefined}
+                  focusOnInit
+                  hideLabel={hideLabel}
+                  label={label}
+                  name="content"
+                  validateElements={validateElements}
+                  onAutoSave={handleAutoSave}
+                  onBlur={onBlur}
+                  onCancelComment={toggleCommentAddForm.off}
+                  onClickAddComment={toggleCommentAddForm.on}
+                  onImageUpload={onImageUpload}
+                  onImageUploadCancel={onImageUploadCancel}
+                />
 
-              <LoadingSpinner
-                inline
-                hideText
-                loading={isSaving}
-                size="md"
-                text="Saving"
-              />
-            </ButtonGroup>
-          </Form>
+                <ButtonGroup>
+                  <Button type="submit" disabled={isSaving}>
+                    {onAutoSave ? 'Save & close' : 'Save'}
+                  </Button>
+                  {!onAutoSave && onCancel && (
+                    <Button variant="secondary" onClick={onCancel}>
+                      Cancel
+                    </Button>
+                  )}
+
+                  <LoadingSpinner
+                    inline
+                    hideText
+                    loading={isSaving}
+                    size="md"
+                    text="Saving"
+                  />
+                </ButtonGroup>
+              </Form>
+            );
+          }}
         </Formik>
       </div>
     </div>

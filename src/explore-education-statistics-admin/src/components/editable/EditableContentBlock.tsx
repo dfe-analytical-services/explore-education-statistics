@@ -28,7 +28,6 @@ interface EditableContentBlockProps {
   idleTimeout?: number;
   isEditing?: boolean;
   isLoading?: boolean;
-  isSaving?: boolean;
   label: string;
   locked?: string;
   lockedBy?: UserDetails;
@@ -58,7 +57,6 @@ const EditableContentBlock = ({
   idleTimeout,
   isLoading,
   isEditing,
-  isSaving,
   label,
   locked,
   lockedBy,
@@ -129,7 +127,6 @@ const EditableContentBlock = ({
         hideLabel={hideLabel}
         id={id}
         idleTimeout={idleTimeout}
-        isSaving={isSaving}
         onAction={onActive}
         onAutoSave={onAutoSave}
         onBlur={onBlur}

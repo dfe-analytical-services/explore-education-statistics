@@ -16,7 +16,6 @@ import {
 import { CommentCreate } from '@admin/services/releaseContentCommentService';
 import { Comment, EditableBlock } from '@admin/services/types/content';
 import Gate from '@common/components/Gate';
-import useAsyncCallback from '@common/hooks/useAsyncCallback';
 import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
@@ -156,7 +155,7 @@ const ReleaseEditableBlock = ({
     };
   }, [block, hub, setLock, updateBlock]);
 
-  const [{ isLoading: isSaving }, handleSave] = useAsyncCallback(
+  const handleSave = useCallback(
     async (content: string) => {
       await updateContentSectionBlock({
         releaseId,
@@ -319,7 +318,6 @@ const ReleaseEditableBlock = ({
             id={blockId}
             isEditing={isLockedByUser}
             isLoading={isLocking}
-            isSaving={isSaving}
             label="Content block"
             locked={locked}
             lockedBy={isLockedByOtherUser ? lockedBy : undefined}

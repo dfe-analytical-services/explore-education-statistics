@@ -68,6 +68,7 @@ describe('EditableContentForm', () => {
 
     test('shows validation error if the form is submitted with no content', async () => {
       const handleSubmit = jest.fn();
+
       render(
         <EditableContentForm
           content=""
@@ -83,11 +84,12 @@ describe('EditableContentForm', () => {
       await waitFor(() => {
         expect(
           screen.getByText('Enter content', {
-            selector: '#block-id-form-block-id-error',
+            selector: '#block-id-form-content-error',
           }),
         ).toBeInTheDocument();
-        expect(handleSubmit).not.toHaveBeenCalled();
       });
+
+      expect(handleSubmit).not.toHaveBeenCalled();
     });
 
     test('calls `onSubmit` handler with the content when form is submitted', async () => {
@@ -108,6 +110,33 @@ describe('EditableContentForm', () => {
       await waitFor(() => {
         expect(handleSubmit).toHaveBeenCalledWith('Test content');
       });
+    });
+
+    test('shows error if `onSubmit` throws error when submitting form', async () => {
+      const handleSubmit = jest.fn();
+      handleSubmit.mockRejectedValue(new Error('Something went wrong'));
+
+      render(
+        <EditableContentForm
+          content="Test content"
+          id="block-id"
+          label="Form label"
+          onCancel={noop}
+          onSubmit={handleSubmit}
+        />,
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Could not save content', {
+            selector: '#block-id-form-content-error',
+          }),
+        ).toBeInTheDocument();
+      });
+
+      expect(handleSubmit).toHaveBeenCalledTimes(1);
     });
 
     test('calls `onAction` handler when user performs action within form', () => {
