@@ -148,6 +148,10 @@ user scrolls down
     [Arguments]    ${px}
     execute javascript    window.scrollBy(0, ${px});
 
+user scrolls up
+    [Arguments]    ${px}
+    execute javascript    window.scrollBy(0, -${px});
+
 user scrolls to element
     [Arguments]    ${element}
     scroll element into view    ${element}
@@ -271,6 +275,23 @@ user opens accordion section
     ...    ${parent}=css:[data-testid="accordion"]
 
     ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
+    ${accordion}=    user opens accordion section with accordion header    ${header_button}    ${parent}
+    [Return]    ${accordion}
+
+user opens accordion section with id
+    [Arguments]
+    ...    ${id}
+    ...    ${parent}=css:[data-testid="accordion"]
+
+    ${header_button}=    get child element    ${parent}    id:${id}-heading
+    ${accordion}=    user opens accordion section with accordion header    ${header_button}    ${parent}
+    [Return]    ${accordion}
+
+user opens accordion section with accordion header
+    [Arguments]
+    ...    ${header_button}
+    ...    ${parent}=css:[data-testid="accordion"]
+
     ${is_expanded}=    get element attribute    ${header_button}    aria-expanded
     IF    '${is_expanded}' != 'true'
         user clicks element    ${header_button}
@@ -282,6 +303,21 @@ user opens accordion section
 user closes accordion section
     [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]
     ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
+    user closes accordion section with accordion header    ${header_button}    ${parent}
+
+user closes accordion section with id
+    [Arguments]
+    ...    ${id}
+    ...    ${parent}=css:[data-testid="accordion"]
+
+    ${header_button}=    get child element    ${parent}    id:${id}-heading
+    user closes accordion section with accordion header    ${header_button}    ${parent}
+
+user closes accordion section with accordion header
+    [Arguments]
+    ...    ${header_button}
+    ...    ${parent}=css:[data-testid="accordion"]
+
     ${is_expanded}=    get element attribute    ${header_button}    aria-expanded
     IF    '${is_expanded}' != 'false'
         user clicks element    ${header_button}

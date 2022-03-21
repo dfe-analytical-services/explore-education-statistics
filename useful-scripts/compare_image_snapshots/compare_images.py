@@ -8,6 +8,7 @@ import imutils
 import cv2
 import os
 import numpy as np
+from logging import warning
 
 
 def resize_and_pad(img, size, padColor=0):
@@ -46,6 +47,8 @@ def resize_and_pad(img, size, padColor=0):
             padColor, (list, tuple, np.ndarray)):  # color image but only one color provided
         padColor = [padColor] * 3
 
+    warning(f'Resizing: {pad_top}, {pad_bot}, {pad_left}, {pad_right}')
+
     # scale and pad
     scaled_img = cv2.resize(img, (new_w, new_h), interpolation=interp)
     scaled_img = cv2.copyMakeBorder(scaled_img, pad_top, pad_bot, pad_left, pad_right,
@@ -57,68 +60,74 @@ def resize_and_pad(img, size, padColor=0):
 def compare_images(
         first_filepath,
         second_filepath,
-        diff_filepath,
+        diff_folder,
+        original_filename,
         diff_threshold=0,
         visual_diff=False):
 
-    # load the two input images
-    image1 = cv2.imread(first_filepath)
-    image2 = cv2.imread(second_filepath)
+    try:
+        # load the two input images
+        image1 = cv2.imread(first_filepath)
+        image2 = cv2.imread(second_filepath)
 
-    image1h, image1w = image1.shape[:2]
-    image2h, image2w = image2.shape[:2]
+        image1h, image1w = image1.shape[:2]
+        image2h, image2w = image2.shape[:2]
 
-    # resize the image canvases to be the same size before comparison
-    if image1w != image2w or image1h != image2h:
-        image1_resized = resize_and_pad(image1, (max(image1h, image2h), max(image1w, image2w)))
-        image2_resized = resize_and_pad(image2, (max(image1h, image2h), max(image1w, image2w)))
-    else:
-        image1_resized = image1
-        image2_resized = image2
+        # resize the image canvases to be the same size before comparison
+        if image1w != image2w or image1h != image2h:
+            image1_resized = resize_and_pad(image1, (max(image1h, image2h), max(image1w, image2w)))
+            image2_resized = resize_and_pad(image2, (max(image1h, image2h), max(image1w, image2w)))
+        else:
+            image1_resized = image1
+            image2_resized = image2
 
-    # convert the images to grayscale
-    image1 = cv2.cvtColor(image1_resized, cv2.COLOR_BGR2GRAY)
-    image2 = cv2.cvtColor(image2_resized, cv2.COLOR_BGR2GRAY)
+        # convert the images to grayscale
+        image1 = cv2.cvtColor(image1_resized, cv2.COLOR_BGR2GRAY)
+        image2 = cv2.cvtColor(image2_resized, cv2.COLOR_BGR2GRAY)
 
-    # compute the Structural Similarity Index (SSIM) between the two
-    # images, ensuring that the difference image is returned
-    (score, diff_image) = compare_ssim(image1, image2, full=True)
-    diff_image = (diff_image * 255).astype("uint8")
+        # compute the Structural Similarity Index (SSIM) between the two
+        # images, ensuring that the difference image is returned
+        (score, diff_image) = compare_ssim(image1, image2, full=True)
+        diff_image = (diff_image * 255).astype("uint8")
 
-    if score < (1 - diff_threshold):
-        print(
-            f"Visual difference detected in snapshot {os.path.basename(first_filepath)} - similarity : {format(score)}")
+        if score < (1 - diff_threshold):
+            print(
+                f"Visual difference detected in snapshot {os.path.basename(first_filepath)} - similarity : {format(score)}")
 
-        # threshold the difference image, followed by finding contours to
-        # obtain the regions of the two input images that differ
-        thresh = cv2.threshold(diff_image, 0, 255,
-                               cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-        contours = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
-                                    cv2.CHAIN_APPROX_SIMPLE)
-        contours = imutils.grab_contours(contours)
+            # threshold the difference image, followed by finding contours to
+            # obtain the regions of the two input images that differ
+            thresh = cv2.threshold(diff_image, 0, 255,
+                                   cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+            contours = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,
+                                        cv2.CHAIN_APPROX_SIMPLE)
+            contours = imutils.grab_contours(contours)
 
-        # loop over the contours
-        for contour in contours:
-            # compute the bounding box of the contour and then draw the
-            # bounding box on both input images to represent where the two
-            # images differ
-            (x, y, w, h) = cv2.boundingRect(contour)
-            cv2.rectangle(image1_resized, (x, y), (x + w, y + h), (0, 0, 255), 2)
-            cv2.rectangle(image2_resized, (x, y), (x + w, y + h), (0, 0, 255), 2)
-    else:
-        print(f"No visual difference detected in snapshot {os.path.basename(first_filepath)}")
+            # loop over the contours
+            for contour in contours:
+                # compute the bounding box of the contour and then draw the
+                # bounding box on both input images to represent where the two
+                # images differ
+                (x, y, w, h) = cv2.boundingRect(contour)
+                cv2.rectangle(image1_resized, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                cv2.rectangle(image2_resized, (x, y), (x + w, y + h), (0, 0, 255), 2)
 
-    if score < (1 - diff_threshold) and diff_filepath:
-        os.makedirs(f'{os.path.dirname(diff_filepath)}', exist_ok=True)
-        cv2.imwrite(diff_filepath, image2_resized)
+                os.makedirs(diff_folder, exist_ok=True)
+                cv2.imwrite(f'{diff_folder}/first-{original_filename}', image1)
+                cv2.imwrite(f'{diff_folder}/second-{original_filename}', image2)
+                cv2.imwrite(f'{diff_folder}/diff-{original_filename}', image2_resized)
 
-    if visual_diff:
-        # show the output images
-        cv2.imshow("Original", image1)
-        cv2.imshow("Modified", image2)
-        cv2.imshow("Diff", diff_image)
-        cv2.imshow("Thresh", thresh)
-        cv2.waitKey(0)
+                if visual_diff:
+                    # show the output images
+                    cv2.imshow("Original", image1)
+                    cv2.imshow("Modified", image2)
+                    cv2.imshow("Diff", diff_image)
+                    cv2.imshow("Thresh", thresh)
+                    cv2.waitKey(0)
+        # else:
+        #     print(f"No visual difference detected in snapshot {os.path.basename(first_filepath)}")
+
+    except BaseException:
+        warning(f'Could not compare image {first_filepath}')
 
 # construct the argument parse and parse the arguments
 # ap = argparse.ArgumentParser()

@@ -24,11 +24,14 @@ class DataBlockRow:
             content_section_id,
             content_section_heading,
             content_section_type,
+            content_section_position,
+            min_content_section_position,
+            content_block_position,
+            min_content_block_position,
             highlight_name,
             subject_id,
             chart_title,
-            chart_type,
-            table_config):
+            chart_type):
 
         self.publication_id = publication_id.lower()
         self.chart_type = chart_type
@@ -36,13 +39,20 @@ class DataBlockRow:
         self.subject_id = subject_id.lower()
         self.highlight_name = highlight_name
         self.content_section_type = content_section_type
+        self.content_section_position = \
+            int(content_section_position) + 1 - int(min_content_section_position) \
+            if content_section_position is not None \
+            else None
+        self.content_block_position = int(content_block_position) + 1 - int(min_content_block_position) \
+            if min_content_block_position is not None \
+            else None
         self.content_section_id = None if content_section_id is None else content_section_id.lower()
         self.publication_slug = publication_slug
         self.release_slug = release_slug
         self.release_id = release_id.lower()
         self.content_block_id = content_block_id.lower()
         self.content_section_heading = content_section_heading
-        self.has_table_config = table_config is not None
+        self.has_table_config = True
         self.has_chart_config = chart_type is not None
 
         if self.content_section_type is None:
@@ -117,7 +127,10 @@ def generate_releases(data_blocks_csv_filepath):
                 read_cell(row[9]),
                 read_cell(row[10]),
                 read_cell(row[11]),
-                read_cell(row[12])))
+                read_cell(row[12]),
+                read_cell(row[13]),
+                read_cell(row[14]),
+                read_cell(row[15])))
 
     release_ids = sorted(set(map(lambda block: block.release_id, content_blocks)))
 
