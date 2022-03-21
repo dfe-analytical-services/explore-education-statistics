@@ -30,6 +30,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly ILocationRepository _locationRepository;
 
+        // List of Prod data block id's which do not contain Institution, Planning Area, Provider, or School level
+        // data but which we are still going to allow single table headers to transform into multiple headers.
+        // These occur where location codes map to more than one distinct location.
+        // E.g. in 'Earnings by local enterprise partnership and academic year' there's an LEP with code 'E37000004'
+        // which maps to two distinct locations. They are distinct because they have different Regions 'London' and 'South East'.
+        private static readonly List<Guid> DataBlocksAllowList = new()
+        {
+            Guid.Parse(
+                "70104471-9fe9-43ca-ae0d-4c34f6672da7"), // Earnings by English devolved area and academic year
+            Guid.Parse(
+                "63eb9cb5-a975-4d58-a9dc-ac35d0a0ff2e"), // EDA destinations 2013/14 to 2018/10
+            Guid.Parse(
+                "def0cb5e-d31c-4c6a-9bae-58f4ffe1d509"), // Destinations of all learners achieving aim in 2018/19...
+            Guid.Parse(
+                "4fa4f6f7-57fb-4220-b0b4-32008be6c43b"), // Earnings by local enterprise partnership and academic year
+            Guid.Parse(
+                "70a6c564-031b-4686-91df-55b944c7c74a") // Destinations of learners by local authority district
+        };
+
         public DataBlockMigrationService(
             ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
@@ -391,7 +410,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                             case 1:
                                 return ListOf(TableHeader.NewLocationHeader(geographicLevel, idList[0].ToString()));
                             // Unhappy path: Check if this was a duplicate code (allowed for Provider/School level data)
-                            case > 1 when geographicLevel is GeographicLevel.Provider or GeographicLevel.School:
+                            case > 1 when geographicLevel is GeographicLevel.Provider or GeographicLevel.School ||
+                                          DataBlocksAllowList.Contains(dataBlockId):
                                 switch (tableHeaderField)
                                 {
                                     case TableHeaderField.Rows:
@@ -423,7 +443,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                                             .ToList();
                                     case TableHeaderField.Columns:
                                     case TableHeaderField.ColumnGroups:
-                                        // A check of Prod data reveals there's no locations in Column/ColumnGroup headers for Provider/School level data.
+                                        // A check of Prod data reveals there's no locations in Column/ColumnGroup headers for Provider/School level data,
+                                        // or data blocks in the allow list.
                                         // Since what we do above for Rows/RowGroups is not completely safe let's limit creating extra headers for ColumnGroups / Columns.
                                         // Fail the migration here with an exception so we can investigate.
                                         throw new InvalidOperationException(
@@ -434,7 +455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                                             tableHeaderField, "Unexpected type of table header field");
                                 }
                             case > 1:
-                                // Only expecting multiple location id's for Provider/School level data
+                                // Only expecting multiple location id's for Provider/School level data and data blocks in the allow list.
                                 // Fail the migration here with an exception so we can investigate.
                                 throw new InvalidOperationException(
                                     $"Only expecting one location id for data block '{dataBlockId}' {tableHeaderField} table header with level '{geographicLevel}' and code '{tableHeader.Value}'"
