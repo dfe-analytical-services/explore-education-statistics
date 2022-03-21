@@ -1,7 +1,7 @@
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import metaService from '@admin/services/metaService';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import FormattedDate from '@common/components/FormattedDate';
+import { releaseTypes } from '@common/services/types/releaseType';
 import Tag from '@common/components/Tag';
 import { Dictionary } from '@common/types';
 import {
@@ -9,7 +9,7 @@ import {
   isValidPartialDate,
 } from '@common/utils/date/partialDate';
 import { parseISO } from 'date-fns';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ReleaseNotesSection from './ReleaseNotesSection';
@@ -24,84 +24,61 @@ const nationalStatisticsLogo: ReleaseTypeIcon = {
   altText: 'UK statistics authority quality mark',
 };
 
+const releaseTypesToIcons: Dictionary<ReleaseTypeIcon> = {
+  [releaseTypes.NationalStatistics]: nationalStatisticsLogo,
+};
+
 interface Props {
   release: EditableRelease;
 }
 
 const BasicReleaseSummary = ({ release }: Props) => {
-  const [releaseTypeIdsToIcons, setReleaseTypeIdsToIcons] = useState<
-    Dictionary<ReleaseTypeIcon>
-  >();
-
-  useEffect(() => {
-    metaService.getReleaseTypes().then(types => {
-      const icons: Dictionary<ReleaseTypeIcon> = {};
-
-      // TODO would be nicer to control this via some metadata from the back end rather than
-      // trust this matching on title
-      const nationalStatisticsType = types.find(
-        type => type.title === 'National Statistics',
-      );
-
-      if (nationalStatisticsType) {
-        icons[nationalStatisticsType.id] = nationalStatisticsLogo;
-      }
-
-      setReleaseTypeIdsToIcons(icons);
-    });
-  }, []);
-
   return (
     <>
-      {releaseTypeIdsToIcons && (
-        <>
-          <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between">
-            <div className="dfe-flex govuk-!-margin-bottom-3">
-              <Tag>{getReleaseApprovalStatusLabel(release.approvalStatus)}</Tag>
-            </div>
-            {releaseTypeIdsToIcons[release.type.id] && (
-              <div className="dfe-flex">
-                <img
-                  src={releaseTypeIdsToIcons[release.type.id].url}
-                  alt={releaseTypeIdsToIcons[release.type.id].altText}
-                  height="120"
-                  width="120"
-                />
-              </div>
-            )}
-          </div>
+      <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">
+        <div>
+          <Tag className="govuk-!-margin-right-3 govuk-!-margin-bottom-3">
+            {getReleaseApprovalStatusLabel(release.approvalStatus)}
+          </Tag>
+          <Tag>{releaseTypes[release.type]}</Tag>
+        </div>
+        {releaseTypesToIcons[release.type] && (
+          <img
+            src={releaseTypesToIcons[release.type].url}
+            alt={releaseTypesToIcons[release.type].altText}
+            height="60"
+            width="60"
+          />
+        )}
+      </div>
 
-          <SummaryList>
-            <SummaryListItem term="Publish date">
-              {release.publishScheduled ? (
-                <FormattedDate>
-                  {parseISO(release.publishScheduled)}
-                </FormattedDate>
-              ) : (
-                <p>TBA</p>
-              )}
-            </SummaryListItem>
-            {isValidPartialDate(release.nextReleaseDate) && (
-              <SummaryListItem term="Next update">
-                <time>{formatPartialDate(release.nextReleaseDate)}</time>
-              </SummaryListItem>
-            )}
-            <SummaryListItem term="Last updated">
-              {release.updates && release.updates.length > 0 ? (
-                <FormattedDate>release.updates[0].on</FormattedDate>
-              ) : (
-                'TBA'
-              )}
-              <ReleaseNotesSection release={release} />
-            </SummaryListItem>
-            <SummaryListItem term="Receive updates">
-              <a className="dfe-print-hidden govuk-!-font-weight-bold" href="#">
-                Sign up for email alerts
-              </a>
-            </SummaryListItem>
-          </SummaryList>
-        </>
-      )}
+      <SummaryList>
+        <SummaryListItem term="Publish date">
+          {release.publishScheduled ? (
+            <FormattedDate>{parseISO(release.publishScheduled)}</FormattedDate>
+          ) : (
+            <p>TBA</p>
+          )}
+        </SummaryListItem>
+        {isValidPartialDate(release.nextReleaseDate) && (
+          <SummaryListItem term="Next update">
+            <time>{formatPartialDate(release.nextReleaseDate)}</time>
+          </SummaryListItem>
+        )}
+        <SummaryListItem term="Last updated">
+          {release.updates && release.updates.length > 0 ? (
+            <FormattedDate>release.updates[0].on</FormattedDate>
+          ) : (
+            'TBA'
+          )}
+          <ReleaseNotesSection release={release} />
+        </SummaryListItem>
+        <SummaryListItem term="Receive updates">
+          <a className="dfe-print-hidden govuk-!-font-weight-bold" href="#">
+            Sign up for email alerts
+          </a>
+        </SummaryListItem>
+      </SummaryList>
     </>
   );
 };

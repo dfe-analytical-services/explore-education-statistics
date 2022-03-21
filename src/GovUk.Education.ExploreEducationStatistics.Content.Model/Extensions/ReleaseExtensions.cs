@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
         /// <returns></returns>
         public static string AllFilesZipPath(this Release release)
         {
-            return $"{FilesPath(release.Id, Ancillary)}{release.AllFilesZipFileName()}";
+            return $"{FilesPath(release.Id, AllFilesZip)}{release.AllFilesZipFileName()}";
         }
 
         public static string AllFilesZipFileName(this Release release)

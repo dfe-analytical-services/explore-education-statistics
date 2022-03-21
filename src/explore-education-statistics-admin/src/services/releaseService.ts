@@ -2,12 +2,14 @@ import { IdTitlePair, ValueLabelPair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { ReleaseApprovalStatus } from '@common/services/publicationService';
 import { PublicationContactDetails } from '@admin/services/publicationService';
+import { ReleaseType } from '@common/services/types/releaseType';
 import { PartialDate } from '@common/utils/date/partialDate';
 
 export interface Release {
   id: string;
   slug: string;
   approvalStatus: ReleaseApprovalStatus;
+  notifySubscribers?: boolean;
   latestRelease: boolean;
   live: boolean;
   amendment: boolean;
@@ -17,7 +19,7 @@ export interface Release {
   publicationSlug: string;
   timePeriodCoverage: ValueLabelPair;
   title: string;
-  type: IdTitlePair;
+  type: ReleaseType;
   contact: PublicationContactDetails;
   publishScheduled?: string;
   published?: string;
@@ -43,8 +45,9 @@ export interface ReleaseSummary {
     value: string;
     label: string;
   };
+  title: string;
   releaseName: string;
-  type: IdTitlePair;
+  type: ReleaseType;
   publishScheduled: string;
   nextReleaseDate?: PartialDate;
   latestInternalReleaseNote: string;
@@ -57,7 +60,7 @@ interface BaseReleaseRequest {
   timePeriodCoverage: {
     value: string;
   };
-  typeId: string;
+  type: ReleaseType;
 }
 
 export interface CreateReleaseRequest extends BaseReleaseRequest {
@@ -70,7 +73,7 @@ export interface UpdateReleaseRequest {
   timePeriodCoverage: {
     value: string;
   };
-  typeId: string;
+  type: ReleaseType;
   preReleaseAccessList?: string;
 }
 
@@ -119,14 +122,17 @@ export interface ReleaseStageStatuses {
   lastUpdated?: string;
 }
 
+export const ReleaseChecklistErrorCode = [
+  'DataFileImportsMustBeCompleted',
+  'DataFileReplacementsMustBeCompleted',
+  'PublicDataGuidanceRequired',
+  'ReleaseNoteRequired',
+  'EmptyContentSectionExists',
+  'GenericSectionsContainEmptyHtmlBlock',
+] as const;
+
 export type ReleaseChecklistError = {
-  code:
-    | 'DataFileImportsMustBeCompleted'
-    | 'DataFileReplacementsMustBeCompleted'
-    | 'PublicMetaGuidanceRequired'
-    | 'ReleaseNoteRequired'
-    | 'EmptyContentSectionExists'
-    | 'GenericSectionsContainEmptyHtmlBlock';
+  code: typeof ReleaseChecklistErrorCode[number];
 };
 
 export type ReleaseChecklistWarning =
@@ -165,8 +171,10 @@ export interface ReleaseStatus {
   releaseStatusId: string;
   internalReleaseNote: string;
   approvalStatus: ReleaseApprovalStatus;
+  notifySubscribers: boolean;
   created: string;
   createdByEmail: string;
+  releaseVersion: number;
 }
 
 export interface DeleteReleasePlan {

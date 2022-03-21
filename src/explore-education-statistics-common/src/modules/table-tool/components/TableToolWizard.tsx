@@ -1,6 +1,7 @@
 import { ConfirmContextProvider } from '@common/contexts/ConfirmContext';
 import FiltersForm, {
   FilterFormSubmitHandler,
+  TableQueryErrorCode,
 } from '@common/modules/table-tool/components/FiltersForm';
 import LocationFiltersForm, {
   LocationFiltersFormSubmitHandler,
@@ -23,11 +24,11 @@ import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
 import publicationService from '@common/services/publicationService';
 import tableBuilderService, {
+  FeaturedTable,
   ReleaseTableDataQuery,
   SelectedPublication,
   Subject,
   SubjectMeta,
-  FeaturedTable,
 } from '@common/services/tableBuilderService';
 import { Theme } from '@common/services/themeService';
 import React, { ReactElement, ReactNode } from 'react';
@@ -68,11 +69,17 @@ export interface TableToolWizardProps {
   initialState?: Partial<InitialTableToolState>;
   hidePublicationSelectionStage?: boolean;
   finalStep?: (props: FinalStepRenderProps) => ReactElement;
+  loadingFastTrack?: boolean;
   renderFeaturedTable?: (featuredTable: FeaturedTable) => ReactNode;
   scrollOnMount?: boolean;
+  onTableQueryError?: (
+    errorCode: TableQueryErrorCode,
+    publicationTitle: string,
+    subjectName: string,
+  ) => void;
+  showTableQueryErrorDownload?: boolean;
   onSubmit?: (table: FullTable) => void;
   onSubjectStepBack?: () => void;
-  loadingFastTrack?: boolean;
 }
 
 const TableToolWizard = ({
@@ -82,8 +89,10 @@ const TableToolWizard = ({
   hidePublicationSelectionStage,
   renderFeaturedTable,
   finalStep,
+  showTableQueryErrorDownload = true,
   onSubmit,
   onSubjectStepBack,
+  onTableQueryError,
   loadingFastTrack = false,
 }: TableToolWizardProps) => {
   const router = useRouter();
@@ -105,7 +114,7 @@ const TableToolWizard = ({
       subjectId: '',
       indicators: [],
       filters: [],
-      locations: {},
+      locationIds: [],
     },
     ...initialState,
   });
@@ -163,8 +172,11 @@ const TableToolWizard = ({
 
     updateState(draft => {
       draft.subjectMeta = nextSubjectMeta;
-
       draft.query.subjectId = selectedSubjectId;
+      draft.query.indicators = [];
+      draft.query.filters = [];
+      draft.query.locationIds = [];
+      draft.query.timePeriod = undefined;
     });
   };
 
@@ -179,26 +191,51 @@ const TableToolWizard = ({
   };
 
   const handleLocationFiltersFormSubmit: LocationFiltersFormSubmitHandler = async ({
-    locations,
+    locationIds,
   }) => {
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-      locations,
+      locationIds,
       subjectId: state.query.subjectId,
     });
+
+    const { timePeriod } = state.query;
+
+    // Check if selected time period is in the time period options so can reset it if not.
+    const hasStartTimePeriod = nextSubjectMeta.timePeriod.options.some(
+      option =>
+        option.code === timePeriod?.startCode &&
+        option.year === timePeriod.startYear,
+    );
+    const hasEndTimePeriod = nextSubjectMeta.timePeriod.options.some(
+      option =>
+        option.code === timePeriod?.endCode &&
+        option.year === timePeriod.endYear,
+    );
 
     updateState(draft => {
       draft.subjectMeta.timePeriod = nextSubjectMeta.timePeriod;
 
-      draft.query.locations = locations;
+      draft.query.locationIds = locationIds;
+
+      if (timePeriod && hasStartTimePeriod && hasEndTimePeriod) {
+        draft.query.timePeriod = {
+          startYear: hasStartTimePeriod ? timePeriod.startYear : 0,
+          startCode: hasStartTimePeriod ? timePeriod.startCode : '',
+          endYear: hasEndTimePeriod ? timePeriod.endYear : 0,
+          endCode: hasEndTimePeriod ? timePeriod.endCode : '',
+        };
+      } else {
+        draft.query.timePeriod = undefined;
+      }
     });
   };
 
   const handleTimePeriodStepBack = async () => {
-    const { subjectId, locations } = state.query;
+    const { subjectId, locationIds } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
       subjectId,
-      locations,
+      locationIds,
     });
 
     updateState(draft => {
@@ -211,7 +248,7 @@ const TableToolWizard = ({
     const [endYear, endCode] = parseYearCodeTuple(values.end);
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-      ...state.query,
+      locationIds: state.query.locationIds,
       subjectId: state.query.subjectId,
       timePeriod: {
         startYear,
@@ -221,10 +258,31 @@ const TableToolWizard = ({
       },
     });
 
+    const indicatorValues = new Set(
+      Object.values(nextSubjectMeta.indicators).flatMap(indicator =>
+        indicator.options.map(option => option.value),
+      ),
+    );
+    const filteredIndicators = state.query.indicators.filter(indicator =>
+      indicatorValues.has(indicator),
+    );
+
+    const filterValues = new Set(
+      Object.values(nextSubjectMeta.filters).flatMap(filterGroup =>
+        Object.values(filterGroup.options).flatMap(filter =>
+          filter.options.map(option => option.value),
+        ),
+      ),
+    );
+    const filteredFilters = state.query.filters.filter(filter =>
+      filterValues.has(filter),
+    );
+
     updateState(draft => {
       draft.subjectMeta.indicators = nextSubjectMeta.indicators;
       draft.subjectMeta.filters = nextSubjectMeta.filters;
-
+      draft.query.indicators = filteredIndicators;
+      draft.query.filters = filteredFilters;
       draft.query.timePeriod = {
         startYear,
         startCode,
@@ -235,11 +293,11 @@ const TableToolWizard = ({
   };
 
   const handleFiltersStepBack = async () => {
-    const { subjectId, locations, timePeriod } = state.query;
+    const { subjectId, locationIds, timePeriod } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
       subjectId,
-      locations,
+      locationIds,
       timePeriod,
     });
 
@@ -335,7 +393,7 @@ const TableToolWizard = ({
               {stepProps => (
                 <LocationFiltersForm
                   {...stepProps}
-                  initialValues={state.query.locations}
+                  initialValues={state.query.locationIds}
                   options={state.subjectMeta.locations}
                   onSubmit={handleLocationFiltersFormSubmit}
                 />
@@ -345,9 +403,7 @@ const TableToolWizard = ({
               {stepProps => (
                 <TimePeriodForm
                   {...stepProps}
-                  initialValues={{
-                    timePeriod: state.query.timePeriod,
-                  }}
+                  initialValues={state.query.timePeriod}
                   options={state.subjectMeta.timePeriod.options}
                   onSubmit={handleTimePeriodFormSubmit}
                 />
@@ -361,7 +417,15 @@ const TableToolWizard = ({
                     indicators: state.query.indicators,
                     filters: state.query.filters,
                   }}
+                  selectedPublication={state.selectedPublication}
+                  subject={
+                    state.subjects.filter(
+                      subject => subject.id === state.query.subjectId,
+                    )[0]
+                  }
                   subjectMeta={state.subjectMeta}
+                  showTableQueryErrorDownload={showTableQueryErrorDownload}
+                  onTableQueryError={onTableQueryError}
                   onSubmit={handleFiltersFormSubmit}
                 />
               )}

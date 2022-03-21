@@ -7,6 +7,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - create methodology publication %{RUN_IDENTIFIER}
@@ -16,15 +17,15 @@ Create Publication and check available Methodology controls
     user creates test publication via api    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology
-    user checks element contains link    ${accordion}    Link to an externally hosted methodology
+    user checks element contains link    ${accordion}    Use an external methodology
 
 Create a Methodology
     user creates methodology for publication    ${PUBLICATION_NAME}
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element does not contain button    ${accordion}    Create methodology
-    user checks element contains link    ${accordion}    Link to an externally hosted methodology
+    user checks element contains link    ${accordion}    Use an external methodology
     ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${details}    Edit this methodology
+    user checks element contains link    ${details}    Edit methodology
     user checks element contains button    ${details}    Remove
     user checks element does not contain button    ${details}    Amend methodology
     user views methodology for open publication accordion    ${accordion}    ${PUBLICATION_NAME}
@@ -36,6 +37,7 @@ Remove the Methodology
     user clicks button    Remove    ${details}
     user waits until modal is visible    Confirm you want to remove this methodology
     user clicks button    Confirm
+    user waits until modal is not visible    Confirm you want to remove this methodology
 
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user checks element contains button    ${accordion}    Create methodology
@@ -88,7 +90,7 @@ Approve the Methodology
 Check the controls available are as expected for an approved Methodology that is not yet publicly visible
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${details}    Edit this methodology
+    user checks element contains link    ${details}    Edit methodology
     user checks element does not contain button    ${details}    Remove
 
     # Check that the Amend methodology button is not yet present.    This is because the Methodology, although set to
@@ -103,5 +105,5 @@ Unapprove the Methodology
 
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     ${details}=    user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${details}    Edit this methodology
+    user checks element contains link    ${details}    Edit methodology
     user checks element contains button    ${details}    Remove

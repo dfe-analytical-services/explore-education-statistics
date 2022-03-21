@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid userId)
         {
             var publicationsGrantedByPublicationOwnerRole = await _context.UserPublicationRoles
+                .AsQueryable()
                 .Where(userPublicationRole => userPublicationRole.UserId == userId &&
                                               userPublicationRole.Publication.TopicId == topicId &&
                                               userPublicationRole.Role == PublicationRole.Owner)
@@ -71,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .GroupBy(release => release.Publication)
                 .Where(publicationWithReleases =>
                 {
-                    // Don't include a publication that's already been included by Publication Owner role 
+                    // Don't include a publication that's already been included by Publication Owner role
                     var publication = publicationWithReleases.Key;
                     return !publicationIdsGrantedByPublicationOwnerRole.Contains(publication.Id);
                 })
@@ -109,6 +110,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .FirstAsync(p => p.Id == publicationId);
 
             return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
+        }
+
+        public async Task<List<Release>> ListActiveReleases(Guid publicationId)
+        {
+            var publication = await _context.Publications
+                .Include(p => p.Releases)
+                .AsAsyncEnumerable()
+                .SingleAsync(p => p.Id == publicationId);
+
+            return publication.ListActiveReleases();
         }
 
         public async Task<Release?> GetLatestReleaseForPublication(Guid publicationId)

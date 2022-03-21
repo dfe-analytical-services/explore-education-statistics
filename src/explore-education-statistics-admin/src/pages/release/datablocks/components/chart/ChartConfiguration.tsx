@@ -35,10 +35,10 @@ export const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'file',
     messages: {
-      FILE_TYPE_INVALID: 'The infographic must be an image',
-      CANNOT_OVERWRITE_FILE: 'The infographic does not have a unique filename',
-      FILE_CANNOT_BE_EMPTY: 'The infographic cannot be an empty file',
-      FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+      FileTypeInvalid: 'The infographic must be an image',
+      CannotOverwriteFile: 'The infographic does not have a unique filename',
+      FileCannotBeEmpty: 'The infographic cannot be an empty file',
+      FilenameCannotContainSpacesOrSpecialCharacters:
         'The infographic filename cannot contain spaces or special characters',
     },
   }),
@@ -104,6 +104,7 @@ const ChartConfiguration = ({
         .required('Enter chart height')
         .positive('Chart height must be positive'),
       width: Yup.number().positive('Chart width must be positive'),
+      includeNonNumericData: Yup.boolean(),
     });
 
     if (definition.capabilities.stackable) {
@@ -253,7 +254,7 @@ const ChartConfiguration = ({
             {validationSchema.fields.height && (
               <FormFieldNumberInput<FormValues>
                 name="height"
-                label="Height (px)"
+                label="Height (pixels)"
                 width={5}
               />
             )}
@@ -261,7 +262,7 @@ const ChartConfiguration = ({
             {validationSchema.fields.width && (
               <FormFieldNumberInput<FormValues>
                 name="width"
-                label="Width (px)"
+                label="Width (pixels)"
                 hint="Leave blank to set as full width"
                 width={5}
               />
@@ -270,7 +271,7 @@ const ChartConfiguration = ({
             {validationSchema.fields.barThickness && (
               <FormFieldNumberInput<FormValues>
                 name="barThickness"
-                label="Bar thickness (px)"
+                label="Bar thickness (pixels)"
                 width={5}
               />
             )}
@@ -295,6 +296,15 @@ const ChartConfiguration = ({
                       onBoundaryLevelChange(e.target.value);
                     }
                   }}
+                />
+              </FormGroup>
+            )}
+
+            {definition.type !== 'map' && (
+              <FormGroup>
+                <FormFieldCheckbox
+                  name="includeNonNumericData"
+                  label="Include data sets with non-numerical values"
                 />
               </FormGroup>
             )}

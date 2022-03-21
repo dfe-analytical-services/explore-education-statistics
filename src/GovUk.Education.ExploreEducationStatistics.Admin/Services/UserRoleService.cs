@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .CheckEntityExists<ApplicationUser, string>(userId)
                         .OnSuccessCombineWith(user =>_usersAndRolesPersistenceHelper
                             .CheckEntityExists<IdentityRole, string>(roleId))
-                        .OnSuccessVoid(async tuple => 
+                        .OnSuccessVoid(async tuple =>
                         {
                             var (user, role) = tuple;
                             await _userManager.AddToRoleAsync(user, role.Name);
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .CheckEntityExists<ApplicationUser, string>(userId.ToString())
                         .OnSuccessCombineWith(user => _contentPersistenceHelper.CheckEntityExists<Publication>(publicationId))
                         .OnSuccessDo(release => ValidatePublicationRoleCanBeAdded(userId, publicationId, role))
-                        .OnSuccessVoid(async tuple =>
+                        .OnSuccess(async tuple =>
                         {
                             var (user, publication) = tuple;
                             await _userPublicationRoleRepository.Create(
@@ -90,32 +90,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 publicationId: publication.Id,
                                 role: role,
                                 createdById: _userService.GetUserId());
-                            _emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
+                            return _emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
                         });
                 });
         }
 
         public async Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
-            return await _userService
-                .CheckCanManageAllUsers()
-                .OnSuccess(async () =>
-                {
-                    return await _usersAndRolesPersistenceHelper
-                        .CheckEntityExists<ApplicationUser, string>(userId.ToString())
-                        .OnSuccessCombineWith(user => _contentPersistenceHelper.CheckEntityExists<Release>(releaseId,
-                            q => q.Include(r => r.Publication)))
-                        .OnSuccessDo(release => ValidateReleaseRoleCanBeAdded(userId, releaseId, role))
-                        .OnSuccessVoid(async tuple =>
-                        {
-                            var (user, release) = tuple;
-                            await _userReleaseRoleRepository.Create(
-                                userId: userId,
-                                releaseId: release.Id,
-                                role: role);
-                            _emailTemplateService.SendReleaseRoleEmail(user.Email, release, role);
-                        });
-                });
+            return await _contentPersistenceHelper
+                .CheckEntityExists<Release>(releaseId, query => query
+                    .Include(r => r.Publication))
+                .OnSuccess(release =>
+                    _userService.CheckCanUpdateReleaseRole(release.Publication, role)
+                    .OnSuccess(async () =>
+                    {
+                        return await _usersAndRolesPersistenceHelper
+                            .CheckEntityExists<ApplicationUser, string>(userId.ToString())
+                            .OnSuccessDo(_ => ValidateReleaseRoleCanBeAdded(userId, releaseId, role))
+                            .OnSuccess(async user =>
+                            {
+                                await _userReleaseRoleRepository.Create(
+                                    userId: userId,
+                                    releaseId: release.Id,
+                                    role: role,
+                                    createdById: _userService.GetUserId());
+                                return _emailTemplateService.SendReleaseRoleEmail(user.Email, release, role);
+                            });
+                    })
+                );
         }
 
         public async Task<Either<ActionResult, List<RoleViewModel>>> GetAllGlobalRoles()
@@ -124,7 +126,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
                 {
-                    return await _usersAndRolesDbContext.Roles.Select(r => new RoleViewModel
+                    return await _usersAndRolesDbContext.Roles
+                        .AsQueryable()
+                        .Select(r => new RoleViewModel
                         {
                             Id = r.Id,
                             Name = r.Name,
@@ -167,11 +171,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async () =>
                 {
                     var roleIds = await _usersAndRolesDbContext.UserRoles
+                        .AsQueryable()
                         .Where(r => r.UserId == userId)
                         .Select(r => r.RoleId)
                         .ToListAsync();
 
                     return await _usersAndRolesDbContext.Roles
+                        .AsQueryable()
                         .Where(r => roleIds.Contains(r.Id))
                         .OrderBy(r => r.Name)
                         .Select(r => new RoleViewModel
@@ -225,8 +231,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ThenBy(userReleaseRole => userReleaseRole.Release.Year)
                         .ThenBy(userReleaseRole => userReleaseRole.Release.TimePeriodCoverage)
                         .ToList();
-                        
-                    return latestReleaseRoles.Select(userReleaseRole => new UserReleaseRoleViewModel 
+
+                    return latestReleaseRoles.Select(userReleaseRole => new UserReleaseRoleViewModel
                         {
                             Id = userReleaseRole.Id,
                             Publication = userReleaseRole.Release.Publication.Title,
@@ -247,7 +253,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .CheckEntityExists<ApplicationUser, string>(userId)
                         .OnSuccessCombineWith(user =>_usersAndRolesPersistenceHelper
                             .CheckEntityExists<IdentityRole, string>(roleId))
-                        .OnSuccessVoid(async tuple => 
+                        .OnSuccessVoid(async tuple =>
                         {
                             var (user, role) = tuple;
                             await _userManager.RemoveFromRoleAsync(user, role.Name);
@@ -255,11 +261,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid id)
+        public async Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId)
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccess(() => _contentPersistenceHelper.CheckEntityExists<UserPublicationRole>(id))
+                .OnSuccess(() => _contentPersistenceHelper.CheckEntityExists<UserPublicationRole>(userPublicationRoleId))
                 .OnSuccessVoid(async userPublicationRole =>
                 {
                     _contentDbContext.Remove(userPublicationRole);
@@ -267,18 +273,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid id)
+        public async Task<Either<ActionResult, Unit>> RemoveUserReleaseRole(Guid userReleaseRoleId)
         {
-            return await _userService
-                .CheckCanManageAllUsers()
-                .OnSuccess(() => _contentPersistenceHelper.CheckEntityExists<UserReleaseRole>(id))
-                .OnSuccessVoid(async userReleaseRole =>
+            return await _contentPersistenceHelper
+                .CheckEntityExists<UserReleaseRole>(userReleaseRoleId)
+                .OnSuccess(async userReleaseRole =>
                 {
-                    _contentDbContext.Remove(userReleaseRole);
-                    await _contentDbContext.SaveChangesAsync();
+                    return await _contentPersistenceHelper
+                        .CheckEntityExists<Release>(query => query
+                            .Include(r => r.Publication)
+                            .Where(r => r.Id == userReleaseRole.ReleaseId)
+                        )
+                        .OnSuccess(async release =>
+                        {
+                            return await _userService
+                                .CheckCanUpdateReleaseRole(release.Publication, userReleaseRole.Role)
+                                .OnSuccessVoid(async () =>
+                                {
+                                    await _userReleaseRoleRepository.Remove(userReleaseRole,
+                                        deletedById: _userService.GetUserId());
+                                });
+                        });
                 });
         }
-        
+
         private async Task<Either<ActionResult, Unit>> ValidatePublicationRoleCanBeAdded(Guid userId,
             Guid publicationId,
             PublicationRole role)
@@ -295,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid releaseId,
             ReleaseRole role)
         {
-            if (await _userReleaseRoleRepository.UserHasRoleOnRelease(userId, releaseId, role))
+            if (await _userReleaseRoleRepository.HasUserReleaseRole(userId, releaseId, role))
             {
                 return ValidationActionResult(UserAlreadyHasResourceRole);
             }

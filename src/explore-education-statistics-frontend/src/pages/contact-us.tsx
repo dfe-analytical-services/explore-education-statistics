@@ -11,6 +11,12 @@ function ContactPage() {
         <div className="govuk-grid-column-two-thirds">
           <section>
             <h2 className="govuk-heading-m">General enquiries</h2>
+
+            <p>
+              The Explore education statistics service is operated by the
+              Department for Education (DfE).
+            </p>
+
             <p>
               If you need help and support using the service or have any general
               questions about education statistics and data contact:

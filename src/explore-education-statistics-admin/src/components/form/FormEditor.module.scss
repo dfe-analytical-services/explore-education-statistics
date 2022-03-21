@@ -1,6 +1,8 @@
 @import '~govuk-frontend/govuk/base';
 @import '~explore-education-statistics-common/src/styles/mixins';
 
+$active-colour: lighten(govuk-colour('orange'), 10);
+
 .editor {
   background: govuk-colour('light-grey');
   border: $govuk-border-width-form-element solid $govuk-input-border-colour;
@@ -9,11 +11,15 @@
   :global(.ck-focused) {
     border-color: $govuk-input-border-colour !important;
   }
+
+  // Make sure svgs are visible (they use the image tag)
+  :global(.ck-content img) {
+    width: 100%;
+  }
 }
 
 .focused {
   @include focused-input;
-  border-width: $govuk-focus-width;
 }
 
 .readOnlyEditor {
@@ -25,4 +31,25 @@
   &:focus {
     @include focused-input;
   }
+}
+
+// Comments in the editor
+:global(.commentStyle) {
+  background: govuk-colour('yellow');
+
+  :global(.commentStyle) {
+    background: lighten(govuk-colour('yellow'), 20);
+  }
+  :global(.commentStyle--active) {
+    background: $active-colour;
+  }
+}
+
+:global(.commentStyle--active) {
+  background: $active-colour;
+}
+
+:global(.commentPlaceholderStyle) {
+  background: govuk-colour('blue');
+  color: govuk-colour('white');
 }

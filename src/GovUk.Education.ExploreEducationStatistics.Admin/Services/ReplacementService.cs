@@ -1,15 +1,17 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -23,7 +25,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -42,6 +43,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ITimePeriodService _timePeriodService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IUserService _userService;
+        private readonly ICacheKeyService _cacheKeyService;
+        private readonly IBlobCacheService _cacheService;
 
         private static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
 
@@ -54,7 +57,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseService releaseService,
             ITimePeriodService timePeriodService,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-            IUserService userService)
+            IUserService userService,
+            ICacheKeyService cacheKeyService,
+            IBlobCacheService cacheService)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -66,6 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _timePeriodService = timePeriodService;
             _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
+            _cacheKeyService = cacheKeyService;
+            _cacheService = cacheService;
         }
 
         public async Task<Either<ActionResult, DataReplacementPlanViewModel>> GetReplacementPlan(
@@ -77,26 +84,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
                 .OnSuccess(() => CheckFileExists(releaseId, originalFileId)
-                .OnSuccess(async originalFile =>
-                {
-                    return await CheckFileExists(releaseId, replacementFileId)
-                        .OnSuccess(replacementFile =>
-                        {
-                            var originalSubjectId = originalFile.SubjectId.Value;
-                            var replacementSubjectId = replacementFile.SubjectId.Value;
+                    .OnSuccess(async originalFile =>
+                    {
+                        return await CheckFileExists(releaseId, replacementFileId)
+                            .OnSuccess(async replacementFile =>
+                            {
+                                var originalSubjectId = originalFile.SubjectId!.Value;
+                                var replacementSubjectId = replacementFile.SubjectId!.Value;
 
-                            var replacementSubjectMeta = GetReplacementSubjectMeta(replacementSubjectId);
+                                var replacementSubjectMeta = await GetReplacementSubjectMeta(replacementSubjectId);
 
-                            var dataBlocks = ValidateDataBlocks(releaseId, originalSubjectId, replacementSubjectMeta);
-                            var footnotes = ValidateFootnotes(releaseId, originalSubjectId, replacementSubjectMeta);
+                                var dataBlocks = ValidateDataBlocks(releaseId, originalSubjectId,
+                                    replacementSubjectMeta);
+                                var footnotes = ValidateFootnotes(releaseId, originalSubjectId, replacementSubjectMeta);
 
-                            return new DataReplacementPlanViewModel(
-                                dataBlocks,
-                                footnotes,
-                                originalSubjectId,
-                                replacementSubjectId);
-                        });
-                }));
+                                return new DataReplacementPlanViewModel(
+                                    dataBlocks,
+                                    footnotes,
+                                    originalSubjectId,
+                                    replacementSubjectId);
+                            });
+                    }));
         }
 
         public async Task<Either<ActionResult, Unit>> Replace(
@@ -112,12 +120,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(ReplacementMustBeValid);
                     }
 
-                    await replacementPlan.DataBlocks.ForEachAsync(plan =>
-                        ReplaceLinksForDataBlock(plan, replacementPlan.ReplacementSubjectId));
-                    await replacementPlan.Footnotes.ForEachAsync(plan =>
-                        ReplaceLinksForFootnote(plan, replacementPlan.OriginalSubjectId,
-                            replacementPlan.ReplacementSubjectId));
-                    await ReplaceMetaGuidance(releaseId, replacementPlan.OriginalSubjectId,
+                    await replacementPlan.DataBlocks
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(plan =>
+                            InvalidateDataBlockCachedResults(plan, releaseId));
+                    await replacementPlan.DataBlocks
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(plan =>
+                            ReplaceLinksForDataBlock(plan, replacementPlan.ReplacementSubjectId));
+                    await replacementPlan.Footnotes
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(plan =>
+                            ReplaceLinksForFootnote(plan, replacementPlan.OriginalSubjectId,
+                                replacementPlan.ReplacementSubjectId));
+                    await ReplaceDataGuidance(releaseId, replacementPlan.OriginalSubjectId,
                         replacementPlan.ReplacementSubjectId);
 
                     await _contentDbContext.SaveChangesAsync();
@@ -145,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        private ReplacementSubjectMeta GetReplacementSubjectMeta(Guid subjectId)
+        private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
         {
             var filtersIncludingItems = _filterRepository.GetFiltersIncludingItems(subjectId)
                 .ToList();
@@ -156,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var indicators = _indicatorRepository.GetIndicators(subjectId)
                 .ToDictionary(filterItem => filterItem.Name, filterItem => filterItem);
 
-            var observationalUnits = _locationRepository.GetObservationalUnits(subjectId);
+            var locations = await _locationRepository.GetDistinctForSubject(subjectId);
 
             var timePeriods = _timePeriodService.GetTimePeriods(subjectId);
 
@@ -164,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 Filters = filters,
                 Indicators = indicators,
-                ObservationalUnits = observationalUnits,
+                Locations = locations,
                 TimePeriods = timePeriods
             };
         }
@@ -286,7 +302,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        private static Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForFootnote(Footnote footnote,
+        private static Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForFootnote(
+            Footnote footnote,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return footnote.Indicators
@@ -298,7 +315,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     group => new IndicatorGroupReplacementViewModel(
                         id: group.Key.Id,
                         label: group.Key.Label,
-                        indicators: group.Select(indicator => ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
+                        indicators: group.Select(indicator =>
+                            ValidateIndicatorForReplacement(indicator, replacementSubjectMeta))
                     )
                 );
         }
@@ -313,12 +331,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var existingFilterNames = _statisticsDbContext
                 .FilterItem
+                .AsQueryable()
                 .Where(fi => existingFilterItemIds.Contains(fi.Id))
                 .Select(fi => fi.FilterGroup.Filter)
                 .Select(f => f.Name)
                 .Distinct()
                 .ToList();
-            
+
             return replacementSubjectMeta
                 .Filters
                 .Select(d => d.Value)
@@ -337,8 +356,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .Select(fi => new FilterItemReplacementViewModel(fi.Id, fi.Label, null)))
                 )
                 .ToDictionary(f => f.Id);
-            
-            return new FilterReplacementViewModel(filter.Id, filter.Label, filter.Name, filterGroupReplacementViewModels);
+
+            return new FilterReplacementViewModel(filter.Id, filter.Label, filter.Name,
+                filterGroupReplacementViewModels);
         }
 
         private Dictionary<Guid, FilterReplacementViewModel> ValidateFiltersForDataBlock(
@@ -346,6 +366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return _statisticsDbContext.FilterItem
+                .AsQueryable()
                 .Where(filterItem => dataBlock.Query.Filters.Contains(filterItem.Id))
                 .Include(filterItem => filterItem.FilterGroup)
                 .ThenInclude(filterGroup => filterGroup.Filter)
@@ -379,7 +400,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        private Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForDataBlock(DataBlock dataBlock,
+        private Dictionary<Guid, IndicatorGroupReplacementViewModel> ValidateIndicatorGroupsForDataBlock(
+            DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
             return _statisticsDbContext.Indicator
@@ -404,13 +426,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             DataBlock dataBlock,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            return GetEnumValues<GeographicLevel>()
-                .ToDictionary(geographicLevel => geographicLevel.ToString(),
-                    geographicLevel =>
-                        ValidateLocationLevelForReplacement(dataBlock.Query.Locations,
-                            geographicLevel,
-                            replacementSubjectMeta))
-                .Filter(pair => pair.Value.Any);
+            return _statisticsDbContext.Location
+                .AsNoTracking()
+                .Where(location => dataBlock.Query.LocationIds.Contains(location.Id))
+                .ToList()
+                .GroupBy(location => location.GeographicLevel)
+                .ToDictionary(group => group.Key.ToString(),
+                    group =>
+                        new LocationReplacementViewModel(
+                            label: group.Key.ToString(),
+                            locationAttributes: group
+                                .Select(location =>
+                                    ValidateLocationForReplacement(
+                                        location: location,
+                                        level: group.Key,
+                                        replacementSubjectMeta: replacementSubjectMeta))
+                                .OrderBy(location => location.Label, LabelComparer)
+                        )
+                );
         }
 
         private static TimePeriodRangeReplacementViewModel ValidateTimePeriodsForDataBlock(
@@ -443,7 +476,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             );
         }
 
-        private static  FilterGroupReplacementViewModel ValidateFilterGroupForReplacement(
+        private static FilterGroupReplacementViewModel ValidateFilterGroupForReplacement(
             FilterGroup filterGroup,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
@@ -483,61 +516,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             );
         }
 
-        private LocationReplacementViewModel ValidateLocationLevelForReplacement(
-            LocationQuery locationQuery,
-            GeographicLevel geographicLevel,
+        private static LocationAttributeReplacementViewModel ValidateLocationForReplacement(
+            Location location,
+            GeographicLevel level,
             ReplacementSubjectMeta replacementSubjectMeta)
         {
-            var queryProperty = typeof(LocationQuery).GetProperty(geographicLevel.ToString());
-            if (queryProperty == null || queryProperty.GetMethod == null)
-            {
-                throw new ArgumentException(
-                    $"{nameof(locationQuery)} does not have a property {geographicLevel.ToString()} with get method");
-            }
+            var locationAttribute = location.ToLocationAttribute();
+            var code = locationAttribute.GetCodeOrFallback();
 
-            var originalCodes = (
-                queryProperty.GetMethod.Invoke(locationQuery, new object[] { }) as IEnumerable<string> ?? new List<string>()
-            ).ToList();
+            // If the replacement subject contains the same location by id then use it,
+            // otherwise try to find a location with the same code
+            var target = replacementSubjectMeta.Locations
+                             .SingleOrDefault(l => l.Id == location.Id)?.Id ??
+                         FindReplacementLocation(replacementSubjectMeta, level, code);
 
-            if (!originalCodes.Any())
-            {
-                return new LocationReplacementViewModel(
-                    label: geographicLevel.GetEnumLabel(),
-                    observationalUnits: new List<ObservationalUnitReplacementViewModel>()
-                );
-            }
-
-            var locations = _locationRepository.GetObservationalUnits(geographicLevel, originalCodes);
-            var replacementLocations = replacementSubjectMeta.ObservationalUnits
-                .GetValueOrDefault(geographicLevel)
-                ?.ToDictionary(location => location.Code) ?? new Dictionary<string, ObservationalUnit>();
-
-            return new LocationReplacementViewModel(
-                label: geographicLevel.GetEnumLabel(),
-                observationalUnits: locations
-                    .Select(location => ValidateLocationForReplacement(location, replacementLocations))
-                    .OrderBy(location => location.Label, LabelComparer)
+            return new LocationAttributeReplacementViewModel(
+                id: location.Id,
+                code: code,
+                label: locationAttribute.Name ?? string.Empty,
+                target: target
             );
         }
 
-        private static ObservationalUnitReplacementViewModel ValidateLocationForReplacement(
-            ObservationalUnit location,
-            Dictionary<string, ObservationalUnit> replacementLocations)
-        {
-            return new ObservationalUnitReplacementViewModel(
-                label: location.Name,
-                code: location.Code,
-                target: replacementLocations.GetValueOrDefault(location.Code)?.Code ?? string.Empty
-            );
-        }
-
-        private static Filter FindReplacementFilter(ReplacementSubjectMeta replacementSubjectMeta,
+        private static Filter? FindReplacementFilter(ReplacementSubjectMeta replacementSubjectMeta,
             string filterName)
         {
             return replacementSubjectMeta.Filters.GetValueOrDefault(filterName);
         }
 
-        private static FilterGroup FindReplacementFilterGroup(ReplacementSubjectMeta replacementSubjectMeta,
+        private static FilterGroup? FindReplacementFilterGroup(ReplacementSubjectMeta replacementSubjectMeta,
             string filterName,
             string filterGroupLabel)
         {
@@ -546,7 +553,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 filterGroup.Label == filterGroupLabel);
         }
 
-        private static FilterItem FindReplacementFilterItem(ReplacementSubjectMeta replacementSubjectMeta,
+        private static FilterItem? FindReplacementFilterItem(ReplacementSubjectMeta replacementSubjectMeta,
             string filterName,
             string filterGroupLabel,
             string filterItemLabel)
@@ -563,10 +570,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return replacementSubjectMeta.Indicators.GetValueOrDefault(indicatorName)?.Id;
         }
 
+        private static Guid? FindReplacementLocation(ReplacementSubjectMeta replacementSubjectMeta,
+            GeographicLevel level,
+            string locationCode)
+        {
+            var candidateReplacements = replacementSubjectMeta.Locations
+                .Where(location =>
+                    // Filter by level as the other locations are unlikely to have matching codes
+                    // and even if they did we shouldn't target a replacement location with a different level
+                    location.GeographicLevel == level &&
+                    location.ToLocationAttribute().GetCodeOrFallback() == locationCode)
+                .ToList();
+
+            // Only return a location if there's exactly one.
+            // We could try and reduce the chance of there being multiple by matching on name as well as code,
+            // but this would restrict replacements from correcting location names.
+            return candidateReplacements.Count == 1 ? candidateReplacements[0].Id : null;
+        }
+
         private async Task ReplaceLinksForDataBlock(DataBlockReplacementPlanViewModel replacementPlan,
             Guid replacementSubjectId)
         {
             var dataBlock = await _contentDbContext.ContentBlocks
+                .AsQueryable()
                 .OfType<DataBlock>()
                 .SingleAsync(block => block.Id == replacementPlan.Id);
 
@@ -575,17 +601,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             dataBlock.Query.SubjectId = replacementSubjectId;
             ReplaceDataBlockQueryFilters(replacementPlan, dataBlock);
             ReplaceDataBlockQueryIndicators(replacementPlan, dataBlock);
+            ReplaceDataBlockQueryLocations(replacementPlan, dataBlock);
 
             var filterItemTargets = replacementPlan.Filters
                 .SelectMany(filter =>
                     filter.Value.Groups.SelectMany(group => group.Value.Filters))
-                .ToDictionary(plan => plan.Id, plan => plan.TargetValue);
+                .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
             var indicatorTargets = replacementPlan.IndicatorGroups
                 .SelectMany(group => group.Value.Indicators)
-                .ToDictionary(plan => plan.Id, plan => plan.TargetValue);
+                .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
+            var locationTargets = replacementPlan.Locations
+                .Values
+                .SelectMany(group => group.LocationAttributes)
+                .ToDictionary(ReplacementPlanOriginalId, ReplacementPlanTargetId);
 
-            ReplaceDataBlockTableHeaders(filterItemTargets, indicatorTargets, dataBlock);
-            ReplaceDataBlockCharts(filterItemTargets, indicatorTargets, dataBlock);
+            ReplaceDataBlockTableHeaders(
+                filterItemTargets: filterItemTargets,
+                indicatorTargets: indicatorTargets,
+                locationTargets: locationTargets,
+                dataBlock);
+            ReplaceDataBlockCharts(
+                filterItemTargets: filterItemTargets,
+                indicatorTargets: indicatorTargets,
+                locationTargets: locationTargets,
+                dataBlock);
         }
 
         private static void ReplaceDataBlockQueryFilters(DataBlockReplacementPlanViewModel replacementPlan,
@@ -623,43 +662,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             dataBlock.Query.Indicators = indicators;
         }
 
+        private static void ReplaceDataBlockQueryLocations(DataBlockReplacementPlanViewModel replacementPlan,
+            DataBlock dataBlock)
+        {
+            var locations = dataBlock.Query.LocationIds.ToList();
+
+            replacementPlan.Locations
+                .Values
+                .SelectMany(group => group.LocationAttributes)
+                .ToList()
+                .ForEach(plan =>
+                {
+                    locations.Remove(plan.Id);
+                    locations.Add(plan.TargetValue);
+                });
+
+            dataBlock.Query.LocationIds = locations;
+        }
+
         private static void ReplaceDataBlockTableHeaders(
-            Dictionary<Guid, Guid> filterItemTargets,
-            Dictionary<Guid, Guid> indicatorTargets,
+            IReadOnlyDictionary<Guid, Guid> filterItemTargets,
+            IReadOnlyDictionary<Guid, Guid> indicatorTargets,
+            IReadOnlyDictionary<Guid, Guid> locationTargets,
             DataBlock dataBlock)
         {
             var tableHeaders = dataBlock.Table.TableHeaders;
 
+            // Replace Columns
             ReplaceDataBlockTableHeaders(
                 tableHeaders.Columns.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
             ReplaceDataBlockTableHeaders(
                 tableHeaders.Columns.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
+            ReplaceDataBlockTableHeaders(
+                tableHeaders.Columns.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
 
+            // Replace Rows
             ReplaceDataBlockTableHeaders(
                 tableHeaders.Rows.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
             ReplaceDataBlockTableHeaders(
                 tableHeaders.Rows.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
+            ReplaceDataBlockTableHeaders(
+                tableHeaders.Rows.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
 
-            foreach (var group in tableHeaders.ColumnGroups)
+            // Replace Column Groups
+            tableHeaders.ColumnGroups.ForEach(group =>
             {
                 ReplaceDataBlockTableHeaders(
                     group.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
 
                 ReplaceDataBlockTableHeaders(
                     group.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
-            }
 
-            foreach (var group in tableHeaders.RowGroups)
+                ReplaceDataBlockTableHeaders(
+                    group.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
+            });
+
+            // Replace Row Groups
+            tableHeaders.RowGroups.ForEach(group =>
             {
                 ReplaceDataBlockTableHeaders(
                     group.FilterByType(TableHeaderType.Filter), dataBlock, filterItemTargets);
 
                 ReplaceDataBlockTableHeaders(
                     group.FilterByType(TableHeaderType.Indicator), dataBlock, indicatorTargets);
-            }
+
+                ReplaceDataBlockTableHeaders(
+                    group.FilterByType(TableHeaderType.Location), dataBlock, locationTargets);
+            });
         }
 
-        private static void ReplaceDataBlockTableHeaders(List<TableHeader> tableHeaders, DataBlock dataBlock,
+        private static void ReplaceDataBlockTableHeaders(
+            List<TableHeader> tableHeaders,
+            DataBlock dataBlock,
             IReadOnlyDictionary<Guid, Guid> targets)
         {
             foreach (var tableHeader in tableHeaders)
@@ -685,22 +759,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private static void ReplaceDataBlockCharts(
-            Dictionary<Guid, Guid> filterItemTargets,
-            Dictionary<Guid, Guid> indicatorTargets,
+            IReadOnlyDictionary<Guid, Guid> filterItemTargets,
+            IReadOnlyDictionary<Guid, Guid> indicatorTargets,
+            IReadOnlyDictionary<Guid, Guid> locationTargets,
             DataBlock dataBlock)
         {
             dataBlock.Charts.ForEach(
                 chart =>
                 {
-                    ReplaceChartMajorAxisDataSets(filterItemTargets, indicatorTargets, dataBlock, chart);
-                    ReplaceChartLegendDataSets(filterItemTargets, indicatorTargets, dataBlock, chart);
+                    ReplaceChartMajorAxisDataSets(
+                        filterItemTargets: filterItemTargets,
+                        indicatorTargets: indicatorTargets,
+                        locationTargets: locationTargets,
+                        dataBlock,
+                        chart);
+                    ReplaceChartLegendDataSets(
+                        filterItemTargets: filterItemTargets,
+                        indicatorTargets: indicatorTargets,
+                        locationTargets: locationTargets,
+                        dataBlock,
+                        chart);
                 }
             );
         }
 
         private static void ReplaceChartLegendDataSets(
-            Dictionary<Guid, Guid> filterItemTargets,
-            Dictionary<Guid, Guid> indicatorTargets,
+            IReadOnlyDictionary<Guid, Guid> filterItemTargets,
+            IReadOnlyDictionary<Guid, Guid> indicatorTargets,
+            IReadOnlyDictionary<Guid, Guid> locationTargets,
             DataBlock dataBlock,
             IChart chart)
         {
@@ -724,28 +810,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     ).ToList();
 
 
-                    if (!dataSet.Indicator.HasValue)
+                    if (dataSet.Indicator.HasValue)
                     {
-                        return;
+                        if (indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
+                        {
+                            dataSet.Indicator = targetIndicatorId;
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(
+                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set indicator: {dataSet.Indicator}"
+                            );
+                        }
                     }
 
-                    if (indicatorTargets.TryGetValue(dataSet.Indicator.Value, out var targetIndicatorId))
+                    if (dataSet.Location != null)
                     {
-                        dataSet.Indicator = targetIndicatorId;
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException(
-                            $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set indicator: {dataSet.Indicator}"
-                        );
+                        if (Guid.TryParse(dataSet.Location.Value, out var idAsGuid))
+                        {
+                            if (locationTargets.TryGetValue(idAsGuid, out var targetLocationId))
+                            {
+                                dataSet.Location.Value = targetLocationId.ToString();
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException(
+                                    $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set location: {dataSet.Location.Value}"
+                                );
+                            }
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(
+                                $"Expected Guid for dataBlock {dataBlock.Id} chart legend data set location: {dataSet.Location.Value}");
+                        }
                     }
                 }
             );
         }
 
         private static void ReplaceChartMajorAxisDataSets(
-            Dictionary<Guid, Guid> filterItemTargets,
-            Dictionary<Guid, Guid> indicatorTargets,
+            IReadOnlyDictionary<Guid, Guid> filterItemTargets,
+            IReadOnlyDictionary<Guid, Guid> indicatorTargets,
+            IReadOnlyDictionary<Guid, Guid> locationTargets,
             DataBlock dataBlock,
             IChart chart)
         {
@@ -776,6 +883,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set indicator: {dataSet.Indicator}"
                         );
                     }
+
+                    if (dataSet.Location != null)
+                    {
+                        if (Guid.TryParse(dataSet.Location.Value, out var idAsGuid))
+                        {
+                            if (locationTargets.TryGetValue(idAsGuid, out var targetLocationId))
+                            {
+                                dataSet.Location.Value = targetLocationId.ToString();
+                            }
+                            else
+                            {
+                                throw new InvalidOperationException(
+                                    $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set location: {dataSet.Location.Value}"
+                                );
+                            }
+                        }
+                        else
+                        {
+                            throw new InvalidOperationException(
+                                $"Expected Guid for dataBlock {dataBlock.Id} chart data set location: {dataSet.Location.Value}");
+                        }
+                    }
                 }
             );
         }
@@ -786,25 +915,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             await ReplaceFootnoteSubject(replacementPlan.Id, originalSubjectId, replacementSubjectId);
 
-            await replacementPlan.Filters.ForEachAsync(async plan =>
-                await ReplaceFootnoteFilter(replacementPlan.Id, plan));
+            await replacementPlan.Filters
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async plan =>
+                    await ReplaceFootnoteFilter(replacementPlan.Id, plan));
 
-            await replacementPlan.FilterGroups.ForEachAsync(async plan =>
-                await ReplaceFootnoteFilterGroup(replacementPlan.Id, plan));
+            await replacementPlan.FilterGroups
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async plan =>
+                    await ReplaceFootnoteFilterGroup(replacementPlan.Id, plan));
 
-            await replacementPlan.FilterItems.ForEachAsync(async plan =>
-                await ReplaceFootnoteFilterItem(replacementPlan.Id, plan));
+            await replacementPlan.FilterItems
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async plan =>
+                    await ReplaceFootnoteFilterItem(replacementPlan.Id, plan));
 
             await replacementPlan.IndicatorGroups
                 .SelectMany(group => group.Value.Indicators)
-                .ForEachAsync(async plan =>
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async plan =>
                     await ReplaceIndicatorFootnote(replacementPlan.Id, plan));
         }
 
         private async Task ReplaceFootnoteSubject(Guid footnoteId, Guid originalSubjectId, Guid replacementSubjectId)
         {
-            var subjectFootnote = await _statisticsDbContext.SubjectFootnote.Where(f =>
-                f.FootnoteId == footnoteId && f.SubjectId == originalSubjectId).SingleOrDefaultAsync();
+            var subjectFootnote = await _statisticsDbContext.SubjectFootnote
+                .AsQueryable()
+                .Where(f =>
+                    f.FootnoteId == footnoteId && f.SubjectId == originalSubjectId).SingleOrDefaultAsync();
 
             if (subjectFootnote != null)
             {
@@ -819,9 +957,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceFootnoteFilter(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var filterFootnote = await _statisticsDbContext.FilterFootnote.SingleAsync(f =>
-                f.FootnoteId == footnoteId && f.FilterId == plan.Id
-            );
+            var filterFootnote = await _statisticsDbContext.FilterFootnote
+                .AsQueryable()
+                .SingleAsync(f =>
+                    f.FootnoteId == footnoteId && f.FilterId == plan.Id
+                );
 
             _statisticsDbContext.Remove(filterFootnote);
             await _statisticsDbContext.FilterFootnote.AddAsync(new FilterFootnote
@@ -833,9 +973,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceFootnoteFilterGroup(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var filterGroupFootnote = await _statisticsDbContext.FilterGroupFootnote.SingleAsync(f =>
-                f.FootnoteId == footnoteId && f.FilterGroupId == plan.Id
-            );
+            var filterGroupFootnote = await _statisticsDbContext.FilterGroupFootnote
+                .AsQueryable()
+                .SingleAsync(f =>
+                    f.FootnoteId == footnoteId && f.FilterGroupId == plan.Id
+                );
 
             _statisticsDbContext.Remove(filterGroupFootnote);
             await _statisticsDbContext.FilterGroupFootnote.AddAsync(new FilterGroupFootnote
@@ -847,9 +989,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceFootnoteFilterItem(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var filterItemFootnote = await _statisticsDbContext.FilterItemFootnote.SingleAsync(f =>
-                f.FootnoteId == footnoteId && f.FilterItemId == plan.Id
-            );
+            var filterItemFootnote = await _statisticsDbContext.FilterItemFootnote
+                .AsQueryable()
+                .SingleAsync(f =>
+                    f.FootnoteId == footnoteId && f.FilterItemId == plan.Id
+                );
 
             _statisticsDbContext.Remove(filterItemFootnote);
             await _statisticsDbContext.FilterItemFootnote.AddAsync(new FilterItemFootnote
@@ -861,9 +1005,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task ReplaceIndicatorFootnote(Guid footnoteId, TargetableReplacementViewModel plan)
         {
-            var indicatorFootnote = await _statisticsDbContext.IndicatorFootnote.SingleAsync(f =>
-                f.FootnoteId == footnoteId && f.IndicatorId == plan.Id
-            );
+            var indicatorFootnote = await _statisticsDbContext.IndicatorFootnote
+                .AsQueryable()
+                .SingleAsync(f =>
+                    f.FootnoteId == footnoteId && f.IndicatorId == plan.Id
+                );
 
             _statisticsDbContext.Remove(indicatorFootnote);
             await _statisticsDbContext.IndicatorFootnote.AddAsync(new IndicatorFootnote
@@ -873,23 +1019,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
         }
 
-        private async Task ReplaceMetaGuidance(
+        private async Task ReplaceDataGuidance(
             Guid releaseId,
             Guid originalSubject,
             Guid replacementSubject)
         {
             var originalReleaseSubject = await _statisticsDbContext.ReleaseSubject
+                .AsQueryable()
                 .Where(rs => rs.ReleaseId == releaseId &&
                              rs.SubjectId == originalSubject)
                 .FirstAsync();
 
             var replacementReleaseSubject = await _statisticsDbContext.ReleaseSubject
+                .AsQueryable()
                 .Where(rs => rs.ReleaseId == releaseId &&
                              rs.SubjectId == replacementSubject)
                 .FirstAsync();
 
             _statisticsDbContext.Update(replacementReleaseSubject);
-            replacementReleaseSubject.MetaGuidance = originalReleaseSubject.MetaGuidance;
+            replacementReleaseSubject.DataGuidance = originalReleaseSubject.DataGuidance;
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(
@@ -924,12 +1072,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(async _ => await _releaseService.RemoveDataFiles(releaseId, originalFileId));
         }
 
+        private Task<Either<ActionResult, Unit>> InvalidateDataBlockCachedResults(
+            DataBlockReplacementPlanViewModel plan, Guid releaseId)
+        {
+            return _cacheKeyService
+                .CreateCacheKeyForDataBlock(releaseId, plan.Id)
+                .OnSuccessVoid(_cacheService.DeleteItem);
+        }
+
+        private static Guid ReplacementPlanOriginalId(TargetableReplacementViewModel plan)
+        {
+            return plan.Id;
+        }
+
+        private static Guid ReplacementPlanTargetId(TargetableReplacementViewModel plan)
+        {
+            return plan.TargetValue;
+        }
+
         private class ReplacementSubjectMeta
         {
             public Dictionary<string, Filter> Filters { get; set; }
             public Dictionary<string, Indicator> Indicators { get; set; }
-            public Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> ObservationalUnits { get; set; }
-            public IEnumerable<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; }
+            public IList<Location> Locations { get; set; }
+            public IList<(int Year, TimeIdentifier TimeIdentifier)> TimePeriods { get; set; }
         }
     }
 }

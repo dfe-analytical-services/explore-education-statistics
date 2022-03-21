@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Mime;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure;
@@ -49,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path)
+        public async Task<List<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blobInfos = new List<BlobInfo>();
@@ -77,7 +76,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                                 contentType: blob.Properties.ContentType,
                                 contentLength: blob.Properties.ContentLength ?? 0,
                                 meta: blob.Metadata,
-                                created: blob.Properties.CreatedOn
+                                created: blob.Properties.CreatedOn,
+                                updated: blob.Properties.LastModified
                             )
                         );
                     }
@@ -106,7 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 contentType: properties.ContentType,
                 contentLength: properties.ContentLength,
                 meta: properties.Metadata,
-                created: properties.CreatedOn
+                created: properties.CreatedOn,
+                updated: properties.LastModified
             );
         }
 
@@ -122,12 +123,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return await GetBlob(containerName, path);
         }
 
-        public async Task DeleteBlobs(IBlobContainer containerName, string directoryPath, string? excludePattern = null)
+        public async Task DeleteBlobs(
+            IBlobContainer containerName,
+            string? directoryPath = null,
+            IBlobStorageService.DeleteBlobsOptions? options = null)
         {
             if (!directoryPath.IsNullOrEmpty())
             {
                 // Forcefully add a trailing slash to prevent deleting blobs whose names begin with that string
-                directoryPath = directoryPath.AppendTrailingSlash();
+                directoryPath = directoryPath?.AppendTrailingSlash();
             }
 
             var blobContainer = await GetBlobContainer(containerName);
@@ -152,13 +156,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                             break;
                         }
 
-                        var excluded = excludePattern != null &&
-                                       Regex.IsMatch(blob.Name, excludePattern, RegexOptions.IgnoreCase);
+                        var excluded = options?.ExcludeRegex?.IsMatch(blob.Name) ?? false;
+                        var included = options?.IncludeRegex?.IsMatch(blob.Name) ?? true;
 
-                        if (excluded)
+                        if (excluded || !included)
                         {
                             _logger.LogInformation($"Ignoring blob {blobContainer.Name}/{blob.Name}");
-                            break;
+                            continue;
                         }
 
                         _logger.LogInformation($"Deleting blob {blobContainer.Name}/{blob.Name}");
@@ -572,7 +576,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                     contentType: source.Properties.ContentType,
                     contentLength: source.Properties.Length,
                     meta: source.Metadata,
-                    created: source.Properties.Created
+                    created: source.Properties.Created,
+                    updated: source.Properties.LastModified
                 )
             );
 

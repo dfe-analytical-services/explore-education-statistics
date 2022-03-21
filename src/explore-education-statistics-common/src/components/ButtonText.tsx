@@ -23,7 +23,6 @@ const ButtonText = ({
 }: Props) => {
   return (
     <button
-      data-testid={testId}
       // eslint-disable-next-line react/jsx-props-no-spreading
       {...props}
       className={classNames(
@@ -33,6 +32,7 @@ const ButtonText = ({
         },
         className,
       )}
+      data-testid={testId}
       // eslint-disable-next-line react/button-has-type
       type={type}
     >

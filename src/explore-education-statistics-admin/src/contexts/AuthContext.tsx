@@ -55,6 +55,15 @@ export const AuthContextProvider = ({ children }: Props) => {
       if (authenticated) {
         try {
           const userProfile = await authService.getUser();
+
+          if (!userProfile) {
+            setState({
+              ready: true,
+            });
+
+            return;
+          }
+
           const { profile } = userProfile;
           const userId = profile.sub;
 
@@ -69,7 +78,7 @@ export const AuthContextProvider = ({ children }: Props) => {
             ready: true,
             user: {
               id: userId,
-              name: profile.given_name,
+              name: profile.given_name ?? '',
               validToken,
               permissions,
             },

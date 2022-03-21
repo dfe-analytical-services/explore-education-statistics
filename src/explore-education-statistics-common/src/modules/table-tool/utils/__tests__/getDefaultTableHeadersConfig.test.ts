@@ -16,12 +16,12 @@ describe('getDefaultTableHeadersConfig', () => {
               label: 'Ethnic group major',
               options: [
                 {
-                  label: 'Ethnicity Major Black Total',
-                  value: 'ethnicity-major-black-total',
-                },
-                {
                   label: 'Ethnicity Major Asian Total',
                   value: 'ethnicity-major-asian-total',
+                },
+                {
+                  label: 'Ethnicity Major Black Total',
+                  value: 'ethnicity-major-black-total',
                 },
               ],
             },
@@ -37,16 +37,16 @@ describe('getDefaultTableHeadersConfig', () => {
               label: 'Default',
               options: [
                 {
-                  label: 'State-funded secondary',
-                  value: 'state-funded-secondary',
-                },
-                {
                   label: 'Special',
                   value: 'special',
                 },
                 {
                   label: 'State-funded primary',
                   value: 'state-funded-primary',
+                },
+                {
+                  label: 'State-funded secondary',
+                  value: 'state-funded-secondary',
                 },
               ],
             },
@@ -85,10 +85,12 @@ describe('getDefaultTableHeadersConfig', () => {
           decimalPlaces: 2,
         },
       ],
-      locations: [
-        { value: 'barnsley', label: 'Barnsley', level: 'localAuthority' },
-        { value: 'barnet', label: 'Barnet', level: 'localAuthority' },
-      ],
+      locations: {
+        localAuthority: [
+          { id: 'barnet', value: 'barnet', label: 'Barnet' },
+          { id: 'barnsley', value: 'barnsley', label: 'Barnsley' },
+        ],
+      },
       boundaryLevels: [],
       publicationName: 'Pupil absence in schools in England',
       subjectName: 'Absence by characteristic',
@@ -101,14 +103,14 @@ describe('getDefaultTableHeadersConfig', () => {
       {
         filters: [],
         geographicLevel: '',
-        location: {},
+        locationId: '',
         measures: {},
         timePeriod: '2014_AY',
       },
       {
         filters: [],
         geographicLevel: '',
-        location: {},
+        locationId: '',
         measures: {},
         timePeriod: '2015_AY',
       },
@@ -152,7 +154,7 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config using a larger number of time periods than indicators', () => {
-    const testTableDataTimePeriods = {
+    const testTableDataTimePeriods: TableDataResponse = {
       ...testTableData,
       subjectMeta: {
         ...testTableData.subjectMeta,
@@ -191,35 +193,35 @@ describe('getDefaultTableHeadersConfig', () => {
         {
           filters: [],
           geographicLevel: '',
-          location: {},
+          locationId: '',
           measures: {},
           timePeriod: '2014_AY',
         },
         {
           filters: [],
           geographicLevel: '',
-          location: {},
+          locationId: '',
           measures: {},
           timePeriod: '2015_AY',
         },
         {
           filters: [],
           geographicLevel: '',
-          location: {},
+          locationId: '',
           measures: {},
           timePeriod: '2016_AY',
         },
         {
           filters: [],
           geographicLevel: '',
-          location: {},
+          locationId: '',
           measures: {},
           timePeriod: '2017_AY',
         },
         {
           filters: [],
           geographicLevel: '',
-          location: {},
+          locationId: '',
           measures: {},
           timePeriod: '2018_AY',
         },
@@ -264,7 +266,7 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config when two options for every filter type', () => {
-    const testTableDataTwoOptions = {
+    const testTableDataTwoOptions: TableDataResponse = {
       ...testTableData,
       subjectMeta: {
         ...testTableData.subjectMeta,
@@ -277,12 +279,12 @@ describe('getDefaultTableHeadersConfig', () => {
                 label: 'Default',
                 options: [
                   {
-                    label: 'State-funded secondary',
-                    value: 'state-funded-secondary',
-                  },
-                  {
                     label: 'Special',
                     value: 'special',
+                  },
+                  {
+                    label: 'State-funded secondary',
+                    value: 'state-funded-secondary',
                   },
                 ],
               },
@@ -341,7 +343,7 @@ describe('getDefaultTableHeadersConfig', () => {
   });
 
   test('returns correct config with siblingless filters removed when one option for every filter type', () => {
-    const testTableDataSiblingless = {
+    const testTableDataSiblingless: TableDataResponse = {
       ...testTableData,
       subjectMeta: {
         ...testTableData.subjectMeta,
@@ -385,15 +387,17 @@ describe('getDefaultTableHeadersConfig', () => {
             decimalPlaces: 2,
           },
         ],
-        locations: [
-          { value: 'barnsley', label: 'Barnsley', level: 'localAuthority' },
-        ],
+        locations: {
+          localAuthority: [
+            { id: 'barnsley', value: 'barnsley', label: 'Barnsley' },
+          ],
+        },
       },
       results: [
         {
           filters: [],
           geographicLevel: '',
-          location: {},
+          locationId: '',
           measures: {},
           timePeriod: '2014_AY',
         },
@@ -438,14 +442,14 @@ describe('getDefaultTableHeadersConfig', () => {
         {
           filters: [],
           geographicLevel: '',
-          location: {},
+          locationId: '',
           measures: {},
           timePeriod: '2018_T1',
         },
         {
           filters: [],
           geographicLevel: '',
-          location: {},
+          locationId: '',
           measures: {},
           timePeriod: '2017_T1',
         },

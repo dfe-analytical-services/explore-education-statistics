@@ -67,6 +67,15 @@
     },
     "enableAlerts": {
       "value": true
+    },
+    "tableBuilderMaxTableCellsAllowed": {
+      "value": 1000000
+    },
+    "maxContentDbSizeBytes": {
+      "value": 2147483648
+    },
+    "maxStatsDbSizeBytes": {
+      "value": 375809638400
     }
   }
 }

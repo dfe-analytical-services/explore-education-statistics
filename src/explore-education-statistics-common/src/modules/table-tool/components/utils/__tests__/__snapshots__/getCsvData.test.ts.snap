@@ -1,0 +1,254 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`getCsvData can contain suppressed cells 1`] = `
+Array [
+  Array [
+    "location",
+    "location_code",
+    "geographic_level",
+    "time_period",
+    "characteristic",
+    "sess_authorised_percent",
+    "sess_authorised",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "13.4",
+    "x",
+  ],
+]
+`;
+
+exports[`getCsvData contains data for a Permalink table created prior to the switchover from Location codes to id's 1`] = `
+Array [
+  Array [
+    "location",
+    "location_code",
+    "geographic_level",
+    "time_period",
+    "characteristic",
+    "school_type",
+    "sess_authorised_percent",
+    "sess_authorised",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "State-funded primary",
+    "111",
+    "222",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "State-funded secondary",
+    "333",
+    "444",
+  ],
+  Array [
+    "Barnet",
+    "barnet",
+    "localAuthority",
+    "201516",
+    "Female",
+    "State-funded primary",
+    "555",
+    "666",
+  ],
+  Array [
+    "Barnsley",
+    "barnsley",
+    "localAuthority",
+    "201516",
+    "Female",
+    "State-funded secondary",
+    "777",
+    "888",
+  ],
+]
+`;
+
+exports[`getCsvData contains full set of data 1`] = `
+Array [
+  Array [
+    "location",
+    "location_code",
+    "geographic_level",
+    "time_period",
+    "characteristic",
+    "school_type",
+    "sess_authorised_percent",
+    "sess_authorised",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "State-funded primary",
+    "111",
+    "222",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "State-funded secondary",
+    "333",
+    "444",
+  ],
+  Array [
+    "Barnsley",
+    "barnsley",
+    "localAuthority",
+    "201516",
+    "Female",
+    "State-funded primary",
+    "555",
+    "666",
+  ],
+  Array [
+    "Barnsley",
+    "barnsley",
+    "localAuthority",
+    "201516",
+    "Female",
+    "State-funded secondary",
+    "777",
+    "888",
+  ],
+]
+`;
+
+exports[`getCsvData contains no data if matching result but no matching indicator 1`] = `
+Array [
+  Array [
+    "location",
+    "location_code",
+    "geographic_level",
+    "time_period",
+    "characteristic",
+    "sess_authorised_percent",
+    "sess_authorised",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "no data",
+    "111",
+  ],
+]
+`;
+
+exports[`getCsvData contains no data if there are only some matching results 1`] = `
+Array [
+  Array [
+    "location",
+    "location_code",
+    "geographic_level",
+    "time_period",
+    "characteristic",
+    "school_type",
+    "sess_authorised_percent",
+    "sess_authorised",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "State-funded primary",
+    "111",
+    "no data",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "State-funded secondary",
+    "no data",
+    "222",
+  ],
+]
+`;
+
+exports[`getCsvData does not format values in any way 1`] = `
+Array [
+  Array [
+    "location",
+    "location_code",
+    "geographic_level",
+    "time_period",
+    "characteristic",
+    "sess_authorised_percent",
+    "sess_authorised",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "12300000",
+    "44255667.2356",
+  ],
+]
+`;
+
+exports[`getCsvData returns only header if there are no results 1`] = `
+Array [
+  Array [
+    "location",
+    "location_code",
+    "geographic_level",
+    "time_period",
+    "characteristic",
+    "sess_authorised_percent",
+    "sess_authorised",
+  ],
+]
+`;
+
+exports[`getCsvData strips out rows with only no data 1`] = `
+Array [
+  Array [
+    "location",
+    "location_code",
+    "geographic_level",
+    "time_period",
+    "characteristic",
+    "school_type",
+    "sess_authorised_percent",
+    "sess_authorised",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "State-funded primary",
+    "111",
+    "222",
+  ],
+]
+`;

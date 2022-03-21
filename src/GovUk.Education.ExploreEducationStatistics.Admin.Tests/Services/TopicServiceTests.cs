@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -22,7 +24,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using static Moq.MockBehavior;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using ContentRelease = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -77,7 +79,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var savedTopic = await context.Topics.FindAsync(result.Right.Id);
 
-                Assert.Equal("Test topic", savedTopic.Title);
+                Assert.NotNull(savedTopic);
+                Assert.Equal("Test topic", savedTopic!.Title);
                 Assert.Equal("test-topic", savedTopic.Slug);
                 Assert.Equal(theme.Id, savedTopic.ThemeId);
             }
@@ -199,7 +202,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var savedTopic = await context.Topics.FindAsync(result.Right.Id);
 
-                Assert.Equal("New title", savedTopic.Title);
+                Assert.NotNull(savedTopic);
+                Assert.Equal("New title", savedTopic!.Title);
                 Assert.Equal("new-title", savedTopic.Slug);
                 Assert.Equal(theme.Id, savedTopic.ThemeId);
             }
@@ -394,7 +398,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var methodologyService = new Mock<IMethodologyService>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
-
+            var cacheService = new Mock<IBlobCacheService>(Strict);
+            
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
@@ -405,7 +410,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     methodologyService: methodologyService.Object,
-                    publishingService: publishingService.Object);
+                    publishingService: publishingService.Object,
+                    cacheService: cacheService.Object);
 
                 releaseDataFileService
                     .Setup(s => s.DeleteAll(releaseId, true))
@@ -426,12 +432,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publishingService.Setup(s => s.TaxonomyChanged())
                     .ReturnsAsync(Unit.Instance);
 
+                cacheService
+                    .Setup(s =>
+                        s.DeleteCacheFolder(
+                            ItIs.DeepEqualTo(new ReleaseContentFolderCacheKey(publicationId, releaseId))))
+                    .Returns(Task.CompletedTask);
+
                 var result = await service.DeleteTopic(topicId);
                 VerifyAllMocks(releaseDataFileService,
                     releaseFileService,
                     releaseSubjectRepository,
                     methodologyService,
-                    publishingService);
+                    publishingService,
+                    cacheService);
 
                 result.AssertRight();
 
@@ -452,6 +465,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseVersion2Id = Guid.NewGuid();
             var releaseVersion3Id = Guid.NewGuid();
             var releaseVersion4Id = Guid.NewGuid();
+
+            var releaseIdsInExpectedDeleteOrder = 
+                AsList(releaseVersion4Id, releaseVersion3Id, releaseVersion2Id, releaseVersion1Id);
 
             var topic = new Topic
             {
@@ -505,7 +521,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 PreviousVersionId = releaseVersion3Id,
                 PublicationId = publicationId
             });
-            
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
@@ -528,6 +544,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseFileService = new Mock<IReleaseFileService>(Strict);
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
+            var cacheService = new Mock<IBlobCacheService>(Strict);
 
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
@@ -538,79 +555,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseDataFileService: releaseDataFileService.Object,
                     releaseFileService: releaseFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
-                    publishingService: publishingService.Object);
+                    publishingService: publishingService.Object,
+                    cacheService: cacheService.Object);
 
                 var releaseDataFileDeleteSequence = new MockSequence();
 
-                releaseDataFileService
-                    .InSequence(releaseDataFileDeleteSequence)
-                    .Setup(s => s.DeleteAll(releaseVersion4Id, true))
-                    .ReturnsAsync(Unit.Instance);
-
-                releaseDataFileService
-                    .InSequence(releaseDataFileDeleteSequence)
-                    .Setup(s => s.DeleteAll(releaseVersion3Id, true))
-                    .ReturnsAsync(Unit.Instance);
-
-                releaseDataFileService
-                    .InSequence(releaseDataFileDeleteSequence)
-                    .Setup(s => s.DeleteAll(releaseVersion2Id, true))
-                    .ReturnsAsync(Unit.Instance);
-
-                releaseDataFileService
-                    .InSequence(releaseDataFileDeleteSequence)
-                    .Setup(s => s.DeleteAll(releaseVersion1Id, true))
-                    .ReturnsAsync(Unit.Instance);
+                releaseIdsInExpectedDeleteOrder.ForEach(releaseId => 
+                    releaseDataFileService
+                        .InSequence(releaseDataFileDeleteSequence)
+                        .Setup(s => s.DeleteAll(releaseId, true))
+                        .ReturnsAsync(Unit.Instance));
 
                 var releaseFileDeleteSequence = new MockSequence();
 
-                releaseFileService
-                    .InSequence(releaseFileDeleteSequence)
-                    .Setup(s => s.DeleteAll(releaseVersion4Id, true))
-                    .ReturnsAsync(Unit.Instance);
-
-                releaseFileService
-                    .InSequence(releaseFileDeleteSequence)
-                    .Setup(s => s.DeleteAll(releaseVersion3Id, true))
-                    .ReturnsAsync(Unit.Instance);
-
-                releaseFileService
-                    .InSequence(releaseFileDeleteSequence)
-                    .Setup(s => s.DeleteAll(releaseVersion2Id, true))
-                    .ReturnsAsync(Unit.Instance);
-
-                releaseFileService
-                    .InSequence(releaseFileDeleteSequence)
-                    .Setup(s => s.DeleteAll(releaseVersion1Id, true))
-                    .ReturnsAsync(Unit.Instance);
+                releaseIdsInExpectedDeleteOrder.ForEach(releaseId => 
+                    releaseFileService
+                        .InSequence(releaseFileDeleteSequence)
+                        .Setup(s => s.DeleteAll(releaseId, true))
+                        .ReturnsAsync(Unit.Instance));
 
                 var releaseSubjectDeleteSequence = new MockSequence();
+                
+                releaseIdsInExpectedDeleteOrder.ForEach(releaseId => 
+                    releaseSubjectRepository
+                        .InSequence(releaseSubjectDeleteSequence)
+                        .Setup(s => s.DeleteAllReleaseSubjects(releaseId, false))
+                        .Returns(Task.CompletedTask));
 
-                releaseSubjectRepository
-                    .InSequence(releaseSubjectDeleteSequence)
-                    .Setup(s => s.DeleteAllReleaseSubjects(releaseVersion4Id, false))
-                    .Returns(Task.CompletedTask);
+                var releaseCacheInvalidationSequence = new MockSequence();
 
-                releaseSubjectRepository
-                    .InSequence(releaseSubjectDeleteSequence)
-                    .Setup(s => s.DeleteAllReleaseSubjects(releaseVersion3Id, false))
-                    .Returns(Task.CompletedTask);
-
-                releaseSubjectRepository
-                    .InSequence(releaseSubjectDeleteSequence)
-                    .Setup(s => s.DeleteAllReleaseSubjects(releaseVersion2Id, false))
-                    .Returns(Task.CompletedTask);
-
-                releaseSubjectRepository
-                    .InSequence(releaseSubjectDeleteSequence)
-                    .Setup(s => s.DeleteAllReleaseSubjects(releaseVersion1Id, false))
-                    .Returns(Task.CompletedTask);
+                releaseIdsInExpectedDeleteOrder.ForEach(releaseId => 
+                    cacheService
+                        .InSequence(releaseCacheInvalidationSequence)
+                        .Setup(s =>
+                            s.DeleteCacheFolder(
+                                ItIs.DeepEqualTo(new ReleaseContentFolderCacheKey(publicationId, releaseId))))
+                        .Returns(Task.CompletedTask));
 
                 publishingService.Setup(s => s.TaxonomyChanged())
                     .ReturnsAsync(Unit.Instance);
 
                 var result = await service.DeleteTopic(topicId);
-                VerifyAllMocks(releaseDataFileService, releaseFileService, releaseSubjectRepository, publishingService);
+                VerifyAllMocks(
+                    releaseDataFileService, 
+                    releaseFileService, 
+                    releaseSubjectRepository, 
+                    publishingService, 
+                    cacheService);
+                
                 result.AssertRight();
 
                 Assert.Equal(0, contentContext.Publications.Count());
@@ -848,7 +840,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var methodologyService = new Mock<IMethodologyService>(Strict);
             var publishingService = new Mock<IPublishingService>(Strict);
-
+            var cacheService = new Mock<IBlobCacheService>(Strict);
+            
             await using (var contentContext = DbUtils.InMemoryApplicationDbContext(contextId))
             await using (var statisticsContext = InMemoryStatisticsDbContext(contextId))
             {
@@ -859,7 +852,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseFileService: releaseFileService.Object,
                     releaseSubjectRepository: releaseSubjectRepository.Object,
                     methodologyService: methodologyService.Object,
-                    publishingService: publishingService.Object);
+                    publishingService: publishingService.Object,
+                    cacheService: cacheService.Object);
 
                 releaseDataFileService
                     .Setup(s => s.DeleteAll(releaseId, true))
@@ -880,19 +874,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 publishingService.Setup(s => s.TaxonomyChanged())
                     .ReturnsAsync(Unit.Instance);
 
+                cacheService
+                    .Setup(s =>
+                        s.DeleteCacheFolder(
+                            ItIs.DeepEqualTo(new ReleaseContentFolderCacheKey(publicationId, releaseId))))
+                    .Returns(Task.CompletedTask);
+
                 var result = await service.DeleteTopic(topicId);
                 VerifyAllMocks(releaseDataFileService,
                     releaseFileService,
                     releaseSubjectRepository,
                     methodologyService,
-                    publishingService);
+                    publishingService,
+                    cacheService);
 
                 result.AssertRight();
 
-                Assert.Equal(otherPublicationId, contentContext.Publications.Select(p => p.Id).Single());
-                Assert.Equal(otherTopicId, contentContext.Topics.Select(t => t.Id).Single());
-                Assert.Equal(otherReleaseId, contentContext.Releases.Select(r => r.Id).Single());
-                Assert.Equal(otherReleaseId, statisticsContext.Release.Select(r => r.Id).Single());
+                Assert.Equal(otherPublicationId, contentContext.Publications.AsQueryable().Select(p => p.Id).Single());
+                Assert.Equal(otherTopicId, contentContext.Topics.AsQueryable().Select(t => t.Id).Single());
+                Assert.Equal(otherReleaseId, contentContext.Releases.AsQueryable().Select(r => r.Id).Single());
+                Assert.Equal(otherReleaseId, statisticsContext.Release.AsQueryable().Select(r => r.Id).Single());
             }
         }
 
@@ -907,11 +908,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseFileService? releaseFileService = null,
             IPublishingService? publishingService = null,
             IMethodologyService? methodologyService = null,
+            IBlobCacheService? cacheService = null,
             bool enableThemeDeletion = true)
         {
             var configuration =
-                CreateMockConfiguration(new Tuple<string, string>("enableThemeDeletion", enableThemeDeletion.ToString()));
-            
+                CreateMockConfiguration(TupleOf("enableThemeDeletion", enableThemeDeletion.ToString()));
+
             return new TopicService(
                 configuration.Object,
                 contentContext,
@@ -923,7 +925,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),
                 releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
                 publishingService ?? Mock.Of<IPublishingService>(Strict),
-                methodologyService ?? Mock.Of<IMethodologyService>(Strict)
+                methodologyService ?? Mock.Of<IMethodologyService>(Strict),
+                cacheService ?? Mock.Of<IBlobCacheService>(Strict)
             );
         }
     }

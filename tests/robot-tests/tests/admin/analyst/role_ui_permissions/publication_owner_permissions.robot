@@ -6,6 +6,7 @@ Resource            ../../../libs/admin/analyst/role_ui_permissions.robot
 
 Suite Setup         user signs in as analyst1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev
 
@@ -28,9 +29,27 @@ Check cannot edit content for published release
 Navigate back to admin dashboard for publication
     user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
+Check Edit publication page inputs are correct
+    ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
+    user clicks link    Manage publication    ${accordion}
+    user waits until page contains title    Manage publication
+
+    user waits until page contains element    label:Select theme
+    user waits until page contains element    label:Select topic
+    user waits until page contains element    label:Team name
+    user waits until page contains element    label:Team email address
+    user waits until page contains element    label:Contact name
+    user waits until page contains element    label:Contact telephone number
+    user checks page does not contain element    label:Publication title    # Only BAU users should see this
+
+    user clicks link    Cancel
+    user waits until page does not contain link    Cancel
+
 Check can create an amendment of a published release
-    ${details}=    user gets details content element    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)
-    ...    ${publication_accordion}    30
+    user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
+
+    ${details}=    user opens details dropdown    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)
+    ...    ${publication_accordion}
     user can see the create amendment controls for release    ${details}
 
 Check cannot approve a draft release

@@ -2,6 +2,8 @@
 // exposed by any of the packages that we consume.
 
 // https://ckeditor.com/docs/ckeditor5/latest/api/module_core_editor_editor-Editor.html
+import { Dictionary } from '@common/types';
+
 export interface EditorClass {
   new (config: EditorConfig): Editor;
 }
@@ -17,6 +19,19 @@ export interface Editor {
   getData(): string;
 }
 
+export interface CommentsPluginConfig {
+  addComment: () => void;
+  commentCancelled: () => void;
+  commentRemoved: (markerId: string) => void;
+  commentSelected: (markerId?: string) => void;
+  undoRedoComment: (type: CommentUndoRedoActions, markerId: string) => void;
+}
+
+export interface AutoSavePluginConfig {
+  save: () => void;
+  waitingTime: number;
+}
+
 export interface EditorConfig {
   toolbar: string[];
   extraPlugins?: Plugin[];
@@ -30,6 +45,11 @@ export interface EditorConfig {
   heading?: {
     options: HeadingOption[];
   };
+  link?: {
+    decorators: Dictionary<LinkDecoratorAutomatic | LinkDecoratorManual>;
+  };
+  comments?: CommentsPluginConfig;
+  autosave?: AutoSavePluginConfig;
 }
 
 export interface PluginCollection {
@@ -38,6 +58,40 @@ export interface PluginCollection {
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Plugin {}
+
+export interface CommentsPlugin extends Plugin {
+  addCommentMarker(id: string): void;
+  removeCommentMarker(id: string): void;
+  resolveCommentMarker(id: string, resolved: boolean): void;
+  selectCommentMarker(id: string): void;
+}
+
+export type CommentUndoRedoActions =
+  | 'undoRemoveComment'
+  | 'undoAddComment'
+  | 'redoAddComment'
+  | 'undoResolveComment'
+  | 'redoUnresolveComment'
+  | 'undoUnresolveComment'
+  | 'redoResolveComment'
+  | 'redoRemoveComment';
+
+export interface LinkDecoratorAutomatic {
+  mode: 'automatic';
+  callback: (url: string) => boolean | RegExpMatchArray | null;
+  attributes: Dictionary<string>;
+  styles?: Dictionary<string>;
+  classes?: string | string[];
+}
+
+export interface LinkDecoratorManual {
+  mode: 'manual';
+  defaultValue: boolean;
+  label: string;
+  attributes: Dictionary<string>;
+  styles?: Dictionary<string>;
+  classes?: string | string[];
+}
 
 export interface HeadingOption {
   model:
@@ -83,8 +137,22 @@ export interface ImageUploadResult {
   [size: string]: string;
 }
 
+// https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_position-Position.html
+interface Position {
+  readonly index: number;
+  isAfter(otherPosition: Position): boolean;
+  isBefore(otherPosition: Position): boolean;
+}
+
+// https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_markercollection-Marker.html
+export interface Marker {
+  readonly name: string;
+  getStart(): Position;
+}
+
 // https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_model-Model.html
 export interface Model {
+  readonly markers: Marker[];
   readonly document: Document;
 }
 

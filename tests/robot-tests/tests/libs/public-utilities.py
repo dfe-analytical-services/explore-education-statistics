@@ -1,10 +1,10 @@
+import re
+import os
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
-import os
-import re
 
 
 def raise_assertion_error(err_msg):
@@ -32,7 +32,7 @@ def cookie_names_should_be_on_page():
             continue
         try:
             sl.page_should_contain(cookie['name'])
-        except:
+        except BaseException:
             raise_assertion_error(f"Page should contain text \"{cookie['name']}\"!")
 
 
@@ -46,13 +46,13 @@ def user_checks_other_release_is_shown_in_position(release_name, position):
     try:
         sl.driver.find_element_by_xpath(
             f'.//*[@data-testid="other-release-item" and a/text()="{release_name}"]')
-    except:
+    except BaseException:
         raise_assertion_error(f'No other release "{release_name}" found')
 
     try:
         elem = sl.driver.find_element_by_xpath(
             f'(.//a[../@data-testid="other-release-item"])[{position}]')
-    except:
+    except BaseException:
         raise_assertion_error(f"There are less than {position} other releases listed!")
 
     if release_name != elem.text:
@@ -61,10 +61,10 @@ def user_checks_other_release_is_shown_in_position(release_name, position):
 
 
 # Methodology
-def user_checks_page_contains_methodology_link(topic, publication, methodology, link_url):
+def user_checks_page_contains_methodology_link(topic, publication, methodology, link_url_ending):
     link = get_methodology_link(topic, publication, methodology)
 
-    if link.get_attribute('href') != link_url:
+    if not link.get_attribute('href').endswith(link_url_ending):
         raise_assertion_error(
             f'Methodology link with title "{methodology}" should be linking to "{link_url}", but is '
             f'linking to "{link.get_attribute("href")}" instead!')
@@ -77,21 +77,22 @@ def user_clicks_methodology_link(topic, publication, methodology):
 def get_methodology_link(topic, publication, methodology):
     try:
         sl.driver.find_element_by_xpath(f'//summary/span[text()="{topic}"]')
-    except:
+    except BaseException:
         raise_assertion_error(f'Cannot find theme "{topic}" on page')
 
     try:
         sl.driver.find_element_by_xpath(
             f'//summary/span[text()="{topic}"]/../..//h3[text()="{publication}"]')
-    except:
+    except BaseException:
         raise_assertion_error(f'Topic "{topic}" doesn\'t contain publication "{publication}"!')
 
     try:
         return sl.driver.find_element_by_xpath(
             f'//h3[text()="{publication}"]/..//a[text()="{methodology}"]')
-    except:
+    except BaseException:
         raise_assertion_error(
             f'Could not find methodology link with title "{methodology}""!')
+
 
 # Table tool
 def user_checks_generated_permalink_is_valid():

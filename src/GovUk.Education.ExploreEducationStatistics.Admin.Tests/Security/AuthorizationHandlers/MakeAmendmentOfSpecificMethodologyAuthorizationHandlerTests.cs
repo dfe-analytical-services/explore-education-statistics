@@ -1,19 +1,19 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
@@ -115,36 +115,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             public async Task
                 UserWithLinkedPublicationOwnerRoleCanCreateAmendmentOfPubliclyAccessibleMethodologyOwnedByPublication()
             {
-                await GetEnumValues<PublicationRole>().ForEachAsync(async role =>
-                {
-                    var (
-                        handler,
-                        methodologyRepository,
-                        methodologyVersionRepository,
-                        publicationRoleRepository
-                        ) = CreateHandlerAndDependencies();
+                await GetEnumValues<PublicationRole>()
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(async role =>
+                    {
+                        var (
+                            handler,
+                            methodologyRepository,
+                            methodologyVersionRepository,
+                            publicationRoleRepository
+                            ) = CreateHandlerAndDependencies();
 
-                    methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
-                        .ReturnsAsync(true);
+                        methodologyVersionRepository.Setup(mock => mock.IsPubliclyAccessible(MethodologyVersion.Id))
+                            .ReturnsAsync(true);
 
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(MethodologyVersion.MethodologyId))
-                        .ReturnsAsync(OwningPublication);
+                        methodologyRepository.Setup(s =>
+                                s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                            .ReturnsAsync(OwningPublication);
 
-                    publicationRoleRepository.SetupPublicationOwnerRoleExpectations(
-                        UserId, OwningPublication, role == Owner);
+                        publicationRoleRepository.SetupPublicationOwnerRoleExpectations(
+                            UserId, OwningPublication, role == Owner);
 
-                    var user = CreateClaimsPrincipal(UserId);
-                    var authContext = CreateAuthContext(user, MethodologyVersion);
+                        var user = CreateClaimsPrincipal(UserId);
+                        var authContext = CreateAuthContext(user, MethodologyVersion);
 
-                    await handler.HandleAsync(authContext);
-                    VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
-                        publicationRoleRepository);
+                        await handler.HandleAsync(authContext);
+                        VerifyAllMocks(methodologyRepository, methodologyVersionRepository,
+                            publicationRoleRepository);
 
-                    // Verify that the user can create an Amendment, as they have a Publication Owner role on a Publication
-                    // that uses this Methodology.
-                    Assert.Equal(role == Owner, authContext.HasSucceeded);
-                });
+                        // Verify that the user can create an Amendment, as they have a Publication Owner role on a Publication
+                        // that uses this Methodology.
+                        Assert.Equal(role == Owner, authContext.HasSucceeded);
+                    });
             }
 
             [Fact]

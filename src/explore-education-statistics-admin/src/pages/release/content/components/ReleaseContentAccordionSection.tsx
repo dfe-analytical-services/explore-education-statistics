@@ -1,4 +1,3 @@
-import { CommentsChangeHandler } from '@admin/components/editable/Comments';
 import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import { useEditingContext } from '@admin/contexts/EditingContext';
@@ -26,7 +25,11 @@ const ReleaseContentAccordionSection = ({
   section: { id: sectionId, caption, heading, content: sectionContent = [] },
   ...props
 }: ReleaseContentAccordionSectionProps) => {
-  const { editingMode, unsavedEdits } = useEditingContext();
+  const {
+    editingMode,
+    unsavedCommentDeletions,
+    unsavedBlocks,
+  } = useEditingContext();
 
   const actions = useReleaseContentActions();
 
@@ -35,10 +38,17 @@ const ReleaseContentAccordionSection = ({
 
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
 
-  const updatedHeading =
-    unsavedEdits.findIndex(edit => edit.sectionId === sectionId) === -1
-      ? heading
-      : `${heading} (Unsaved changes)`;
+  const updatedHeading = () => {
+    if (
+      blocks.find(block => unsavedBlocks.includes(block.id)) ||
+      blocks.find(block =>
+        Object.keys(unsavedCommentDeletions).includes(block.id),
+      )
+    ) {
+      return `${heading} (unsaved changes)`;
+    }
+    return heading;
+  };
 
   useEffect(() => {
     setBlocks(sectionContent);
@@ -129,22 +139,10 @@ const ReleaseContentAccordionSection = ({
     });
   }, [actions, sectionId, release.id]);
 
-  const updateBlockComments: CommentsChangeHandler = useCallback(
-    async (blockId, comments) => {
-      await actions.updateBlockComments({
-        sectionId,
-        blockId,
-        sectionKey: 'content',
-        comments,
-      });
-    },
-    [actions, sectionId],
-  );
-
   return (
     <EditableAccordionSection
       {...props}
-      heading={updatedHeading || ''}
+      heading={updatedHeading()}
       caption={caption}
       onHeadingChange={handleHeadingChange}
       onRemoveSection={handleRemoveSection}
@@ -164,53 +162,61 @@ const ReleaseContentAccordionSection = ({
         </Button>
       }
     >
-      <EditableSectionBlocks
-        allowComments
-        blocks={blocks}
-        isReordering={isReordering}
-        sectionId={sectionId}
-        onBlocksChange={setBlocks}
-        onBlockCommentsChange={updateBlockComments}
-        renderBlock={block => (
-          <ReleaseBlock block={block} releaseId={release.id} />
-        )}
-        renderEditableBlock={block => (
-          <ReleaseEditableBlock
-            allowImages
-            block={block}
-            sectionId={sectionId}
-            editable={!isReordering}
-            releaseId={release.id}
-            onSave={updateBlock}
-            onDelete={removeBlock}
-          />
-        )}
-      />
-
-      {editingMode === 'edit' && !isReordering && (
+      {({ open }) => (
         <>
-          {showDataBlockForm && (
-            <DataBlockSelectForm
-              id={`dataBlockSelectForm-${sectionId}`}
-              releaseId={release.id}
-              onSelect={async selectedDataBlockId => {
-                await attachDataBlock(selectedDataBlockId);
-                toggleDataBlockForm.off();
-              }}
-              onCancel={toggleDataBlockForm.off}
-            />
-          )}
-
-          <ButtonGroup className="govuk-!-margin-bottom-8 dfe-justify-content--center">
-            <Button variant="secondary" onClick={addBlock}>
-              Add text block
-            </Button>
-            {!showDataBlockForm && (
-              <Button variant="secondary" onClick={toggleDataBlockForm.on}>
-                Add data block
-              </Button>
+          <EditableSectionBlocks
+            blocks={blocks}
+            isReordering={isReordering}
+            sectionId={sectionId}
+            onBlocksChange={setBlocks}
+            renderBlock={block => (
+              <ReleaseBlock
+                block={block}
+                releaseId={release.id}
+                visible={open}
+              />
             )}
-          </ButtonGroup>
+            renderEditableBlock={block => (
+              <ReleaseEditableBlock
+                allowComments
+                allowImages
+                block={block}
+                sectionId={sectionId}
+                editable={!isReordering}
+                releaseId={release.id}
+                visible={open}
+                onSave={updateBlock}
+                onDelete={removeBlock}
+              />
+            )}
+          />
+
+          {editingMode === 'edit' && !isReordering && (
+            <>
+              {showDataBlockForm && (
+                <DataBlockSelectForm
+                  id={`dataBlockSelectForm-${sectionId}`}
+                  releaseId={release.id}
+                  onSelect={async selectedDataBlockId => {
+                    await attachDataBlock(selectedDataBlockId);
+                    toggleDataBlockForm.off();
+                  }}
+                  onCancel={toggleDataBlockForm.off}
+                />
+              )}
+
+              <ButtonGroup className="govuk-!-margin-bottom-8 dfe-justify-content--center">
+                <Button variant="secondary" onClick={addBlock}>
+                  Add text block
+                </Button>
+                {!showDataBlockForm && (
+                  <Button variant="secondary" onClick={toggleDataBlockForm.on}>
+                    Add data block
+                  </Button>
+                )}
+              </ButtonGroup>
+            </>
+          )}
         </>
       )}
     </EditableAccordionSection>

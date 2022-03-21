@@ -4,26 +4,27 @@ Resource            ../libs/charts.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
-Force Tags          GeneralPublic    Local    Dev    Test    Preprod
+Force Tags          GeneralPublic    Local    Dev    Preprod
 
 *** Test Cases ***
 Navigate to Absence publication
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}
+    user navigates to public frontend
     user waits until page contains    Explore our statistics and data
+
     user clicks link    Explore
     user waits until page contains
-    ...    Browse to find the statistics and data you’re looking for and open the section to get links to
-    user waits for page to finish loading
+    ...    Browse to find the statistics and data you’re looking for and open the section to get links to:
+    ...    %{WAIT_MEDIUM}
 
     user opens accordion section    Pupils and schools
     user opens details dropdown    Pupil absence
     user clicks element    testid:View stats link for Pupil absence in schools in England
-    user waits until h1 is visible    Pupil absence in schools in England    90
+    user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
 
 Validate title
-    user waits until h1 is visible    Pupil absence in schools in England    90
+    user waits until h1 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
     user waits until page contains title caption    Academic Year 2016/17
 
 Validate URL
@@ -62,6 +63,7 @@ Validate "About these statistics" -- "Last updated"
     user closes details dropdown    See all updates (2)
 
 Validate "Useful information"
+    user checks page contains element    link:Download all data
     user checks page contains link with text and url    Pupil absence statistics: methodology
     ...    /methodology/pupil-absence-in-schools-in-england
 
@@ -87,7 +89,7 @@ Validate headlines -- Summary tab key stats
     [Documentation]    DFE-915    EES-806    EES-1508
     user scrolls to element    xpath://h2[contains(text(), "Headline facts and figures")]
 
-    user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    90
+    user checks key stat contents    1    Overall absence rate    4.7%    Up from 4.6% in 2015/16    %{WAIT_MEDIUM}
     user checks key stat definition    1    What is overall absence?
     ...    Total number of all authorised and unauthorised absences from possible school sessions for all pupils.
 
@@ -157,7 +159,7 @@ Validate Key Statistics data block -- Charts tab
 Validate Key Statistics data block -- Data tables tab
     user clicks element    id:releaseHeadlines-tables-tab
     user waits until element contains    css:[data-testid="dataTableCaption"]
-    ...    Table showing 'Absence by characteristic' in England between 2012/13 and 2016/17    30
+    ...    'Absence by characteristic' in England between 2012/13 and 2016/17    %{WAIT_SMALL}
 
     user checks table column heading contains    1    1    2012/13    css:#releaseHeadlines-tables table
     user checks table column heading contains    1    2    2013/14    css:#releaseHeadlines-tables table
@@ -205,7 +207,7 @@ Validate accordion sections order
 
     user scrolls to element    id:help-and-support
     user checks accordion is in position    Methodology    1    id:help-and-support
-    user checks accordion is in position    Official Statistics    2    id:help-and-support
+    user checks accordion is in position    Official statistics    2    id:help-and-support
     user checks accordion is in position    Contact us    3    id:help-and-support
 
     user checks there are x accordion sections    3    id:help-and-support
@@ -215,7 +217,7 @@ Validate Regional and local authority (LA) breakdown table
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
     user waits until element contains    css:#content_9_datablock-tables [data-testid="dataTableCaption"]
-    ...    Table showing 'Absence by characteristic' from 'Pupil absence in schools in England' in    90
+    ...    'Absence by characteristic' from 'Pupil absence in schools in England' in    %{WAIT_MEDIUM}
 
     user checks table column heading contains    1    1    2016/17    css:#content_9_datablock-tables table
 
@@ -270,28 +272,20 @@ Validate Regional and local authority (LA) breakdown chart
     user waits until element does not contain chart tooltip    ${datablock}
 
     user mouses over selected map feature    ${datablock}
-    user checks chart tooltip label contains    ${datablock}    Vale of White Horse
-    user checks chart tooltip item contains    ${datablock}    1    Unauthorised absence rate: 0.9%
-    user checks chart tooltip item contains    ${datablock}    2    Overall absence rate: 4.3%
-    user checks chart tooltip item contains    ${datablock}    3    Authorised absence rate: 3.4%
+    user checks map tooltip label contains    ${datablock}    Vale of White Horse
+    user checks map tooltip item contains    ${datablock}    Unauthorised absence rate: 0.9%
 
-    user checks map chart indicator tile contains    ${datablock}    1    Unauthorised absence rate    0.9%
-    user checks map chart indicator tile contains    ${datablock}    2    Overall absence rate    4.3%
-    user checks map chart indicator tile contains    ${datablock}    3    Authorised absence rate    3.4%
+    user checks map chart indicator tile contains    ${datablock}    Unauthorised absence rate    0.9%
 
     user mouses over element    ${datablock} select[name="selectedLocation"]
     user chooses select option    ${datablock} select[name="selectedLocation"]    Harlow
     user waits until element does not contain chart tooltip    ${datablock}
 
     user mouses over selected map feature    ${datablock}
-    user checks chart tooltip label contains    ${datablock}    Harlow
-    user checks chart tooltip item contains    ${datablock}    1    Unauthorised absence rate: 1.1%
-    user checks chart tooltip item contains    ${datablock}    2    Overall absence rate: 4.2%
-    user checks chart tooltip item contains    ${datablock}    3    Authorised absence rate: 3.1%
+    user checks map tooltip label contains    ${datablock}    Harlow
+    user checks map tooltip item contains    ${datablock}    Unauthorised absence rate: 1.1%
 
-    user checks map chart indicator tile contains    ${datablock}    1    Unauthorised absence rate    1.1%
-    user checks map chart indicator tile contains    ${datablock}    2    Overall absence rate    4.2%
-    user checks map chart indicator tile contains    ${datablock}    3    Authorised absence rate    3.1%
+    user checks map chart indicator tile contains    ${datablock}    Unauthorised absence rate    1.1%
 
     user mouses over element    ${datablock} select[name="selectedLocation"]
     user chooses select option    ${datablock} select[name="selectedLocation"]    Newham
@@ -299,19 +293,17 @@ Validate Regional and local authority (LA) breakdown chart
 
     user mouses over selected map feature    ${datablock}
     user checks chart tooltip label contains    ${datablock}    Newham
-    user checks chart tooltip item contains    ${datablock}    1    Unauthorised absence rate: 1.7%
-    user checks chart tooltip item contains    ${datablock}    2    Overall absence rate: 4.4%
-    user checks chart tooltip item contains    ${datablock}    3    Authorised absence rate: 2.7%
+    user checks chart tooltip item contains    ${datablock}    Unauthorised absence rate: 1.7%
 
-    user checks map chart indicator tile contains    ${datablock}    1    Unauthorised absence rate    1.7%
-    user checks map chart indicator tile contains    ${datablock}    2    Overall absence rate    4.4%
-    user checks map chart indicator tile contains    ${datablock}    3    Authorised absence rate    2.7%
+    user checks map chart indicator tile contains    ${datablock}    Unauthorised absence rate    1.7%
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]    DFE-898
+    user opens accordion section    Explore data and files
+    user waits until h3 is visible    Create your own tables
     user clicks link    Create tables
-    user waits until h1 is visible    Create your own tables    60
+    user waits until h1 is visible    Create your own tables    %{WAIT_MEDIUM}
     user waits for page to finish loading
 
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user checks previous table tool step contains    1    Publication    Pupil absence in schools in England

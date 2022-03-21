@@ -3,7 +3,6 @@ import {
   FilterOption,
   GeoJsonFeature,
   IndicatorOption,
-  LocationOption,
   TimePeriodOption,
 } from '@common/services/tableBuilderService';
 
@@ -67,13 +66,15 @@ export class LocationFilter extends Filter {
   public readonly geoJson?: GeoJsonFeature[];
 
   public constructor({
+    id,
     value,
     label,
     level,
     geoJson,
     group,
-  }: GroupedFilterOption & LocationOption) {
-    super({ value, label, group });
+  }: GroupedFilterOption & { level: string; geoJson?: GeoJsonFeature[] }) {
+    const idOrFallback = id ?? value;
+    super({ value: idOrFallback, label, group });
 
     this.level = level;
     this.geoJson = geoJson;

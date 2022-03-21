@@ -1,30 +1,39 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class SubjectMetaService : AbstractSubjectMetaService,
-        ISubjectMetaService
+    public class SubjectMetaService : AbstractSubjectMetaService, ISubjectMetaService
     {
+        private enum SubjectMetaQueryStep
+        {
+            GetTimePeriods,
+            GetFilterItems
+        }
+
+        private readonly StatisticsDbContext _context;
         private readonly IFilterRepository _filterRepository;
-        private readonly IFilterItemRepository _filterItemRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
         private readonly ILocationRepository _locationRepository;
         private readonly ILogger _logger;
@@ -32,21 +41,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
+        private readonly LocationsOptions _locationOptions;
 
-        public SubjectMetaService(IBoundaryLevelRepository boundaryLevelRepository,
+        public SubjectMetaService(
+            StatisticsDbContext context,
             IFilterRepository filterRepository,
             IFilterItemRepository filterItemRepository,
-            IGeoJsonRepository geoJsonRepository,
             IIndicatorGroupRepository indicatorGroupRepository,
             ILocationRepository locationRepository,
             ILogger<SubjectMetaService> logger,
             IObservationService observationService,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
-            IUserService userService) : base(boundaryLevelRepository, filterItemRepository, geoJsonRepository)
+            IUserService userService,
+            IOptions<LocationsOptions> locationOptions) :
+            base(filterItemRepository)
         {
+            _context = context;
             _filterRepository = filterRepository;
-            _filterItemRepository = filterItemRepository;
             _indicatorGroupRepository = indicatorGroupRepository;
             _locationRepository = locationRepository;
             _logger = logger;
@@ -54,6 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _persistenceHelper = persistenceHelper;
             _timePeriodService = timePeriodService;
             _userService = userService;
+            _locationOptions = locationOptions.Value;
         }
 
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
@@ -61,90 +74,104 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return _persistenceHelper.CheckEntityExists<Subject>(subjectId)
                 .OnSuccess(GetSubjectMetaViewModel);
         }
-        
-        public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(Guid subjectId)
+
+        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(Guid subjectId)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(subjectId)
+            return await _persistenceHelper.CheckEntityExists<Subject>(subjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(GetSubjectMetaViewModel);
         }
 
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(
-            SubjectMetaQueryContext query)
+            ObservationQueryContext query, CancellationToken cancellationToken)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
-                .OnSuccess(subject => GetSubjectMetaViewModelFromQuery(query));
+                .OnSuccess(_ => GetSubjectMetaViewModelFromQuery(query, cancellationToken));
         }
-        
+
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(
-            SubjectMetaQueryContext query)
+            ObservationQueryContext query, CancellationToken cancellationToken)
         {
             return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
-                .OnSuccess(subject => GetSubjectMetaViewModelFromQuery(query));
+                .OnSuccess(_ => GetSubjectMetaViewModelFromQuery(query, cancellationToken));
         }
-        
-        private SubjectMetaViewModel GetSubjectMetaViewModel(Subject subject)
+
+        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModel(Subject subject)
         {
-            return new SubjectMetaViewModel
+            return new()
             {
                 Filters = GetFilters(subject.Id),
                 Indicators = GetIndicators(subject.Id),
-                Locations = GetObservationalUnits(subject.Id),
+                Locations = await GetLocations(subject.Id),
                 TimePeriod = GetTimePeriods(subject.Id)
             };
         }
 
-        private SubjectMetaViewModel GetSubjectMetaViewModelFromQuery(SubjectMetaQueryContext query)
+        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromQuery(
+            ObservationQueryContext query,
+            CancellationToken cancellationToken)
         {
-            var observations = _observationService.FindObservations(query).AsQueryable();
-            var locations = new Dictionary<string, ObservationalUnitsMetaViewModel>();
-            var timePeriods = new TimePeriodsMetaViewModel();
-            var filters = new Dictionary<string, FilterMetaViewModel>();
-            var indicators = new Dictionary<string, IndicatorsMetaViewModel>();
-            
-            var stopwatch = Stopwatch.StartNew();
-            stopwatch.Start();
-
-            if (query.Locations == null)
+            SubjectMetaQueryStep? subjectMetaStep = null;
+            if (!query.LocationIds.IsNullOrEmpty() && query.TimePeriod == null)
             {
-                locations = GetObservationalUnits(observations);
-                
-                _logger.LogTrace("Got Observational Units in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Restart();
-            }
-            
-            if (query.TimePeriod == null && query.Locations != null)
+                subjectMetaStep = SubjectMetaQueryStep.GetTimePeriods;
+            } else if (query.TimePeriod != null && query.Filters == null)
             {
-                timePeriods = GetTimePeriods(observations);
-
-                _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Restart();
-            }
-            
-            if (query.TimePeriod != null)
-            {
-                filters = GetFilters(query.SubjectId, observations, false);
-
-                _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                stopwatch.Restart();
-
-                indicators = GetIndicators(query.SubjectId);
-
-                _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                subjectMetaStep = SubjectMetaQueryStep.GetFilterItems;
             }
 
-            stopwatch.Stop();
-            
-            // Only data relevant to the step being executed in the table tool needs to be returned hence the 
-            // null checks above so only the minimum requisite DB calls for the task are performed.
-            return new SubjectMetaViewModel
+            // Only data relevant to the step being executed in the table tool needs to be returned, so only the
+            // minimum requisite DB calls for the task are performed.
+            switch (subjectMetaStep)
             {
-                Filters = filters,
-                Indicators = indicators,
-                Locations = locations,
-                TimePeriod = timePeriods
-            };
+                case SubjectMetaQueryStep.GetTimePeriods:
+                {
+                    var stopwatch = Stopwatch.StartNew();
+
+                    var observations = _context
+                        .Observation
+                        .AsNoTracking()
+                        .Where(o => o.SubjectId == query.SubjectId && query.LocationIds.Contains(o.LocationId));
+                    
+                    var timePeriods = GetTimePeriods(observations);
+                        
+                    _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    
+                    return new SubjectMetaViewModel
+                    {
+                        TimePeriod = timePeriods
+                    };
+                }
+
+                case SubjectMetaQueryStep.GetFilterItems:
+                {
+                    var stopwatch = Stopwatch.StartNew();
+                    
+                    var observations = 
+                        await _observationService.GetMatchedObservations(query, cancellationToken);
+                    _logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+                    
+                    var filterItems = await 
+                        _filterItemRepository.GetFilterItemsFromMatchedObservationIds(query.SubjectId, observations);
+                    var filters = BuildFilterHierarchy(filterItems);
+                    _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    stopwatch.Restart();
+
+                    var indicators = GetIndicators(query.SubjectId);
+                    _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
+                    
+                    return new SubjectMetaViewModel
+                    {
+                        Filters = filters,
+                        Indicators = indicators,
+                    };
+                }
+                default:
+                    throw new ArgumentOutOfRangeException($"{nameof(subjectMetaStep)}", 
+                        "Unable to determine which SubjectMeta information has requested");
+            }
         }
 
         private Dictionary<string, FilterMetaViewModel> GetFilters(Guid subjectId)
@@ -159,8 +186,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         Options = filter.FilterGroups
                             .OrderBy(filterGroup => filterGroup.Label, LabelComparer)
                             .ToDictionary(
-                            filterGroup => filterGroup.Label.PascalCase(),
-                            filterGroup => BuildFilterItemsViewModel(filterGroup, filterGroup.FilterItems)),
+                                filterGroup => filterGroup.Label.PascalCase(),
+                                filterGroup => BuildFilterItemsViewModel(filterGroup, filterGroup.FilterItems)),
                         TotalValue = GetTotalValue(filter)
                     });
         }
@@ -177,17 +204,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return BuildTimePeriodsViewModels(timePeriods);
         }
 
-        private Dictionary<string, ObservationalUnitsMetaViewModel> GetObservationalUnits(Guid subjectId)
+        private async Task<Dictionary<string, LocationsMetaViewModel>> GetLocations(Guid subjectId)
         {
-            var observationalUnits = _locationRepository.GetObservationalUnits(subjectId);
-            return BuildObservationalUnitsViewModels(observationalUnits);
-        }
-
-        private Dictionary<string, ObservationalUnitsMetaViewModel> GetObservationalUnits(
-            IQueryable<Observation> observations)
-        {
-            var observationalUnits = _locationRepository.GetObservationalUnits(observations);
-            return BuildObservationalUnitsViewModels(observationalUnits);
+            var locations = await _locationRepository.GetDistinctForSubject(subjectId);
+            var locationsHierarchical = 
+                locations.GetLocationAttributesHierarchical(_locationOptions.Hierarchies);
+            return BuildLocationAttributeViewModels(locationsHierarchical);
         }
 
         private Dictionary<string, IndicatorsMetaViewModel> GetIndicators(Guid subjectId)
@@ -204,27 +226,58 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 );
         }
 
-        private static Dictionary<string, ObservationalUnitsMetaViewModel> BuildObservationalUnitsViewModels(
-            Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> observationalUnits)
+        private static Dictionary<string, LocationsMetaViewModel> BuildLocationAttributeViewModels(
+            Dictionary<GeographicLevel, List<LocationAttributeNode>> locationAttributes)
         {
-            var viewModels = observationalUnits
-                .OrderBy(pair => pair.Key.GetEnumLabel())
+            return locationAttributes
                 .ToDictionary(
                     pair => pair.Key.ToString().CamelCase(),
-                    pair => new ObservationalUnitsMetaViewModel
+                    pair => new LocationsMetaViewModel
                     {
-                        Hint = "",
                         Legend = pair.Key.GetEnumLabel(),
-                        Options = pair.Value.Select(MapObservationalUnitToLabelValue)
-                    });
+                        Options = DeduplicateLocationViewModels(
+                                pair.Value
+                                    .OrderBy(OrderLocationAttributes)
+                                    .Select(BuildLocationAttributeViewModel)
+                            )
+                            .ToList()
+                    }
+                );
+        }
 
-            foreach (var (_, viewModel) in viewModels)
+        private static LocationAttributeViewModel BuildLocationAttributeViewModel(
+            LocationAttributeNode locationAttributeNode)
+        {
+            return locationAttributeNode.IsLeaf
+                ? new LocationAttributeViewModel
+                {
+                    Id = locationAttributeNode.LocationId.Value,
+                    Label = locationAttributeNode.Attribute.Name ?? string.Empty,
+                    Value = locationAttributeNode.Attribute.GetCodeOrFallback()
+                }
+                : new LocationAttributeViewModel
+                {
+                    Label = locationAttributeNode.Attribute.Name ?? string.Empty,
+                    Level = locationAttributeNode.Attribute.GetType().Name.CamelCase(),
+                    Value = locationAttributeNode.Attribute.GetCodeOrFallback(),
+                    Options = DeduplicateLocationViewModels(
+                            locationAttributeNode.Children
+                                .OrderBy(OrderLocationAttributes)
+                                .Select(BuildLocationAttributeViewModel)
+                        )
+                        .ToList()
+                };
+        }
+
+        private static string OrderLocationAttributes(LocationAttributeNode node)
+        {
+            var locationAttribute = node.Attribute;
+
+            return locationAttribute switch
             {
-                viewModel.Options = TransformDuplicateObservationalUnitsWithUniqueLabels(viewModel.Options)
-                    .OrderBy(value => value.Label);
-            }
-
-            return viewModels;
+                Region region => region.Code ?? string.Empty,
+                _ => locationAttribute.Name ?? string.Empty
+            };
         }
 
         private static TimePeriodsMetaViewModel BuildTimePeriodsViewModels(
@@ -242,16 +295,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private string GetTotalValue(Filter filter)
         {
             return _filterItemRepository.GetTotal(filter)?.Id.ToString() ?? string.Empty;
-        }
-
-        private static LabelValue MapObservationalUnitToLabelValue(ObservationalUnit unit)
-        {
-            var value = unit is LocalAuthority localAuthority ? localAuthority.GetCodeOrOldCodeIfEmpty() : unit.Code;
-            return new LabelValue
-            {
-                Label = unit.Name,
-                Value = value
-            };
         }
 
         private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)

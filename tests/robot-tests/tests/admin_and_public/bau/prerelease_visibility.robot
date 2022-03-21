@@ -6,6 +6,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 *** Variables ***
 ${RELEASE_NAME}=        Calendar Year 2000
@@ -20,10 +21,9 @@ Verify release summary
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
     user verifies release summary    ${PUBLICATION_NAME}    Calendar Year    2000    UI test contact name
-    ...    National Statistics
+    ...    National statistics
 
 Upload subject
-    user clicks link    Data and files
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
 
 Go to 'Sign Off' page
@@ -35,10 +35,7 @@ Go to 'Sign Off' page
     Set Suite Variable    ${PUBLIC_RELEASE_LINK}
 
 Go to Public Release Link
-    # To get around basic auth on public frontend
-    user goes to url    %{PUBLIC_URL}
-    user waits until h1 is visible    Explore our statistics and data
-    user goes to url    ${PUBLIC_RELEASE_LINK}
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found
     user checks page does not contain    ${RELEASE_NAME}
 
@@ -50,8 +47,8 @@ Select release from admin dashboard
     ${accordion}=    user gets accordion section content element    ${PUBLICATION_NAME}
     user opens details dropdown    ${RELEASE_NAME} (not Live)    ${accordion}
     ${details}=    user gets details content element    ${RELEASE_NAME} (not Live)    ${accordion}
-    user waits until parent contains element    ${details}    xpath:.//a[text()="Edit this release"]
-    user clicks link    Edit this release
+    user waits until parent contains element    ${details}    xpath:.//a[text()="Edit release"]
+    user clicks link    Edit release
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -60,21 +57,21 @@ Add public prerelease access list
 Update public prerelease access list
     user updates public prerelease access list    Updated test public access list
 
-Add meta guidance to subject
+Add data guidance to subject
     user clicks link    Data and files
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
-    user waits until page contains element    id:metaGuidanceForm-content
-    user waits until page contains element    id:metaGuidance-dataFiles
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
+    user waits until page contains element    id:dataGuidanceForm-content
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    UI test subject
-    user enters text into meta guidance data file content editor    UI test subject    metaguidance content
+    user enters text into data guidance data file content editor    UI test subject    dataguidance content
     user clicks button    Save guidance
 
 Go to "Sign off" page
     user clicks link    Sign off
-    user waits until h2 is visible    Sign off    90
-    user waits until page contains button    Edit release status    60
+    user waits until h2 is visible    Sign off    %{WAIT_MEDIUM}
+    user waits until page contains button    Edit release status    %{WAIT_SMALL}
 
 Approve release and wait for it to be Scheduled
     [Tags]    NotAgainstDev
@@ -87,7 +84,7 @@ Approve release and wait for it to be Scheduled
     user clicks radio    Approved for publication
     user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Approved by UI tests
 
-    user waits until page contains element    xpath://label[text()="On a specific date"]/../input    60
+    user waits until page contains element    xpath://label[text()="On a specific date"]/../input    %{WAIT_SMALL}
     user clicks radio    On a specific date
 
     user waits until page contains    Publish date
@@ -97,21 +94,21 @@ Approve release and wait for it to be Scheduled
     user enters text into element    id:releaseStatusForm-nextReleaseDate-month    1
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    2001
     user clicks button    Update status
-    user waits until h1 is visible    Confirm publish date
+    user waits until h2 is visible    Confirm publish date
     user clicks button    Confirm
     # the below fails on dev
     user checks summary list contains    Scheduled release    ${day} ${month_word} ${year}
     user checks summary list contains    Next release expected    January 2001
     user checks summary list contains    Current status    Approved
 
-    user waits for release process status to be    Scheduled    60
+    user waits for release process status to be    Scheduled    %{WAIT_SMALL}
 
 Check scheduled release isn't visible on public Table Tool
     user navigates to data tables page on public frontend
     user checks page does not contain    ${PUBLICATION_NAME}
 
 Go to public release URL and check release isn't visible
-    user goes to url    ${PUBLIC_RELEASE_LINK}
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
     user waits until page does not contain    ${PUBLICATION_NAME}
 
 Check "Page not found" appears
@@ -136,5 +133,5 @@ Approve release for immediate publication but don't wait to finish
     user checks summary list contains    Current status    Approved
 
 Go to public release URL again and check release isn't visible
-    user goes to url    ${PUBLIC_RELEASE_LINK}
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
     user waits until page contains    Page not found

@@ -7,11 +7,11 @@ interface Props {
   publicView?: boolean;
 }
 
-const PrototypeMetaCreate = (publicView: Props) => {
+const PrototypeMetaCreate = ({ publicView }: Props) => {
   const query = new URLSearchParams(window.location.search);
   const dialog = query.has('showDialog');
 
-  const switchPublicView = publicView?.publicView;
+  const switchPublicView = publicView;
 
   const [createMeta, setCreateMeta] = useState(!switchPublicView);
   const [addNewMeta, setAddNewMeta] = useState(false);

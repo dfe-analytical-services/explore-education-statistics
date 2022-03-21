@@ -10,7 +10,7 @@ import PublicationEditPage from '@admin/pages/publication/PublicationEditPage';
 import PreReleaseAccessListPage from '@admin/pages/release/pre-release/PreReleaseAccessListPage';
 import PreReleasePageContainer from '@admin/pages/release/pre-release/PreReleasePageContainer';
 import ReleaseCreatePage from '@admin/pages/release/ReleaseCreatePage';
-import ReleaseMetaGuidancePage from '@admin/pages/release/ReleaseMetaGuidancePage';
+import ReleaseDataGuidancePage from '@admin/pages/release/ReleaseDataGuidancePage';
 import ReleasePageContainer from '@admin/pages/release/ReleasePageContainer';
 import ThemeCreatePage from '@admin/pages/themes/ThemeCreatePage';
 import ThemeEditPage from '@admin/pages/themes/ThemeEditPage';
@@ -23,6 +23,8 @@ import {
   preReleaseContentRoute,
   preReleaseTableToolRoute,
 } from '@admin/routes/preReleaseRoutes';
+import PublicationManageTeamAccessPage from '@admin/pages/publication/PublicationManageTeamAccessPage';
+import PublicationReleaseContributorsPage from '@admin/pages/publication/PublicationReleaseContributorsPage';
 
 export type PublicationRouteParams = {
   publicationId: string;
@@ -107,6 +109,27 @@ export const publicationEditRoute: ProtectedRouteProps = {
   exact: true,
 };
 
+export const publicationManageTeamAccessRoute: ProtectedRouteProps = {
+  path: '/publication/:publicationId/manage-team',
+  component: PublicationManageTeamAccessPage,
+  protectionAction: user => user.permissions.canAccessAnalystPages,
+  exact: true,
+};
+
+export const publicationManageTeamAccessReleaseRoute: ProtectedRouteProps = {
+  path: '/publication/:publicationId/manage-team/:releaseId',
+  component: PublicationManageTeamAccessPage,
+  protectionAction: user => user.permissions.canAccessAnalystPages,
+  exact: true,
+};
+
+export const publicationReleaseContributorsRoute: ProtectedRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/add-contributors',
+  component: PublicationReleaseContributorsPage,
+  protectionAction: user => user.permissions.canAccessAnalystPages,
+  exact: true,
+};
+
 export const methodologyRoute: ProtectedRouteProps = {
   path: '/methodology/:methodologyId',
   component: MethodologyPage,
@@ -157,9 +180,9 @@ export const preReleaseAccessListRoute: ProtectedRouteProps = {
   exact: true,
 };
 
-export const releaseMetaGuidanceRoute: ProtectedRouteProps = {
-  path: '/publication/:publicationId/release/:releaseId/meta-guidance',
-  component: ReleaseMetaGuidancePage,
+export const releaseDataGuidanceRoute: ProtectedRouteProps = {
+  path: '/publication/:publicationId/release/:releaseId/data-guidance',
+  component: ReleaseDataGuidancePage,
   protectionAction: user => user.permissions.canAccessPrereleasePages,
   exact: true,
 };
@@ -177,6 +200,9 @@ const routes = {
   topicEditRoute,
   publicationCreateRoute,
   publicationEditRoute,
+  publicationManageTeamAccessRoute,
+  publicationManageTeamAccessReleaseRoute,
+  publicationReleaseContributorsRoute,
   methodologyRoute,
   methodologyAdoptRoute,
   externalMethodologyEditRoute,
@@ -184,7 +210,7 @@ const routes = {
   preReleaseContentRoute,
   preReleaseTableToolRoute,
   preReleaseAccessListRoute,
-  releaseMetaGuidanceRoute,
+  releaseDataGuidanceRoute,
   releaseRoute,
   releaseCreateRoute,
   legacyReleasesRoute,

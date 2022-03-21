@@ -7,6 +7,7 @@ Resource            ../../libs/charts.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -15,6 +16,8 @@ ${TOPIC_NAME}=              %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=        UI tests - create data block with chart %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}=          UI test data block
 ${CONTENT_SECTION_NAME}=    Test data block section
+${FOOTNOTE_1}=              Test footnote from bau
+${FOOTNOTE_UPDATED}=        Updated test footnote from bau
 
 *** Test Cases ***
 Create test publication and release via API
@@ -24,8 +27,23 @@ Create test publication and release via API
 Upload subject
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    Academic Year 2025/26 (not Live)
-    user clicks link    Data and files
     user uploads subject    UI test subject    upload-file-test.csv    upload-file-test.meta.csv
+
+Navigate to 'Footnotes' page
+    user waits for page to finish loading
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+
+Create footnote
+    user waits until page contains link    Create footnote
+    user clicks link    Create footnote
+    user waits until page does not contain loading spinner
+    user clicks footnote subject radio    UI test subject    Applies to all data
+    user clicks element    id:footnoteForm-content
+    user enters text into element    id:footnoteForm-content    ${FOOTNOTE_1}
+    user clicks radio    Applies to all data
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes    %{WAIT_SMALL}
 
 Start creating a data block
     user clicks link    Data blocks
@@ -33,75 +51,76 @@ Start creating a data block
     user waits until page contains    No data blocks have been created.
 
     user clicks link    Create data block
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    1    Choose a subject
 
 Select subject "UI test subject"
-    user waits until page contains    UI test subject
+    user waits until page contains    UI test subject    %{WAIT_SMALL}
     user clicks radio    UI test subject
     user clicks element    id:publicationSubjectForm-submit
-    user waits until table tool wizard step is available    Choose locations    90
+    user waits until table tool wizard step is available    2    Choose locations    %{WAIT_MEDIUM}
     user checks previous table tool step contains    1    Subject    UI test subject
 
 Select locations
     user opens details dropdown    Opportunity Area
-    user clicks checkbox    Bolton 001 (E02000984)
-    user clicks checkbox    Bolton 001 (E05000364)
-    user clicks checkbox    Bolton 004 (E02000987)
-    user clicks checkbox    Bolton 004 (E05010450)
+    user clicks checkbox    Bolton 001
+    user clicks checkbox    Bolton 002
+    user clicks checkbox    Bolton 003
+    user clicks checkbox    Bolton 004
+
     user opens details dropdown    Ward
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
     user clicks element    id:locationFiltersForm-submit
-    user waits until table tool wizard step is available    Choose time period    90
+    user waits until table tool wizard step is available    3    Choose time period    90
 
 Select time period
     user waits until page contains element    id:timePeriodForm-start
     ${timePeriodStartList}=    get list items    id:timePeriodForm-start
     ${timePeriodEndList}=    get list items    id:timePeriodForm-end
-    ${expectedList}=    create list    Please select    2005    2007    2008    2009    2010    2011    2012    2016
-    ...    2017    2018    2019    2020
+
+    ${expectedList}=    create list    Please select    2005    2006    2007    2008    2009    2010    2011    2012
+    ...    2014    2016    2017    2018    2019    2020
     lists should be equal    ${timePeriodStartList}    ${expectedList}
     lists should be equal    ${timePeriodEndList}    ${expectedList}
 
     user chooses select option    id:timePeriodForm-start    2005
     user chooses select option    id:timePeriodForm-end    2020
     user clicks element    id:timePeriodForm-submit
-    user waits until table tool wizard step is available    Choose your filters
-    user checks previous table tool step contains    3    Time period    2005 to 2020
+    user waits until table tool wizard step is available    4    Choose your filters
+    user checks previous table tool step contains    3    Time period    2005 to 2020    %{WAIT_MEDIUM}
 
 Select indicators
-    user clicks indicator checkbox    Admission Numbers
+    user checks indicator checkbox is checked    Admission Numbers
 
 Create table
     [Documentation]    EES-615
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    css:[data-testid="dataTableCaption"]
-    ...    Admission Numbers for 'UI test subject' in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020
+    ...    Admission Numbers for 'UI test subject' in Bolton 001, Bolton 002, Bolton 003, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2020
 
 Validate table rows
     user checks table column heading contains    1    1    Admission Numbers
 
-    ${row}=    user gets row number with heading    Bolton 001 (E02000984)
-    user checks table heading in offset row contains    ${row}    0    2    2019
+    ${row}=    user gets row number with heading    Bolton 001
+    user checks table heading in offset row contains    ${row}    0    2    2009
 
-    user checks table cell in offset row contains    ${row}    0    1    8,533
+    user checks table cell in offset row contains    ${row}    0    1    5,815
 
-    ${row}=    user gets row number with heading    Bolton 001 (E05000364)
+    ${row}=    user gets row number with heading    Bolton 001
     user checks table heading in offset row contains    ${row}    0    2    2009
     user checks table heading in offset row contains    ${row}    1    1    2010
     user checks table heading in offset row contains    ${row}    2    1    2017
 
-    user checks table cell in offset row contains    ${row}    0    1    5,815
     user checks table cell in offset row contains    ${row}    1    1    5,595
     user checks table cell in offset row contains    ${row}    2    1    6,373
 
-    ${row}=    user gets row number with heading    Bolton 004 (E02000987)
-    user checks table heading in offset row contains    ${row}    0    2    2020
+    ${row}=    user gets row number with heading    Bolton 004
+    user checks table heading in offset row contains    ${row}    0    2    2005
 
-    user checks table cell in offset row contains    ${row}    0    1    6,031
+    user checks table cell in offset row contains    ${row}    0    1    8,557
 
-    ${row}=    user gets row number with heading    Bolton 004 (E05010450)
+    ${row}=    user gets row number with heading    Bolton 004
     user checks table heading in offset row contains    ${row}    0    2    2005
     user checks table heading in offset row contains    ${row}    1    1    2017
     user checks table heading in offset row contains    ${row}    2    1    2018
@@ -173,27 +192,60 @@ Embed data block into release content
 
     user creates new content section    1    ${CONTENT_SECTION_NAME}
     user clicks button    Add data block
-    user chooses select option    css:select[name="selectedDataBlock"]    ${DATABLOCK_NAME}
-    user waits until element is visible    css:table
-    user clicks button    Embed
-    # Wait for table to update
-    sleep    0.3s
+    user chooses and embeds data block    ${DATABLOCK_NAME}
+
+Check footnote is displayed in content Tab
+    user checks accordion section contains x blocks    ${CONTENT_SECTION_NAME}    1    id:releaseMainContent
+    user scrolls to accordion section content    ${CONTENT_SECTION_NAME}    id:releaseMainContent
+    user scrolls to element    testid:footnotes
+    user waits until element is visible    testid:footnotes    %{WAIT_SMALL}
+    user checks list has x items    testid:footnotes    1
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_1}
+
+Update footnote
+    [Documentation]    EES-3136
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+    user clicks link    Edit footnote    testid:Footnote - ${FOOTNOTE_1}
+
+    user waits until h2 is visible    Edit footnote
+    user enters text into element    label:Footnote    ${FOOTNOTE_UPDATED}
+    user clicks button    Save footnote
+    user waits until page contains    ${FOOTNOTE_UPDATED}
+    user checks page does not contain    ${FOOTNOTE_1}
+
+Navigate to content tab
+    user clicks link    Content
+    user waits until h2 is visible    ${PUBLICATION_NAME}
+
+Check updated footnote is displayed in content Tab
+    [Documentation]    EES-3136
+    [Tags]    Failing
+    user clicks button    Test data block section
+    ${section}=    user gets accordion section content element    Test data block section
+    ...    //*[@data-testid="editableAccordionSection"]
+
+    user scrolls to element    //*[@data-testid="editableAccordionSection"]//*[@data-testid="footnotes"]
+
+    user checks list has x items    testid:footnotes    1
+    user checks list item contains    testid:footnotes    1    ${FOOTNOTE_UPDATED}
 
 Validate embedded table rows
-    ${table}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"] table
-    user scrolls to element    xpath://button[text()="${CONTENT_SECTION_NAME}"]
-    # The below is to avoid React lazy-loading the table which causes the test to fail here
-    user scrolls down    400
-    user waits until page contains element    ${table}    30
+    ${datablock}=    set variable    //*[@data-testid="Data block - ${DATABLOCK_NAME}"]
+    user scrolls to element    id:releaseMainContent
 
+    user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+
+    ${table}=    set variable    ${datablock} >> css:table
+    user waits until page contains element    ${table}    30
     user checks table column heading contains    1    1    Admission Numbers    ${table}
 
-    ${row}=    user gets row number with heading    Bolton 001 (E02000984)    ${table}
-    user checks table heading in offset row contains    ${row}    0    2    2019    ${table}
+    ${row}=    user gets row number with heading    Bolton 001    ${table}
+    user checks table heading in offset row contains    ${row}    0    2    2009    ${table}
 
-    user checks table cell in offset row contains    ${row}    0    1    8,533    ${table}
+    user checks table cell in offset row contains    ${row}    0    1    5,815    ${table}
 
-    ${row}=    user gets row number with heading    Bolton 001 (E05000364)    ${table}
+    ${row}=    user gets row number with heading    Bolton 001    ${table}
     user checks table heading in offset row contains    ${row}    0    2    2009    ${table}
     user checks table heading in offset row contains    ${row}    1    1    2010    ${table}
     user checks table heading in offset row contains    ${row}    2    1    2017    ${table}
@@ -201,13 +253,14 @@ Validate embedded table rows
     user checks table cell in offset row contains    ${row}    0    1    5,815    ${table}
     user checks table cell in offset row contains    ${row}    1    1    5,595    ${table}
     user checks table cell in offset row contains    ${row}    2    1    6,373    ${table}
+    user checks table cell in offset row contains    ${row}    3    1    8,533    ${table}
 
-    ${row}=    user gets row number with heading    Bolton 004 (E02000987)    ${table}
-    user checks table heading in offset row contains    ${row}    0    2    2020    ${table}
+    ${row}=    user gets row number with heading    Bolton 004    ${table}
+    user checks table heading in offset row contains    ${row}    0    2    2005    ${table}
 
-    user checks table cell in offset row contains    ${row}    0    1    6,031    ${table}
+    user checks table cell in offset row contains    ${row}    0    1    8,557    ${table}
 
-    ${row}=    user gets row number with heading    Bolton 004 (E05010450)    ${table}
+    ${row}=    user gets row number with heading    Bolton 004    ${table}
     user checks table heading in offset row contains    ${row}    0    2    2005    ${table}
     user checks table heading in offset row contains    ${row}    1    1    2017    ${table}
     user checks table heading in offset row contains    ${row}    2    1    2018    ${table}
@@ -268,7 +321,7 @@ Navigate to Chart tab
     set suite variable    ${DATABLOCK_URL}    ${url}
 
     user clicks link    Chart
-    user waits until table tool wizard step is available    Choose chart type
+    user waits until h3 is visible    Choose chart type
 
 Configure basic line chart
     user clicks button    Line
@@ -283,38 +336,45 @@ Configure basic line chart
     user chooses select option    id:chartDataSetsConfigurationForm-location    Nailsea Youngwood
     user clicks button    Add data set
 
+    user clicks link    Legend
+    user chooses select option    id:chartLegendConfigurationForm-items-0-symbol    Circle
+
 Validate basic line chart preview
-    ${preview}=    set variable    id:chartBuilderPreview
-    user waits until element contains line chart    ${preview}
+    user waits until element contains line chart    id:chartBuilderPreview
 
-    user checks chart title contains    ${preview}    Test chart title
-    user checks chart legend item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood)
+    user checks chart title contains    id:chartBuilderPreview    Test chart title
+    user checks chart legend item contains    id:chartBuilderPreview    1    Admission Numbers (Nailsea Youngwood)
 
-    user checks chart height    ${preview}    400
-    user checks chart width    ${preview}    900
+    user checks chart height    id:chartBuilderPreview    400
+    user checks chart width    id:chartBuilderPreview    900
 
-    user checks chart y axis ticks    ${preview}    0    2,500    5,000    7,500    10,000
-    user checks chart x axis ticks    ${preview}    2005    2010    2011    2012    2016
+    user checks chart y axis ticks    id:chartBuilderPreview    0    2,500    5,000    7,500    10,000
+    user checks chart x axis ticks    id:chartBuilderPreview    2005    2010    2011    2012    2016
 
-    user mouses over line chart point    ${preview}    1    1
-    user checks chart tooltip label contains    ${preview}    2005
-    user checks chart tooltip item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood): 3,612
+    user mouses over line chart point    id:chartBuilderPreview    1    1
+    user checks chart tooltip label contains    id:chartBuilderPreview    2005
+    user checks chart tooltip item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers (Nailsea Youngwood): 3,612
 
-    user mouses over line chart point    ${preview}    1    2
-    user checks chart tooltip label contains    ${preview}    2010
-    user checks chart tooltip item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood): 9,304
+    user mouses over line chart point    id:chartBuilderPreview    1    2
+    user checks chart tooltip label contains    id:chartBuilderPreview    2010
+    user checks chart tooltip item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers (Nailsea Youngwood): 9,304
 
-    user mouses over line chart point    ${preview}    1    3
-    user checks chart tooltip label contains    ${preview}    2011
-    user checks chart tooltip item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood): 9,603
+    user mouses over line chart point    id:chartBuilderPreview    1    3
+    user checks chart tooltip label contains    id:chartBuilderPreview    2011
+    user checks chart tooltip item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers (Nailsea Youngwood): 9,603
 
-    user mouses over line chart point    ${preview}    1    4
-    user checks chart tooltip label contains    ${preview}    2012
-    user checks chart tooltip item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood): 8,150
+    user mouses over line chart point    id:chartBuilderPreview    1    4
+    user checks chart tooltip label contains    id:chartBuilderPreview    2012
+    user checks chart tooltip item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers (Nailsea Youngwood): 8,150
 
-    user mouses over line chart point    ${preview}    1    5
-    user checks chart tooltip label contains    ${preview}    2016
-    user checks chart tooltip item contains    ${preview}    1    Admission Numbers (Nailsea Youngwood): 4,198
+    user mouses over line chart point    id:chartBuilderPreview    1    5
+    user checks chart tooltip label contains    id:chartBuilderPreview    2016
+    user checks chart tooltip item contains    id:chartBuilderPreview    1
+    ...    Admission Numbers (Nailsea Youngwood): 4,198
 
 Save chart and validate marked as 'Has chart' in data blocks list
     user clicks link    Chart configuration
@@ -336,9 +396,10 @@ Validate line chart embeds correctly
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
-    ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
-    # The below is to avoid React lazy-loading the chart which causes the test to fail here
-    user scrolls down    400
+
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    # Need to scroll to block to load it
+    user scrolls to element    ${datablock}
     user waits until element contains line chart    ${datablock}
 
     user checks chart title contains    ${datablock}    Test chart title
@@ -371,7 +432,7 @@ Validate line chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admission Numbers (Nailsea Youngwood): 4,198
 
 Configure basic vertical bar chart
-    user goes to url    ${DATABLOCK_URL}
+    user navigates to admin frontend    ${DATABLOCK_URL}
 
     user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_MEDIUM}
     user waits until page does not contain loading spinner
@@ -381,47 +442,46 @@ Configure basic vertical bar chart
 
 Change vertical bar chart legend
     user clicks link    Legend
-    user waits until h3 is visible    Legend    60
+    user waits until h3 is visible    Legend    %{WAIT_SMALL}
 
     user counts legend form item rows    1
     user checks element value should be    id:chartLegendConfigurationForm-items-0-label
-    ...    Admission Numbers (Nailsea Youngwood)    60
+    ...    Admission Numbers (Nailsea Youngwood)    %{WAIT_SMALL}
 
     user enters text into element    id:chartLegendConfigurationForm-items-0-label    Admissions
 
 Validate basic vertical bar chart preview
-    ${preview}=    set variable    id:chartBuilderPreview
-    user waits until element does not contain line chart    ${preview}
-    user waits until element contains bar chart    ${preview}
+    user waits until element does not contain line chart    id:chartBuilderPreview
+    user waits until element contains bar chart    id:chartBuilderPreview
 
-    user checks chart title contains    ${preview}    Test chart title
-    user checks chart legend item contains    ${preview}    1    Admissions
+    user checks chart title contains    id:chartBuilderPreview    Test chart title
+    user checks chart legend item contains    id:chartBuilderPreview    1    Admissions
 
-    user checks chart height    ${preview}    500
-    user checks chart width    ${preview}    800
+    user checks chart height    id:chartBuilderPreview    500
+    user checks chart width    id:chartBuilderPreview    800
 
-    user checks chart y axis ticks    ${preview}    0    2,500    5,000    7,500    10,000
-    user checks chart x axis ticks    ${preview}    2005    2010    2011    2012    2016
+    user checks chart y axis ticks    id:chartBuilderPreview    0    2,500    5,000    7,500    10,000
+    user checks chart x axis ticks    id:chartBuilderPreview    2005    2010    2011    2012    2016
 
-    user mouses over chart bar    ${preview}    1
-    user checks chart tooltip label contains    ${preview}    2005
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 3,612
+    user mouses over chart bar    id:chartBuilderPreview    1
+    user checks chart tooltip label contains    id:chartBuilderPreview    2005
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 3,612
 
-    user mouses over chart bar    ${preview}    2
-    user checks chart tooltip label contains    ${preview}    2010
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 9,304
+    user mouses over chart bar    id:chartBuilderPreview    2
+    user checks chart tooltip label contains    id:chartBuilderPreview    2010
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 9,304
 
-    user mouses over chart bar    ${preview}    3
-    user checks chart tooltip label contains    ${preview}    2011
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 9,603
+    user mouses over chart bar    id:chartBuilderPreview    3
+    user checks chart tooltip label contains    id:chartBuilderPreview    2011
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 9,603
 
-    user mouses over chart bar    ${preview}    4
-    user checks chart tooltip label contains    ${preview}    2012
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 8,150
+    user mouses over chart bar    id:chartBuilderPreview    4
+    user checks chart tooltip label contains    id:chartBuilderPreview    2012
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 8,150
 
-    user mouses over chart bar    ${preview}    5
-    user checks chart tooltip label contains    ${preview}    2016
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 4,198
+    user mouses over chart bar    id:chartBuilderPreview    5
+    user checks chart tooltip label contains    id:chartBuilderPreview    2016
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 4,198
 
 Save and validate vertical bar chart embeds correctly
     # Transient React error that happens locally & on dev sometimes: TypeError: Cannot read property '_leaflet_pos' of undefined
@@ -430,13 +490,13 @@ Save and validate vertical bar chart embeds correctly
     user waits until button is enabled    Save chart options
 
     user clicks link    Content
-    user waits until h2 is visible    ${PUBLICATION_NAME}    60
+    user waits until h2 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
-    ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    # Need to scroll to block to load it
+    user scrolls to element    ${datablock}
     user waits until element does not contain line chart    ${datablock}
-    # below is to prevent React lazy loading the chart
-    user scrolls down    400
     user waits until element contains bar chart    ${datablock}
 
     user checks chart title contains    ${datablock}    Test chart title
@@ -469,45 +529,44 @@ Save and validate vertical bar chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admissions: 4,198
 
 Configure basic horizontal bar chart
-    user goes to url    ${DATABLOCK_URL}
-    user waits until h2 is visible    ${DATABLOCK_NAME}    60
+    user navigates to admin frontend    ${DATABLOCK_URL}
+    user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page does not contain loading spinner
 
     user clicks link    Chart
     user configures basic chart    Horizontal bar    600    700
 
 Validate basic horizontal bar chart preview
-    ${preview}=    set variable    id:chartBuilderPreview
-    user waits until element contains bar chart    ${preview}
+    user waits until element contains bar chart    id:chartBuilderPreview
 
-    user checks chart title contains    ${preview}    Test chart title
-    user checks chart legend item contains    ${preview}    1    Admissions
+    user checks chart title contains    id:chartBuilderPreview    Test chart title
+    user checks chart legend item contains    id:chartBuilderPreview    1    Admissions
 
-    user checks chart x axis ticks    ${preview}    0    2,500    5,000    7,500    10,000
-    user checks chart y axis ticks    ${preview}    2005    2010    2011    2012    2016
+    user checks chart x axis ticks    id:chartBuilderPreview    0    2,500    5,000    7,500    10,000
+    user checks chart y axis ticks    id:chartBuilderPreview    2005    2010    2011    2012    2016
 
-    user checks chart height    ${preview}    600
-    user checks chart width    ${preview}    700
+    user checks chart height    id:chartBuilderPreview    600
+    user checks chart width    id:chartBuilderPreview    700
 
-    user mouses over chart bar    ${preview}    1
-    user checks chart tooltip label contains    ${preview}    2005
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 3,612
+    user mouses over chart bar    id:chartBuilderPreview    1
+    user checks chart tooltip label contains    id:chartBuilderPreview    2005
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 3,612
 
-    user mouses over chart bar    ${preview}    2
-    user checks chart tooltip label contains    ${preview}    2010
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 9,304
+    user mouses over chart bar    id:chartBuilderPreview    2
+    user checks chart tooltip label contains    id:chartBuilderPreview    2010
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 9,304
 
-    user mouses over chart bar    ${preview}    3
-    user checks chart tooltip label contains    ${preview}    2011
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 9,603
+    user mouses over chart bar    id:chartBuilderPreview    3
+    user checks chart tooltip label contains    id:chartBuilderPreview    2011
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 9,603
 
-    user mouses over chart bar    ${preview}    4
-    user checks chart tooltip label contains    ${preview}    2012
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 8,150
+    user mouses over chart bar    id:chartBuilderPreview    4
+    user checks chart tooltip label contains    id:chartBuilderPreview    2012
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 8,150
 
-    user mouses over chart bar    ${preview}    5
-    user checks chart tooltip label contains    ${preview}    2016
-    user checks chart tooltip item contains    ${preview}    1    Admissions: 4,198
+    user mouses over chart bar    id:chartBuilderPreview    5
+    user checks chart tooltip label contains    id:chartBuilderPreview    2016
+    user checks chart tooltip item contains    id:chartBuilderPreview    1    Admissions: 4,198
 
 Save and validate horizontal bar chart embeds correctly
     user clicks link    Chart configuration
@@ -518,7 +577,9 @@ Save and validate horizontal bar chart embeds correctly
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
-    ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    # Need to scroll to block to load it
+    user scrolls to element    ${datablock}
     user waits until element contains bar chart    ${datablock}
 
     user checks chart title contains    ${datablock}    Test chart title
@@ -551,8 +612,8 @@ Save and validate horizontal bar chart embeds correctly
     user checks chart tooltip item contains    ${datablock}    1    Admissions: 4,198
 
 Configure basic geographic chart
-    user goes to url    ${DATABLOCK_URL}
-    user waits until h2 is visible    ${DATABLOCK_NAME}    60
+    user navigates to admin frontend    ${DATABLOCK_URL}
+    user waits until h2 is visible    ${DATABLOCK_NAME}    %{WAIT_SMALL}
     user waits until page does not contain loading spinner
 
     user clicks link    Chart
@@ -560,7 +621,7 @@ Configure basic geographic chart
 
 Change geographic chart legend
     user clicks link    Legend
-    user waits until h3 is visible    Legend    90
+    user waits until h3 is visible    Legend    %{WAIT_MEDIUM}
 
     user counts legend form item rows    5
     user checks element value should be    id:chartLegendConfigurationForm-items-0-label    Admission Numbers (2005)
@@ -578,28 +639,18 @@ Change geographic chart legend
     user waits until page does not contain loading spinner
 
 Validate basic geographic chart preview
-    ${preview}=    set variable    id:chartBuilderPreview
-    user waits until element does not contain bar chart    ${preview}
-    user waits until element contains map chart    ${preview}
+    user waits until element does not contain bar chart    id:chartBuilderPreview
+    user waits until element contains map chart    id:chartBuilderPreview
 
-    user checks map chart height    ${preview}    700
-    user checks map chart width    ${preview}    600
+    user checks map chart height    id:chartBuilderPreview    700
+    user checks map chart width    id:chartBuilderPreview    600
 
-    user chooses select option    ${preview}-map-selectedLocation    Nailsea Youngwood
+    user chooses select option    id:chartBuilderPreview-map-selectedLocation    Nailsea Youngwood
 
-    user mouses over selected map feature    ${preview}
-    user checks chart tooltip label contains    ${preview}    Nailsea Youngwood
-    user checks chart tooltip item contains    ${preview}    1    Admissions in 2005: 3,612
-    user checks chart tooltip item contains    ${preview}    2    Admissions in 2010: 9,304
-    user checks chart tooltip item contains    ${preview}    3    Admissions in 2011: 9,603
-    user checks chart tooltip item contains    ${preview}    4    Admissions in 2012: 8,150
-    user checks chart tooltip item contains    ${preview}    5    Admissions in 2016: 4,198
+    user mouses over selected map feature    id:chartBuilderPreview
+    user checks map tooltip label contains    id:chartBuilderPreview    Nailsea Youngwood
 
-    user checks map chart indicator tile contains    ${preview}    1    Admissions in 2005    3,612
-    user checks map chart indicator tile contains    ${preview}    2    Admissions in 2010    9,304
-    user checks map chart indicator tile contains    ${preview}    3    Admissions in 2011    9,603
-    user checks map chart indicator tile contains    ${preview}    4    Admissions in 2012    8,150
-    user checks map chart indicator tile contains    ${preview}    5    Admissions in 2016    4,198
+    user checks map chart indicator tile contains    id:chartBuilderPreview    Admissions in 2005    3,612
 
 Save and validate geographic chart embeds correctly
     user scrolls to the bottom of the page
@@ -609,38 +660,32 @@ Save and validate geographic chart embeds correctly
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
+    user waits until page does not contain loading spinner
 
-    ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    # Need to scroll to block to load it
+    user scrolls to element    ${datablock}
     user waits until element does not contain bar chart    ${datablock}
     user waits until element contains map chart    ${datablock}
 
     user checks map chart height    ${datablock}    700
     user checks map chart width    ${datablock}    600
 
-    user chooses select option    ${datablock} select[name="selectedLocation"]    Nailsea Youngwood
+    user chooses select option    ${datablock} >> name:selectedLocation    Nailsea Youngwood
 
     user mouses over selected map feature    ${datablock}
-    user checks chart tooltip label contains    ${datablock}    Nailsea Youngwood
-    user checks chart tooltip item contains    ${datablock}    1    Admissions in 2005: 3,612
-    user checks chart tooltip item contains    ${datablock}    2    Admissions in 2010: 9,304
-    user checks chart tooltip item contains    ${datablock}    3    Admissions in 2011: 9,603
-    user checks chart tooltip item contains    ${datablock}    4    Admissions in 2012: 8,150
-    user checks chart tooltip item contains    ${datablock}    5    Admissions in 2016: 4,198
+    user checks map tooltip label contains    ${datablock}    Nailsea Youngwood
 
-    user checks map chart indicator tile contains    ${datablock}    1    Admissions in 2005    3,612
-    user checks map chart indicator tile contains    ${datablock}    2    Admissions in 2010    9,304
-    user checks map chart indicator tile contains    ${datablock}    3    Admissions in 2011    9,603
-    user checks map chart indicator tile contains    ${datablock}    4    Admissions in 2012    8,150
-    user checks map chart indicator tile contains    ${datablock}    5    Admissions in 2016    4,198
+    user checks map chart indicator tile contains    ${datablock}    Admissions in 2005    3,612
 
 Configure basic infographic chart
-    user goes to url    ${DATABLOCK_URL}
+    user navigates to admin frontend    ${DATABLOCK_URL}
 
     user waits until h2 is visible    ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
 
     user clicks link    Chart
-    user waits until table tool wizard step is available    Choose chart type
+    user waits until h3 is visible    Choose chart type
     user clicks button    Choose an infographic as alternative
     user chooses file    id:chartConfigurationForm-file    ${FILES_DIR}test-infographic.png
 
@@ -657,7 +702,9 @@ Save and validate infographic chart embeds correctly
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
-    ${datablock}=    set variable    css:[data-testid="Data block - ${DATABLOCK_NAME}"]
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    # Need to scroll to block to load it
+    user scrolls to element    ${datablock}
     user checks chart title contains    ${datablock}    Test chart title
     user checks infographic chart contains alt    ${datablock}    Test chart alt
 
@@ -666,7 +713,7 @@ Delete embedded data block
     user clicks button    Confirm
 
 Delete chart from data block
-    user goes to url    ${DATABLOCK_URL}
+    user navigates to admin frontend    ${DATABLOCK_URL}
     user waits until h2 is visible    ${DATABLOCK_NAME}
     user waits until page does not contain loading spinner
     user clicks link    Chart

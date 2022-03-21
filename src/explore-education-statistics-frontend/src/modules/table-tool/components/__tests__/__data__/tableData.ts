@@ -10,7 +10,7 @@ import {
   TableDataQuery,
   SelectedPublication,
 } from '@common/services/tableBuilderService';
-import { Release, ReleaseType } from '@common/services/publicationService';
+import { Release } from '@common/services/publicationService';
 
 export const testQuery: TableDataQuery = {
   publicationId: '536154f5-7f82-4dc7-060a-08d9097c1945',
@@ -23,7 +23,7 @@ export const testQuery: TableDataQuery = {
     'bfd88241-1130-4df8-9e49-a411618d082f',
     '3f223187-a2aa-420c-a3d8-e2a94f77e4b5',
   ],
-  locations: { country: ['E92000001'] },
+  locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
   timePeriod: {
     startYear: 2020,
     startCode: 'W23',
@@ -73,7 +73,7 @@ export const testTable: FullTable = {
     ],
     locations: [
       new LocationFilter({
-        value: 'E92000001',
+        value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
         label: 'England',
         level: 'country',
       }),
@@ -119,9 +119,7 @@ export const testTable: FullTable = {
     {
       filters: ['3f223187-a2aa-420c-a3d8-e2a94f77e4b5'],
       geographicLevel: 'country',
-      location: {
-        country: { code: 'E92000001', name: 'England' },
-      },
+      locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
       measures: {
         '18a27dde-e54e-46d0-6656-08d9097c4255': '22500',
         '6240d58e-c160-4c39-6657-08d9097c4255': '0.9',
@@ -131,9 +129,7 @@ export const testTable: FullTable = {
     {
       filters: ['bfd88241-1130-4df8-9e49-a411618d082f'],
       geographicLevel: 'country',
-      location: {
-        country: { code: 'E92000001', name: 'England' },
-      },
+      locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
       measures: {
         '18a27dde-e54e-46d0-6656-08d9097c4255': '18700',
         '6240d58e-c160-4c39-6657-08d9097c4255': '0.76',
@@ -272,9 +268,6 @@ export const testPublicationRelease: Release = {
     id: '',
     slug: '',
     title: '',
-    description: '',
-    dataSource: '',
-    summary: '',
     otherReleases: [],
     legacyReleases: [],
     topic: {
@@ -298,14 +291,11 @@ export const testPublicationRelease: Release = {
   },
   latestRelease: true,
   relatedInformation: [],
-  type: {
-    id: '',
-    title: 'National Statistics' as ReleaseType,
-  },
+  type: 'NationalStatistics',
   updates: [],
   content: [],
   downloadFiles: [],
   dataLastPublished: '',
   hasPreReleaseAccessList: true,
-  hasMetaGuidance: true,
+  hasDataGuidance: true,
 };

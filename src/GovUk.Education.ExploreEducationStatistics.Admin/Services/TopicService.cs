@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
@@ -11,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -29,9 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
      */
     public class TopicService : ITopicService
     {
-        private static readonly VersionedEntityDeletionOrderComparer VersionedEntityComparer =
-            new VersionedEntityDeletionOrderComparer();
-
         private readonly ContentDbContext _contentContext;
         private readonly StatisticsDbContext _statisticsContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
@@ -42,6 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IReleaseFileService _releaseFileService;
         private readonly IPublishingService _publishingService;
         private readonly IMethodologyService _methodologyService;
+        private readonly IBlobCacheService _cacheService;
         private readonly bool _topicDeletionAllowed;
 
         public TopicService(
@@ -55,7 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IReleaseDataFileService releaseDataFileService,
             IReleaseFileService releaseFileService,
             IPublishingService publishingService,
-            IMethodologyService methodologyService)
+            IMethodologyService methodologyService,
+            IBlobCacheService cacheService)
         {
             _contentContext = contentContext;
             _statisticsContext = statisticsContext;
@@ -67,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _releaseFileService = releaseFileService;
             _publishingService = publishingService;
             _methodologyService = methodologyService;
+            _cacheService = cacheService;
             _topicDeletionAllowed = configuration.GetValue<bool>("enableThemeDeletion");
         }
 
@@ -188,6 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var methodologyIdsToDelete = await _contentContext
                 .PublicationMethodologies
+                .AsQueryable()
                 .Where(pm => pm.Owner && publicationIds.Contains(pm.PublicationId))
                 .Select(pm => pm.MethodologyId)
                 .ToListAsync();
@@ -206,12 +209,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Releases
                 .IgnoreQueryFilters()
                 .Where(r => publicationIds.Contains(r.PublicationId))
-                .ToList()
-                .OrderBy(release => new IdAndPreviousVersionIdPair(release.Id, release.PreviousVersionId),
-                    VersionedEntityComparer)
-                .Select(r => r.Id);
-
-            return await releasesIdsToDelete.Select(DeleteContentAndStatsRelease)
+                .Select(release => new IdAndPreviousVersionIdPair<string>(release.Id.ToString(), release.PreviousVersionId != null ? release.PreviousVersionId.ToString() : null))
+                .ToList();
+            
+            var releaseIdsInDeleteOrder = VersionedEntityDeletionOrderUtil
+                .Sort(releasesIdsToDelete)
+                .Select(ids => Guid.Parse(ids.Id));
+                
+            return await releaseIdsInDeleteOrder
+                .Select(DeleteContentAndStatsRelease)
                 .OnSuccessAll()
                 .OnSuccessVoid();
         }
@@ -220,8 +226,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var contentRelease = await _contentContext
                 .Releases
+                .AsQueryable()
                 .SingleOrDefaultAsync(r => r.Id == releaseId);
-            
+
             if (contentRelease == null)
             {
                 // The Content Db Release may already be soft-deleted and therefore not visible.
@@ -233,6 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return await _releaseDataFileService.DeleteAll(releaseId, forceDelete: true)
                 .OnSuccessDo(() => _releaseFileService.DeleteAll(releaseId, forceDelete: true))
+                .OnSuccessDo(() => DeleteCachedReleaseContent(releaseId, contentRelease.PublicationId))
                 .OnSuccessVoid(async () =>
                 {
                     _contentContext.Releases.Remove(contentRelease);
@@ -240,6 +248,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     await DeleteStatsDbRelease(releaseId);
                 });
+        }
+
+        private Task DeleteCachedReleaseContent(Guid releaseId, Guid publicationId)
+        {
+            return _cacheService.DeleteCacheFolder(new ReleaseContentFolderCacheKey(publicationId, releaseId));
         }
 
         private async Task DeleteSoftDeletedContentDbRelease(Guid releaseId)
@@ -259,6 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var statsRelease = await _statisticsContext
                 .Release
+                .AsQueryable()
                 .SingleOrDefaultAsync(r => r.Id == releaseId);
 
             if (statsRelease != null)
@@ -269,7 +283,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
-        private async Task<Either<ActionResult, Topic>> CheckCanDeleteTopic(Topic topic)
+        private Either<ActionResult, Topic> CheckCanDeleteTopic(Topic topic)
         {
             if (!_topicDeletionAllowed)
             {

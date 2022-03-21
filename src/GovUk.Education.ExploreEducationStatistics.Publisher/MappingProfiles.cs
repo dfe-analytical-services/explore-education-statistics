@@ -3,7 +3,6 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
-using Microsoft.Azure.Management.DataFactory.Models;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher
 {
@@ -37,6 +36,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             CreateMap<Release, CachedReleaseViewModel>()
                 .ForMember(dest => dest.CoverageTitle,
                     m => m.MapFrom(release => release.TimePeriodCoverage.GetEnumLabel()))
+                .ForMember(dest => dest.Type,
+                    m => m.MapFrom(release => new ReleaseTypeViewModel
+                    {
+                        Title = release.Type.GetTitle()
+                    }))
                 .ForMember(
                     dest => dest.Updates,
                     m => m.MapFrom(r => r.Updates.OrderByDescending(update => update.On)))
@@ -45,8 +49,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));
 
             CreateMap<Release, ReleaseTitleViewModel>();
-
-            CreateMap<ReleaseType, ReleaseTypeViewModel>();
 
             CreateMap<Theme, ThemeViewModel>();
 

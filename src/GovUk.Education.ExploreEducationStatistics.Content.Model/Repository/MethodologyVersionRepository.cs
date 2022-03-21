@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 {
@@ -28,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         {
             var publication = await _contentDbContext
                 .Publications
+                .AsQueryable()
                 .SingleAsync(p => p.Id == publicationId);
 
             var methodology = (await _contentDbContext.MethodologyVersions.AddAsync(new MethodologyVersion
@@ -67,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         {
             // First check the publication exists
             var publication = await _contentDbContext.Publications
+                .AsQueryable()
                 .SingleAsync(p => p.Id == publicationId);
 
             var methodologies = await _methodologyRepository.GetByPublication(publication.Id);
@@ -85,6 +86,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         public async Task<MethodologyVersion?> GetLatestPublishedVersion(Guid methodologyId)
         {
             var methodology = await _contentDbContext.Methodologies
+                .AsQueryable()
                 .SingleAsync(mp => mp.Id == methodologyId);
 
             return await GetLatestPublishedByMethodology(methodology);
@@ -136,7 +138,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Select(m => m.Methodology)
                 .ToListAsync();
 
-            await ownedMethodologies.ForEachAsync(async methodology =>
+            await ownedMethodologies
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async methodology =>
             {
                 methodology.OwningPublicationTitle = updatedTitle;
 
@@ -171,42 +175,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
         private async Task<bool> IsPubliclyAccessible(MethodologyVersion methodologyVersion)
         {
+            // A version that's not approved can't be publicly accessible
             if (!methodologyVersion.Approved)
             {
                 return false;
             }
 
-            if (!await IsLatestVersionOfMethodologyExcludingDrafts(methodologyVersion))
+            // If this version is not the latest it can still be publicly accessible,
+            // i.e. when the next version is draft or it's approved for publishing with a release that's not live yet.
+            // If the next version exists and is approved for publishing immediately or approved with a release that's live
+            // then this version can't be publicly accessible.
+            var nextVersion = await GetNextVersion(methodologyVersion);
+            if (nextVersion?.Approved == true)
             {
-                return false;
+                if (nextVersion.ScheduledForPublishingImmediately ||
+                    await IsVersionScheduledForPublishingWithPublishedRelease(nextVersion))
+                {
+                    return false;
+                }
             }
 
+            // A version scheduled for publishing immediately is restricted from public view until it's used by
+            // a publication that's published
             if (methodologyVersion.ScheduledForPublishingImmediately)
             {
                 return await PublicationsHaveAtLeastOnePublishedRelease(methodologyVersion);
             }
 
-            // Scheduled for publishing with a Release so check the Release is published
-
-            await _contentDbContext.Entry(methodologyVersion)
-                .Reference(m => m.ScheduledWithRelease)
-                .LoadAsync();
-            return methodologyVersion.ScheduledForPublishingWithPublishedRelease;
-        }
-
-        private async Task<bool> IsLatestVersionOfMethodologyExcludingDrafts(MethodologyVersion methodologyVersion)
-        {
-            await _contentDbContext.Entry(methodologyVersion)
-                .Reference(m => m.Methodology)
-                .LoadAsync();
-
-            await _contentDbContext.Entry(methodologyVersion.Methodology)
-                .Collection(mp => mp.Versions)
-                .LoadAsync();
-
-            return methodologyVersion.Methodology.Versions.All(mv =>
-                mv.PreviousVersionId != methodologyVersion.Id ||
-                mv.PreviousVersionId == methodologyVersion.Id && mv.Status != Approved);
+            // A version scheduled for publishing with a release is only publicly accessible if that release is published
+            return await IsVersionScheduledForPublishingWithPublishedRelease(methodologyVersion);
         }
 
         private async Task<bool> PublicationsHaveAtLeastOnePublishedRelease(MethodologyVersion methodologyVersion)
@@ -227,6 +224,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
                 return publicationMethodology.Publication.Live;
             });
+        }
+
+        private async Task<bool> IsVersionScheduledForPublishingWithPublishedRelease(
+            MethodologyVersion methodologyVersion)
+        {
+            if (!methodologyVersion.ScheduledForPublishingWithRelease)
+            {
+                return false;
+            }
+
+            await _contentDbContext.Entry(methodologyVersion)
+                .Reference(m => m.ScheduledWithRelease)
+                .LoadAsync();
+            return methodologyVersion.ScheduledForPublishingWithPublishedRelease;
+        }
+
+        private async Task<MethodologyVersion?> GetNextVersion(MethodologyVersion methodologyVersion)
+        {
+            await _contentDbContext.Entry(methodologyVersion)
+                .Reference(m => m.Methodology)
+                .LoadAsync();
+
+            await _contentDbContext.Entry(methodologyVersion.Methodology)
+                .Collection(mp => mp.Versions)
+                .LoadAsync();
+
+            // TODO EES-2672 SingleOrDefault here is susceptible to bug EES-2672 which is allowing multiple amendments
+            // of the same version to be created. If there is a next version there should only be one.
+            return methodologyVersion.Methodology.Versions.SingleOrDefault(mv =>
+                mv.PreviousVersionId == methodologyVersion.Id);
         }
     }
 }

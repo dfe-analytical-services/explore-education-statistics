@@ -8,7 +8,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { BasicMethodology } from '@admin/services/methodologyService';
+import { BasicMethodologyVersion } from '@admin/services/methodologyService';
 import Tag from '@common/components/Tag';
 import TagGroup from '@common/components/TagGroup';
 import useFormSubmit from '@common/hooks/useFormSubmit';
@@ -21,7 +21,7 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'methodologyId',
     messages: {
-      CANNOT_ADOPT_METHODOLOGY_ALREADY_LINKED_TO_PUBLICATION:
+      CannotAdoptMethodologyAlreadyLinkedToPublication:
         'Select a methodology that has not already been adopted by this publication',
     },
   }),
@@ -32,7 +32,7 @@ interface FormValues {
 }
 
 interface Props {
-  methodologies: BasicMethodology[];
+  methodologies: BasicMethodologyVersion[];
   onCancel: () => void;
   onSubmit: (values: FormValues) => void;
 }

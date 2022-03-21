@@ -19,7 +19,7 @@ const errorMappings = [
   mapFieldErrors<MethodologySummaryFormValues>({
     target: 'title',
     messages: {
-      SLUG_NOT_UNIQUE: 'Choose a unique title',
+      SlugNotUnique: 'Choose a unique title',
     },
   }),
 ];

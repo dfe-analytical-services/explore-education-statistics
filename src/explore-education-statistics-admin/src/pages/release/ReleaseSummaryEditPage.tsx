@@ -19,7 +19,7 @@ const errorMappings = [
   mapFieldErrors<ReleaseSummaryFormValues>({
     target: 'timePeriodCoverageStartYear',
     messages: {
-      SLUG_NOT_UNIQUE:
+      SlugNotUnique:
         'Choose a unique combination of time period and start year',
     },
   }),
@@ -53,7 +53,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
       },
-      typeId: values.releaseTypeId,
+      type: values.releaseType ?? 'AdHocStatistics',
       preReleaseAccessList: release.preReleaseAccessList,
     });
 
@@ -91,7 +91,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
             initialValues={() => ({
               timePeriodCoverageCode: release.timePeriodCoverage.value,
               timePeriodCoverageStartYear: release.releaseName.toString(),
-              releaseTypeId: release.type.id,
+              releaseType: release.type,
             })}
             onSubmit={handleSubmit}
             onCancel={handleCancel}

@@ -38,9 +38,13 @@ export const testSubjectMeta: SubjectMeta = {
     },
   },
   locations: {
+    country: {
+      legend: 'Country',
+      options: [{ id: 'england', value: 'england', label: 'England' }],
+    },
     localAuthority: {
       legend: 'Local authority',
-      options: [{ value: 'barnet', label: 'Barnet' }],
+      options: [{ id: 'barnet', value: 'barnet', label: 'Barnet' }],
     },
   },
   timePeriod: {
@@ -56,13 +60,15 @@ export const testTableData: TableDataResponse = {
     footnotes: [],
     subjectName: 'Subject 1',
     geoJsonAvailable: false,
-    locations: [
-      {
-        level: 'localAuthority',
-        label: 'Barnet',
-        value: 'barnet',
-      },
-    ],
+    locations: {
+      localAuthority: [
+        {
+          id: 'barnet',
+          label: 'Barnet',
+          value: 'barnet',
+        },
+      ],
+    },
     timePeriodRange: [{ code: 'AY', year: 2020, label: '2020/21' }],
     indicators: [
       {
@@ -99,12 +105,7 @@ export const testTableData: TableDataResponse = {
       measures: {
         'authorised-absence-sessions': '123',
       },
-      location: {
-        localAuthority: {
-          name: 'Barnet',
-          code: 'barnet',
-        },
-      },
+      locationId: 'barnet',
       geographicLevel: 'localAuthority',
       filters: ['gender-female'],
     },

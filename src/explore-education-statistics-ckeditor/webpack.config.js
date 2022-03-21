@@ -46,7 +46,7 @@ module.exports = {
     new CKEditorWebpackPlugin({
       // UI language. Language codes follow the https://en.wikipedia.org/wiki/ISO_639-1 format.
       // When changing the built-in language, remember to also change it in the editor's configuration (src/ckeditor.js).
-      language: 'en',
+      language: 'en-gb',
       additionalLanguages: 'all',
     }),
     new webpack.BannerPlugin({
@@ -88,6 +88,16 @@ module.exports = {
             },
           },
         ],
+      },
+      {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env'],
+          },
+        },
       },
     ],
   },

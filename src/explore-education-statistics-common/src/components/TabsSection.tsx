@@ -66,7 +66,7 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
         role={onMedia('tabpanel')}
         tabIndex={onMedia(-1)}
       >
-        {headingTitle && createElement(headingTag, { children: headingTitle })}
+        {headingTitle && createElement(headingTag, null, headingTitle)}
         {children}
       </section>
     ) : null;

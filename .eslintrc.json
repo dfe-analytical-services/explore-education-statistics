@@ -23,7 +23,7 @@
     "plugin:jsx-a11y/recommended",
     "plugin:import/typescript",
     "prettier",
-    "prettier/@typescript-eslint"
+    "prettier/prettier"
   ],
   "rules": {
     "@typescript-eslint/ban-ts-ignore": "off",

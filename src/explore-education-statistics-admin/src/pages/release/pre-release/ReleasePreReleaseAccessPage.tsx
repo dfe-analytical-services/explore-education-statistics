@@ -82,6 +82,7 @@ const ReleasePreReleaseAccessPage = () => {
 
             <PreReleaseUserAccessForm
               releaseId={release.id}
+              isReleaseApproved={release.approvalStatus === 'Approved'}
               isReleaseLive={release.live}
             />
           </TabsSection>
@@ -101,7 +102,7 @@ const ReleasePreReleaseAccessPage = () => {
                   {
                     releaseName: release.releaseName,
                     timePeriodCoverage: release.timePeriodCoverage,
-                    typeId: release.type.id,
+                    type: release.type,
                     preReleaseAccessList,
                   },
                 );

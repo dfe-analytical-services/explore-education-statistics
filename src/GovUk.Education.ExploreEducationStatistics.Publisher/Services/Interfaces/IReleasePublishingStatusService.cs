@@ -1,0 +1,70 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
+
+namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces
+{
+    public interface IReleasePublishingStatusService
+    {
+        Task<ReleasePublishingStatus> CreateAsync(
+            Guid releaseId, 
+            Guid releaseStatusId, 
+            ReleasePublishingStatusState state, 
+            bool immediate,
+            IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null);
+
+        Task<ReleasePublishingStatus> GetAsync(Guid releaseId, Guid releaseStatusId);
+
+        Task<IEnumerable<ReleasePublishingStatus>> GetWherePublishingDueTodayWithStages(
+            ReleasePublishingStatusContentStage? content = null,
+            ReleasePublishingStatusDataStage? data = null,
+            ReleasePublishingStatusFilesStage? files = null,
+            ReleasePublishingStatusPublishingStage? publishing = null,
+            ReleasePublishingStatusOverallStage? overall = null);
+
+        Task<IEnumerable<ReleasePublishingStatus>> GetAllByOverallStage(
+            Guid releaseId, 
+            params ReleasePublishingStatusOverallStage[] overallStages);
+
+        Task<ReleasePublishingStatus> GetLatestAsync(Guid releaseId);
+
+        Task<bool> IsImmediate(Guid releaseId, Guid releaseStatusId);
+
+        Task UpdateStateAsync(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusState state);
+
+        Task UpdateStagesAsync(
+            Guid releaseId, 
+            Guid releaseStatusId, 
+            ReleasePublishingStatusContentStage? content = null,
+            ReleasePublishingStatusDataStage? data = null, 
+            ReleasePublishingStatusFilesStage? files = null,
+            ReleasePublishingStatusPublishingStage? publishing = null, 
+            ReleasePublishingStatusOverallStage? overall = null, 
+            ReleasePublishingStatusLogMessage logMessage = null);
+
+        Task UpdateContentStageAsync(
+            Guid releaseId, 
+            Guid releaseStatusId, 
+            ReleasePublishingStatusContentStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null);
+
+        Task UpdateDataStageAsync(
+            Guid releaseId, 
+            Guid releaseStatusId, 
+            ReleasePublishingStatusDataStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null);
+
+        Task UpdateFilesStageAsync(
+            Guid releaseId, 
+            Guid releaseStatusId, 
+            ReleasePublishingStatusFilesStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null);
+
+        Task UpdatePublishingStageAsync(
+            Guid releaseId, 
+            Guid releaseStatusId, 
+            ReleasePublishingStatusPublishingStage stage,
+            ReleasePublishingStatusLogMessage logMessage = null);
+    }
+}

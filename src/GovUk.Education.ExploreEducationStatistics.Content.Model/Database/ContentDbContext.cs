@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Newtonsoft.Json;
@@ -16,11 +17,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
     {
         public ContentDbContext()
         {
+            // We intentionally don't run `Configure` here as Moq would call this constructor
+            // and we'd immediately get a MockException from interacting with its fields
+            // e.g. from adding events listeners to `ChangeTracker`.
+            // We can just rely on the variants which take options instead as these
+            // are what get used in real application scenarios.
         }
 
-        public ContentDbContext(DbContextOptions<ContentDbContext> options)
-            : base(options)
+        public ContentDbContext(DbContextOptions<ContentDbContext> options) : base(options)
         {
+            Configure();
+        }
+
+        private void Configure()
+        {
+            ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
+            ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
         }
 
         public DbSet<Methodology> Methodologies { get; set; }
@@ -43,7 +55,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<HtmlBlock> HtmlBlocks { get; set; }
         public DbSet<MarkDownBlock> MarkDownBlocks { get; set; }
         public DbSet<MethodologyNote> MethodologyNotes { get; set; }
-        public DbSet<ReleaseType> ReleaseTypes { get; set; }
         public DbSet<Contact> Contacts { get; set; }
         public DbSet<ReleaseContentSection> ReleaseContentSections { get; set; }
         public DbSet<ReleaseContentBlock> ReleaseContentBlocks { get; set; }
@@ -124,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.Created)
                 .HasConversion(
-                    v => v, 
+                    v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
             modelBuilder.Entity<MethodologyVersion>()
@@ -162,13 +173,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<MethodologyNote>()
                 .Property(n => n.Updated)
                 .HasConversion(
-                    v => v, 
+                    v => v,
                     v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
             modelBuilder.Entity<MethodologyNote>()
                 .HasOne(m => m.UpdatedBy)
                 .WithMany()
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.NoAction)
+                .IsRequired(false);
 
             modelBuilder.Entity<Publication>()
                 .Property(p => p.LegacyPublicationUrl)
@@ -179,6 +191,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<Publication>()
                 .OwnsOne(p => p.ExternalMethodology)
                 .ToTable("ExternalMethodology");
+
+            modelBuilder.Entity<Publication>()
+                .Property(n => n.Published)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
+            modelBuilder.Entity<Publication>()
+                .Property(n => n.Updated)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasKey(pm => new {pm.PublicationId, pm.MethodologyId});
@@ -217,16 +241,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<Release>()
                 .HasQueryFilter(r => !r.SoftDeleted);
 
+            modelBuilder.Entity<Release>()
+                .Property(release => release.Type)
+                .HasConversion(new EnumToEnumValueConverter<ReleaseType>());
+
+            modelBuilder.Entity<Release>()
+                .HasIndex(release => release.Type);
+
             modelBuilder.Entity<ReleaseStatus>()
                 .Property(rs => rs.Created)
                 .HasConversion(
                     v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                    v => v.HasValue
+                        ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
+                        : (DateTime?) null);
 
             modelBuilder.Entity<ReleaseStatus>()
                 .HasOne(rs => rs.CreatedBy)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<ReleaseStatus>()
+                .Property(rs => rs.NotifiedOn)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue
+                        ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
+                        : (DateTime?) null);
 
             modelBuilder.Entity<ReleaseStatus>()
                 .Property(rs => rs.ApprovalStatus)
@@ -313,14 +354,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Query)
-                .HasColumnName("DataBlock_Query")
+                // TODO EES-3212 rename back to DataBlock_Query
+                .HasColumnName("DataBlock_QueryMigrated")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
 
+            // TODO EES-3212 remove these temporary fields related to the migration from Location codes to id's.
+            modelBuilder.Entity<DataBlock>()
+                .Property(block => block.TableHeaderCountChanged)
+                .HasColumnName("DataBlock_TableHeaderCountChanged")
+                .HasDefaultValue(false)
+                .IsRequired();
+            modelBuilder.Entity<DataBlock>()
+                .Property(block => block.LocationsMigrated)
+                .HasColumnName("DataBlock_LocationsMigrated")
+                .HasDefaultValue(true)
+                .IsRequired();
+
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Charts)
-                .HasColumnName("DataBlock_Charts")
+                // TODO EES-3212 rename back to DataBlock_Charts
+                .HasColumnName("DataBlock_ChartsMigrated")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<IChart>>(v));
@@ -334,7 +389,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Table)
-                .HasColumnName("DataBlock_Table")
+                // TODO EES-3212 rename this back to DataBlock_Table
+                .HasColumnName("DataBlock_TableMigrated")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v));
@@ -371,11 +427,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasConversion(new EnumToStringConverter<PublicationRole>());
 
             modelBuilder.Entity<UserReleaseRole>()
+                .Property(userReleaseRole => userReleaseRole.Created)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+
+            modelBuilder.Entity<UserReleaseRole>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<ReleaseRole>());
 
             modelBuilder.Entity<UserReleaseRole>()
-                .HasQueryFilter(r => !r.SoftDeleted);
+                .HasQueryFilter(r =>
+                    !r.SoftDeleted
+                    && r.Deleted == null);
 
             modelBuilder.Entity<UserReleaseInvite>()
                 .Property(r => r.Role)
@@ -384,22 +448,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<UserReleaseInvite>()
                 .HasQueryFilter(r => !r.SoftDeleted);
 
-            modelBuilder.Entity<ReleaseType>().HasData(
-                new ReleaseType
-                {
-                    Id = new Guid("9d333457-9132-4e55-ae78-c55cb3673d7c"),
-                    Title = "Official Statistics"
-                },
-                new ReleaseType
-                {
-                    Id = new Guid("1821abb8-68b0-431b-9770-0bea65d02ff0"),
-                    Title = "Ad Hoc"
-                },
-                new ReleaseType
-                {
-                    Id = new Guid("8becd272-1100-4e33-8a7d-1c0c4e3b42b8"),
-                    Title = "National Statistics"
-                });
+            modelBuilder.Entity<UserReleaseInvite>()
+                .Property(invite => invite.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
             modelBuilder.Entity<GlossaryEntry>()
                 .Property(rs => rs.Created)

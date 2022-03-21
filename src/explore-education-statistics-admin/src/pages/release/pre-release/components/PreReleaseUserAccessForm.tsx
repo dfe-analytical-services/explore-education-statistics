@@ -1,9 +1,11 @@
-import preReleaseUserService from '@admin/services/preReleaseUserService';
+import PreReleaseInvitePlanModal from '@admin/pages/release/pre-release/components/PreReleaseInvitePlanModal';
+import preReleaseUserService, {
+  PreReleaseInvitePlan,
+} from '@admin/services/preReleaseUserService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import Form from '@common/components/form/Form';
-import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import { Form, FormFieldTextArea } from '@common/components/form';
 import Gate from '@common/components/Gate';
 import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -14,30 +16,35 @@ import useToggle from '@common/hooks/useToggle';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 
 interface FormValues {
-  email: string;
+  emails: string;
 }
 
 const errorMappings = [
   mapFieldErrors<FormValues>({
-    target: 'email',
+    target: 'emails',
     messages: {
-      USER_ALREADY_EXISTS: 'User with this email already exists',
+      InvalidEmailAddress: 'Enter only @education.gov.uk email addresses',
+      NoInvitableEmails:
+        'All of the email addresses have already been invited or accepted',
     },
   }),
 ];
 
 interface Props {
   releaseId: string;
+  isReleaseApproved?: boolean;
   isReleaseLive?: boolean;
 }
 
 const formId = 'preReleaseUserAccessForm';
+const inviteLimit = 50;
 
 const PreReleaseUserAccessForm = ({
   releaseId,
+  isReleaseApproved = false,
   isReleaseLive = false,
 }: Props) => {
   const [isRemoving, toggleRemoving] = useToggle(false);
@@ -51,18 +58,42 @@ const PreReleaseUserAccessForm = ({
     releaseId,
   ]);
 
-  const handleSubmit = useFormSubmit<FormValues>(async (values, actions) => {
-    const newUser = await preReleaseUserService.inviteUser(
-      releaseId,
-      values.email,
+  const [invitePlan, setInvitePlan] = useState<PreReleaseInvitePlan>();
+
+  const splitAndTrimLines = (input: string) =>
+    input
+      .split(/\r\n|\r|\n/)
+      .map(line => line.trim())
+      .filter(line => line);
+
+  const handleSubmit = useFormSubmit<FormValues>(async values => {
+    setInvitePlan(
+      await preReleaseUserService.getInvitePlan(
+        releaseId,
+        splitAndTrimLines(values.emails),
+      ),
     );
-
-    setUsers({
-      value: [...users, newUser],
-    });
-
-    actions.resetForm();
   }, errorMappings);
+
+  const handleModalSubmit = useFormSubmit<FormValues>(
+    async (values, actions) => {
+      const newUsers = await preReleaseUserService.inviteUsers(
+        releaseId,
+        splitAndTrimLines(values.emails),
+      );
+
+      setUsers({
+        value: [...users, ...newUsers],
+      });
+
+      actions.resetForm();
+    },
+    errorMappings,
+  );
+
+  const handleModalCancel = useCallback(() => {
+    setInvitePlan(undefined);
+  }, []);
 
   if (error) {
     return <WarningMessage>Could not load pre-release users</WarningMessage>;
@@ -81,28 +112,43 @@ const PreReleaseUserAccessForm = ({
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
-            email: '',
+            emails: '',
           }}
           validationSchema={Yup.object<FormValues>({
-            email: Yup.string()
-              .required('Enter an email address')
-              .email('Enter a valid @education.gov.uk email address')
+            emails: Yup.string()
+              .trim()
+              .required('Enter 1 or more email addresses')
               .test({
-                name: 'email format',
-                message: 'Enter a valid @education.gov.uk email address',
+                name: 'number of lines',
+                message: `Enter between 1 and ${inviteLimit} lines of email addresses`,
                 test: (value: string) => {
                   if (value) {
-                    if (
-                      value ===
-                      'simulate-delivered@notifications.service.gov.uk'
-                    ) {
-                      return true;
-                    }
-                    const emailSegments = value.split('@');
-                    return (
-                      emailSegments.length === 2 &&
-                      emailSegments[1] === 'education.gov.uk'
-                    );
+                    const numOfLines = (value.match(/^\s*\S/gm) || '').length;
+                    return numOfLines <= inviteLimit;
+                  }
+                  return true;
+                },
+              })
+              .test({
+                name: 'email format',
+                message: 'Enter only @education.gov.uk email addresses',
+                test: (value: string) => {
+                  if (value) {
+                    const emails = splitAndTrimLines(value);
+                    return emails.every(email => {
+                      if (
+                        /^simulate-delivered(?:-[1-3])?@notifications.service.gov.uk$/i.test(
+                          email,
+                        )
+                      ) {
+                        return true;
+                      }
+                      const emailSegments = email.split('@');
+                      return (
+                        emailSegments.length === 2 &&
+                        emailSegments[1] === 'education.gov.uk'
+                      );
+                    });
                   }
                   return false;
                 },
@@ -112,10 +158,12 @@ const PreReleaseUserAccessForm = ({
         >
           {form => (
             <Form id={formId}>
-              <FormFieldTextInput<FormValues>
-                label="Invite new user by email"
-                name="email"
+              <FormFieldTextArea<FormValues>
+                label="Invite new users by email"
+                name="emails"
                 className="govuk-!-width-one-third"
+                hint={`Invite up to ${inviteLimit} users at a time. Enter each email address on a new line.`}
+                rows={15}
               />
 
               <ButtonGroup>
@@ -123,9 +171,24 @@ const PreReleaseUserAccessForm = ({
                   type="submit"
                   disabled={form.isSubmitting || isRemoving}
                 >
-                  {form.isSubmitting ? 'Inviting new user' : 'Invite new user'}
+                  {form.isSubmitting
+                    ? 'Inviting new users'
+                    : 'Invite new users'}
                 </Button>
               </ButtonGroup>
+
+              {invitePlan && (
+                <PreReleaseInvitePlanModal
+                  isReleaseApproved={isReleaseApproved}
+                  invitePlan={invitePlan}
+                  onConfirm={() => {
+                    handleModalSubmit(form.values, form);
+                    setInvitePlan(undefined);
+                  }}
+                  onCancel={handleModalCancel}
+                  onExit={handleModalCancel}
+                />
+              )}
             </Form>
           )}
         </Formik>

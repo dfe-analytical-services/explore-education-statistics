@@ -75,9 +75,15 @@ describe('TableToolPage', () => {
             decimalPlaces: 0,
           },
         ],
-        locations: [
-          { level: 'country', label: 'Great Britain', value: 'K03000001' },
-        ],
+        locations: {
+          country: [
+            {
+              id: '26100e90-c8c5-43a5-9999-296d402f02fb',
+              label: 'Great Britain',
+              value: 'K03000001',
+            },
+          ],
+        },
         boundaryLevels: [
           {
             id: 1,
@@ -94,9 +100,7 @@ describe('TableToolPage', () => {
         {
           filters: ['72303947-27a4-4ea2-a708-dfeb7bb31efb'],
           geographicLevel: 'country',
-          location: {
-            country: { code: 'K03000001', name: 'Great Britain' },
-          },
+          locationId: '26100e90-c8c5-43a5-9999-296d402f02fb',
           measures: {
             '0e8f9198-ce65-40ac-662a-08d9097c4255': '2',
             'e5174cb8-02f6-48d3-662e-08d9097c4255': '20.00%',
@@ -106,9 +110,7 @@ describe('TableToolPage', () => {
         {
           filters: ['0164a10e-c041-49f8-b44d-daa6f0c1fbfd'],
           geographicLevel: 'country',
-          location: {
-            country: { code: 'K03000001', name: 'Great Britain' },
-          },
+          locationId: '26100e90-c8c5-43a5-9999-296d402f02fb',
           measures: {
             '0e8f9198-ce65-40ac-662a-08d9097c4255': '2',
             'e5174cb8-02f6-48d3-662e-08d9097c4255': '60.00%',
@@ -134,7 +136,7 @@ describe('TableToolPage', () => {
         'e5174cb8-02f6-48d3-662e-08d9097c4255',
         '0e8f9198-ce65-40ac-662a-08d9097c4255',
       ],
-      locations: { country: ['K03000001'] },
+      locationIds: ['26100e90-c8c5-43a5-9999-296d402f02fb'],
       includeGeoJson: false,
     },
   };
@@ -267,9 +269,14 @@ describe('TableToolPage', () => {
     },
     locations: {
       country: {
-        hint: '',
         legend: 'National',
-        options: [{ label: 'Great Britain', value: 'K03000001' }],
+        options: [
+          {
+            id: '26100e90-c8c5-43a5-9999-296d402f02fb',
+            label: 'Great Britain',
+            value: 'K03000001',
+          },
+        ],
       },
     },
     timePeriod: {
@@ -294,7 +301,7 @@ describe('TableToolPage', () => {
               id: testPublicationId,
               title: 'Test publication',
               slug: 'test-publication',
-              summary: '',
+              type: 'NationalAndOfficial',
             },
           ],
         },

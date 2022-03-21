@@ -1,26 +1,26 @@
+#nullable enable
 using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta
 {
-    public class ResultSubjectMetaViewModel
+    public record ResultSubjectMetaViewModel
     {
-        public Dictionary<string, FilterMetaViewModel> Filters { get; set; }
+        public Dictionary<string, FilterMetaViewModel> Filters { get; init; } = new();
 
-        public IEnumerable<FootnoteViewModel> Footnotes { get; set; }
+        public List<FootnoteViewModel> Footnotes { get; init; } = new();
 
-        public IEnumerable<IndicatorMetaViewModel> Indicators { get; set; }
+        public List<IndicatorMetaViewModel> Indicators { get; init; } = new();
 
-        public IEnumerable<ObservationalUnitMetaViewModel> Locations { get; set; }
+        public Dictionary<string, List<LocationAttributeViewModel>> Locations { get; set; } = new();
 
-        public IEnumerable<BoundaryLevelIdLabel> BoundaryLevels { get; set; }
+        public List<BoundaryLevelViewModel> BoundaryLevels { get; init; } = new();
 
-        public string PublicationName { get; set; }
+        public string PublicationName { get; init; } = string.Empty;
 
-        public string SubjectName { get; set; }
+        public string SubjectName { get; init; } = string.Empty;
 
-        public IEnumerable<TimePeriodMetaViewModel> TimePeriodRange { get; set; }
+        public List<TimePeriodMetaViewModel> TimePeriodRange { get; init; } = new();
 
-        public bool GeoJsonAvailable { get; set; }
+        public bool GeoJsonAvailable { get; init; }
     }
 }

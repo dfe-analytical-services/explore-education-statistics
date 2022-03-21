@@ -1,5 +1,8 @@
 import { ReleaseStatusPermissions } from '@admin/services/permissionService';
-import { Release } from '@admin/services/releaseService';
+import {
+  Release,
+  ReleaseChecklistErrorCode,
+} from '@admin/services/releaseService';
 import { createServerValidationErrorMock } from '@common-test/createAxiosErrorMock';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { format } from 'date-fns';
@@ -24,10 +27,7 @@ describe('ReleaseStatusForm', () => {
     publicationSlug: 'publication-1-slug',
     timePeriodCoverage: { value: 'W51', label: 'Week 51' },
     title: 'Release Title',
-    type: {
-      id: 'type-1',
-      title: 'Official Statistics',
-    },
+    type: 'OfficialStatistics',
     contact: {
       id: 'contact-1',
       teamName: 'Test name',
@@ -560,34 +560,72 @@ describe('ReleaseStatusForm', () => {
       });
     });
 
-    test('shows mapped server validation error from failed `onSubmit`', async () => {
-      const handleSubmit = jest.fn().mockImplementation(() => {
-        throw createServerValidationErrorMock([
-          'PUBLIC_META_GUIDANCE_REQUIRED',
-        ]);
-      });
+    ReleaseChecklistErrorCode.forEach(checklistError => {
+      test(`shows generic checklist error message from failed \`onSubmit\` with \`${checklistError}\` error code`, async () => {
+        const handleSubmit = jest.fn().mockImplementation(() => {
+          throw createServerValidationErrorMock([checklistError]);
+        });
 
-      render(
-        <ReleaseStatusForm
-          release={testRelease}
-          statusPermissions={testStatusPermissions}
-          onCancel={noop}
-          onSubmit={handleSubmit}
-        />,
-      );
+        render(
+          <ReleaseStatusForm
+            release={testRelease}
+            statusPermissions={testStatusPermissions}
+            onCancel={noop}
+            onSubmit={handleSubmit}
+          />,
+        );
 
-      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+        userEvent.click(screen.getByRole('button', { name: 'Update status' }));
 
-      await waitFor(() => {
-        expect(screen.getByText('There is a problem')).toBeInTheDocument();
-        expect(
-          screen.getByRole('link', {
-            name:
-              'All public metadata guidance must be populated before the release can be approved',
-          }),
-        ).toBeInTheDocument();
+        await waitFor(() => {
+          expect(screen.getByText('There is a problem')).toBeInTheDocument();
+        });
+
+        const errorLink = screen.getByRole('link', {
+          name: 'Resolve all errors in the publishing checklist',
+        });
+
+        expect(errorLink).toHaveAttribute(
+          'href',
+          '#releaseStatusForm-approvalStatus',
+        );
       });
     });
+
+    test(
+      'shows fallback error message mapped to `approvalStatus` field when receiving unmapped server ' +
+        'validation error from failed `onSubmit`',
+      async () => {
+        const handleSubmit = jest.fn().mockImplementation(() => {
+          throw createServerValidationErrorMock(['UnexpectedError']);
+        });
+
+        render(
+          <ReleaseStatusForm
+            release={testRelease}
+            statusPermissions={testStatusPermissions}
+            onCancel={noop}
+            onSubmit={handleSubmit}
+          />,
+        );
+
+        userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+
+        await waitFor(() => {
+          expect(screen.getByText('There is a problem')).toBeInTheDocument();
+        });
+
+        const errorLink = screen.getByRole('link', {
+          name:
+            'There was a problem updating the approval status of this release',
+        });
+
+        expect(errorLink).toHaveAttribute(
+          'href',
+          '#releaseStatusForm-approvalStatus',
+        );
+      },
+    );
 
     test('submits successfully with updated values and Draft status', async () => {
       const handleSubmit = jest.fn();
@@ -644,6 +682,7 @@ describe('ReleaseStatusForm', () => {
           release={{
             ...testRelease,
             approvalStatus: 'Approved',
+            notifySubscribers: true,
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -680,6 +719,7 @@ describe('ReleaseStatusForm', () => {
       const expectedValues: ReleaseStatusFormValues = {
         latestInternalReleaseNote: 'Test release note',
         approvalStatus: 'Approved',
+        notifySubscribers: true,
         publishScheduled: new Date('2022-10-10'),
         publishMethod: 'Scheduled',
         nextReleaseDate: {
@@ -708,6 +748,7 @@ describe('ReleaseStatusForm', () => {
           release={{
             ...testRelease,
             approvalStatus: 'Approved',
+            notifySubscribers: true,
           }}
           statusPermissions={testStatusPermissions}
           onCancel={noop}
@@ -736,11 +777,62 @@ describe('ReleaseStatusForm', () => {
       const expectedValues: ReleaseStatusFormValues = {
         latestInternalReleaseNote: 'Test release note',
         approvalStatus: 'Approved',
+        notifySubscribers: true,
         publishMethod: 'Immediate',
         nextReleaseDate: {
           month: 5,
           year: 2021,
         },
+      };
+
+      await waitFor(() => {
+        expect(handleSubmit).toHaveBeenCalledWith(expectedValues);
+      });
+    });
+
+    test('Amendment should have "Notify subscribers by email" checkbox', async () => {
+      const handleSubmit = jest.fn();
+
+      render(
+        <ReleaseStatusForm
+          release={{
+            ...testRelease,
+            approvalStatus: 'Approved',
+            amendment: true,
+            notifySubscribers: true,
+          }}
+          statusPermissions={testStatusPermissions}
+          onCancel={noop}
+          onSubmit={handleSubmit}
+        />,
+      );
+
+      await userEvent.type(
+        screen.getByLabelText('Internal note'),
+        'Test release note',
+      );
+
+      expect(
+        screen.getByLabelText('Notify subscribers by email'),
+      ).toBeChecked();
+
+      userEvent.click(screen.getByLabelText('Notify subscribers by email'));
+
+      expect(
+        screen.getByLabelText('Notify subscribers by email'),
+      ).not.toBeChecked();
+
+      userEvent.click(screen.getByLabelText('Immediately'));
+
+      expect(handleSubmit).not.toHaveBeenCalled();
+
+      userEvent.click(screen.getByRole('button', { name: 'Update status' }));
+
+      const expectedValues: ReleaseStatusFormValues = {
+        latestInternalReleaseNote: 'Test release note',
+        approvalStatus: 'Approved',
+        notifySubscribers: false,
+        publishMethod: 'Immediate',
       };
 
       await waitFor(() => {

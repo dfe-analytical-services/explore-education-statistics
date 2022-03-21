@@ -29,15 +29,29 @@ export default function groupResultMeasuresByCombination(
   excludedFilterIds: string[] = [],
 ): Dictionary<unknown> {
   return results.reduce<MeasuresGroupedByDataSet>((acc, result) => {
-    const { geographicLevel, filters, timePeriod, location, measures } = result;
+    const {
+      geographicLevel,
+      filters,
+      timePeriod,
+      locationId,
+      location,
+      measures,
+    } = result;
+
+    // Default to using the code in the legacy 'location' field that exists for historical Permalinks created prior to EES-2955.
+    // Note that EES-3203 added 'locationId' to table results before EES-2955 switched over to using location id's
+    // and removed 'location'.
+    // The presence of a location id doesn't mean the code should be ignored.
+    const locationCodeOrId =
+      (location && location[geographicLevel]?.code) || locationId;
 
     const path = getIndicatorPath({
       filters,
       timePeriod,
       indicator: '',
-      location: location[geographicLevel]
+      location: locationCodeOrId
         ? {
-            value: location[geographicLevel].code,
+            value: locationCodeOrId,
             level: geographicLevel,
           }
         : undefined,

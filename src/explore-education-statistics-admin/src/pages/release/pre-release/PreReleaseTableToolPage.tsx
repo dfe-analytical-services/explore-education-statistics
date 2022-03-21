@@ -84,7 +84,7 @@ const PreReleaseTableToolPage = ({
         subjectId: '',
         indicators: [],
         filters: [],
-        locations: {},
+        locationIds: [],
       },
     };
   }, [publicationId, releaseId, dataBlockId]);

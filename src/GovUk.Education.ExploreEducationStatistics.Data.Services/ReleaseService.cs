@@ -28,7 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IUserService _userService;
-        private readonly IMetaGuidanceSubjectService _metaGuidanceSubjectService;
+        private readonly IDataGuidanceSubjectService _dataGuidanceSubjectService;
+        private readonly ITimePeriodService _timePeriodService;
         private readonly IReleaseService.IBlobInfoGetter _blobInfoGetter;
 
         public ReleaseService(
@@ -36,14 +37,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             StatisticsDbContext statisticsDbContext,
             IUserService userService,
-            IMetaGuidanceSubjectService metaGuidanceSubjectService,
+            IDataGuidanceSubjectService dataGuidanceSubjectService,
+            ITimePeriodService timePeriodService,
             IReleaseService.IBlobInfoGetter blobInfoGetter)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
             _statisticsDbContext = statisticsDbContext;
             _userService = userService;
-            _metaGuidanceSubjectService = metaGuidanceSubjectService;
+            _dataGuidanceSubjectService = dataGuidanceSubjectService;
+            _timePeriodService = timePeriodService;
             _blobInfoGetter = blobInfoGetter;
         }
 
@@ -67,7 +70,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return new List<SubjectViewModel>();
             }
 
-            var releaseSubjects = await _statisticsDbContext.ReleaseSubject
+            var releaseSubjects = await _statisticsDbContext
+                .ReleaseSubject
+                .AsQueryable()
                 .Where(rs => rs.ReleaseId == releaseId && subjectsToInclude.Contains(rs.SubjectId))
                 .ToListAsync();
 
@@ -86,9 +91,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         return new SubjectViewModel(
                             id: rs.SubjectId,
                             name: await GetSubjectName(releaseId, rs.SubjectId),
-                            content: rs.MetaGuidance,
-                            timePeriods: await _metaGuidanceSubjectService.GetTimePeriods(rs.SubjectId),
-                            geographicLevels: await _metaGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
+                            content: rs.DataGuidance,
+                            timePeriods: _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
+                            geographicLevels: await _dataGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
                             file: blobInfo is null
                                 ? releaseFile.ToPublicFileInfoNotFound()
                                 : releaseFile.ToFileInfo(blobInfo)

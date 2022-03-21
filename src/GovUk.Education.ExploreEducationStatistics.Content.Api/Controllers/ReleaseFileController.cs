@@ -48,27 +48,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [ResponseCache(Duration = 300)]
-        [HttpGet("releases/{releaseId}/files/all")]
-        public async Task<ActionResult> StreamAll(string releaseId)
-        {
-            if (Guid.TryParse(releaseId, out var releaseGuid))
-            {
-                return await _persistenceHelper.CheckEntityExists<Release>(releaseGuid)
-                    .OnSuccessDo(release => this.CacheWithLastModified(release.Published))
-                    .OnSuccess(release => _releaseFileService.StreamAllFilesZip(release.Id))
-                    .OnSuccessDo(result => this.CacheWithETag(result.FileStream.ComputeMd5Hash()))
-                    .HandleFailures();
-            }
-
-            return NotFound();
-        }
-
-        [ResponseCache(Duration = 300)]
-        [HttpGet("releases/{releaseId}/files")]
+        [HttpGet("releases/{releaseId:guid}/files")]
         [Produces(MediaTypeNames.Application.Octet)]
         public async Task StreamFilesToZip(
             Guid releaseId,
-            [FromQuery] IList<Guid> fileIds)
+            [FromQuery] IList<Guid>? fileIds = null)
         {
             await _persistenceHelper.CheckEntityExists<Release>(
                     releaseId,
@@ -78,12 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .OnSuccess(
                     async release =>
                     {
-                        // Create a hash just so that we have some uniqueness
-                        // to attach to the end of the file name.
-                        var fileIdsHash = GetFileIdsHash(fileIds);
-                        var filename = $"{release.Publication.Slug}_{release.Slug}_{fileIdsHash}.zip";
-
-                        Response.Headers.Add(HeaderNames.ContentDisposition, $"attachment; filename={filename}");
+                        var filename = $"{release.Publication.Slug}_{release.Slug}.zip";
+                        Response.Headers.Add(HeaderNames.ContentDisposition, @$"attachment; filename=""{filename}""");
                         Response.Headers.Add(HeaderNames.ContentType, MediaTypeNames.Application.Octet);
 
                         // We start the response immediately, before all of the files have
@@ -93,8 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                         // to spend time waiting for the download to initiate.
                         return await _releaseFileService.ZipFilesToStream(
                             releaseId: releaseId,
-                            fileIds: fileIds,
                             outputStream: Response.BodyWriter.AsStream(),
+                            fileIds: fileIds,
                             cancellationToken: HttpContext.RequestAborted
                         );
                     }
@@ -113,14 +93,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                     }
                 );
 
-        }
-
-        private static string GetFileIdsHash(IList<Guid> fileIds)
-        {
-            return fileIds.Select(id => id.ToString())
-                .OrderBy(id => id)
-                .JoinToString(',')
-                .ToMd5Hash();
         }
     }
 }

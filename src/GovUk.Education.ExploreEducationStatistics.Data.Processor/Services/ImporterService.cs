@@ -17,13 +17,13 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils.ImporterUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
     public class ImporterService : IImporterService
     {
         private readonly IGuidGenerator _guidGenerator;
+        private readonly ImporterMemoryCache _memoryCache;
         private readonly ImporterLocationService _importerLocationService;
         private readonly ImporterFilterService _importerFilterService;
         private readonly IImporterMetaService _importerMetaService;
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         private const int Stage2RowCheck = 1000;
 
         private static readonly Dictionary<GeographicLevel, string[]> ColumnValues =
-            new Dictionary<GeographicLevel, string[]>
+            new()
             {
                 {
                     GeographicLevel.Country,
@@ -103,6 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
         public ImporterService(
             IGuidGenerator guidGenerator,
+            ImporterMemoryCache memoryCache,
             ImporterFilterService importerFilterService,
             ImporterLocationService importerLocationService,
             IImporterMetaService importerMetaService,
@@ -110,6 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             ILogger<ImporterService> logger)
         {
             _guidGenerator = guidGenerator;
+            _memoryCache = memoryCache;
             _importerFilterService = importerFilterService;
             _importerLocationService = importerLocationService;
             _importerMetaService = importerMetaService;
@@ -127,20 +129,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return _importerMetaService.Get(table.Columns, table.Rows, subject, context);
         }
 
-        public async Task ImportFiltersAndLocations(DataImport dataImport,
+        public async Task ImportFiltersAndLocations(
+            DataImport dataImport,
             DataColumnCollection cols,
             DataRowCollection rows,
             SubjectMeta subjectMeta,
             StatisticsDbContext context)
         {
             // Clearing the caches is required here as the seeder shares the cache with all subjects
-            _importerFilterService.ClearCache();
-            _importerLocationService.ClearCache();
+            _memoryCache.Clear();
 
             var colValues = CsvUtil.GetColumnValues(cols);
             var rowCount = 1;
             var totalRows = rows.Count;
-            var hasSoloAllowedGeographicLevel = HasSoloAllowedGeographicLevel(dataImport.GeographicLevels);
+            var soleGeographicLevel = dataImport.HasSoleGeographicLevel();
 
             foreach (DataRow row in rows)
             {
@@ -161,8 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
 
                 var rowValues = CsvUtil.GetRowValues(row);
-                var rowGeographicLevel = GetGeographicLevel(rowValues, colValues);
-                if (hasSoloAllowedGeographicLevel || AllowRowImport(rowGeographicLevel))
+                if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))
                 {
                     CreateFiltersAndLocationsFromCsv(context, rowValues, colValues, subjectMeta.Filters);
                 }
@@ -171,41 +172,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             }
         }
 
-        public async Task ImportObservations(DataColumnCollection cols, DataRowCollection rows, Subject subject,
-            SubjectMeta subjectMeta, HashSet<GeographicLevel> subjectGeographicLevels, int batchNo, int rowsPerBatch, StatisticsDbContext context)
+        public async Task ImportObservations(
+            DataImport import,
+            DataColumnCollection cols,
+            DataRowCollection rows,
+            Subject subject,
+            SubjectMeta subjectMeta, 
+            int batchNo,
+            StatisticsDbContext context)
         {
-            _importerFilterService.ClearCache();
-            _importerLocationService.ClearCache();
+            _memoryCache.Clear();
 
             var observations = GetObservations(
+                import,
                 context,
                 rows,
                 CsvUtil.GetColumnValues(cols),
                 subject,
                 subjectMeta,
-                subjectGeographicLevels,
-                batchNo,
-                rowsPerBatch).ToList();
+                batchNo).ToList();
 
             await InsertObservations(context, observations);
-        }
-
-        public GeographicLevel GetGeographicLevel(IReadOnlyList<string> rowValues, List<string> colValues)
-        {
-            return GetGeographicLevelFromString(CsvUtil.Value(rowValues, colValues, "geographic_level"));
-        }
-
-        private static GeographicLevel GetGeographicLevelFromString(string value)
-        {
-            foreach (GeographicLevel val in Enum.GetValues(typeof(GeographicLevel)))
-            {
-                if (val.GetEnumLabel().ToLower().Equals(value.ToLower()))
-                {
-                    return val;
-                }
-            }
-
-            throw new InvalidGeographicLevelException(value);
         }
 
         public TimeIdentifier GetTimeIdentifier(IReadOnlyList<string> rowValues, List<string> colValues)
@@ -234,32 +221,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         }
 
         private IEnumerable<Observation> GetObservations(
+            DataImport import,
             StatisticsDbContext context,
             DataRowCollection rows,
             List<string> colValues,
             Subject subject,
             SubjectMeta subjectMeta,
-            HashSet<GeographicLevel> subjectGeographicLevels,
-            int batchNo,
-            int rowsPerBatch
-        )
+            int batchNo)
         {
             var observations = new List<Observation>();
             var i = 0;
-            var hasSoloAllowedGeographicLevel = HasSoloAllowedGeographicLevel(subjectGeographicLevels);
+            var soleGeographicLevel = import.HasSoleGeographicLevel();
 
             foreach (DataRow row in rows)
             {
-                var o = ObservationFromCsv(
-                    context,
-                    CsvUtil.GetRowValues(row).ToArray(),
-                    colValues,
-                    subject,
-                    subjectMeta,
-                    ((batchNo - 1) * rowsPerBatch) + i++ + 2);
+                var rowValues = CsvUtil.GetRowValues(row).ToArray();
+                var geographicLevel = CsvUtil.GetGeographicLevel(rowValues, colValues);
 
-                if (hasSoloAllowedGeographicLevel || AllowRowImport(o.GeographicLevel))
+                if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))
                 {
+                    var o = ObservationFromCsv(
+                        context,
+                        rowValues,
+                        colValues,
+                        geographicLevel,
+                        subject,
+                        subjectMeta,
+                        ((batchNo - 1) * import.RowsPerBatch) + i++ + 2);
                     observations.Add(o);
                 }
             }
@@ -271,6 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             StatisticsDbContext context,
             string[] rowValues,
             List<string> colValues,
+            GeographicLevel geographicLevel,
             Subject subject,
             SubjectMeta subjectMeta,
             int csvRowNum)
@@ -281,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 Id = observationId,
                 FilterItems = GetFilterItems(context, rowValues, colValues, subjectMeta.Filters, observationId),
-                GeographicLevel = GetGeographicLevel(rowValues, colValues),
+                GeographicLevel = geographicLevel,
                 LocationId = GetLocationIdOrCreate(rowValues, colValues, context),
                 Measures = GetMeasures(rowValues, colValues, subjectMeta.Indicators),
                 SubjectId = subject.Id,
@@ -344,6 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         {
             return _importerLocationService.FindOrCreate(
                 context,
+                CsvUtil.GetGeographicLevel(rowValues, colValues),
                 GetCountry(rowValues, colValues),
                 GetEnglishDevolvedArea(rowValues, colValues),
                 GetInstitution(rowValues, colValues),
@@ -354,13 +344,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 GetMultiAcademyTrust(rowValues, colValues),
                 GetOpportunityArea(rowValues, colValues),
                 GetParliamentaryConstituency(rowValues, colValues),
+                GetPlanningArea(rowValues, colValues),
                 GetProvider(rowValues, colValues),
                 GetRegion(rowValues, colValues),
                 GetRscRegion(rowValues, colValues),
                 GetSchool(rowValues, colValues),
                 GetSponsor(rowValues, colValues),
-                GetWard(rowValues, colValues),
-                GetPlanningArea(rowValues, colValues)
+                GetWard(rowValues, colValues)
             ).Id;
         }
 

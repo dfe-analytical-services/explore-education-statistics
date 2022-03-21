@@ -1,15 +1,20 @@
 /**
  * Find elements that match the given
  * {@param text} and a {@param selector}.
- * Elements can also be matched by lower cased
- * text content if {@param useLowerCase} is true.
+ *
+ * Additional options can be supplied via {@param options}.
  */
 export default function findAllByText<T extends HTMLElement = HTMLElement>(
   text: string,
   selector: string,
-  useLowerCase = false,
+  options?: {
+    rootElement?: Element;
+    useLowerCase?: boolean;
+  },
 ): T[] {
-  return Array.from(document.querySelectorAll(selector)).filter(element => {
+  const { rootElement = document, useLowerCase = false } = options ?? {};
+
+  return Array.from(rootElement.querySelectorAll(selector)).filter(element => {
     const searchText = useLowerCase
       ? (element.textContent || '').toLocaleLowerCase()
       : element.textContent || '';

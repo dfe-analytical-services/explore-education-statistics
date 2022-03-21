@@ -61,8 +61,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
             var blob = new BlobInfo(
-                path: null,
-                size: null,
+                path: string.Empty,
+                size: string.Empty,
                 contentType: "image/png",
                 contentLength: 0L,
                 meta: null,
@@ -254,7 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.NotNull(releaseFile);
-                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile.File.Created.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile.File.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, releaseFile.File.CreatedById);
             }
 

@@ -6,6 +6,7 @@ Resource            ../../../libs/admin/analyst/role_ui_permissions.robot
 
 Suite Setup         user signs in as analyst1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev
 
@@ -31,8 +32,8 @@ Navigate back to admin dashboard for publication
     user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
 Check cannot create an amendment of a published release
-    ${details}=    user gets details content element    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)
-    ...    ${publication_accordion}    30
+    ${details}=    user opens details dropdown    ${PUBLISHED_RELEASE_TYPE} (Live - Latest release)
+    ...    ${publication_accordion}
     user cannot see the create amendment controls for release    ${details}
 
 Check cannot edit the release status of a Draft Release

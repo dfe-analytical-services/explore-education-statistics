@@ -27,17 +27,12 @@ const KeyStatSelectForm = ({
 
   const keyStatDataBlocks = useMemo(() => {
     return availableDataBlocks.filter(dataBlock => {
-      const { timePeriod, locations, indicators } = dataBlock.query;
-
-      const locationLevels = Object.values(locations);
-
-      const hasSingleLocation =
-        locationLevels.length === 1 && locationLevels[0].length === 1;
+      const { indicators, locationIds, timePeriod } = dataBlock.query;
 
       return (
         indicators.length === 1 &&
-        timePeriod?.startYear === timePeriod?.endYear &&
-        hasSingleLocation
+        locationIds.length === 1 &&
+        timePeriod?.startYear === timePeriod?.endYear
         // NOTE(mark): No check for number of filters because they cannot tell us whether
         // there is a single result
       );
@@ -69,8 +64,8 @@ const KeyStatSelectForm = ({
     <>
       <FormSelect
         className="govuk-!-margin-right-1"
-        id="id"
-        name="key_indicator_select"
+        id="keyIndicatorSelect"
+        name="selectedDataBlock"
         label={label}
         value={selectedDataBlockId}
         onChange={e => setSelectedDataBlockId(e.target.value)}

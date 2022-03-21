@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -53,20 +52,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task StreamAllFilesZip()
-        {
-            await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(Release, ContentSecurityPolicies.CanViewSpecificRelease)
-                .AssertForbidden(
-                    userService =>
-                    {
-                        var service = BuildReleaseFileService(userService: userService.Object);
-                        return service.StreamAllFilesZip(Release.Id);
-                    }
-                );
-        }
-
-        [Fact]
         public async Task ZipFilesToStream()
         {
             await PolicyCheckBuilder<ContentSecurityPolicies>()
@@ -77,8 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         var service = BuildReleaseFileService(userService: userService.Object);
                         return service.ZipFilesToStream(
                             releaseId: Release.Id,
-                            fileIds: ListOf(Guid.NewGuid()),
-                            outputStream: Stream.Null
+                            outputStream: Stream.Null,
+                            fileIds: ListOf(Guid.NewGuid())
                         );
                     }
                 );
@@ -96,8 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 blobStorageService ?? Mock.Of<IBlobStorageService>(),
                 dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
-                userService ?? Mock.Of<IUserService>(),
-                Mock.Of<ILogger<ReleaseFileService>>()
+                userService ?? Mock.Of<IUserService>()
             );
         }
 

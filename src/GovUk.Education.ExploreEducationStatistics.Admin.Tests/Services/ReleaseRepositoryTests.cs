@@ -12,7 +12,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -275,7 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var statsRelease = await statisticsDbContext.Release.FindAsync(release.Id);
                 Assert.NotNull(statsRelease);
-                Assert.Equal(release.Published, statsRelease.Published);
+                Assert.Equal(release.Published, statsRelease!.Published);
                 Assert.Equal(release.Slug, statsRelease.Slug);
                 Assert.Equal(release.PublicationId, statsRelease.PublicationId);
                 Assert.Equal(release.TimePeriodCoverage, statsRelease.TimeIdentifier);
@@ -390,6 +390,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(releaseSubjects);
                 Assert.Equal(subjects[0].Id, releaseSubjects[0].SubjectId);
                 Assert.Equal(release.Id, releaseSubjects[0].ReleaseId);
+            }
+        }
+
+        [Fact]
+        public async Task GetAllReleaseVersionIds()
+        {
+            var originalRelease = new Release();
+
+            var amendedRelease1 = new Release
+            {
+                PreviousVersion = originalRelease,
+            };
+
+            var amendedRelease2 = new Release
+            {
+                PreviousVersion = amendedRelease1,
+            };
+
+            var ignoredRelease = new Release();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(
+                    originalRelease, amendedRelease1, amendedRelease2, ignoredRelease);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseRepository = BuildReleaseRepository(contentDbContext: contentDbContext);
+                var result = await releaseRepository.GetAllReleaseVersionIds(amendedRelease2);
+                Assert.Equal(3, result.Count);
+
+                Assert.Contains(originalRelease.Id, result);
+                Assert.Contains(amendedRelease1.Id, result);
+                Assert.Contains(amendedRelease2.Id, result);
+            }
+        }
+
+        [Fact]
+        public async Task GetAllReleaseVersionIds_SingleResult()
+        {
+            var originalRelease = new Release();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(originalRelease);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseRepository = BuildReleaseRepository(contentDbContext: contentDbContext);
+                var result = await releaseRepository.GetAllReleaseVersionIds(originalRelease);
+                Assert.Single(result);
+
+                Assert.Contains(originalRelease.Id, result);
             }
         }
 

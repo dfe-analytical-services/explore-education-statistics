@@ -8,6 +8,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - create methodology amendment publication %{RUN_IDENTIFIER}
@@ -18,7 +19,7 @@ Create publicly accessible Publication
     user create test release via api    ${PUBLICATION_ID}    AY    2021
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    Academic Year 2021/22 (not Live)
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 Create Methodology with some content and images
     user creates methodology for publication    ${PUBLICATION_NAME}
@@ -97,7 +98,7 @@ Verify the summary for the original Methodology is as expected
     user views methodology for publication
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - first methodology version
-    ...    View this methodology
+    ...    View methodology
     user verifies methodology summary details
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - first methodology version
@@ -118,7 +119,7 @@ Edit the Amendment's summary to return the Methodology's title to the same as it
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME} - first methodology version
     ...    ${PUBLICATION_NAME}
-    ...    Edit this amendment
+    ...    Edit amendment
     user verifies methodology summary details
     ...    ${PUBLICATION_NAME}
     ...    ${PUBLICATION_NAME}
@@ -137,9 +138,10 @@ Remove a Content Section from the Amendment
     user deletes editable accordion section    Methodology annex section 1    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Remove an image from a Content Block
+    user closes Set Page View box
     user opens accordion section    Methodology annex section 2    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
     user removes image from accordion section text block    Methodology annex section 2    2
-    ...    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    ...    Alt text for the uploaded annex image 3    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}    Save
     user checks accordion section text block does not contain image with alt text    Methodology annex section 2    2
     ...    Alt text for the uploaded content image    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
@@ -181,13 +183,13 @@ Approve the Methodology Amendment
 Revisit the Publication on the dashboard and check that the new Amendment is now the live Methodology
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${accordion}    View this methodology
-    user checks element does not contain link    ${accordion}    Edit this methodology
+    user checks element contains link    ${accordion}    View methodology
+    user checks element does not contain link    ${accordion}    Edit methodology
     user checks element contains button    ${accordion}    Amend methodology
-    user checks element does not contain link    ${accordion}    Edit this amendment
+    user checks element does not contain link    ${accordion}    Edit amendment
 
 Visit the approved Amendment and check that its summary is as expected
-    user clicks link    View this methodology
+    user clicks link    View methodology
     ${date}=    get current datetime    %-d %B %Y
     user verifies methodology summary details
     ...    ${PUBLICATION_NAME}
@@ -205,13 +207,13 @@ Create and cancel an Amendment
 
     ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user opens details dropdown    ${PUBLICATION_NAME}    ${accordion}
-    user checks element contains link    ${accordion}    View this methodology
-    user checks element does not contain link    ${accordion}    Edit this methodology
+    user checks element contains link    ${accordion}    View methodology
+    user checks element does not contain link    ${accordion}    Edit methodology
     user checks element contains button    ${accordion}    Amend methodology
-    user checks element does not contain link    ${accordion}    Edit this amendment
+    user checks element does not contain link    ${accordion}    Edit amendment
 
 Revisit the live Amendment after the cancellation to double check it remains unaffected
-    user clicks link    View this methodology
+    user clicks link    View methodology
     user clicks link    Manage content
     user verifies amended Methodology readonly content
 
@@ -219,17 +221,20 @@ Revisit the live Amendment after the cancellation to double check it remains una
 user verifies original Methodology readonly content
     ${section}=    user opens accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_READONLY_ACCORDION}
-    user waits until element contains    ${section}    Adding Methodology content
+    user verifies accordion is open    Methodology content section 1
+    user waits until element contains    ${section}    Adding Methodology content    %{WAIT_MEDIUM}
     user waits until parent contains element    ${section}
-    ...    xpath://img[@alt="Alt text for the uploaded content image"]
+    ...    xpath://img[@alt="Alt text for the uploaded content image"]    %{WAIT_MEDIUM}
 
     ${section}=    user opens accordion section    Methodology annex section 1
     ...    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
+    user verifies accordion is open    Methodology annex section 1
     user waits until element contains    ${section}    Adding Methodology annex
     user waits until parent contains element    ${section}    xpath://img[@alt="Alt text for the uploaded annex image"]
 
     ${section}=    user opens accordion section    Methodology annex section 2
     ...    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
+    user verifies accordion is open    Methodology annex section 2
     user waits until element contains    ${section}    Adding Methodology annex 2 text block 1
     user waits until element contains    ${section}    Adding Methodology annex 2 text block 2
     user waits until parent contains element    ${section}
@@ -240,7 +245,7 @@ user verifies original Methodology readonly content
 user verifies amended Methodology readonly content
     ${section}=    user opens accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_READONLY_ACCORDION}
-    user waits until element contains    ${section}    Adding Methodology content
+    user waits until element contains    ${section}    Adding Methodology content    %{WAIT_SMALL}
     user waits until parent contains element    ${section}
     ...    xpath://img[@alt="Alt text for the uploaded content image"]
     user waits until parent contains element    ${section}
@@ -248,4 +253,5 @@ user verifies amended Methodology readonly content
 
     ${section}=    user opens accordion section    Methodology annex section 2
     ...    ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}
+    user verifies accordion is open    Methodology annex section 2
     user waits until element contains    ${section}    Adding Methodology annex 2 text block 2

@@ -1,3 +1,4 @@
+import base64
 import json
 import pytz
 import time
@@ -37,7 +38,6 @@ if not utilities_init.initialised:
         for_id = labels[0].get_attribute('for')
         return get_child_elements(parent_locator, f'id:{for_id}')
 
-
     def _find_by_testid(parent_locator: object, criteria: str, tag: str, constraints: dict) -> list:
         parent_locator = _normalize_parent_locator(parent_locator)
 
@@ -49,6 +49,27 @@ if not utilities_init.initialised:
     element_finder.register('testid', _find_by_testid, persist=True)
 
     utilities_init.initialised = True
+
+
+def enable_basic_auth_headers():
+    # Setup basic auth headers for public frontend
+    public_auth_user = os.getenv('PUBLIC_AUTH_USER')
+    public_auth_password = os.getenv('PUBLIC_AUTH_PASSWORD')
+
+    if public_auth_user and public_auth_password:
+        token = base64.b64encode(f'{public_auth_user}:{public_auth_password}'.encode())
+
+        sl.driver.execute_cdp_cmd('Network.enable', {})
+        sl.driver.execute_cdp_cmd('Network.setExtraHTTPHeaders', {
+            'headers': {
+                'Authorization': f'Basic {token.decode()}'
+            }
+        })
+
+
+def disable_basic_auth_headers():
+    # Must be disabled to visit admin frontend
+    sl.driver.execute_cdp_cmd('Network.disable', {})
 
 
 def raise_assertion_error(err_msg):
@@ -105,7 +126,7 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
             return waiting._wait_until(
                 parent_does_not_contain_matching_element,
                 "Parent '%s' should not have contained '%s' in <TIMEOUT>." % (
-                parent_locator, child_locator),
+                    parent_locator, child_locator),
                 timeout, error
             )
 
@@ -141,7 +162,7 @@ def get_child_element(parent_locator: object, child_locator: str):
                     f"under parent locator {parent_locator} in utilities.py#get_child_element() - "
                     f"was expecting only one. Consider making the parent selector more specific. "
                     f"Returning the first element found.")
-            
+
         return children[0]
     except Exception as err:
         warning(f"Error whilst executing utilities.py get_child_element() with parent {parent_locator} and child "
@@ -242,7 +263,7 @@ def capture_large_screenshot():
 
 def capture_html():
     html = sl.get_source()
-    current_time_millis=round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
+    current_time_millis = round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
     html_file = open(f"test-results/captured-html-{current_time_millis}.html", "w")
     html_file.write(html)
     html_file.close()
@@ -265,7 +286,7 @@ def user_gets_row_with_group_and_indicator(group: str, indicator: str,
         try:
             elem.find_element_by_xpath(f'.//th[text()="{indicator}"]/..')
             return elem
-        except:
+        except BaseException:
             continue
     raise_assertion_error(f'Indicator "{indicator}" not found!')
 
@@ -273,7 +294,7 @@ def user_gets_row_with_group_and_indicator(group: str, indicator: str,
 def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
     try:
         elem = get_child_element(row_elem, f'xpath:.//td[{cell_num}]')
-    except:
+    except BaseException:
         raise_assertion_error(f'Couldn\'t find TD tag num "{cell_num}" for provided row element')
 
     if expected_text not in elem.text:
@@ -314,13 +335,8 @@ def user_is_on_admin_dashboard_with_theme_and_topic_selected(admin_url: str, the
 
 
 def user_navigates_to_admin_dashboard_if_needed(admin_url: str):
+    disable_basic_auth_headers()
     if user_is_on_admin_dashboard(admin_url):
-        return
-
-    home_button = element_finder.find("xpath://a[@href='/dashboard']", required=False, first_only=True)
-    
-    if home_button is not None:
-        home_button.click()
         return
 
     sl.go_to(admin_url)
@@ -332,13 +348,13 @@ def is_webelement(variable: object) -> bool:
 
 def _normalise_child_locator(child_locator: str) -> str:
     if isinstance(child_locator, str):
-        # the below substitution is necessary in order to correctly find the parent's descendants.  Without the 
-        # preceding dot, the double forward slash breaks out of the parent container and returns the xpath query 
-        # to the root of the DOM, leading to false positives or incorrectly found DOM elements.  The below 
-        # substitution covers both child selectors beginning with "xpath://" and "//", as the double forward 
+        # the below substitution is necessary in order to correctly find the parent's descendants.  Without the
+        # preceding dot, the double forward slash breaks out of the parent container and returns the xpath query
+        # to the root of the DOM, leading to false positives or incorrectly found DOM elements.  The below
+        # substitution covers both child selectors beginning with "xpath://" and "//", as the double forward
         # slashes without the "xpath:" prefix are inferred as being xpath expressions.
         return re.sub(r'^(xpath:)?//', "xpath:.//", child_locator)
-    
+
     raise_assertion_error(f"Child locator was not a str - {child_locator}")
 
 

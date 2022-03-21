@@ -18,6 +18,7 @@ export interface DataSet {
   indicator: string;
   filters: string[];
   location?: LocationCompositeId;
+  order?: number;
   timePeriod?: string;
 }
 

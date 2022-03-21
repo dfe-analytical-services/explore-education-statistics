@@ -100,41 +100,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             }
         }
 
-        public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, Task> func)
-        {
-            foreach (var item in source)
-            {
-                await func(item);
-            }
-        }
-
-        public static async Task ForEachAsync<T>(this IEnumerable<T> source, Func<T, int, Task> func)
+        public static int IndexOfFirst<T>(this IEnumerable<T> source, Func<T, bool> predicate)
         {
             var index = 0;
 
             foreach (var item in source)
             {
-                await func(item, index);
+                if (predicate(item))
+                {
+                    return index;
+                }
+
                 index += 1;
             }
-        }
 
-        public static async Task<List<TResult>> ForEachAsync<T, TResult>(this IEnumerable<T> source, Func<T, Task<TResult>> func)
-        {
-            List<TResult> results = new List<TResult>();
-
-            foreach (var item in source)
-            {
-                results.Add(await func(item));
-            }
-
-            return results;
+            return -1;
         }
 
         public static async Task<Either<TLeft, List<TRight>>> ForEachAsync<T, TLeft, TRight>(this IEnumerable<T> source,
             Func<T, Task<Either<TLeft, TRight>>> func)
         {
-            List<TRight> rightResults = new List<TRight>();
+            var rightResults = new List<TRight>();
 
             foreach (var item in source)
             {
@@ -161,12 +147,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return !list.Any();
         }
 
-        public static string JoinToString(this IEnumerable<string> source, char delimiter)
+        public static string JoinToString<T>(this IEnumerable<T> source)
+        {
+            return string.Join(string.Empty, source);
+        }
+
+        public static string JoinToString<T>(this IEnumerable<T> source, char delimiter)
         {
             return string.Join(delimiter, source);
         }
 
-        public static string JoinToString(this IEnumerable<string> source, string delimiter)
+        public static string JoinToString<T>(this IEnumerable<T> source, string delimiter)
         {
             return string.Join(delimiter, source);
         }

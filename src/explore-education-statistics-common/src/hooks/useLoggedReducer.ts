@@ -1,5 +1,5 @@
 import logger from '@common/services/logger';
-import produce from 'immer';
+import produce, { Immutable } from 'immer';
 import {
   Dispatch,
   Reducer,
@@ -53,13 +53,14 @@ export function useLoggedImmerReducer<S, A>(
   reducer: ImmerReducer<S, A>,
   initialState: S,
   initializer?: ReducerWithoutAction<S>,
-) {
+): [S & Immutable<S>, Dispatch<A>] {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const cachedReducer = useCallback(produce(reducer), [reducer]);
+
   return useLoggedReducer(
     name,
-    cachedReducer as Reducer<S, A>,
+    cachedReducer as never,
     initialState,
     initializer,
-  );
+  ) as [S & Immutable<S>, Dispatch<A>];
 }

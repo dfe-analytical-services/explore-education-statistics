@@ -6,8 +6,8 @@ import camelCase from 'lodash/camelCase';
 import set from 'lodash/set';
 import toPath from 'lodash/toPath';
 
-export interface ServerValidationErrorResponse {
-  errors: Dictionary<string[]>;
+export interface ServerValidationErrorResponse<T extends string = string> {
+  errors: Dictionary<T[]>;
   title: string;
   status: number;
 }
@@ -78,6 +78,25 @@ export function mapFieldErrors<FormValues>(options: {
   };
 }
 
+/**
+ * Add a generic fallback message that targets the
+ * `target` form field if no other error handlers
+ * have handled the error.
+ */
+export function mapFallbackFieldError<FormValues>(options: {
+  target: FieldName<FormValues>;
+  fallbackMessage: string;
+}): FieldMessageMapper<FormValues> {
+  const { target, fallbackMessage } = options;
+
+  return _ => {
+    return {
+      targetField: target,
+      message: fallbackMessage,
+    };
+  };
+}
+
 function normalizeField(fieldName: string): string {
   const path = toPath(fieldName);
 
@@ -99,6 +118,7 @@ function normalizeField(fieldName: string): string {
 export function convertServerFieldErrors<FormValues>(
   response: ServerValidationErrorResponse,
   messageMappers: FieldMessageMapper<FormValues>[] = [],
+  fallbackMapper?: FieldMessageMapper<FormValues>,
 ): FormikErrors<FormValues> {
   return Object.entries(response.errors).reduce<FormikErrors<FormValues>>(
     (acc, [source, messages]) => {
@@ -123,6 +143,12 @@ export function convertServerFieldErrors<FormValues>(
           });
         } else if (sourceField) {
           set(acc, sourceField, message);
+        } else if (fallbackMapper) {
+          const mappedFallback = fallbackMapper(error);
+          if (mappedFallback) {
+            const { targetField, message: mappedMessage } = mappedFallback;
+            set(acc, targetField, mappedMessage);
+          }
         }
       });
 
@@ -132,19 +158,67 @@ export function convertServerFieldErrors<FormValues>(
   );
 }
 
-export function isServerValidationError(
-  error: Error,
-): error is AxiosError<ServerValidationErrorResponse> {
+/**
+ * Asserts whether the given error object is an
+ * {@link AxiosError<ServerValidationErrorResponse<T>>}.
+ *
+ * @param error - the error object to check the type of.
+ */
+export function isServerValidationError<T extends string = string>(
+  error: unknown,
+): error is AxiosError<ServerValidationErrorResponse<T>> {
   if (!isAxiosError(error) || !error.response?.data) {
     return false;
   }
 
   const errorDataAsValidationError = error.response
-    .data as ServerValidationErrorResponse;
+    .data as ServerValidationErrorResponse<T>;
 
   return (
     errorDataAsValidationError.errors !== undefined &&
     errorDataAsValidationError.status !== undefined &&
     errorDataAsValidationError.title !== undefined
   );
+}
+
+/**
+ * This method checks whether or not the error contains any of the error
+ * messages provided, using {@param fieldName} to determine field
+ * validation, or global validation if {@param fieldName} is omitted.
+ *
+ * If any are included in this error, this method will return true.
+ *
+ * @param error - the error to check the messages of.
+ * @param errorMessages - array of error messages, any of which can appear
+ * in this error in order for this method to return true.
+ * @param fieldName - optional fieldName that, if omitted, will be treated
+ * as checking for global errors.
+ */
+export function hasErrorMessage<T extends string = string>(
+  error: AxiosError<ServerValidationErrorResponse<T>>,
+  errorMessages: readonly T[],
+  fieldName = '',
+): boolean {
+  if (!errorMessages.length) {
+    return true;
+  }
+
+  return errorMessages.some(errorMessage =>
+    error.response?.data.errors[fieldName].includes(errorMessage),
+  );
+}
+
+/**
+ * Retrieves the first error message for the given {@param fieldName}, or the
+ * first global error message if {@param fieldName} is omitted.
+ *
+ * @param error - the error containing messages.
+ * @param fieldName - optional fieldName that, if omitted, will be treated as
+ * checking for global errors.
+ */
+export function getErrorMessage<T extends string = string>(
+  error: AxiosError<ServerValidationErrorResponse<T>>,
+  fieldName = '',
+): T | undefined {
+  return error.response?.data?.errors[fieldName]?.[0];
 }

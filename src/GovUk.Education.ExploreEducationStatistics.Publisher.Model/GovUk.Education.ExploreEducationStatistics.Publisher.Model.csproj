@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
-        <LangVersion>9.0</LangVersion>
+        <TargetFramework>net6.0</TargetFramework>
+        <LangVersion>10.0</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="IsExternalInit" Version="1.0.1" PrivateAssets="all" />
-        <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.7" />
+        <PackageReference Include="IsExternalInit" Version="1.0.2" PrivateAssets="all" />
+        <PackageReference Include="Microsoft.Azure.Cosmos.Table" Version="1.0.8" />
     </ItemGroup>
 
     <ItemGroup>

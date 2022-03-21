@@ -29,6 +29,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             return either.Right;
         }
         
+        public static TRight AssertRight<TLeft, TRight>(this Either<TLeft, TRight> either, TRight expectedValue, string message = null)
+        {
+            var value = either.AssertRight(message);
+            Assert.Equal(expectedValue, value);
+            return value;
+        }
+        
         public static TLeft AssertLeft<TLeft, TRight>(this Either<TLeft, TRight> either, string message = null)
         {
             if (either.IsRight)
@@ -36,6 +43,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 AssertFail(message ?? $"Expected Either to be Left, but was Right with value {either.Right}");
             }
             
+            return either.Left;
+        }
+        
+        public static TLeft AssertLeft<TLeft, TRight>(
+            this Either<TLeft, TRight> either, 
+            TLeft expectedValue, 
+            string message = null)
+        {
+            var value = either.AssertLeft(message);
+            Assert.Equal(expectedValue, value);
             return either.Left;
         }
         

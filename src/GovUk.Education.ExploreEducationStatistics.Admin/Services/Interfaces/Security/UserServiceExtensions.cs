@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -6,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using Microsoft.AspNetCore.Mvc;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security
 {
@@ -128,6 +130,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService, Publication publication)
         {
             return userService.CheckPolicy(publication, SecurityPolicies.CanUpdateSpecificPublication);
+        }
+
+        public static Task<Either<ActionResult, Unit>> CheckCanUpdatePublicationTitle(
+            this IUserService userService)
+        {
+            return userService.CheckPolicy(SecurityPolicies.CanUpdatePublicationTitles);
+        }
+
+        public static Task<Either<ActionResult, Tuple<Publication, ReleaseRole>>> CheckCanUpdateReleaseRole(
+            this IUserService userService, Publication publication, ReleaseRole role)
+        {
+            return userService.CheckPolicy(TupleOf(publication, role),
+                SecurityPolicies.CanUpdateSpecificReleaseRole);
         }
 
         public static Task<Either<ActionResult, Publication>> CheckCanCreateReleaseForPublication(
@@ -262,6 +277,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             this IUserService userService, Comment comment)
         {
             return userService.CheckPolicy(comment, SecurityPolicies.CanUpdateSpecificComment);
+        }
+
+        public static Task<Either<ActionResult, Comment>> CheckCanDeleteComment(
+            this IUserService userService, Comment comment)
+        {
+            return userService.CheckPolicy(comment, SecurityPolicies.CanDeleteSpecificComment);
         }
 
         public static Task<Either<ActionResult, File>> CheckCanCancelFileImport(

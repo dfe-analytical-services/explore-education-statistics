@@ -5,6 +5,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 {
     public interface INotificationsService
     {
-        Task NotifySubscribers(params Guid[] releaseIds);
+        Task NotifySubscribersIfApplicable(params Guid[] releaseIds);
     }
 }

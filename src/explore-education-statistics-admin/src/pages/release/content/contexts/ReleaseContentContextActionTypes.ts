@@ -1,5 +1,4 @@
 import {
-  Comment,
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
@@ -81,14 +80,6 @@ export type UpdateContentSection = {
   };
 };
 
-export type UpdateBlockComments = {
-  type: 'UPDATE_BLOCK_COMMENTS';
-  payload: {
-    meta: BlockMeta;
-    comments: Comment[];
-  };
-};
-
 export type ReleaseDispatchAction =
   | SetAvailableDatablocks
   | RemoveBlockFromSection
@@ -97,5 +88,4 @@ export type ReleaseDispatchAction =
   | UpdateSectionContent
   | AddContentSection
   | SetReleaseContent
-  | UpdateContentSection
-  | UpdateBlockComments;
+  | UpdateContentSection;

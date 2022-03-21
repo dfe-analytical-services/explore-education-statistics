@@ -1,17 +1,12 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
 {
-    public interface ILocationRepository : IRepository<Location, Guid>
+    public interface ILocationRepository
     {
-        Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> GetObservationalUnits(Guid subjectId);
-
-        Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>> GetObservationalUnits(
-            IQueryable<Observation> observations);
-
-        IEnumerable<ObservationalUnit> GetObservationalUnits(GeographicLevel level, IEnumerable<string> codes);
+        Task<IList<Location>> GetDistinctForSubject(Guid subjectId);
     }
 }

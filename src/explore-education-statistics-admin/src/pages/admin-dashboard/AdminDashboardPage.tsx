@@ -139,6 +139,7 @@ const AdminDashboardPage = () => {
                           releaseId: release.id,
                         },
                       )}
+                      variant="secondary"
                     >
                       View release
                     </ButtonLink>

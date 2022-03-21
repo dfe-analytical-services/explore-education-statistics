@@ -1,7 +1,6 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 {
@@ -13,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
 
         public TableBuilderConfiguration Configuration { get; set; }
 
-        public TableBuilderResultViewModel FullTable { get; set; }
+        public PermalinkTableBuilderResult FullTable { get; set; }
 
         public ObservationQueryContext Query { get; set; }
 
@@ -22,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Models
         }
 
         public Permalink(TableBuilderConfiguration configuration,
-            TableBuilderResultViewModel result,
+            PermalinkTableBuilderResult result,
             ObservationQueryContext query)
         {
             Id = Guid.NewGuid();

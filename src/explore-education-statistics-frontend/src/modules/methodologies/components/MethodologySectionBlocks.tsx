@@ -1,5 +1,10 @@
+import glossaryService from '@frontend/services/glossaryService';
 import InsetText from '@common/components/InsetText';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
+import {
+  logEvent,
+  logOutboundLink,
+} from '@frontend/services/googleAnalyticsService';
 import { ContentBlock } from '@common/services/types/blocks';
 import React from 'react';
 import useMethodologyImageAttributeTransformer from '@common/modules/methodology/hooks/useMethodologyImageAttributeTransformer';
@@ -21,6 +26,17 @@ const MethodologySectionBlocks = ({ blocks, methodologyId }: Props) => {
           key={block.id}
           block={block}
           transformImageAttributes={transformImageAttributes}
+          getGlossaryEntry={glossaryService.getEntry}
+          trackContentLinks={url =>
+            logOutboundLink(`Methodology page content link: ${url}`, url)
+          }
+          trackGlossaryLinks={glossaryEntrySlug =>
+            logEvent({
+              category: `Methodology Page Content Glossary Link`,
+              action: `Glossary link clicked`,
+              label: glossaryEntrySlug,
+            })
+          }
         />
       ))}
     </>

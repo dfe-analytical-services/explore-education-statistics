@@ -8,6 +8,7 @@ import {
 } from '@common/components/form';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import { PublicationSummary, Theme } from '@common/services/themeService';
 import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
@@ -16,7 +17,6 @@ import React, { useState } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
-import WizardStepEditButton from './WizardStepEditButton';
 
 export interface PublicationFormValues {
   publicationId: string;
@@ -26,33 +26,29 @@ export type PublicationFormSubmitHandler = (values: {
   publication: PublicationSummary;
 }) => void;
 
-interface Props {
-  initialValues?: PublicationFormValues;
-  onSubmit: PublicationFormSubmitHandler;
-  options: Theme[];
-}
-
 const formId = 'publicationForm';
 
-const PublicationForm = (props: Props & InjectedWizardProps) => {
-  const {
-    options,
-    onSubmit,
-    isActive,
-    goToNextStep,
-    initialValues = {
-      publicationId: '',
-    },
-    currentStep,
-    stepNumber,
-  } = props;
+interface Props extends InjectedWizardProps {
+  initialValues?: PublicationFormValues;
+  options: Theme[];
+  onSubmit: PublicationFormSubmitHandler;
+}
+
+const PublicationForm = ({
+  initialValues = {
+    publicationId: '',
+  },
+  options,
+  onSubmit,
+  ...stepProps
+}: Props) => {
+  const { isActive, goToNextStep } = stepProps;
 
   const [searchTerm, setSearchTerm] = useState('');
   const lowercaseSearchTerm = searchTerm.toLowerCase();
-  const stepEnabled = currentStep > stepNumber;
 
   const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading stepEnabled={stepEnabled}>
+    <WizardStepHeading {...stepProps} fieldsetHeading>
       Choose a publication
     </WizardStepHeading>
   );
@@ -76,9 +72,9 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
           throw new Error('Selected publication not found');
         }
 
-        await onSubmit({ publication });
-
-        goToNextStep();
+        await goToNextStep(async () => {
+          await onSubmit({ publication });
+        });
       }}
     >
       {form => {
@@ -151,6 +147,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                           summary={theme.title}
                           key={theme.id}
                           id={`${formId}-theme-${theme.id}`}
+                          detailsId="theme"
                           open={
                             searchTerm !== '' ||
                             theme.topics.some(topic =>
@@ -166,6 +163,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                               summary={topic.title}
                               key={topic.id}
                               id={`${formId}-topic-${topic.id}`}
+                              detailsId="topic"
                               open={
                                 searchTerm !== '' ||
                                 topic.publications.some(
@@ -199,7 +197,7 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
                 </FormGroup>
               </FormFieldset>
 
-              <WizardStepFormActions {...props} />
+              <WizardStepFormActions {...stepProps} />
             </Form>
           );
         }
@@ -210,24 +208,15 @@ const PublicationForm = (props: Props & InjectedWizardProps) => {
           .find(option => option.id === form.values.publicationId);
 
         return (
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
-              {stepHeading}
-              <SummaryList noBorder>
-                <SummaryListItem term="Publication">
-                  {publication?.title}
-                </SummaryListItem>
-              </SummaryList>
-            </div>
-            <div className="govuk-grid-column-one-third dfe-align--right">
-              {stepEnabled && (
-                <WizardStepEditButton
-                  {...props}
-                  editTitle="Change publication"
-                />
-              )}
-            </div>
-          </div>
+          <WizardStepSummary {...stepProps} goToButtonText="Change publication">
+            {stepHeading}
+
+            <SummaryList noBorder>
+              <SummaryListItem term="Publication">
+                {publication?.title}
+              </SummaryListItem>
+            </SummaryList>
+          </WizardStepSummary>
         );
       }}
     </Formik>

@@ -4,7 +4,6 @@ using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using Newtonsoft.Json;
@@ -62,9 +61,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Publication Publication { get; set; }
 
-        public List<Update> Updates { get; set; }
+        public List<Update> Updates { get; set; } = new();
 
-        public List<ReleaseStatus> ReleaseStatuses { get; set; }
+        public List<ReleaseStatus> ReleaseStatuses { get; set; } = new();
+
+        public bool NotifySubscribers
+        {
+            get
+            {
+                var status = ReleaseStatuses
+                           .OrderBy(rs => rs.Created)
+                           .LastOrDefault();
+                return status != null
+                       && status.NotifySubscribers
+                       && status.NotifiedOn == null;
+            }
+        }
 
         public string LatestInternalReleaseNote
         {
@@ -77,15 +89,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         }
 
         [JsonIgnore]
-        public List<ReleaseContentSection> Content { get; set; }
+        public List<ReleaseContentSection> Content { get; set; } = new();
 
         // TODO: EES-1568 This should be DataBlocks
         [JsonIgnore]
-        public List<ReleaseContentBlock> ContentBlocks { get; set; }
+        public List<ReleaseContentBlock> ContentBlocks { get; set; } = new();
 
         public string PreReleaseAccessList { get; set; } = string.Empty;
 
-        public string MetaGuidance { get; set; } = string.Empty;
+        public string DataGuidance { get; set; } = string.Empty;
 
         public Release? PreviousVersion { get; set; }
 
@@ -195,8 +207,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }));
         }
 
-        public Guid? TypeId { get; set; }
-
         public ReleaseType Type { get; set; }
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
@@ -222,123 +232,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             }
         }
 
-        public List<Link> RelatedInformation { get; set; }
+        public List<Link> RelatedInformation { get; set; } = new();
 
         public DateTime? DataLastPublished { get; set; }
 
-        public Release CreateReleaseAmendment(DateTime createdDate, Guid createdByUserId)
+        public Release Clone()
         {
-            var amendment = MemberwiseClone() as Release;
-
-            // Set new values for fields that should be altered in the amended
-            // Release rather than copied from the original Release
-            amendment.Id = Guid.NewGuid();
-            amendment.Published = null;
-            amendment.PublishScheduled = null;
-            amendment.ApprovalStatus = ReleaseApprovalStatus.Draft;
-            amendment.Created = createdDate;
-            amendment.CreatedById = createdByUserId;
-            amendment.Version = Version + 1;
-            amendment.PreviousVersionId = Id;
-
-            var context = new CloneContext();
-
-            amendment.Content = amendment
-                .Content?
-                .Select(content => content.Clone(amendment, context))
-                .ToList();
-
-            amendment.ContentBlocks = amendment
-                .ContentBlocks?
-                .Select(releaseContentBlock => releaseContentBlock.Clone(amendment, context))
-                .ToList();
-
-            amendment.RelatedInformation = amendment
-                .RelatedInformation?
-                .Select(link => link.Clone())
-                .ToList();
-
-            amendment.Updates = amendment
-                .Updates?
-                .Select(update => update.Clone(amendment))
-                .ToList();
-
-            UpdateAmendmentContent(context);
-
-            return amendment;
+            return MemberwiseClone() as Release;
         }
 
-        // Bit cheeky to re-use the clone context, but it's a nice
-        // easy way to access and modify all of the content blocks
-        // that we used during the clone.
-        private static void UpdateAmendmentContent(CloneContext context)
+        public record CloneContext
         {
-            var dataBlocks = context.ContentBlocks
-                .Where(pair => pair.Key is DataBlock && pair.Value is DataBlock)
-                .ToDictionary(pair => pair.Key as DataBlock, pair => pair.Value as DataBlock);
+            // Maps old content block references to new content blocks
+            // Ideally we want to try and get rid of this completely as we
+            // shouldn't have to deal with the same content blocks being
+            // referenced in multiple places.
+            // TODO: EES-1306 may be possible to remove this as part of this ticket
+            public Dictionary<ContentBlock, ContentBlock> ContentBlocks { get; } = new();
 
-            foreach (var contentBlock in context.ContentBlocks.Values)
+            public Release NewRelease { get; }
+
+            public CloneContext(Release newRelease)
             {
-                switch (contentBlock)
-                {
-                    case HtmlBlock block:
-                        block.Body = UpdateFastTrackLinks(block.Body, dataBlocks);
-                        break;
-                    case MarkDownBlock block:
-                        block.Body = UpdateFastTrackLinks(block.Body, dataBlocks);
-                        break;
-                }
+                NewRelease = newRelease;
             }
-        }
-
-        private static string UpdateFastTrackLinks(string content, Dictionary<DataBlock, DataBlock> dataBlocks)
-        {
-            if (content.IsNullOrEmpty())
-            {
-                return content;
-            }
-
-            var nextContent = content;
-
-            foreach (var (oldDataBlock, newDataBlock) in dataBlocks)
-            {
-                // Not a particularly fast way to replace fast tracks
-                // if there's a lot of content. Could be improved
-                // using something like a parallel substring approach.
-                nextContent = nextContent.Replace(
-                    $"/fast-track/{oldDataBlock.Id}",
-                    $"/fast-track/{newDataBlock.Id}"
-                );
-            }
-
-            return nextContent;
-        }
-
-        public void CreateGenericContentFromTemplate(Release newRelease)
-        {
-            var context = new CloneContext();
-
-            newRelease.Content = Content.Where(c => c.ContentSection.Type == ContentSectionType.Generic).ToList();
-
-            newRelease.Content = newRelease
-                .Content?
-                .Select(content => content.Clone(newRelease, context))
-                .ToList();
-
-            newRelease.ContentBlocks = newRelease
-                .ContentBlocks?
-                .Select(releaseContentBlock => releaseContentBlock.Clone(newRelease, context))
-                .ToList();
-        }
-
-        // Ideally we want to try and get rid of this completely as we
-        // shouldn't have to deal with the same content blocks being
-        // referenced in multiple places.
-        // TODO: EES-1306 may be possible to remove this as part of this ticket
-        public class CloneContext
-        {
-            // Maps references to old content blocks to new content blocks
-            public Dictionary<ContentBlock, ContentBlock> ContentBlocks { get; } = new Dictionary<ContentBlock, ContentBlock>();
         }
     }
 }

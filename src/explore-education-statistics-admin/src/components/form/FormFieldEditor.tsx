@@ -13,26 +13,28 @@ import React, { useRef } from 'react';
 export const elementsFieldName = (name: string) => `__${name}`;
 
 type Props<FormValues> = {
+  blockId?: string;
+  formGroupClass?: string;
+  handleBlur?: (isDirty: boolean) => void;
   id?: string;
   name: keyof FormValues | string;
   showError?: boolean;
-  formGroupClass?: string;
   testId?: string;
   validateElements?: (
     elements: Element[],
   ) => string | undefined | Promise<string | undefined>;
-  handleBlur?: (isDirty: boolean) => void;
-} & OmitStrict<FormEditorProps, 'id' | 'value' | 'onChange'>;
+} & OmitStrict<FormEditorProps, 'blockId' | 'id' | 'value' | 'onChange'>;
 
 function FormFieldEditor<T>({
+  blockId,
   error,
+  formGroupClass,
+  handleBlur,
   id,
   name,
   showError = true,
-  formGroupClass,
   testId,
   validateElements,
-  handleBlur,
   ...props
 }: Props<T>) {
   const { prefixFormId, fieldId } = useFormContext();
@@ -64,6 +66,7 @@ function FormFieldEditor<T>({
               testId={testId}
               {...props}
               {...field}
+              blockId={blockId}
               id={id ? prefixFormId(id) : fieldId(name as string)}
               onBlur={() => {
                 form.setFieldTouched(name as string, true);

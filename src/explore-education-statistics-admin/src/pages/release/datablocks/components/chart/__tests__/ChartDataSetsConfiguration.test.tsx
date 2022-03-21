@@ -7,30 +7,25 @@ import { DataSet } from '@common/modules/charts/types/dataSet';
 import { LocationFilter } from '@common/modules/table-tool/types/filters';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import mapFullTableMeta from '@common/modules/table-tool/utils/mapFullTableMeta';
+import { TableDataSubjectMeta } from '@common/services/tableBuilderService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
 
 describe('ChartDataSetsConfiguration', () => {
-  const testMeta = {
+  const testMeta: TableDataSubjectMeta = {
     publicationName: '',
     subjectName: '',
     geoJsonAvailable: false,
     footnotes: [],
     boundaryLevels: [],
-    locations: [
-      {
-        label: 'Barnet',
-        value: 'barnet',
-        level: 'localAuthority',
-      },
-      {
-        label: 'Barnsley',
-        value: 'barnsley',
-        level: 'localAuthority',
-      },
-    ],
+    locations: {
+      localAuthority: [
+        { id: 'barnet', label: 'Barnet', value: 'barnet' },
+        { id: 'barnsley', label: 'Barnsley', value: 'barnsley' },
+      ],
+    },
     timePeriodRange: [
       {
         label: '2019/20',
@@ -209,6 +204,119 @@ describe('ChartDataSetsConfiguration', () => {
       expect(screen.getByText('Cannot save chart')).toBeInTheDocument();
       expect(screen.getByText('Options tab is invalid')).toBeInTheDocument();
     });
+  });
+
+  test('does not show the reorder button when there is only one dataset', () => {
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartDataSetsConfiguration
+          meta={testSubjectMeta}
+          dataSets={[
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+            },
+          ]}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+    expect(
+      screen.queryByRole('button', {
+        name: 'Reorder data sets',
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('shows the reorder button when there is more than one dataset', () => {
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartDataSetsConfiguration
+          meta={testSubjectMeta}
+          dataSets={[
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+            },
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+              location: {
+                level: 'localAuthority',
+                value: 'barnet',
+              },
+            },
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+              location: {
+                level: 'localAuthority',
+                value: 'barnet',
+              },
+              timePeriod: '2019_AY',
+            },
+          ]}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    expect(
+      screen.getByRole('button', {
+        name: 'Reorder data sets',
+      }),
+    ).toBeInTheDocument();
+  });
+
+  test('clicking the reorder button toggles reordering on and off', () => {
+    render(
+      <ChartBuilderFormsContextProvider initialForms={testFormState}>
+        <ChartDataSetsConfiguration
+          meta={testSubjectMeta}
+          dataSets={[
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+            },
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+              location: {
+                level: 'localAuthority',
+                value: 'barnet',
+              },
+            },
+            {
+              indicator: 'authorised-absence-sessions',
+              filters: ['male'],
+              location: {
+                level: 'localAuthority',
+                value: 'barnet',
+              },
+              timePeriod: '2019_AY',
+            },
+          ]}
+          onChange={noop}
+        />
+      </ChartBuilderFormsContextProvider>,
+    );
+
+    userEvent.click(
+      screen.getByRole('button', {
+        name: 'Reorder data sets',
+      }),
+    );
+    expect(
+      screen.queryByRole('button', {
+        name: 'Reorder data sets',
+      }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Finish reordering' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Remove' }),
+    ).not.toBeInTheDocument();
   });
 
   describe('add data set form', () => {
@@ -424,6 +532,7 @@ describe('ChartDataSetsConfiguration', () => {
           {
             filters: ['male'],
             indicator: 'unauthorised-absence-sessions',
+            order: 0,
           },
         ];
 
@@ -471,6 +580,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 0,
           },
         ];
 
@@ -507,6 +617,7 @@ describe('ChartDataSetsConfiguration', () => {
           {
             filters: [],
             indicator: 'unauthorised-absence-sessions',
+            order: 0,
           },
         ];
 
@@ -550,6 +661,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 0,
           },
           {
             filters: ['male'],
@@ -559,6 +671,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 1,
           },
         ];
 
@@ -605,6 +718,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 0,
           },
           {
             filters: ['female'],
@@ -614,6 +728,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 1,
           },
         ];
 
@@ -660,6 +775,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 0,
           },
           {
             filters: ['male', 'primary'],
@@ -669,6 +785,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 1,
           },
           {
             filters: ['male', 'special'],
@@ -678,6 +795,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 2,
           },
           {
             filters: ['female', 'secondary'],
@@ -687,6 +805,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 3,
           },
           {
             filters: ['female', 'primary'],
@@ -696,6 +815,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 4,
           },
           {
             filters: ['female', 'special'],
@@ -705,6 +825,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 5,
           },
         ];
 
@@ -747,6 +868,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 0,
           },
           {
             filters: ['male'],
@@ -756,6 +878,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 1,
           },
           {
             filters: ['female'],
@@ -765,6 +888,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 2,
           },
           {
             filters: ['female'],
@@ -774,6 +898,7 @@ describe('ChartDataSetsConfiguration', () => {
               level: 'localAuthority',
             },
             timePeriod: '2020_AY',
+            order: 3,
           },
         ];
 
@@ -830,14 +955,12 @@ describe('ChartDataSetsConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      const tableRows = screen.getAllByRole('row');
-      expect(tableRows).toHaveLength(3);
+      const rows = screen.getAllByRole('row');
+      expect(rows).toHaveLength(3);
 
       expect(handleChange).not.toHaveBeenCalled();
 
-      userEvent.click(
-        within(tableRows[1]).getByRole('button', { name: 'Remove' }),
-      );
+      userEvent.click(within(rows[1]).getByRole('button', { name: 'Remove' }));
 
       expect(handleChange).toHaveBeenCalledWith([
         {

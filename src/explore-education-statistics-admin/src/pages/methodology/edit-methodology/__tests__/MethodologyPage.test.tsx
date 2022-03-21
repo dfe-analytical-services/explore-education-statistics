@@ -5,7 +5,7 @@ import {
 } from '@admin/routes/methodologyRoutes';
 import { methodologyRoute } from '@admin/routes/routes';
 import _methodologyService, {
-  BasicMethodology,
+  BasicMethodologyVersion,
 } from '@admin/services/methodologyService';
 import _methodologyContentService, {
   MethodologyContent,
@@ -16,6 +16,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Route } from 'react-router-dom';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/methodologyContentService');
@@ -32,7 +33,7 @@ const permissionService = _permissionService as jest.Mocked<
 >;
 
 describe('MethodologyPage', () => {
-  const testMethodology: BasicMethodology = {
+  const testMethodology: BasicMethodologyVersion = {
     id: 'm1',
     amendment: false,
     methodologyId: 'm-1',
@@ -56,6 +57,7 @@ describe('MethodologyPage', () => {
     status: 'Draft',
     content: [],
     annexes: [],
+    notes: [],
   };
 
   test('renders the page with the summary tab', async () => {
@@ -177,7 +179,9 @@ describe('MethodologyPage', () => {
 
     render(
       <MemoryRouter initialEntries={[path]}>
-        <Route component={MethodologyPage} path={methodologyRoute.path} />
+        <TestConfigContextProvider>
+          <Route component={MethodologyPage} path={methodologyRoute.path} />
+        </TestConfigContextProvider>
       </MemoryRouter>,
     );
   }

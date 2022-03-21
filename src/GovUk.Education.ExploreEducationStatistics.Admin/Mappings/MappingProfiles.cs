@@ -9,8 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseStatus = GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatus;
 using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
@@ -57,18 +57,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         model.PublishScheduled.HasValue
                             ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
                             : (DateTime?) null))
-                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyReleasePermissionSetPropertyResolver>());
+                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyReleasePermissionsResolver>());
 
             CreateMap<ReleaseCreateViewModel, Release>()
                 .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>
                     model.PublishScheduledDate));
 
-            CreateMap<ReleaseStatus, ReleasePublishingStatusViewModel>()
+            CreateMap<ReleasePublishingStatus, ReleasePublishingStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
 
             CreateMap<MethodologyNote, MethodologyNoteViewModel>();
 
-            CreateMap<MethodologyVersion, MethodologySummaryViewModel>()
+            CreateMap<MethodologyVersion, MethodologyVersionSummaryViewModel>()
                 .ForMember(dest => dest.LatestInternalReleaseNote,
                     m => m.MapFrom(model => model.InternalReleaseNote))
                 .ForMember(dest => dest.ScheduledWithRelease,
@@ -82,7 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))))
                 .ForMember(
                     dest => dest.LegacyReleases,
-                    m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order))
+                    m =>
+                        m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order).ToList())
                 )
                 .ForMember(dest => dest.Methodologies, m => m.MapFrom(p => 
                     p.Methodologies
@@ -92,15 +93,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     dest => dest.ThemeId,
                     m => m.MapFrom(p => p.Topic.ThemeId));
 
-            CreateMap<MethodologyVersion, MyMethodologyViewModel>()
+            CreateMap<MethodologyVersion, MyMethodologyVersionViewModel>()
                 .ForMember(dest => dest.LatestInternalReleaseNote,
                     m => m.MapFrom(model => model.InternalReleaseNote))
-                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyMethodologyPermissionSetPropertyResolver>());
+                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyMethodologyVersionPermissionsResolver>());
 
-            CreateMap<PublicationMethodology, MyPublicationMethodologyViewModel>()
+            CreateMap<PublicationMethodology, MyPublicationMethodologyVersionViewModel>()
                 .ForMember(dest => dest.Methodology,
                     m => m.MapFrom(pm => pm.Methodology.LatestVersion()))
-                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationMethodologyPermissionsPropertyResolver>());
+                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationMethodologyVersionPermissionsResolver>());
 
             CreateMap<Publication, MyPublicationViewModel>()
                 .ForMember(
@@ -111,7 +112,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))
                         .OrderByDescending(r => r.Year)
                         .ThenByDescending(r => r.TimePeriodCoverage)))
-                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionSetPropertyResolver>())
+                .ForMember(
+                    dest => dest.LegacyReleases,
+                    m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order))
+                )
+                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionsResolver>())
                 .AfterMap((publication, model) => model.Methodologies = model.Methodologies.OrderBy(m => m.Methodology.Title).ToList());
 
             CreateMap<Contact, ContactViewModel>();
@@ -144,11 +149,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => new ManageContentPageViewModel.PublicationViewModel
                     {
                         Id = r.Publication.Id,
-                        Description = r.Publication.Description,
                         Title = r.Publication.Title,
                         Slug = r.Publication.Slug,
-                        Summary = r.Publication.Summary,
-                        DataSource = r.Publication.DataSource,
                         Contact = r.Publication.Contact,
                         Topic = new ManageContentPageViewModel.TopicViewModel
                         {
@@ -219,13 +221,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
 
             CreateMap<ContentSection, ContentSectionViewModel>()
                 .ForMember(dest => dest.Content,
-                m => m.MapFrom(section => section.Content.OrderBy(contentBlock => contentBlock.Order)));
+                m => m.MapFrom(section =>
+                    section.Content.OrderBy(contentBlock => contentBlock.Order)));
 
             CreateMap<MethodologyVersion, ManageMethodologyContentViewModel>()
                 .ForMember(dest => dest.Content,
-                    m => m.MapFrom(methodology => methodology.Content.OrderBy(contentSection => contentSection.Order)))
+                    m => m.MapFrom(methodologyVersion =>
+                        methodologyVersion.Content.OrderBy(contentSection => contentSection.Order)))
                 .ForMember(dest => dest.Annexes,
-                    m => m.MapFrom(methodology => methodology.Annexes.OrderBy(annexSection => annexSection.Order)));
+                    m => m.MapFrom(methodologyVersion =>
+                        methodologyVersion.Annexes.OrderBy(annexSection => annexSection.Order)))
+                .ForMember(dest => dest.Notes,
+                    m => m.MapFrom(methodologyVersion =>
+                        methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));
 
             CreateMap<Release, ReleasePublicationStatusViewModel>();
         }

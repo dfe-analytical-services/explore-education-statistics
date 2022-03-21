@@ -7,6 +7,7 @@ Resource            ../../libs/public-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -30,24 +31,23 @@ Verify release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 Upload subject
-    user clicks link    Data and files
     user uploads subject    Dates test subject    dates.csv    dates.meta.csv
 
-Add meta guidance
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
+Add data guidance
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
 
-    user waits until page contains element    id:metaGuidanceForm-content
-    user waits until page contains element    id:metaGuidance-dataFiles
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+    user waits until page contains element    id:dataGuidanceForm-content
+    user waits until page contains element    id:dataGuidance-dataFiles
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    Dates test subject
 
     user checks summary list contains    Filename    dates.csv
     user checks summary list contains    Geographic levels    National
     user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
 
-    user enters text into meta guidance data file content editor    Dates test subject
-    ...    Dates test subject test meta guidance content
+    user enters text into data guidance data file content editor    Dates test subject
+    ...    Dates test subject test data guidance content
     user clicks button    Save guidance
 
 Add ancillary file
@@ -71,53 +71,7 @@ Add ancillary file
     user checks there are x accordion sections    1    id:file-uploads
 
 Create data block table
-    user clicks link    Data blocks
-    user waits until h2 is visible    Data blocks
-
-    user clicks link    Create data block
-    user waits until h2 is visible    Create data block
-    user waits until table tool wizard step is available    Choose a subject
-
-    user waits until page contains    Dates test subject
-    user clicks radio    Dates test subject
-    user clicks element    id:publicationSubjectForm-submit
-
-    user waits until table tool wizard step is available    Choose locations
-    user opens details dropdown    National
-    user clicks checkbox    England
-    user clicks element    id:locationFiltersForm-submit
-
-    user waits until table tool wizard step is available    Choose time period
-    user chooses select option    id:timePeriodForm-start    2020 Week 13
-    user chooses select option    id:timePeriodForm-end    2020 Week 16
-    user clicks element    id:timePeriodForm-submit
-
-    user waits until table tool wizard step is available    Choose your filters
-    user clicks subheaded indicator checkbox    Open settings    Number of open settings
-    user checks subheaded indicator checkbox is checked    Open settings    Number of open settings
-    user clicks subheaded indicator checkbox    Open settings    Proportion of settings open
-    user checks subheaded indicator checkbox is checked    Open settings    Proportion of settings open
-
-    user opens details dropdown    Date
-    user clicks category checkbox    Date    23/03/2020
-    user checks category checkbox is checked    Date    23/03/2020
-
-    user clicks element    id:filtersForm-submit
-    user waits until results table appears    %{WAIT_LONG}
-
-    user checks table column heading contains    1    1    2020 Week 13
-    user checks headed table body row cell contains    Number of open settings    1    22,900
-    user checks headed table body row cell contains    Proportion of settings open    1    1%
-
-Save data block
-    user enters text into element    id:dataBlockDetailsForm-name    ${DATABLOCK_NAME}
-    user enters text into element    id:dataBlockDetailsForm-heading    Dates table title
-    user enters text into element    id:dataBlockDetailsForm-source    Dates source
-
-    user clicks button    Save data block
-
-    user waits until h2 is visible    Edit data block
-    user waits until page contains button    Delete this data block
+    user creates data block for dates csv    Dates test subject    ${DATABLOCK_NAME}    Dates table title
 
 Create chart for data block
     user waits until page contains link    Chart
@@ -137,7 +91,7 @@ Create chart for data block
 Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-    user waits until page contains button    Add a summary text block    60
+    user waits until page contains button    Add a summary text block    %{WAIT_SMALL}
 
 Add two accordion sections to release
     user waits for page to finish loading
@@ -151,14 +105,15 @@ Add data block to first accordion section
     user adds data block to editable accordion section    Dates data block    ${DATABLOCK_NAME}
     ...    css:#releaseMainContent
     ${datablock}=    set variable    xpath://*[@data-testid="Data block - ${DATABLOCK_NAME}"]
-    user waits until page contains element    ${datablock}    60
+    user waits until page contains element    ${datablock}    %{WAIT_SMALL}
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text
 
 Add test text to second accordion section
     user adds text block to editable accordion section    Test text    css:#releaseMainContent
-    user adds content to accordion section text block    Test text    1    Some test text!    css:#releaseMainContent
+    user adds content to autosaving accordion section text block    Test text    1    Some test text!
+    ...    css:#releaseMainContent
 
 Add public prerelease access list
     user clicks link    Pre-release access
@@ -174,7 +129,7 @@ Verify release is scheduled
     user checks summary list contains    Next release expected    December 3001
 
 Approve release for immediate publication
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 User goes to public Find Statistics page
     user navigates to find statistics page on public frontend
@@ -186,14 +141,13 @@ Verify newly published release is on Find Statistics page
 
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}
-    ...    %{WAIT_MEDIUM}
     user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
     user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
     user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
 
 Navigate to newly published release page
     user clicks element    testid:View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    90
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
 Verify release URL and page caption
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}
@@ -213,22 +167,22 @@ Verify publish and update dates
 Verify release associated files
     user opens accordion section    Explore data and files
     ${downloads}=    user gets accordion section content element    Explore data and files
-    user waits until page contains element    ${downloads}    60
+    user waits until page contains element    ${downloads}    %{WAIT_SMALL}
 
-    user checks element should contain    ${downloads}    Download all files
-    ...    60
+    user checks element should contain    ${downloads}    Download all data
+    ...    %{WAIT_SMALL}
     user checks element should contain    ${downloads}
-    ...    All data used to create this release is published as open data and is available for download.
+    ...    All data used in this release is available as open data for download
     user checks element should contain    ${downloads}
-    ...    You can create your own tables from this data using our table tool, or view featured tables that we have built for you.
+    ...    You can view featured tables that we have built for you, or create your own tables from the open data using our table tool
 
     user checks element should contain    ${downloads}
-    ...    The open data files contain all data used in this release in a machine readable format.
+    ...    Browse and download individual open data files from this release in our data catalogue
     user checks element should contain    ${downloads}
-    ...    Learn more about the data files used in this release using our data files guide.
+    ...    Learn more about the data files used in this release using our online guidance
 
-    user opens details dropdown    List of other files
-    ${other_files}=    user gets details content element    List of other files
+    user opens details dropdown    List of all supporting files
+    ${other_files}=    user gets details content element    List of all supporting files
     ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
 
     user waits until element contains link    ${other_files_1}    Test ancillary file 1
@@ -242,20 +196,20 @@ Verify release associated files
 Verify public metadata guidance document
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
-    user clicks link    data files guide
+    user clicks link    Data guidance
 
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
-    user checks nth breadcrumb contains    4    Metadata guidance document
-    user waits until h2 is visible    Metadata guidance document    30
+    user checks nth breadcrumb contains    4    Data guidance
+    user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
 
     user waits until page contains title caption    ${RELEASE_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
-    user waits until h2 is visible    Metadata guidance document
-    user waits until page contains    Test meta guidance content
+    user waits until h2 is visible    Data guidance
+    user waits until page contains    Test data guidance content
 
     user waits until page contains accordion section    Dates test subject
     user checks there are x accordion sections    1
@@ -264,7 +218,7 @@ Verify public metadata guidance document
     user checks summary list contains    Filename    dates.csv
     user checks summary list contains    Geographic levels    National
     user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
-    user checks summary list contains    Content    Dates test subject test meta guidance content
+    user checks summary list contains    Content    Dates test subject test data guidance content
 
     user opens details dropdown    Variable names and descriptions
 
@@ -306,7 +260,7 @@ Verify accordions are correct
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
 
-    user checks accordion is in position    National Statistics    1    id:help-and-support
+    user checks accordion is in position    National statistics    1    id:help-and-support
     user checks accordion is in position    Contact us    2    id:help-and-support
 
 Verify Dates data block accordion section
@@ -338,6 +292,17 @@ Verify Test text accordion section contains correct text
 Return to Admin and Create amendment
     user navigates to admin dashboard    Bau1
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
+
+Change the Release type
+    user waits until page contains link    Edit release summary
+    user clicks link    Edit release summary
+    user waits until h2 is visible    Edit release summary
+    user checks page contains radio    Experimental statistics
+    user clicks radio    Experimental statistics
+    user clicks button    Update release summary
+    user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
+    user verifies release summary    ${PUBLICATION_NAME}    Financial Year    3000-01    UI test contact name
+    ...    Experimental statistics
 
 Navigate to data replacement page
     user clicks link    Data and files
@@ -386,12 +351,12 @@ Confirm data replacement
     user clicks button    Confirm data replacement
     user waits until h2 is visible    Data replacement complete
 
-Verify existing meta guidance for amendment
+Verify existing data guidance for amendment
     user clicks link    Data and files
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
 
-    user waits until element contains    id:metaGuidanceForm-content    Test meta guidance content
+    user waits until element contains    id:dataGuidanceForm-content    Test data guidance content
 
     user waits until page contains accordion section    Dates test subject
 
@@ -399,13 +364,13 @@ Verify existing meta guidance for amendment
     user checks summary list contains    Geographic levels    National
     user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
 
-    ${editor}=    user gets meta guidance data file content editor    Dates test subject
-    user waits until element contains    ${editor}    Dates test subject test meta guidance content
+    ${editor}=    user gets data guidance data file content editor    Dates test subject
+    user waits until element contains    ${editor}    Dates test subject test data guidance content
 
-Update existing meta guidance for amendment
-    user enters text into element    id:metaGuidanceForm-content    Updated test meta guidance content
-    user enters text into meta guidance data file content editor    Dates test subject
-    ...    Updated Dates test subject test meta guidance content
+Update existing data guidance for amendment
+    user enters text into element    id:dataGuidanceForm-content    Updated test data guidance content
+    user enters text into data guidance data file content editor    Dates test subject
+    ...    Updated Dates test subject test data guidance content
 
     user clicks button    Save guidance
 
@@ -434,10 +399,11 @@ Add ancillary file to amendment
 
 User navigates to Data blocks page
     user clicks link    Data blocks
-    user waits until h2 is visible    Data blocks
+    user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
 
 Edit data block for amendment
     user waits until table is visible
+
     user checks table body has x rows    1
     user checks results table cell contains    1    1    ${DATABLOCK_NAME}
     user checks results table cell contains    1    2    Yes
@@ -499,7 +465,7 @@ Navigate to 'Content' page for amendment
 
 Update second accordion section text for amendment
     user opens accordion section    Test text    css:#releaseMainContent
-    user adds content to accordion section text block    Test text    1    Updated test text!
+    user adds content to autosaving accordion section text block    Test text    1    Updated test text!
     ...    css:#releaseMainContent
 
 Add release note to amendment
@@ -516,10 +482,10 @@ Update public prerelease access list for amendment
 
 Approve amendment for immediate release
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves amended release for immediate publication
 
 Go back to public find-statistics page
-    user goes to url    %{PUBLIC_URL}/find-statistics
+    user navigates to public frontend    %{PUBLIC_URL}/find-statistics
     user waits until h1 is visible    Find statistics and data
     user waits for page to finish loading
 
@@ -529,14 +495,15 @@ Verify amendment is on Find Statistics page again
     user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
 
     user opens details dropdown    %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}    10
+    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}
+    ...    Experimental statistics
     user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
     user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
     user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
 
 Navigate to amendment release page
     user clicks element    testid:View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    90
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
     user waits until page contains title caption    ${RELEASE_NAME}
 
     user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publish-release-%{RUN_IDENTIFIER}
@@ -560,11 +527,11 @@ Verify amendment is published
 Verify amendment files
     user opens accordion section    Explore data and files
     ${downloads}=    user gets accordion section content element    Explore data and files
-    user checks element should contain    ${downloads}    Download all files
-    ...    30
+    user checks element should contain    ${downloads}    Download all data
+    ...    %{WAIT_SMALL}
 
-    user opens details dropdown    List of other files
-    ${other_files}=    user gets details content element    List of other files
+    user opens details dropdown    List of all supporting files
+    ${other_files}=    user gets details content element    List of all supporting files
     ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
     ${other_files_2}=    get child element    ${other_files}    css:li:nth-child(2)
 
@@ -587,20 +554,20 @@ Verify amendment files
 Verify amendment public metadata guidance document
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
-    user clicks link    data files guide
+    user clicks link    Data guidance
 
     user checks breadcrumb count should be    4
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Find statistics and data
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
-    user checks nth breadcrumb contains    4    Metadata guidance document
-    user waits until h2 is visible    Metadata guidance document
+    user checks nth breadcrumb contains    4    Data guidance
+    user waits until h2 is visible    Data guidance
 
     user waits until page contains title caption    ${RELEASE_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
-    user waits until h2 is visible    Metadata guidance document
-    user waits until page contains    Updated test meta guidance content
+    user waits until h2 is visible    Data guidance
+    user waits until page contains    Updated test data guidance content
 
     user waits until page contains accordion section    Dates test subject
     user checks there are x accordion sections    1
@@ -609,7 +576,7 @@ Verify amendment public metadata guidance document
     user checks summary list contains    Filename    dates-replacement.csv
     user checks summary list contains    Geographic levels    National
     user checks summary list contains    Time period    2020 Week 13 to 2021 Week 24
-    user checks summary list contains    Content    Updated Dates test subject test meta guidance content
+    user checks summary list contains    Content    Updated Dates test subject test data guidance content
 
     user opens details dropdown    Variable names and descriptions
 
@@ -648,7 +615,7 @@ Verify amendment accordions are correct
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
 
-    user checks accordion is in position    National Statistics    1    id:help-and-support
+    user checks accordion is in position    Experimental statistics    1    id:help-and-support
     user checks accordion is in position    Contact us    2    id:help-and-support
 
 Verify amendment Dates data block accordion section

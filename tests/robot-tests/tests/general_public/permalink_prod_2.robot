@@ -3,6 +3,7 @@ Resource            ../libs/public-common.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Prod
 
@@ -11,7 +12,7 @@ Go to Table Tool page
     user navigates to data tables page on public frontend
 
 Go to permalink
-    user goes to url    %{PUBLIC_URL}/data-tables/permalink/edfe9f83-d1f0-40fc-8dce-9467a250c61b
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables/permalink/edfe9f83-d1f0-40fc-8dce-9467a250c61b
     user waits until h1 is visible
     ...    'Exclusions by characteristic' from 'Permanent and fixed-period exclusions in England'
 
@@ -26,7 +27,7 @@ Validate breadcrumbs
 Validate miscellaneous
     user checks summary list contains    Created    7 April 2020
     user waits until element contains    testid:dataTableCaption
-    ...    Table showing 'Exclusions by characteristic' in England between 2013/14 and 2015/16
+    ...    'Exclusions by characteristic' in England between 2013/14 and 2015/16
     user waits until page contains button    Print this page
 
 Validate table

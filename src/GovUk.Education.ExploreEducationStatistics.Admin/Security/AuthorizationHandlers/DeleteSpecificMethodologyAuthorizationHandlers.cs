@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -41,9 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            // If the Methodology is the first version added to a Publication and is still in Draft, or if it is a 
-            // subsequent version but is still an amendment, it can potentially be deleted.  Otherwise it cannot.
-            if (!methodologyVersion.Amendment && !methodologyVersion.DraftFirstVersion)
+            if (methodologyVersion.Status == Approved)
             {
                 return;
             }

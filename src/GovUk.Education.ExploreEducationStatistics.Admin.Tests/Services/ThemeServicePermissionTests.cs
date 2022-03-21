@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -15,6 +14,7 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            PolicyCheckBuilder()
+            await PolicyCheckBuilder()
                 .SetupCheck(SecurityPolicies.CanAccessSystem)
                 .SetupCheck(SecurityPolicies.CanManageAllTaxonomy)
                 .AssertSuccess(
@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            PolicyCheckBuilder()
+            await PolicyCheckBuilder()
                 .SetupCheck(SecurityPolicies.CanAccessSystem)
                 .SetupCheck(SecurityPolicies.CanManageAllTaxonomy, false)
                 .AssertSuccess(
@@ -225,6 +225,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
         }
 
+        private static Mock<IConfiguration> DefaultConfigurationMock()
+        {
+            var mock = new Mock<IConfiguration>(MockBehavior.Strict);
+            mock
+                .Setup(x => x.GetSection(It.IsAny<String>()))
+                .Returns(new Mock<IConfigurationSection>().Object);
+            return mock;
+        }
+
         private ThemeService SetupThemeService(
             ContentDbContext context = null,
             IMapper mapper = null,
@@ -234,11 +243,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPublishingService publishingService = null)
         {
             return new ThemeService(
-                Mock.Of<IConfiguration>(),
+                DefaultConfigurationMock().Object,
                 context ?? new Mock<ContentDbContext>().Object,
                 mapper ?? AdminMapper(),
-                persistenceHelper ?? MockUtils.MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object,
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                persistenceHelper ?? MockPersistenceHelper<ContentDbContext, Theme>(_theme.Id, _theme).Object,
+                userService ?? AlwaysTrueUserService().Object,
                 topicService ?? new Mock<ITopicService>().Object,
                 publishingService ?? new Mock<IPublishingService>().Object
             );

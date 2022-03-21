@@ -19,13 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.View
                     new AllMethodologiesPublicationViewModel
                     {
                         Title = "PublicationWithoutMethodology",
-                        Methodologies = new List<MethodologySummaryViewModel>()
+                        Methodologies = new List<MethodologyVersionSummaryViewModel>()
                     },
                     new AllMethodologiesPublicationViewModel
                     {
                         Title = "PublicationWithMethodology",
                         Methodologies = AsList(
-                            new MethodologySummaryViewModel()
+                            new MethodologyVersionSummaryViewModel()
                         )
                     }
                 )
@@ -48,21 +48,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests.View
                     {
                         Title = "Publication C",
                         Methodologies = AsList(
-                            new MethodologySummaryViewModel()
+                            new MethodologyVersionSummaryViewModel()
                         )
                     },
                     new AllMethodologiesPublicationViewModel
                     {
                         Title = "Publication A",
                         Methodologies = AsList(
-                            new MethodologySummaryViewModel()
+                            new MethodologyVersionSummaryViewModel()
                         )
                     },
                     new AllMethodologiesPublicationViewModel
                     {
                         Title = "Publication B",
                         Methodologies = AsList(
-                            new MethodologySummaryViewModel()
+                            new MethodologyVersionSummaryViewModel()
                         )
                     }
                 )

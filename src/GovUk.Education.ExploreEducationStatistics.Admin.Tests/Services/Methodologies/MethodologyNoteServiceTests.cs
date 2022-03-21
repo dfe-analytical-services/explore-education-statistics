@@ -69,6 +69,53 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         }
 
         [Fact]
+        public async Task AddNote_NoDisplayDateDefaultsToToday()
+        {
+            var methodologyVersion = new MethodologyVersion();
+
+            var request = new MethodologyNoteAddRequest
+            {
+                Content = "Adding note",
+                DisplayDate = null
+            };
+
+            var today = DateTime.Today.ToUniversalTime();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyNoteService(contentDbContext);
+
+                var result = (await service.AddNote(
+                    methodologyVersionId: methodologyVersion.Id,
+                    request: request)).AssertRight();
+
+                Assert.NotEqual(Guid.Empty, result.Id);
+                Assert.Equal(request.Content, result.Content);
+                Assert.Equal(today, result.DisplayDate);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                Assert.Single(contentDbContext.MethodologyVersions);
+
+                var addedNote =
+                    await contentDbContext.MethodologyNotes.SingleAsync(n =>
+                        n.MethodologyVersionId == methodologyVersion.Id);
+
+                Assert.Equal(request.Content, addedNote.Content);
+                Assert.Equal(today, addedNote.DisplayDate);
+            }
+        }
+
+        [Fact]
         public async Task AddNote_MethodologyVersionNotFound()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -264,6 +311,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 Assert.Equal(request.Content, updatedNote.Content);
                 Assert.Equal(request.DisplayDate, updatedNote.DisplayDate);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateNote_NoDisplayDateDefaultsToToday()
+        {
+            var methodologyVersion = new MethodologyVersion
+            {
+                Notes = new List<MethodologyNote>
+                {
+                    new()
+                    {
+                        Content = "Original note",
+                        DisplayDate = DateTime.Today.AddDays(-7).ToUniversalTime()
+                    }
+                }
+            };
+
+            var request = new MethodologyNoteUpdateRequest
+            {
+                Content = "Updating note",
+                DisplayDate = null
+            };
+
+            var today = DateTime.Today.ToUniversalTime();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyNoteService(contentDbContext);
+
+                var result = (await service.UpdateNote(
+                    methodologyVersionId: methodologyVersion.Id,
+                    methodologyNoteId: methodologyVersion.Notes[0].Id,
+                    request: request)).AssertRight();
+
+                Assert.Equal(methodologyVersion.Notes[0].Id, result.Id);
+                Assert.Equal(request.Content, result.Content);
+                Assert.Equal(today, result.DisplayDate);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var updatedNote =
+                    await contentDbContext.MethodologyNotes.SingleAsync(n => n.Id == methodologyVersion.Notes[0].Id);
+
+                Assert.Equal(request.Content, updatedNote.Content);
+                Assert.Equal(today, updatedNote.DisplayDate);
             }
         }
 

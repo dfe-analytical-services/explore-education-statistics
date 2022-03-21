@@ -5,17 +5,24 @@ using System.Security.Claims;
 using AutoMapper;
 using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
+using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
+using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -25,6 +32,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
@@ -55,14 +64,25 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
+using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.FootnoteService;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
+using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
+using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
+using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
+using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
+using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
+using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
+using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
+using MethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
+using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyService;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
+using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
 using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseRepository;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
@@ -83,7 +103,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationInsightsTelemetry();
+            services.AddApplicationInsightsTelemetry()
+                .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -93,12 +114,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options.Secure = CookieSecurePolicy.Always;
             });
 
-            services.AddControllers(
-                options =>
-                {
-                    options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
-                }
-            );
+            services
+                .AddControllers(
+                    options =>
+                    {
+                        options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
+                    }
+                )
+                .AddControllersAsServices();
 
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
@@ -110,14 +133,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        builder => builder.MigrationsAssembly(typeof(Startup).Assembly.FullName))
+                        builder =>
+                        {
+                            builder.MigrationsAssembly(typeof(Startup).Assembly.FullName);
+                        })
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
+                        builder =>
+                        {
+                            builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model");
+                            builder.AddBulkOperationSupport();
+                        })
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -196,6 +226,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             });
 
             services.Configure<PreReleaseOptions>(Configuration);
+            services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
+            services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
             // here we configure our security policies
             StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
@@ -203,18 +235,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-            services.AddTransient<IMyReleasePermissionSetPropertyResolver,
-                MyReleasePermissionSetPropertyResolver>();
-            services.AddTransient<IMyPublicationPermissionSetPropertyResolver,
-                MyPublicationPermissionSetPropertyResolver>();
-            services.AddTransient<IMyPublicationMethodologyPermissionsPropertyResolver,
-                MyPublicationMethodologyPermissionsPropertyResolver>();
-            services.AddTransient<IMyMethodologyPermissionSetPropertyResolver,
-                MyMethodologyPermissionSetPropertyResolver>();
+            services.AddTransient<IMyReleasePermissionsResolver,
+                MyReleasePermissionsResolver>();
+            services.AddTransient<IMyPublicationPermissionsResolver,
+                MyPublicationPermissionsResolver>();
+            services.AddTransient<IMyPublicationMethodologyVersionPermissionsResolver,
+                MyPublicationMethodologyVersionPermissionsResolver>();
+            services.AddTransient<IMyMethodologyVersionPermissionsResolver,
+                MyMethodologyVersionPermissionsResolver>();
 
             services.AddMvc(options =>
                 {
                     options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
+                    options.Filters.Add(new OperationCancelledExceptionFilter());
                     options.EnableEndpointRouting = false;
                     options.AllowEmptyInputInBodyModelBinding = true;
                 })
@@ -233,8 +266,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
 
             services.AddTransient<IReleaseDataFileService, ReleaseDataFileService>();
+            services.AddTransient<IDataGuidanceFileWriter, DataGuidanceFileWriter>();
             services.AddTransient<IReleaseFileService, ReleaseFileService>();
             services.AddTransient<IReleaseImageService, ReleaseImageService>();
+            services.AddTransient<IReleasePermissionService, ReleasePermissionService>();
             services.AddTransient<IDataImportService, DataImportService>();
             services.AddTransient<IImportStatusBauService, ImportStatusBauService>();
 
@@ -244,14 +279,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     new StorageQueueService(Configuration.GetValue<string>("PublisherStorage")),
                     provider.GetService<IUserService>(),
                     provider.GetRequiredService<ILogger<PublishingService>>()));
-            services.AddTransient<IReleaseStatusService, ReleaseStatusService>(s =>
-                new ReleaseStatusService(
+            services.AddTransient<IReleasePublishingStatusService, ReleasePublishingStatusService>(s =>
+                new ReleasePublishingStatusService(
                     s.GetService<IMapper>(),
                     s.GetService<IUserService>(),
                     s.GetService<IPersistenceHelper<ContentDbContext>>(),
                     new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))));
-            services.AddTransient<IReleaseStatusRepository, ReleaseStatusRepository>(s =>
-                new ReleaseStatusRepository(
+            services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>(s =>
+                new ReleasePublishingStatusRepository(
                     new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))
                 )
             );
@@ -262,6 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();
             services.AddTransient<IReleaseService, ReleaseService>();
+            services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
             services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
             services.AddTransient<IReleaseSubjectRepository, ReleaseSubjectRepository>();
             services.AddTransient<IReleaseChecklistService, ReleaseChecklistService>();
@@ -275,6 +311,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyFileRepository, MethodologyFileRepository>();
             services.AddTransient<IMethodologyImageService, MethodologyImageService>();
             services.AddTransient<IMethodologyAmendmentService, MethodologyAmendmentService>();
+            services.AddTransient<IMethodologyApprovalService, MethodologyApprovalService>(provider =>
+                new MethodologyApprovalService(
+                    context: provider.GetService<ContentDbContext>(),
+                    persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                    methodologyContentService: provider.GetRequiredService<IMethodologyContentService>(),
+                    methodologyFileRepository: provider.GetRequiredService<IMethodologyFileRepository>(),
+                    methodologyImageService: provider.GetRequiredService<IMethodologyImageService>(),
+                    methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
+                    publicBlobCacheService: new BlobCacheService(
+                        GetBlobStorageService(provider, "PublicStorage"),
+                        provider.GetRequiredService<ILogger<BlobCacheService>>()),
+                    publishingService: provider.GetRequiredService<IPublishingService>(),
+                    userService: provider.GetRequiredService<IUserService>()));
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
@@ -286,8 +335,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
             services.AddTransient<IUserRoleService, UserRoleService>();
+            services.AddTransient<IUserReleaseRoleService, UserReleaseRoleService>();
             services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
             services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
+            services.AddTransient<IUserReleaseInviteRepository, UserReleaseInviteRepository>();
 
             services.AddTransient<INotificationClient>(s =>
             {
@@ -309,7 +360,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IEmailService, EmailService>();
 
             services.AddTransient<IBoundaryLevelRepository, BoundaryLevelRepository>();
-            services.AddTransient<IBlobCacheService, BlobCacheService>();
             services.AddTransient<IEmailTemplateService, EmailTemplateService>();
             services.AddTransient<ITableBuilderService, TableBuilderService>();
             services.AddTransient<IFilterRepository, FilterRepository>();
@@ -317,11 +367,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFootnoteService, FootnoteService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
             services.AddTransient<IGeoJsonRepository, GeoJsonRepository>();
+            services.AddTransient<IGlossaryService, GlossaryService>();
             services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<ILocationRepository, LocationRepository>();
-            services.AddTransient<IMetaGuidanceService, MetaGuidanceService>();
-            services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
+            services.AddTransient<IDataGuidanceService, DataGuidanceService>();
+            services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<IObservationService, ObservationService>();
             services.AddTransient<Data.Services.Interfaces.IReleaseService, Data.Services.ReleaseService>();
             // TODO: EES-2343 Remove when file sizes are stored in database
@@ -338,22 +389,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<IUserManagementService, UserManagementService>();
+            services.AddTransient<IReleaseInviteService, ReleaseInviteService>();
+            services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IUserInviteRepository, UserInviteRepository>();
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
-            services.AddTransient<IBlobStorageService, BlobStorageService>(provider =>
-                {
-                    var connectionString = Configuration.GetValue<string>("CoreStorage");
-
-                    return new BlobStorageService(
-                        connectionString,
-                        new BlobServiceClient(connectionString),
-                        provider.GetRequiredService<ILogger<BlobStorageService>>()
-                    );
-                }
-            );
+            services.AddTransient(provider => GetBlobStorageService(provider, "CoreStorage"));
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
             services.AddTransient<IStorageQueueService, StorageQueueService>(s =>
                 new StorageQueueService(Configuration.GetValue<string>("CoreStorage")));
+            services.AddTransient<IDataBlockMigrationService, DataBlockMigrationService>(provider =>
+                new DataBlockMigrationService(
+                    context: provider.GetRequiredService<ContentDbContext>(),
+                    storageQueueService: new StorageQueueService(Configuration.GetValue<string>("PublisherStorage")),
+                    userService: provider.GetRequiredService<IUserService>(),
+                    logger: provider.GetRequiredService<ILogger<DataBlockMigrationService>>()));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
@@ -361,6 +411,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
+
+            // These services act as delegates through to underlying Identity services that cannot be mocked or are
+            // hard to mock.
+            services.AddTransient<ISignInManagerDelegate, SignInManagerDelegate>();
+            services.AddTransient<IUserManagerDelegate, UserManagerDelegate>();
 
             // This service allows a set of users to be pre-invited to the service on startup.
             if (HostEnvironment.IsDevelopment())
@@ -373,6 +428,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddSingleton<IFileTypeService, FileTypeService>();
             services.AddTransient<IDataArchiveValidationService, DataArchiveValidationService>();
+            services.AddTransient<IBlobCacheService, BlobCacheService>();
+            services.AddTransient<ICacheKeyService, CacheKeyService>();
+
+            // Register any controllers that need specific dependencies
+            services.AddTransient(
+                provider => new BauCacheController(
+                    privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
+                    publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")
+                )
+            );
 
             services.AddSwaggerGen(c =>
             {
@@ -402,6 +467,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            // Enable caching and register any caching services.
+            CacheAspect.Enabled = true;
+            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+
             UpdateDatabase(app, env);
 
             if (env.IsDevelopment())
@@ -419,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 });
             }
 
-            if(Configuration.GetValue<bool>("enableSwagger"))
+            if (Configuration.GetValue<bool>("enableSwagger"))
             {
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
@@ -527,6 +596,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     .GetService<BootstrapUsersService>()
                     .AddBootstrapUsers();
             }
+        }
+
+        private IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)
+        {
+            var connectionString = Configuration.GetValue<string>(connectionStringKey);
+            return new BlobStorageService(
+                connectionString,
+                new BlobServiceClient(connectionString),
+                provider.GetRequiredService<ILogger<BlobStorageService>>());
         }
 
         private static void ApplyCustomMigrations(params ICustomMigration[] migrations)

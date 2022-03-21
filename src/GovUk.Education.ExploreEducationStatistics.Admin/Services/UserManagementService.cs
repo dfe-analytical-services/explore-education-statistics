@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -27,13 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IEmailTemplateService _emailTemplateService;
         private readonly IUserRoleService _userRoleService;
         private readonly IUserService _userService;
+        private readonly IUserInviteRepository _userInviteRepository;
 
         public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext,
             ContentDbContext contentDbContext,
             IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper,
             IEmailTemplateService emailTemplateService,
             IUserRoleService userRoleService,
-            IUserService userService)
+            IUserService userService,
+            IUserInviteRepository userInviteRepository)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -41,6 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _emailTemplateService = emailTemplateService;
             _userRoleService = userRoleService;
             _userService = userService;
+            _userInviteRepository = userInviteRepository;
         }
 
         public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()
@@ -50,6 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() =>
                 {
                     return _usersAndRolesDbContext.Users
+                        .AsQueryable()
                         .Join(
                             _usersAndRolesDbContext.UserRoles,
                             user => user.Id,
@@ -72,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 Role = role.Name
                             }
                         )
-                        .Where(uvm => uvm.Role != "Prerelease User")
+                        .Where(uvm => uvm.Role != Role.PrereleaseUser.GetEnumLabel())
                         .OrderBy(uvm => uvm.Name)
                         .ToListAsync();
                 });
@@ -85,6 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ =>
                 {
                     return _contentDbContext.Publications
+                        .AsQueryable()
                         .Select(p => new TitleAndIdViewModel
                         {
                             Id = p.Id,
@@ -119,7 +126,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
                 {
-                    return await _usersAndRolesDbContext.Roles.Select(r => new RoleViewModel
+                    return await _usersAndRolesDbContext.Roles
+                        .AsQueryable()
+                        .Select(r => new RoleViewModel
                         {
                             Id = r.Id,
                             Name = r.Name,
@@ -133,6 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<UserViewModel>> ListPreReleaseUsersAsync()
         {
             return await _usersAndRolesDbContext.Users
+                .AsQueryable()
                 .Join(
                     _usersAndRolesDbContext.UserRoles,
                     user => user.Id,
@@ -156,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
                 )
                 .OrderBy(x => x.Name)
-                .Where(u => u.Role == "Prerelease User")
+                .Where(u => u.Role == Role.PrereleaseUser.GetEnumLabel())
                 .ToListAsync();
         }
 
@@ -200,6 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
                     await _usersAndRolesDbContext.UserInvites
+                        .AsQueryable()
                         .Where(ui => !ui.Accepted)
                         .OrderBy(ui => ui.Email)
                         .Include(ui => ui.Role)
@@ -211,40 +222,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        public async Task<Either<ActionResult, UserInvite>> InviteUser(string email, string inviteCreatedByUser,
-            string roleId)
+        public async Task<Either<ActionResult, UserInvite>> InviteUser(string email, string roleId)
         {
             return await _userService
                 .CheckCanManageAllUsers()
+                .OnSuccess(() => ValidateUserDoesNotExist(email))
                 .OnSuccess<ActionResult, Unit, UserInvite>(async () =>
                 {
-                    if (string.IsNullOrWhiteSpace(email))
-                    {
-                        return ValidationActionResult(InvalidEmailAddress);
-                    }
+                    var role = await _usersAndRolesDbContext.Roles
+                        .AsQueryable()
+                        .FirstOrDefaultAsync(r => r.Id == roleId);
 
-                    if (_usersAndRolesDbContext.Users.Any(u => u.Email.ToLower() == email.ToLower()))
-                    {
-                        return ValidationActionResult(UserAlreadyExists);
-                    }
-
-                    var role = await _usersAndRolesDbContext.Roles.FirstOrDefaultAsync(r => r.Id == roleId);
                     if (role == null)
                     {
                         return ValidationActionResult(InvalidUserRole);
                     }
 
-                    var invite = new UserInvite
-                    {
-                        Email = email.ToLower(),
-                        Created = DateTime.UtcNow,
-                        CreatedBy = inviteCreatedByUser,
-                        Role = role
-                    };
-                    await _usersAndRolesDbContext.UserInvites.AddAsync(invite);
-                    await _usersAndRolesDbContext.SaveChangesAsync();
-                    _emailTemplateService.SendInviteEmail(email);
-                    return invite;
+                    return await _userInviteRepository.Create(
+                        email: email.ToLower(),
+                        roleId: roleId,
+                        createdById: _userService.GetUserId());
+                })
+                .OnSuccess(invite =>
+                {
+                    return _emailTemplateService
+                        .SendInviteEmail(email)
+                        .OnSuccess(() => invite);
                 });
         }
 
@@ -254,7 +257,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckCanManageAllUsers()
                 .OnSuccess<ActionResult, Unit, Unit>(async () =>
                 {
-                    var invite = await _usersAndRolesDbContext.UserInvites.FirstOrDefaultAsync(i => i.Email == email);
+                    var invite = await _usersAndRolesDbContext.UserInvites
+                        .AsQueryable()
+                        .FirstOrDefaultAsync(i => i.Email == email);
+
                     if (invite == null)
                     {
                         return ValidationActionResult(InviteNotFound);
@@ -275,8 +281,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     // Currently we only allow a user to have a maximum of one global role
                     var existingRole =
-                        await _usersAndRolesDbContext.UserRoles.FirstOrDefaultAsync(userRole =>
-                            userRole.UserId == userId);
+                        await _usersAndRolesDbContext.UserRoles
+                            .AsQueryable()
+                            .FirstOrDefaultAsync(userRole => userRole.UserId == userId);
+
                     if (existingRole == null)
                     {
                         return await _userRoleService.AddGlobalRole(userId, roleId);
@@ -285,6 +293,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return await _userRoleService.RemoveGlobalRole(userId, existingRole.RoleId)
                         .OnSuccess(() => _userRoleService.AddGlobalRole(userId, roleId));
                 });
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateUserDoesNotExist(string email)
+        {
+            if (await _usersAndRolesDbContext.Users
+                    .AsQueryable()
+                    .AnyAsync(u => u.Email.ToLower() == email.ToLower()))
+            {
+                return ValidationActionResult(UserAlreadyExists);
+            }
+
+            return Unit.Instance;
         }
     }
 }

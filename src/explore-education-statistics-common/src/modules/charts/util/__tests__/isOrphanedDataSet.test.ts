@@ -75,10 +75,12 @@ describe('isOrphanedDataSet', () => {
           name: 'sess_authorised_percent',
         },
       ],
-      locations: [
-        { level: 'localAuthority', label: 'Barnsley', value: 'E08000016' },
-        { level: 'localAuthority', label: 'Barnet', value: 'E09000003' },
-      ],
+      locations: {
+        localAuthority: [
+          { id: 'barnsley', label: 'Barnsley', value: 'barnsley' },
+          { id: 'barnet', label: 'Barnet', value: 'barnet' },
+        ],
+      },
       boundaryLevels: [
         {
           id: 2,
@@ -105,7 +107,7 @@ describe('isOrphanedDataSet', () => {
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       indicator: 'authorised-absence-sessions',
       location: {
-        value: 'E08000016',
+        value: 'barnsley',
         level: 'localAuthority',
       },
     };
@@ -135,7 +137,7 @@ describe('isOrphanedDataSet', () => {
       filters: ['ethnicity-major-chinese', 'state-funded-primary'],
       indicator: 'authorised-absence-sessions',
       location: {
-        value: 'E08000016',
+        value: 'barnsley',
         level: 'localAuthorityDistrict',
       },
     };
@@ -219,7 +221,7 @@ describe('isOrphanedDataSet', () => {
       indicator: 'authorised-absence-sessions',
       timePeriod: '2013_AY',
       location: {
-        value: 'E08000016',
+        value: 'barnsley',
         level: 'localAuthority',
       },
     };

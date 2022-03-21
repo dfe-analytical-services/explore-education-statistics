@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IMapper _mapper;
 
         public ReleaseRepository(
-            ContentDbContext contentDbContext, 
+            ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             IMapper mapper)
         {
@@ -34,11 +34,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<List<MyReleaseViewModel>> ListReleases(
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
-            var releases = await 
+            var releases = await
                 HydrateReleaseForReleaseViewModel(_contentDbContext.Releases)
                 .Where(r => releaseApprovalStatuses.Contains(r.ApprovalStatus))
                 .ToListAsync();
-            
+
             return _mapper.Map<List<MyReleaseViewModel>>(releases);
         }
 
@@ -47,24 +47,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var userReleaseIds = await _contentDbContext
                 .UserReleaseRoles
+                .AsQueryable()
                 .Where(r => r.UserId == userId && r.Role != ReleaseRole.PrereleaseViewer)
                 .Select(r => r.ReleaseId)
                 .ToListAsync();
 
             var userPublicationIds = await _contentDbContext
                 .UserPublicationRoles
+                .AsQueryable()
                 .Where(r => r.UserId == userId && r.Role == PublicationRole.Owner)
                 .Select(r => r.PublicationId)
                 .ToListAsync();
             var userPublicationRoleReleaseIds = await _contentDbContext
                 .Releases
+                .AsQueryable()
                 .Where(r => userPublicationIds.Contains(r.PublicationId))
                 .Select(r => r.Id)
                 .ToListAsync();
             userReleaseIds.AddRange(userPublicationRoleReleaseIds);
             userReleaseIds = userReleaseIds.Distinct().ToList();
 
-            var releases = await 
+            var releases = await
                 HydrateReleaseForReleaseViewModel(_contentDbContext.Releases)
                 .Where(r => userReleaseIds.Contains(r.Id) && releaseApprovalStatuses.Contains(r.ApprovalStatus))
                 .ToListAsync();
@@ -99,6 +102,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             await _statisticsDbContext.SaveChangesAsync();
             return releaseSubject.Subject.Id;
+        }
+
+        public async Task<List<Guid>> GetAllReleaseVersionIds(Content.Model.Release release)
+        {
+            var releaseIdList = new List<Guid> { release.Id };
+            var currentRelease = release;
+
+            while (currentRelease.PreviousVersionId != null)
+            {
+                currentRelease = await _contentDbContext.Releases
+                    .AsQueryable()
+                    .SingleAsync(r => r.Id == currentRelease.PreviousVersionId);
+                releaseIdList.Add(currentRelease.Id);
+            }
+
+            return releaseIdList;
         }
     }
 }

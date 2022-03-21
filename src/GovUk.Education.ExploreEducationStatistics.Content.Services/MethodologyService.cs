@@ -10,10 +10,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,13 +37,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _methodologyVersionRepository = methodologyVersionRepository;
         }
 
-        public async Task<Either<ActionResult, MethodologyViewModel>> GetLatestMethodologyBySlug(string slug)
+        public async Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Methodology>(
                     query => query
                         .Where(mp => mp.Slug == slug))
-                .OnSuccess<ActionResult, Methodology, MethodologyViewModel>(async methodology =>
+                .OnSuccess<ActionResult, Methodology, MethodologyVersionViewModel>(async methodology =>
                 {
                     var latestPublishedVersion =
                         await _methodologyVersionRepository.GetLatestPublishedVersion(methodology.Id);
@@ -52,11 +52,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         return new NotFoundResult();
                     }
 
-                    return _mapper.Map<MethodologyViewModel>(latestPublishedVersion);
+                    await _contentDbContext.Entry(latestPublishedVersion)
+                        .Collection(m => m.Notes)
+                        .LoadAsync();
+
+                    var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
+                    viewModel.Publications =
+                        await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
+
+                    return viewModel;
                 });
         }
 
-        public async Task<Either<ActionResult, List<MethodologySummaryViewModel>>> GetSummariesByPublication(
+        public async Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(
             Guid publicationId)
         {
             return await _persistenceHelper
@@ -64,7 +72,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OnSuccess(publication => BuildMethodologiesForPublication(publication.Id));
         }
 
-        [BlobCache(typeof(AllMethodologiesCacheKey))]
         public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetTree()
         {
             var themes = await _contentDbContext.Themes
@@ -91,7 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
             await themes.SelectMany(model => model.Topics)
                 .SelectMany(model => model.Publications)
-                .ForEachAsync(async publication =>
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async publication =>
                     publication.Methodologies = await BuildMethodologiesForPublication(publication.Id));
 
             themes.ForEach(theme => theme.RemoveTopicNodesWithoutMethodologiesAndSort());
@@ -101,11 +109,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .ToList();
         }
 
-        private async Task<List<MethodologySummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)
+        private async Task<List<PublicationSummaryViewModel>> GetPublishedPublicationsForMethodology(Guid methodologyId)
+        {
+            var publications = await _contentDbContext.PublicationMethodologies
+                .Include(pm => pm.Publication)
+                .ThenInclude(p => p.Releases)
+                .Where(pm => pm.MethodologyId == methodologyId)
+                .Select(pm => pm.Publication)
+                .ToListAsync();
+
+            var publicationsWithPublishedReleases = publications
+                .Where(p => p.Releases.Any(r => r.IsLatestPublishedVersionOfRelease()))
+                .OrderBy(p => p.Title)
+                .ToList();
+
+            return _mapper.Map<List<PublicationSummaryViewModel>>(publicationsWithPublishedReleases);
+        }
+
+        private async Task<List<MethodologyVersionSummaryViewModel>> BuildMethodologiesForPublication(Guid publicationId)
         {
             var latestPublishedMethodologies =
                 await _methodologyVersionRepository.GetLatestPublishedVersionByPublication(publicationId);
-            return _mapper.Map<List<MethodologySummaryViewModel>>(latestPublishedMethodologies);
+            return _mapper.Map<List<MethodologyVersionSummaryViewModel>>(latestPublishedMethodologies);
         }
     }
 }

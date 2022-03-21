@@ -11,11 +11,14 @@ import PageSearchForm from '@common/components/PageSearchForm';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import MethodologyAccordion from '@admin/pages/methodology/edit-methodology/content/components/MethodologyAccordion';
+import MethodologyNotesSection from '@admin/pages/methodology/edit-methodology/content/components/MethodologyNotesSection';
 import {
   MethodologyContextState,
   MethodologyContentProvider,
   useMethodologyContentState,
 } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContext';
+import SummaryList from '@common/components/SummaryList';
+import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
@@ -26,9 +29,7 @@ const MethodologyContentPageInternal = () => {
     canUpdateMethodology && methodology.status === 'Draft';
 
   return (
-    <EditingContextProvider
-      initialEditingMode={canUpdateContent ? 'edit' : 'preview'}
-    >
+    <EditingContextProvider editingMode={canUpdateContent ? 'edit' : 'preview'}>
       {({ editingMode }) => (
         <>
           {canUpdateContent && <EditablePageModeToggle />}
@@ -55,32 +56,23 @@ const MethodologyContentPageInternal = () => {
                 {methodology.title}
               </h2>
 
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-two-thirds">
-                  <dl className="dfe-meta-content govuk-!-margin-top-0">
-                    <div>
-                      <dt className="govuk-caption-m">Published: </dt>
-                      <dd data-testid="published-date">
-                        <strong>
-                          {methodology.published ? (
-                            <FormattedDate>
-                              {methodology.published}
-                            </FormattedDate>
-                          ) : (
-                            'Not yet published'
-                          )}
-                        </strong>
-                      </dd>
-                    </div>
-                  </dl>
-                  {editingMode !== 'edit' && (
-                    <>
-                      <PrintThisPage />
-                      <PageSearchForm inputLabel="Search in this methodology page." />
-                    </>
+              <SummaryList>
+                <SummaryListItem term="Publish date">
+                  {methodology.published ? (
+                    <FormattedDate>{methodology.published}</FormattedDate>
+                  ) : (
+                    'Not yet published'
                   )}
-                </div>
-              </div>
+                </SummaryListItem>
+                <MethodologyNotesSection methodology={methodology} />
+              </SummaryList>
+              {editingMode !== 'edit' && (
+                <>
+                  <PrintThisPage />
+                  <PageSearchForm inputLabel="Search in this methodology page." />
+                </>
+              )}
+
               <MethodologyAccordion
                 methodology={methodology}
                 sectionKey="content"

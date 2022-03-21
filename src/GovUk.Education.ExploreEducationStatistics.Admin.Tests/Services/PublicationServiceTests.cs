@@ -1,16 +1,20 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -140,6 +144,321 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var result = await publicationService.GetPublication(Guid.NewGuid());
 
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task GetMyPublication_CanViewAllReleases()
+        {
+            var methodologyVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 1 Version 1",
+                Version = 0,
+                Status = Draft
+            };
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Slug = "test-publication",
+                Topic = new Topic
+                {
+                    Title = "Test topic",
+                    Theme = new Theme
+                    {
+                        Title = "Test theme"
+                    }
+                },
+                Contact = new Contact
+                {
+                    ContactName = "Test contact",
+                    ContactTelNo = "0123456789",
+                    TeamName = "Test team",
+                    TeamEmail = "team@test.com",
+                },
+                Methodologies = new List<PublicationMethodology>
+                {
+                    new PublicationMethodology
+                    {
+                        Methodology = new Methodology
+                        {
+                            Slug = "methodology-1-slug",
+                            Versions = new List<MethodologyVersion>
+                            {
+                                methodologyVersion,
+                            },
+                        },
+                        Owner = true
+                    },
+                },
+                LegacyReleases = new List<LegacyRelease>
+                {
+                    new LegacyRelease
+                    {
+                        Description = "Legacy Release A",
+                        Url = "legacy-release-a-url",
+                        Order = 3,
+                    },
+                    new LegacyRelease
+                    {
+                        Description = "Legacy Release C",
+                        Url = "legacy-release-c-url",
+                        Order = 1,
+                    },
+                    new LegacyRelease
+                    {
+                        Description = "Legacy Release B",
+                        Url = "legacy-release-b-url",
+                        Order = 2,
+                    },
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationRepository = new PublicationRepository(context, AdminMapper());
+                var publicationService = BuildPublicationService(context, publicationRepository: publicationRepository);
+                var result = await publicationService.GetMyPublication(publication.Id);
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(publication.Id, viewModel.Id);
+                Assert.Equal(publication.Title, viewModel.Title);
+
+                Assert.Equal(publication.Topic.Id, viewModel.TopicId);
+                Assert.Equal(publication.Topic.ThemeId, viewModel.ThemeId);
+
+                Assert.Equal(publication.Contact.Id, viewModel.Contact.Id);
+                Assert.Equal(publication.Contact.ContactName, viewModel.Contact.ContactName);
+                Assert.Equal(publication.Contact.ContactTelNo, viewModel.Contact.ContactTelNo);
+                Assert.Equal(publication.Contact.TeamEmail, viewModel.Contact.TeamEmail);
+                Assert.Equal(publication.Contact.TeamName, viewModel.Contact.TeamName);
+
+                Assert.Single(viewModel.Methodologies);
+                Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Methodology.Id);
+                Assert.Equal(methodologyVersion.Title, viewModel.Methodologies[0].Methodology.Title);
+
+                Assert.Equal(3, viewModel.LegacyReleases.Count);
+                var legacyReleases = publication.LegacyReleases
+                    .OrderByDescending(lr => lr.Order)
+                    .ToList();
+                Assert.Equal(legacyReleases[0].Id, viewModel.LegacyReleases[0].Id); // Legacy Release A
+                Assert.Equal(legacyReleases[1].Id, viewModel.LegacyReleases[1].Id); // Legacy Release B
+                Assert.Equal(legacyReleases[2].Id, viewModel.LegacyReleases[2].Id); // Legacy Release C
+            }
+        }
+
+        [Fact]
+        public async Task GetMyPublication_CanViewSpecificPublication()
+        {
+            var userId = Guid.NewGuid();
+            var methodologyVersion = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 1 Version 1",
+                Version = 0,
+                Status = Draft
+            };
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+            };
+            var userReleaseRole = new UserReleaseRole
+            {
+                UserId = userId,
+                ReleaseId = release.Id,
+            };
+            var publication = new Publication
+            {
+                Title = "Test publication",
+                Slug = "test-publication",
+                Topic = new Topic
+                {
+                    Title = "Test topic",
+                    Theme = new Theme
+                    {
+                        Title = "Test theme"
+                    }
+                },
+                Contact = new Contact
+                {
+                    ContactName = "Test contact",
+                    ContactTelNo = "0123456789",
+                    TeamName = "Test team",
+                    TeamEmail = "team@test.com",
+                },
+                Releases = new List<Release>
+                {
+                    release,
+                },
+                Methodologies = new List<PublicationMethodology>
+                {
+                    new PublicationMethodology
+                    {
+                        Methodology = new Methodology
+                        {
+                            Slug = "methodology-1-slug",
+                            Versions = new List<MethodologyVersion>
+                            {
+                                methodologyVersion,
+                            },
+                        },
+                        Owner = true
+                    },
+                },
+                LegacyReleases = new List<LegacyRelease>
+                {
+                    // In result, should appear in order A, B, C
+                    new LegacyRelease
+                    {
+                        Description = "Legacy Release A",
+                        Url = "legacy-release-a-url",
+                        Order = 3,
+                    },
+                    new LegacyRelease
+                    {
+                        Description = "Legacy Release C",
+                        Url = "legacy-release-c-url",
+                        Order = 1,
+                    },
+                    new LegacyRelease
+                    {
+                        Description = "Legacy Release B",
+                        Url = "legacy-release-b-url",
+                        Order = 2,
+                    },
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication, userReleaseRole);
+                await context.SaveChangesAsync();
+            }
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService
+                .Setup(s => s.GetUserId())
+                .Returns(userId);
+
+            userService
+                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+                .ReturnsAsync(true);
+
+            userService
+                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+                .ReturnsAsync(false);
+
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        SecurityPolicies.CanViewSpecificPublication))
+                .ReturnsAsync(true);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationRepository = new PublicationRepository(context, AdminMapper());
+                var publicationService = BuildPublicationService(context,
+                    publicationRepository: publicationRepository,
+                    userService: userService.Object);
+                var result = await publicationService.GetMyPublication(publication.Id);
+                var viewModel = result.AssertRight();
+
+                Assert.Equal(publication.Id, viewModel.Id);
+                Assert.Equal(publication.Title, viewModel.Title);
+
+                Assert.Equal(publication.Topic.Id, viewModel.TopicId);
+                Assert.Equal(publication.Topic.ThemeId, viewModel.ThemeId);
+
+                Assert.Equal(publication.Contact.Id, viewModel.Contact.Id);
+                Assert.Equal(publication.Contact.ContactName, viewModel.Contact.ContactName);
+                Assert.Equal(publication.Contact.ContactTelNo, viewModel.Contact.ContactTelNo);
+                Assert.Equal(publication.Contact.TeamEmail, viewModel.Contact.TeamEmail);
+                Assert.Equal(publication.Contact.TeamName, viewModel.Contact.TeamName);
+
+                Assert.Single(viewModel.Releases);
+                Assert.Equal(release.Id, viewModel.Releases[0].Id);
+
+                Assert.Single(viewModel.Methodologies);
+                Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Methodology.Id);
+                Assert.Equal(methodologyVersion.Title, viewModel.Methodologies[0].Methodology.Title);
+
+                Assert.Equal(3, viewModel.LegacyReleases.Count);
+                var legacyReleases = publication.LegacyReleases
+                    .OrderByDescending(lr => lr.Order)
+                    .ToList();
+                Assert.Equal(legacyReleases[0].Id, viewModel.LegacyReleases[0].Id); // Legacy Release A
+                Assert.Equal(legacyReleases[1].Id, viewModel.LegacyReleases[1].Id); // Legacy Release B
+                Assert.Equal(legacyReleases[2].Id, viewModel.LegacyReleases[2].Id); // Legacy Release C
+            }
+        }
+
+        [Fact]
+        public async Task GetMyPublication_No_CanViewSpecificPublication()
+        {
+            var userId = Guid.NewGuid();
+            var publication = new Publication();
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.Publications.AddAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService
+                .Setup(s => s.GetUserId())
+                .Returns(userId);
+
+            userService
+                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+                .ReturnsAsync(true);
+
+            userService
+                .Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+                .ReturnsAsync(false);
+
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        SecurityPolicies.CanViewSpecificPublication))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationRepository = new PublicationRepository(context, AdminMapper());
+                var publicationService = BuildPublicationService(context,
+                    publicationRepository: publicationRepository,
+                    userService: userService.Object);
+                var result = await publicationService.GetMyPublication(publication.Id);
+                var actionResult = result.AssertLeft();
+                Assert.IsType<ForbidResult>(actionResult);
+            }
+        }
+
+        [Fact]
+        public async Task GetMyPublication_NotFound()
+        {
+            await using var context = InMemoryApplicationDbContext();
+            var publicationService = BuildPublicationService(context);
+
+            var result = await publicationService.GetMyPublication(Guid.NewGuid());
             result.AssertNotFound();
         }
 
@@ -304,13 +623,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-                
+
                 var publicationService = BuildPublicationService(context, methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 methodologyVersionRepository
                     .Setup(s => s.PublicationTitleChanged(publication.Id, publication.Slug, "New title", "new-title"))
                     .Returns(Task.CompletedTask);
-                
+
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
@@ -343,7 +662,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
                 Assert.False(updatedPublication.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
                 Assert.Equal("new-title", updatedPublication.Slug);
                 Assert.Equal("New title", updatedPublication.Title);
 
@@ -436,7 +755,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
                 Assert.True(updatedPublication.Live);
                 Assert.True(updatedPublication.Updated.HasValue);
-                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
                 // Slug remains unchanged
                 Assert.Equal("old-title", updatedPublication.Slug);
                 Assert.Equal("New title", updatedPublication.Title);
@@ -671,6 +990,107 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpdatePublication_NoPermissionToChangeTitle()
+        {
+            var publication = new Publication
+            {
+                Title = "Old publication title",
+                Slug = "publication-slug",
+                Topic = new Topic { Title = "Old topic title" },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var userService = new Mock<IUserService>(Strict);
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        SecurityPolicies.CanUpdateSpecificPublication))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublicationTitles))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context, userService: userService.Object);
+
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new PublicationSaveViewModel
+                    {
+                        Title = "New publication title",
+                    }
+                );
+
+                var actionResult = result.AssertLeft();
+                Assert.IsType<ForbidResult>(actionResult);
+            }
+        }
+
+        [Fact]
+        public async Task UpdatePublication_NoPermissionToChangeTopic()
+        {
+            var newTopic = new Topic
+            {
+                Title = "New topic title"
+            };
+            var publication = new Publication
+            {
+                Title = "Publication title",
+                Slug = "publication-slug",
+                Topic = new Topic { Title = "Old topic title" },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication, newTopic);
+                await context.SaveChangesAsync();
+            }
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        SecurityPolicies.CanUpdateSpecificPublication))
+                .ReturnsAsync(true);
+
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Topic>(t => t.Id == newTopic.Id),
+                        SecurityPolicies.CanCreatePublicationForSpecificTopic))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context, userService: userService.Object);
+
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new PublicationSaveViewModel
+                    {
+                        Title = "Publication title",
+                        TopicId = newTopic.Id,
+                    }
+                );
+
+                var actionResult = result.AssertLeft();
+                Assert.IsType<ForbidResult>(actionResult);
+            }
+        }
+
+        [Fact]
         public async Task UpdatePublication_FailsWithNonUniqueSlug()
         {
             var topic = new Topic
@@ -832,6 +1252,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task ListActiveReleases()
+        {
+            var release1Original = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+            };
+            var release1Amendment = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+                PreviousVersion = release1Original,
+            };
+            var release2 = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2001",
+            };
+            var release3Original = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2002",
+            };
+            var release3Amendment = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2002",
+                PreviousVersion = release3Original,
+            };
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    release1Original,
+                    release1Amendment,
+                    release2,
+                    release3Original,
+                    release3Amendment,
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication, release1Original, release1Amendment);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                var result = await publicationService.ListActiveReleases(
+                    publication.Id);
+
+                var releases = result.AssertRight();
+
+                Assert.Equal(3, releases.Count);
+
+                Assert.Equal(release3Amendment.Id, releases[0].Id);
+                Assert.Equal(release2.Id, releases[1].Id);
+                Assert.Equal(release1Amendment.Id, releases[2].Id);
+            }
+        }
+
         private static PublicationService BuildPublicationService(ContentDbContext context,
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
@@ -840,10 +1326,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             return new(
                 context,
-                AdminMapper(), 
+                AdminMapper(),
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object, 
-                publicationRepository ?? new Mock<IPublicationRepository>().Object, 
+                publicationRepository ?? new Mock<IPublicationRepository>().Object,
                 publishingService ?? new Mock<IPublishingService>().Object, 
                 methodologyVersionRepository ?? new Mock<IMethodologyVersionRepository>().Object);
         }

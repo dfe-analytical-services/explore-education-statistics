@@ -7,11 +7,10 @@ export interface ReleaseData {
   publicationSlug: string;
   releaseName: string;
   yearTitle: string;
-  typeId: string;
   live: boolean;
   timePeriodCoverage: { value: string; label: string };
   latestRelease: boolean;
-  type: { id: string; title: string };
+  type: string;
   contact: {
     id: string;
     teamName: string;

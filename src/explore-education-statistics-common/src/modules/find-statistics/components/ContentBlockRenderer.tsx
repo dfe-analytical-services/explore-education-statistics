@@ -7,15 +7,25 @@ import {
 } from '@common/utils/sanitizeHtml';
 import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { GlossaryEntry } from '@common/services/types/glossary';
 
 interface Props {
   block: ContentBlock;
   transformImageAttributes?: (
     attributes: Dictionary<string>,
   ) => Dictionary<string>;
+  getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
+  trackContentLinks?: (url: string) => void;
+  trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
 }
 
-const ContentBlockRenderer = ({ block, transformImageAttributes }: Props) => {
+const ContentBlockRenderer = ({
+  block,
+  transformImageAttributes,
+  getGlossaryEntry,
+  trackContentLinks,
+  trackGlossaryLinks,
+}: Props) => {
   const { body = '', type } = block;
 
   const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
@@ -38,7 +48,15 @@ const ContentBlockRenderer = ({ block, transformImageAttributes }: Props) => {
     case 'MarkDownBlock':
       return <ReactMarkdown className="dfe-content" source={body} />;
     case 'HtmlBlock':
-      return <ContentHtml html={body} sanitizeOptions={sanitizeOptions} />;
+      return (
+        <ContentHtml
+          html={body}
+          sanitizeOptions={sanitizeOptions}
+          getGlossaryEntry={getGlossaryEntry}
+          trackContentLinks={trackContentLinks}
+          trackGlossaryLinks={trackGlossaryLinks}
+        />
+      );
     default:
       return null;
   }

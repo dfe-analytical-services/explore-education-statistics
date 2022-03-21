@@ -3,6 +3,7 @@ Resource            ../libs/public-common.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Prod
 
@@ -10,9 +11,7 @@ Force Tags          GeneralPublic    Prod
 Navigate to Find Statistics page
     [Tags]    Local    Dev
     environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/find-statistics
-    user waits until h1 is visible    Find statistics and data
-    user waits for page to finish loading
+    user navigates to find statistics page on public frontend
 
 check bootstrapped data
     [Tags]    Local    Dev    NotAgainstProd
@@ -27,10 +26,7 @@ check bootstrapped data
     user waits until page contains accordion section    UK education and training statistics
 
 Navigate to Find Statistics page
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/find-statistics
-    user waits until h1 is visible    Find statistics and data
-    user waits for page to finish loading
+    user navigates to find statistics page on public frontend
 
 Validate accordion sections exist
     user waits until page contains accordion section    Children's social care

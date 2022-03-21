@@ -97,19 +97,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 .Setup(
                     s => s.ZipFilesToStream(
                         _release.Id,
+                        It.IsAny<Stream>(),
                         It.Is<IEnumerable<Guid>>(
                             ids => ids.SequenceEqual(ListOf(fileId1, fileId2))),
-                        It.IsAny<Stream>(),
                         It.IsAny<CancellationToken?>()
                     )
                 )
                 .ReturnsAsync(Unit.Instance)
-                .Callback<Guid, IEnumerable<Guid>, Stream, CancellationToken?>(
-                    (_, _, stream, _) => { stream.WriteText("Test zip"); }
+                .Callback<Guid, Stream, IEnumerable<Guid>, CancellationToken?>(
+                    (_, stream, _, _) => { stream.WriteText("Test zip"); }
                 );
 
             var response = await client
                 .GetAsync($"/api/releases/{_release.Id}/files?fileIds={fileId1},{fileId2}");
+
+            MockUtils.VerifyAllMocks(_releaseFileService);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Test zip", await response.Content.ReadAsStringAsync());
+        }
+
+        [Fact]
+        public async Task StreamFilesToZip_NoFileIds()
+        {
+            var client = _testApp.CreateClient();
+
+            _releaseFileService
+                .Setup(
+                    s => s.ZipFilesToStream(
+                        _release.Id,
+                        It.IsAny<Stream>(),
+                        null,
+                        It.IsAny<CancellationToken?>()
+                    )
+                )
+                .ReturnsAsync(Unit.Instance)
+                .Callback<Guid, Stream, IEnumerable<Guid>?, CancellationToken?>(
+                    (_, stream, _, _) => { stream.WriteText("Test zip"); }
+                );
+
+            var response = await client
+                .GetAsync($"/api/releases/{_release.Id}/files");
 
             MockUtils.VerifyAllMocks(_releaseFileService);
 

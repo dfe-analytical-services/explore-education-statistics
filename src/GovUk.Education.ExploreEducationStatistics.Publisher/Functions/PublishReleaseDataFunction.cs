@@ -1,6 +1,9 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
@@ -11,7 +14,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Clients.ActiveDirectory;
 using Microsoft.Rest;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusDataStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusDataStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
@@ -20,15 +23,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     {
         private readonly IConfiguration _configuration;
         private readonly IQueueService _queueService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleaseService _releaseService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
         public PublishReleaseDataFunction(IConfiguration configuration,
             IQueueService queueService,
-            IReleaseStatusService releaseStatusService)
+            IReleaseService releaseService,
+            IReleasePublishingStatusService releasePublishingStatusService)
         {
             _configuration = configuration;
             _queueService = queueService;
-            _releaseStatusService = releaseStatusService;
+            _releaseService = releaseService;
+            _releasePublishingStatusService = releasePublishingStatusService;
         }
 
         /// <summary>
@@ -44,7 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         [FunctionName("PublishReleaseData")]
         // ReSharper disable once UnusedMember.Global
         public async Task PublishReleaseData(
-            [QueueTrigger(PublishReleaseDataQueue)] PublishReleaseDataMessage message,
+            [QueueTrigger(PublishReleaseDataQueue)]
+            PublishReleaseDataMessage message,
             ExecutionContext executionContext,
             ILogger logger)
         {
@@ -52,44 +59,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 message);
 
-            if (PublisherUtils.IsDevelopment())
+            try
             {
-                // Skip the ADF Pipeline if running locally
-                // If the Release is immediate then trigger publishing the content
-                // This usually happens when the ADF Pipeline is complete
-                if (await _releaseStatusService.IsImmediate(message.ReleaseId, message.ReleaseStatusId))
-                {
-                    await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId,
-                        message.ReleaseStatusId);
-                }
+                // Azure Data Factory isn't emulated for running in a local environment
+                // It also has an overhead to run which isn't necessary if there are no data files
+                var runDataFactory = !EnvironmentUtils.IsLocalEnvironment()
+                                     && await ReleaseHasAnyDataFiles(message.ReleaseId);
 
-                await UpdateStage(message, Complete);
-            }
-            else
-            {
-                try
+                if (runDataFactory)
                 {
                     var clientConfiguration = new DataFactoryClientConfiguration(_configuration);
                     var success = TriggerDataFactoryReleasePipeline(clientConfiguration, logger, message);
                     await UpdateStage(message, success ? Started : Failed);
                 }
-                catch (Exception e)
+                else
                 {
-                    logger.LogError(e, "Exception occured while executing {0}",
-                        executionContext.FunctionName);
-                    await UpdateStage(message, Failed,
-                        new ReleaseStatusLogMessage($"Exception in data stage: {e.Message}"));
+                    await SimulateDataFactoryReleasePipeline(message);
+                    await UpdateStage(message, Complete);
                 }
+            }
+            catch (Exception e)
+            {
+                logger.LogError(e, "Exception occured while executing {0}",
+                    executionContext.FunctionName);
+                await UpdateStage(message, Failed,
+                    new ReleasePublishingStatusLogMessage($"Exception in data stage: {e.Message}"));
             }
 
             logger.LogInformation("{0} completed",
                 executionContext.FunctionName);
         }
 
-        private async Task UpdateStage(PublishReleaseDataMessage message, ReleaseStatusDataStage stage,
-            ReleaseStatusLogMessage logMessage = null)
+        private async Task UpdateStage(PublishReleaseDataMessage message, ReleasePublishingStatusDataStage stage,
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await _releaseStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId, stage,
+            await _releasePublishingStatusService.UpdateDataStageAsync(message.ReleaseId, message.ReleaseStatusId,
+                stage,
                 logMessage);
         }
 
@@ -119,7 +124,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             };
         }
 
-        private static DataFactoryManagementClient GetDataFactoryClient(DataFactoryClientConfiguration configuration)
+        private static DataFactoryManagementClient GetDataFactoryClient(
+            DataFactoryClientConfiguration configuration)
         {
             var context = new AuthenticationContext($"https://login.windows.net/{configuration.TenantId}");
             var clientCredential = new ClientCredential(configuration.ClientId, configuration.ClientSecret);
@@ -130,6 +136,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             {
                 SubscriptionId = configuration.SubscriptionId
             };
+        }
+
+        private async Task<bool> ReleaseHasAnyDataFiles(Guid releaseId)
+        {
+            var dataFiles = await _releaseService.GetFiles(releaseId, FileType.Data);
+            return dataFiles.Any();
+        }
+
+        private async Task SimulateDataFactoryReleasePipeline(PublishReleaseDataMessage message)
+        {
+            // Create the Public Statistics Release if a Statistics Release exists.
+            // This copying would have happened in the ADF Pipeline in procedure DropAndCreateRelease.
+            // The Statistics Release will exist if Subjects have been imported previously
+            // (to either to this Release or a previous version), despite there being no Subjects now.
+
+            // TODO EES-2819 We should call the DropAndCreateRelease procedure here or replicate its behaviour instead
+            // of just creating the Release. Reason:
+            // If this stage is ever forcefully retried then it's possible the Release already exists, that it's
+            // attributes may now be different, and that it may have had Subjects and Footnotes that should be deleted.
+            // The DropAndCreateRelease procedure covers these scenarios by deleting the Release and its related data.
+            await _releaseService.CreatePublicStatisticsRelease(message.ReleaseId);
+
+            // If the Release is immediate then trigger publishing the content.
+            // This would have happened when the ADF Pipeline completed in the callback it makes to
+            // DataFactoryPipelineStatusFunction.
+            if (await _releasePublishingStatusService.IsImmediate(message.ReleaseId, message.ReleaseStatusId))
+            {
+                await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId,
+                    message.ReleaseStatusId);
+            }
         }
 
         private class DataFactoryClientConfiguration

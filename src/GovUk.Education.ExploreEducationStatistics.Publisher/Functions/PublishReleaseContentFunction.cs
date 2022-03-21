@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -21,20 +22,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
         private readonly IReleaseService _releaseService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
 
         public PublishReleaseContentFunction(
             IBlobCacheService blobCacheService,
             IContentService contentService,
             INotificationsService notificationsService,
             IReleaseService releaseService,
-            IReleaseStatusService releaseStatusService)
+            IReleasePublishingStatusService releasePublishingStatusService)
         {
             _blobCacheService = blobCacheService;
             _contentService = contentService;
             _notificationsService = notificationsService;
             _releaseService = releaseService;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
         }
 
         /// <summary>
@@ -69,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await _contentService.UpdateContent(context, message.ReleaseId);
                 await _releaseService.SetPublishedDates(message.ReleaseId, context.Published);
 
-                if (!PublisherUtils.IsDevelopment())
+                if (!EnvironmentUtils.IsLocalEnvironment())
                 {
                     await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
                 }
@@ -83,7 +84,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                 await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
                 await _contentService.DeletePreviousVersionsContent(message.ReleaseId);
-                await _notificationsService.NotifySubscribers(message.ReleaseId);
+
+                await _notificationsService.NotifySubscribersIfApplicable(message.ReleaseId);
+
                 await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Complete);
             }
             catch (Exception e)
@@ -93,37 +96,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 logger.LogError("{StackTrace}", e.StackTrace);
 
                 await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Failed,
-                    new ReleaseStatusLogMessage($"Exception publishing release immediately: {e.Message}"));
+                    new ReleasePublishingStatusLogMessage($"Exception publishing release immediately: {e.Message}"));
             }
 
             logger.LogInformation("{0} completed", executionContext.FunctionName);
         }
 
         private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, State state,
-            ReleaseStatusLogMessage logMessage = null)
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
             switch (state)
             {
                 case State.Started:
-                    await _releaseStatusService.UpdateStagesAsync(releaseId,
+                    await _releasePublishingStatusService.UpdateStagesAsync(releaseId,
                         releaseStatusId,
                         logMessage: logMessage,
-                        publishing: ReleaseStatusPublishingStage.Started,
-                        content: ReleaseStatusContentStage.Started);
+                        publishing: ReleasePublishingStatusPublishingStage.Started,
+                        content: ReleasePublishingStatusContentStage.Started);
                     break;
                 case State.Complete:
-                    await _releaseStatusService.UpdateStagesAsync(releaseId,
+                    await _releasePublishingStatusService.UpdateStagesAsync(releaseId,
                         releaseStatusId,
                         logMessage: logMessage,
-                        publishing: ReleaseStatusPublishingStage.Complete,
-                        content: ReleaseStatusContentStage.Complete);
+                        publishing: ReleasePublishingStatusPublishingStage.Complete,
+                        content: ReleasePublishingStatusContentStage.Complete);
                     break;
                 case State.Failed:
-                    await _releaseStatusService.UpdateStagesAsync(releaseId,
+                    await _releasePublishingStatusService.UpdateStagesAsync(releaseId,
                         releaseStatusId,
                         logMessage: logMessage,
-                        publishing: ReleaseStatusPublishingStage.Failed,
-                        content: ReleaseStatusContentStage.Failed);
+                        publishing: ReleasePublishingStatusPublishingStage.Failed,
+                        content: ReleasePublishingStatusContentStage.Failed);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(state), state, null);

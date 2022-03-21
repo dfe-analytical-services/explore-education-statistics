@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
@@ -11,7 +12,9 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.PermissionTestUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -100,7 +103,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var service = SetupUserManagementService(userService: userService.Object);
                     return await service.InviteUser(
                         "test@test.com",
-                        "Test User",
                         Guid.NewGuid().ToString());
                 });
         }
@@ -131,23 +133,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static UserManagementService SetupUserManagementService(
-            ContentDbContext contentDbContext = null,
-            UsersAndRolesDbContext usersAndRolesDbContext = null,
-            IPersistenceHelper<UsersAndRolesDbContext> usersAndRolesPersistenceHelper = null,
-            IEmailTemplateService emailTemplateService = null,
-            IUserService userService = null,
-            IUserRoleService userRoleService = null)
+            ContentDbContext? contentDbContext = null,
+            UsersAndRolesDbContext? usersAndRolesDbContext = null,
+            IPersistenceHelper<UsersAndRolesDbContext>? usersAndRolesPersistenceHelper = null,
+            IEmailTemplateService? emailTemplateService = null,
+            IUserRoleService? userRoleService = null,
+            IUserService? userService = null,
+            IUserInviteRepository? userInviteRepository = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
 
             return new UserManagementService(
-                usersAndRolesDbContext ?? InMemoryUserAndRolesDbContext(),
+                usersAndRolesDbContext,
                 contentDbContext,
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-                emailTemplateService ?? new Mock<IEmailTemplateService>().Object,
-                userRoleService ?? new Mock<IUserRoleService>().Object,
-                userService ?? new Mock<IUserService>().Object
+                emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
+                userRoleService ?? Mock.Of<IUserRoleService>(Strict),
+                userService ?? AlwaysTrueUserService().Object,
+                userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext)
             );
         }
     }

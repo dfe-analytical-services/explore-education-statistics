@@ -3,6 +3,7 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import ResetFormOnPreviousStep from '@common/modules/table-tool/components/ResetFormOnPreviousStep';
+import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import {
   SubjectMeta,
   TimePeriodQuery,
@@ -13,7 +14,6 @@ import React, { useMemo } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import WizardStepFormActions from './WizardStepFormActions';
 import WizardStepHeading from './WizardStepHeading';
-import WizardStepEditButton from './WizardStepEditButton';
 
 interface FormValues {
   start: string;
@@ -22,24 +22,21 @@ interface FormValues {
 
 export type TimePeriodFormSubmitHandler = (values: FormValues) => void;
 
-interface Props {
+const formId = 'timePeriodForm';
+
+interface Props extends InjectedWizardProps {
+  initialValues?: Partial<TimePeriodQuery>;
   options: SubjectMeta['timePeriod']['options'];
-  initialValues?: { timePeriod?: TimePeriodQuery };
   onSubmit: TimePeriodFormSubmitHandler;
 }
 
-const TimePeriodForm = (props: Props & InjectedWizardProps) => {
-  const {
-    options,
-    onSubmit,
-    isActive,
-    goToNextStep,
-    currentStep,
-    stepNumber,
-    initialValues = { timePeriod: undefined },
-  } = props;
-
-  const formId = 'timePeriodForm';
+const TimePeriodForm = ({
+  initialValues = {},
+  options,
+  onSubmit,
+  ...stepProps
+}: Props) => {
+  const { isActive, goToNextStep } = stepProps;
 
   const timePeriodOptions: SelectOption[] = [
     {
@@ -53,21 +50,6 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
       };
     }),
   ];
-
-  const formInitialValues = useMemo(() => {
-    let start = '';
-    let end = '';
-
-    if (initialValues && initialValues.timePeriod) {
-      start = `${initialValues.timePeriod.startYear}_${initialValues.timePeriod.startCode}`;
-      end = `${initialValues.timePeriod.endYear}_${initialValues.timePeriod.endCode}`;
-    }
-
-    return {
-      start,
-      end,
-    };
-  }, [initialValues]);
 
   const getOptionLabel = (optionValue: string) => {
     const matchingOption = timePeriodOptions.find(
@@ -87,9 +69,20 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
     return `${getOptionLabel(startValue)} to ${getOptionLabel(endValue)}`;
   };
 
-  const stepEnabled = currentStep > stepNumber;
+  const formInitialValues = useMemo(() => {
+    const { startYear, startCode, endYear, endCode } = initialValues;
+
+    const start = startYear && startCode ? `${startYear}_${startCode}` : '';
+    const end = endYear && endCode ? `${endYear}_${endCode}` : '';
+
+    return {
+      start,
+      end,
+    };
+  }, [initialValues]);
+
   const stepHeading = (
-    <WizardStepHeading {...props} fieldsetHeading stepEnabled={stepEnabled}>
+    <WizardStepHeading {...stepProps} fieldsetHeading>
       Choose time period
     </WizardStepHeading>
   );
@@ -156,8 +149,9 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
           ),
       })}
       onSubmit={async values => {
-        await onSubmit(values);
-        goToNextStep();
+        await goToNextStep(async () => {
+          await onSubmit(values);
+        });
       }}
     >
       {form => {
@@ -180,30 +174,22 @@ const TimePeriodForm = (props: Props & InjectedWizardProps) => {
               />
             </FormFieldset>
 
-            <WizardStepFormActions {...props} />
+            <WizardStepFormActions {...stepProps} />
           </Form>
         ) : (
-          <div className="govuk-grid-row">
-            <div className="govuk-grid-column-two-thirds">
-              {stepHeading}
-              <SummaryList noBorder>
-                <SummaryListItem term="Time period">
-                  {form.values.start &&
-                    form.values.end &&
-                    getDisplayTimePeriod(form.values.start, form.values.end)}
-                </SummaryListItem>
-              </SummaryList>
-            </div>
-            <div className="govuk-grid-column-one-third dfe-align--right">
-              {stepEnabled && (
-                <WizardStepEditButton {...props} editTitle="Edit time period" />
-              )}
-              <ResetFormOnPreviousStep
-                currentStep={currentStep}
-                stepNumber={stepNumber}
-              />
-            </div>
-          </div>
+          <WizardStepSummary {...stepProps} goToButtonText="Edit time period">
+            {stepHeading}
+
+            <SummaryList noBorder>
+              <SummaryListItem term="Time period">
+                {form.values.start &&
+                  form.values.end &&
+                  getDisplayTimePeriod(form.values.start, form.values.end)}
+              </SummaryListItem>
+            </SummaryList>
+
+            <ResetFormOnPreviousStep {...stepProps} />
+          </WizardStepSummary>
         );
       }}
     </Formik>

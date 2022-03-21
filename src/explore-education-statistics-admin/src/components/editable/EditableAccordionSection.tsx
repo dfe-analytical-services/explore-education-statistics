@@ -143,46 +143,51 @@ const EditableAccordionSection = (props: EditableAccordionSectionProps) => {
             heading={heading}
             header={header}
           >
-            <ButtonGroup>
-              {onHeadingChange &&
-                (isEditingHeading ? (
-                  <Button onClick={saveHeading}>Save section title</Button>
-                ) : (
-                  <Button
-                    type="button"
-                    onClick={toggleEditingHeading}
-                    variant="secondary"
-                  >
-                    Edit section title
-                  </Button>
-                ))}
+            {sectionProps => (
+              <>
+                <ButtonGroup>
+                  {isEditingHeading ? (
+                    <Button onClick={saveHeading}>Save section title</Button>
+                  ) : (
+                    <Button
+                      type="button"
+                      onClick={toggleEditingHeading}
+                      variant="secondary"
+                    >
+                      Edit section title
+                    </Button>
+                  )}
 
-              {headerButtons}
+                  {headerButtons}
 
-              {onRemoveSection && (
-                <>
-                  <Button onClick={toggleRemoveModal.on} variant="warning">
-                    Remove this section
-                  </Button>
+                  {onRemoveSection && (
+                    <>
+                      <Button onClick={toggleRemoveModal.on} variant="warning">
+                        Remove this section
+                      </Button>
 
-                  <ModalConfirm
-                    title="Are you sure?"
-                    open={showRemoveModal}
-                    onConfirm={onRemoveSection}
-                    onExit={toggleRemoveModal.off}
-                    onCancel={toggleRemoveModal.off}
-                  >
-                    <p>
-                      Are you sure you want to remove the following section?
-                      <br />
-                      <strong>"{heading}"</strong>
-                    </p>
-                  </ModalConfirm>
-                </>
-              )}
-            </ButtonGroup>
+                      <ModalConfirm
+                        title="Are you sure?"
+                        open={showRemoveModal}
+                        onConfirm={onRemoveSection}
+                        onExit={toggleRemoveModal.off}
+                        onCancel={toggleRemoveModal.off}
+                      >
+                        <p>
+                          Are you sure you want to remove the following section?
+                          <br />
+                          <strong>"{heading}"</strong>
+                        </p>
+                      </ModalConfirm>
+                    </>
+                  )}
+                </ButtonGroup>
 
-            {children}
+                {typeof children === 'function'
+                  ? children(sectionProps)
+                  : children}
+              </>
+            )}
           </AccordionSection>
         </div>
       )}

@@ -51,7 +51,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 TableHeaders = new TableHeaders
                 {
-                    Rows = new []{ new TableHeader("table header 1", TableHeaderType.Filter) }
+                    Rows = new List<TableHeader>
+                    {
+                        new("table header 1", TableHeaderType.Filter)
+                    }
                 }
             }, new ObservationQueryContext
             {
@@ -85,14 +88,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     PublicReleaseFastTrackTableName, It.IsAny<TableQuery<ReleaseFastTrack>>()))
                 .ReturnsAsync(new List<ReleaseFastTrack>
                 {
-                    new ReleaseFastTrack
+                    new()
                     {
                         PartitionKey = releaseId.ToString()
                     }
                 });
 
             tableBuilderService
-                .Setup(s => s.Query(releaseId, It.Is<ObservationQueryContext>(query => query.SubjectId == fastTrackAsBlob.Query.SubjectId)))
+                .Setup(s => s
+                    .Query(
+                        releaseId, 
+                        It.Is<ObservationQueryContext>(query => query.SubjectId == fastTrackAsBlob.Query.SubjectId),
+                        default))
                 .ReturnsAsync(tableBuilderResult);
 
             blobStorageService
@@ -107,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.GetLatestPublishedRelease(publicationId))
                 .Returns(release);
             
-            var result = await service.Get(fastTrackId);
+            var result = await service.GetFastTrackAndResults(fastTrackId);
             Assert.True(result.IsRight);
 
             var viewModel = result.Right;
@@ -177,7 +184,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 });
 
             tableBuilderService
-                .Setup(s => s.Query(releaseId, It.Is<ObservationQueryContext>(query => query.SubjectId == fastTrackAsBlob.Query.SubjectId)))
+                .Setup(s => s
+                    .Query(
+                        releaseId, 
+                        It.Is<ObservationQueryContext>(query => query.SubjectId == fastTrackAsBlob.Query.SubjectId),
+                        default))
                 .ReturnsAsync(tableBuilderResult);
 
             blobStorageService
@@ -192,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.GetLatestPublishedRelease(publicationId))
                 .Returns(latestRelease);
             
-            var result = await service.Get(fastTrackId);
+            var result = await service.GetFastTrackAndResults(fastTrackId);
             Assert.True(result.IsRight);
 
             var viewModel = result.Right;

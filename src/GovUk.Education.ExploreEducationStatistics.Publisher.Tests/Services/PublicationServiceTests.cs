@@ -13,6 +13,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentif
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 {
@@ -67,8 +68,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Contact = Contact1,
             Title = "Publication A",
             TopicId = Topic.Id,
-            DataSource = "first publication data source",
-            Description = "first publication description",
             ExternalMethodology = new ExternalMethodology
             {
                 Title = "external methodology title",
@@ -98,7 +97,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 }
             ),
             Slug = "publication-a",
-            Summary = "first publication summary",
             LegacyPublicationUrl = new Uri("http://legacy.url/")
         };
 
@@ -108,10 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Contact = Contact2,
             Title = "Publication B",
             TopicId = Topic.Id,
-            DataSource = "second publication data source",
-            Description = "second publication description",
             Slug = "publication-b",
-            Summary = "second publication summary"
         };
 
         private static readonly Publication PublicationC = new()
@@ -120,10 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Contact = Contact3,
             Title = "Publication C",
             TopicId = Topic.Id,
-            DataSource = "third publication data source",
-            Description = "third publication description",
             Slug = "publication-c",
-            Summary = "third publication summary",
             LegacyPublicationUrl = new Uri("http://legacy.url/")
         };
 
@@ -232,7 +224,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         {
             var contextId = Guid.NewGuid().ToString();
 
-            using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            using (var context = InMemoryContentDbContext(contextId))
             {
                 await context.AddAsync(Theme);
                 await context.AddAsync(Topic);
@@ -241,7 +233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 await context.SaveChangesAsync();
             }
 
-            using (var context = ContentDbUtils.InMemoryContentDbContext(contextId))
+            using (var context = InMemoryContentDbContext(contextId))
             {
                 var releaseService = new Mock<IReleaseService>();
 
@@ -255,9 +247,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(PublicationA.Id, result.Id);
                 Assert.Equal("Publication A", result.Title);
                 Assert.Equal("publication-a", result.Slug);
-                Assert.Equal("first publication description", result.Description);
-                Assert.Equal("first publication data source", result.DataSource);
-                Assert.Equal("first publication summary", result.Summary);
                 Assert.Equal(PublicationARelease1V1.Id, result.LatestReleaseId);
                 Assert.Contains(PublicationARelease1V1.Id, result.Releases.Select(r => r.Id));
                 Assert.DoesNotContain(PublicationARelease1V0.Id, result.Releases.Select(r => r.Id));
@@ -341,13 +330,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildPublicationService(contentDbContext);
 
@@ -362,13 +351,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildPublicationService(contentDbContext);
 
@@ -390,13 +379,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildPublicationService(contentDbContext);
 
@@ -421,22 +410,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publishDate = DateTime.Now;
 
             var contextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 var service = BuildPublicationService(contentDbContext);
                 await service.SetPublishedDate(publication.Id, publishDate);
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
 
+                Assert.NotNull(contentPublication);
                 Assert.Equal(publication.Id, contentPublication.Id);
                 Assert.Equal("Test publication", contentPublication.Title);
                 Assert.Equal("test-publication", contentPublication.Slug);
@@ -461,23 +451,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var publishDate = DateTime.Now;
 
             var contextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 await contentDbContext.AddAsync(publication);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 var service = BuildPublicationService(contentDbContext);
 
                 await service.SetPublishedDate(publication.Id, publishDate);
             }
 
-            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contextId))
             {
                 var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
 
+                Assert.NotNull(contentPublication);
                 Assert.Equal(publication.Id, contentPublication.Id);
                 Assert.Equal("Test publication", contentPublication.Title);
                 Assert.Equal("test-publication", contentPublication.Slug);

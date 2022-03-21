@@ -1,5 +1,6 @@
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
 import { FileInfo } from '@common/services/types/file';
+import { ReleaseType } from '@common/services/types/releaseType';
 import {
   MethodologySummary,
   ExternalMethodology,
@@ -13,9 +14,6 @@ export interface Publication {
   id: string;
   slug: string;
   title: string;
-  description: string;
-  dataSource: string;
-  summary: string;
   otherReleases: {
     id: string;
     slug: string;
@@ -40,9 +38,6 @@ export interface PublicationSummary {
   id: string;
   slug: string;
   title: string;
-  description: string;
-  dataSource: string;
-  summary: string;
 }
 
 export interface BasicPublicationContact {
@@ -77,13 +72,6 @@ export interface ReleaseNote {
   reason: string;
 }
 
-// eslint-disable-next-line no-shadow
-export enum ReleaseType {
-  AdHoc = 'Ad Hoc',
-  NationalStatistics = 'National Statistics',
-  OfficialStatistics = 'Official Statistics',
-}
-
 export interface ContentSection<BlockType> {
   id: string;
   order: number;
@@ -112,16 +100,13 @@ export interface Release<
   latestRelease: boolean;
   nextReleaseDate?: PartialDate;
   relatedInformation: BasicLink[];
-  type: {
-    id: string;
-    title: ReleaseType;
-  };
+  type: ReleaseType;
   updates: ReleaseNote[];
   content: ContentSection<ContentBlockType | DataBlockType>[];
   downloadFiles: FileInfo[];
   dataLastPublished: string;
   hasPreReleaseAccessList: boolean;
-  hasMetaGuidance: boolean;
+  hasDataGuidance: boolean;
 }
 
 export interface ReleaseSummary {
@@ -133,10 +118,7 @@ export interface ReleaseSummary {
   published?: string;
   slug: string;
   nextReleaseDate: PartialDate;
-  type: {
-    id: string;
-    title: ReleaseType;
-  };
+  type: ReleaseType;
   latestRelease: boolean;
   dataLastPublished: string;
 }

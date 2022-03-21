@@ -46,7 +46,7 @@ const Modal = ({
       onRequestClose={onExit}
       onAfterOpen={onOpen}
     >
-      <h1 className="govuk-heading-l">{title}</h1>
+      <h2 className="govuk-heading-l">{title}</h2>
       {children}
     </BaseModal>
   );

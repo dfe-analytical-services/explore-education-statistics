@@ -16,6 +16,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task UpdatePublication(PublishContext context, Guid publicationId);
 
-        Task UpdateTaxonomy(PublishContext context);
+        Task DeleteCachedTaxonomyBlobs();
     }
 }

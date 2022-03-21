@@ -1,13 +1,10 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -25,8 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationService _publicationService;
         private readonly IReleaseService _releaseService;
-        private readonly IZipFileService _zipFileService;
-        private readonly IDataGuidanceFileService _dataGuidanceFileService;
         private readonly ILogger<PublishingService> _logger;
 
         public PublishingService(
@@ -36,8 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IMethodologyService methodologyService,
             IPublicationService publicationService,
             IReleaseService releaseService,
-            IZipFileService zipFileService,
-            IDataGuidanceFileService dataGuidanceFileService,
             ILogger<PublishingService> logger)
         {
             _publicStorageConnectionString = publicStorageConnectionString;
@@ -46,8 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _methodologyService = methodologyService;
             _publicationService = publicationService;
             _releaseService = releaseService;
-            _zipFileService = zipFileService;
-            _dataGuidanceFileService = dataGuidanceFileService;
             _logger = logger;
         }
 
@@ -117,13 +108,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 Image
             );
 
-            if (!release.MetaGuidance.IsNullOrWhitespace())
-            {
-                var dataGuidanceFile = await _dataGuidanceFileService.CreateDataGuidanceFile(release.Id);
-
-                files.Add(dataGuidanceFile);
-            }
-
             var destinationDirectoryPath = $"{release.Id}/";
 
             // Delete any existing blobs in public storage
@@ -149,8 +133,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                     new IBlobStorageService.CopyDirectoryOptions
                     {
                         DestinationConnectionString = _publicStorageConnectionString,
-                        SetAttributesCallbackAsync = destination =>
-                            SetPublishedBlobAttributesCallback(destination, release.PublishScheduled.Value),
+                        SetAttributesCallbackAsync = (source, destination) =>
+                            SetPublishedBlobAttributesCallback(destination, release.PublishScheduled!.Value),
                         ShouldTransferCallbackAsync = (source, _) =>
                             // Filter by blobs with matching file paths
                             TransferBlobIfFileExistsCallback(
@@ -160,24 +144,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                                 logger: _logger)
                     });
             }
-
-            // Create the 'All files' zip in Public storage using the files already copied
-            await CreateAllFilesZip(release, files);
-        }
-
-        private async Task CreateAllFilesZip(Release release, List<File> files)
-        {
-            var filesToZip = files
-                .Where(file => file.Type != Chart && file.Type != Image)
-                .ToList();
-
-            await _zipFileService.UploadZippedFiles(
-                PublicReleaseFiles,
-                destinationPath: release.AllFilesZipPath(),
-                files: filesToZip,
-                releaseId: release.Id,
-                publishScheduled: release.PublishScheduled.Value
-            );
         }
 
         private async Task PublishMethodologyFiles(MethodologyVersion methodologyVersion)
@@ -201,7 +167,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 new IBlobStorageService.CopyDirectoryOptions
                 {
                     DestinationConnectionString = _publicStorageConnectionString,
-                    SetAttributesCallbackAsync = destination =>
+                    SetAttributesCallbackAsync = (source, destination) =>
                         SetPublishedBlobAttributesCallback(destination, DateTime.UtcNow),
                     ShouldTransferCallbackAsync = (source, _) =>
                         // Filter by blobs with matching file paths

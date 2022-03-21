@@ -15,16 +15,24 @@ class AdminClient:
         assert os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN') is not None
         assert os.getenv('ADMIN_URL') is not None
 
+        requests.sessions.HTTPAdapter(
+            pool_connections=50,
+            pool_maxsize=50,
+            max_retries=3
+        )
+        session = requests.Session()
+
         jwt_token = json.loads(os.getenv('IDENTITY_LOCAL_STORAGE_ADMIN'))['access_token']
         headers = {
             'Content-Type': 'application/json',
             'Authorization': f'Bearer {jwt_token}',
         }
 
-        return requests.request(
+        return session.request(
             method,
             url=f'{os.getenv("ADMIN_URL")}{url}',
             headers=headers,
+            stream=True,
             json=body,
             verify=False
         )
@@ -117,7 +125,11 @@ def user_creates_test_publication_via_api(publication_name: str, topic_id: str =
     return response.json()['id']
 
 
-def user_create_test_release_via_api(publication_id: str, time_period: str, year: str):
+def user_create_test_release_via_api(
+        publication_id: str,
+        time_period: str,
+        year: str,
+        type: str = 'NationalStatistics'):
     response = admin_client.post(
         f'/api/publications/{publication_id}/releases',
         {
@@ -126,7 +138,7 @@ def user_create_test_release_via_api(publication_id: str, time_period: str, year
                 "value": time_period,
             },
             "releaseName": int(year),
-            "typeId": "8becd272-1100-4e33-8a7d-1c0c4e3b42b8",
+            "type": type,
             "templateReleaseId": "",
         }
     )

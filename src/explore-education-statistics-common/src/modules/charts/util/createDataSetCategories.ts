@@ -16,11 +16,12 @@ import {
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { TableDataResult } from '@common/services/tableBuilderService';
 import { Dictionary, Pair } from '@common/types';
-import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import cartesian from '@common/utils/cartesian';
-import parseNumber from '@common/utils/number/parseNumber';
+import naturalOrderBy from '@common/utils/array/naturalOrderBy';
 import get from 'lodash/get';
 import groupBy from 'lodash/groupBy';
+import sortBy from 'lodash/sortBy';
+import uniq from 'lodash/uniq';
 
 /**
  * We use this form of a data set as it's
@@ -218,31 +219,60 @@ function createKeyedDataSets(
   );
 }
 
-function sortDataSetCategories(
+/**
+ * Order the categories by the data set `order` property
+ * or a natural ordering algorithm based on the label
+ * (for backwards compatibility with older charts).
+ */
+function getSortedDataSetCategoryRange(
   dataSetCategories: DataSetCategory[],
   axisConfiguration: AxisConfiguration,
 ): DataSetCategory[] {
-  const { sortBy, sortAsc } = axisConfiguration;
-
-  if (!sortBy) {
-    return dataSetCategories;
-  }
-
-  return naturalOrderBy(
-    dataSetCategories,
-    data => {
-      if (sortBy === 'name') {
-        if (data.filter instanceof TimePeriodFilter) {
-          return data.filter.order;
-        }
-
-        return data.filter.label;
+  const groupOrder = uniq(
+    axisConfiguration.dataSets.flatMap(dataSet => {
+      switch (axisConfiguration.groupBy) {
+        case 'locations':
+          return dataSet.location?.value;
+        case 'indicators':
+          return dataSet.indicator;
+        case 'timePeriod':
+          return dataSet.timePeriod;
+        case 'filters':
+          return dataSet.filters;
+        default:
+          return undefined;
       }
-
-      return parseNumber(data.dataSets[sortBy]) ?? 0;
-    },
-    sortAsc ? 'asc' : 'desc',
+    }),
   );
+
+  // Check if the data sets have an explicit order property.
+  // Older charts don't have this property, so we need to
+  // order them using the previous ordering algorithm.
+  const hasDataSetOrder = axisConfiguration.dataSets.some(
+    dataSet => typeof dataSet.order !== 'undefined',
+  );
+
+  const sortedDataSetCategories = hasDataSetOrder
+    ? sortBy(dataSetCategories, category =>
+        groupOrder.indexOf(category.filter.value),
+      )
+    : naturalOrderBy(dataSetCategories, data =>
+        data.filter instanceof TimePeriodFilter
+          ? data.filter.order
+          : data.filter.label,
+      );
+
+  const sortedDataSetCategoriesRange = sortedDataSetCategories.slice(
+    axisConfiguration.min ?? 0,
+    (axisConfiguration.max ?? dataSetCategories.length) + 1,
+  );
+
+  // If no `sortAsc` has been set, we should default
+  // to true as it's not really natural to sort in
+  // descending order most of the time.
+  return axisConfiguration.sortAsc ?? true
+    ? sortedDataSetCategoriesRange
+    : sortedDataSetCategoriesRange.reverse();
 }
 
 /**
@@ -282,9 +312,9 @@ export default function createDataSetCategories(
   axisConfiguration: AxisConfiguration,
   results: TableDataResult[],
   meta: FullTableMeta,
+  includeNonNumericData = false,
 ): DataSetCategory[] {
   const categoryFilters = getCategoryFilters(axisConfiguration, meta);
-
   const childDataSets = getChildDataSets(axisConfiguration, meta);
   const dedupedChildDataSets = dedupeDataSets(childDataSets);
 
@@ -292,18 +322,27 @@ export default function createDataSetCategories(
   // allow result lookups to be MUCH faster.
   const measuresByDataSet = groupResultMeasuresByDataSet(results);
 
-  const childDataSetsWithValues: Pair<
-    ChildDataSet,
-    number
-  >[] = dedupedChildDataSets
-    .map(childDataSet => {
-      const { dataSet } = childDataSet;
+  const childDataSetsWithValues = dedupedChildDataSets.reduce<
+    Pair<ChildDataSet, number>[]
+  >((acc, childDataSet) => {
+    const { dataSet } = childDataSet;
+    const rawValue = get(measuresByDataSet, getIndicatorPath(dataSet));
+    const value = Number(rawValue);
 
-      const value = Number(get(measuresByDataSet, getIndicatorPath(dataSet)));
+    if (includeNonNumericData && rawValue) {
+      acc.push([childDataSet, Number.isNaN(value) ? null : value] as Pair<
+        ChildDataSet,
+        number
+      >);
+      return acc;
+    }
 
-      return [childDataSet, value] as Pair<ChildDataSet, number>;
-    })
-    .filter(([, value]) => !Number.isNaN(value));
+    if (!Number.isNaN(value)) {
+      acc.push([childDataSet, value] as Pair<ChildDataSet, number>);
+    }
+
+    return acc;
+  }, []);
 
   const dataSetCategories = categoryFilters
     .map(filter => {
@@ -338,10 +377,7 @@ export default function createDataSetCategories(
     })
     .filter(category => Object.values(category.dataSets).length > 0);
 
-  return sortDataSetCategories(dataSetCategories, axisConfiguration).slice(
-    axisConfiguration.min ?? 0,
-    (axisConfiguration.max ?? dataSetCategories.length) + 1,
-  );
+  return getSortedDataSetCategoryRange(dataSetCategories, axisConfiguration);
 }
 
 export const toChartData = (chartCategory: DataSetCategory): ChartData => {

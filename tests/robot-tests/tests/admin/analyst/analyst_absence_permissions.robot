@@ -3,13 +3,14 @@ Resource            ../../libs/admin-common.robot
 
 Suite Setup         user signs in as analyst1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev
 
 *** Test Cases ***
 Validate Analyst1 can see correct themes and topics
     user selects theme and topic from admin dashboard    Pupils and schools    Pupil absence
-    user waits until page contains accordion section    Pupil absence in schools in England    60
+    user waits until page contains accordion section    Pupil absence in schools in England    %{WAIT_SMALL}
 
     user checks select contains option    id:publicationsReleases-themeTopic-themeId    Pupils and schools
     user checks select contains x options    id:publicationsReleases-themeTopic-topicId    2
@@ -40,12 +41,12 @@ Navigate to Absence release
 
 Validate Analyst1 can see Absence release summary
     user verifies release summary    Pupil absence in schools in England    Academic Year    2016/17    Data Analyst
-    ...    Official Statistics
+    ...    Official statistics
 
 Validate Analyst1 can see 'Content' page
     user clicks link    Content
-    user waits until h2 is visible    Pupil absence in schools in England    %{WAIT_MEDIUM}
     user waits for page to finish loading
+    user waits until h2 is visible    Pupil absence in schools in England    %{WAIT_SMALL}
 
 Validate Analyst1 can see 'Content' page key stats
     user waits until page contains element    id:releaseHeadlines    %{WAIT_LONG}
@@ -77,6 +78,6 @@ Validate Analyst1 can see 'Content' page accordion sections
     user checks accordion is in position    Regional and local authority (LA) breakdown    9    id:releaseMainContent
     user checks there are x accordion sections    9    id:releaseMainContent
     user checks accordion is in position    Methodology    1    id:helpAndSupport
-    user checks accordion is in position    Official Statistics    2    id:helpAndSupport
+    user checks accordion is in position    Official statistics    2    id:helpAndSupport
     user checks accordion is in position    Contact us    3    id:helpAndSupport
     user checks there are x accordion sections    3    id:helpAndSupport

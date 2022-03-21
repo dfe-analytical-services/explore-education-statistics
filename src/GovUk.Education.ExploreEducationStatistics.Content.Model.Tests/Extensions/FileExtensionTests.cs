@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = Data
+                Type = FileType.Data
             };
 
             Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/", dataFile.BatchesPath());
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = Data
+                Type = FileType.Data
             };
 
             Assert.Equal($"{dataFile.RootPath}/data/batches/{dataFile.Id}/{dataFile.Id}_000999",
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = Data
+                Type = FileType.Data
             };
 
             var imageFile = new File
@@ -89,7 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Type = Metadata
             };
 
-            var zipFile = new File
+            var dataZipFile = new File
             {
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
@@ -102,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.Equal($"{dataFile.RootPath}/data/{dataFile.Id}", dataFile.Path());
             Assert.Equal($"{imageFile.RootPath}/image/{imageFile.Id}", imageFile.Path());
             Assert.Equal($"{metaFile.RootPath}/data/{metaFile.Id}", metaFile.Path());
-            Assert.Equal($"{zipFile.RootPath}/zip/{zipFile.Id}", zipFile.Path());
+            Assert.Equal($"{dataZipFile.RootPath}/data-zip/{dataZipFile.Id}", dataZipFile.Path());
         }
 
         [Fact]
@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 Filename = "data.csv",
-                Type = Data
+                Type = FileType.Data
             };
 
             var imageFile = new File

@@ -1,5 +1,6 @@
 import Tag from '@common/components/Tag';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import useToggle from '@common/hooks/useToggle';
 import DownloadTable, {
   FileFormat,
 } from '@common/modules/table-tool/components/DownloadTable';
@@ -32,6 +33,7 @@ const TableToolFinalStep = ({
   selectedPublication,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
+  const [hasTableError, toggleHasTableError] = useToggle(false);
   const [currentTableHeaders, setCurrentTableHeaders] = useState<
     TableHeadersConfig
   >();
@@ -50,11 +52,7 @@ const TableToolFinalStep = ({
   const getMethodologyLinks = () => {
     const links: ReactNode[] =
       publication?.methodologies?.map(methodology => (
-        <Link
-          key={methodology.id}
-          to="/methodology/[methodology]"
-          as={`/methodology/${methodology.slug}`}
-        >
+        <Link key={methodology.id} to={`/methodology/${methodology.slug}`}>
           {methodology.title}
         </Link>
       )) ?? [];
@@ -107,8 +105,7 @@ const TableToolFinalStep = ({
                 <Link
                   className="dfe-print-hidden"
                   unvisited
-                  to="/find-statistics/[publication]"
-                  as={`/find-statistics/${selectedPublication.slug}`}
+                  to={`/find-statistics/${selectedPublication.slug}`}
                   testId="View latest data link"
                 >
                   View latest data:{' '}
@@ -124,38 +121,50 @@ const TableToolFinalStep = ({
             ref={dataTableRef}
             fullTable={table}
             tableHeadersConfig={currentTableHeaders}
+            onError={message => {
+              toggleHasTableError.on();
+              logEvent({
+                category: 'Table Tool',
+                action: 'Table rendering error',
+                label: message,
+              });
+            }}
           />
         </>
       )}
-      <div className="govuk-!-margin-bottom-7">
-        <TableToolShare
-          tableHeaders={currentTableHeaders}
-          query={query}
-          selectedPublication={selectedPublication}
-        />
-      </div>
+      {!hasTableError && (
+        <>
+          <div className="govuk-!-margin-bottom-7">
+            <TableToolShare
+              tableHeaders={currentTableHeaders}
+              query={query}
+              selectedPublication={selectedPublication}
+            />
+          </div>
 
-      <DownloadTable
-        fullTable={table}
-        fileName={`data-${selectedPublication.slug}`}
-        tableRef={dataTableRef}
-        onSubmit={(fileFormat: FileFormat) =>
-          logEvent({
-            category: 'Table tool',
-            action:
-              fileFormat === 'csv'
-                ? 'CSV download button clicked'
-                : 'ODS download button clicked',
-            label: `${table.subjectMeta.publicationName} between ${
-              table.subjectMeta.timePeriodRange[0].label
-            } and ${
-              table.subjectMeta.timePeriodRange[
-                table.subjectMeta.timePeriodRange.length - 1
-              ].label
-            }`,
-          })
-        }
-      />
+          <DownloadTable
+            fullTable={table}
+            fileName={`data-${selectedPublication.slug}`}
+            tableRef={dataTableRef}
+            onSubmit={(fileFormat: FileFormat) =>
+              logEvent({
+                category: 'Table tool',
+                action:
+                  fileFormat === 'csv'
+                    ? 'CSV download button clicked'
+                    : 'ODS download button clicked',
+                label: `${table.subjectMeta.publicationName} between ${
+                  table.subjectMeta.timePeriodRange[0].label
+                } and ${
+                  table.subjectMeta.timePeriodRange[
+                    table.subjectMeta.timePeriodRange.length - 1
+                  ].label
+                }`,
+              })
+            }
+          />
+        </>
+      )}
 
       <TableToolInfo
         contactDetails={publication?.contact}
@@ -163,16 +172,12 @@ const TableToolFinalStep = ({
         releaseLink={
           <>
             {selectedPublication.selectedRelease.latestData ? (
-              <Link
-                to="/find-statistics/[publication]"
-                as={`/find-statistics/${selectedPublication.slug}`}
-              >
+              <Link to={`/find-statistics/${selectedPublication.slug}`}>
                 {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
               </Link>
             ) : (
               <Link
-                to="/find-statistics/[publication]/[releaseSlug]"
-                as={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
+                to={`/find-statistics/${selectedPublication.slug}/${selectedPublication.selectedRelease.slug}`}
               >
                 {`${selectedPublication.title}, ${selectedPublication.selectedRelease.title}`}
               </Link>

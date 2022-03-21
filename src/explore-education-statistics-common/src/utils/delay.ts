@@ -6,7 +6,7 @@
  * version of {@see setTimeout}.
  */
 export default async function delay(timeout?: number): Promise<void> {
-  await new Promise(resolve => {
+  await new Promise<void>(resolve => {
     setTimeout(async () => {
       resolve();
     }, timeout);

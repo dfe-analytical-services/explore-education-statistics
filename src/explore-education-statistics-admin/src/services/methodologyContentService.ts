@@ -1,5 +1,6 @@
 import { ContentSectionKeys } from '@admin/pages/methodology/edit-methodology/content/context/MethodologyContentContextActionTypes';
 import { MethodologyStatus } from '@admin/services/methodologyService';
+import { MethodologyNote } from '@admin/services/methodologyNoteService';
 import {
   ContentBlockPostModel,
   ContentBlockPutModel,
@@ -19,6 +20,7 @@ export interface MethodologyContent {
   published?: string;
   content: ContentSection<EditableContentBlock>[];
   annexes: ContentSection<EditableContentBlock>[];
+  notes: MethodologyNote[];
 }
 
 const methodologyContentService = {

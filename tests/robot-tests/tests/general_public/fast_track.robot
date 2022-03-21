@@ -5,11 +5,12 @@ Force Tags          GeneralPublic    Local    Dev    Test    Preprod
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 *** Test Cases ***
 Navigate to publication release page
     environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
+    user navigates to public frontend    %{PUBLIC_URL}/find-statistics/pupil-absence-in-schools-in-england
 
 Click fast track link for 'Pupil absence rates' data block
     user waits until h1 is visible    Pupil absence in schools in England

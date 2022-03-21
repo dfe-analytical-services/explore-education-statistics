@@ -1,5 +1,5 @@
+#nullable enable
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -24,29 +24,63 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _storageQueueService = storageQueueService;
         }
 
-        public async Task NotifySubscribers(params Guid[] releaseIds)
+        public async Task NotifySubscribersIfApplicable(params Guid[] releaseIds)
         {
-            var publications = GetPublications(releaseIds);
-            var messages = publications.Select(BuildPublicationNotificationMessage);
-            await _storageQueueService.AddMessages(PublicationQueue, messages);
-        }
-
-        private IEnumerable<Publication> GetPublications(IEnumerable<Guid> releaseIds)
-        {
-            return _context.Releases
-                .AsNoTracking()
-                .Where(release => releaseIds.Contains(release.Id))
-                .Select(release => release.Publication)
-                .Distinct();
-        }
-
-        private static PublicationNotificationMessage BuildPublicationNotificationMessage(Publication publication)
-        {
-            return new PublicationNotificationMessage
+            var releasesToNotify = _context.Releases
+                .Include(r => r.ReleaseStatuses)
+                .Where(r => releaseIds.Contains(r.Id))
+                .ToList()
+                .Where(r => r.NotifySubscribers)
+                .ToList();
+            var messages = await releasesToNotify
+                .ToAsyncEnumerable()
+                .SelectAwait(async release => await BuildPublicationNotificationMessage(release))
+                .ToListAsync();
+            if (messages.Count > 0)
             {
-                Name = publication.Title,
-                PublicationId = publication.Id,
-                Slug = publication.Slug
+                await _storageQueueService.AddMessages(ReleaseNotificationQueue, messages);
+                releasesToNotify
+                    .ForEach(release =>
+                    {
+                        var status = release.ReleaseStatuses
+                            .OrderBy(rs => rs.Created)
+                            .Last();
+                        _context.Update(status);
+                        status.NotifiedOn = DateTime.UtcNow;
+                    });
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        private async Task<ReleaseNotificationMessage> BuildPublicationNotificationMessage(Release release)
+        {
+            await _context.Entry(release)
+                .Reference(r => r.Publication)
+                .LoadAsync();
+
+            var latestUpdateNoteReason = "No update note provided.";
+            // NOTE: Only amendment email template displays an update note.
+            if (release.Version > 0)
+            {
+                await _context.Entry(release)
+                    .Collection(r => r.Updates)
+                    .LoadAsync();
+                var latestUpdateNote = release.Updates
+                    .OrderBy(u => u.Created)
+                    .Last();
+                latestUpdateNoteReason = latestUpdateNote.Reason;
+            }
+
+
+            return new ReleaseNotificationMessage
+            {
+                PublicationId = release.Publication.Id,
+                PublicationName = release.Publication.Title,
+                PublicationSlug = release.Publication.Slug,
+                ReleaseName = release.Title,
+                ReleaseSlug = release.Slug,
+                Amendment = release.Version > 0,
+                UpdateNote = latestUpdateNoteReason,
             };
         }
     }

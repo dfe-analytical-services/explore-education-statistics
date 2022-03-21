@@ -1,14 +1,18 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -17,7 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
@@ -25,7 +28,10 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbU
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static Moq.MockBehavior;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -34,7 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReplacementServiceTests
     {
-        private const string CountryCodeEngland = "E92000001";
+        private readonly Country _england = new("E92000001", "England");
+        private readonly LocalAuthority _derby = new("E06000015", "", "Derby");
 
         [Fact]
         public async Task GetReplacementPlan_FileHasWrongFileType()
@@ -136,6 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     releaseId: contentReleaseVersion2.Id,
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
+
+                VerifyAllMocks(mocks);
 
                 result.AssertBadRequest(ReplacementFileTypesMustBeData);
             }
@@ -255,6 +264,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
+                VerifyAllMocks(mocks);
+
                 result.AssertNotFound();
             }
         }
@@ -330,6 +341,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>());
+
+            mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
@@ -359,8 +376,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
 
                 Assert.Equal(originalSubject.Id, replacementPlan.OriginalSubjectId);
                 Assert.Equal(replacementSubject.Id, replacementPlan.ReplacementSubjectId);
@@ -524,7 +542,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
-            var country = new Country(CountryCodeEngland, "England");
+            var originalLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
 
             var timePeriod = new TimePeriodQuery
             {
@@ -532,36 +555,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 StartCode = CalendarYear,
                 EndYear = 2020,
                 EndCode = CalendarYear
-            };
-
-            var table = new TableBuilderConfiguration
-            {
-                TableHeaders = new TableHeaders
-                {
-                    ColumnGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                        }
-                    },
-                    Columns = new List<TableHeader>
-                    {
-                        new TableHeader("2019_CY", TableHeaderType.TimePeriod),
-                        new TableHeader("2020_CY", TableHeaderType.TimePeriod)
-                    },
-                    RowGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            new TableHeader(originalFilterItem.Id.ToString(), TableHeaderType.Filter)
-                        }
-                    },
-                    Rows = new List<TableHeader>
-                    {
-                        new TableHeader(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
-                    }
-                }
             };
 
             var dataBlock = new DataBlock
@@ -572,13 +565,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     SubjectId = originalSubject.Id,
                     Filters = new[] {originalFilterItem.Id},
                     Indicators = new[] {originalIndicator.Id},
-                    Locations = new LocationQuery
-                    {
-                        Country = new[] {CountryCodeEngland}
-                    },
+                    LocationIds = ListOf(originalLocation.Id),
                     TimePeriod = timePeriod
-                },
-                Table = table
+                }
             };
 
             var releaseContentBlock = new ReleaseContentBlock
@@ -595,7 +584,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter",
                 filterFootnotes: new List<FilterFootnote>
                 {
-                    new FilterFootnote
+                    new()
                     {
                         Filter = originalFilter
                     }
@@ -605,7 +594,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter group",
                 filterGroupFootnotes: new List<FilterGroupFootnote>
                 {
-                    new FilterGroupFootnote
+                    new()
                     {
                         FilterGroup = originalFilterGroup
                     }
@@ -615,7 +604,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter item",
                 filterItemFootnotes: new List<FilterItemFootnote>
                 {
-                    new FilterItemFootnote
+                    new()
                     {
                         FilterItem = originalFilterItem
                     }
@@ -625,7 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter item",
                 indicatorFootnotes: new List<IndicatorFootnote>
                 {
-                    new IndicatorFootnote
+                    new()
                     {
                         Indicator = originalIndicator
                     }
@@ -633,15 +622,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>());
-
-            mocks.locationRepository
-                .Setup(s => s.GetObservationalUnits(GeographicLevel.Country, new [] { CountryCodeEngland }))
-                .Returns(new List<ObservationalUnit>(new List<ObservationalUnit>
-                {
-                    country
-                }));
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>());
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -668,6 +650,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
                 await statisticsDbContext.AddRangeAsync(footnoteForFilter, footnoteForFilterGroup,
                     footnoteForFilterItem, footnoteForIndicator, footnoteForSubject);
+                await statisticsDbContext.AddAsync(originalLocation);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -681,8 +664,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
 
                 Assert.Equal(originalSubject.Id, replacementPlan.OriginalSubjectId);
                 Assert.Equal(replacementSubject.Id, replacementPlan.ReplacementSubjectId);
@@ -696,8 +680,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var dataBlockIndicatorGroupPlan = dataBlockPlan.IndicatorGroups.First();
 
-                Assert.Equal(originalIndicator.IndicatorGroup.Id,  dataBlockIndicatorGroupPlan.Key);
-                Assert.Equal(originalIndicator.IndicatorGroup.Label,  dataBlockIndicatorGroupPlan.Value.Label);
+                Assert.Equal(originalIndicator.IndicatorGroup.Id, dataBlockIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Label, dataBlockIndicatorGroupPlan.Value.Label);
                 Assert.Single(dataBlockIndicatorGroupPlan.Value.Indicators);
                 Assert.False(dataBlockIndicatorGroupPlan.Value.Valid);
 
@@ -739,21 +723,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(dataBlockPlan.Locations);
                 Assert.Single(dataBlockPlan.Locations);
                 Assert.True(dataBlockPlan.Locations.ContainsKey(GeographicLevel.Country.ToString()));
-                Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].ObservationalUnits);
+                Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].LocationAttributes);
                 Assert.False(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Valid);
 
                 var dataBlockLocationPlan = dataBlockPlan
                     .Locations[GeographicLevel.Country.ToString()]
-                    .ObservationalUnits
+                    .LocationAttributes
                     .First();
 
-                Assert.Equal(country.Code, dataBlockLocationPlan.Code);
-                Assert.Equal(country.Name, dataBlockLocationPlan.Label);
-                Assert.Empty(dataBlockLocationPlan.Target);
+                Assert.Equal(originalLocation.Id, dataBlockLocationPlan.Id);
+                Assert.Equal(_england.Code, dataBlockLocationPlan.Code);
+                Assert.Equal(_england.Name, dataBlockLocationPlan.Label);
+                Assert.Null(dataBlockLocationPlan.Target);
                 Assert.False(dataBlockLocationPlan.Valid);
 
                 Assert.NotNull(dataBlockPlan.TimePeriods);
-                Assert.False(dataBlockPlan.TimePeriods.Valid);
+                Assert.False(dataBlockPlan.TimePeriods!.Valid);
 
                 Assert.Equal(timePeriod.StartYear, dataBlockPlan.TimePeriods.Start.Year);
                 Assert.Equal(timePeriod.StartCode, dataBlockPlan.TimePeriods.Start.Code);
@@ -822,9 +807,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(originalFilterItem.Id, footnoteForFilterItemFilterItemPlan.Id);
                 Assert.Equal(originalFilterItem.Label, footnoteForFilterItemFilterItemPlan.Label);
                 Assert.Equal(originalFilterItem.FilterGroup.Filter.Id, footnoteForFilterItemFilterItemPlan.FilterId);
-                Assert.Equal(originalFilterItem.FilterGroup.Filter.Label, footnoteForFilterItemFilterItemPlan.FilterLabel);
+                Assert.Equal(originalFilterItem.FilterGroup.Filter.Label,
+                    footnoteForFilterItemFilterItemPlan.FilterLabel);
                 Assert.Equal(originalFilterItem.FilterGroup.Id, footnoteForFilterItemFilterItemPlan.FilterGroupId);
-                Assert.Equal(originalFilterItem.FilterGroup.Label, footnoteForFilterItemFilterItemPlan.FilterGroupLabel);
+                Assert.Equal(originalFilterItem.FilterGroup.Label,
+                    footnoteForFilterItemFilterItemPlan.FilterGroupLabel);
                 Assert.Null(footnoteForFilterItemFilterItemPlan.Target);
                 Assert.False(footnoteForFilterItemFilterItemPlan.Valid);
 
@@ -841,8 +828,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var footnoteForIndicatorIndicatorGroupPlan = footnoteForIndicatorPlan.IndicatorGroups.First();
 
-                Assert.Equal(originalIndicator.IndicatorGroup.Id,  footnoteForIndicatorIndicatorGroupPlan.Key);
-                Assert.Equal(originalIndicator.IndicatorGroup.Label, footnoteForIndicatorIndicatorGroupPlan.Value.Label);
+                Assert.Equal(originalIndicator.IndicatorGroup.Id, footnoteForIndicatorIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Label,
+                    footnoteForIndicatorIndicatorGroupPlan.Value.Label);
                 Assert.Single(footnoteForIndicatorIndicatorGroupPlan.Value.Indicators);
                 Assert.False(footnoteForIndicatorIndicatorGroupPlan.Value.Valid);
 
@@ -1014,45 +1002,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var location = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
+
             var timePeriod = new TimePeriodQuery
             {
                 StartYear = 2019,
                 StartCode = CalendarYear,
                 EndYear = 2020,
                 EndCode = CalendarYear
-            };
-
-            var country = new Country(CountryCodeEngland, "England");
-
-            var table = new TableBuilderConfiguration
-            {
-                TableHeaders = new TableHeaders
-                {
-                    ColumnGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                        }
-                    },
-                    Columns = new List<TableHeader>
-                    {
-                        new TableHeader("2019_CY", TableHeaderType.TimePeriod),
-                        new TableHeader("2020_CY", TableHeaderType.TimePeriod)
-                    },
-                    RowGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            new TableHeader(originalDefaultFilterItem.Id.ToString(), TableHeaderType.Filter),
-                            new TableHeader(originalDefaultFilterItem2.Id.ToString(), TableHeaderType.Filter)
-                        }
-                    },
-                    Rows = new List<TableHeader>
-                    {
-                        new TableHeader(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
-                    }
-                }
             };
 
             var dataBlock = new DataBlock
@@ -1067,13 +1029,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         originalDefaultFilterItem2.Id
                     },
                     Indicators = new[] {originalIndicator.Id},
-                    Locations = new LocationQuery
-                    {
-                        Country = new[] {CountryCodeEngland}
-                    },
+                    LocationIds = ListOf(location.Id),
                     TimePeriod = timePeriod
-                },
-                Table = table
+                }
             };
 
             var releaseContentBlock = new ReleaseContentBlock
@@ -1084,23 +1042,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>
                 {
-                    {
-                        GeographicLevel.Country,
-                        new List<Country>
-                        {
-                            country,
-                        }
-                    }
-                });
-
-            mocks.locationRepository
-                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<ObservationalUnit>
-                {
-                    country
+                    location
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -1130,6 +1075,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
                 await statisticsDbContext.AddRangeAsync(originalDefaultFilter, replacementDefaultFilter);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
+                await statisticsDbContext.AddAsync(location);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1143,8 +1089,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
                 Assert.False(replacementPlan.Valid);
 
                 Assert.Single(replacementPlan.DataBlocks);
@@ -1289,44 +1236,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var location = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
+
             var timePeriod = new TimePeriodQuery
             {
                 StartYear = 2019,
                 StartCode = CalendarYear,
                 EndYear = 2020,
                 EndCode = CalendarYear
-            };
-
-            var country = new Country(CountryCodeEngland, "England");
-
-            var table = new TableBuilderConfiguration
-            {
-                TableHeaders = new TableHeaders
-                {
-                    ColumnGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                        }
-                    },
-                    Columns = new List<TableHeader>
-                    {
-                        new TableHeader("2019_CY", TableHeaderType.TimePeriod),
-                        new TableHeader("2020_CY", TableHeaderType.TimePeriod)
-                    },
-                    RowGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            new TableHeader(originalDefaultFilterItem.Id.ToString(), TableHeaderType.Filter)
-                        }
-                    },
-                    Rows = new List<TableHeader>
-                    {
-                        new TableHeader(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
-                    }
-                }
             };
 
             var dataBlock = new DataBlock
@@ -1340,13 +1262,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         originalDefaultFilterItem.Id
                     },
                     Indicators = new[] {originalIndicator.Id},
-                    Locations = new LocationQuery
-                    {
-                        Country = new[] {CountryCodeEngland}
-                    },
+                    LocationIds = ListOf(location.Id),
                     TimePeriod = timePeriod
-                },
-                Table = table
+                }
             };
 
             var releaseContentBlock = new ReleaseContentBlock
@@ -1357,23 +1275,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>
                 {
-                    {
-                        GeographicLevel.Country,
-                        new List<Country>
-                        {
-                            country,
-                        }
-                    }
-                });
-
-            mocks.locationRepository
-                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<ObservationalUnit>
-                {
-                    country
+                    location
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -1403,6 +1308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
                 await statisticsDbContext.AddRangeAsync(originalDefaultFilter, replacementDefaultFilter);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
+                await statisticsDbContext.AddAsync(location);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1416,8 +1322,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
                 Assert.False(replacementPlan.Valid);
 
                 Assert.Single(replacementPlan.DataBlocks);
@@ -1587,44 +1494,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var location = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
+
             var timePeriod = new TimePeriodQuery
             {
                 StartYear = 2019,
                 StartCode = CalendarYear,
                 EndYear = 2020,
                 EndCode = CalendarYear
-            };
-
-            var country = new Country(CountryCodeEngland, "England");
-
-            var table = new TableBuilderConfiguration
-            {
-                TableHeaders = new TableHeaders
-                {
-                    ColumnGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                        }
-                    },
-                    Columns = new List<TableHeader>
-                    {
-                        new TableHeader("2019_CY", TableHeaderType.TimePeriod),
-                        new TableHeader("2020_CY", TableHeaderType.TimePeriod)
-                    },
-                    RowGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            new TableHeader(originalDefaultFilterItem.Id.ToString(), TableHeaderType.Filter)
-                        }
-                    },
-                    Rows = new List<TableHeader>
-                    {
-                        new TableHeader(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
-                    }
-                }
             };
 
             var dataBlock = new DataBlock
@@ -1638,13 +1520,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         originalDefaultFilterItem.Id
                     },
                     Indicators = new[] {originalIndicator.Id},
-                    Locations = new LocationQuery
-                    {
-                        Country = new[] {CountryCodeEngland}
-                    },
+                    LocationIds = ListOf(location.Id),
                     TimePeriod = timePeriod
-                },
-                Table = table
+                }
             };
 
             var releaseContentBlock = new ReleaseContentBlock
@@ -1655,23 +1533,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>
                 {
-                    {
-                        GeographicLevel.Country,
-                        new List<Country>
-                        {
-                            country,
-                        }
-                    }
-                });
-
-            mocks.locationRepository
-                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<ObservationalUnit>
-                {
-                    country
+                    location
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -1702,6 +1567,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.AddRangeAsync(originalDefaultFilter,
                     replacementDefaultFilter, replacementNewlyIntroducedFilter);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
+                await statisticsDbContext.AddAsync(location);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1715,14 +1581,267 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
                 Assert.False(replacementPlan.Valid);
 
                 Assert.Single(replacementPlan.DataBlocks);
                 var dataBlockPlan = replacementPlan.DataBlocks.First();
                 Assert.False(dataBlockPlan.Valid);
                 Assert.False(dataBlockPlan.Fixable);
+            }
+        }
+
+        [Fact]
+        public async Task GetReplacementPlan_ReplacementHasDifferentLocation_LocationMatchedByCode_ReplacementValid()
+        {
+            var originalSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var replacementSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contentRelease = new Content.Model.Release
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var originalFile = new File
+            {
+                Filename = "original.csv",
+                Type = FileType.Data,
+                SubjectId = originalSubject.Id
+            };
+
+            var replacementFile = new File
+            {
+                Filename = "replacement.csv",
+                Type = FileType.Data,
+                SubjectId = replacementSubject.Id
+            };
+
+            var originalReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = originalFile
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = replacementFile
+            };
+
+            var originalFilterItem = new FilterItem
+            {
+                Id = Guid.NewGuid(),
+                Label = "Test filter item - not changing"
+            };
+
+            var replacementFilterItem = new FilterItem
+            {
+                Label = "Test filter item - not changing"
+            };
+
+            var originalFilterGroup = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    originalFilterItem
+                }
+            };
+
+            var replacementFilterGroup = new FilterGroup
+            {
+                Label = "Default group - not changing",
+                FilterItems = new List<FilterItem>
+                {
+                    replacementFilterItem
+                }
+            };
+
+            var originalFilter = new Filter
+            {
+                Label = "Filter - not changing",
+                Name = "filter_not_changing",
+                Subject = originalSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    originalFilterGroup
+                }
+            };
+
+            var replacementFilter = new Filter
+            {
+                Label = "Filter - not changing",
+                Name = "filter_not_changing",
+                Subject = replacementSubject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    replacementFilterGroup
+                }
+            };
+
+            var originalIndicator = new Indicator
+            {
+                Id = Guid.NewGuid(),
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var replacementIndicator = new Indicator
+            {
+                Label = "Indicator - not changing",
+                Name = "indicator_not_changing"
+            };
+
+            var originalIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = originalSubject,
+                Indicators = new List<Indicator>
+                {
+                    originalIndicator
+                }
+            };
+
+            var replacementIndicatorGroup = new IndicatorGroup
+            {
+                Label = "Default group - not changing",
+                Subject = replacementSubject,
+                Indicators = new List<Indicator>
+                {
+                    replacementIndicator
+                }
+            };
+
+            var originalLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                LocalAuthority = _derby
+            };
+
+            // Replacement location has a different id but the primary attribute code remains the same
+            var replacementLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = _england,
+                LocalAuthority = _derby
+            };
+
+            var timePeriod = new TimePeriodQuery
+            {
+                StartYear = 2019,
+                StartCode = CalendarYear,
+                EndYear = 2020,
+                EndCode = CalendarYear
+            };
+
+            var dataBlock = new DataBlock
+            {
+                Name = "Test DataBlock",
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = originalSubject.Id,
+                    Filters = new[] { originalFilterItem.Id},
+                    Indicators = new[] {originalIndicator.Id},
+                    LocationIds = ListOf(originalLocation.Id),
+                    TimePeriod = timePeriod
+                }
+            };
+
+            var releaseContentBlock = new ReleaseContentBlock
+            {
+                Release = contentRelease,
+                ContentBlock = dataBlock
+            };
+
+            var mocks = Mocks();
+
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>
+                {
+                    replacementLocation
+                });
+
+            mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>
+                {
+                    (2019, CalendarYear),
+                    (2020, CalendarYear)
+                });
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(contentRelease);
+                await contentDbContext.AddRangeAsync(originalFile, replacementFile);
+                await contentDbContext.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
+                await contentDbContext.AddAsync(dataBlock);
+                await contentDbContext.AddAsync(releaseContentBlock);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
+                await statisticsDbContext.AddRangeAsync(originalFilter, replacementFilter);
+                await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
+                await statisticsDbContext.AddAsync(originalLocation);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
+
+                var result = await replacementService.GetReplacementPlan(
+                    releaseId: contentRelease.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
+
+                VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
+
+                Assert.Equal(originalSubject.Id, replacementPlan.OriginalSubjectId);
+                Assert.Equal(replacementSubject.Id, replacementPlan.ReplacementSubjectId);
+
+                Assert.Single(replacementPlan.DataBlocks);
+                var dataBlockPlan = replacementPlan.DataBlocks.First();
+                Assert.Equal(dataBlock.Id, dataBlockPlan.Id);
+                Assert.Equal(dataBlock.Name, dataBlockPlan.Name);
+
+                Assert.NotNull(dataBlockPlan.Locations);
+                Assert.Single(dataBlockPlan.Locations);
+                Assert.True(dataBlockPlan.Locations.ContainsKey(GeographicLevel.LocalAuthority.ToString()));
+                Assert.Single(dataBlockPlan.Locations[GeographicLevel.LocalAuthority.ToString()].LocationAttributes);
+                Assert.True(dataBlockPlan.Locations[GeographicLevel.LocalAuthority.ToString()].Valid);
+
+                var dataBlockLocationPlan = dataBlockPlan
+                    .Locations[GeographicLevel.LocalAuthority.ToString()]
+                    .LocationAttributes
+                    .First();
+
+                Assert.Equal(originalLocation.Id, dataBlockLocationPlan.Id);
+                Assert.Equal(_derby.Code, dataBlockLocationPlan.Code);
+                Assert.Equal(_derby.Name, dataBlockLocationPlan.Label);
+                Assert.Equal(replacementLocation.Id, dataBlockLocationPlan.Target);
+                Assert.True(dataBlockLocationPlan.Valid);
+
+                Assert.True(dataBlockPlan.Valid);
+                Assert.True(replacementPlan.Valid);
             }
         }
 
@@ -1961,44 +2080,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var location = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
+
             var timePeriod = new TimePeriodQuery
             {
                 StartYear = 2019,
                 StartCode = CalendarYear,
                 EndYear = 2020,
                 EndCode = CalendarYear
-            };
-
-            var country = new Country(CountryCodeEngland, "England");
-
-            var table = new TableBuilderConfiguration
-            {
-                TableHeaders = new TableHeaders
-                {
-                    ColumnGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
-                        }
-                    },
-                    Columns = new List<TableHeader>
-                    {
-                        new TableHeader("2019_CY", TableHeaderType.TimePeriod),
-                        new TableHeader("2020_CY", TableHeaderType.TimePeriod)
-                    },
-                    RowGroups = new List<List<TableHeader>>
-                    {
-                        new List<TableHeader>
-                        {
-                            new TableHeader(originalDefaultFilterItem.Id.ToString(), TableHeaderType.Filter)
-                        }
-                    },
-                    Rows = new List<TableHeader>
-                    {
-                        new TableHeader(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
-                    }
-                }
             };
 
             var dataBlock = new DataBlock
@@ -2014,13 +2108,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         originalPrimaryAndSecondarySchoolsFilterItem.Id,
                     },
                     Indicators = new[] {originalIndicator.Id},
-                    Locations = new LocationQuery
-                    {
-                        Country = new[] {CountryCodeEngland}
-                    },
+                    LocationIds = ListOf(location.Id),
                     TimePeriod = timePeriod
-                },
-                Table = table
+                }
             };
 
             var releaseContentBlock = new ReleaseContentBlock
@@ -2033,7 +2123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter",
                 filterFootnotes: new List<FilterFootnote>
                 {
-                    new FilterFootnote
+                    new()
                     {
                         Filter = originalDefaultFilter
                     }
@@ -2043,7 +2133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter group",
                 filterGroupFootnotes: new List<FilterGroupFootnote>
                 {
-                    new FilterGroupFootnote
+                    new()
                     {
                         FilterGroup = originalDefaultFilterGroup
                     }
@@ -2053,7 +2143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter item",
                 filterItemFootnotes: new List<FilterItemFootnote>
                 {
-                    new FilterItemFootnote
+                    new()
                     {
                         FilterItem = originalDefaultFilterItem
                     }
@@ -2063,7 +2153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter item",
                 indicatorFootnotes: new List<IndicatorFootnote>
                 {
-                    new IndicatorFootnote
+                    new()
                     {
                         Indicator = originalIndicator
                     }
@@ -2075,23 +2165,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>
                 {
-                    {
-                        GeographicLevel.Country,
-                        new List<Country>
-                        {
-                            country,
-                        }
-                    }
-                });
-
-            mocks.locationRepository
-                .Setup(service => service.GetObservationalUnits(GeographicLevel.Country, new []{ CountryCodeEngland }))
-                .Returns(new List<ObservationalUnit>
-                {
-                    country
+                    location
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -2122,6 +2199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.AddRangeAsync(originalDefaultFilter, originalSchoolTypeFilter,
                     replacementDefaultFilter, replacementSchoolTypeFilter);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
+                await statisticsDbContext.AddAsync(location);
                 await statisticsDbContext.AddRangeAsync(footnoteForFilter, footnoteForFilterGroup,
                     footnoteForFilterItem, footnoteForIndicator, footnoteForSubject);
                 await statisticsDbContext.SaveChangesAsync();
@@ -2137,8 +2215,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                Assert.True(result.IsRight);
-                var replacementPlan = result.Right;
+                VerifyAllMocks(mocks);
+
+                var replacementPlan = result.AssertRight();
 
                 Assert.Equal(originalSubject.Id, replacementPlan.OriginalSubjectId);
                 Assert.Equal(replacementSubject.Id, replacementPlan.ReplacementSubjectId);
@@ -2152,7 +2231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var dataBlockIndicatorGroupPlan = dataBlockPlan.IndicatorGroups.First();
 
-                Assert.Equal(originalIndicator.IndicatorGroup.Id,  dataBlockIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Id, dataBlockIndicatorGroupPlan.Key);
                 Assert.Equal(originalIndicator.IndicatorGroup.Label, dataBlockIndicatorGroupPlan.Value.Label);
                 Assert.Single(dataBlockIndicatorGroupPlan.Value.Indicators);
                 Assert.True(dataBlockIndicatorGroupPlan.Value.Valid);
@@ -2167,7 +2246,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(2, dataBlockPlan.Filters.Count);
 
-                var dataBlockDefaultFilterPlan = dataBlockPlan.Filters.First(f => f.Key.Equals(originalDefaultFilter.Id));
+                var dataBlockDefaultFilterPlan =
+                    dataBlockPlan.Filters.First(f => f.Key.Equals(originalDefaultFilter.Id));
 
                 Assert.Equal(originalDefaultFilter.Id, dataBlockDefaultFilterPlan.Value.Id);
                 Assert.Equal(originalDefaultFilter.Label, dataBlockDefaultFilterPlan.Value.Label);
@@ -2191,7 +2271,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(replacementDefaultFilterItem.Id, dataBlockDefaultFilterItemPlan.Target);
                 Assert.True(dataBlockDefaultFilterItemPlan.Valid);
 
-                var dataBlockSchoolTypeFilterPlan = dataBlockPlan.Filters.First(f => f.Key.Equals(originalSchoolTypeFilter.Id));
+                var dataBlockSchoolTypeFilterPlan =
+                    dataBlockPlan.Filters.First(f => f.Key.Equals(originalSchoolTypeFilter.Id));
 
                 Assert.Equal(originalSchoolTypeFilter.Id, dataBlockSchoolTypeFilterPlan.Value.Id);
                 Assert.Equal(originalSchoolTypeFilter.Label, dataBlockSchoolTypeFilterPlan.Value.Label);
@@ -2203,8 +2284,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var dataBlockIndividualSchoolTypeFilterGroupPlan =
                     dataBlockSchoolTypeFilterPlan.Value.Groups.First(g => g.Key == originalIndividualSchoolTypeFilterGroup.Id);
 
-                Assert.Equal(originalIndividualSchoolTypeFilterGroup.Id, dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Id);
-                Assert.Equal(originalIndividualSchoolTypeFilterGroup.Label, dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Label);
+                Assert.Equal(originalIndividualSchoolTypeFilterGroup.Id,
+                    dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Id);
+                Assert.Equal(originalIndividualSchoolTypeFilterGroup.Label,
+                    dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Label);
                 Assert.Single(dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Filters);
                 Assert.True(dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Valid);
 
@@ -2216,7 +2299,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(dataBlockCombinedSchoolTypeFilterGroupPlan.Value.Filters);
                 Assert.True(dataBlockCombinedSchoolTypeFilterGroupPlan.Value.Valid);
 
-                var dataBlockPrimarySchoolsFilterItemPlan = dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Filters.First();
+                var dataBlockPrimarySchoolsFilterItemPlan =
+                    dataBlockIndividualSchoolTypeFilterGroupPlan.Value.Filters.First();
 
                 Assert.Equal(originalPrimarySchoolsFilterItem.Id, dataBlockPrimarySchoolsFilterItemPlan.Id);
                 Assert.Equal(originalPrimarySchoolsFilterItem.Label, dataBlockPrimarySchoolsFilterItemPlan.Label);
@@ -2226,17 +2310,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(dataBlockPlan.Locations);
                 Assert.Single(dataBlockPlan.Locations);
                 Assert.True(dataBlockPlan.Locations.ContainsKey(GeographicLevel.Country.ToString()));
-                Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].ObservationalUnits);
+                Assert.Single(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].LocationAttributes);
                 Assert.True(dataBlockPlan.Locations[GeographicLevel.Country.ToString()].Valid);
 
                 var dataBlockLocationPlan = dataBlockPlan
                     .Locations[GeographicLevel.Country.ToString()]
-                    .ObservationalUnits
+                    .LocationAttributes
                     .First();
 
-                Assert.Equal(country.Code, dataBlockLocationPlan.Code);
-                Assert.Equal(country.Name, dataBlockLocationPlan.Label);
-                Assert.Equal(country.Code,dataBlockLocationPlan.Target);
+                Assert.Equal(location.Id, dataBlockLocationPlan.Id);
+                Assert.Equal(_england.Code, dataBlockLocationPlan.Code);
+                Assert.Equal(_england.Name, dataBlockLocationPlan.Label);
+                Assert.Equal(location.Id, dataBlockLocationPlan.Target);
                 Assert.True(dataBlockLocationPlan.Valid);
 
                 Assert.NotNull(dataBlockPlan.TimePeriods);
@@ -2306,10 +2391,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(originalDefaultFilterItem.Id, footnoteForFilterItemFilterItemPlan.Id);
                 Assert.Equal(originalDefaultFilterItem.Label, footnoteForFilterItemFilterItemPlan.Label);
-                Assert.Equal(originalDefaultFilterItem.FilterGroup.Filter.Id, footnoteForFilterItemFilterItemPlan.FilterId);
-                Assert.Equal(originalDefaultFilterItem.FilterGroup.Filter.Label, footnoteForFilterItemFilterItemPlan.FilterLabel);
-                Assert.Equal(originalDefaultFilterItem.FilterGroup.Id, footnoteForFilterItemFilterItemPlan.FilterGroupId);
-                Assert.Equal(originalDefaultFilterItem.FilterGroup.Label, footnoteForFilterItemFilterItemPlan.FilterGroupLabel);
+                Assert.Equal(originalDefaultFilterItem.FilterGroup.Filter.Id,
+                    footnoteForFilterItemFilterItemPlan.FilterId);
+                Assert.Equal(originalDefaultFilterItem.FilterGroup.Filter.Label,
+                    footnoteForFilterItemFilterItemPlan.FilterLabel);
+                Assert.Equal(originalDefaultFilterItem.FilterGroup.Id,
+                    footnoteForFilterItemFilterItemPlan.FilterGroupId);
+                Assert.Equal(originalDefaultFilterItem.FilterGroup.Label,
+                    footnoteForFilterItemFilterItemPlan.FilterGroupLabel);
                 Assert.Equal(replacementDefaultFilterItem.Id, footnoteForFilterItemFilterItemPlan.Target);
                 Assert.True(footnoteForFilterItemFilterItemPlan.Valid);
 
@@ -2327,7 +2416,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var footnoteForIndicatorIndicatorGroupPlan =
                     footnoteForIndicatorPlan.IndicatorGroups.First();
 
-                Assert.Equal(originalIndicator.IndicatorGroup.Id,  footnoteForIndicatorIndicatorGroupPlan.Key);
+                Assert.Equal(originalIndicator.IndicatorGroup.Id, footnoteForIndicatorIndicatorGroupPlan.Key);
                 Assert.Equal(originalIndicator.IndicatorGroup.Label, footnoteForIndicatorIndicatorGroupPlan.Value.Label);
                 Assert.Single(footnoteForIndicatorIndicatorGroupPlan.Value.Indicators);
                 Assert.True(footnoteForIndicatorIndicatorGroupPlan.Value.Valid);
@@ -2411,6 +2500,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 File = replacementFile
             };
 
+            var originalLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
+
             var timePeriod = new TimePeriodQuery
             {
                 StartYear = 2019,
@@ -2425,14 +2521,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ColumnGroups = new List<List<TableHeader>>(),
                     Columns = new List<TableHeader>
                     {
-                        new TableHeader("2019_CY", TableHeaderType.TimePeriod),
-                        new TableHeader("2020_CY", TableHeaderType.TimePeriod)
+                        new("2019_CY", TableHeaderType.TimePeriod),
+                        new("2020_CY", TableHeaderType.TimePeriod)
                     },
                     RowGroups = new List<List<TableHeader>>
                     {
-                        new List<TableHeader>
+                        new()
                         {
-                            TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                            TableHeader.NewLocationHeader(GeographicLevel.Country, originalLocation.Id.ToString())
                         }
                     },
                     Rows = new List<TableHeader>()
@@ -2447,10 +2543,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     SubjectId = originalSubject.Id,
                     Filters = new Guid[] { },
                     Indicators = new Guid[] { },
-                    Locations = new LocationQuery
-                    {
-                        Country = new[] {CountryCodeEngland}
-                    },
+                    LocationIds = ListOf(originalLocation.Id),
                     TimePeriod = timePeriod
                 },
                 Table = table
@@ -2464,8 +2557,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>());
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>());
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -2487,6 +2580,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await statisticsDbContext.AddRangeAsync(statsRelease);
                 await statisticsDbContext.AddRangeAsync(originalSubject, replacementSubject);
+                await statisticsDbContext.AddAsync(originalLocation);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -2500,7 +2594,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     originalFileId: originalFile.Id,
                     replacementFileId: replacementFile.Id);
 
-                mocks.ReleaseService.VerifyNoOtherCalls();
+                VerifyAllMocks(mocks);
 
                 result.AssertBadRequest(ReplacementMustBeValid);
             }
@@ -2519,16 +2613,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid()
             };
 
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid()
+            };
+
             var contentReleaseVersion1 = new Content.Model.Release
             {
                 Id = Guid.NewGuid(),
-                PreviousVersionId = null
+                PreviousVersionId = null,
+                Publication = publication
             };
 
             var contentReleaseVersion2 = new Content.Model.Release
             {
                 Id = Guid.NewGuid(),
-                PreviousVersionId = contentReleaseVersion1.Id
+                PreviousVersionId = contentReleaseVersion1.Id,
+                Publication = publication
             };
 
             var statsReleaseVersion1 = new Release
@@ -2583,21 +2684,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = statsReleaseVersion1,
                 Subject = originalSubject,
-                MetaGuidance = "Original meta guidance version 1"
+                DataGuidance = "Original guidance version 1"
             };
 
             var originalReleaseSubject2 = new ReleaseSubject
             {
                 Release = statsReleaseVersion2,
                 Subject = originalSubject,
-                MetaGuidance = "Original meta guidance version 2"
+                DataGuidance = "Original guidance version 2"
             };
 
             var replacementReleaseSubject = new ReleaseSubject
             {
                 Release = statsReleaseVersion2,
                 Subject = replacementSubject,
-                MetaGuidance = null
+                DataGuidance = null
             };
 
             var originalFilterItem1 = new FilterItem
@@ -2737,6 +2838,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            var originalLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                LocalAuthority = _derby
+            };
+
+            var replacementLocation = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalAuthority,
+                Country = _england,
+                LocalAuthority = _derby
+            };
+
             var timePeriod = new TimePeriodQuery
             {
                 StartYear = 2019,
@@ -2753,10 +2869,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     SubjectId = originalSubject.Id,
                     Filters = new[] {originalFilterItem1.Id, originalFilterItem2.Id},
                     Indicators = new[] {originalIndicator.Id},
-                    Locations = new LocationQuery
-                    {
-                        Country = new[] {CountryCodeEngland}
-                    },
+                    LocationIds = ListOf(originalLocation.Id),
                     TimePeriod = timePeriod
                 },
                 Table = new TableBuilderConfiguration
@@ -2765,19 +2878,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         ColumnGroups = new List<List<TableHeader>>
                         {
-                            new List<TableHeader>
+                            new()
                             {
-                                TableHeader.NewLocationHeader(GeographicLevel.Country, CountryCodeEngland)
+                                TableHeader.NewLocationHeader(GeographicLevel.LocalAuthority, originalLocation.Id.ToString())
                             }
                         },
                         Columns = new List<TableHeader>
                         {
-                            new TableHeader("2019_CY", TableHeaderType.TimePeriod),
-                            new TableHeader("2020_CY", TableHeaderType.TimePeriod)
+                            new("2019_CY", TableHeaderType.TimePeriod),
+                            new("2020_CY", TableHeaderType.TimePeriod)
                         },
                         RowGroups = new List<List<TableHeader>>
                         {
-                            new List<TableHeader>
+                            new()
                             {
                                 new TableHeader(originalFilterItem1.Id.ToString(), TableHeaderType.Filter),
                                 new TableHeader(originalFilterItem2.Id.ToString(), TableHeaderType.Filter)
@@ -2785,7 +2898,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         },
                         Rows = new List<TableHeader>
                         {
-                            new TableHeader(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
+                            new(originalIndicator.Id.ToString(), TableHeaderType.Indicator)
                         }
                     }
                 },
@@ -2801,13 +2914,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 {
                                     DataSets = new List<ChartDataSet>
                                     {
-                                        new ChartDataSet
+                                        new()
                                         {
                                             Filters = new List<Guid>
                                             {
                                                 originalFilterItem1.Id
                                             },
-                                            Indicator = originalIndicator.Id
+                                            Indicator = originalIndicator.Id,
+                                            Location = new ChartDataSetLocation
+                                            {
+                                                Level = GeographicLevel.LocalAuthority.ToString().CamelCase(),
+                                                Value = originalLocation.Id.ToString()
+                                            }
                                         }
                                     }
                                 }
@@ -2817,7 +2935,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         {
                             Items = new List<ChartLegendItem>
                             {
-                                new ChartLegendItem
+                                new()
                                 {
                                     DataSet = new ChartLegendItemDataSet
                                     {
@@ -2825,7 +2943,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         {
                                             originalFilterItem1.Id
                                         },
-                                        Indicator = originalIndicator.Id
+                                        Indicator = originalIndicator.Id,
+                                        Location = new ChartDataSetLocation
+                                        {
+                                            Level = GeographicLevel.LocalAuthority.ToString().CamelCase(),
+                                            Value = originalLocation.Id.ToString()
+                                        }
                                     }
                                 }
                             }
@@ -2844,7 +2967,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter",
                 filterFootnotes: new List<FilterFootnote>
                 {
-                    new FilterFootnote
+                    new()
                     {
                         Filter = originalFilter1
                     }
@@ -2854,7 +2977,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter group",
                 filterGroupFootnotes: new List<FilterGroupFootnote>
                 {
-                    new FilterGroupFootnote
+                    new()
                     {
                         FilterGroup = originalFilterGroup1
                     }
@@ -2864,7 +2987,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter item",
                 filterItemFootnotes: new List<FilterItemFootnote>
                 {
-                    new FilterItemFootnote
+                    new()
                     {
                         FilterItem = originalFilterItem1
                     }
@@ -2874,7 +2997,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 "Test footnote for Filter item",
                 indicatorFootnotes: new List<IndicatorFootnote>
                 {
-                    new IndicatorFootnote
+                    new()
                     {
                         Indicator = originalIndicator
                     }
@@ -2886,16 +3009,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var mocks = Mocks();
 
-            mocks.locationRepository.Setup(service => service.GetObservationalUnits(replacementSubject.Id))
-                .Returns(new Dictionary<GeographicLevel, IEnumerable<ObservationalUnit>>
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>
                 {
-                    {
-                        GeographicLevel.Country,
-                        new List<Country>
-                        {
-                            new Country(CountryCodeEngland, "England")
-                        }
-                    }
+                    replacementLocation
                 });
 
             mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
@@ -2928,13 +3045,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.AddRangeAsync(originalFilter1, originalFilter2,
                     replacementFilter1, replacementFilter2);
                 await statisticsDbContext.AddRangeAsync(originalIndicatorGroup, replacementIndicatorGroup);
+                await statisticsDbContext.AddAsync(originalLocation);
                 await statisticsDbContext.AddRangeAsync(footnoteForFilter, footnoteForFilterGroup,
                     footnoteForFilterItem, footnoteForIndicator, footnoteForSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
             mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
-                    contentReleaseVersion2.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
+                contentReleaseVersion2.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
+
+            var cacheKey = new DataBlockTableResultCacheKey(releaseContentBlock);
+
+            mocks.cacheKeyService
+                .Setup(service => service
+                    .CreateCacheKeyForDataBlock(releaseContentBlock.ReleaseId, releaseContentBlock.ContentBlockId))
+                .ReturnsAsync(cacheKey);
+
+            mocks.cacheService
+                .Setup(service => service.DeleteItem(cacheKey))
+                .Returns(Task.CompletedTask);
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2950,39 +3079,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock => mock.RemoveDataFiles(contentReleaseVersion2.Id, originalFile.Id),
                     Times.Once());
 
-                mocks.ReleaseService.VerifyNoOtherCalls();
+                VerifyAllMocks(mocks);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 // Check that the original file was unlinked from the replacement before the mock call to remove it.
-                Assert.Null((await contentDbContext.Files.FindAsync(originalFile.Id))
-                    .ReplacedById);
+                var originalFileUpdated = await contentDbContext.Files.FindAsync(originalFile.Id);
+                Assert.NotNull(originalFileUpdated);
+                Assert.Null(originalFileUpdated!.ReplacedById);
+
                 // Check that the replacement file was unlinked from the original.
-                Assert.Null((await contentDbContext.Files.FindAsync(replacementFile.Id))
-                    .ReplacingId);
+                var replacementFileUpdated = await contentDbContext.Files.FindAsync(replacementFile.Id);
+                Assert.NotNull(replacementFileUpdated);
+                Assert.Null(replacementFileUpdated!.ReplacingId);
 
                 var replacedDataBlock = await contentDbContext.DataBlocks.FindAsync(dataBlock.Id);
                 Assert.NotNull(replacedDataBlock);
-                Assert.Equal(dataBlock.Name, replacedDataBlock.Name);
+                Assert.Equal(dataBlock.Name, replacedDataBlock!.Name);
                 Assert.Equal(replacementSubject.Id, replacedDataBlock.Query.SubjectId);
 
                 Assert.Single(replacedDataBlock.Query.Indicators);
                 Assert.Equal(replacementIndicator.Id, replacedDataBlock.Query.Indicators.First());
 
-                var replacedFilterItemIds = replacedDataBlock.Query.Filters;
-                Assert.Equal(2, replacedFilterItemIds.Count());
-                Assert.Equal(replacementFilterItem1.Id, replacedFilterItemIds.ToList()[0]);
-                Assert.Equal(replacementFilterItem2.Id, replacedFilterItemIds.ToList()[1]);
+                var replacedFilterItemIds = replacedDataBlock.Query.Filters.ToList();
+                Assert.Equal(2, replacedFilterItemIds.Count);
+                Assert.Equal(replacementFilterItem1.Id, replacedFilterItemIds[0]);
+                Assert.Equal(replacementFilterItem2.Id, replacedFilterItemIds[1]);
 
-                Assert.NotNull(replacedDataBlock.Query.Locations);
-                Assert.Equal(dataBlock.Query.Locations, replacedDataBlock.Query.Locations);
+                var replacedLocationId = Assert.Single(replacedDataBlock.Query.LocationIds);
+                Assert.Equal(replacementLocation.Id, replacedLocationId);
 
                 Assert.NotNull(replacedDataBlock.Query.TimePeriod);
-                Assert.Equal(timePeriod, replacedDataBlock.Query.TimePeriod);
+                timePeriod.AssertDeepEqualTo(replacedDataBlock.Query.TimePeriod);
 
                 Assert.Equal(2, replacedDataBlock.Table.TableHeaders.Columns.Count());
                 Assert.Equal(TableHeaderType.TimePeriod, replacedDataBlock.Table.TableHeaders.Columns.First().Type);
@@ -2994,7 +3126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(replacedDataBlock.Table.TableHeaders.ColumnGroups.First());
                 Assert.Equal(TableHeaderType.Location,
                     replacedDataBlock.Table.TableHeaders.ColumnGroups.First().First().Type);
-                Assert.Equal(CountryCodeEngland,
+                Assert.Equal(replacementLocation.Id.ToString(),
                     replacedDataBlock.Table.TableHeaders.ColumnGroups.First().First().Value);
                 Assert.Single(replacedDataBlock.Table.TableHeaders.Rows);
                 Assert.Equal(TableHeaderType.Indicator, replacedDataBlock.Table.TableHeaders.Rows.First().Type);
@@ -3003,25 +3135,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Single(replacedDataBlock.Table.TableHeaders.RowGroups);
                 var replacementRowGroup = replacedDataBlock.Table.TableHeaders.RowGroups.First().ToList();
-                Assert.Equal(2, replacementRowGroup.Count());
+                Assert.Equal(2, replacementRowGroup.Count);
                 Assert.Equal(TableHeaderType.Filter, replacementRowGroup[0].Type);
-                Assert.Equal(replacementFilterItem1.Id.ToString(),replacementRowGroup[0].Value);
+                Assert.Equal(replacementFilterItem1.Id.ToString(), replacementRowGroup[0].Value);
                 Assert.Equal(TableHeaderType.Filter, replacementRowGroup[1].Type);
-                Assert.Equal(replacementFilterItem2.Id.ToString(),replacementRowGroup[1].Value);
+                Assert.Equal(replacementFilterItem2.Id.ToString(), replacementRowGroup[1].Value);
 
                 var chartMajorAxis = replacedDataBlock.Charts[0].Axes?["major"];
                 Assert.NotNull(chartMajorAxis);
-                Assert.Single(chartMajorAxis.DataSets);
-                Assert.Single(chartMajorAxis.DataSets[0].Filters);
-                Assert.Equal(replacementFilterItem1.Id, chartMajorAxis.DataSets[0].Filters[0]);
-                Assert.Equal(replacementIndicator.Id, chartMajorAxis.DataSets[0].Indicator);
+                var dataSet = Assert.Single(chartMajorAxis!.DataSets);
+                Assert.NotNull(dataSet);
+                Assert.Single(dataSet.Filters);
+                Assert.Equal(replacementFilterItem1.Id, dataSet.Filters[0]);
+                Assert.Equal(replacementIndicator.Id, dataSet.Indicator);
+                Assert.Equal(replacementLocation.Id, Guid.Parse(dataSet.Location.Value));
 
                 var chartLegendItems = replacedDataBlock.Charts[0].Legend?.Items;
                 Assert.NotNull(chartLegendItems);
-                Assert.Single(chartLegendItems);
-                Assert.Single(chartLegendItems[0].DataSet.Filters);
-                Assert.Equal(replacementFilterItem1.Id, chartLegendItems[0].DataSet.Filters[0]);
-                Assert.Equal(replacementIndicator.Id, chartLegendItems[0].DataSet.Indicator);
+                var chartLegendItem = Assert.Single(chartLegendItems!);
+                Assert.NotNull(chartLegendItem);
+                var filter = Assert.Single(chartLegendItem!.DataSet.Filters);
+                Assert.Equal(replacementFilterItem1.Id, filter);
+                Assert.Equal(replacementIndicator.Id, chartLegendItem.DataSet.Indicator);
+                Assert.NotNull(chartLegendItem.DataSet.Location);
+                Assert.Equal(replacementLocation.Id, Guid.Parse(chartLegendItem.DataSet.Location!.Value));
 
                 var replacedFootnoteForFilter = await GetFootnoteById(statisticsDbContext, footnoteForFilter.Id);
                 Assert.NotNull(replacedFootnoteForFilter);
@@ -3092,25 +3229,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(replacementSubject.Id, replacedFootnoteForSubject.Subjects.First().Subject.Id);
 
-                // Check the original Meta Guidance has been retained on the replacement
+                // Check the original guidance has been retained on the replacement
                 var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
+                    .AsQueryable()
                     .Where(rs => rs.ReleaseId == statsReleaseVersion2.Id
                                  && rs.SubjectId == replacementSubject.Id)
                     .FirstAsync();
 
-                Assert.Equal("Original meta guidance version 2", replacedReleaseSubject.MetaGuidance);
+                Assert.Equal("Original guidance version 2", replacedReleaseSubject.DataGuidance);
             }
         }
 
         private static Footnote CreateFootnote(Release release,
             string content,
-            List<FilterFootnote> filterFootnotes = null,
-            List<FilterGroupFootnote> filterGroupFootnotes = null,
-            List<FilterItemFootnote> filterItemFootnotes = null,
-            List<IndicatorFootnote> indicatorFootnotes = null,
-            Subject subject = null)
+            List<FilterFootnote>? filterFootnotes = null,
+            List<FilterGroupFootnote>? filterGroupFootnotes = null,
+            List<FilterItemFootnote>? filterItemFootnotes = null,
+            List<IndicatorFootnote>? indicatorFootnotes = null,
+            Subject? subject = null)
         {
-            return new Footnote
+            return new()
             {
                 Content = content,
                 Filters = filterFootnotes,
@@ -3120,7 +3258,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Subjects = subject != null
                     ? new List<SubjectFootnote>
                     {
-                        new SubjectFootnote
+                        new()
                         {
                             Subject = subject
                         }
@@ -3128,7 +3266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     : new List<SubjectFootnote>(),
                 Releases = new List<ReleaseFootnote>
                 {
-                    new ReleaseFootnote
+                    new()
                     {
                         Release = release
                     }
@@ -3157,9 +3295,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             StatisticsDbContext statisticsDbContext,
             (Mock<ILocationRepository> locationRepository,
                 Mock<IReleaseService> releaseService,
-                Mock<ITimePeriodService> timePeriodService) mocks)
+                Mock<ITimePeriodService> timePeriodService,
+                Mock<ICacheKeyService> cacheKeyService,
+                Mock<IBlobCacheService> cacheService) mocks)
         {
-            var (locationRepository, releaseService, timePeriodService) = mocks;
+            var (locationRepository, releaseService, timePeriodService, cacheKeyService, cacheService) = mocks;
 
             return new ReplacementService(
                 contentDbContext,
@@ -3171,18 +3311,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 releaseService.Object,
                 timePeriodService.Object,
                 new PersistenceHelper<ContentDbContext>(contentDbContext),
-                MockUtils.AlwaysTrueUserService().Object
+                AlwaysTrueUserService().Object,
+                cacheKeyService.Object,
+                cacheService.Object
             );
         }
 
         private static (Mock<ILocationRepository> locationRepository,
             Mock<IReleaseService> ReleaseService,
-            Mock<ITimePeriodService> TimePeriodService) Mocks()
+            Mock<ITimePeriodService> TimePeriodService,
+            Mock<ICacheKeyService> cacheKeyService,
+            Mock<IBlobCacheService> cacheService) Mocks()
         {
             return (
-                new Mock<ILocationRepository>(),
-                new Mock<IReleaseService>(),
-                new Mock<ITimePeriodService>());
+                new Mock<ILocationRepository>(Strict),
+                new Mock<IReleaseService>(Strict),
+                new Mock<ITimePeriodService>(Strict),
+                new Mock<ICacheKeyService>(Strict),
+                new Mock<IBlobCacheService>(Strict));
         }
     }
 }

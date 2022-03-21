@@ -41,8 +41,8 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'subjectTitle',
     messages: {
-      SUBJECT_TITLE_MUST_BE_UNIQUE: 'Subject title must be unique',
-      SUBJECT_TITLE_CANNOT_CONTAIN_SPECIAL_CHARACTERS:
+      SubjectTitleMustBeUnique: 'Subject title must be unique',
+      SubjectTitleCannotContainSpecialCharacters:
         'Subject title cannot contain special characters',
     },
   }),

@@ -1,7 +1,11 @@
 using System;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -13,6 +17,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -46,22 +51,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             foreach (var release in releases)
             {
-                if (release.PreviousVersion == null)
+                var previousRelease = release.PreviousVersion;
+
+                if (previousRelease == null)
                 {
                     break;
                 }
 
-                await _fastTrackService.DeleteAllFastTracksByRelease(release.PreviousVersion.Id);
+                await _fastTrackService.DeleteAllFastTracksByRelease(previousRelease.Id);
+
+                // Delete any lazily-cached results that are owned by the previous Release
+                await DeleteLazilyCachedReleaseResults(release.Publication.Slug, previousRelease.Slug);
 
                 // Delete content which hasn't been overwritten because the Slug has changed
-                if (release.Slug != release.PreviousVersion.Slug)
+                if (release.Slug != previousRelease.Slug)
                 {
                     await _publicBlobStorageService.DeleteBlob(
                         PublicContent,
-                        PublicContentReleasePath(release.Publication.Slug, release.PreviousVersion.Slug)
+                        PublicContentReleasePath(release.Publication.Slug, previousRelease.Slug)
                     );
                 }
             }
+        }
+
+        private async Task DeleteLazilyCachedReleaseResults(string publicationSlug, string releaseSlug)
+        {
+            await _blobCacheService.DeleteCacheFolder(new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug));
+            await _blobCacheService.DeleteItem(new ReleaseSubjectsCacheKey(publicationSlug, releaseSlug));
+            await _blobCacheService.DeleteCacheFolder(new ReleaseFastTrackResultsFolderCacheKey(publicationSlug, releaseSlug));
+            await _blobCacheService.DeleteCacheFolder(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
         }
 
         public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseIds)
@@ -105,8 +123,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task UpdateContent(PublishContext context, params Guid[] releaseIds)
         {
-            var releases = await _releaseService.List(releaseIds);
-            var publications = releases.Select(release => release.Publication).ToList();
+            var releases = (await _releaseService
+                .List(releaseIds))
+                .ToList();
+
+            var publications = releases
+                .Select(release => release.Publication)
+                .DistinctByProperty(publication => publication.Id)
+                .ToList();
 
             foreach (var publication in publications)
             {
@@ -129,16 +153,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             // Invalidate the various cached trees in case any
             // publications/methodologies are affected by the changes
-            await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
-            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
-            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
-            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
+            await DeleteCachedTaxonomyBlobs();
         }
 
-        public async Task UpdateTaxonomy(PublishContext context)
+        public async Task DeleteCachedTaxonomyBlobs()
         {
-            // Invalidate the cached trees in case any
-            // publications/methodologies are affected by the changes
             await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
@@ -176,8 +195,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task DeleteAllContentAsyncExcludingStaging()
         {
-            var excludePattern = $"^{PublicContentStagingPath()}/.+$";
-            await _publicBlobStorageService.DeleteBlobs(PublicContent, string.Empty, excludePattern);
+            await _publicBlobStorageService.DeleteBlobs(
+                containerName: PublicContent,
+                options: new DeleteBlobsOptions
+                {
+                    ExcludeRegex = new Regex($"^{PublicContentStagingPath()}/.+$", RegexOptions.IgnoreCase | RegexOptions.Compiled)
+                }
+            );
         }
 
         private static JsonSerializerSettings GetJsonSerializerSettings(NamingStrategy namingStrategy)
@@ -186,7 +210,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             {
                 ContractResolver = new DefaultContractResolver
                 {
-                    NamingStrategy = namingStrategy
+                    NamingStrategy = namingStrategy,
                 },
                 NullValueHandling = NullValueHandling.Ignore,
                 TypeNameHandling = TypeNameHandling.Auto
@@ -199,6 +223,74 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             var pathPrefix = context.Staging ? PublicContentStagingPath() : null;
             var blobName = pathFunction.Invoke(pathPrefix);
             await _publicBlobStorageService.UploadAsJson(PublicContent, blobName, value, settings);
+        }
+
+        private record ReleaseDataBlockResultsFolderCacheKey : IBlobCacheKey
+        {
+            private string PublicationSlug { get; }
+
+            private string ReleaseSlug { get; }
+
+            public ReleaseDataBlockResultsFolderCacheKey(string publicationSlug, string releaseSlug)
+            {
+                PublicationSlug = publicationSlug;
+                ReleaseSlug = releaseSlug;
+            }
+
+            public string Key => PublicContentDataBlockParentPath(PublicationSlug, ReleaseSlug);
+
+            public IBlobContainer Container => PublicContent;
+        }
+
+        private record ReleaseSubjectsCacheKey : IBlobCacheKey
+        {
+            private string PublicationSlug { get; }
+
+            private string ReleaseSlug { get; }
+
+            public ReleaseSubjectsCacheKey(string publicationSlug, string releaseSlug)
+            {
+                PublicationSlug = publicationSlug;
+                ReleaseSlug = releaseSlug;
+            }
+
+            public string Key => PublicContentReleaseSubjectsPath(PublicationSlug, ReleaseSlug);
+
+            public IBlobContainer Container => PublicContent;
+        }
+
+        private record ReleaseFastTrackResultsFolderCacheKey : IBlobCacheKey
+        {
+            private string PublicationSlug { get; }
+
+            private string ReleaseSlug { get; }
+
+            public ReleaseFastTrackResultsFolderCacheKey(string publicationSlug, string releaseSlug)
+            {
+                PublicationSlug = publicationSlug;
+                ReleaseSlug = releaseSlug;
+            }
+
+            public string Key => PublicContentFastTrackResultsParentPath(PublicationSlug, ReleaseSlug);
+
+            public IBlobContainer Container => PublicContent;
+        }
+
+        private record ReleaseSubjectMetaFolderCacheKey : IBlobCacheKey
+        {
+            private string PublicationSlug { get; }
+
+            private string ReleaseSlug { get; }
+
+            public ReleaseSubjectMetaFolderCacheKey(string publicationSlug, string releaseSlug)
+            {
+                PublicationSlug = publicationSlug;
+                ReleaseSlug = releaseSlug;
+            }
+
+            public string Key => PublicContentSubjectMetaParentPath(PublicationSlug, ReleaseSlug);
+
+            public IBlobContainer Container => PublicContent;
         }
     }
 }

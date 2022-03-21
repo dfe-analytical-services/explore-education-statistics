@@ -17,16 +17,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         public IEnumerable<Footnote> GetFilteredFootnotes(
             Guid releaseId,
             Guid subjectId,
-            IQueryable<Observation> observations,
+            IEnumerable<Guid> filterItemIds,
             IEnumerable<Guid> indicatorIds)
         {
-            var filterItemIds = observations.SelectMany(observation => observation.FilterItems)
-                .Select(item => item.FilterItemId).Distinct();
-
             var releaseIdParam = new SqlParameter("releaseId", releaseId);
             var subjectIdParam = new SqlParameter("subjectId", subjectId);
-            var indicatorListParam = CreateIdListType("indicatorList", indicatorIds);
             var filterItemListParam = CreateIdListType("filterItemList", filterItemIds);
+            var indicatorListParam = CreateIdListType("indicatorList", indicatorIds);
 
             return _context
                 .Footnote
@@ -114,7 +111,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .Select(rs => rs.SubjectId)
                 .ToList();
 
-            return GetFootnotes(releaseId, subjectsIdsForRelease);
+            var footnotes = GetFootnotes(releaseId, subjectsIdsForRelease)
+                .ToList();
+
+            // Remove the below check as part of EES-2971
+            var releaseFootnotes = _context.ReleaseFootnote
+                .Where(rf => rf.ReleaseId == releaseId)
+                .ToList();
+            if (footnotes.Count != releaseFootnotes.Count)
+            {
+                throw new Exception(
+                    $"Number of footnotes different from number of ReleaseFootnotes for release {releaseId}");
+            }
+
+            return footnotes;
         }
 
         public IEnumerable<Footnote> GetFootnotes(Guid releaseId, Guid subjectId)

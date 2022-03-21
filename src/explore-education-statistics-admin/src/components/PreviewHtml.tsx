@@ -1,3 +1,4 @@
+import glossaryService from '@admin/services/glossaryService';
 import ContentHtml from '@common/components/ContentHtml';
 import classNames from 'classnames';
 import React from 'react';
@@ -15,6 +16,7 @@ const PreviewHtml = ({ className, html, testId }: Props) => {
       html={html}
       className={classNames(styles.preview, className)}
       testId={testId}
+      getGlossaryEntry={glossaryService.getEntry}
     />
   );
 };

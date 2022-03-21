@@ -115,7 +115,7 @@ const ChartLegendConfiguration = ({
     );
 
     const defaultConfig: Partial<LegendItemConfiguration> = {
-      symbol: capabilities.hasSymbols ? 'circle' : undefined,
+      symbol: capabilities.hasSymbols ? 'none' : undefined,
       lineStyle: capabilities.hasLineStyle ? 'solid' : undefined,
     };
 

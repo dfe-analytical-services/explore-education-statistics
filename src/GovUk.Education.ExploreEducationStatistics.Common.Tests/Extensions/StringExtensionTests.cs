@@ -72,6 +72,88 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             }
         }
 
+        public class IndentWidth
+        {
+            [Fact]
+            public void WithCharacters()
+            {
+                Assert.Equal(4, "    Test".IndentWidth());
+                Assert.Equal(8, "        Test".IndentWidth());
+            }
+
+            [Fact]
+            public void NoCharacters()
+            {
+                Assert.Equal(4, "    ".IndentWidth());
+                Assert.Equal(8, "        ".IndentWidth());
+            }
+        }
+
+        public class TrimIndent
+        {
+            [Fact]
+            public void SingleLine()
+            {
+                Assert.Equal("Test", "    Test".TrimIndent());
+                Assert.Equal("Test", "        Test".TrimIndent());
+            }
+
+            [Fact]
+            public void SingleLine_Empty()
+            {
+                Assert.Equal("", "    ".TrimIndent());
+                Assert.Equal("", "        ".TrimIndent());
+            }
+
+            [Fact]
+            public void MultiLine_OneIndent()
+            {
+                Assert.Equal(
+                    @"Test
+                    Test",
+                    @"Test
+                    Test".TrimIndent()
+                );
+            }
+
+            [Fact]
+            public void MultiLine_EqualIndents()
+            {
+                Assert.Equal(
+                    @"
+Test
+Test",
+                    @"
+                    Test
+                    Test".TrimIndent()
+                );
+            }
+
+            [Fact]
+            public void MultiLine_DifferentIndents()
+            {
+                Assert.Equal(
+                    @"
+Test
+    Test",
+                    @"
+                    Test
+                        Test".TrimIndent()
+                );
+            }
+
+            [Fact]
+            public void MultiLine_Empty()
+            {
+                Assert.Equal(
+                    "\n\n",
+                    @"
+                    
+                    ".TrimIndent()
+                );
+            }
+        }
+
         public class CamelCaseTests
         {
             [Fact]
@@ -279,51 +361,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                 Assert.Equal("FooBar", "foo_Bar".PascalCase());
                 Assert.Equal("FooBar", "Foo_Bar".PascalCase());
                 Assert.Equal("FOOBar", "FOO_Bar".PascalCase());
-            }
-        }
-
-        public class ScreamingSnakeCaseTests
-        {
-            [Fact]
-            public void NullStringsCanBeScreamingSnakeCased()
-            {
-                string? input = null;
-                Assert.Null(input!.ScreamingSnakeCase());
-            }
-
-            [Fact]
-            public void EmptyStringCanBeScreamingSnakeCased()
-            {
-                Assert.Equal(string.Empty, string.Empty.ScreamingSnakeCase());
-            }
-
-            [Fact]
-            public void AcronymsAreAlreadyScreamingSnakeCased()
-            {
-                Assert.Equal("ABC", "ABC".ScreamingSnakeCase());
-            }
-
-            [Fact]
-            public void CamelCasedStringsAreScreamingSnakeCased()
-            {
-                Assert.Equal("FOO", "foo".ScreamingSnakeCase());
-                Assert.Equal("CAMEL_CASE_STRING", "camelCaseString".ScreamingSnakeCase());
-            }
-
-            [Fact]
-            public void UnderscoreSeparatedStringsAreScreamingSnakeCased()
-            {
-                Assert.Equal("FOO_BAR", "foo_bar".ScreamingSnakeCase());
-                Assert.Equal("FOO_BAR", "foo_Bar".ScreamingSnakeCase());
-                Assert.Equal("FOO_BAR", "Foo_Bar".ScreamingSnakeCase());
-                Assert.Equal("FOO_BAR", "FOO_Bar".ScreamingSnakeCase());
-            }
-
-            [Fact]
-            public void PascalCasedStringsAreScreamingSnakeCased()
-            {
-                Assert.Equal("FOO_BAR", "FooBar".ScreamingSnakeCase());
-                Assert.Equal("FOO_BAR", "FooBAr".ScreamingSnakeCase());
             }
         }
 

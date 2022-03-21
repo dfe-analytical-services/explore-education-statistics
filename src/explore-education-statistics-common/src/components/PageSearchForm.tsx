@@ -26,9 +26,10 @@ export interface PageSearchFormProps {
   className?: string;
   elementSelectors?: string[];
   id?: string;
-  minInput?: number;
-  onSearch?: (s: string) => void;
   inputLabel: string;
+  minInput?: number;
+  rootElement?: string;
+  onSearch?: (s: string) => void;
 }
 
 const defaultSelectors = ['p', 'li > strong', 'h2', 'h3', 'h4'];
@@ -39,6 +40,7 @@ const PageSearchForm = ({
   id = 'pageSearchForm',
   inputLabel,
   minInput = 3,
+  rootElement = '#main-content',
   onSearch,
 }: PageSearchFormProps) => {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
@@ -98,7 +100,11 @@ const PageSearchForm = ({
     const elements = findAllByText(
       isAcronym ? value : value.toLocaleLowerCase(),
       elementSelectors.join(', '),
-      !isAcronym,
+      {
+        rootElement: (document.querySelector(rootElement) ||
+          document) as Element,
+        useLowerCase: !isAcronym,
+      },
     );
 
     const nextSearchResults = elements.map(element => {

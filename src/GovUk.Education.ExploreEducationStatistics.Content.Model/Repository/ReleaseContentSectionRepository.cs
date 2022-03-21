@@ -21,6 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
         {
             return await _contentDbContext
                 .ReleaseContentSections
+                .AsQueryable()
                 .Where(releaseContentSection => releaseContentSection.ReleaseId == releaseId)
                 .Include(releaseContentSection => releaseContentSection.ContentSection)
                 .ThenInclude(section => section.Content)

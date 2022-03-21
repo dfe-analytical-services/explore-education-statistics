@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 import _methodologyService, {
-  BasicMethodology,
+  BasicMethodologyVersion,
 } from '@admin/services/methodologyService';
 import _permissionService from '@admin/services/permissionService';
 import { generatePath, MemoryRouter } from 'react-router';
@@ -13,6 +13,7 @@ import {
 } from '@admin/routes/methodologyRoutes';
 import userEvent from '@testing-library/user-event';
 import { Route } from 'react-router-dom';
+import { TestConfigContextProvider } from '@admin/contexts/ConfigContext';
 
 jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/permissionService');
@@ -25,7 +26,7 @@ const permissionService = _permissionService as jest.Mocked<
 >;
 
 describe('MethodologyStatusPage', () => {
-  const testMethodology: BasicMethodology = {
+  const testMethodology: BasicMethodologyVersion = {
     id: 'm1',
     amendment: false,
     title: 'Test methodology',
@@ -34,7 +35,7 @@ describe('MethodologyStatusPage', () => {
       id: 'p1',
       title: 'Owning publication title',
     },
-  } as BasicMethodology;
+  } as BasicMethodologyVersion;
 
   const testMethodologyWithOtherPublications = {
     ...testMethodology,
@@ -259,7 +260,17 @@ describe('MethodologyStatusPage', () => {
     });
   });
 
-  function renderPage(methodology: BasicMethodology) {
+  test('renders the publicly accessible url of the methodology', async () => {
+    renderPage(testMethodology);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('public-methodology-url')).toHaveValue(
+        'http://localhost/methodology/test-methodology',
+      );
+    });
+  });
+
+  function renderPage(methodology: BasicMethodologyVersion) {
     render(
       <MemoryRouter
         initialEntries={[
@@ -268,12 +279,14 @@ describe('MethodologyStatusPage', () => {
           }),
         ]}
       >
-        <MethodologyContextProvider methodology={methodology}>
-          <Route
-            path={methodologyStatusRoute.path}
-            component={MethodologyStatusPage}
-          />
-        </MethodologyContextProvider>
+        <TestConfigContextProvider>
+          <MethodologyContextProvider methodology={methodology}>
+            <Route
+              path={methodologyStatusRoute.path}
+              component={MethodologyStatusPage}
+            />
+          </MethodologyContextProvider>
+        </TestConfigContextProvider>
       </MemoryRouter>,
     );
   }

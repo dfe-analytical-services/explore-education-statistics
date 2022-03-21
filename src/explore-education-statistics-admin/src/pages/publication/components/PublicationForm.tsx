@@ -27,7 +27,7 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'title',
     messages: {
-      SLUG_NOT_UNIQUE: 'Choose a unique title',
+      SlugNotUnique: 'Choose a unique title',
     },
   }),
 ];
@@ -37,6 +37,7 @@ interface Props {
   initialValues?: FormValues;
   onSubmit: (values: FormValues) => void;
   confirmOnSubmit?: boolean;
+  showTitleInput?: boolean;
 }
 
 const PublicationForm = ({
@@ -44,6 +45,7 @@ const PublicationForm = ({
   id = 'publicationForm',
   initialValues,
   confirmOnSubmit = false,
+  showTitleInput = true,
   onSubmit,
 }: Props) => {
   const {
@@ -101,11 +103,13 @@ const PublicationForm = ({
       {form => (
         <>
           <Form id={id}>
-            <FormFieldTextInput<FormValues>
-              label="Publication title"
-              name="title"
-              className="govuk-!-width-two-thirds"
-            />
+            {showTitleInput && (
+              <FormFieldTextInput<FormValues>
+                label="Publication title"
+                name="title"
+                className="govuk-!-width-two-thirds"
+              />
+            )}
 
             {initialValues?.topicId && (
               <FormFieldThemeTopicSelect<FormValues>

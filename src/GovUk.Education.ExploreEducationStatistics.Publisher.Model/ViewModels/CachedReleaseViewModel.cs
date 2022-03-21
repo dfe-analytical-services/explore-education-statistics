@@ -1,96 +1,55 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 {
-    public class CachedReleaseViewModel
+    public record CachedReleaseViewModel
     {
-        public CachedReleaseViewModel()
-        {
-        }
-
-        protected CachedReleaseViewModel(
-            Guid id,
-            string title,
-            string yearTitle,
-            string coverageTitle,
-            string releaseName,
-            PartialDate nextReleaseDate,
-            DateTime? published,
-            string slug,
-            ReleaseTypeViewModel type,
-            List<ReleaseNoteViewModel> updates,
-            List<ContentSectionViewModel> content,
-            ContentSectionViewModel summarySection,
-            ContentSectionViewModel headlinesSection,
-            ContentSectionViewModel keyStatisticsSection,
-            ContentSectionViewModel keyStatisticsSecondarySection,
-            List<FileInfo> downloadFiles,
-            string metaGuidance,
-            string preReleaseAccessList,
-            List<LinkViewModel> relatedInformation,
-            DateTime? dataLastPublished)
+        public CachedReleaseViewModel(Guid id)
         {
             Id = id;
-            Title = title;
-            YearTitle = yearTitle;
-            CoverageTitle = coverageTitle;
-            ReleaseName = releaseName;
-            NextReleaseDate = nextReleaseDate;
-            Published = published;
-            Slug = slug;
-            Type = type;
-            Updates = updates;
-            Content = content;
-            SummarySection = summarySection;
-            HeadlinesSection = headlinesSection;
-            KeyStatisticsSection = keyStatisticsSection;
-            KeyStatisticsSecondarySection = keyStatisticsSecondarySection;
-            DownloadFiles = downloadFiles;
-            MetaGuidance = metaGuidance;
-            PreReleaseAccessList = preReleaseAccessList;
-            RelatedInformation = relatedInformation;
-            DataLastPublished = dataLastPublished;
         }
 
         public Guid Id { get; set; }
 
-        public string Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
-        public string YearTitle { get; set; }
+        public string YearTitle { get; set; } = string.Empty;
 
-        public string CoverageTitle { get; set; }
+        public string CoverageTitle { get; set; } = string.Empty;
 
-        public string ReleaseName { get; set; }
+        public string ReleaseName { get; set; } = string.Empty;
 
-        public PartialDate NextReleaseDate { get; set; }
+        public string Slug { get; set; } = string.Empty;
+
+        // TODO EES-3127 Replace ReleaseTypeViewModel with ReleaseType. Requires a content cache refresh
+        public ReleaseTypeViewModel Type { get; set; } = null!;
+
+        public PartialDate? NextReleaseDate { get; set; }
 
         public DateTime? Published { get; set; }
 
-        public string Slug { get; set; }
+        public List<ReleaseNoteViewModel> Updates { get; set; } = new();
 
-        public ReleaseTypeViewModel Type { get; set; }
+        public List<ContentSectionViewModel> Content { get; set; } = new();
 
-        public List<ReleaseNoteViewModel> Updates { get; set; } = new List<ReleaseNoteViewModel>();
+        public ContentSectionViewModel SummarySection { get; set; } = null!;
 
-        public List<ContentSectionViewModel> Content { get; set; } = new List<ContentSectionViewModel>();
+        public ContentSectionViewModel HeadlinesSection { get; set; } = null!;
 
-        public ContentSectionViewModel SummarySection { get; set; }
+        public ContentSectionViewModel KeyStatisticsSection { get; set; } = null!;
 
-        public ContentSectionViewModel HeadlinesSection { get; set; }
+        public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = null!;
 
-        public ContentSectionViewModel KeyStatisticsSection { get; set; }
+        public List<FileInfo> DownloadFiles { get; set; } = new();
 
-        public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; }
+        public string DataGuidance { get; set; } = string.Empty;
 
-        public List<FileInfo> DownloadFiles { get; set; } = new List<FileInfo>();
+        public string PreReleaseAccessList { get; set; } = string.Empty;
 
-        public string MetaGuidance { get; set; }
-
-        public string PreReleaseAccessList { get; set; }
-
-        public List<LinkViewModel> RelatedInformation { get; set; } = new List<LinkViewModel>();
+        public List<LinkViewModel> RelatedInformation { get; set; } = new();
 
         private DateTime? _dataLastPublished;
 

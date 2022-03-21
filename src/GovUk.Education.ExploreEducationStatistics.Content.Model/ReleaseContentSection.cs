@@ -12,11 +12,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid ContentSectionId { get; set; }
 
-        public ReleaseContentSection Clone(Release newRelease, Release.CloneContext context)
+        public ReleaseContentSection Clone(Release.CloneContext context)
         {
             var copy = MemberwiseClone() as ReleaseContentSection;
-            copy.Release = newRelease;
-            copy.ReleaseId = newRelease.Id;
+            copy.Release = context.NewRelease;
+            copy.ReleaseId = context.NewRelease.Id;
 
             var contentSection = copy
                 .ContentSection

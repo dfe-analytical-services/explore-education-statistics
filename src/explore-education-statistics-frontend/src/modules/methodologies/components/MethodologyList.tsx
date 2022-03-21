@@ -19,17 +19,17 @@ function MethodologyList({ publications }: Props) {
     <ul>
       {filteredPublications.map(publication => (
         <li className="govuk-!-margin-bottom-2" key={publication.id}>
-          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+          <h3
+            className="govuk-heading-s govuk-!-margin-bottom-0"
+            id={`methodology-heading-${publication.id}`}
+          >
             {publication.title}
           </h3>
 
           <ul>
             {publication.methodologies.map(methodology => (
               <li key={methodology.id}>
-                <Link
-                  to="/methodology/[methodology]"
-                  as={`/methodology/${methodology.slug}`}
-                >
+                <Link to={`/methodology/${methodology.slug}`}>
                   {methodology.title}
                 </Link>
               </li>

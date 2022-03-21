@@ -48,9 +48,7 @@ describe('ReleaseDataBlockEditPage', () => {
     query: {
       includeGeoJson: false,
       subjectId: 'subject-1',
-      locations: {
-        localAuthority: ['barnet'],
-      },
+      locationIds: ['barnet'],
       timePeriod: {
         startYear: 2020,
         startCode: 'AY',
@@ -174,10 +172,12 @@ describe('ReleaseDataBlockEditPage', () => {
     renderPage();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', { name: 'Edit data block' }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Edit data block')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('heading', { name: 'Edit data block' }),
+    ).toBeInTheDocument();
 
     const tabs = screen.getAllByRole('tab');
 
@@ -333,8 +333,10 @@ describe('ReleaseDataBlockEditPage', () => {
     userEvent.click(modal.getByRole('button', { name: 'Cancel' }));
 
     await waitFor(() => {
-      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.queryByText('Delete data block')).not.toBeInTheDocument();
     });
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   describe('read-only view', () => {
@@ -366,20 +368,22 @@ describe('ReleaseDataBlockEditPage', () => {
       renderPage();
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('heading', { name: 'Test name 1' }),
-        ).toBeInTheDocument();
-
-        expect(screen.getByTestId('Featured table name')).toHaveTextContent(
-          'Test highlight name 1',
-        );
-        expect(
-          screen.getByTestId('Featured table description'),
-        ).toHaveTextContent('Test highlight description 1');
-        expect(screen.getByLabelText('Url')).toHaveValue(
-          'http://localhost/data-tables/fast-track/block-1',
-        );
+        expect(screen.getByText('Test name 1')).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByRole('heading', { name: 'Test name 1' }),
+      ).toBeInTheDocument();
+
+      expect(screen.getByTestId('Featured table name')).toHaveTextContent(
+        'Test highlight name 1',
+      );
+      expect(
+        screen.getByTestId('Featured table description'),
+      ).toHaveTextContent('Test highlight description 1');
+      expect(screen.getByLabelText('Url')).toHaveValue(
+        'http://localhost/data-tables/fast-track/block-1',
+      );
     });
 
     test('renders with correct data block details without Featured table name and description', async () => {
@@ -392,21 +396,23 @@ describe('ReleaseDataBlockEditPage', () => {
       renderPage();
 
       await waitFor(() => {
-        expect(
-          screen.getByRole('heading', { name: 'Test name 1' }),
-        ).toBeInTheDocument();
-
-        expect(
-          screen.queryByTestId('Featured table name'),
-        ).not.toBeInTheDocument();
-        expect(
-          screen.queryByTestId('Featured table description'),
-        ).not.toBeInTheDocument();
-
-        expect(screen.getByLabelText('Url')).toHaveValue(
-          'http://localhost/data-tables/fast-track/block-1',
-        );
+        expect(screen.getByText('Test name 1')).toBeInTheDocument();
       });
+
+      expect(
+        screen.getByRole('heading', { name: 'Test name 1' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.queryByTestId('Featured table name'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByTestId('Featured table description'),
+      ).not.toBeInTheDocument();
+
+      expect(screen.getByLabelText('Url')).toHaveValue(
+        'http://localhost/data-tables/fast-track/block-1',
+      );
     });
 
     test('renders page selector with list of data blocks', async () => {
@@ -432,8 +438,10 @@ describe('ReleaseDataBlockEditPage', () => {
       renderPage();
 
       await waitFor(() => {
-        expect(screen.getAllByRole('tab')).toHaveLength(2);
+        expect(screen.getByText('Table')).toBeInTheDocument();
       });
+
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
 
       const tabPanel = within(screen.getByRole('tabpanel'));
       expect(tabPanel.getByRole('table')).toBeInTheDocument();
@@ -454,9 +462,10 @@ describe('ReleaseDataBlockEditPage', () => {
       renderPage();
 
       await waitFor(() => {
-        expect(screen.getAllByRole('tab')).toHaveLength(2);
+        expect(screen.getByText('Chart')).toBeInTheDocument();
       });
 
+      expect(screen.getAllByRole('tab')).toHaveLength(2);
       userEvent.click(screen.getByRole('tab', { name: 'Chart' }));
 
       await waitFor(() => {

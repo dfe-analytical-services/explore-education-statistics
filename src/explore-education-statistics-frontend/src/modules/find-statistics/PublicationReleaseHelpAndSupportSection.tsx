@@ -3,17 +3,18 @@ import AccordionSection from '@common/components/AccordionSection';
 import ContactUsSection from '@common/modules/find-statistics/components/ContactUsSection';
 import NationalStatisticsSection from '@common/modules/find-statistics/components/NationalStatisticsSection';
 import OfficialStatisticsSection from '@common/modules/find-statistics/components/OfficialStatisticsSection';
-import {
-  PublicationContact,
-  ReleaseType,
-} from '@common/services/publicationService';
+import { PublicationContact } from '@common/services/publicationService';
 import {
   ExternalMethodology,
   MethodologySummary,
 } from '@common/services/types/methodology';
+import { ReleaseType } from '@common/services/types/releaseType';
 import Link from '@frontend/components/Link';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
 import React, { ReactNode } from 'react';
+import AdHocOfficialStatisticsSection from '@common/modules/find-statistics/components/AdHocOfficialStatisticsSection';
+import ExperimentalStatisticsSection from '@common/modules/find-statistics/components/ExperimentalStatisticsSection';
+import ManagementInformationSection from '@common/modules/find-statistics/components/ManageInformationSection';
 
 interface Props {
   includeAnalytics?: boolean;
@@ -21,7 +22,7 @@ interface Props {
   publicationTitle: string;
   methodologies: MethodologySummary[];
   externalMethodology?: ExternalMethodology;
-  releaseType?: string;
+  releaseType?: ReleaseType;
   publicationContact: PublicationContact;
 }
 
@@ -55,10 +56,7 @@ const PublicationReleaseHelpAndSupportSection = ({
           >
             {methodologies.map(methodology => (
               <p key={methodology.id} className="govuk-!-margin-bottom-9">
-                <Link
-                  to="/methodology/[methodology]"
-                  as={`/methodology/${methodology.slug}`}
-                >
+                <Link to={`/methodology/${methodology.slug}`}>
                   {methodology.title}
                 </Link>
               </p>
@@ -72,14 +70,32 @@ const PublicationReleaseHelpAndSupportSection = ({
             )}
           </AccordionSection>
         )}
-        {releaseType === ReleaseType.NationalStatistics && (
-          <AccordionSection heading="National Statistics" headingTag="h3">
+        {releaseType === 'NationalStatistics' && (
+          <AccordionSection heading="National statistics" headingTag="h3">
             <NationalStatisticsSection />
           </AccordionSection>
         )}
-        {releaseType === ReleaseType.OfficialStatistics && (
-          <AccordionSection heading="Official Statistics" headingTag="h3">
+        {releaseType === 'OfficialStatistics' && (
+          <AccordionSection heading="Official statistics" headingTag="h3">
             <OfficialStatisticsSection />
+          </AccordionSection>
+        )}
+        {releaseType === 'AdHocStatistics' && (
+          <AccordionSection
+            heading="Ad hoc official statistics"
+            headingTag="h3"
+          >
+            <AdHocOfficialStatisticsSection />
+          </AccordionSection>
+        )}
+        {releaseType === 'ExperimentalStatistics' && (
+          <AccordionSection heading="Experimental statistics" headingTag="h3">
+            <ExperimentalStatisticsSection />
+          </AccordionSection>
+        )}
+        {releaseType === 'ManagementInformation' && (
+          <AccordionSection heading="Management information" headingTag="h3">
+            <ManagementInformationSection />
           </AccordionSection>
         )}
         <AccordionSection

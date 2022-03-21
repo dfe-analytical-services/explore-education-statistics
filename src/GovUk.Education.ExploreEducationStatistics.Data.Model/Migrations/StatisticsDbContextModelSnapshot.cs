@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.5")
+                .HasAnnotation("ProductVersion", "3.1.18")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -248,6 +248,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<string>("EnglishDevolvedArea_Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("GeographicLevel")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(6)")
+                        .HasMaxLength(6);
+
                     b.Property<string>("Institution_Code")
                         .HasColumnType("nvarchar(450)");
 
@@ -343,6 +348,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.HasIndex("Country_Code");
 
                     b.HasIndex("EnglishDevolvedArea_Code");
+
+                    b.HasIndex("GeographicLevel");
 
                     b.HasIndex("Institution_Code");
 
@@ -503,7 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("MetaGuidance")
+                    b.Property<string>("DataGuidance")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("ReleaseId", "SubjectId");

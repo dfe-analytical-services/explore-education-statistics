@@ -53,10 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(query => query
-                        .Include(r => r.Type)
-                        .Where(r => r.Id == releaseId)
-                )
+                .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(HydrateReleaseForReleaseViewModel)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccessCombineWith(release => _contentService.GetUnattachedContentBlocks<DataBlock>(releaseId))
@@ -86,6 +83,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private async Task<Release> HydrateReleaseForReleaseViewModel(Release release)
         {
             release.Updates = await _contentDbContext.Update
+                .AsQueryable()
                 .Where(u => u.ReleaseId == release.Id)
                 .ToListAsync();
 
@@ -105,23 +103,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .LoadAsync();
 
             var content = await _contentDbContext.ReleaseContentSections
+                .AsQueryable()
                 .Where(rcs => rcs.ReleaseId == release.Id)
                 .Include(rcs => rcs.ContentSection)
                 .ThenInclude(cs => cs.Content)
                 .ToListAsync();
             release.Content = content;
 
-            await release.Content.ForEachAsync(async rcs =>
-            {
-                await rcs.ContentSection.Content.ForEachAsync(async cb =>
+            await release.Content
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async rcs =>
                 {
-                    cb.Comments = await _contentDbContext.Comment
-                        .Where(c => c.ContentBlockId == cb.Id)
-                        .Include(c => c.CreatedBy)
-                        .Include(c => c.ResolvedBy)
-                        .ToListAsync();
+                    await rcs.ContentSection.Content
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(async cb =>
+                        {
+                            cb.Comments = await _contentDbContext.Comment
+                                .AsQueryable()
+                                .Where(c => c.ContentBlockId == cb.Id)
+                                .Include(c => c.CreatedBy)
+                                .Include(c => c.ResolvedBy)
+                                .ToListAsync();
+                        });
                 });
-            });
             return release;
         }
     }

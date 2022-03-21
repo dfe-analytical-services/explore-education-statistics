@@ -33,6 +33,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
 
         Task SetPublishedDates(Guid id, DateTime published);
 
+        Task CreatePublicStatisticsRelease(Guid releaseId);
+
         Task DeletePreviousVersionsStatisticalData(params Guid[] releaseIds);
     }
 }

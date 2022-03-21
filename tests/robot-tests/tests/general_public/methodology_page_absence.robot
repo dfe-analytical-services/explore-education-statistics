@@ -3,8 +3,9 @@ Resource            ../libs/public-common.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
-Force Tags          GeneralPublic    Local    Test
+Force Tags          GeneralPublic    Local    Dev
 
 *** Test Cases ***
 Navigate to Pupil absence in schools in England methodology page
@@ -12,7 +13,7 @@ Navigate to Pupil absence in schools in England methodology page
     user opens accordion section    Pupils and schools
     user opens details dropdown    Pupil absence
 
-User navigates to absence methodology page
+Go to Pupil absence methodology page
     user checks page contains methodology link
     ...    Pupil absence
     ...    Pupil absence in schools in England
@@ -25,8 +26,12 @@ User navigates to absence methodology page
     user waits until h1 is visible    Pupil absence statistics: methodology
     user waits until page contains title caption    Methodology
 
-Validate Published date, Last updated date
-    user checks testid element contains    published-date    22 March 2018
+Validate Published date
+    [Tags]    NotAgainstDev
+    user checks summary list contains    Published    22 March 2018
+
+Validate Last updated is not visible
+    user checks page does not contain testid    Last updated
 
 Validate accordion sections order
     user checks accordion is in position    1. Overview of absence statistics    1    id:content
@@ -44,6 +49,27 @@ Validate accordion sections order
     user checks accordion is in position    Annex D - Standard breakdowns    4    id:annexes
     user checks accordion is in position    Annex E - Timeline    5    id:annexes
     user checks accordion is in position    Annex F - Absence rates over time    6    id:annexes
+
+Validate Related information section and links exist
+    ${relatedInformation}=    get webelement    css:[aria-labelledby="related-information"]
+
+    user checks element contains child element    ${relatedInformation}    xpath://h2[text()="Related information"]
+
+    user checks element contains child element    ${relatedInformation}    xpath://h3[text()="Publications"]
+    user checks page contains link with text and url
+    ...    Pupil absence in schools in England
+    ...    /find-statistics/pupil-absence-in-schools-in-england
+    ...    ${relatedInformation}
+
+    user checks element contains child element    ${relatedInformation}    xpath://h3[text()="Related pages"]
+    user checks page contains link with text and url
+    ...    Find statistics and data
+    ...    /find-statistics
+    ...    ${relatedInformation}
+    user checks page contains link with text and url
+    ...    Education statistics: glossary
+    ...    /glossary
+    ...    ${relatedInformation}
 
 Validate page has Print this page link
     user waits until page contains button    Print this page

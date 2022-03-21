@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -13,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {
     public interface IBlobStorageService
     {
-        public Task<IEnumerable<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path = null);
+        public Task<List<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path = null);
 
         public Task<bool> CheckBlobExists(IBlobContainer containerName, string path);
 
@@ -21,7 +22,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 
         public Task<BlobInfo?> FindBlob(IBlobContainer containerName, string path);
 
-        public Task DeleteBlobs(IBlobContainer containerName, string directoryPath, string? excludePattern = null);
+        public record DeleteBlobsOptions
+        {
+            public Regex? ExcludeRegex { get; set; }
+            public Regex? IncludeRegex { get; set; }
+        }
+
+        public Task DeleteBlobs(
+            IBlobContainer containerName,
+            string? directoryPath = null,
+            DeleteBlobsOptions? options = null);
 
         public Task DeleteBlob(IBlobContainer containerName, string path);
 

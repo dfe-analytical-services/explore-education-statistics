@@ -23,6 +23,7 @@ import {
   GeoJsonFeatureProperties,
 } from '@common/services/tableBuilderService';
 import { Dictionary } from '@common/types';
+import locationLevelsMap from '@common/utils/locationLevelsMap';
 import generateHslColour from '@common/utils/colour/generateHslColour';
 import lighten from '@common/utils/colour/lighten';
 import { unsafeCountDecimals } from '@common/utils/number/countDecimals';
@@ -350,90 +351,52 @@ export const MapBlockInternal = ({
     );
   }, [dataSetCategoryConfigs]);
 
+  const shouldGroupLocationOptions = useMemo(() => {
+    return dataSetCategories.some(
+      element =>
+        element.filter.level === 'localAuthority' ||
+        element.filter.level === 'localAuthorityDistrict',
+    );
+  }, [dataSetCategories]);
+
+  // If there are no LAs or LADs don't group the locations.
   const locationOptions = useMemo(() => {
-    const locations = orderBy(
+    if (shouldGroupLocationOptions) {
+      return undefined;
+    }
+    return orderBy(
       dataSetCategories.map(dataSetCategory => ({
         label: dataSetCategory.filter.label,
         value: dataSetCategory.filter.id,
       })),
       ['label'],
     );
-    locations.unshift({ label: 'None selected', value: '' });
-    return locations;
-  }, [dataSetCategories]);
+  }, [dataSetCategories, shouldGroupLocationOptions]);
+
+  // If there are LAs or LADs, group them by region and group any others by level
+  const groupedLocationOptions = useMemo(() => {
+    if (!shouldGroupLocationOptions) {
+      return undefined;
+    }
+    return dataSetCategories.reduce<Dictionary<SelectOption[]>>(
+      (acc, { filter }) => {
+        const groupLabel =
+          filter.level === 'localAuthority' ||
+          filter.level === 'localAuthorityDistrict'
+            ? (filter.group as string)
+            : locationLevelsMap[filter.level].label;
+
+        (acc[groupLabel] ??= []).push({
+          label: filter.label,
+          value: filter.id,
+        });
+        return acc;
+      },
+      {},
+    );
+  }, [dataSetCategories, shouldGroupLocationOptions]);
 
   const locationType = useMemo(() => {
-    const locationLevelsMap: Dictionary<Dictionary<string>> = {
-      country: {
-        label: 'Country',
-        prefix: 'a',
-      },
-      englishDevolvedArea: {
-        label: 'English Devolved Area',
-        prefix: 'an',
-      },
-      institution: {
-        label: 'Institution',
-        prefix: 'an',
-      },
-      localAuthority: {
-        label: 'Local Authority',
-        prefix: 'a',
-      },
-      localAuthorityDistrict: {
-        label: 'Local Authority District',
-        prefix: 'a',
-      },
-      localEnterprisePartnership: {
-        label: 'Local Enterprise Partnership',
-        prefix: 'a',
-      },
-      mayoralCombinedAuthority: {
-        label: 'Mayoral Combined Authority',
-        prefix: 'a',
-      },
-      multiAcademyTrust: {
-        label: 'Multi Academy Trust',
-        prefix: 'a',
-      },
-      opportunityArea: {
-        label: 'Opportunity Area',
-        prefix: 'an',
-      },
-      parliamentaryConstituency: {
-        label: 'Parliamentary Constituency',
-        prefix: 'a',
-      },
-      provider: {
-        label: 'Provider',
-        prefix: 'a',
-      },
-      region: {
-        label: 'Region',
-        prefix: 'a',
-      },
-      rscRegion: {
-        label: 'RSC Region',
-        prefix: 'an',
-      },
-      school: {
-        label: 'School',
-        prefix: 'a',
-      },
-      sponsor: {
-        label: 'Sponsor',
-        prefix: 'a',
-      },
-      ward: {
-        label: 'Ward',
-        prefix: 'a',
-      },
-      planningArea: {
-        label: 'Planning Area',
-        prefix: 'a',
-      },
-    };
-
     const levels = dataSetCategories.map(category => category.filter.level);
     return !levels.every(level => level === levels[0]) ||
       !locationLevelsMap[levels[0]]
@@ -451,14 +414,10 @@ export const MapBlockInternal = ({
 
   const [legendEntries, setLegendEntries] = useState<LegendEntry[]>([]);
 
-  const selectedDataSetConfiguration =
-    dataSetCategoryConfigs[selectedDataSetKey];
+  const selectedDataSetConfig = dataSetCategoryConfigs[selectedDataSetKey];
 
-  if (mapRef && mapRef.current) {
-    mapRef.current.leafletElement.setMaxBounds(
-      mapRef.current.leafletElement.getBounds(),
-    );
-  }
+  const selectedDataSet =
+    selectedFeature?.properties?.dataSets[selectedDataSetKey];
 
   // initialise
   useEffect(() => {
@@ -490,14 +449,11 @@ export const MapBlockInternal = ({
 
   // Rebuild the geometry if the selection has changed
   useEffect(() => {
-    if (dataSetCategories.length && selectedDataSetConfiguration) {
+    if (dataSetCategories.length && selectedDataSetConfig) {
       const {
         geometry: newGeometry,
         legend: newLegendEntries,
-      } = generateGeometryAndLegend(
-        selectedDataSetConfiguration,
-        dataSetCategories,
-      );
+      } = generateGeometryAndLegend(selectedDataSetConfig, dataSetCategories);
 
       setGeometry(newGeometry);
       setLegendEntries(newLegendEntries);
@@ -506,7 +462,7 @@ export const MapBlockInternal = ({
     dataSetCategories,
     dataSetCategoryConfigs,
     meta,
-    selectedDataSetConfiguration,
+    selectedDataSetConfig,
     selectedDataSetKey,
   ]);
 
@@ -588,21 +544,12 @@ export const MapBlockInternal = ({
 
       featureLayer.bindTooltip(() => {
         if (feature.properties) {
-          const items = Object.entries(feature.properties.dataSets).map(
-            ([dataSetKey, dataSet]) => {
-              const dataSetConfig = dataSetCategoryConfigs[dataSetKey];
-
-              return (
-                `<li>` +
-                `${dataSetConfig.config.label}: ${formatPretty(
-                  dataSet.value,
-                  dataSetConfig.dataSet.indicator.unit,
-                  dataSetConfig.dataSet.indicator.decimalPlaces,
-                )}` +
-                `</li>`
-              );
-            },
+          const dataSetValue = formatPretty(
+            feature.properties.dataSets[selectedDataSetKey].value,
+            selectedDataSetConfig.dataSet.indicator.unit,
+            selectedDataSetConfig.dataSet.indicator.decimalPlaces,
           );
+          const content = `${selectedDataSetConfig.config.label}: ${dataSetValue}`;
 
           const mapWidth = mapRef.current?.container?.clientWidth;
 
@@ -614,9 +561,7 @@ export const MapBlockInternal = ({
           return (
             `<div class="${styles.tooltip}" style="${tooltipStyle}">` +
             `<p><strong data-testid="chartTooltip-label">${feature.properties.name}</strong></p>` +
-            `<ul class="${
-              styles.tooltipList
-            }" data-testid="chartTooltip-items">${items.join('')}</ul>` +
+            `<p class="${styles.tooltipContent}" data-testid="chartTooltip-contents">${content}</p>` +
             `</div>`
           );
         }
@@ -624,7 +569,7 @@ export const MapBlockInternal = ({
         return '';
       });
     },
-    [dataSetCategoryConfigs],
+    [dataSetCategoryConfigs, selectedDataSetKey],
   );
 
   if (
@@ -659,7 +604,9 @@ export const MapBlockInternal = ({
               label={`2. Select ${locationType.prefix} ${locationType.label}`}
               value={selectedFeature?.id?.toString()}
               options={locationOptions}
+              optGroups={groupedLocationOptions}
               order={FormSelect.unordered}
+              placeholder="None selected"
               onChange={e => {
                 const feature = geometry?.features.find(
                   feat => feat.id === e.currentTarget.value,
@@ -687,6 +634,11 @@ export const MapBlockInternal = ({
               center={position}
               minZoom={5}
               zoom={5}
+              whenReady={() => {
+                mapRef.current?.leafletElement.setMaxBounds(
+                  mapRef.current.leafletElement.getBounds(),
+                );
+              }}
             >
               <GeoJSON data={ukGeometry} className={styles.uk} ref={ukRef} />
 
@@ -720,10 +672,10 @@ export const MapBlockInternal = ({
             </Map>
           )}
         </div>
-        {selectedDataSetConfiguration && (
-          <div className="govuk-grid-column-one-third" aria-live="assertive">
+        {selectedDataSetConfig && (
+          <div className="govuk-grid-column-one-third">
             <h3 className="govuk-heading-s">
-              Key to {selectedDataSetConfiguration?.config?.label}
+              Key to {selectedDataSetConfig?.config?.label}
             </h3>
             <ul className="govuk-list">
               {legendEntries.map(({ min, max, colour }) => (
@@ -743,48 +695,35 @@ export const MapBlockInternal = ({
                 </li>
               ))}
             </ul>
+
+            <div
+              aria-live="polite"
+              className="govuk-!-margin-top-5"
+              data-testid="mapBlock-indicator"
+            >
+              {selectedFeature && (
+                <>
+                  <h3 className="govuk-heading-s">
+                    {selectedFeature?.properties.name}
+                  </h3>
+
+                  {selectedDataSet && (
+                    <KeyStatTile
+                      testId="mapBlock-indicatorTile"
+                      title={selectedDataSetConfig.config.label}
+                      value={formatPretty(
+                        selectedDataSet.value,
+                        selectedDataSetConfig.dataSet.indicator.unit,
+                        selectedDataSetConfig.dataSet.indicator.decimalPlaces,
+                      )}
+                    />
+                  )}
+                </>
+              )}
+            </div>
           </div>
         )}
       </div>
-
-      {selectedDataSetConfiguration && selectedFeature && (
-        <>
-          <h3 className="govuk-heading-m">
-            {selectedFeature?.properties.name}
-          </h3>
-
-          {selectedFeature?.properties?.dataSets && selectedDataSetKey && (
-            <KeyStatContainer>
-              {Object.entries(selectedFeature?.properties.dataSets).map(
-                ([dataSetKey, dataSet]) => {
-                  if (!dataSetCategoryConfigs[dataSetKey]) {
-                    return null;
-                  }
-
-                  const {
-                    config,
-                    dataSet: expandedDataSet,
-                  } = dataSetCategoryConfigs[dataSetKey];
-
-                  return (
-                    <KeyStatColumn key={dataSetKey} testId="mapBlock-indicator">
-                      <KeyStatTile
-                        testId="mapBlock-indicatorTile"
-                        title={config.label}
-                        value={formatPretty(
-                          dataSet.value,
-                          expandedDataSet.indicator.unit,
-                          expandedDataSet.indicator.decimalPlaces,
-                        )}
-                      />
-                    </KeyStatColumn>
-                  );
-                },
-              )}
-            </KeyStatContainer>
-          )}
-        </>
-      )}
     </>
   );
 };

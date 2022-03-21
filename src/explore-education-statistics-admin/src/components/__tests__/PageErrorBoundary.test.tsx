@@ -1,6 +1,6 @@
 import PageErrorBoundary from '@admin/components/PageErrorBoundary';
 import { useErrorControl } from '@common/contexts/ErrorControlContext';
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { AxiosError } from 'axios';
 import React, { useEffect } from 'react';
 import { MemoryRouter } from 'react-router';
@@ -21,7 +21,7 @@ describe('PageErrorBoundary', () => {
       return null;
     };
 
-    const { queryByText } = render(
+    render(
       <MemoryRouter>
         <PageErrorBoundary>
           <TestComponent />
@@ -31,15 +31,15 @@ describe('PageErrorBoundary', () => {
 
     await waitFor(() => {
       expect(
-        queryByText('Sorry, there is a problem with the service'),
-      ).not.toBeNull();
-      expect(queryByText('Try again later.')).not.toBeNull();
+        screen.getByText('Sorry, there is a problem with the service'),
+      ).toBeInTheDocument();
+      expect(screen.getByText('Try again later.')).toBeInTheDocument();
     });
   });
 
   test('calling `handleError` with 401 error renders Forbidden page', async () => {
     const error: Partial<AxiosError> = {
-      name: '',
+      name: 'Error',
       message: 'Forbidden',
       isAxiosError: true,
       request: {},
@@ -65,7 +65,7 @@ describe('PageErrorBoundary', () => {
       return null;
     };
 
-    const { queryByText } = render(
+    render(
       <MemoryRouter>
         <PageErrorBoundary>
           <TestComponent />
@@ -74,16 +74,16 @@ describe('PageErrorBoundary', () => {
     );
 
     await waitFor(() => {
-      expect(queryByText('Forbidden')).not.toBeNull();
+      expect(screen.getByText('Forbidden')).toBeInTheDocument();
       expect(
-        queryByText('You do not have permission to access this page.'),
-      ).not.toBeNull();
+        screen.getByText('You do not have permission to access this page.'),
+      ).toBeInTheDocument();
     });
   });
 
   test('calling `handleError` with 404 error renders Not Found page', async () => {
     const error: Partial<AxiosError> = {
-      name: '',
+      name: 'Error',
       message: 'Not Found',
       isAxiosError: true,
       request: {},
@@ -109,7 +109,7 @@ describe('PageErrorBoundary', () => {
       return null;
     };
 
-    const { queryByText } = render(
+    render(
       <MemoryRouter>
         <PageErrorBoundary>
           <TestComponent />
@@ -118,10 +118,10 @@ describe('PageErrorBoundary', () => {
     );
 
     await waitFor(() => {
-      expect(queryByText('Resource not found')).not.toBeNull();
+      expect(screen.getByText('Resource not found')).toBeInTheDocument();
       expect(
-        queryByText('There was a problem accessing a resource.'),
-      ).not.toBeNull();
+        screen.getByText('There was a problem accessing a resource.'),
+      ).toBeInTheDocument();
     });
   });
 });

@@ -1,4 +1,7 @@
+#nullable enable
 using System.Linq;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -7,38 +10,42 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
-    public class ImporterLocationService : BaseImporterService
+    public class ImporterLocationService
     {
         private readonly IGuidGenerator _guidGenerator;
+        private readonly ImporterMemoryCache _memoryCache;
 
         public ImporterLocationService(
             IGuidGenerator guidGenerator,
-            ImporterMemoryCache cache) : base(cache)
+            ImporterMemoryCache memoryCache)
         {
             _guidGenerator = guidGenerator;
+            _memoryCache = memoryCache;
         }
 
         public Location FindOrCreate(
             StatisticsDbContext context,
+            GeographicLevel geographicLevel,
             Country country,
-            EnglishDevolvedArea englishDevolvedArea = null,
-            Institution institution = null,
-            LocalAuthority localAuthority = null,
-            LocalAuthorityDistrict localAuthorityDistrict = null,
-            LocalEnterprisePartnership localEnterprisePartnership = null,
-            MayoralCombinedAuthority mayoralCombinedAuthority = null,
-            Mat multiAcademyTrust = null,
-            OpportunityArea opportunityArea = null,
-            ParliamentaryConstituency parliamentaryConstituency = null,
-            Provider provider = null,
-            Region region = null,
-            RscRegion rscRegion = null,
-            School school = null,
-            Sponsor sponsor = null,
-            Ward ward = null,
-            PlanningArea planningArea = null)
+            EnglishDevolvedArea? englishDevolvedArea = null,
+            Institution? institution = null,
+            LocalAuthority? localAuthority = null,
+            LocalAuthorityDistrict? localAuthorityDistrict = null,
+            LocalEnterprisePartnership? localEnterprisePartnership = null,
+            MayoralCombinedAuthority? mayoralCombinedAuthority = null,
+            Mat? multiAcademyTrust = null,
+            OpportunityArea? opportunityArea = null,
+            ParliamentaryConstituency? parliamentaryConstituency = null,
+            PlanningArea? planningArea = null,
+            Provider? provider = null,
+            Region? region = null,
+            RscRegion? rscRegion = null,
+            School? school = null,
+            Sponsor? sponsor = null,
+            Ward? ward = null)
         {
             var cacheKey = GetCacheKey(
+                geographicLevel,
                 country,
                 englishDevolvedArea,
                 institution,
@@ -49,21 +56,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 multiAcademyTrust,
                 opportunityArea,
                 parliamentaryConstituency,
+                planningArea,
                 provider,
                 region,
                 rscRegion,
                 school,
                 sponsor,
-                ward,
-                planningArea);
+                ward);
 
-            if (GetCache().TryGetValue(cacheKey, out Location location))
+            if (_memoryCache.Cache.TryGetValue(cacheKey, out Location location))
             {
                 return location;
             }
 
             location = LookupOrCreate(
                 context,
+                geographicLevel,
                 country,
                 englishDevolvedArea,
                 institution,
@@ -74,38 +82,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 multiAcademyTrust,
                 opportunityArea,
                 parliamentaryConstituency,
+                planningArea,
                 provider,
                 region,
                 rscRegion,
                 school,
                 sponsor,
-                ward,
-                planningArea);
-            GetCache().Set(cacheKey, location);
+                ward);
+            _memoryCache.Cache.Set(cacheKey, location);
 
             return location;
         }
 
         private static string GetCacheKey(
+            GeographicLevel geographicLevel,
             Country country,
-            EnglishDevolvedArea englishDevolvedArea,
-            Institution institution,
-            LocalAuthority localAuthority,
-            LocalAuthorityDistrict localAuthorityDistrict,
-            LocalEnterprisePartnership localEnterprisePartnership,
-            MayoralCombinedAuthority mayoralCombinedAuthority,
-            Mat multiAcademyTrust,
-            OpportunityArea opportunityArea,
-            ParliamentaryConstituency parliamentaryConstituency,
-            Provider provider,
-            Region region,
-            RscRegion rscRegion,
-            School school,
-            Sponsor sponsor,
-            Ward ward,
-            PlanningArea planningArea)
+            EnglishDevolvedArea? englishDevolvedArea,
+            Institution? institution,
+            LocalAuthority? localAuthority,
+            LocalAuthorityDistrict? localAuthorityDistrict,
+            LocalEnterprisePartnership? localEnterprisePartnership,
+            MayoralCombinedAuthority? mayoralCombinedAuthority,
+            Mat? multiAcademyTrust,
+            OpportunityArea? opportunityArea,
+            ParliamentaryConstituency? parliamentaryConstituency,
+            PlanningArea? planningArea,
+            Provider? provider,
+            Region? region,
+            RscRegion? rscRegion,
+            School? school,
+            Sponsor? sponsor,
+            Ward? ward)
         {
-            var observationalUnits = new ObservationalUnit[]
+            var locationAttributes = new ILocationAttribute?[]
             {
                 country,
                 englishDevolvedArea,
@@ -116,46 +125,49 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 mayoralCombinedAuthority,
                 multiAcademyTrust,
                 parliamentaryConstituency,
+                planningArea,
                 provider,
                 opportunityArea,
                 region,
                 rscRegion,
                 school,
                 sponsor,
-                ward,
-                planningArea
+                ward
             };
 
-            const string separator = "_";
+            var tokens = locationAttributes
+                .WhereNotNull()
+                .Select(attribute => attribute.GetCacheKey())
+                .ToList();
 
-            return string.Join(separator, observationalUnits
-                .Where(unit => unit != null)
-                .Select(unit =>
-                    $"{unit.GetType()}:{(unit is LocalAuthority la ? la.GetCodeOrOldCodeIfEmpty() : unit.Code)}:{unit.Name}"));
+            const char separator = '_';
+            return $"{geographicLevel}{separator}{tokens.JoinToString(separator)}";
         }
 
         private Location LookupOrCreate(
             StatisticsDbContext context,
+            GeographicLevel geographicLevel,
             Country country,
-            EnglishDevolvedArea englishDevolvedArea = null,
-            Institution institution = null,
-            LocalAuthority localAuthority = null,
-            LocalAuthorityDistrict localAuthorityDistrict = null,
-            LocalEnterprisePartnership localEnterprisePartnership = null,
-            MayoralCombinedAuthority mayoralCombinedAuthority = null,
-            Mat multiAcademyTrust = null,
-            OpportunityArea opportunityArea = null,
-            ParliamentaryConstituency parliamentaryConstituency = null,
-            Provider provider = null,
-            Region region = null,
-            RscRegion rscRegion = null,
-            School school = null,
-            Sponsor sponsor = null,
-            Ward ward = null,
-            PlanningArea planningArea = null)
+            EnglishDevolvedArea? englishDevolvedArea,
+            Institution? institution,
+            LocalAuthority? localAuthority,
+            LocalAuthorityDistrict? localAuthorityDistrict,
+            LocalEnterprisePartnership? localEnterprisePartnership,
+            MayoralCombinedAuthority? mayoralCombinedAuthority,
+            Mat? multiAcademyTrust,
+            OpportunityArea? opportunityArea,
+            ParliamentaryConstituency? parliamentaryConstituency,
+            PlanningArea? planningArea,
+            Provider? provider,
+            Region? region,
+            RscRegion? rscRegion,
+            School? school,
+            Sponsor? sponsor,
+            Ward? ward)
         {
             var location = Lookup(
                 context,
+                geographicLevel,
                 country,
                 englishDevolvedArea,
                 institution,
@@ -166,36 +178,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 multiAcademyTrust,
                 opportunityArea,
                 parliamentaryConstituency,
+                planningArea,
                 provider,
                 region,
                 rscRegion,
                 school,
                 sponsor,
-                ward,
-                planningArea);
+                ward);
 
             if (location == null)
             {
                 var entityEntry = context.Location.Add(new Location
                 {
                     Id = _guidGenerator.NewGuid(),
-                    Country = country ?? Country.Empty(),
-                    EnglishDevolvedArea = englishDevolvedArea ?? EnglishDevolvedArea.Empty(),
-                    Institution = institution ?? Institution.Empty(),
-                    LocalAuthority = localAuthority ?? LocalAuthority.Empty(),
-                    LocalAuthorityDistrict = localAuthorityDistrict ?? LocalAuthorityDistrict.Empty(),
-                    LocalEnterprisePartnership = localEnterprisePartnership ?? LocalEnterprisePartnership.Empty(),
-                    MayoralCombinedAuthority = mayoralCombinedAuthority ?? MayoralCombinedAuthority.Empty(),
-                    MultiAcademyTrust = multiAcademyTrust ?? Mat.Empty(),
-                    OpportunityArea = opportunityArea ?? OpportunityArea.Empty(),
-                    ParliamentaryConstituency = parliamentaryConstituency ?? ParliamentaryConstituency.Empty(),
-                    Provider = provider ?? Provider.Empty(),
-                    Region = region ?? Region.Empty(),
-                    RscRegion = rscRegion ?? RscRegion.Empty(),
-                    School = school ?? School.Empty(),
-                    Sponsor = sponsor ?? Sponsor.Empty(),
-                    Ward = ward ?? Ward.Empty(),
-                    PlanningArea = planningArea ?? PlanningArea.Empty()
+                    GeographicLevel = geographicLevel,
+                    Country = country,
+                    EnglishDevolvedArea = englishDevolvedArea,
+                    Institution = institution,
+                    LocalAuthority = localAuthority,
+                    LocalAuthorityDistrict = localAuthorityDistrict,
+                    LocalEnterprisePartnership = localEnterprisePartnership,
+                    MayoralCombinedAuthority = mayoralCombinedAuthority,
+                    MultiAcademyTrust = multiAcademyTrust,
+                    OpportunityArea = opportunityArea,
+                    ParliamentaryConstituency = parliamentaryConstituency,
+                    PlanningArea = planningArea,
+                    Provider = provider,
+                    Region = region,
+                    RscRegion = rscRegion,
+                    School = school,
+                    Sponsor = sponsor,
+                    Ward = ward
                 });
 
                 return entityEntry.Entity;
@@ -204,28 +217,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return location;
         }
 
-        private Location Lookup(
+        private Location? Lookup(
             StatisticsDbContext context,
+            GeographicLevel geographicLevel,
             Country country,
-            EnglishDevolvedArea englishDevolvedArea = null,
-            Institution institution = null,
-            LocalAuthority localAuthority = null,
-            LocalAuthorityDistrict localAuthorityDistrict = null,
-            LocalEnterprisePartnership localEnterprisePartnership = null,
-            MayoralCombinedAuthority mayoralCombinedAuthority = null,
-            Mat multiAcademyTrust = null,
-            OpportunityArea opportunityArea = null,
-            ParliamentaryConstituency parliamentaryConstituency = null,
-            Provider provider = null,
-            Region region = null,
-            RscRegion rscRegion = null,
-            School school = null,
-            Sponsor sponsor = null,
-            Ward ward = null,
-            PlanningArea planningArea = null)
+            EnglishDevolvedArea? englishDevolvedArea,
+            Institution? institution,
+            LocalAuthority? localAuthority,
+            LocalAuthorityDistrict? localAuthorityDistrict,
+            LocalEnterprisePartnership? localEnterprisePartnership,
+            MayoralCombinedAuthority? mayoralCombinedAuthority,
+            Mat? multiAcademyTrust,
+            OpportunityArea? opportunityArea,
+            ParliamentaryConstituency? parliamentaryConstituency,
+            PlanningArea? planningArea,
+            Provider? provider,
+            Region? region,
+            RscRegion? rscRegion,
+            School? school,
+            Sponsor? sponsor,
+            Ward? ward)
         {
             var predicateBuilder = PredicateBuilder.True<Location>()
-                .And(location => location.Country_Code == country.Code 
+                .And(location => location.GeographicLevel == geographicLevel);
+
+            predicateBuilder = predicateBuilder
+                .And(location => location.Country_Code == country.Code
                                  && location.Country_Name == country.Name);
 
             predicateBuilder = predicateBuilder
@@ -268,6 +285,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                                  && location.ParliamentaryConstituency_Name == (parliamentaryConstituency != null ? parliamentaryConstituency.Name : null));
 
             predicateBuilder = predicateBuilder
+                .And(location => location.PlanningArea_Code == (planningArea != null ? planningArea.Code : null) 
+                                 && location.PlanningArea_Name == (planningArea != null ? planningArea.Name : null));
+
+            predicateBuilder = predicateBuilder
                 .And(location => location.Provider_Code == (provider != null ? provider.Code : null)
                                  && location.Provider_Name == (provider != null ? provider.Name : null));
 
@@ -291,18 +312,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             predicateBuilder = predicateBuilder
                 .And(location => location.Ward_Code == (ward != null ? ward.Code : null)
                                  && location.Ward_Name == (ward != null ? ward.Name : null));
-            
-            predicateBuilder = predicateBuilder
-                .And(location => location.PlanningArea_Code == (planningArea != null ? planningArea.Code : null)
-                                 && location.PlanningArea_Name == (planningArea != null ? planningArea.Name : null));
 
-            // Can return multiple locations because SQL comparison is case insensitive
-            var locations = context.Location.AsNoTracking()
+            // This can return multiple results because C# equality is translated directly to SQL equality
+            // and our config of SqlServer is using the default case-insensitive collation
+            // See https://docs.microsoft.com/en-us/ef/core/miscellaneous/collations-and-case-sensitivity
+            var locations = context.Location
+                .AsNoTracking()
                 .Where(predicateBuilder)
                 .ToList();
 
+            // Perform case-sensitive comparison on the Name fields
             return locations.FirstOrDefault(location =>
-                location.Country_Name == country?.Name
+                location.Country_Name == country.Name
                 && location.EnglishDevolvedArea_Name == englishDevolvedArea?.Name
                 && location.Institution_Name == institution?.Name
                 && location.LocalAuthority_Name == localAuthority?.Name
@@ -312,13 +333,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 && location.MultiAcademyTrust_Name == multiAcademyTrust?.Name
                 && location.OpportunityArea_Name == opportunityArea?.Name
                 && location.ParliamentaryConstituency_Name == parliamentaryConstituency?.Name
+                && location.PlanningArea_Name == planningArea?.Name
                 && location.Provider_Name == provider?.Name
                 && location.Region_Name == region?.Name
                 && location.RscRegion_Code == rscRegion?.Code // RscRegion codes function as the name
                 && location.School_Name == school?.Name
                 && location.Sponsor_Name == sponsor?.Name
                 && location.Ward_Name == ward?.Name
-                && location.PlanningArea_Name == planningArea?.Name
             );
         }
     }

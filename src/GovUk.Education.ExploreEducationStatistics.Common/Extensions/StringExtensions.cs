@@ -56,6 +56,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return value.StripLineBreaks();
         }
 
+        public static int IndentWidth(this string value)
+        {
+            var firstChar = value.IndexOfFirst(c => !c.IsWhiteSpaceCharacter());
+            return firstChar > -1 ? firstChar : value.Length;
+        }
+
+        public static string TrimIndent(this string value)
+        {
+            var lines = value.ToLines()
+                .ToList();
+
+            var minIndent = lines.Where(line => !string.IsNullOrEmpty(line))
+                .Select(line => line.IndentWidth())
+                .Min();
+
+            return lines
+                .Select(line => line.Skip(minIndent).JoinToString())
+                .JoinToString("\n");
+        }
+
         public static string AppendTrailingSlash(this string input)
         {
             return input.EndsWith("/") ? input : input + "/";
@@ -100,28 +120,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             input = cultInfo.ToTitleCase(input);
             input = input.Replace(" ", "");
             return input;
-        }
-
-        public static string SnakeCase(this string input)
-        {
-            if (input.IsNullOrEmpty())
-            {
-                return input;
-            }
-
-            input = Regex.Replace(input, "(([^_A-Z])([A-Z]))", "$2_$3");
-
-            return input.TrimStart('_').ToLower();
-        }
-
-        public static string ScreamingSnakeCase(this string input)
-        {
-            if (input.IsNullOrEmpty())
-            {
-                return input;
-            }
-
-            return SnakeCase(input).ToUpper();
         }
 
         public static string ToMd5Hash(this string input, Encoding? encoding = null)

@@ -41,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             StatisticsDbContext? statisticsDbContext = null,
             IUserService? userService = null,
-            IMetaGuidanceSubjectService? metaGuidanceSubjectService = null,
+            IDataGuidanceSubjectService? dataGuidanceSubjectService = null,
+            ITimePeriodService? timePeriodService = null,
             IReleaseService.IBlobInfoGetter? fileSizeGetter = null)
         {
             return new ReleaseService(
@@ -49,7 +50,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 persistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? Mock.Of<IUserService>(),
-                metaGuidanceSubjectService ?? Mock.Of<IMetaGuidanceSubjectService>(),
+                dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>(),
+                timePeriodService ?? Mock.Of<ITimePeriodService>(),
                 fileSizeGetter ?? Mock.Of<IReleaseService.IBlobInfoGetter>()
             );
         }

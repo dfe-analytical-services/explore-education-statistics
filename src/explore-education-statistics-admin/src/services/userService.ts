@@ -70,10 +70,7 @@ export interface UsersService {
     userId: string,
     userReleaseRole: UserReleaseRoleSubmission,
   ) => Promise<boolean>;
-  removeUserReleaseRole: (
-    userId: string,
-    userReleaseRole: UserReleaseRole,
-  ) => Promise<boolean>;
+  removeUserReleaseRole: (userReleaseRoleId: string) => Promise<boolean>;
 
   addUserPublicationRole: (
     userId: string,
@@ -88,6 +85,15 @@ export interface UsersService {
   getPreReleaseUsers(): Promise<UserStatus[]>;
   getInvitedUsers(): Promise<UserStatus[]>;
   inviteUser: (invite: UserInvite) => Promise<boolean>;
+  inviteContributor: (
+    email: string,
+    publicationId: string,
+    releaseIds: string[],
+  ) => Promise<boolean>;
+  removeContributorReleaseInvites: (
+    email: string,
+    publicationId: string,
+  ) => Promise<boolean>;
   cancelInvite: (email: string) => Promise<boolean>;
   updateUser: (userId: string, update: UserUpdate) => Promise<boolean>;
 }
@@ -127,12 +133,9 @@ const userService: UsersService = {
       userReleaseRole,
     );
   },
-  removeUserReleaseRole(
-    userId: string,
-    userReleaseRole: UserReleaseRole,
-  ): Promise<boolean> {
+  removeUserReleaseRole(userReleaseRoleId: string): Promise<boolean> {
     return client.delete(
-      `/user-management/users/release-role/${userReleaseRole.id}`,
+      `/user-management/users/release-role/${userReleaseRoleId}`,
     );
   },
 
@@ -163,6 +166,28 @@ const userService: UsersService = {
   },
   inviteUser(invite: UserInvite): Promise<boolean> {
     return client.post(`/user-management/invites`, invite);
+  },
+  inviteContributor(
+    email: string,
+    publicationId: string,
+    releaseIds: string[],
+  ): Promise<boolean> {
+    return client.post(
+      `/user-management/publications/${publicationId}/invites/contributor`,
+      {
+        email,
+        releaseIds,
+      },
+    );
+  },
+  removeContributorReleaseInvites(
+    email: string,
+    publicationId: string,
+  ): Promise<boolean> {
+    return client.delete(
+      `/user-management/publications/${publicationId}/release-invites/contributor`,
+      { data: { email } },
+    );
   },
   cancelInvite(email: string): Promise<boolean> {
     return client.delete(`/user-management/invites/${email}`);

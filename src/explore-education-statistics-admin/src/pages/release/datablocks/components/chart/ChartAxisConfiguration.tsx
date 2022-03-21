@@ -49,6 +49,7 @@ interface Props {
   definition: ChartDefinition;
   data: TableDataResult[];
   meta: FullTableMeta;
+  includeNonNumericData?: boolean;
   onChange: (configuration: AxisConfiguration) => void;
   onSubmit: (configuration: AxisConfiguration) => void;
 }
@@ -60,6 +61,7 @@ const ChartAxisConfiguration = ({
   id,
   data,
   meta,
+  includeNonNumericData,
   type,
   onChange,
   onSubmit,
@@ -79,8 +81,8 @@ const ChartAxisConfiguration = ({
       max: undefined,
     };
 
-    return createDataSetCategories(config, data, meta);
-  }, [configuration, data, meta, type]);
+    return createDataSetCategories(config, data, meta, includeNonNumericData);
+  }, [configuration, data, meta, includeNonNumericData, type]);
 
   const groupByOptions = useMemo<RadioOption<AxisGroupBy>[]>(() => {
     const options: RadioOption<AxisGroupBy>[] = [
@@ -351,7 +353,7 @@ const ChartAxisConfiguration = ({
                   <FormFieldNumberInput<AxisConfiguration>
                     name="size"
                     min={0}
-                    label="Size of axis (px)"
+                    label="Size of axis (pixels)"
                     width={3}
                   />
                 )}
@@ -398,7 +400,7 @@ const ChartAxisConfiguration = ({
                   <FormFieldTextInput label="Label" name="label.text" />
 
                   <FormFieldNumberInput
-                    label="Width (px)"
+                    label="Width (pixels)"
                     name="label.width"
                     width={5}
                     min={0}

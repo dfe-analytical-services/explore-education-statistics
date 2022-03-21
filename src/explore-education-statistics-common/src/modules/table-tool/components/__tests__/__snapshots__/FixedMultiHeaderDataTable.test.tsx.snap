@@ -2,9 +2,9 @@
 
 exports[`FixedMultiHeaderDataTable renders underlying table 1`] = `
 <table
-  aria-labelledby="dataTableCaption"
+  aria-labelledby="test-caption-id"
   class="govuk-table table"
-  data-testid="dataTableCaption-table"
+  data-testid="test-caption-id-table"
 >
   <thead
     class="tableHead"

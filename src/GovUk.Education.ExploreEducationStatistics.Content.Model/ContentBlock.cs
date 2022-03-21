@@ -29,18 +29,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? Created { get; set; }
 
-        public List<Comment> Comments { get; set; }
+        public List<Comment> Comments { get; set; } = new();
 
-        public ContentBlock Clone(Release.CloneContext context, ContentSection? newContentSection)
+        public ContentBlock Clone(Release.CloneContext context, ContentSection? newContentSection = null)
         {
             var copy = MemberwiseClone() as ContentBlock;
             copy.Id = Guid.NewGuid();
 
-            if (newContentSection != null)
-            {
-                copy.ContentSection = newContentSection;
-                copy.ContentSectionId = newContentSection.Id;
-            }
+            copy.ContentSection = newContentSection;
+            copy.ContentSectionId = newContentSection?.Id;
 
             // start a new amendment with no comments
             copy.Comments = new List<Comment>();
@@ -49,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
             return copy;
         }
-        
+
         public ContentBlock Clone(DateTime createdDate)
         {
             var copy = MemberwiseClone() as ContentBlock;
@@ -130,6 +127,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public DataBlockSummary Summary { get; set; }
 
         public TableBuilderConfiguration Table { get; set; }
+
+        // TODO EES-3212 Remove these temporary fields that were added for the migration from Location codes to id's.
+        [NotMapped]
+        public List<IChart> ChartsMigrated { get; set; } = new();
+        [NotMapped]
+        public ObservationQueryContext QueryMigrated { get; set; }
+        [NotMapped]
+        public TableBuilderConfiguration TableMigrated { get; set; }
+        public bool TableHeaderCountChanged { get; set; }
+        public bool LocationsMigrated { get; set; }
     }
 
     [AttributeUsage(AttributeTargets.Field)]

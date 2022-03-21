@@ -122,10 +122,12 @@ describe('PreReleaseTableToolPage', () => {
           name: 'sess_authorised',
         },
       ],
-      locations: [
-        { level: 'localAuthority', label: 'Barnet', value: 'barnet' },
-        { level: 'localAuthority', label: 'Barnsley', value: 'barnsley' },
-      ],
+      locations: {
+        localAuthority: [
+          { id: 'barnet', label: 'Barnet', value: 'barnet' },
+          { id: 'barnsley', label: 'Barnsley', value: 'barnsley' },
+        ],
+      },
       boundaryLevels: [],
       publicationName: 'Pupil absence',
       subjectName: 'Absence by characteristic',
@@ -136,9 +138,7 @@ describe('PreReleaseTableToolPage', () => {
       {
         filters: ['state-funded-primary'],
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: { code: 'barnet', name: 'Barnet' },
-        },
+        locationId: 'barnet',
         measures: {
           'authorised-absence-sessions': '2613',
         },
@@ -147,9 +147,7 @@ describe('PreReleaseTableToolPage', () => {
       {
         filters: ['state-funded-secondary'],
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: { code: 'barnsley', name: 'Barnsley' },
-        },
+        locationId: 'barnsley',
         measures: {
           'authorised-absence-sessions': 'x',
         },
@@ -158,9 +156,7 @@ describe('PreReleaseTableToolPage', () => {
       {
         filters: ['state-funded-secondary'],
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: { code: 'barnet', name: 'Barnet' },
-        },
+        locationId: 'barnet',
         measures: {
           'authorised-absence-sessions': '1939',
         },
@@ -169,9 +165,7 @@ describe('PreReleaseTableToolPage', () => {
       {
         filters: ['state-funded-primary'],
         geographicLevel: 'localAuthority',
-        location: {
-          localAuthority: { code: 'barnsley', name: 'Barnsley' },
-        },
+        locationId: 'barnsley',
         measures: {
           'authorised-absence-sessions': '39',
         },
@@ -253,9 +247,7 @@ describe('PreReleaseTableToolPage', () => {
         endYear: 2014,
         endCode: 'AY',
       },
-      locations: {
-        localAuthority: ['barnet', 'barnsley'],
-      },
+      locationIds: ['barnet', 'barnsley'],
     },
   };
 

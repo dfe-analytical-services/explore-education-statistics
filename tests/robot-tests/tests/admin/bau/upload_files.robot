@@ -5,6 +5,7 @@ Resource            ../../libs/admin-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -39,7 +40,7 @@ Upload a ZIP file subject
     ${section}=    user gets accordion section content element    Absence in PRUs
 
     # To ensure "Data file size" and "Number of rows" will be filled
-    user waits until page does not contain    Queued    60
+    user waits until page does not contain    Queued    %{WAIT_MEDIUM}
 
     user checks headed table body row contains    Subject title    Absence in PRUs    ${section}
     user checks headed table body row contains    Data file    absence_in_prus.csv    ${section}
@@ -72,7 +73,9 @@ Check subject appears in 'Data blocks' page
 
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until page contains    Choose a subject    %{WAIT_LONG}
+
+    user waits until table tool wizard step is available    1    Choose a subject
 
     user waits until page contains    Updated Absence in PRUs
 
@@ -120,17 +123,28 @@ Upload multiple ancillary files
 
     user checks there are x accordion sections    2    id:file-uploads
 
-Validate ancillary files on release page
+Navigate to 'Content' page
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
 
+Validate 'Explore data and files' accordion
     user opens accordion section    Explore data and files
-    ${downloads}=    user gets accordion section content element    Explore data and files
+    ${section}=    user gets accordion section content element    Explore data and files
 
-    user waits until h3 is visible    Other files
+    # All files zip
+    user checks element contains button    ${section}    Download all data
 
-    user opens details dropdown    List of other files
-    ${other_files}=    user gets details content element    List of other files
+    # Data files
+    user waits until h3 is visible    Open data
+    user opens details dropdown    Download files
+    user checks list has x items    testid:data-files    1    ${section}
+    ${data_files_1}=    user gets list item element    testid:data-files    1    ${section}
+    user checks element contains button    ${data_files_1}    Updated Absence in PRUs
+
+    # Ancillary files
+    user waits until h3 is visible    All supporting files
+    user opens details dropdown    List of all supporting files
+    ${other_files}=    user gets details content element    List of all supporting files    ${section}
     ${other_files_1}=    get child element    ${other_files}    css:li:nth-child(1)
 
     user checks element contains button    ${other_files_1}    Test 1
@@ -173,7 +187,7 @@ Validate ancillary file details were changed
 Delete ancillary file
     ${file_2_section}=    user gets accordion section content element    Test 2 updated    id:file-uploads
     user clicks button    Delete file    ${file_2_section}
-    user waits until h1 is visible    Confirm deletion of file
+    user waits until h2 is visible    Confirm deletion of file
     user clicks button    Confirm
 
     user waits until page does not contain accordion section    Test 2 updated

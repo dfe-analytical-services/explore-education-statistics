@@ -3,25 +3,24 @@ import React, { ReactNode } from 'react';
 import { InjectedWizardProps } from './Wizard';
 import styles from './WizardStepHeading.module.scss';
 
-interface Props {
+interface Props extends InjectedWizardProps {
   children: ReactNode;
   fieldsetHeading?: boolean;
-  stepEnabled?: boolean;
 }
 
 const WizardStepHeading = ({
   children,
   fieldsetHeading = false,
   isActive,
+  isEnabled,
   stepNumber,
-  stepEnabled,
-}: Props & InjectedWizardProps) => {
+}: Props) => {
   return (
     <h2
       className={classNames({
-        'govuk-heading-l dfe-flex dfe-align-items--center govuk-!-margin-top-6': isActive,
+        'govuk-heading-l dfe-flex dfe-align-items--center': isActive,
         'govuk-fieldset__heading': fieldsetHeading && isActive,
-        [styles.stepEnabled]: stepEnabled && !isActive,
+        [styles.stepEnabled]: isEnabled && !isActive,
       })}
     >
       <span

@@ -23,6 +23,122 @@ user creates new content section
     user clicks element    xpath://button[.="Add new section"]    ${parent}
     user changes accordion section title    ${section_number}    ${content_section_name}    ${parent}
 
+user creates data block for dates csv
+    [Arguments]
+    ...    ${subject_name}
+    ...    ${datablock_name}
+    ...    ${datablock_title}
+
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks
+
+    user clicks link    Create data block
+    user waits until h2 is visible    Create data block
+
+    user waits until table tool wizard step is available    1    Choose a subject
+    user waits until page contains    ${subject_name}
+    user clicks radio    ${subject_name}
+    user clicks element    id:publicationSubjectForm-submit
+
+    user waits until table tool wizard step is available    2    Choose locations
+    user opens details dropdown    National
+    user checks location checkbox is checked    England
+
+    user clicks element    id:locationFiltersForm-submit
+
+    user waits until table tool wizard step is available    3    Choose time period
+    user chooses select option    id:timePeriodForm-start    2020 Week 13
+    user chooses select option    id:timePeriodForm-end    2020 Week 16
+    user clicks element    id:timePeriodForm-submit
+
+    user waits until table tool wizard step is available    4    Choose your filters
+    user clicks subheaded indicator checkbox    Open settings    Number of open settings
+    user checks subheaded indicator checkbox is checked    Open settings    Number of open settings
+    user clicks subheaded indicator checkbox    Open settings    Proportion of settings open
+    user checks subheaded indicator checkbox is checked    Open settings    Proportion of settings open
+
+    user opens details dropdown    Date
+    user clicks category checkbox    Date    23/03/2020
+    user checks category checkbox is checked    Date    23/03/2020
+
+    user clicks element    id:filtersForm-submit
+    user waits until results table appears    %{WAIT_LONG}
+
+    user checks table column heading contains    1    1    2020 Week 13
+    user checks headed table body row cell contains    Number of open settings    1    22,900
+    user checks headed table body row cell contains    Proportion of settings open    1    1%
+
+    user enters text into element    id:dataBlockDetailsForm-name    ${datablock_name}
+    user enters text into element    id:dataBlockDetailsForm-heading    ${datablock_title}
+    user enters text into element    id:dataBlockDetailsForm-source    Dates source
+
+    user clicks button    Save data block
+
+    user waits until h2 is visible    Edit data block
+    user waits until page contains button    Delete this data block
+
+user creates key stats data block for dates csv
+    [Arguments]
+    ...    ${subject_name}
+    ...    ${datablock_name}
+    ...    ${datablock_title}
+    ...    ${indicator_name}
+    ...    ${expected_indicator_value}
+
+    user clicks link    Data blocks
+    user waits until h2 is visible    Data blocks
+
+    user clicks link    Create data block
+    user waits until h2 is visible    Create data block
+
+    user waits until table tool wizard step is available    1    Choose a subject
+    user waits until page contains    ${subject_name}
+    user clicks radio    ${subject_name}
+    user clicks element    id:publicationSubjectForm-submit
+
+    user waits until table tool wizard step is available    2    Choose locations
+    user opens details dropdown    National
+    user checks location checkbox is checked    England
+
+    user clicks element    id:locationFiltersForm-submit
+
+    user waits until table tool wizard step is available    3    Choose time period
+    user chooses select option    id:timePeriodForm-start    2020 Week 13
+    user chooses select option    id:timePeriodForm-end    2020 Week 13
+    user clicks element    id:timePeriodForm-submit
+
+    user waits until table tool wizard step is available    4    Choose your filters
+    user clicks subheaded indicator checkbox    Open settings    ${indicator_name}
+    user checks subheaded indicator checkbox is checked    Open settings    ${indicator_name}
+
+    user opens details dropdown    Date
+    user clicks category checkbox    Date    23/03/2020
+    user checks category checkbox is checked    Date    23/03/2020
+
+    user clicks element    id:filtersForm-submit
+    user waits until results table appears    %{WAIT_LONG}
+
+    user checks table column heading contains    1    1    2020 Week 13
+    user checks headed table body row cell contains    ${indicator_name}    1    ${expected_indicator_value}
+
+    user enters text into element    id:dataBlockDetailsForm-name    ${datablock_name}
+    user enters text into element    id:dataBlockDetailsForm-heading    ${datablock_title}
+    user enters text into element    id:dataBlockDetailsForm-source    Dates source
+
+    user clicks button    Save data block
+
+    user waits until h2 is visible    Edit data block
+    user waits until page contains button    Delete this data block
+
+user chooses and embeds data block
+    [Arguments]
+    ...    ${datablock_name}
+    user chooses select option    css:select[name="selectedDataBlock"]    ${datablock_name}
+    user waits until button is enabled    Embed    %{WAIT_SMALL}
+    user clicks button    Embed
+    user waits until page does not contain button    Embed    %{WAIT_MEDIUM}
+    user waits until page does not contain loading spinner
+
 user opens nth editable accordion section
     [Arguments]
     ...    ${section_num}
@@ -72,7 +188,7 @@ user adds text block to editable accordion section
 
     ${section}=    user gets accordion section content element    ${section_name}    ${parent}
     user clicks button    Add text block    ${section}
-    user waits until element contains    ${section}    This section is empty
+    user waits until element contains    ${section}    This section is empty    %{WAIT_SMALL}
 
 user adds data block to editable accordion section
     [Arguments]
@@ -87,6 +203,7 @@ user adds data block to editable accordion section
     user chooses select option    ${block_list}    Dates data block name
     user waits until parent contains element    ${section}    css:table
     user clicks button    Embed    ${section}
+    user waits until parent does not contain element    ${section}    xpath://button[text()="Embed"]
 
 user edits accordion section text block
     [Arguments]
@@ -112,6 +229,20 @@ user adds content to accordion section text block
     user clicks button    Save    ${block}
     user waits until element contains    ${block}    ${content}
 
+user adds content to autosaving accordion section text block
+    [Arguments]
+    ...    ${section_name}
+    ...    ${block_num}
+    ...    ${content}
+    ...    ${parent}=[data-testid="accordion"]
+
+    ${block}=    user edits accordion section text block    ${section_name}    ${block_num}    ${parent}
+    user presses keys    CTRL+a
+    user presses keys    BACKSPACE
+    user presses keys    ${content}
+    user clicks button    Save & close    ${block}
+    user waits until element contains    ${block}    ${content}
+
 user adds image to accordion section text block
     [Arguments]
     ...    ${section_name}
@@ -121,6 +252,10 @@ user adds image to accordion section text block
     ...    ${parent}=[data-testid="accordion"]
 
     ${block}=    user edits accordion section text block    ${section_name}    ${block_num}    ${parent}
+
+    # If we don't do this, `Insert paragraph after block` circle button on image doesn't appear
+    user presses keys    ${\n}
+    user presses keys    ARROW_UP
 
     choose file
     ...    xpath://button[span[.="Insert image"]]/following-sibling::input[@type="file"]
@@ -147,6 +282,7 @@ user removes image from accordion section text block
     ...    ${block_num}
     ...    ${alt_text}
     ...    ${parent}=[data-testid="accordion"]
+    ...    ${save_button}=Save & close
 
     ${block}=    user edits accordion section text block    ${section_name}    ${block_num}    ${parent}
     user waits until parent contains element    ${block}    xpath://img[@alt="${alt_text}"]
@@ -160,7 +296,7 @@ user removes image from accordion section text block
 
     # Delete the empty line left by the deleted image.
     user presses keys    DELETE
-    user clicks button    Save    ${block}
+    user clicks button    ${save_button}    ${block}
 
 user checks accordion section text block contains
     [Arguments]
@@ -201,6 +337,10 @@ user deletes editable accordion section content block
     ${block}=    get accordion section text block    ${section_name}    ${block_num}    ${parent}
     user clicks button    Remove block    ${block}
     user clicks button    Confirm
+    # avoid blocks being lazy loaded
+    user waits until page does not contain loading spinner
+    Sleep    0.5
+    user scrolls down    1
 
 user deletes editable accordion section
     [Arguments]
@@ -211,6 +351,7 @@ user deletes editable accordion section
     user clicks button    Remove this section    ${section}
     user waits until modal is visible    Are you sure?
     user clicks button    Confirm
+    user waits until modal is not visible    Are you sure?
 
 get accordion section text block
     [Arguments]

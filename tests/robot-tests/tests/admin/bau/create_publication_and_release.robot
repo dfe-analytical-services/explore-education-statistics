@@ -4,6 +4,7 @@ Resource            ../../libs/admin-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      teardown suite
+Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -26,28 +27,28 @@ Go to Create publication page for "UI tests topic" topic
 Enters contact details
     user enters text into element    id:publicationForm-teamName    Post-16 statistics team
     user enters text into element    id:publicationForm-teamEmail    post16.statistics@education.gov.uk
-    user enters text into element    id:publicationForm-contactName    Suzanne Wallace
+    user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
     user enters text into element    id:publicationForm-contactTelNo    0123456789
 
 Error message appears when submitting and title is empty
-    user checks element is not visible    id:publicationForm-title-error    30
+    user checks element is not visible    id:publicationForm-title-error    %{WAIT_SMALL}
     user clicks button    Save publication
-    user waits until element is visible    id:publicationForm-title-error    30
+    user waits until element is visible    id:publicationForm-title-error    %{WAIT_SMALL}
 
 Enter new publication title
     user enters text into element    id:publicationForm-title    ${PUBLICATION_NAME} (created)
-    user checks element is not visible    id:publicationForm-title-error    60
+    user checks element is not visible    id:publicationForm-title-error    %{WAIT_SMALL}
 
 User redirects to the dashboard after saving publication
     user clicks button    Save publication
-    user waits until h1 is visible    Dashboard    60
+    user waits until h1 is visible    Dashboard    %{WAIT_SMALL}
 
 Verify that new publication has been created
     user opens publication on the admin dashboard    ${PUBLICATION_NAME} (created)
     user checks testid element contains    Team name for ${PUBLICATION_NAME} (created)    Post-16 statistics team
     user checks testid element contains    Team email for ${PUBLICATION_NAME} (created)
     ...    post16.statistics@education.gov.uk
-    user checks testid element contains    Contact name for ${PUBLICATION_NAME} (created)    Suzanne Wallace
+    user checks testid element contains    Contact name for ${PUBLICATION_NAME} (created)    UI Tests Contact Name
     user checks testid element contains    Contact phone number for ${PUBLICATION_NAME} (created)    0123456789
     user checks testid element contains    Releases for ${PUBLICATION_NAME} (created)    No releases created
 
@@ -58,7 +59,7 @@ Create new test theme and topic
 
 Go to edit publication
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME} (created)
-    user waits until page contains title caption    ${PUBLICATION_NAME} (created)    60
+    user waits until page contains title caption    ${PUBLICATION_NAME} (created)    %{WAIT_SMALL}
     user waits until h1 is visible    Manage publication
 
 Update publication
@@ -67,10 +68,10 @@ Update publication
     user chooses select option    id:publicationForm-topicId    ${CREATED_TOPIC_NAME}
     user enters text into element    id:publicationForm-teamName    Special educational needs statistics team
     user enters text into element    id:publicationForm-teamEmail    sen.statistics@education.gov.uk
-    user enters text into element    id:publicationForm-contactName    Sean Gibson
+    user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
     user enters text into element    id:publicationForm-contactTelNo    0987654321
     user clicks button    Save publication
-    user waits until h1 is visible    Confirm publication changes
+    user waits until h2 is visible    Confirm publication changes
     user clicks button    Confirm
 
 Add a methodology
@@ -82,18 +83,27 @@ Verify publication has been updated
     user checks testid element contains    Team name for ${PUBLICATION_NAME}
     ...    Special educational needs statistics team
     user checks testid element contains    Team email for ${PUBLICATION_NAME}    sen.statistics@education.gov.uk
-    user checks testid element contains    Contact name for ${PUBLICATION_NAME}    Sean Gibson
+    user checks testid element contains    Contact name for ${PUBLICATION_NAME}    UI Tests Contact Name
     user checks testid element contains    Contact phone number for ${PUBLICATION_NAME}    0987654321
     user checks testid element contains    Methodology for ${PUBLICATION_NAME}    ${PUBLICATION_NAME}
     user checks testid element contains    Releases for ${PUBLICATION_NAME}    No releases created
 
-Create new release
+Go to 'Create new release'
     user clicks element    testid:Create new release link for ${PUBLICATION_NAME}
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
+
+Verify Release type options
+    user checks page contains radio    Ad hoc statistics
+    user checks page contains radio    Experimental statistics
+    user checks page contains radio    Management information
+    user checks page contains radio    National statistics
+    user checks page contains radio    Official statistics
+
+Create new release
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Spring Term
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2025
-    user clicks radio    National Statistics
+    user clicks radio    National statistics
     user clicks button    Create new release
     user waits until page contains title caption    Edit release for Spring Term 2025/26
     user waits until h1 is visible    ${PUBLICATION_NAME}
@@ -101,8 +111,8 @@ Create new release
 Verify created release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
-    user verifies release summary    ${PUBLICATION_NAME}    Spring Term    2025/26    Sean Gibson
-    ...    National Statistics
+    user verifies release summary    ${PUBLICATION_NAME}    Spring Term    2025/26    UI Tests Contact Name
+    ...    National statistics
 
 Edit release summary
     user waits until page contains link    Edit release summary
@@ -111,13 +121,13 @@ Edit release summary
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverageStartYear
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    Summer Term
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    2026
-    user clicks radio    Official Statistics
+    user clicks radio    Official statistics
     user clicks button    Update release summary
 
 Verify updated release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    ${PUBLICATION_NAME}    Summer Term    2026/27    Sean Gibson
-    ...    Official Statistics
+    user verifies release summary    ${PUBLICATION_NAME}    Summer Term    2026/27    UI Tests Contact Name
+    ...    Official statistics
 
 *** Keywords ***
 teardown suite

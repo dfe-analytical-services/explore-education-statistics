@@ -112,10 +112,7 @@ const ReleaseAccessForm = ({
                       {userReleaseRole.role}
                     </td>
                     <td className="govuk-table__cell">
-                      <ButtonText
-                        onClick={() => onRemove(userReleaseRole)}
-                        testId={`remove-release-role-${userReleaseRole.role}`}
-                      >
+                      <ButtonText onClick={() => onRemove(userReleaseRole)}>
                         Remove
                       </ButtonText>
                     </td>

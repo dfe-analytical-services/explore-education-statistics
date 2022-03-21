@@ -23,6 +23,7 @@ import DownloadStep, {
 } from '@frontend/modules/data-catalogue/components/DownloadStep';
 import { ReleaseFormSubmitHandler } from '@frontend/modules/data-catalogue/components/ReleaseForm';
 import ReleaseStep from '@frontend/modules/data-catalogue/components/ReleaseStep';
+import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useMemo } from 'react';
@@ -112,11 +113,24 @@ const DataCataloguePage: NextPage<Props> = ({
   const handleDownloadFormSubmit: DownloadFormSubmitHandler = async ({
     files,
   }) => {
-    if (!state.query.release) {
+    const { release } = state.query;
+
+    if (!release) {
       throw new Error('Release has not been selected');
     }
 
-    await downloadService.downloadFiles(state.query.release.id, files);
+    await downloadService.downloadFiles(release.id, files);
+
+    const availableFiles = state.subjects.map(subject => subject.file);
+    const selectedFilenames = files
+      .map(fileId => availableFiles.find(file => file.id === fileId)?.fileName)
+      .join(', ');
+
+    logEvent({
+      category: 'Downloads',
+      action: 'Data Catalogue page selected files download',
+      label: `Publication: ${state.query.publication?.title}, Release: ${release.title} File: ${selectedFilenames}`,
+    });
   };
 
   const PublicationStep = (props: InjectedWizardProps) => {

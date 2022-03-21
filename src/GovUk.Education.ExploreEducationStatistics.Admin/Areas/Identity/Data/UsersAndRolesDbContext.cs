@@ -1,7 +1,10 @@
 #nullable enable
+using System;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using IdentityServer4.EntityFramework.Options;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
@@ -18,108 +21,109 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
             DbContextOptions<UsersAndRolesDbContext> options,
             IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
         {
+            Configure();
         }
 
-        private static IdentityRole<string> CreateRole(
-            string id,
-            string name
-        )
+        private void Configure()
+        {
+            ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
+            ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
+        }
+
+        private static IdentityRole<string> CreateRole(Role role)
         {
             return new IdentityRole<string>
             {
-                Id = id,
-                Name = name,
-                NormalizedName = name.ToUpper(),
+                Id = role.GetEnumValue(),
+                Name = role.GetEnumLabel(),
+                NormalizedName = role.GetEnumLabel().ToUpper(),
                 ConcurrencyStamp = "85d6c75e-a6c8-4c7e-b4d0-8ee70a4879d3",
             };
         }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-         
-            const string bauUserRoleId = "cf67b697-bddd-41bd-86e0-11b7e11d99b3";
-            const string analystRoleId = "f9ddb43e-aa9e-41ed-837d-3062e130c425";
-            const string prereleaseUserRoleId = "17e634f4-7a2b-4a23-8636-b079877b4232";
+
+            modelBuilder.Entity<UserInvite>()
+                .Property(invite => invite.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
             modelBuilder.Entity<IdentityRole>()
                 .HasData(
-                    CreateRole(
-                        bauUserRoleId,
-                        "BAU User"
-                    ),
-                    CreateRole(
-                        analystRoleId,
-                        "Analyst"
-                    ),
-                    CreateRole(
-                        prereleaseUserRoleId,
-                        "Prerelease User"
-                    )
+                    CreateRole(Role.BauUser),
+                    CreateRole(Role.Analyst),
+                    CreateRole(Role.PrereleaseUser)
                 );
+
+            string bauRoleId = Role.BauUser.GetEnumValue();
+            string analystRoleId = Role.Analyst.GetEnumValue();
+            string prereleaseRoleId = Role.PrereleaseUser.GetEnumValue();
 
             modelBuilder.Entity<IdentityRoleClaim<string>>()
                 .HasData(
                     new IdentityRoleClaim<string>
                     {
                         Id = -2,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.ApplicationAccessGranted.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -3,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.AccessAllReleases.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -5,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.MarkAllReleasesAsDraft.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -6,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.SubmitAllReleasesToHigherReview.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -7,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.ApproveAllReleases.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -8,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.UpdateAllReleases.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -9,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.CreateAnyPublication.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -10,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.CreateAnyRelease.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -11,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.ManageAnyUser.ToString(),
                         ClaimValue = "",
                     },
@@ -140,14 +144,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     new IdentityRoleClaim<string>
                     {
                         Id = -15,
-                        RoleId = prereleaseUserRoleId,
+                        RoleId = prereleaseRoleId,
                         ClaimType = SecurityClaimTypes.ApplicationAccessGranted.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -16,
-                        RoleId = prereleaseUserRoleId,
+                        RoleId = prereleaseRoleId,
                         ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
                         ClaimValue = "",
                     },
@@ -161,21 +165,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     new IdentityRoleClaim<string>
                     {
                         Id = -18,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.AnalystPagesAccessGranted.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -19,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.PrereleasePagesAccessGranted.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -20,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.CanViewPrereleaseContacts.ToString(),
                         ClaimValue = "",
                     },
@@ -189,105 +193,105 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
                     new IdentityRoleClaim<string>
                     {
                         Id = -22,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.CreateAnyMethodology.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -23,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.UpdateAllMethodologies.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -24,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.AccessAllMethodologies.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -29,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.ApproveAllMethodologies.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -30,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.PublishAllReleases.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -31,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.MakeAmendmentsOfAllReleases.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -32,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.DeleteAllReleaseAmendments.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -33,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.ManageAllTaxonomy.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -34,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.UpdateAllPublications.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -35,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.MarkAllMethodologiesDraft.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -36,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.AccessAllImports.ToString(),
                         ClaimValue = "",
                     },
                     new
                     {
                         Id = -37,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.CancelAllFileImports.ToString(),
                         ClaimValue = "",
                     },
                     new
                     {
                         Id = -38,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.MakeAmendmentsOfAllMethodologies.ToString(),
                         ClaimValue = "",
                     },
                     new
                     {
                         Id = -39,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.DeleteAllMethodologies.ToString(),
                         ClaimValue = "",
                     },
                     new IdentityRoleClaim<string>
                     {
                         Id = -40,
-                        RoleId = bauUserRoleId,
+                        RoleId = bauRoleId,
                         ClaimType = SecurityClaimTypes.AdoptAnyMethodology.ToString(),
                         ClaimValue = "",
                     }

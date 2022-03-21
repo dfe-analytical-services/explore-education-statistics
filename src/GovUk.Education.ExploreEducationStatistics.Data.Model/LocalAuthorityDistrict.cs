@@ -1,14 +1,10 @@
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public class LocalAuthorityDistrict : ObservationalUnit
+    public class LocalAuthorityDistrict : LocationAttribute
     {
-        public LocalAuthorityDistrict(string code, string name) : base(code, name)
+        public LocalAuthorityDistrict(string? code, string? name) : base(code, name)
         {
-        }
-        
-        public static LocalAuthorityDistrict Empty()
-        {
-            return new LocalAuthorityDistrict(null, null);
         }
     }
 }

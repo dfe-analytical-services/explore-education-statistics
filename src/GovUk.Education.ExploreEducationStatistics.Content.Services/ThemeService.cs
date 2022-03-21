@@ -3,12 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -25,7 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _contentDbContext = contentDbContext;
         }
 
-        [BlobCache(typeof(PublicationTreeCacheKey))]
         public async Task<IList<ThemeTree<PublicationTreeNode>>> GetPublicationTree(
             PublicationTreeFilter? filter = null)
         {
@@ -70,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OrderBy(publication => publication.Title)
                 .ToListAsync();
 
-            return new()
+            return new TopicTree<PublicationTreeNode>
             {
                 Id = topic.Id,
                 Title = topic.Title,
@@ -112,19 +109,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         private static PublicationTreeNode BuildPublicationNode(Publication publication)
         {
-            // Ignore any legacyPublicationUrl once the Publication has Releases
-            var legacyPublicationUrlIgnored =
-                publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease());
+            var latestRelease = publication.LatestPublishedRelease();
+            var type = GetPublicationType(latestRelease?.Type);
 
             return new PublicationTreeNode
             {
                 Id = publication.Id,
                 Title = publication.Title,
-                Summary = publication.Summary,
                 Slug = publication.Slug,
-                LegacyPublicationUrl = legacyPublicationUrlIgnored
-                    ? null
-                    : publication.LegacyPublicationUrl?.ToString()
+                Type = type,
+                LegacyPublicationUrl = type == PublicationType.Legacy
+                    ? publication.LegacyPublicationUrl?.ToString()
+                    : null
             };
         }
 
@@ -135,6 +131,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .ThenInclude(topic => topic.Publications)
                 .ThenInclude(publication => publication.Releases)
                 .ToListAsync();
+        }
+
+        private static PublicationType GetPublicationType(ReleaseType? releaseType)
+        {
+            return releaseType switch
+            {
+                ReleaseType.AdHocStatistics => PublicationType.AdHoc,
+                ReleaseType.NationalStatistics => PublicationType.NationalAndOfficial,
+                ReleaseType.ExperimentalStatistics => PublicationType.Experimental,
+                ReleaseType.ManagementInformation => PublicationType.ManagementInformation,
+                ReleaseType.OfficialStatistics => PublicationType.NationalAndOfficial,
+                null => PublicationType.Legacy,
+                _ => throw new ArgumentOutOfRangeException()
+            };
         }
     }
 }

@@ -498,41 +498,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 
             Assert.False(methodology.Amendment);
         }
-
-        [Fact]
-        public void DraftFirstVersionFlag()
-        {
-            var methodology = new MethodologyVersion
-            {
-                Status = Draft,
-                PreviousVersionId = null
-            };
-
-            Assert.True(methodology.DraftFirstVersion);
-        }
-
-        [Fact]
-        public void DraftFirstVersionFlag_NotDraft()
-        {
-            var methodology = new MethodologyVersion
-            {
-                Status = Approved,
-                PreviousVersionId = null
-            };
-
-            Assert.False(methodology.DraftFirstVersion);
-        }
-
-        [Fact]
-        public void DraftFirstVersionFlag_NotFirstVersion()
-        {
-            var methodology = new MethodologyVersion
-            {
-                Status = Draft,
-                PreviousVersionId = Guid.NewGuid()
-            };
-
-            Assert.False(methodology.DraftFirstVersion);
-        }
     }
 }

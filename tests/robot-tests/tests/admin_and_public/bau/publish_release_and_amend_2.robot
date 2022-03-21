@@ -7,6 +7,7 @@ Force Tags          Admin    Local    Dev    AltersData
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 *** Variables ***
 ${RELEASE_NAME}         Academic Year Q1 2020/21
@@ -26,28 +27,29 @@ Create new release
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user clicks link    Create new release
     user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
-    user clicks link    Data and files
     user uploads subject    ${SUBJECT_NAME}    seven_filters.csv    seven_filters.meta.csv
 
 Upload another subject (for deletion later)
     user waits until page contains element    id:dataFileUploadForm-subjectTitle
     user uploads subject    ${SECOND_SUBJECT}    upload-file-test.csv    upload-file-test.meta.csv
 
-Add meta guidance to subject
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document    90
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+Add data guidance to subject
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance    %{WAIT_MEDIUM}
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SUBJECT_NAME}
-    user enters text into meta guidance data file content editor    ${SUBJECT_NAME}
-    ...    meta guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_NAME}
+    ...    data guidance content
 
-Add meta guidance to second Subject
-    user waits until h2 is visible    Public metadata guidance document
-    user enters text into element    id:metaGuidanceForm-content    Test meta guidance content
+Add data guidance to second Subject
+    user waits until h2 is visible    Public data guidance
+    user enters text into element    id:dataGuidanceForm-content    Test data guidance content
     user waits until page contains accordion section    ${SECOND_SUBJECT}    15
-    user enters text into meta guidance data file content editor    ${SECOND_SUBJECT}
-    ...    meta guidance content
+    user enters text into data guidance data file content editor    ${SECOND_SUBJECT}
+    ...    data guidance content
     user clicks button    Save guidance
+    user waits until page contains button    ${SUBJECT_NAME}
+    user waits until page contains button    ${SECOND_SUBJECT}
 
 Navigate to 'Footnotes' page
     user clicks link    Footnotes
@@ -100,7 +102,7 @@ Add public prerelease access list
 
 Approve release
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 Go to public Table Tool page
     user navigates to data tables page on public frontend
@@ -112,28 +114,27 @@ Select "Test Topic" publication
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
 Select subject
     user clicks radio    ${SUBJECT_NAME}
     user clicks element    id:publicationSubjectForm-submit
-    user waits until table tool wizard step is available    Choose locations
+    user waits until table tool wizard step is available    3    Choose locations
     user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME}
 
 Select National location
-    user opens details dropdown    National
-    user clicks checkbox    England
+    user checks location checkbox is checked    England
 
 Click next step button
     user clicks element    id:locationFiltersForm-submit
-    user waits until table tool wizard step is available    Choose time period
+    user waits until table tool wizard step is available    4    Choose time period
 
 Select start date and end date
     user chooses select option    id:timePeriodForm-start    2012/13
     user chooses select option    id:timePeriodForm-end    2012/13
     user clicks element    id:timePeriodForm-submit
-    user waits until table tool wizard step is available    Choose your filters
+    user waits until table tool wizard step is available    5    Choose your filters
     user waits until page contains element    id:filtersForm-indicators
     user checks previous table tool step contains    4    Time period    2012/13
 
@@ -167,13 +168,12 @@ Wait until new footnote is visible
     user checks page contains    Footnote 1 ${SUBJECT_NAME}
 
 Validate results table column headings
-    user checks results table row heading contains    1    1    Asian/Asian British
-    user checks results table row heading contains    2    1    Black/African/Caribbean/Black British
-    user checks results table row heading contains    3    1    Mixed/Multiple ethnic group
-
-    user checks results table row heading contains    4    1    Not Known/Not Provided
-    user checks results table row heading contains    5    1    Other Ethnic Group
-    user checks results table row heading contains    6    1    Total
+    user checks results table row heading contains    1    1    Total
+    user checks results table row heading contains    2    1    Asian/Asian British
+    user checks results table row heading contains    3    1    Black/African/Caribbean/Black British
+    user checks results table row heading contains    4    1    Mixed/Multiple ethnic group
+    user checks results table row heading contains    5    1    Not Known/Not Provided
+    user checks results table row heading contains    6    1    Other Ethnic Group
     user checks results table row heading contains    7    1    White
 
 Validate row headings
@@ -184,56 +184,56 @@ Validate row headings
     user checks table column heading contains    1    5    5 years after study
 
 Validate table cells
-    user checks results table cell contains    1    1    8
-    user checks results table cell contains    2    1    2
-    user checks results table cell contains    3    1    5
-    user checks results table cell contains    4    1    8
+    user checks results table cell contains    1    1    2
+    user checks results table cell contains    2    1    8
+    user checks results table cell contains    3    1    2
+    user checks results table cell contains    4    1    5
     user checks results table cell contains    5    1    8
-    user checks results table cell contains    6    1    2
+    user checks results table cell contains    6    1    8
     user checks results table cell contains    7    1    3
 
-    user checks results table cell contains    1    2    10
-    user checks results table cell contains    2    2    4
-    user checks results table cell contains    3    2    8
-    user checks results table cell contains    4    2    5
+    user checks results table cell contains    1    2    2
+    user checks results table cell contains    2    2    10
+    user checks results table cell contains    3    2    4
+    user checks results table cell contains    4    2    8
     user checks results table cell contains    5    2    5
-    user checks results table cell contains    6    2    2
+    user checks results table cell contains    6    2    5
     user checks results table cell contains    7    2    6
 
-    user checks results table cell contains    1    3    3
-    user checks results table cell contains    2    3    0
-    user checks results table cell contains    3    3    6
-    user checks results table cell contains    4    3    3
-    user checks results table cell contains    5    3    2
-    user checks results table cell contains    6    3    8
+    user checks results table cell contains    1    3    8
+    user checks results table cell contains    2    3    3
+    user checks results table cell contains    3    3    0
+    user checks results table cell contains    4    3    6
+    user checks results table cell contains    5    3    3
+    user checks results table cell contains    6    3    2
     user checks results table cell contains    7    3    0
 
-    user checks results table cell contains    1    4    3
-    user checks results table cell contains    2    4    9
-    user checks results table cell contains    3    4    4
-    user checks results table cell contains    4    4    7
-    user checks results table cell contains    5    4    4
-    user checks results table cell contains    6    4    2
+    user checks results table cell contains    1    4    2
+    user checks results table cell contains    2    4    3
+    user checks results table cell contains    3    4    9
+    user checks results table cell contains    4    4    4
+    user checks results table cell contains    5    4    7
+    user checks results table cell contains    6    4    4
     user checks results table cell contains    7    4    8
 
-    user checks results table cell contains    1    5    0
-    user checks results table cell contains    2    5    6
-    user checks results table cell contains    3    5    8
-    user checks results table cell contains    4    5    1
+    user checks results table cell contains    1    5    9
+    user checks results table cell contains    2    5    0
+    user checks results table cell contains    3    5    6
+    user checks results table cell contains    4    5    8
     user checks results table cell contains    5    5    1
-    user checks results table cell contains    6    5    9
+    user checks results table cell contains    6    5    1
     user checks results table cell contains    7    5    1
 
 Generate the permalink
     [Documentation]    EES-214
-    user waits until page contains button    Generate shareable link    60
+    user waits until page contains button    Generate shareable link    %{WAIT_SMALL}
     user clicks button    Generate shareable link
     user waits until page contains testid    permalink-generated-url
     ${PERMA_LOCATION_URL}    Get Value    testid:permalink-generated-url
     Set Suite Variable    ${PERMA_LOCATION_URL}
 
 Go to permalink
-    user goes to url    ${PERMA_LOCATION_URL}
+    user navigates to public frontend    ${PERMA_LOCATION_URL}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain    WARNING - The data used in this permalink may be out-of-date.
     user checks page contains    Footnote 1 ${SUBJECT_NAME}
@@ -271,10 +271,11 @@ Replace subject data
 
 Confirm data replacement
     user clicks button    Confirm data replacement
+    user waits until h2 is visible    Data replacement complete    %{WAIT_MEDIUM}
 
 Delete second subject file
-    user clicks link    Footnotes    # to avoid focus issues
     user clicks link    Data and files
+    user waits until h2 is visible    Add data file to release
     user deletes subject file    ${SECOND_SUBJECT}
 
 Navigate to 'Content' page for release amendment
@@ -290,22 +291,34 @@ Add release note to release amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note one
 
-Go to "Sign off" page and approve release amendment
+Go to "Sign off" page
     user clicks link    Sign off
-    user approves release for immediate publication
+    user waits until h3 is visible    Release status history
+
+Validate Release status table row is correct
+    user waits until page contains element    css:table
+    user checks element count is x    xpath://table/tbody/tr    1
+    ${datetime}    get current datetime    %-d %B %Y
+    table cell should contain    css:table    2    1    ${datetime}    # Date
+    table cell should contain    css:table    2    2    Approved    # Status
+    table cell should contain    css:table    2    3    Approved by UI tests    # Internal note
+    table cell should contain    css:table    2    4    1    # Release version
+    table cell should contain    css:table    2    5    ees-bau1@education.gov.uk    # By user
+
+Approve release amendment
+    user approves amended release for immediate publication
 
 Go to permalink page & check for error element to be present
-    user goes to url    ${PERMA_LOCATION_URL}
+    user navigates to public frontend    ${PERMA_LOCATION_URL}
     user waits until page contains    WARNING - The data used in this permalink may be out-of-date.
 
 Check the table has the same results as original table
-    user checks results table row heading contains    1    1    Asian/Asian British
-    user checks results table row heading contains    2    1    Black/African/Caribbean/Black British
-    user checks results table row heading contains    3    1    Mixed/Multiple ethnic group
-
-    user checks results table row heading contains    4    1    Not Known/Not Provided
-    user checks results table row heading contains    5    1    Other Ethnic Group
-    user checks results table row heading contains    6    1    Total
+    user checks results table row heading contains    1    1    Total
+    user checks results table row heading contains    2    1    Asian/Asian British
+    user checks results table row heading contains    3    1    Black/African/Caribbean/Black British
+    user checks results table row heading contains    4    1    Mixed/Multiple ethnic group
+    user checks results table row heading contains    5    1    Not Known/Not Provided
+    user checks results table row heading contains    6    1    Other Ethnic Group
     user checks results table row heading contains    7    1    White
 
     user checks table column heading contains    1    1    1 year after study
@@ -314,54 +327,54 @@ Check the table has the same results as original table
     user checks table column heading contains    1    4    4 years after study
     user checks table column heading contains    1    5    5 years after study
 
-    user checks results table cell contains    1    1    8
-    user checks results table cell contains    2    1    2
-    user checks results table cell contains    3    1    5
-    user checks results table cell contains    4    1    8
+    user checks results table cell contains    1    1    2
+    user checks results table cell contains    2    1    8
+    user checks results table cell contains    3    1    2
+    user checks results table cell contains    4    1    5
     user checks results table cell contains    5    1    8
-    user checks results table cell contains    6    1    2
+    user checks results table cell contains    6    1    8
     user checks results table cell contains    7    1    3
 
-    user checks results table cell contains    1    2    10
-    user checks results table cell contains    2    2    4
-    user checks results table cell contains    3    2    8
-    user checks results table cell contains    4    2    5
+    user checks results table cell contains    1    2    2
+    user checks results table cell contains    2    2    10
+    user checks results table cell contains    3    2    4
+    user checks results table cell contains    4    2    8
     user checks results table cell contains    5    2    5
-    user checks results table cell contains    6    2    2
+    user checks results table cell contains    6    2    5
     user checks results table cell contains    7    2    6
 
-    user checks results table cell contains    1    3    3
-    user checks results table cell contains    2    3    0
-    user checks results table cell contains    3    3    6
-    user checks results table cell contains    4    3    3
-    user checks results table cell contains    5    3    2
-    user checks results table cell contains    6    3    8
+    user checks results table cell contains    1    3    8
+    user checks results table cell contains    2    3    3
+    user checks results table cell contains    3    3    0
+    user checks results table cell contains    4    3    6
+    user checks results table cell contains    5    3    3
+    user checks results table cell contains    6    3    2
     user checks results table cell contains    7    3    0
 
-    user checks results table cell contains    1    4    3
-    user checks results table cell contains    2    4    9
-    user checks results table cell contains    3    4    4
-    user checks results table cell contains    4    4    7
-    user checks results table cell contains    5    4    4
-    user checks results table cell contains    6    4    2
+    user checks results table cell contains    1    4    2
+    user checks results table cell contains    2    4    3
+    user checks results table cell contains    3    4    9
+    user checks results table cell contains    4    4    4
+    user checks results table cell contains    5    4    7
+    user checks results table cell contains    6    4    4
     user checks results table cell contains    7    4    8
 
-    user checks results table cell contains    1    5    0
-    user checks results table cell contains    2    5    6
-    user checks results table cell contains    3    5    8
-    user checks results table cell contains    4    5    1
+    user checks results table cell contains    1    5    9
+    user checks results table cell contains    2    5    0
+    user checks results table cell contains    3    5    6
+    user checks results table cell contains    4    5    8
     user checks results table cell contains    5    5    1
-    user checks results table cell contains    6    5    9
+    user checks results table cell contains    6    5    1
     user checks results table cell contains    7    5    1
 
 Check amended release doesn't contain deleted subject
-    user goes to url    %{PUBLIC_URL}/data-tables
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
     user checks page does not contain    ${SECOND_SUBJECT}
 
@@ -370,13 +383,12 @@ Create amendment to modify release
     user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
 
 Add subject to release
-    user clicks link    Data and files
     user uploads subject    ${THIRD_SUBJECT}    upload-file-test-with-filter.csv
     ...    upload-file-test-with-filter.meta.csv
 
-Add meta guidance to third subject
-    user clicks link    Metadata guidance
-    user enters text into meta guidance data file content editor    ${THIRD_SUBJECT}    meta content
+Add data guidance to third subject
+    user clicks link    Data guidance
+    user enters text into data guidance data file content editor    ${THIRD_SUBJECT}    meta content
     user clicks button    Save guidance
 
 Navigate to 'Footnotes' Tab
@@ -410,12 +422,12 @@ Add release note for new release amendment
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) time    ${date}
     user waits until element contains    css:#releaseNotes li:nth-of-type(1) p    Test release note two
 
-Go to "Sign off" to approve release for immediate publication
+Go to "Sign off" to approve amended release for immediate publication
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves amended release for immediate publication
 
 Go to public Table Tool page for amendment
-    user goes to url    %{PUBLIC_URL}/data-tables
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
 
 Select publication
@@ -423,29 +435,28 @@ Select publication
     user opens details dropdown    %{TEST_TOPIC_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
     #user checks page does not contain    ${SECOND_SUBJECT}    # EES-1360
 
 Select subject again
     user clicks radio    ${SUBJECT_NAME}
     user clicks element    id:publicationSubjectForm-submit
-    user waits until table tool wizard step is available    Choose locations
+    user waits until table tool wizard step is available    3    Choose locations
     user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME}
 
 Select National location filter
-    user opens details dropdown    National
-    user clicks checkbox    England
+    user checks location checkbox is checked    England
 
 Click the next step button
     user clicks element    id:locationFiltersForm-submit
-    user waits until table tool wizard step is available    Choose time period
+    user waits until table tool wizard step is available    4    Choose time period
 
 Select start date + end date
     user chooses select option    id:timePeriodForm-start    2020 Week 13
     user chooses select option    id:timePeriodForm-end    2021 Week 24
     user clicks element    id:timePeriodForm-submit
-    user waits until table tool wizard step is available    Choose your filters
+    user waits until table tool wizard step is available    5    Choose your filters
     user waits until page contains element    id:filtersForm-indicators
 
 Select four indicators
@@ -462,9 +473,20 @@ Select the date cateogory
     user opens details dropdown    Date
     user clicks select all for category    Date
 
-Generate table
+Attempt to generate a table that is too large
     user clicks element    id:filtersForm-submit
-    user waits until page contains    Generate shareable link    60
+    user waits until page contains
+    ...    Could not create table as the filters chosen may exceed the maximum allowed table size.
+    user waits until page contains    Select different filters or download the subject data.
+    user waits until page contains button    Download Seven filters (csv, 17 Kb)    %{WAIT_MEDIUM}
+
+Reduce the number of selected Dates and generate a smaller table
+    user clicks unselect all for category    Date
+    user clicks category checkbox    Date    23/03/2020
+    user clicks category checkbox    Date    24/03/2020
+    user clicks category checkbox    Date    25/03/2020
+    user clicks element    id:filtersForm-submit
+    user waits until page contains    Generate shareable link    %{WAIT_SMALL}
 
 Validate generated table
     user checks page contains    Updating ${SUBJECT_NAME} footnote
@@ -477,7 +499,7 @@ Generate the new permalink
     Set Suite Variable    ${PERMA_LOCATION_URL_TWO}
 
 Go to new permalink
-    user goes to url    ${PERMA_LOCATION_URL_TWO}
+    user navigates to public frontend    ${PERMA_LOCATION_URL_TWO}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
     user checks page does not contain    WARNING - The data used in this permalink may be out-of-date.
     user checks page contains    Updating ${SUBJECT_NAME} footnote

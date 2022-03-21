@@ -9,7 +9,7 @@ const mobileWidth = 1024;
 
 interface Props extends OmitStrict<MultiHeaderTableProps, 'ariaLabelledBy'> {
   caption: ReactNode;
-  captionId?: string;
+  captionId: string;
   innerRef?: Ref<HTMLElement>;
   footnotes?: FullTableMeta['footnotes'];
   source?: string;
@@ -17,12 +17,7 @@ interface Props extends OmitStrict<MultiHeaderTableProps, 'ariaLabelledBy'> {
 
 const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
   (props, ref) => {
-    const {
-      caption,
-      captionId = 'dataTableCaption',
-      footnotes = [],
-      source,
-    } = props;
+    const { caption, captionId, footnotes = [], source } = props;
 
     const containerRef = useRef<HTMLDivElement>(null);
     const mainTableRef = useRef<HTMLTableElement>(null);
@@ -35,21 +30,21 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
           window.innerWidth <= mobileWidth
         ) {
           mainTableRef.current
-            .querySelectorAll<HTMLTableHeaderCellElement>('thead td')
+            .querySelectorAll<HTMLTableCellElement>('thead td')
             .forEach(el => {
               // eslint-disable-next-line no-param-reassign
               el.style.transform = '';
             });
 
           mainTableRef.current
-            .querySelectorAll<HTMLTableHeaderCellElement>('thead th')
+            .querySelectorAll<HTMLTableCellElement>('thead th')
             .forEach(el => {
               // eslint-disable-next-line no-param-reassign
               el.style.transform = '';
             });
 
           mainTableRef.current
-            .querySelectorAll<HTMLTableHeaderCellElement>('tbody th')
+            .querySelectorAll<HTMLTableCellElement>('tbody th')
             .forEach(el => {
               // eslint-disable-next-line no-param-reassign
               el.style.transform = '';
@@ -77,21 +72,21 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
 
             if (mainTableRef.current && window.innerWidth >= mobileWidth) {
               mainTableRef.current
-                .querySelectorAll<HTMLTableHeaderCellElement>('thead td')
+                .querySelectorAll<HTMLTableCellElement>('thead td')
                 .forEach(el => {
                   // eslint-disable-next-line no-param-reassign
                   el.style.transform = `translate(${scrollLeft}px, ${scrollTop}px)`;
                 });
 
               mainTableRef.current
-                .querySelectorAll<HTMLTableHeaderCellElement>('thead th')
+                .querySelectorAll<HTMLTableCellElement>('thead th')
                 .forEach(el => {
                   // eslint-disable-next-line no-param-reassign
                   el.style.transform = `translate(0, ${scrollTop}px)`;
                 });
 
               mainTableRef.current
-                .querySelectorAll<HTMLTableHeaderCellElement>('tbody th')
+                .querySelectorAll<HTMLTableCellElement>('tbody th')
                 .forEach(el => {
                   // eslint-disable-next-line no-param-reassign
                   el.style.transform = `translate(${scrollLeft}px, 0)`;

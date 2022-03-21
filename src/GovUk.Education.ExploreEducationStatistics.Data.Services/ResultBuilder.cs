@@ -1,7 +1,7 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -11,49 +11,37 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class ResultBuilder : IResultBuilder<Observation, ObservationViewModel>
     {
-        private readonly IMapper _mapper;
-
-        public ResultBuilder(IMapper mapper)
-        {
-            _mapper = mapper;
-        }
-
         public ObservationViewModel BuildResult(Observation observation, IEnumerable<Guid> indicators)
         {
             return new ObservationViewModel
             {
+                Id = observation.Id,
                 Filters = FilterItems(observation),
-                GeographicLevel = observation.GeographicLevel,
-                Location = _mapper.Map<LocationViewModel>(observation.Location),
-                Measures = Measures(observation, indicators),
+                GeographicLevel = observation.Location.GeographicLevel,
+                LocationId = observation.LocationId,
+                Measures = Measures(observation, indicators.ToList()),
                 TimePeriod = observation.GetTimePeriod()
             };
         }
 
-        private static IEnumerable<string> FilterItems(Observation observation)
+        private static List<Guid> FilterItems(Observation observation)
         {
-            return observation.FilterItems.Select(item => item.FilterItemId).OrderBy(l => l).Select(l => l.ToString());
+            return observation
+                .FilterItems
+                .Select(item => item.FilterItemId)
+                .ToList();
         }
 
-        private static Dictionary<string, string> Measures(Observation observation, IEnumerable<Guid> indicators)
+        private static Dictionary<Guid, string> Measures(Observation observation, List<Guid> indicators)
         {
-            var indicatorsList = indicators?.ToList();
-            var measures = indicatorsList != null && indicatorsList.Any()
-                ? FilterMeasures(observation.Measures, indicatorsList)
-                : observation.Measures;
-            return measures.Where(pair => pair.Value != null)
-                .ToDictionary(pair => pair.Key.ToString(), pair => pair.Value);
-        }
-        
-        private static Dictionary<Guid, string> FilterMeasures(
-            Dictionary<Guid, string> measures,
-            IEnumerable<Guid> indicators)
-        {
-            return (
-                from kvp in measures
-                where indicators.Contains(kvp.Key)
-                select kvp
-            ).ToDictionary(pair => pair.Key, pair => pair.Value);
+            if (!indicators.Any())
+            {
+                return observation.Measures;
+            }
+
+            return observation.Measures
+                .Where(pair => indicators.Contains(pair.Key))
+                .ToDictionary(item => item.Key, item => item.Value);
         }
     }
 }

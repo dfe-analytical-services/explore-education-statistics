@@ -22,7 +22,7 @@ const PublicationEditPage = ({
   const history = useHistory();
 
   const { value: publication, isLoading } = useAsyncHandledRetry(
-    () => publicationService.getPublication(publicationId),
+    () => publicationService.getMyPublication(publicationId),
     [publicationId],
   );
 
@@ -44,6 +44,7 @@ const PublicationEditPage = ({
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
           <PublicationForm
+            showTitleInput={publication.permissions.canUpdatePublicationTitle}
             cancelButton={
               <Link
                 unvisited

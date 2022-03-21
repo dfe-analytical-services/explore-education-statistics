@@ -24,15 +24,13 @@ const RelatedPagesSection = ({ release }: Props) => {
 
   const { editingMode } = useEditingContext();
 
-  const addLink = (link: Omit<BasicLink, 'id'>) => {
-    return new Promise(resolve => {
-      releaseContentRelatedInformationService
-        .create(release.id, link)
-        .then(newLinks => {
-          setLinks(newLinks);
-          resolve();
-        });
-    });
+  const addLink = async (link: Omit<BasicLink, 'id'>) => {
+    const newLinks = await releaseContentRelatedInformationService.create(
+      release.id,
+      link,
+    );
+
+    setLinks(newLinks);
   };
 
   const removeLink = (linkId: string) => {
@@ -53,11 +51,10 @@ const RelatedPagesSection = ({ release }: Props) => {
             .url('Enter a valid link url')
             .required('Enter a link url'),
         })}
-        onSubmit={link =>
-          addLink(link).then(() => {
-            setFormOpen(false);
-          })
-        }
+        onSubmit={async link => {
+          await addLink(link);
+          setFormOpen(false);
+        }}
       >
         {form => {
           return (

@@ -1,7 +1,5 @@
-using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
@@ -31,9 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 message.ToString());
 
-            var context = new PublishContext(DateTime.UtcNow, false);
-
-            await _contentService.UpdateTaxonomy(context);
+            await _contentService.DeleteCachedTaxonomyBlobs();
 
             logger.LogInformation("{0} completed",
                 executionContext.FunctionName);

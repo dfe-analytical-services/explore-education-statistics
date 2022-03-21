@@ -2,16 +2,13 @@ import {
   LocationOption,
   TableDataResult,
 } from '@common/services/tableBuilderService';
-import {
-  groupBy,
-  isEqual,
-  mapValues,
-  partition,
-  sum,
-  uniq,
-  uniqWith,
-} from 'lodash';
-import produce from 'immer';
+import groupBy from 'lodash/groupBy';
+import isEqual from 'lodash/isEqual';
+import mapValues from 'lodash/mapValues';
+import partition from 'lodash/partition';
+import sum from 'lodash/sum';
+import uniq from 'lodash/uniq';
+import uniqWith from 'lodash/uniqWith';
 
 type LocationGroupingKey = {
   level: string;
@@ -23,22 +20,28 @@ export type MeasurementsMergeStrategy = (
 ) => string;
 
 /**
- * Combine rows of {@param results} that reference Locations that use duplicate Codes but have unique Names.
+ * Combine rows of {@param results} that reference Locations that use duplicate
+ * Codes but have unique Names.
  *
- * This is possible when, say, a Provider changes its name during the course of the period of time that a Data Table
- * covers, thus leading to 2 distinct names for the same Provider (under the same Code).
+ * This is possible when, say, a Provider changes its name during the course of
+ * the period of time that a Data Table covers, thus leading to 2 distinct names
+ * for the same Provider (under the same Code).
  *
- * The API already handles this scenario by returning a single combined Location option which groups these 2 or more
- * duplicate Locations into a single selectable option in the Table Tool (with the label of the form
+ * The API already handles this scenario by returning a single combined Location
+ * option which groups these 2 or more duplicate Locations into a single
+ * selectable option in the Table Tool (with the label of the form
  * "Location A / Location B").
  *
- * {@param deduplicatedLocations} is an array of Locations available for the given Subject being queried, and from this
- * list, the single combined Location label can be determined for use as the Location label for the row header that
+ * {@param deduplicatedLocations} is an array of Locations available for the
+ * given Subject being queried, and from this list, the single combined Location
+ * label can be determined for use as the Location label for the row header that
  * these combined result rows will fall under.
  *
- * ${@param measurementsMergeStrategy} is the strategy whereby multiple values from the various duplicate Locations
- * are merged together so that the final value will reside within a single table cell.  By default this is by summing
- * any numerical values together or, if no numeric values exist, to display the first non-numeric string.
+ * {@param measurementsMergeStrategy} is the strategy whereby multiple values
+ * from the various duplicate Locations are merged together so that the final
+ * value will reside within a single table cell. By default this is by summing
+ * any numerical values together or, if no numeric values exist, to display the
+ * first non-numeric string.
  */
 export default function combineMeasuresWithDuplicateLocationCodes(
   results: TableDataResult[],
@@ -56,7 +59,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
   const [deduplicatedLocationsResults, unaffectedResults] = partition(
     results,
     result => {
-      const { code } = result.location[result.geographicLevel];
+      const { code } = result.location![result.geographicLevel];
       return deduplicatedLocations.find(
         dedupedLocations =>
           dedupedLocations.level === result.geographicLevel &&
@@ -77,7 +80,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
     result =>
       JSON.stringify({
         level: result.geographicLevel,
-        code: result.location[result.geographicLevel].code,
+        code: result.location![result.geographicLevel].code,
       }),
   );
 
@@ -86,7 +89,7 @@ export default function combineMeasuresWithDuplicateLocationCodes(
       const { level, code }: LocationGroupingKey = JSON.parse(key);
       const resultsGroupedByLocationName = groupBy(
         resultsForLocation,
-        r => r.location[level].name,
+        r => r.location![level].name,
       );
 
       // If there is only a single unique Location name for this combination of Level and Code, no combining of result
@@ -190,9 +193,10 @@ export default function combineMeasuresWithDuplicateLocationCodes(
 
           // Return the Time Period / Filter combination, now with the merged measurement values from all of the
           // Locations
-          return produce(combination, draft => {
-            draft.measures = mergedMeasurements;
-          });
+          return {
+            ...combination,
+            measures: mergedMeasurements,
+          };
         },
       );
 

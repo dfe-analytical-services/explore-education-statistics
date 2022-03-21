@@ -62,7 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             return await _persistenceHelper.CheckEntityExists<Publication>(
                     q => q
                         .Include(p => p.Releases)
-                        .ThenInclude(r => r.Type)
                         .Where(p => p.Slug == publicationSlug)
                 )
                 .OnSuccess(_userService.CheckCanViewPublication)

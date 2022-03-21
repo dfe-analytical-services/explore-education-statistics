@@ -17,5 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public DateTime? Created { get; set; }
 
         public string CreatedByEmail { get; set; }
+
+        public int ReleaseVersion { get; set; }
     }
 }

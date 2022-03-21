@@ -1,9 +1,18 @@
 import TableToolWizard from '@common/modules/table-tool/components/TableToolWizard';
-import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
+import _tableBuilderService, {
+  Subject,
+  SubjectMeta,
+} from '@common/services/tableBuilderService';
 import { Theme } from '@common/services/themeService';
 import { within } from '@testing-library/dom';
 import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
+
+jest.mock('@common/services/tableBuilderService');
+const tableBuilderService = _tableBuilderService as jest.Mocked<
+  typeof _tableBuilderService
+>;
 
 describe('TableToolWizard', () => {
   const testThemeMeta: Theme[] = [
@@ -21,7 +30,7 @@ describe('TableToolWizard', () => {
               id: 'publication-1',
               title: 'Publication 1',
               slug: 'publication-1',
-              summary: '',
+              type: 'NationalAndOfficial',
             },
           ],
         },
@@ -135,11 +144,15 @@ describe('TableToolWizard', () => {
       },
     },
     locations: {
+      country: {
+        legend: 'Country',
+        options: [{ id: 'england', value: 'england', label: 'England' }],
+      },
       localAuthority: {
         legend: 'Local authority',
         options: [
-          { value: 'barnet', label: 'Barnet' },
-          { value: 'barnsley', label: 'Barnsley' },
+          { id: 'barnet', value: 'barnet', label: 'Barnet' },
+          { id: 'barnsley', value: 'barnsley', label: 'Barnsley' },
         ],
       },
     },
@@ -175,7 +188,7 @@ describe('TableToolWizard', () => {
           query: {
             publicationId: 'publication-1',
             subjectId: '',
-            locations: {},
+            locationIds: [],
             filters: [],
             indicators: [],
           },
@@ -199,7 +212,7 @@ describe('TableToolWizard', () => {
           query: {
             subjectId: '',
             releaseId: 'release-1',
-            locations: {},
+            locationIds: [],
             filters: [],
             indicators: [],
           },
@@ -229,9 +242,7 @@ describe('TableToolWizard', () => {
           query: {
             publicationId: 'publication-1',
             subjectId: 'subject-1',
-            locations: {
-              localAuthority: ['barnet', 'barnsley'],
-            },
+            locationIds: ['barnet', 'barnsley'],
             timePeriod: {
               startYear: 2013,
               startCode: 'AY',
@@ -309,6 +320,243 @@ describe('TableToolWizard', () => {
       expect(
         step5.getByLabelText('Number of authorised absence sessions'),
       ).toHaveAttribute('checked');
+    });
+  });
+
+  test('re-populates step choices when subject meta changes', async () => {
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
+
+    render(
+      <TableToolWizard
+        themeMeta={testThemeMeta}
+        initialState={{
+          initialStep: 2,
+          subjects: testSubjects,
+          query: {
+            publicationId: 'publication-1',
+            subjectId: 'subject-1',
+            locationIds: ['barnet'],
+            filters: ['ethnicity-major-asian-total'],
+            indicators: ['authorised-absence-sessions'],
+            timePeriod: {
+              endCode: 'AY',
+              endYear: 2013,
+              startCode: 'AY',
+              startYear: 2014,
+            },
+          },
+        }}
+      />,
+    );
+
+    // Change subject at Step 2
+    const subjectRadios = screen.getAllByLabelText(/Subject/);
+    userEvent.click(subjectRadios[1]);
+
+    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    // Step 3
+    await waitFor(() => {
+      expect(screen.getByText('Step 3')).toBeInTheDocument();
+    });
+
+    const localAuthorityCheckboxes = within(
+      screen.getByRole('group', {
+        name: 'Local authority',
+        hidden: true,
+      }),
+    ).getAllByRole('checkbox', {
+      hidden: true,
+    });
+    expect(localAuthorityCheckboxes[0]).not.toBeChecked();
+    expect(localAuthorityCheckboxes[1]).not.toBeChecked();
+
+    userEvent.click(localAuthorityCheckboxes[0]);
+    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    // Step 4
+    await waitFor(() => {
+      expect(screen.getByText('Step 4')).toBeInTheDocument();
+    });
+
+    const startDateOptions = within(
+      screen.getByLabelText('Start date'),
+    ).getAllByRole('option') as HTMLOptionElement[];
+    expect(startDateOptions[0].selected).toBe(true);
+
+    const endDateOptions = within(
+      screen.getByLabelText('End date'),
+    ).getAllByRole('option') as HTMLOptionElement[];
+    expect(endDateOptions[0].selected).toBe(true);
+
+    userEvent.selectOptions(screen.getByLabelText('Start date'), ['2013_AY']);
+    userEvent.selectOptions(screen.getByLabelText('End date'), ['2013_AY']);
+    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    // Step 5
+    await waitFor(() => {
+      expect(screen.getByText('Step 5')).toBeInTheDocument();
+    });
+
+    const filterCheckboxes = within(
+      screen.getByRole('group', {
+        name: 'Characteristic',
+        hidden: true,
+      }),
+    ).getAllByRole('checkbox', {
+      hidden: true,
+    });
+    expect(filterCheckboxes[0]).not.toBeChecked();
+
+    const indicatorCheckboxes = within(
+      screen.getByRole('group', {
+        name: 'Indicators',
+      }),
+    ).getAllByRole('checkbox', {});
+    expect(indicatorCheckboxes[0]).not.toBeChecked();
+  });
+
+  test('prevent progress to filters step if pre-selected time periods are not in the subject meta', async () => {
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
+
+    render(
+      <TableToolWizard
+        themeMeta={testThemeMeta}
+        initialState={{
+          initialStep: 3,
+          subjects: testSubjects,
+          subjectMeta: testSubjectMeta,
+          query: {
+            publicationId: 'publication-1',
+            subjectId: 'subject-1',
+            locationIds: ['barnet'],
+            filters: [],
+            indicators: [],
+            timePeriod: {
+              endCode: 'AY',
+              endYear: 2021,
+              startCode: 'AY',
+              startYear: 2021,
+            },
+          },
+        }}
+      />,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Step 4')).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', { name: 'Start date required' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('link', { name: 'End date required' }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('prevent progress to final step step if pre-selected indicators are not in the subject meta', async () => {
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
+
+    render(
+      <TableToolWizard
+        themeMeta={testThemeMeta}
+        initialState={{
+          initialStep: 4,
+          subjects: testSubjects,
+          subjectMeta: testSubjectMeta,
+          query: {
+            publicationId: 'publication-1',
+            subjectId: 'subject-1',
+            locationIds: ['barnet'],
+            filters: ['state-funded-primary'],
+            indicators: ['another-indicator'],
+            timePeriod: {
+              endCode: 'AY',
+              endYear: 2021,
+              startCode: 'AY',
+              startYear: 2021,
+            },
+          },
+        }}
+      />,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Step 5')).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('button', { name: 'Create table' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', {
+          name: 'Select at least one option from indicators',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('prevent progress to final step if pre-selected filters are not in the subject meta', async () => {
+    tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
+    tableBuilderService.filterSubjectMeta.mockResolvedValue(testSubjectMeta);
+
+    render(
+      <TableToolWizard
+        themeMeta={testThemeMeta}
+        initialState={{
+          initialStep: 4,
+          subjects: testSubjects,
+          subjectMeta: testSubjectMeta,
+          query: {
+            publicationId: 'publication-1',
+            subjectId: 'subject-1',
+            locationIds: ['barnet'],
+            filters: ['another-filter'],
+            indicators: [
+              'authorised-absence-sessions',
+              'overall-absence-sessions',
+            ],
+            timePeriod: {
+              endCode: 'AY',
+              endYear: 2021,
+              startCode: 'AY',
+              startYear: 2021,
+            },
+          },
+        }}
+      />,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Next step' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Step 5')).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByRole('button', { name: 'Create table' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
+      expect(
+        screen.getByRole('link', {
+          name: 'Select at least one option from school type',
+        }),
+      ).toBeInTheDocument();
     });
   });
 });

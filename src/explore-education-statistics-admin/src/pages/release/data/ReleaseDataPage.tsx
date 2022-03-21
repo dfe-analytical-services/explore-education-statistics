@@ -1,7 +1,8 @@
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import ReleaseDataUploadsSection from '@admin/pages/release/data/components/ReleaseDataUploadsSection';
 import ReleaseFileUploadsSection from '@admin/pages/release/data/components/ReleaseFileUploadsSection';
-import ReleaseMetaGuidanceSection from '@admin/pages/release/data/components/ReleaseMetaGuidanceSection';
+import ReleaseDataGuidanceSection from '@admin/pages/release/data/components/ReleaseDataGuidanceSection';
+import ReleaseDataReorderSection from '@admin/pages/release/data/components/ReleaseDataReorderSection';
 import permissionService from '@admin/services/permissionService';
 import { DataFile } from '@admin/services/releaseDataFileService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
@@ -13,7 +14,7 @@ import React, { useState } from 'react';
 export const releaseDataPageTabIds = {
   dataUploads: 'data-uploads',
   fileUploads: 'file-uploads',
-  metaGuidance: 'metadata-guidance',
+  dataGuidance: 'data-guidance',
 };
 
 const ReleaseDataPage = () => {
@@ -53,11 +54,11 @@ const ReleaseDataPage = () => {
           />
         </TabsSection>
         <TabsSection
-          id={releaseDataPageTabIds.metaGuidance}
-          title="Metadata guidance"
+          id={releaseDataPageTabIds.dataGuidance}
+          title="Data guidance"
           lazy
         >
-          <ReleaseMetaGuidanceSection
+          <ReleaseDataGuidanceSection
             // Track data files so that we can re-render this
             // section automatically whenever there is a change
             key={dataFiles.filter(file => file.status === 'COMPLETE').length}
@@ -65,6 +66,13 @@ const ReleaseDataPage = () => {
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
+        {/* EES-1243 
+        <TabsSection id="test-id" title="Reorder filters and indicators">
+          <ReleaseDataReorderSection
+            releaseId={releaseId}
+            canUpdateRelease={canUpdateRelease}
+          />
+        </TabsSection> */}
       </Tabs>
     </LoadingSpinner>
   );

@@ -8,24 +8,24 @@ Run 'python run_tests.py -h' to see argument options
 
 import argparse
 import cProfile
+import datetime
 import json
 import os
 import platform
 import pstats
 import shutil
-import datetime
 from pathlib import Path
 
 import pyderman
 import requests
 from dotenv import load_dotenv
 from pabot.pabot import main as pabot_run_cli
-from robot import run_cli as robot_run_cli
 from robot import rebot_cli as robot_rebot_cli
-
+from robot import run_cli as robot_run_cli
 import scripts.keyword_profile as kp
 from tests.libs.setup_auth_variables import setup_auth_variables
-
+from tests.libs.slack import send_slack_report
+from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
 
@@ -40,14 +40,21 @@ if pythonpath:
 else:
     os.environ['PYTHONPATH'] = str(current_dir)
 
+
 # Parse arguments
-parser = argparse.ArgumentParser(prog="pipenv run python run_tests.py",
-                                 description="Use this script to run the UI tests, locally or as part of the CI pipeline, against the environment of your choosing")
-parser.add_argument("-b", "--browser",
-                    dest="browser",
-                    default="chrome",
-                    choices=["chrome", "firefox", "ie"],
-                    help="name of the browser you wish to run the tests with (NOTE: Only chromedriver is automatically installed!)")
+parser = argparse.ArgumentParser(
+    prog="pipenv run python run_tests.py",
+    description="Use this script to run the UI tests, locally or as part of the CI pipeline, against the environment of your choosing")
+parser.add_argument(
+    "-b",
+    "--browser",
+    dest="browser",
+    default="chrome",
+    choices=[
+        "chrome",
+        "firefox",
+        "ie"],
+    help="name of the browser you wish to run the tests with (NOTE: Only chromedriver is automatically installed!)")
 parser.add_argument("-i", "--interp",
                     dest="interp",
                     default="pabot",
@@ -99,18 +106,14 @@ parser.add_argument("--rerun-failed-suites",
                     dest="rerun_failed_suites",
                     action='store_true',
                     help="rerun failed test suites and merge results into original run results")
-parser.add_argument("--timeout",
-                    default="30",
-                    dest="timeout",
-                    help="default robot timeout in seconds (default is 30)")
-parser.add_argument("--implicit-wait",
-                    default="5",
-                    dest="implicit_wait",
-                    help="default robot implicit wait in seconds (default is 5)")
 parser.add_argument("--print-keywords",
                     dest="print_keywords",
                     action='store_true',
                     help="choose to print out keywords as they are started")
+parser.add_argument("--enable-slack",
+                    dest="enable_slack",
+                    action='store_true'
+                    )
 parser.add_argument("--prompt-to-continue",
                     dest="prompt_to_continue",
                     action='store_true',
@@ -123,13 +126,15 @@ parser.add_argument("--custom-env",
                     dest="custom_env",
                     default=None,
                     help="load a custom .env file (must be in ~/robot-tests directory)")
-
 """
-NOTE(mark): The admin and analyst passwords to access the admin app are stored in the CI pipeline 
-            as secret variables, which means they cannot be accessed like normal 
-            environment variables, and instead must be passed to this script as 
-            arguments.
+NOTE(mark): The slack webhook url, and admin and analyst passwords to access to Admin app are
+stored in the CI pipeline as secret variables, which means they cannot be accessed as normal
+environment variables, and instead must be passed as an argument to this script.
 """
+parser.add_argument("--slack-webhook-url",
+                    dest="slack_webhook_url",
+                    default=None,
+                    help="URL for Slack webhook")
 parser.add_argument("--admin-pass",
                     dest="admin_pass",
                     default=None,
@@ -139,6 +144,28 @@ parser.add_argument("--analyst-pass",
                     default=None,
                     help="manually specify the analyst password")
 args = parser.parse_args()
+
+
+if args.custom_env:
+    load_dotenv(args.custom_env)
+else:
+    load_dotenv('.env.' + args.env)
+
+assert os.getenv('TIMEOUT') is not None
+assert os.getenv('IMPLICIT_WAIT') is not None
+assert os.getenv('PUBLIC_URL') is not None
+assert os.getenv('ADMIN_URL') is not None
+assert os.getenv('PUBLIC_AUTH_USER') is not None
+assert os.getenv('PUBLIC_AUTH_PASSWORD') is not None
+assert os.getenv('RELEASE_COMPLETE_WAIT') is not None
+assert os.getenv('WAIT_MEDIUM') is not None
+assert os.getenv('WAIT_LONG') is not None
+assert os.getenv('WAIT_SMALL') is not None
+assert os.getenv('FAIL_TEST_SUITES_FAST') is not None
+
+
+if args.slack_webhook_url:
+    os.environ['SLACK_WEBHOOK_URL'] = args.slack_webhook_url
 
 if args.admin_pass:
     os.environ['ADMIN_PASSWORD'] = args.admin_pass
@@ -157,17 +184,17 @@ pyderman.install(file_directory='./webdriver/',
 
 os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
 
-output_file="rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
+output_file = "rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
+
 
 # Set robotArgs
 robotArgs = ["--outputdir", "test-results/",
              "--output", output_file,
-             # "--exitonfailure",
              "--exclude", "Failing",
              "--exclude", "UnderConstruction",
              "--exclude", "BootstrapData"]
 
-robotArgs += ["-v", f"timeout:{args.timeout}", "-v", f"implicit_wait:{args.implicit_wait}"]
+robotArgs += ["-v", f"timeout:{os.getenv('TIMEOUT')}", "-v", f"implicit_wait:{os.getenv('IMPLICIT_WAIT')}"]
 
 if args.fail_fast:
     robotArgs += ["--exitonfailure"]
@@ -191,16 +218,19 @@ if args.ci:
     robotArgs += ['--removekeywords',
                   'name:common.user goes to url']  # To hide basic auth credentials
 else:
-    if args.custom_env: 
+    if args.custom_env:
         load_dotenv(args.custom_env)
 
     else:
         load_dotenv('.env.' + args.env)
 
-assert os.getenv('PUBLIC_URL') is not None
-assert os.getenv('ADMIN_URL') is not None
-assert os.getenv('ADMIN_EMAIL') is not None
-assert os.getenv('ADMIN_PASSWORD') is not None
+
+# seed Azure storage emulator release files
+if (args.env == 'local'):
+    generator = ReleaseFilesGenerator()
+    generator.create_public_release_files()
+    generator.create_private_release_files()
+
 
 def admin_request(method, endpoint, body=None):
     assert method and endpoint
@@ -210,6 +240,13 @@ def admin_request(method, endpoint, body=None):
     if method == 'POST':
         assert body is not None, 'POST requests require a body'
 
+    requests.sessions.HTTPAdapter(
+        pool_connections=50,
+        pool_maxsize=50,
+        max_retries=3
+    )
+    session = requests.Session()
+
     # To prevent InsecureRequestWarning
     requests.packages.urllib3.disable_warnings()
 
@@ -218,10 +255,11 @@ def admin_request(method, endpoint, body=None):
         'Content-Type': 'application/json',
         'Authorization': f'Bearer {jwt_token}',
     }
-    response = requests.request(
+    response = session.request(
         method,
         url=f'{os.getenv("ADMIN_URL")}{endpoint}',
         headers=headers,
+        stream=True,
         json=body,
         verify=False
     )
@@ -232,13 +270,14 @@ def admin_request(method, endpoint, body=None):
         # Delete identify files and re-attempt to fetch them
         setup_authentication(clear_existing=True)
         jwt_token = json.loads(os.environ['IDENTITY_LOCAL_STORAGE_ADMIN'])['access_token']
-        response = requests.request(
+        response = session.request(
             method,
             url=f'{os.getenv("ADMIN_URL")}{endpoint}',
             headers={
                 'Content-Type': 'application/json',
                 'Authorization': f'Bearer {jwt_token}',
             },
+            stream=True,
             json=body,
             verify=False
         )
@@ -355,6 +394,9 @@ else:
 if os.getenv('RELEASE_COMPLETE_WAIT'):
     robotArgs += ["-v", f"release_complete_wait:{os.getenv('RELEASE_COMPLETE_WAIT')}"]
 
+if os.getenv('FAIL_TEST_SUITES_FAST'):
+    robotArgs += ["-v", f"FAIL_TEST_SUITES_FAST:{os.getenv('FAIL_TEST_SUITES_FAST')}"]
+
 if args.prompt_to_continue:
     robotArgs += ["-v", "prompt_to_continue_on_failure:1"]
 
@@ -412,15 +454,17 @@ finally:
         delete_test_topic()
 
     if args.rerun_failed_tests or args.rerun_failed_suites:
-        print("Combining rerun test results with original test results") 
-        merge_options=[
-            "--outputdir","test-results/",
-            "-o","output.xml",
+        print("Combining rerun test results with original test results")
+        merge_options = [
+            "--outputdir", "test-results/",
+            "-o", "output.xml",
             "--prerebotmodifier", "report-modifiers/CheckForAtLeastOnePassingRunPrerebotModifier.py",
-            "--merge","test-results/output.xml","test-results/rerun.xml"
+            "--merge", "test-results/output.xml", "test-results/rerun.xml"
         ]
         robot_rebot_cli(merge_options, exit=False)
 
     print(f"\nLog available at: file://{os.getcwd()}{os.sep}test-results{os.sep}log.html")
     print(f"Report available at: file://{os.getcwd()}{os.sep}test-results{os.sep}report.html")
     print("\nTests finished!")
+    if args.enable_slack:
+        send_slack_report(args.env, args.tests)

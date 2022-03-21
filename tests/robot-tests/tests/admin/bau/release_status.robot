@@ -5,11 +5,13 @@ Resource            ../../libs/admin-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - release status %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}             UI tests - release status %{RUN_IDENTIFIER}
+${ADOPTED_PUBLICATION_NAME}     UI tests - release status publication with adoptable methodology %{RUN_IDENTIFIER}
 
 *** Test Cases ***
 Create new publication and release via API
@@ -19,11 +21,6 @@ Create new publication and release via API
 Go to release sign off page and verify initial release checklist
     user navigates to this release
     user edits release status
-
-    # EES-1807 May be re-instated as error pending further decisions on release types
-#    user waits until page contains testid    releaseChecklist-errors
-#    user checks checklist errors contains    1 issue that must be resolved before this release can be published
-#    user checks checklist errors contains link    Public pre-release access list is required
 
     user checks checklist warnings contains
     ...    4 things you may have forgotten, but do not need to resolve to publish this release.
@@ -50,16 +47,10 @@ Verify release status is Higher Review
 Verify release checklist has not been updated by status
     user edits release status
 
-    # EES-1807 May be re-instated as error pending further decisions on release types
-#    user waits until page contains testid    releaseChecklist-errors
-#    user checks checklist errors contains    1 issue that must be resolved before this release can be published
-#    user checks checklist errors contains link    Public pre-release access list is required
-
     user checks checklist warnings contains
     ...    3 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    An in-EES methodology page has not been linked to this publication
     user checks checklist warnings contains link    No data files uploaded
-    # EES-1807 May be re-instated as error pending further decisions on release types
     user checks checklist warnings contains link    A public pre-release access list has not been created
 
     user checks page does not contain testid    releaseChecklist-errors
@@ -93,7 +84,7 @@ Approve release
     user enters text into element    id:releaseStatusForm-nextReleaseDate-year    3002
 
     user clicks button    Update status
-    user waits until h1 is visible    Confirm publish date
+    user waits until h2 is visible    Confirm publish date
     user clicks button    Confirm
 
 Verify release status is Approved
@@ -118,7 +109,7 @@ Verify release status is Draft
     user checks summary list contains    Scheduled release    Not scheduled
     user checks summary list contains    Next release expected    January 3001
 
-Check that having a Draft Methodology attached to this Release's Publication will show a checklist warning
+Check that having a Draft owned Methodology attached to this Release's Publication will show a checklist warning
     user creates methodology for publication    ${PUBLICATION_NAME}
     user navigates to this release
     user edits release status
@@ -126,11 +117,35 @@ Check that having a Draft Methodology attached to this Release's Publication wil
     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    A methodology for this publication is not yet approved
 
-Approve the methodology and verify the warning disappears
+Approve the owned methodology and verify the warning disappears
     user approves methodology for publication    ${PUBLICATION_NAME}
     user navigates to this release
     user edits release status
+    user checks checklist warnings contains
+    ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings does not contain link    A methodology for this publication is not yet approved
 
+Adopt a Draft methodology
+    user creates test publication via api    ${ADOPTED_PUBLICATION_NAME}
+    user creates methodology for publication    ${ADOPTED_PUBLICATION_NAME}
+    ${accordion}    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    user checks element contains link    ${accordion}    Adopt an existing methodology
+    user clicks link    Adopt an existing methodology
+    user waits until page contains title    Adopt a methodology
+    user clicks radio    ${ADOPTED_PUBLICATION_NAME}
+    user clicks button    Save
+
+Check that having a Draft methodology adopted by this Release's Publication will show a checklist warning
+    user navigates to this release
+    user edits release status
+    user checks checklist warnings contains
+    ...    2 things you may have forgotten, but do not need to resolve to publish this release.
+    user checks checklist warnings contains link    A methodology for this publication is not yet approved
+
+Approve the adopted methodology and verify the warning disappears
+    user approves methodology for publication    ${ADOPTED_PUBLICATION_NAME}
+    user navigates to this release
+    user edits release status
     user checks checklist warnings contains
     ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings does not contain link    A methodology for this publication is not yet approved
@@ -142,12 +157,12 @@ user navigates to this release
 
 user navigates to sign off page
     user clicks link    Sign off
-    user waits until h2 is visible    Sign off    60
+    user waits until h2 is visible    Sign off    %{WAIT_SMALL}
 
 user edits release status
     user navigates to sign off page
     user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    60
+    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
 
 user checks checklist errors contains
     [Arguments]    ${text}

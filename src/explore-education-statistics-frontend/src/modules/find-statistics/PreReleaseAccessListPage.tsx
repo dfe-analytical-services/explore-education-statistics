@@ -3,6 +3,7 @@ import ContentHtml from '@common/components/ContentHtml';
 import publicationService, {
   PreReleaseAccessListSummary,
 } from '@common/services/publicationService';
+import glossaryService from '@frontend/services/glossaryService';
 import Page from '@frontend/components/Page';
 import { GetServerSideProps } from 'next';
 import React from 'react';
@@ -38,7 +39,10 @@ const PreReleaseAccessListPage = ({ release }: Props) => {
       )}
 
       {release.preReleaseAccessList && (
-        <ContentHtml html={release.preReleaseAccessList} />
+        <ContentHtml
+          html={release.preReleaseAccessList}
+          getGlossaryEntry={glossaryService.getEntry}
+        />
       )}
     </Page>
   );

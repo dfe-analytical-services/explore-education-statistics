@@ -1,6 +1,7 @@
 import Accordion from '@common/components/Accordion';
 import AccordionSection from '@common/components/AccordionSection';
 import Details from '@common/components/Details';
+import SectionBreak from '@common/components/SectionBreak';
 import { Release } from '@common/services/publicationService';
 import { FileInfo } from '@common/services/types/file';
 import classNames from 'classnames';
@@ -11,11 +12,11 @@ import styles from './ReleaseDataAndFilesAccordion.module.scss';
 interface Props {
   release: Release;
   renderAllFilesButton?: ReactNode;
-  renderCreateTablesButton?: ReactNode;
-  renderDataCatalogueLink?: ReactNode;
+  renderCreateTablesButton: ReactNode;
+  renderDataCatalogueLink: ReactNode;
+  renderDataGuidanceLink: ReactNode;
   renderDownloadLink: (file: FileInfo) => ReactNode;
-  renderMetaGuidanceLink: ReactNode;
-  renderPreReleaseAccessLink?: ReactNode;
+  showDownloadFilesList?: boolean;
   onSectionOpen?: (accordionSection: { id: string; title: string }) => void;
 }
 
@@ -24,30 +25,25 @@ const ReleaseDataAndFilesAccordion = ({
   renderAllFilesButton,
   renderCreateTablesButton,
   renderDataCatalogueLink,
+  renderDataGuidanceLink,
   renderDownloadLink,
-  renderMetaGuidanceLink,
-  renderPreReleaseAccessLink,
+  showDownloadFilesList = false,
   onSectionOpen,
 }: Props) => {
-  const allFilesZip = release.downloadFiles.find(
-    file => file.name === 'All files' && file.type === 'Ancillary',
-  );
-
-  const files = orderBy(
-    release.downloadFiles.filter(
-      file => file.type !== 'Ancillary' && file.name !== 'All files',
-    ),
+  const dataFiles = orderBy(
+    release.downloadFiles.filter(file => file.type === 'Data'),
     ['name'],
   );
 
-  const otherFiles = orderBy(
+  const ancillaryFiles = orderBy(
     release.downloadFiles.filter(
       file => file.type === 'Ancillary' && file.name !== 'All files',
     ),
     ['name'],
   );
 
-  const hasAllFilesButton = allFilesZip && renderAllFilesButton;
+  const hasAllFilesButton =
+    (dataFiles.length > 0 || ancillaryFiles.length > 0) && renderAllFilesButton;
 
   return (
     <div className={styles.container}>
@@ -61,7 +57,9 @@ const ReleaseDataAndFilesAccordion = ({
         }}
       >
         <AccordionSection heading="Explore data and files">
-          <div className="govuk-grid-row">
+          <div
+            className={`govuk-grid-row dfe-flex dfe-align-items--center ${styles.section}`}
+          >
             <div
               className={classNames({
                 'govuk-grid-column-three-quarters': hasAllFilesButton,
@@ -69,8 +67,8 @@ const ReleaseDataAndFilesAccordion = ({
               })}
             >
               <p>
-                All data used to create this release is published as open data
-                and is available for download.
+                All data used in this release is available as open data for
+                download
               </p>
             </div>
 
@@ -81,68 +79,90 @@ const ReleaseDataAndFilesAccordion = ({
             )}
           </div>
 
-          {renderCreateTablesButton && (
-            <>
-              <h3>Create your own tables</h3>
+          <SectionBreak />
 
-              <div className="govuk-grid-row">
-                <div className="govuk-grid-column-three-quarters">
-                  <p>
-                    You can create your own tables from this data using our
-                    table tool, or view featured tables that we have built for
-                    you.
-                  </p>
-                </div>
-                <div className="govuk-grid-column-one-quarter">
-                  {renderCreateTablesButton}
-                </div>
-              </div>
-            </>
-          )}
-
-          <div className="govuk-grid-row">
+          <div
+            className={`govuk-grid-row dfe-flex dfe-align-items--center ${styles.section}`}
+          >
             <div className="govuk-grid-column-three-quarters">
               <h3>Open data</h3>
               <p>
-                The open data files contain all data used in this release in a
-                machine readable format.
+                Browse and download individual open data files from this release
+                in our data catalogue
               </p>
 
-              {!renderDataCatalogueLink && files.length > 0 && (
-                <ul className="govuk-list" data-testid="download-files">
-                  {files.map(file => (
-                    <li key={file.id}>
-                      {renderDownloadLink(file)}
-                      {` (${file.extension}, ${file.size})`}
-                    </li>
-                  ))}
-                </ul>
+              {showDownloadFilesList && dataFiles.length > 0 && (
+                <Details
+                  summary="Download files"
+                  className="govuk-!-margin-bottom-0 govuk-!-margin-top-2"
+                >
+                  <ul className="govuk-list" data-testid="data-files">
+                    {dataFiles.map(file => (
+                      <li key={file.id}>
+                        {renderDownloadLink(file)}
+                        {` (${file.extension}, ${file.size})`}
+                      </li>
+                    ))}
+                  </ul>
+                </Details>
               )}
-
-              {release.hasMetaGuidance && (
-                <p>
-                  Learn more about the data files used in this release using our{' '}
-                  {renderMetaGuidanceLink}.
-                </p>
-              )}
-
-              {renderDataCatalogueLink && (
-                <p>
-                  Browse and download individual open data files in our{' '}
-                  {renderDataCatalogueLink}.
-                </p>
-              )}
+            </div>
+            <div className="govuk-grid-column-one-quarter">
+              {renderDataCatalogueLink}
             </div>
           </div>
 
-          {otherFiles.length > 0 && (
-            <>
-              <h3>Other files</h3>
-              <p>All other files available for download are listed below:</p>
+          <SectionBreak />
 
-              <Details summary="List of other files">
-                <ul className="govuk-list" data-testid="other-download-files">
-                  {otherFiles.map(file => (
+          {release.hasDataGuidance && (
+            <>
+              <div
+                className={`govuk-grid-row dfe-flex dfe-align-items--center ${styles.section}`}
+              >
+                <div className="govuk-grid-column-three-quarters">
+                  <h3>Guidance</h3>
+                  <p>
+                    Learn more about the data files used in this release using
+                    our online guidance
+                  </p>
+                </div>
+                <div className="govuk-grid-column-one-quarter">
+                  {renderDataGuidanceLink}
+                </div>
+              </div>
+
+              <SectionBreak />
+            </>
+          )}
+
+          <div
+            className={`govuk-grid-row dfe-flex dfe-align-items--center ${styles.section}`}
+          >
+            <div className="govuk-grid-column-three-quarters">
+              <h3>Create your own tables</h3>
+              <p>
+                You can view featured tables that we have built for you, or
+                create your own tables from the open data using our table tool
+              </p>
+            </div>
+            <div className="govuk-grid-column-one-quarter">
+              {renderCreateTablesButton}
+            </div>
+          </div>
+
+          <SectionBreak visible={ancillaryFiles.length > 0} />
+
+          {ancillaryFiles.length > 0 && (
+            <>
+              <h3>All supporting files</h3>
+              <p>
+                All supporting files from this release are listed for individual
+                download below:
+              </p>
+
+              <Details summary="List of all supporting files">
+                <ul className="govuk-list" data-testid="other-files">
+                  {ancillaryFiles.map(file => (
                     <li key={file.id}>
                       {renderDownloadLink(file)}
                       {` (${file.extension}, ${file.size})`}
@@ -161,12 +181,6 @@ const ReleaseDataAndFilesAccordion = ({
                   ))}
                 </ul>
               </Details>
-            </>
-          )}
-          {release.hasPreReleaseAccessList && renderPreReleaseAccessLink && (
-            <>
-              <h3>Pre-release access list</h3>
-              <p>{renderPreReleaseAccessLink}</p>
             </>
           )}
         </AccordionSection>

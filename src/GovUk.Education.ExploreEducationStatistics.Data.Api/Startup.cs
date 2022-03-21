@@ -9,6 +9,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
+using GovUk.Education.ExploreEducationStatistics.Common.Config;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -38,6 +40,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
+using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api
@@ -57,9 +60,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddApplicationInsightsTelemetry();
+            services.AddApplicationInsightsTelemetry()
+                .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
+            
             services.AddMvc(options =>
             {
+                options.Filters.Add(new OperationCancelledExceptionFilter());
                 options.RespectBrowserAcceptHeader = true;
                 options.ReturnHttpNotAcceptable = true;
                 options.EnableEndpointRouting = false;
@@ -80,7 +86,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddDbContext<StatisticsDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("StatisticsDb"),
-                        builder => builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model"))
+                        builder =>
+                        {
+                            builder.MigrationsAssembly("GovUk.Education.ExploreEducationStatistics.Data.Model");
+                            builder.AddBulkOperationSupport();
+                        })
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -100,6 +110,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Explore education statistics - Data API", Version = "v1"});
             });
+
+            services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
+            services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
             services.AddTransient<IBlobCacheService, BlobCacheService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
@@ -134,16 +147,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IReleaseRepository, ReleaseRepository>();
             services.AddTransient<IReleaseDataFileRepository, ReleaseDataFileRepository>();
             services.AddTransient<ISubjectRepository, SubjectRepository>();
-            services.AddTransient<IMetaGuidanceSubjectService, MetaGuidanceSubjectService>();
+            services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
-            services.AddTransient<IPermalinkMigrationService, PermalinkMigrationService>();
             services.AddTransient<IFastTrackService, FastTrackService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
             services.AddTransient<IUserService, UserService>();
+            services.AddTransient<ICacheKeyService, CacheKeyService>();
 
             services
                 .AddAuthentication(options => {
@@ -176,9 +189,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Enable caching and register any caching services
+            // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+            // Enable cancellation aspects and register request timeout configuration.
+            CancellationTokenTimeoutAspect.Enabled = true;
+            CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
 
             UpdateDatabase(app);
 
@@ -210,7 +226,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             // Adds Brotli and Gzip compressing
             app.UseResponseCompression();
 
-            app.UseCors(options => options.WithOrigins("http://localhost:3000","http://localhost:3001","https://localhost:3000","https://localhost:3001").AllowAnyMethod().AllowAnyHeader());
+            app.UseCors(options => options
+                .WithOrigins(
+                    "http://localhost:3000",
+                    "http://localhost:3001",
+                    "https://localhost:3000",
+                    "https://localhost:3001")
+                .AllowAnyMethod()
+                .AllowAnyHeader());
+
             app.UseMvc();
         }
 

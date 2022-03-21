@@ -6,7 +6,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     public partial class E2328UpdateLocationTypeAndUpsertLocation : Migration
     {
-        private const string MigrationId = "20210719084148";
+        public const string MigrationId = "20210719084148";
         private const string PreviousLocationTypeMigrationId = "20210512112804";
         private const string PreviousUpsertLocationMigrationId = "20210512112804";
 

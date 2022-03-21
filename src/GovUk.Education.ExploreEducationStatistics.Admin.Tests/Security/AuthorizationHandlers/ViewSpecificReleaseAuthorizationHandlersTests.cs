@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
@@ -100,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             var failureScenario = new ReleaseHandlerTestScenario
             {
                 Entity = release,
-                User = CreateClaimsPrincipal(userId),
+                User = ClaimsPrincipalUtils.CreateClaimsPrincipal(userId),
                 UserReleaseRoles = new List<UserReleaseRole>
                 {
                     new UserReleaseRole
@@ -118,7 +119,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             await GetEnumValues<PreReleaseAccess>()
                 .Where(value => value != PreReleaseAccess.Within)
                 .ToList()
-                .ForEachAsync(async access =>
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async access =>
                 {
                     preReleaseService
                         .Setup(s => s.GetPreReleaseWindowStatus(release, It.IsAny<DateTime>()))

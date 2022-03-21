@@ -5,6 +5,7 @@ Resource            ../../libs/public-common.robot
 
 Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
@@ -50,7 +51,7 @@ Add public prerelease access list
 
 Go to "Sign off" page and approve release
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 Create another release for the same publication
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    ${TOPIC_NAME}
@@ -65,7 +66,6 @@ Verify new release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
 
 Upload subjects to release
-    user clicks link    Data and files
     user uploads subject    ${SUBJECT_1_NAME}    tiny-two-filters.csv    tiny-two-filters.meta.csv
     user uploads subject    ${SUBJECT_2_NAME}    upload-file-test.csv    upload-file-test-with-filter.meta.csv
 
@@ -224,25 +224,25 @@ Confirm created footnotes
     user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}
     user waits until page contains element    testid:Footnote - ${FOOTNOTE_SUBJECT_1_MIXTURE}
 
-Add meta guidance to subjects
+Add data guidance to subjects
     user clicks link    Data and files
     user waits until h2 is visible    Add data file to release
 
-    user clicks link    Metadata guidance
-    user waits until h2 is visible    Public metadata guidance document
+    user clicks link    Data guidance
+    user waits until h2 is visible    Public data guidance
 
-    user waits until page contains element    id:metaGuidance-dataFiles
+    user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_1_NAME}
-    user enters text into meta guidance data file content editor    ${SUBJECT_1_NAME}
-    ...    ${SUBJECT_1_NAME} meta guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_1_NAME}
+    ...    ${SUBJECT_1_NAME} data guidance content
 
     user waits until page contains accordion section    ${SUBJECT_2_NAME}
-    user enters text into meta guidance data file content editor    ${SUBJECT_2_NAME}
-    ...    ${SUBJECT_2_NAME} meta guidance content
+    user enters text into data guidance data file content editor    ${SUBJECT_2_NAME}
+    ...    ${SUBJECT_2_NAME} data guidance content
 
-Validate meta guidance variables and descriptions
+Validate data guidance variables and descriptions
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
-    ...    id:metaGuidance-dataFiles
+    ...    id:dataGuidance-dataFiles
     user opens details dropdown    Variable names and descriptions    ${subject_1_content}
 
     ${subject_1_variables}=    get child element    ${subject_1_content}    testid:Variables
@@ -267,7 +267,7 @@ Validate meta guidance variables and descriptions
     user checks results table cell contains    9    2    Unauthorised absence rate    ${subject_1_variables}
 
     ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
-    ...    id:metaGuidance-dataFiles
+    ...    id:dataGuidance-dataFiles
     user opens details dropdown    Variable names and descriptions    ${subject_2_content}
 
     ${subject_2_variables}=    get child element    ${subject_2_content}    testid:Variables
@@ -282,9 +282,9 @@ Validate meta guidance variables and descriptions
     user checks results table cell contains    2    1    some_filter    ${subject_2_variables}
     user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
 
-Validate meta guidance footnotes
+Validate data guidance footnotes
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
-    ...    id:metaGuidance-dataFiles
+    ...    id:dataGuidance-dataFiles
     user opens details dropdown    Footnotes    ${subject_1_content}
 
     user checks list has x items    testid:Footnotes    9    ${subject_1_content}
@@ -301,7 +301,7 @@ Validate meta guidance footnotes
     user checks list item contains    testid:Footnotes    9    ${FOOTNOTE_SUBJECT_1_MIXTURE}    ${subject_1_content}
 
     ${subject_2_content}=    user gets accordion section content element    ${SUBJECT_2_NAME}
-    ...    id:metaGuidance-dataFiles
+    ...    id:dataGuidance-dataFiles
     user opens details dropdown    Footnotes    ${subject_2_content}
 
     user checks list has x items    testid:Footnotes    3    ${subject_2_content}
@@ -309,51 +309,45 @@ Validate meta guidance footnotes
     user checks list item contains    testid:Footnotes    2    ${FOOTNOTE_ALL_INDICATOR}    ${subject_2_content}
     user checks list item contains    testid:Footnotes    3    ${FOOTNOTE_ALL_FILTER}    ${subject_2_content}
 
-Save meta guidance
+Save data guidance
     user clicks button    Save guidance
 
 Navigate to Data blocks page
     user clicks link    Data blocks
-    user waits until h2 is visible    Data blocks
+    user waits until h2 is visible    Data blocks    %{WAIT_MEDIUM}
 
 Create new data block
     user clicks link    Create data block
     user waits until h2 is visible    Create data block
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    1    Choose a subject
 
 Select subject "${SUBJECT_2_NAME}"
     user waits until page contains    ${SUBJECT_2_NAME}
     user clicks radio    ${SUBJECT_2_NAME}
-    user clicks element    id:publicationSubjectForm-submit
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
 
 Select locations
-    user waits until table tool wizard step is available    Choose locations
+    user waits until table tool wizard step is available    2    Choose locations
     user opens details dropdown    Opportunity Area
-    user clicks checkbox    Bolton 001 (E02000984)
-    user clicks checkbox    Bolton 001 (E05000364)
-    user clicks checkbox    Bolton 004 (E02000987)
-    user clicks checkbox    Bolton 004 (E05010450)
+    user clicks checkbox    Bolton 001
+    user clicks checkbox    Bolton 004
     user opens details dropdown    Ward
     user clicks checkbox    Nailsea Youngwood
     user clicks checkbox    Syon
-    user clicks element    id:locationFiltersForm-submit
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
 
 Select time period
-    user waits until table tool wizard step is available    Choose time period
+    user waits until table tool wizard step is available    3    Choose time period
     user chooses select option    id:timePeriodForm-start    2005
-    user chooses select option    id:timePeriodForm-end    2020
-    user clicks element    id:timePeriodForm-submit
-
-Select indicators and filters
-    user waits until table tool wizard step is available    Choose your filters
-    user clicks indicator checkbox    Admission Numbers
-
-    user opens details dropdown    Random Filter
-    user clicks category checkbox    Random Filter    Not specified
+    user chooses select option    id:timePeriodForm-end    2017
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
 
 Create table
-    user clicks element    id:filtersForm-submit
-    user waits until results table appears    %{WAIT_LONG}
+    user waits until button is enabled    Create table
+    user clicks button    Create table
 
 Check created table has footnotes
     user checks list has x items    testid:footnotes    3
@@ -387,7 +381,7 @@ Edit footnote
 
 Check footnote was updated on data block
     user clicks link    Data blocks
-    user waits until h2 is visible    Data blocks
+    user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
 
     user clicks link    Edit block    css:tbody > tr:first-child
     user waits until table is visible
@@ -403,7 +397,7 @@ Add public prerelease access list for release
 
 Approve release
     user clicks link    Sign off
-    user approves release for immediate publication
+    user approves original release for immediate publication
 
 User goes to public Find Statistics page
     user navigates to find statistics page on public frontend
@@ -421,15 +415,15 @@ Verify newly published release is on Find Statistics page
 
 Navigate to published release page
     user clicks element    testid:View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    90
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
 Check latest release is correct
-    user waits until page contains title caption    ${RELEASE_2_NAME}    90
+    user waits until page contains title caption    ${RELEASE_2_NAME}    %{WAIT_MEDIUM}
     user checks page contains    This is the latest data
     user checks page contains    See other releases (1)
 
     user opens details dropdown    See other releases (1)
-    user checks page contains other release    ${RELEASE_1_NAME}
+    user waits until page contains other release    ${RELEASE_1_NAME}
     user checks page does not contain other release    ${RELEASE_2_NAME}
 
     user clicks link    ${RELEASE_1_NAME}
@@ -439,7 +433,7 @@ Check other release is correct
 
     user waits until page contains link    View latest data: ${RELEASE_2_NAME}
     user checks page contains    See other releases (1)
-    user checks page contains other release    ${RELEASE_2_NAME}
+    user waits until page contains other release    ${RELEASE_2_NAME}
     user checks page does not contain other release    ${RELEASE_1_NAME}
 
 Go to Table Tool page
@@ -450,26 +444,35 @@ Select publication in table tool
     user opens details dropdown    ${TOPIC_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
 Select subject "${SUBJECT_2_NAME}" in table tool
     user clicks link    Create your own table
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
     user waits until page contains    ${SUBJECT_2_NAME}
     user clicks radio    ${SUBJECT_2_NAME}
-    user clicks element    id:publicationSubjectForm-submit
-    user waits until table tool wizard step is available    Choose locations
+    user waits until button is enabled    Next step    %{WAIT_SMALL}
+    user clicks button    Next step
+    user waits until table tool wizard step is available    3    Choose locations
     user checks previous table tool step contains    2    Subject    ${SUBJECT_2_NAME}
 
 Select locations in table tool
-    user opens details dropdown    Local Authority
+    # LH: Not using the 'user opens details dropdown' keyword here as
+    # it opens the 'Local Authority District' dropdown instead
+    # due to using 'contains'
+    # TODO: LH - fix this
+    user clicks element    testid:Expand Details Section Local Authority
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
+
     user clicks element    id:locationFiltersForm-submit
-    user waits until table tool wizard step is available    Choose time period
+
+    user waits until table tool wizard step is available    4    Choose time period
     user checks previous table tool step contains    3    Local Authority    Barnsley
     user checks previous table tool step contains    3    Local Authority    Birmingham
+
+    user waits until table tool wizard step is available    4    Choose time period
 
 Select time period in table tool
     user chooses select option    id:timePeriodForm-start    2014
@@ -477,11 +480,9 @@ Select time period in table tool
     user clicks element    id:timePeriodForm-submit
 
 Select indicators and filters in table tool
-    user waits until table tool wizard step is available    Choose your filters
-    user clicks indicator checkbox    Admission Numbers
-
-    user opens details dropdown    Random Filter
-    user clicks category checkbox    Random Filter    Not specified
+    user waits until table tool wizard step is available    5    Choose your filters
+    user checks indicator checkbox is checked    Admission Numbers
+    user checks category checkbox is checked    Random Filter    Not specified
     user clicks element    id:filtersForm-submit
 
 Validate table
@@ -514,13 +515,14 @@ Validate table has footnotes
 
 Select table featured table from subjects step
     user clicks element    testid:wizardStep-2-goToButton
-    user waits until h1 is visible    Go back to previous step
+    user waits until h2 is visible    Go back to previous step
     user clicks button    Confirm
+    user waits until page does not contain button    Confirm
 
-    user waits until table tool wizard step is available    Choose a subject
+    user waits until table tool wizard step is available    2    Choose a subject
 
     user clicks link    Featured tables
-    user waits until table tool wizard step is available    Choose a table
+    user waits until table tool wizard step is available    2    Choose a table
 
     user checks element count is x    css:#featuredTables li    1
     user checks element should contain    css:#featuredTables li:first-child a    Test highlight name
@@ -530,18 +532,13 @@ Select table featured table from subjects step
     user clicks link    Test highlight name
     user waits until results table appears    %{WAIT_LONG}
     user waits until page contains element
-    ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for '${SUBJECT_2_NAME}' for Not specified in Bolton 001 (E02000984), Bolton 001 (E05000364), Bolton 004 (E02000987), Bolton 004 (E05010450), Nailsea Youngwood and Syon between 2005 and 2020"]
+    ...    xpath://*[@data-testid="dataTableCaption" and text()="Admission Numbers for '${SUBJECT_2_NAME}' for Not specified in Bolton 001, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2017"]
 
 Validate table column headings for featured table
     user checks table column heading contains    1    1    Admission Numbers
 
 Validate table rows for featured table
-    ${row}=    user gets row number with heading    Bolton 001 (E02000984)
-    user checks table heading in offset row contains    ${row}    0    2    2019
-
-    user checks table cell in offset row contains    ${row}    0    1    8,533
-
-    ${row}=    user gets row number with heading    Bolton 001 (E05000364)
+    ${row}=    user gets row number with heading    Bolton 001
     user checks table heading in offset row contains    ${row}    0    2    2009
     user checks table heading in offset row contains    ${row}    1    1    2010
     user checks table heading in offset row contains    ${row}    2    1    2017
@@ -550,19 +547,11 @@ Validate table rows for featured table
     user checks table cell in offset row contains    ${row}    1    1    5,595
     user checks table cell in offset row contains    ${row}    2    1    6,373
 
-    ${row}=    user gets row number with heading    Bolton 004 (E02000987)
-    user checks table heading in offset row contains    ${row}    0    2    2020
-
-    user checks table cell in offset row contains    ${row}    0    1    6,031
-
-    ${row}=    user gets row number with heading    Bolton 004 (E05010450)
+    ${row}=    user gets row number with heading    Bolton 004
     user checks table heading in offset row contains    ${row}    0    2    2005
     user checks table heading in offset row contains    ${row}    1    1    2017
-    user checks table heading in offset row contains    ${row}    2    1    2018
-
     user checks table cell in offset row contains    ${row}    0    1    8,557
     user checks table cell in offset row contains    ${row}    1    1    3,481
-    user checks table cell in offset row contains    ${row}    2    1    8,630
 
     ${row}=    user gets row number with heading    Nailsea Youngwood
     user checks table heading in offset row contains    ${row}    0    2    2005
@@ -600,19 +589,19 @@ Go to release page
     user opens accordion section    Related information
     user clicks link    ${PUBLICATION_NAME}, ${RELEASE_2_NAME}
 
-    user waits until h1 is visible    ${PUBLICATION_NAME}    90
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
     user waits until page contains title caption    ${RELEASE_2_NAME}
 
-Go to meta guidance document
+Go to data guidance document
     user opens accordion section    Explore data and files
     user waits until h3 is visible    Open data
-    user clicks link    data files guide
+    user clicks link    Data guidance
 
     user waits until page contains title caption    ${RELEASE_2_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}
-    user waits until h2 is visible    Metadata guidance document
+    user waits until h2 is visible    Data guidance
 
-Validate meta guidance document file details
+Validate data guidance document file details
     user waits until page contains accordion section    ${SUBJECT_1_NAME}
     user waits until page contains accordion section    ${SUBJECT_2_NAME}
     user checks there are x accordion sections    2
@@ -623,7 +612,7 @@ Validate meta guidance document file details
     user checks summary list contains    Filename    tiny-two-filters.csv    ${subject_1_content}
     user checks summary list contains    Geographic levels    National    ${subject_1_content}
     user checks summary list contains    Time period    2017/18    ${subject_1_content}
-    user checks summary list contains    Content    UI test subject 1 meta guidance content    ${subject_1_content}
+    user checks summary list contains    Content    UI test subject 1 data guidance content    ${subject_1_content}
 
     user opens accordion section    ${SUBJECT_2_NAME}
 
@@ -633,9 +622,9 @@ Validate meta guidance document file details
     ...    Local Authority; Local Authority District; Local Enterprise Partnership; Opportunity Area; Parliamentary Constituency; RSC Region; Regional; Ward
     ...    ${subject_2_content}
     user checks summary list contains    Time period    2005 to 2020    ${subject_2_content}
-    user checks summary list contains    Content    UI test subject 2 meta guidance content    ${subject_2_content}
+    user checks summary list contains    Content    UI test subject 2 data guidance content    ${subject_2_content}
 
-Validate meta guidance document variables
+Validate data guidance document variables
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
     user opens details dropdown    Variable names and descriptions    ${subject_1_content}
 
@@ -675,7 +664,7 @@ Validate meta guidance document variables
     user checks results table cell contains    2    1    some_filter    ${subject_2_variables}
     user checks results table cell contains    2    2    Random Filter    ${subject_2_variables}
 
-Validate meta guidance document footnotes
+Validate data guidance document footnotes
     ${subject_1_content}=    user gets accordion section content element    ${SUBJECT_1_NAME}
     user opens details dropdown    Footnotes    ${subject_1_content}
 

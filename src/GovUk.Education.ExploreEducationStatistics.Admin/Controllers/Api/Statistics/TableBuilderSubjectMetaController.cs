@@ -1,7 +1,9 @@
+#nullable enable
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Authorization;
@@ -9,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
-    [Route("api/data/meta")]
+    [Route("api")]
     [ApiController]
     [Authorize]
     public class TableBuilderMetaController : ControllerBase
@@ -21,18 +23,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _subjectMetaService = subjectMetaService;
         }
 
-        [HttpGet("subject/{subjectId}")]
-        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMetaAsync(Guid subjectId)
+        [HttpGet("data/meta/subject/{subjectId:guid}")]
+        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
             return _subjectMetaService.GetSubjectMetaRestricted(subjectId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("subject")]
-        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMetaAsync(
-            [FromBody] SubjectMetaQueryContext query)
+        [HttpPost("data/meta/subject")]
+        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(
+            [FromBody] ObservationQueryContext query,
+            CancellationToken cancellationToken)
         {
-            return _subjectMetaService.GetSubjectMetaRestricted(query)
+            return _subjectMetaService.GetSubjectMetaRestricted(query, cancellationToken)
                 .HandleFailuresOrOk();
         }
     }

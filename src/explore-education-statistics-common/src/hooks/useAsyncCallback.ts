@@ -11,7 +11,7 @@ import {
 export interface AsyncState<T> {
   isLoading: boolean;
   value?: T;
-  error?: Error;
+  error?: unknown;
 }
 
 export type AsyncStateSetterParam<T> = SetStateAction<
@@ -24,7 +24,7 @@ export type AsyncStateSetterParam<T> = SetStateAction<
     }
   | {
       isLoading?: false;
-      error: Error;
+      error: unknown;
     }
 >;
 

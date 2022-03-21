@@ -22,6 +22,8 @@
 }
 
 .stepActive {
+  margin-top: govuk-spacing(4);
+
   &::before,
   &:last-child::after {
     border-color: govuk-colour('black');

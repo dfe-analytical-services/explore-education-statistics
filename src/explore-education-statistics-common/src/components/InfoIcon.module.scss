@@ -1,0 +1,20 @@
+@import '~govuk-frontend/govuk/base';
+
+.infoIcon {
+  background-color: $govuk-link-colour;
+  border-radius: 10px;
+  color: govuk-colour('white');
+  display: inline-block;
+  font-size: 18px;
+  font-weight: bold;
+  height: 20px;
+  line-height: 22px;
+  text-align: center;
+  text-decoration: none;
+  width: 20px;
+
+  &:hover {
+    background-color: $govuk-link-hover-colour;
+    color: govuk-colour('white');
+  }
+}

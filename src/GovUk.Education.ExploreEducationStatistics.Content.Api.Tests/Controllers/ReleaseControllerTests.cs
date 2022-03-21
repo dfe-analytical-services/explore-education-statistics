@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
@@ -174,9 +175,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseId = Guid.NewGuid();
 
             return new ReleaseViewModel(
-                new CachedReleaseViewModel
+                new CachedReleaseViewModel(releaseId)
                 {
-                    Id = releaseId
+                    Type = new ReleaseTypeViewModel
+                    {
+                        Title = "National Statistics"
+                    }
                 },
                 new CachedPublicationViewModel
                 {
@@ -192,9 +196,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseId = Guid.NewGuid();
 
             return new ReleaseSummaryViewModel(
-                new CachedReleaseViewModel
+                new CachedReleaseViewModel(releaseId)
                 {
-                    Id = releaseId
+                    Type = new ReleaseTypeViewModel
+                    {
+                        Title = "National Statistics"
+                    }
                 },
                 new CachedPublicationViewModel
                 {
@@ -206,11 +213,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         }
 
         private static ReleaseController BuildReleaseController(
-            IReleaseService releaseService = null
+            IReleaseService? releaseService = null
         )
         {
-            return new ReleaseController(
-                releaseService ?? new Mock<IReleaseService>().Object
+            return new(
+                releaseService ?? Mock.Of<IReleaseService>()
             );
         }
     }

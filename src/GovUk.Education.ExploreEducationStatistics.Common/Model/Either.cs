@@ -1,21 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
-    public class Either<Tl, Tr>
+    public class Either<TL, TR>
     {
-        private readonly Tl _left;
-        private readonly Tr _right;
+        private readonly TL _left;
+        private readonly TR _right;
 
-        public Either(Tl left)
+        public Either(TL left)
         {
             _left = left;
             IsLeft = true;
         }
 
-        public Either(Tr right)
+        public Either(TR right)
         {
             _right = right;
             IsLeft = false;
@@ -25,31 +26,47 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public bool IsRight => !IsLeft;
 
-        public Tl Left => IsLeft ? _left : throw new ArgumentException("Calling Left on a Right");
+        public TL Left => IsLeft ? _left : throw new ArgumentException("Calling Left on a Right");
 
-        public Tr Right => !IsLeft ? _right : throw new ArgumentException("Calling Right on a Left");
+        public TR Right => !IsLeft ? _right : throw new ArgumentException("Calling Right on a Left");
 
-        public Either<Tl, T> Map<T>(Func<Tr, T> func) =>
-            IsLeft ? new Either<Tl, T>(Left) : new Either<Tl, T>(func.Invoke(Right));
+        private Either<TL, T> Map<T>(Func<TR, T> func) =>
+            IsLeft ? new Either<TL, T>(Left) : new Either<TL, T>(func.Invoke(Right));
 
-        public Either<Tl, T> Map<T>(Func<Tr, Either<Tl, T>> func) =>
-            IsLeft ? new Either<Tl, T>(Left) : func.Invoke(Right);
+        public Either<TL, T> OnSuccess<T>(Func<TR, T> func) => Map(func);
 
-        public Either<Tl, T> OnSuccess<T>(Func<Tr, T> func) => Map(func);
+        public async Task<Either<TL, T>> OnSuccess<T>(Func<TR, Task<Either<TL, T>>> func)
+        {
+            if (IsLeft)
+            {
+                return _left;
+            }
 
-        public Either<Tl, T> OnSuccess<T>(Func<T> func) => Map(_ => func.Invoke());
+            return await func.Invoke(_right);
+        }
 
-        public Either<Tl, Tr> OrElse(Func<Tr> func) => IsLeft ? func() : Right;
+        public Either<TL, T> OnSuccess<T>(Func<T> func) => Map(_ => func.Invoke());
 
-        public T Fold<T>(Func<Tl, T> leftFunc, Func<Tr, T> rightFunc) => IsRight ? rightFunc(Right) : leftFunc(Left);
+        public Either<TL, TR> OrElse(Func<TR> func) => IsLeft ? func() : Right;
 
-        public T FoldLeft<T>(Func<Tl, T> leftFunc, T defaultValue) => IsLeft ? leftFunc(Left) : defaultValue;
+        public Either<TL, TR> OrElse(Func<TL, TR> func) => IsLeft ? func(Left) : Right;
 
-        public T FoldRight<T>(Func<Tr, T> rightFunc, T defaultValue) => IsRight ? rightFunc(Right) : defaultValue;
+        public T Fold<T>(Func<TL, T> leftFunc, Func<TR, T> rightFunc) => IsRight ? rightFunc(Right) : leftFunc(Left);
 
-        public static implicit operator Either<Tl, Tr>(Tl left) => new Either<Tl, Tr>(left);
+        public T FoldLeft<T>(Func<TL, T> leftFunc, T defaultValue) => IsLeft ? leftFunc(Left) : defaultValue;
 
-        public static implicit operator Either<Tl, Tr>(Tr right) => new Either<Tl, Tr>(right);
+        public T FoldRight<T>(Func<TR, T> rightFunc, T defaultValue) => IsRight ? rightFunc(Right) : defaultValue;
+
+        public static implicit operator Either<TL, TR>(TL left) => new(left);
+
+        public static implicit operator Either<TL, TR>(TR right) => new(right);
+    }
+    
+    public static class EitherExtensions {
+        public static T Result<T>(this Either<T, T> either)
+        {
+            return either.IsLeft ? either.Left : either.Right;
+        }
     }
 
     public static class EitherTaskExtensions
@@ -167,6 +184,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
             return await func();
         }
+        
+        [Obsolete("Use OnSuccessDo or OnSuccessVoid for chaining a non-generic Task")]
+        public static async Task<Either<TFailure, Unit>> OnSuccess<TFailure, TSuccess1>(
+            this Task<Either<TFailure, TSuccess1>> task,
+            Func<TSuccess1, Task> func)
+        {
+            return await task.OnSuccessVoid(func);
+        }
 
         public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
             this Task<Either<TFailure, TSuccess1>> task,
@@ -201,6 +226,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
             return Unit.Instance;
         }
+        
+        /**
+         * Convenience method so that the chained function can be
+         * void and doesn't have to explicitly return a Unit.
+         */
+        public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess1, TSuccess2>(
+            this Task<Either<TFailure, TSuccess1>> task,
+            Func<TSuccess1, Task<Either<TFailure, TSuccess2>>> task2)
+        {
+            return task
+                .OnSuccess(task2.Invoke)
+                .OnSuccessVoid();
+        }
+        
+        /**
+         * Convenience method so that the chained function can be
+         * void and doesn't have to explicitly return a Unit.
+         */
+        public static Task<Either<TFailure, Unit>> OnSuccessVoid<TFailure, TSuccess1, TSuccess2>(
+            this Task<Either<TFailure, TSuccess1>> task,
+            Func<Task<Either<TFailure, TSuccess2>>> func)
+        {
+            return task
+                .OnSuccess(func.Invoke)
+                .OnSuccessVoid();
+        }
+
 
         public static async Task<Either<TFailure, TSuccess2>> OnSuccess<TFailure, TSuccess1, TSuccess2>(
             this Task<Either<TFailure, TSuccess1>> task,
@@ -223,7 +275,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
         {
             return await task.OnSuccess(success =>
             {
-                return func(success).OnSuccess(combinator => new Tuple<TSuccess1, TSuccess2>(success, combinator));
+                return func(success).OnSuccess(combinator => TupleOf(success, combinator));
             });
         }
 
@@ -313,9 +365,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public static async Task<Either<TFailure1, TFailure2>> OnFailureFailWith<TFailure1, TFailure2>(
             this Task<Either<TFailure1, TFailure2>> task,
-            Func<TFailure1> failureTask)
+            Func<TFailure1> failure)
         {
-            return await task.OnFailureFailWith(async _ => await Task.FromResult(failureTask()));
+            return await task.OnFailureFailWith(async _ => await Task.FromResult(failure()));
         }
 
         /**

@@ -13,6 +13,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import { releaseTypes } from '@common/services/types/releaseType';
 import React from 'react';
 import { generatePath, useLocation } from 'react-router';
 
@@ -59,7 +60,7 @@ const ReleaseSummaryPage = () => {
               <time>{release.yearTitle}</time>
             </SummaryListItem>
             <SummaryListItem term="Release type">
-              {release.type.title}
+              {releaseTypes[release.type]}
             </SummaryListItem>
           </SummaryList>
 

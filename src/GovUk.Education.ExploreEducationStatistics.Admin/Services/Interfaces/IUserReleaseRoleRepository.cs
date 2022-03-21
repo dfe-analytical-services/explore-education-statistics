@@ -10,7 +10,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<UserReleaseRole> Create(Guid userId,
             Guid releaseId,
-            ReleaseRole role);
+            ReleaseRole role,
+            Guid createdById);
+
+        Task<UserReleaseRole> CreateIfNotExists(Guid userId,
+            Guid releaseId,
+            ReleaseRole role,
+            Guid createdById);
+
+        Task CreateManyIfNotExists(List<Guid> userIds,
+            Guid releaseId,
+            ReleaseRole role,
+            Guid createdById);
+
+        Task CreateManyIfNotExists(Guid userId,
+            List<Guid> releaseIds,
+            ReleaseRole role,
+            Guid createdById);
+
+        Task Remove(UserReleaseRole userReleaseRole, Guid deletedById);
+
+        Task RemoveMany(List<UserReleaseRole> userReleaseRoles, Guid deletedById);
+
+        Task RemoveAllForPublication(
+            Guid userId, Publication publication,
+            ReleaseRole role, Guid deletedById);
 
         Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId,
             Guid releaseId);
@@ -19,7 +43,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<bool> IsUserEditorOrApproverOnLatestRelease(Guid userId, Guid publicationId);
 
-        Task<bool> UserHasRoleOnRelease(Guid userId,
+        Task<UserReleaseRole?> GetUserReleaseRole(Guid userId,
+            Guid releaseId,
+            ReleaseRole role);
+
+        Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, ReleaseRole role);
+
+        Task<bool> HasUserReleaseRole(Guid userId,
+            Guid releaseId,
+            ReleaseRole role);
+
+        Task<bool> HasUserReleaseRole(string email,
             Guid releaseId,
             ReleaseRole role);
 

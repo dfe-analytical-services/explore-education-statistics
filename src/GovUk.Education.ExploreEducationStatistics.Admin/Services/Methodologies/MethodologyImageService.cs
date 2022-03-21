@@ -74,21 +74,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         _methodologyFileRepository.CheckFileExists(methodologyVersionId, fileId, Image)).OnSuccessAll())
                 .OnSuccessVoid(async files =>
                 {
-                    await files.ForEachAsync(async file =>
-                    {
-                        var methodologyLinks = await _methodologyFileRepository.GetByFile(file.Id);
-
-                        await _methodologyFileRepository.Delete(methodologyVersionId, file.Id);
-
-                        // If this methodology version is the only version that is referencing this Blob and File, it
-                        // can be deleted from Blob Storage and the File table. Otherwise preserve them for the other
-                        // versions that are still using them. 
-                        if (methodologyLinks.Count == 1 && methodologyLinks[0].MethodologyVersionId == methodologyVersionId)
+                    await files
+                        .ToAsyncEnumerable()
+                        .ForEachAwaitAsync(async file =>
                         {
-                            await _blobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
-                            await _fileRepository.Delete(file.Id);
-                        }
-                    });
+                            var methodologyLinks = await _methodologyFileRepository.GetByFile(file.Id);
+
+                            await _methodologyFileRepository.Delete(methodologyVersionId, file.Id);
+
+                            // If this methodology version is the only version that is referencing this Blob and File, it
+                            // can be deleted from Blob Storage and the File table. Otherwise preserve them for the other
+                            // versions that are still using them.
+                            if (methodologyLinks.Count == 1 &&
+                                methodologyLinks[0].MethodologyVersionId == methodologyVersionId)
+                            {
+                                await _blobStorageService.DeleteBlob(PrivateMethodologyFiles, file.Path());
+                                await _fileRepository.Delete(file.Id);
+                            }
+                        });
                 });
         }
 

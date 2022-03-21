@@ -6,11 +6,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
     {
         [EnumLabelValue("ancillary")]
         Ancillary,
+        [EnumLabelValue("zip")]
+        AllFilesZip,
         [EnumLabelValue("chart")]
         Chart,
         [EnumLabelValue("data")]
         Data,
-        [EnumLabelValue("zip")]
+        [EnumLabelValue("data-zip")]
         DataZip,
         [EnumLabelValue("image")]
         Image,

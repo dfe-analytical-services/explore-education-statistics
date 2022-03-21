@@ -4,7 +4,6 @@ import {
 } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseDispatchAction } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
 import {
-  Comment,
   EditableBlock,
   EditableContentBlock,
 } from '@admin/services/types/content';
@@ -34,7 +33,7 @@ const basicDataBlock: DataBlock = {
   query: {
     filters: [],
     indicators: [],
-    locations: {},
+    locationIds: [],
     subjectId: 'subjectId',
   },
 };
@@ -52,7 +51,6 @@ describe('ReleaseContentContext', () => {
           release: testEditableRelease,
           canUpdateRelease: false,
           availableDataBlocks: [],
-          unresolvedComments: [],
         },
         {
           type: 'SET_AVAILABLE_DATABLOCKS',
@@ -63,7 +61,6 @@ describe('ReleaseContentContext', () => {
       release: testEditableRelease,
       canUpdateRelease: false,
       availableDataBlocks: [basicDataBlock],
-      unresolvedComments: [],
     });
   });
 
@@ -78,7 +75,6 @@ describe('ReleaseContentContext', () => {
         release: testEditableRelease,
         canUpdateRelease: true,
         availableDataBlocks: [basicDataBlock],
-        unresolvedComments: [],
       },
       {
         type: 'REMOVE_BLOCK_FROM_SECTION',
@@ -116,7 +112,6 @@ describe('ReleaseContentContext', () => {
         release: testEditableRelease,
         canUpdateRelease: true,
         availableDataBlocks: [basicDataBlock],
-        unresolvedComments: [],
       },
       {
         type: 'REMOVE_BLOCK_FROM_SECTION',
@@ -151,7 +146,6 @@ describe('ReleaseContentContext', () => {
         release: testEditableRelease,
         canUpdateRelease: true,
         availableDataBlocks: [basicDataBlock],
-        unresolvedComments: [],
       },
       {
         type: 'UPDATE_BLOCK_FROM_SECTION',
@@ -187,7 +181,6 @@ describe('ReleaseContentContext', () => {
         release: testEditableRelease,
         canUpdateRelease: true,
         availableDataBlocks: [basicDataBlock],
-        unresolvedComments: [],
       },
       {
         type: 'UPDATE_BLOCK_FROM_SECTION',
@@ -228,7 +221,6 @@ describe('ReleaseContentContext', () => {
         release: testEditableRelease,
         canUpdateRelease: false,
         availableDataBlocks: [],
-        unresolvedComments: [],
       },
       {
         type: 'ADD_BLOCK_TO_SECTION',
@@ -270,7 +262,6 @@ describe('ReleaseContentContext', () => {
         release: testEditableRelease,
         canUpdateRelease: true,
         availableDataBlocks: [basicDataBlock],
-        unresolvedComments: [],
       },
       {
         type: 'ADD_BLOCK_TO_SECTION',
@@ -315,9 +306,7 @@ describe('ReleaseContentContext', () => {
             '214f5fb8-c12b-411e-fdfb-08d7bec1dd71',
             '99f5bbc3-de9a-4831-fdf8-08d7bec1dd71',
           ],
-          locations: {
-            country: ['E92000001'],
-          },
+          locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
           includeGeoJson: true,
         },
         charts: [],
@@ -364,7 +353,6 @@ describe('ReleaseContentContext', () => {
         release: testEditableRelease,
         canUpdateRelease: true,
         availableDataBlocks: [basicDataBlock],
-        unresolvedComments: [],
       },
       {
         type: 'UPDATE_SECTION_CONTENT',
@@ -389,7 +377,6 @@ describe('ReleaseContentContext', () => {
         release: testEditableRelease,
         canUpdateRelease: true,
         availableDataBlocks: [basicDataBlock],
-        unresolvedComments: [],
       },
       {
         type: 'ADD_CONTENT_SECTION',
@@ -422,7 +409,6 @@ describe('ReleaseContentContext', () => {
         release: testEditableRelease,
         canUpdateRelease: true,
         availableDataBlocks: [basicDataBlock],
-        unresolvedComments: [],
       },
       {
         type: 'SET_CONTENT',
@@ -444,7 +430,6 @@ describe('ReleaseContentContext', () => {
         release: testEditableRelease,
         canUpdateRelease: true,
         availableDataBlocks: [basicDataBlock],
-        unresolvedComments: [],
       },
       {
         type: 'UPDATE_CONTENT_SECTION',
@@ -460,118 +445,5 @@ describe('ReleaseContentContext', () => {
 
     expect(release?.content[0].id).toEqual(basicSection.id);
     expect(release?.content[0].heading).toEqual('updated heading');
-  });
-
-  test("UPDATE_BLOCK_COMMENTS updates a block's comments and the unresolved comments list", () => {
-    const sectionKey = 'content';
-
-    const newComment: Comment = {
-      id: 'comment-3',
-      content: 'a third comment',
-      createdBy: {
-        id: 'user-1',
-        firstName: 'Bau1',
-        lastName: '',
-        email: 'bau1@test.com',
-      },
-      created: '2020-03-10T12:00:00.000',
-    };
-
-    const updatedComments = [
-      ...testEditableRelease.content[0].content[0].comments,
-      newComment,
-    ];
-
-    const { release, unresolvedComments } = releaseReducer(
-      {
-        release: testEditableRelease,
-        canUpdateRelease: true,
-        availableDataBlocks: [basicDataBlock],
-        unresolvedComments: [],
-      },
-      {
-        type: 'UPDATE_BLOCK_COMMENTS',
-        payload: {
-          meta: {
-            sectionId: testEditableRelease.content[0].id,
-            blockId: testEditableRelease.content[0].content[0].id,
-            sectionKey,
-          },
-          comments: [...updatedComments],
-        },
-      },
-    );
-
-    expect(release?.content[0].content[0].comments).toEqual<Comment[]>([
-      {
-        id: 'comment-1',
-        content: 'A comment',
-        createdBy: {
-          id: 'user-1',
-          firstName: 'Bau1',
-          lastName: '',
-          email: 'bau1@test.com',
-        },
-        created: '2020-03-09T09:39:53.736',
-      },
-      {
-        id: 'comment-2',
-        content: 'another comment',
-        createdBy: {
-          id: 'user-1',
-          firstName: 'Bau1',
-          lastName: '',
-          email: 'bau1@test.com',
-        },
-        created: '2020-03-09T09:40:16.534',
-      },
-      {
-        id: 'comment-3',
-        content: 'a third comment',
-        createdBy: {
-          id: 'user-1',
-          firstName: 'Bau1',
-          lastName: '',
-          email: 'bau1@test.com',
-        },
-        created: '2020-03-10T12:00:00.000',
-      },
-    ]);
-
-    expect(unresolvedComments).toEqual([
-      {
-        id: 'comment-1',
-        content: 'A comment',
-        createdBy: {
-          id: 'user-1',
-          firstName: 'Bau1',
-          lastName: '',
-          email: 'bau1@test.com',
-        },
-        created: '2020-03-09T09:39:53.736',
-      },
-      {
-        id: 'comment-2',
-        content: 'another comment',
-        createdBy: {
-          id: 'user-1',
-          firstName: 'Bau1',
-          lastName: '',
-          email: 'bau1@test.com',
-        },
-        created: '2020-03-09T09:40:16.534',
-      },
-      {
-        id: 'comment-3',
-        content: 'a third comment',
-        createdBy: {
-          id: 'user-1',
-          firstName: 'Bau1',
-          lastName: '',
-          email: 'bau1@test.com',
-        },
-        created: '2020-03-10T12:00:00.000',
-      },
-    ]);
   });
 });

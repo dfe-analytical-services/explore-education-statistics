@@ -3,14 +3,14 @@ Resource            ../libs/public-common.robot
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
+Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 
 *** Test Cases ***
 Verify public page loads
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}
-    user waits until element contains    css:body    Explore education statistics
+    user navigates to public frontend
+    user waits until page contains    Explore education statistics
 
 Verify can accept cookie banner
     user checks page contains    We use some essential cookies to make this service work.
@@ -52,8 +52,8 @@ Validate homepage
 
 Validate Cookies page
     user clicks link    Cookies
+    user waits until h1 is visible    Cookies on Explore education statistics    %{WAIT_MEDIUM}
 
-    user waits until h1 is visible    Cookies on Explore education statistics
     user checks url contains    %{PUBLIC_URL}/cookies
 
     user checks breadcrumb count should be    2

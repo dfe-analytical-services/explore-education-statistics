@@ -21,6 +21,7 @@ import { logEvent } from '@frontend/services/googleAnalyticsService';
 import { GetServerSideProps, NextPage } from 'next';
 import dynamic from 'next/dynamic';
 import React, { useEffect, useMemo, useState } from 'react';
+import { TableQueryErrorCode } from '@common/modules/table-tool/components/FiltersForm';
 
 const TableToolFinalStep = dynamic(
   () => import('@frontend/modules/table-tool/components/TableToolFinalStep'),
@@ -93,7 +94,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         subjectId: '',
         indicators: [],
         filters: [],
-        locations: {},
+        locationIds: [],
       },
       selectedPublication,
     };
@@ -117,8 +118,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         loadingFastTrack={loadingFastTrack}
         renderFeaturedTable={highlight => (
           <Link
-            to="/data-tables/fast-track/[fastTrackId]"
-            as={`/data-tables/fast-track/${highlight.id}`}
+            to={`/data-tables/fast-track/${highlight.id}`}
             onClick={() => {
               setLoadingFastTrack(true);
               logEvent({
@@ -131,6 +131,32 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
             {highlight.name}
           </Link>
         )}
+        onTableQueryError={(
+          errorCode: TableQueryErrorCode,
+          publicationTitle: string,
+          subjectName: string,
+        ) => {
+          switch (errorCode) {
+            case 'QueryExceedsMaxAllowableTableSize': {
+              logEvent({
+                category: 'Table tool size error',
+                action: 'Table exceeded maximum size',
+                label: `${publicationTitle}/${subjectName}`,
+              });
+              break;
+            }
+            case 'RequestCancelled': {
+              logEvent({
+                category: 'Table tool query timeout error',
+                action: 'Table exceeded maximum timeout duration',
+                label: `${publicationTitle}/${subjectName}`,
+              });
+              break;
+            }
+            default:
+              break;
+          }
+        }}
         finalStep={({
           query,
           response,

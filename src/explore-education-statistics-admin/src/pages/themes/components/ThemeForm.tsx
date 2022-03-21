@@ -16,7 +16,7 @@ const errorMappings = [
   mapFieldErrors<ThemeFormValues>({
     target: 'title',
     messages: {
-      SLUG_NOT_UNIQUE: 'Enter a unique title',
+      SlugNotUnique: 'Enter a unique title',
     },
   }),
 ];

@@ -3,8 +3,10 @@
   "functionTimeout": "04:00:00",
   "logging": {
     "logLevel": {
-      "default": "Information",
-      "Microsoft": "Warning"
+      "default": "Warning",
+      "Microsoft": "Warning",
+      "Function": "Information",
+      "GovUk.Education.ExploreEducationStatistics": "Information"
     }
   },
   "extensions": {

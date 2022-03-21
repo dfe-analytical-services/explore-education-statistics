@@ -4,6 +4,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
@@ -25,7 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public PartialDate NextReleaseDate { get; }
 
-        public ReleaseTypeViewModel Type { get; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseType Type { get; }
 
         public bool LatestRelease { get; }
 
@@ -43,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             Published = release.Published;
             ReleaseName = release.ReleaseName;
             NextReleaseDate = release.NextReleaseDate;
-            Type = release.Type;
+            Type = ReleaseViewModel.ReleaseTypeTitleMap[release.Type.Title];
             LatestRelease = Id == publication.LatestReleaseId;
             DataLastPublished = release.DataLastPublished;
             Publication = new PublicationSummaryViewModel(publication);
@@ -59,10 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             Published = release.Published;
             ReleaseName = release.ReleaseName;
             NextReleaseDate = release.NextReleaseDate;
-            Type = new ReleaseTypeViewModel {
-                Id = release.Type.Id,
-                Title = release.Type.Title
-            };
+            Type = release.Type;
             LatestRelease = Id == release.Publication.LatestPublishedRelease()?.Id;
             DataLastPublished = release.DataLastPublished;
         }

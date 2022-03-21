@@ -775,8 +775,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             {
                 var boxed = CompletedTask;
 
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(boxed, unboxed);
+                Assert.False(boxed.TryUnboxResult(out var unboxed));
+                Assert.Null(unboxed);
+
             }
 
             [Fact]
@@ -878,8 +879,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             {
                 var boxed = new Either<Unit, Task>(CompletedTask);
 
-                Assert.True(boxed.TryUnboxResult(out var unboxed));
-                Assert.Equal(CompletedTask, unboxed);
+                Assert.False(boxed.TryUnboxResult(out var unboxed));
+                Assert.Null(unboxed);
             }
 
             [Fact]

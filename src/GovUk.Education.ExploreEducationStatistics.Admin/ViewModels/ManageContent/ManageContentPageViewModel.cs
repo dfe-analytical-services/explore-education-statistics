@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public bool LatestRelease { get; set; }
 
+            [JsonConverter(typeof(StringEnumConverter))]
             public ReleaseType Type { get; set; }
 
             public List<ReleaseNoteViewModel> Updates { get; set; } = new List<ReleaseNoteViewModel>();
@@ -58,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
 
             public bool HasPreReleaseAccessList { get; set; }
 
-            public bool HasMetaGuidance => DownloadFiles.Any(file => file.Type == FileType.Data);
+            public bool HasDataGuidance => DownloadFiles.Any(file => file.Type == FileType.Data);
 
             [JsonConverter(typeof(DateTimeToDateJsonConverter))]
             public DateTime? PublishScheduled { get; set; }
@@ -83,12 +84,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
             public string Title { get; set; }
 
             public string Slug { get; set; }
-
-            public string Description { get; set; }
-
-            public string DataSource { get; set; }
-
-            public string Summary { get; set; }
 
             public List<PreviousReleaseViewModel> OtherReleases { get; set; }
 

@@ -17,6 +17,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageContent
 {
@@ -74,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 
                     if (contentBlock == null)
                     {
-                        return ValidationActionResult<CommentViewModel>(ContentBlockNotFound);
+                        return ValidationResult<CommentViewModel>(ContentBlockNotFound);
                     }
 
                     var comment = new Comment
@@ -126,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         public Task<Either<ActionResult, bool>> DeleteComment(Guid commentId)
         {
             return _persistenceHelper.CheckEntityExists<Comment>(commentId)
-                .OnSuccess(_userService.CheckCanUpdateComment)
+                .OnSuccess(_userService.CheckCanDeleteComment)
                 .OnSuccess(async comment =>
                     {
                         _context.Comment.Remove(comment);
@@ -179,7 +181,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     }
 
                     return new Either<ActionResult, Tuple<Release, ContentSection>>(
-                        new Tuple<Release, ContentSection>(release, section));
+                        TupleOf(release, section));
                 });
         }
 

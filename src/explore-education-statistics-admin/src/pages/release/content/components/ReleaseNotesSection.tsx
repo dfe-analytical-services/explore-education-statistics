@@ -47,29 +47,22 @@ const ReleaseNotesSection = ({ release }: Props) => {
   );
   const { editingMode } = useEditingContext();
 
-  const addReleaseNote = (releaseNote: CreateFormValues) => {
-    return new Promise(resolve => {
-      releaseNoteService
-        .create(release.id, releaseNote)
-        .then(newReleaseNotes => {
-          setReleaseNotes(newReleaseNotes);
-          resolve();
-        });
-    });
+  const addReleaseNote = async (releaseNote: CreateFormValues) => {
+    const newReleaseNotes = await releaseNoteService.create(
+      release.id,
+      releaseNote,
+    );
+
+    setReleaseNotes(newReleaseNotes);
   };
 
-  const editReleaseNote = (id: string, releaseNote: EditFormValues) => {
-    return new Promise(resolve => {
-      releaseNoteService
-        .edit(id, release.id, {
-          on: releaseNote.on,
-          reason: releaseNote.reason,
-        })
-        .then(newReleaseNotes => {
-          setReleaseNotes(newReleaseNotes);
-          resolve();
-        });
+  const editReleaseNote = async (id: string, releaseNote: EditFormValues) => {
+    const newReleaseNotes = await releaseNoteService.edit(id, release.id, {
+      on: releaseNote.on,
+      reason: releaseNote.reason,
     });
+
+    setReleaseNotes(newReleaseNotes);
   };
 
   const openAddForm = () => {

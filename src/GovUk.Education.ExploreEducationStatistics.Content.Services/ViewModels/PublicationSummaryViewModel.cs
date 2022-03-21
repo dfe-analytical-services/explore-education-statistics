@@ -1,30 +1,26 @@
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 {
-    public class PublicationSummaryViewModel
+    public record PublicationSummaryViewModel
     {
-        public Guid Id { get; }
+        public Guid Id { get; set; }
 
-        public string Title { get; }
+        public string Title { get; set; } = string.Empty;
 
-        public string Slug { get;  }
+        public string Slug { get; set; } = string.Empty;
 
-        public string Description { get; }
-
-        public string DataSource { get; }
-
-        public string Summary { get; }
+        public PublicationSummaryViewModel()
+        {
+        }
 
         public PublicationSummaryViewModel(CachedPublicationViewModel publication)
         {
             Id = publication.Id;
             Title = publication.Title;
             Slug = publication.Slug;
-            Description = publication.Description;
-            DataSource = publication.DataSource;
-            Summary = publication.Summary;
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
@@ -6,10 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 {
     public class TableHeader
     {
-        public string Level { get; set; }
+        public string? Level { get; set; }
         public string Value { get; set; }
+
         [JsonConverter(typeof(StringEnumConverter))]
-        public TableHeaderType? Type { get; set; }
+        public TableHeaderType Type { get; set; }
 
         private TableHeader()
         {
@@ -23,12 +25,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 
         public static TableHeader NewLocationHeader(GeographicLevel level, string value)
         {
-            return new TableHeader
+            return new()
             {
                 Level = level.ToString().CamelCase(),
                 Value = value,
                 Type = TableHeaderType.Location
             };
+        }
+
+        public TableHeader Clone()
+        {
+            return (TableHeader)MemberwiseClone();
         }
     }
 

@@ -1,15 +1,17 @@
+import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import styles from '@admin/components/form/FormEditor.module.scss';
 import {
-  EditorConfig,
+  CommentsPlugin,
+  Editor as EditorType,
   Element,
-  HeadingOption,
-  ResizeOption,
 } from '@admin/types/ckeditor';
+import { defaultAllowedHeadings } from '@admin/config/ckEditorConfig';
+import useCKEditorConfig from '@admin/hooks/useCKEditorConfig';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
 } from '@admin/utils/ckeditor/CustomUploadAdapter';
-import customUploadAdapterPlugin from '@admin/utils/ckeditor/customUploadAdapterPlugin';
+import getMarkersOrder from '@admin/utils/ckeditor/getMarkersOrder';
 import { CKEditor, CKEditorProps } from '@ckeditor/ckeditor5-react';
 import ErrorMessage from '@common/components/ErrorMessage';
 import FormLabel from '@common/components/form/FormLabel';
@@ -18,198 +20,80 @@ import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
 import Editor from 'explore-education-statistics-ckeditor';
-import React, {
-  MutableRefObject,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-} from 'react';
-
-export const toolbarConfigs = {
-  full: [
-    'heading',
-    '|',
-    'bold',
-    'italic',
-    'link',
-    '|',
-    'bulletedList',
-    'numberedList',
-    '|',
-    'blockQuote',
-    'insertTable',
-    'imageUpload',
-    '|',
-    'redo',
-    'undo',
-  ],
-  simple: [
-    'bold',
-    'italic',
-    'link',
-    '|',
-    'bulletedList',
-    'numberedList',
-    '|',
-    'redo',
-    'undo',
-  ],
-};
-
-const defaultAllowedHeadings = ['h3', 'h4', 'h5'];
-
-const headingOptions: HeadingOption[] = [
-  {
-    model: 'heading1',
-    view: 'h1',
-    title: 'Heading 1',
-    class: 'ck-heading_heading1',
-  },
-  {
-    model: 'heading2',
-    view: 'h2',
-    title: 'Heading 2',
-    class: 'ck-heading_heading2',
-  },
-  {
-    model: 'heading3',
-    view: 'h3',
-    title: 'Heading 3',
-    class: 'ck-heading_heading3',
-  },
-  {
-    model: 'heading4',
-    view: 'h4',
-    title: 'Heading 4',
-    class: 'ck-heading_heading4',
-  },
-  {
-    model: 'heading5',
-    view: 'h5',
-    title: 'Heading 5',
-    class: 'ck-heading_heading5',
-  },
-];
-
-const imageToolbar: string[] = [
-  'imageTextAlternative',
-  '|',
-  'imageResize:50',
-  'imageResize:75',
-  'imageResize:original',
-];
-
-const resizeOptions: ResizeOption[] = [
-  {
-    name: 'imageResize:original',
-    value: null,
-    label: 'Original',
-    icon: 'original',
-  },
-  {
-    name: 'imageResize:50',
-    value: '50',
-    label: '50%',
-    icon: 'medium',
-  },
-  {
-    name: 'imageResize:75',
-    value: '75',
-    label: '75%',
-    icon: 'large',
-  },
-];
-
-const tableContentToolbar = ['tableColumn', 'tableRow', 'mergeTableCells'];
+import React, { MutableRefObject, useCallback, useEffect, useRef } from 'react';
 
 export type EditorChangeHandler = (value: string) => void;
 export type EditorElementsHandler = (elements: Element[]) => void;
 
 export interface FormEditorProps {
+  allowComments?: boolean;
   allowedHeadings?: string[];
+  blockId?: string;
   error?: string;
   focusOnInit?: boolean;
   hideLabel?: boolean;
   hint?: string;
   id: string;
   label: string;
+  testId?: string;
   toolbarConfig?: string[];
   value: string;
-  testId?: string;
+  onAutoSave?: (values: string) => void;
   onBlur?: () => void;
+  onCancelComment?: () => void;
+  onChange: EditorChangeHandler;
+  onClickAddComment?: () => void;
   onElementsChange?: EditorElementsHandler;
   onElementsReady?: EditorElementsHandler;
-  onChange: EditorChangeHandler;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
 }
 
 const FormEditor = ({
+  allowComments = false,
   allowedHeadings = defaultAllowedHeadings,
+  blockId,
   error,
   focusOnInit,
   hideLabel,
   hint,
   id,
   label,
-  toolbarConfig = toolbarConfigs.full,
-  value,
   testId,
+  toolbarConfig,
+  value,
+  onAutoSave,
   onBlur,
+  onCancelComment,
   onChange,
+  onClickAddComment,
   onElementsChange,
   onElementsReady,
   onImageUpload,
   onImageUploadCancel,
 }: FormEditorProps) => {
+  const editorInstance = useRef<EditorType>();
+  const commentsPlugin = useRef<CommentsPlugin>();
   const editorRef: MutableRefObject<HTMLDivElement | null> = useRef(null);
+  const {
+    currentInteraction,
+    selectedComment,
+    setMarkersOrder,
+  } = useCommentsContext();
+  const config = useCKEditorConfig({
+    allowComments,
+    allowedHeadings,
+    blockId,
+    editorInstance,
+    toolbarConfig,
+    onAutoSave,
+    onCancelComment,
+    onClickAddComment,
+    onImageUpload,
+    onImageUploadCancel,
+  });
 
   const [isFocused, toggleFocused] = useToggle(false);
-
-  const config = useMemo<EditorConfig>(() => {
-    const toolbar = toolbarConfig?.filter(tool => {
-      // Disable image upload if no callback provided
-      if (tool === 'imageUpload' && !onImageUpload) {
-        return false;
-      }
-
-      return true;
-    });
-
-    const hasImageUpload = toolbar.includes('imageUpload');
-
-    return {
-      toolbar,
-      heading: toolbar.includes('heading')
-        ? {
-            options: [
-              {
-                model: 'paragraph',
-                title: 'Paragraph',
-                class: 'ck-heading_paragraph',
-              },
-              ...headingOptions.filter(option =>
-                allowedHeadings?.includes(option.view ?? ''),
-              ),
-            ],
-          }
-        : undefined,
-      image: hasImageUpload
-        ? {
-            toolbar: imageToolbar,
-            resizeOptions,
-          }
-        : undefined,
-      table: {
-        contentToolbar: tableContentToolbar,
-      },
-      extraPlugins:
-        hasImageUpload && onImageUpload
-          ? [customUploadAdapterPlugin(onImageUpload, onImageUploadCancel)]
-          : undefined,
-    };
-  }, [allowedHeadings, onImageUpload, onImageUploadCancel, toolbarConfig]);
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'test') {
@@ -253,12 +137,9 @@ const FormEditor = ({
 
   const handleChange = useCallback<CKEditorProps['onChange']>(
     (event, editor) => {
-      if (onElementsChange) {
-        onElementsChange(
-          Array.from(editor.model.document.getRoot('main').getChildren()),
-        );
-      }
-
+      onElementsChange?.(
+        Array.from(editor.model.document.getRoot('main').getChildren()),
+      );
       onChange(editor.getData());
     },
     [onChange, onElementsChange],
@@ -266,10 +147,7 @@ const FormEditor = ({
 
   const handleBlur = useCallback<CKEditorProps['onBlur']>(() => {
     toggleFocused.off();
-
-    if (onBlur) {
-      onBlur();
-    }
+    onBlur?.();
   }, [onBlur, toggleFocused]);
 
   const handleReady = useCallback<CKEditorProps['onReady']>(
@@ -277,15 +155,62 @@ const FormEditor = ({
       if (focusOnInit) {
         editor.editing.view.focus();
       }
-
-      if (onElementsReady) {
-        onElementsReady(
-          Array.from(editor.model.document.getRoot('main').getChildren()),
-        );
-      }
+      onElementsReady?.(
+        Array.from(editor.model.document.getRoot('main').getChildren()),
+      );
+      editorInstance.current = editor;
+      commentsPlugin.current = editor.plugins.get<CommentsPlugin>('Comments');
+      setMarkersOrder(getMarkersOrder([...editor.model.markers]));
     },
-    [focusOnInit, onElementsReady],
+    [focusOnInit, onElementsReady, setMarkersOrder],
   );
+
+  useEffect(() => {
+    if (!selectedComment?.fromEditor && selectedComment?.id) {
+      commentsPlugin.current?.selectCommentMarker(selectedComment.id);
+    }
+  }, [selectedComment]);
+
+  useEffect(() => {
+    function updateMarker() {
+      if (!commentsPlugin.current || !currentInteraction) {
+        return;
+      }
+      switch (currentInteraction.type) {
+        case 'adding':
+          commentsPlugin.current.addCommentMarker(currentInteraction.id);
+          if (editorInstance.current) {
+            setMarkersOrder(
+              getMarkersOrder([...editorInstance.current.model.markers]),
+            );
+          }
+          break;
+        case 'removing':
+          commentsPlugin.current.removeCommentMarker(currentInteraction.id);
+          break;
+        case 'resolving':
+          commentsPlugin.current.resolveCommentMarker(
+            currentInteraction.id,
+            false,
+          );
+          break;
+        case 'unresolving':
+          commentsPlugin.current.resolveCommentMarker(
+            currentInteraction.id,
+            true,
+          );
+          break;
+        default:
+          break;
+      }
+    }
+
+    updateMarker();
+    if (editorInstance.current) {
+      onAutoSave?.(editorInstance.current.getData());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentInteraction]);
 
   const isReadOnly = isBrowser('IE');
 
@@ -322,8 +247,8 @@ const FormEditor = ({
             [styles.focused]: isFocused,
           })}
           data-testid={isFocused ? `${testId}-focused` : testId}
-          ref={ref => {
-            const editorElement = ref?.querySelector<HTMLDivElement>(
+          ref={thisRef => {
+            const editorElement = thisRef?.querySelector<HTMLDivElement>(
               '[role="textbox"]',
             );
 

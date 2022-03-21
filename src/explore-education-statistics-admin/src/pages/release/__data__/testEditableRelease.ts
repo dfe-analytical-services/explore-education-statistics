@@ -1,5 +1,4 @@
 import { EditableRelease } from '@admin/services/releaseContentService';
-import { ReleaseType } from '@common/services/publicationService';
 import { Table } from '@common/services/types/blocks';
 
 const emptyTable: Table = {
@@ -30,9 +29,6 @@ export const testEditableRelease: EditableRelease = {
     slug: 'my-pub',
     otherReleases: [],
     legacyReleases: [],
-    dataSource: '',
-    description: '',
-    summary: '',
     topic: { theme: { title: 'Children, early years and social care' } },
     contact: {
       teamName: 'Explore Education Statistics',
@@ -49,10 +45,7 @@ export const testEditableRelease: EditableRelease = {
     ],
   },
   latestRelease: false,
-  type: {
-    id: '9d333457-9132-4e55-ae78-c55cb3673d7c',
-    title: ReleaseType.OfficialStatistics,
-  },
+  type: 'OfficialStatistics',
   updates: [
     {
       id: '262cf6c8-db96-40d8-8fb1-b55028a9f55b',
@@ -115,9 +108,7 @@ export const testEditableRelease: EditableRelease = {
               '214f5fb8-c12b-411e-fdfb-08d7bec1dd71',
               '99f5bbc3-de9a-4831-fdf8-08d7bec1dd71',
             ],
-            locations: {
-              country: ['E92000001'],
-            },
+            locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
             includeGeoJson: true,
           },
           charts: [],
@@ -176,9 +167,7 @@ export const testEditableRelease: EditableRelease = {
           },
           filters: ['5a1b6c93-c9c3-4710-f71f-08d7bec1ddb3'],
           indicators: ['272f4b12-9dfe-45ef-fdf9-08d7bec1dd71'],
-          locations: {
-            country: ['E92000001'],
-          },
+          locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
           includeGeoJson: true,
         },
         charts: [],
@@ -203,9 +192,7 @@ export const testEditableRelease: EditableRelease = {
           },
           filters: ['5a1b6c93-c9c3-4710-f71f-08d7bec1ddb3'],
           indicators: ['d314e2a9-5069-4d79-fdfa-08d7bec1dd71'],
-          locations: {
-            country: ['E92000001'],
-          },
+          locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
           includeGeoJson: true,
         },
         charts: [],
@@ -230,9 +217,7 @@ export const testEditableRelease: EditableRelease = {
           },
           filters: ['5a1b6c93-c9c3-4710-f71f-08d7bec1ddb3'],
           indicators: ['214f5fb8-c12b-411e-fdfb-08d7bec1dd71'],
-          locations: {
-            country: ['E92000001'],
-          },
+          locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
           includeGeoJson: true,
         },
         charts: [],
@@ -267,9 +252,7 @@ export const testEditableRelease: EditableRelease = {
             'd314e2a9-5069-4d79-fdfa-08d7bec1dd71',
             '214f5fb8-c12b-411e-fdfb-08d7bec1dd71',
           ],
-          locations: {
-            country: ['E92000001'],
-          },
+          locationIds: ['dd590fcf-b0c1-4fa3-8599-d13c0f540793'],
           includeGeoJson: true,
         },
         charts: [],
@@ -292,7 +275,7 @@ export const testEditableRelease: EditableRelease = {
     },
   ],
   hasPreReleaseAccessList: false,
-  hasMetaGuidance: true,
+  hasDataGuidance: true,
   publishScheduled: '2020-03-03T00:00:00',
   nextReleaseDate: { year: 2020, month: 3, day: 4 },
   relatedInformation: [],

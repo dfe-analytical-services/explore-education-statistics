@@ -25,6 +25,7 @@ describe('PublicationSummary', () => {
     canAdoptMethodologies: true,
     canCreateReleases: true,
     canUpdatePublication: true,
+    canUpdatePublicationTitle: true,
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
   };
@@ -34,11 +35,15 @@ describe('PublicationSummary', () => {
     title: 'Publication 1',
     contact: undefined,
     releases: [],
+    legacyReleases: [],
     methodologies: [],
+    themeId: 'theme-1',
+    topicId: 'topic-1',
     permissions: {
       canAdoptMethodologies: false,
       canCreateReleases: false,
       canUpdatePublication: false,
+      canUpdatePublicationTitle: false,
       canCreateMethodologies: false,
       canManageExternalMethodology: false,
     },
@@ -148,13 +153,13 @@ describe('PublicationSummary', () => {
 
     expect(
       screen.queryByRole('link', {
-        name: 'Link to an externally hosted methodology',
+        name: 'Use an external methodology',
       }),
     ).not.toBeInTheDocument();
 
     expect(
       screen.queryByRole('link', {
-        name: 'Manage this publication',
+        name: 'Manage publication',
       }),
     ).not.toBeInTheDocument();
 
@@ -230,13 +235,13 @@ describe('PublicationSummary', () => {
 
     expect(
       screen.getByRole('link', {
-        name: 'Link to an externally hosted methodology',
+        name: 'Use an external methodology',
       }),
     ).toBeInTheDocument();
 
     expect(
       screen.getByRole('link', {
-        name: 'Manage this publication',
+        name: 'Manage publication',
       }),
     ).toBeInTheDocument();
 
@@ -308,7 +313,7 @@ describe('PublicationSummary', () => {
     // PublicationSummary.
     expect(
       screen.getByRole('button', {
-        name: `${testMethodologies[0].methodology.title} (Owned) Approved`,
+        name: `${testMethodologies[0].methodology.title} (Owned) Published`,
       }),
     ).toBeInTheDocument();
 

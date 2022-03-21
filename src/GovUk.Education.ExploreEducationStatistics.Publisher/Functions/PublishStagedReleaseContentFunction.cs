@@ -1,41 +1,35 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleaseStatusPublishingStage;
+using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusPublishingStage;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 {
     // ReSharper disable once UnusedType.Global
     public class PublishStagedReleaseContentFunction
     {
-        private readonly IBlobCacheService _blobCacheService;
         private readonly IContentService _contentService;
         private readonly INotificationsService _notificationsService;
-        private readonly IReleaseStatusService _releaseStatusService;
+        private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IPublishingService _publishingService;
         private readonly IReleaseService _releaseService;
 
-        public PublishStagedReleaseContentFunction(IBlobCacheService blobCacheService,
-            IContentService contentService,
+        public PublishStagedReleaseContentFunction(IContentService contentService,
             INotificationsService notificationsService,
-            IReleaseStatusService releaseStatusService,
+            IReleasePublishingStatusService releasePublishingStatusService,
             IPublishingService publishingService,
             IReleaseService releaseService)
         {
-            _blobCacheService = blobCacheService;
             _contentService = contentService;
             _notificationsService = notificationsService;
-            _releaseStatusService = releaseStatusService;
+            _releasePublishingStatusService = releasePublishingStatusService;
             _publishingService = publishingService;
             _releaseService = releaseService;
         }
@@ -64,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             var scheduled = (await QueryScheduledReleases()).ToList();
             if (scheduled.Any())
             {
-                var published = new List<ReleaseStatus>();
+                var published = new List<ReleasePublishingStatus>();
                 foreach (var releaseStatus in scheduled)
                 {
                     logger.LogInformation("Moving content for release: {0}",
@@ -81,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         logger.LogError(e, "Exception occured while executing {0}",
                             executionContext.FunctionName);
                         await UpdateStage(releaseStatus, Failed,
-                            new ReleaseStatusLogMessage($"Exception in publishing stage: {e.Message}"));
+                            new ReleasePublishingStatusLogMessage($"Exception in publishing stage: {e.Message}"));
                     }
                 }
 
@@ -89,20 +83,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                 try
                 {
-                    if (!PublisherUtils.IsDevelopment())
+                    if (!EnvironmentUtils.IsLocalEnvironment())
                     {
                         await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
                     }
 
                     // Invalidate the cached trees in case any methodologies/publications
                     // are now accessible for the first time after publishing these releases
-                    await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
-                    await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
-                    await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
+                    await _contentService.DeleteCachedTaxonomyBlobs();
 
                     await _contentService.DeletePreviousVersionsDownloadFiles(releaseIds);
                     await _contentService.DeletePreviousVersionsContent(releaseIds);
-                    await _notificationsService.NotifySubscribers(releaseIds);
+
+                    await _notificationsService.NotifySubscribersIfApplicable(releaseIds);
+
                     await UpdateStage(published, Complete);
                 }
                 catch (Exception e)
@@ -110,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     logger.LogError(e, "Exception occured while executing {0}",
                         executionContext.FunctionName);
                     await UpdateStage(published, Failed,
-                        new ReleaseStatusLogMessage($"Exception in publishing stage: {e.Message}"));
+                        new ReleasePublishingStatusLogMessage($"Exception in publishing stage: {e.Message}"));
                 }
             }
 
@@ -120,16 +114,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 timer.FormatNextOccurrences(1));
         }
 
-        private async Task<IEnumerable<ReleaseStatus>> QueryScheduledReleases()
+        private async Task<IEnumerable<ReleasePublishingStatus>> QueryScheduledReleases()
         {
-            return await _releaseStatusService.GetWherePublishingDueTodayWithStages(
-                content: ReleaseStatusContentStage.Complete,
-                data: ReleaseStatusDataStage.Complete,
+            return await _releasePublishingStatusService.GetWherePublishingDueTodayWithStages(
+                content: ReleasePublishingStatusContentStage.Complete,
+                data: ReleasePublishingStatusDataStage.Complete,
                 publishing: Scheduled);
         }
 
-        private async Task UpdateStage(IEnumerable<ReleaseStatus> releaseStatuses, ReleaseStatusPublishingStage stage,
-            ReleaseStatusLogMessage logMessage = null)
+        private async Task UpdateStage(IEnumerable<ReleasePublishingStatus> releaseStatuses, ReleasePublishingStatusPublishingStage stage,
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
             foreach (var releaseStatus in releaseStatuses)
             {
@@ -137,10 +131,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             }
         }
 
-        private async Task UpdateStage(ReleaseStatus releaseStatus, ReleaseStatusPublishingStage stage,
-            ReleaseStatusLogMessage logMessage = null)
+        private async Task UpdateStage(ReleasePublishingStatus releasePublishingStatus, ReleasePublishingStatusPublishingStage stage,
+            ReleasePublishingStatusLogMessage? logMessage = null)
         {
-            await _releaseStatusService.UpdatePublishingStageAsync(releaseStatus.ReleaseId, releaseStatus.Id, stage,
+            await _releasePublishingStatusService.UpdatePublishingStageAsync(releasePublishingStatus.ReleaseId, releasePublishingStatus.Id, stage,
                 logMessage);
         }
     }

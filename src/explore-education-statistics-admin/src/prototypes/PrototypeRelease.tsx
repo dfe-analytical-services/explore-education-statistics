@@ -24,7 +24,7 @@ const PrototypeRelease = () => {
           {
             name: 'Childrens social care',
             link:
-              'https://explore-education-statistics.service.gov.uk/find-statistics#publications-1',
+              'https://explore-education-statistics.service.gov.uk/find-statistics#themes-1',
           },
           {
             name: 'Children looked after in England including adoptions',
@@ -44,7 +44,7 @@ const PrototypeRelease = () => {
                 </div>
 
                 <img
-                  src="/assets/images/UKSA-quality-mark2.jpg"
+                  src="/assets/images/UKSA-quality-mark.jpg"
                   className="govuk-!-margin-right-3"
                   alt="UK statistics authority quality mark"
                   height="60"

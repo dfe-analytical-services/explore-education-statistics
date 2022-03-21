@@ -143,7 +143,9 @@ export const testChartTableData: TableDataResponse = {
         name: 'sess_overall_percent',
       },
     ],
-    locations: [{ level: 'country', label: 'England', value: 'england' }],
+    locations: {
+      country: [{ id: 'england', label: 'England', value: 'england' }],
+    },
     boundaryLevels: [
       {
         id: 1,
@@ -166,7 +168,7 @@ export const testChartTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'country',
-      location: { country: { code: 'england', name: 'England' } },
+      locationId: 'england',
       measures: {
         'authorised-absence-rate': '3.5',
         'overall-absence-rate': '4.6',
@@ -177,7 +179,7 @@ export const testChartTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'country',
-      location: { country: { code: 'england', name: 'England' } },
+      locationId: 'england',
       measures: {
         'authorised-absence-rate': '4.2',
         'overall-absence-rate': '5.3',
@@ -188,7 +190,7 @@ export const testChartTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'country',
-      location: { country: { code: 'england', name: 'England' } },
+      locationId: 'england',
       measures: {
         'authorised-absence-rate': '3.5',
         'overall-absence-rate': '4.5',
@@ -199,7 +201,7 @@ export const testChartTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'country',
-      location: { country: { code: 'england', name: 'England' } },
+      locationId: 'england',
       measures: {
         'authorised-absence-rate': '3.4',
         'overall-absence-rate': '4.7',
@@ -210,7 +212,7 @@ export const testChartTableData: TableDataResponse = {
     {
       filters: ['characteristic-total', 'school-type-total'],
       geographicLevel: 'country',
-      location: { country: { code: 'england', name: 'England' } },
+      locationId: 'england',
       measures: {
         'authorised-absence-rate': '3.4',
         'overall-absence-rate': '4.6',

@@ -17,17 +17,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         : AuthorizationHandler<ResolveSpecificCommentRequirement, Comment>
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IReleaseStatusRepository _releaseStatusRepository;
+        private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
 
         public ResolveSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext,
-            IReleaseStatusRepository releaseStatusRepository,
+            IReleasePublishingStatusRepository releasePublishingStatusRepository,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
             _contentDbContext = contentDbContext;
-            _releaseStatusRepository = releaseStatusRepository;
+            _releasePublishingStatusRepository = releasePublishingStatusRepository;
             _userPublicationRoleRepository = userPublicationRoleRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
         }
@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             var release = GetRelease(_contentDbContext, resource);
             var updateSpecificReleaseContext = new AuthorizationHandlerContext(
                 new[] {new UpdateSpecificReleaseRequirement()}, context.User, release);
-            await new UpdateSpecificReleaseAuthorizationHandler(_releaseStatusRepository,
+            await new UpdateSpecificReleaseAuthorizationHandler(_releasePublishingStatusRepository,
                 _userPublicationRoleRepository,
                 _userReleaseRoleRepository)
                 .HandleAsync(updateSpecificReleaseContext);

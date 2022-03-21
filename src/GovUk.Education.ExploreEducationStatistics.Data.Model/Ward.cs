@@ -1,14 +1,10 @@
+#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
-    public class Ward : ObservationalUnit
+    public class Ward : LocationAttribute
     {
-        public Ward(string code, string name) : base(code, name)
+        public Ward(string? code, string? name) : base(code, name)
         {
-        }
-        
-        public static Ward Empty()
-        {
-            return new Ward(null, null);
         }
     }
 }

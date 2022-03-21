@@ -8,10 +8,10 @@ import SubjectForm, {
 import FeaturedTablesList from '@common/modules/table-tool/components/FeaturedTablesList';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import { Subject, FeaturedTable } from '@common/services/tableBuilderService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { ReactNode } from 'react';
-import WizardStepEditButton from './WizardStepEditButton';
 
 const subjectTabsId = 'subjectTabs';
 const subjectTabIds = {
@@ -19,7 +19,7 @@ const subjectTabIds = {
   createTable: `${subjectTabsId}-createTable`,
 };
 
-interface Props {
+interface Props extends InjectedWizardProps {
   featuredTables?: FeaturedTable[];
   loadingFastTrack?: boolean;
   subjects: Subject[];
@@ -36,17 +36,13 @@ const SubjectStep = ({
   renderFeaturedTable,
   onSubmit,
   ...stepProps
-}: Props & InjectedWizardProps) => {
-  const { isActive, currentStep, stepNumber } = stepProps;
+}: Props) => {
+  const { isActive } = stepProps;
 
   const hasFeaturedTables = renderFeaturedTable && featuredTables.length > 0;
-  const stepEnabled = currentStep > stepNumber;
+
   const stepHeading = (
-    <WizardStepHeading
-      {...stepProps}
-      fieldsetHeading={!hasFeaturedTables}
-      stepEnabled={stepEnabled}
-    >
+    <WizardStepHeading {...stepProps} fieldsetHeading={!hasFeaturedTables}>
       {hasFeaturedTables
         ? 'View a featured table or create your own'
         : 'Choose a subject'}
@@ -58,7 +54,7 @@ const SubjectStep = ({
       <SubjectForm
         {...stepProps}
         initialValues={{
-          subjectId,
+          subjectId: subjects.length === 1 ? subjects[0].id : subjectId,
         }}
         options={subjects}
         onSubmit={onSubmit}
@@ -126,19 +122,13 @@ const SubjectStep = ({
     subjects.find(({ id }) => subjectId === id)?.name ?? 'None';
 
   return (
-    <div className="govuk-grid-row">
-      <div className="govuk-grid-column-two-thirds">
-        {stepHeading}
-        <SummaryList noBorder>
-          <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
-        </SummaryList>
-      </div>
-      <div className="govuk-grid-column-one-third dfe-align--right">
-        {stepEnabled && (
-          <WizardStepEditButton {...stepProps} editTitle="Change subject" />
-        )}
-      </div>
-    </div>
+    <WizardStepSummary {...stepProps} goToButtonText="Change subject">
+      {stepHeading}
+
+      <SummaryList noBorder>
+        <SummaryListItem term="Subject">{subjectName}</SummaryListItem>
+      </SummaryList>
+    </WizardStepSummary>
   );
 };
 

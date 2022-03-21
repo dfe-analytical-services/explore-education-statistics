@@ -12,8 +12,8 @@ using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -37,7 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Id = Guid.NewGuid(),
             Methodologies = ListOf(new PublicationMethodology
             {
-                Owner = true
+                Owner = true,
+                MethodologyId = Guid.NewGuid(),
             })
         };
 
@@ -46,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             Id = Guid.NewGuid(),
             Methodologies = ListOf(new PublicationMethodology
             {
-                Owner = false
+                Owner = false,
+                MethodologyId = Guid.NewGuid(),
             })
         };
 
@@ -75,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
-                    await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                    await using var context = InMemoryApplicationDbContext();
                     context.Attach(publication);
 
                     var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
@@ -104,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachSecurityClaimAsync(async claim =>
                 {
-                    await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                    await using var context = InMemoryApplicationDbContext();
                     await context.Publications.AddAsync(publication);
                     await context.SaveChangesAsync();
 
@@ -139,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task UserCannotCreateMethodologyForPublicationWithoutPublicationOwnerRole()
             {
-                await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                await using var context = InMemoryApplicationDbContext();
                 await context.Publications.AddAsync(Publication);
                 await context.SaveChangesAsync();
 
@@ -166,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             private static async Task AssertPublicationOwnerCanCreateMethodology(Publication publication)
             {
-                await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                await using var context = InMemoryApplicationDbContext();
                 context.Attach(publication);
 
                 var (handler, publicationRoleRepository) = CreateHandlerAndDependencies(context);
@@ -186,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
             private static async Task AssertPublicationOwnerCannotCreateMethodology(Publication publication)
             {
-                await using var context = InMemoryApplicationDbContext(Guid.NewGuid().ToString());
+                await using var context = InMemoryApplicationDbContext();
                 await context.Publications.AddAsync(publication);
                 await context.SaveChangesAsync();
 

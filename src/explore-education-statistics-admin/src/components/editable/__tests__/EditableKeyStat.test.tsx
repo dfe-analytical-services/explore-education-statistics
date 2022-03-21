@@ -38,13 +38,14 @@ describe('EditableKeyStat', () => {
           },
         },
       },
-      locations: [
-        {
-          label: 'England',
-          level: 'country',
-          value: 'england',
-        },
-      ],
+      locations: {
+        country: [
+          {
+            label: 'England',
+            value: 'england',
+          },
+        ],
+      },
       timePeriodRange: [{ code: 'AY', label: '2020/21', year: 2020 }],
       indicators: [
         {
@@ -61,12 +62,7 @@ describe('EditableKeyStat', () => {
       {
         filters: ['filter-1'],
         geographicLevel: 'country',
-        location: {
-          country: {
-            name: 'england',
-            code: 'england',
-          },
-        },
+        locationId: 'england',
         timePeriod: '2020_AY',
         measures: {
           'indicator-1': '608180',

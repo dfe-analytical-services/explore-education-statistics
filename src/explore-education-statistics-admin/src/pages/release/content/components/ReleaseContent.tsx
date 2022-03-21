@@ -1,7 +1,8 @@
-import { CommentsChangeHandler } from '@admin/components/editable/Comments';
+import ButtonLink from '@admin/components/ButtonLink';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import Link from '@admin/components/Link';
 import PrintThisPage from '@admin/components/PrintThisPage';
+import RouteLeavingGuard from '@admin/components/RouteLeavingGuard';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import BasicReleaseSummary from '@admin/pages/release/content/components/BasicReleaseSummary';
@@ -16,17 +17,19 @@ import useReleaseContentActions from '@admin/pages/release/content/contexts/useR
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import {
   preReleaseAccessListRoute,
-  releaseMetaGuidanceRoute,
+  releaseDataGuidanceRoute,
 } from '@admin/routes/routes';
 import releaseDataFileService from '@admin/services/releaseDataFileService';
+import releaseFileService from '@admin/services/releaseFileService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
+import useToggle from '@common/hooks/useToggle';
+import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
-import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 
 interface MethodologyLink {
   key: string;
@@ -37,10 +40,23 @@ interface MethodologyLink {
 const ReleaseContent = () => {
   const config = useConfig();
   const location = useLocation();
-
-  const { editingMode } = useEditingContext();
+  const {
+    editingMode,
+    unsavedBlocks,
+    unsavedCommentDeletions,
+  } = useEditingContext();
   const { release } = useReleaseContentState();
   const actions = useReleaseContentActions();
+  const [blockRouteChange, toggleBlockRouteChange] = useToggle(false);
+
+  useMemo(() => {
+    const blocksWithCommentDeletions = Object.entries(unsavedCommentDeletions)
+      .filter(blockWithDeletions => blockWithDeletions[1].length)
+      .map(blockWithDeletions => blockWithDeletions[0]);
+    toggleBlockRouteChange(
+      unsavedBlocks.length > 0 || blocksWithCommentDeletions.length > 0,
+    );
+  }, [toggleBlockRouteChange, unsavedBlocks, unsavedCommentDeletions]);
 
   const releaseCount = useMemo(() => {
     if (release) {
@@ -93,18 +109,6 @@ const ReleaseContent = () => {
     [release, actions],
   );
 
-  const updateBlockComments: CommentsChangeHandler = useCallback(
-    async (blockId, comments) => {
-      await actions.updateBlockComments({
-        sectionId: release.summarySection.id,
-        blockId,
-        sectionKey: 'summarySection',
-        comments,
-      });
-    },
-    [actions, release.summarySection.id],
-  );
-
   if (!release) {
     return null;
   }
@@ -127,27 +131,39 @@ const ReleaseContent = () => {
     });
   }
 
+  const hasAllFilesButton = release.downloadFiles.some(
+    file =>
+      file.type === 'Data' ||
+      (file.type === 'Ancillary' && file.name !== 'All files'),
+  );
+
   return (
     <>
+      <RouteLeavingGuard
+        blockRouteChange={blockRouteChange}
+        title="There are unsaved changes"
+      >
+        <p>
+          Clicking away from this tab will result in the changes being lost.
+        </p>
+      </RouteLeavingGuard>
+
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-two-thirds">
-          <div className="govuk-grid-row">
-            <BasicReleaseSummary release={release} />
-          </div>
+          <BasicReleaseSummary release={release} />
 
           <div id="releaseSummary">
             {release.summarySection && (
               <>
                 <EditableSectionBlocks
-                  allowComments
                   blocks={release.summarySection.content}
                   sectionId={release.summarySection.id}
-                  onBlockCommentsChange={updateBlockComments}
                   renderBlock={block => (
                     <ReleaseBlock block={block} releaseId={release.id} />
                   )}
                   renderEditableBlock={block => (
                     <ReleaseEditableBlock
+                      allowComments
                       block={block}
                       releaseId={release.id}
                       sectionId={release.summarySection.id}
@@ -179,17 +195,50 @@ const ReleaseContent = () => {
 
         <div className="govuk-grid-column-one-third">
           <RelatedAside>
-            <h2 className="govuk-heading-m">Useful information</h2>
+            <h2 className="govuk-heading-m" id="data-downloads">
+              Data downloads
+            </h2>
+            <nav role="navigation" aria-labelledby="data-downloads">
+              <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
+                <li>
+                  <a href="#dataDownloads-1">Explore data and files</a>
+                </li>
+                <li>
+                  <Link
+                    to={{
+                      pathname: generatePath<ReleaseRouteParams>(
+                        releaseDataGuidanceRoute.path,
+                        {
+                          publicationId: release.publication.id,
+                          releaseId: release.id,
+                        },
+                      ),
+                      state: {
+                        backLink: location.pathname,
+                      },
+                    }}
+                  >
+                    Data guidance
+                  </Link>
+                </li>
+                {hasAllFilesButton && (
+                  <li>
+                    <Button
+                      className="govuk-!-width-full govuk-!-margin-bottom-3"
+                      disableDoubleClick
+                      onClick={() =>
+                        releaseFileService.downloadAllFilesZip(release.id)
+                      }
+                    >
+                      Download all data
+                    </Button>
+                  </li>
+                )}
+              </ul>
+            </nav>
 
+            <h2 className="govuk-heading-m">Supporting information</h2>
             <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
-              <li>
-                <a
-                  href="#dataDownloads-1"
-                  className="govuk-button govuk-!-margin-bottom-3"
-                >
-                  View data and files
-                </a>
-              </li>
               {release.hasPreReleaseAccessList && (
                 <li>
                   <Link
@@ -215,39 +264,38 @@ const ReleaseContent = () => {
               </li>
             </ul>
 
-            <dl className="dfe-meta-content">
-              <dt className="govuk-caption-m">For {release.coverageTitle}: </dt>
-              <dd data-testid="release-name">
-                <strong>{release.yearTitle}</strong>
+            {!!releaseCount && (
+              <>
+                <p className="govuk-!-margin-bottom-0">
+                  {release.coverageTitle} <strong>{release.yearTitle}</strong>
+                </p>
+                <Details summary={`See other releases (${releaseCount})`}>
+                  <ul className="govuk-list">
+                    {[
+                      ...release.publication.otherReleases.map(
+                        ({ id, title, slug }) => (
+                          <li key={id} data-testid="other-release-item">
+                            <Link
+                              to={`${config?.PublicAppUrl}/find-statistics/${release.publication.slug}/${slug}`}
+                            >
+                              {title}
+                            </Link>
+                          </li>
+                        ),
+                      ),
+                      ...release.publication.legacyReleases.map(
+                        ({ id, description, url }) => (
+                          <li key={id} data-testid="other-release-item">
+                            <Link to={url}>{description}</Link>
+                          </li>
+                        ),
+                      ),
+                    ]}
+                  </ul>
+                </Details>
+              </>
+            )}
 
-                {releaseCount > 0 && (
-                  <Details summary={`See other releases (${releaseCount})`}>
-                    <ul className="govuk-list">
-                      {[
-                        ...release.publication.otherReleases.map(
-                          ({ id, title, slug }) => (
-                            <li key={id} data-testid="other-release-item">
-                              <Link
-                                to={`${config?.PublicAppUrl}/find-statistics/${release.publication.slug}/${slug}`}
-                              >
-                                {title}
-                              </Link>
-                            </li>
-                          ),
-                        ),
-                        ...release.publication.legacyReleases.map(
-                          ({ id, description, url }) => (
-                            <li key={id} data-testid="other-release-item">
-                              <Link to={url}>{description}</Link>
-                            </li>
-                          ),
-                        ),
-                      ]}
-                    </ul>
-                  </Details>
-                )}
-              </dd>
-            </dl>
             {allMethodologies.length > 0 && (
               <>
                 <h3
@@ -281,6 +329,15 @@ const ReleaseContent = () => {
       {(release.downloadFiles || release.hasPreReleaseAccessList) && (
         <ReleaseDataAndFilesAccordion
           release={release}
+          renderAllFilesButton={
+            <Button
+              disableDoubleClick
+              variant="secondary"
+              onClick={() => releaseFileService.downloadAllFilesZip(release.id)}
+            >
+              Download all data
+            </Button>
+          }
           renderDownloadLink={file => (
             <ButtonText
               onClick={() =>
@@ -294,11 +351,11 @@ const ReleaseContent = () => {
               {file.name}
             </ButtonText>
           )}
-          renderMetaGuidanceLink={
-            <Link
+          renderDataGuidanceLink={
+            <ButtonLink
               to={{
                 pathname: generatePath<ReleaseRouteParams>(
-                  releaseMetaGuidanceRoute.path,
+                  releaseDataGuidanceRoute.path,
                   {
                     publicationId: release.publication.id,
                     releaseId: release.id,
@@ -308,28 +365,24 @@ const ReleaseContent = () => {
                   backLink: location.pathname,
                 },
               }}
+              variant="secondary"
             >
-              data files guide
-            </Link>
+              Data guidance
+            </ButtonLink>
           }
-          renderPreReleaseAccessLink={
-            <Link
-              to={{
-                pathname: generatePath<ReleaseRouteParams>(
-                  preReleaseAccessListRoute.path,
-                  {
-                    publicationId: release.publication.id,
-                    releaseId: release.id,
-                  },
-                ),
-                state: {
-                  backLink: location.pathname,
-                },
-              }}
-            >
-              View pre-release access list
-            </Link>
+          renderDataCatalogueLink={
+            <Button disabled variant="secondary">
+              Browse data files
+              <br /> (public site only)
+            </Button>
           }
+          renderCreateTablesButton={
+            <Button disabled>
+              Create tables
+              <br /> (public site only)
+            </Button>
+          }
+          showDownloadFilesList
         />
       )}
 

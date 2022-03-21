@@ -6,8 +6,10 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    AuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
+    PublicationAuthorizationHandlersTestUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -53,22 +55,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public void ViewLegacyRelease_PublicationRoles()
+            public async Task ViewLegacyRelease_PublicationRoles()
             {
                 var legacyRelease = new LegacyRelease
                 {
                     PublicationId = Guid.NewGuid(),
                 };
 
-                AssertHandlerOnlySucceedsWithPublicationRole<
-                   ViewLegacyReleaseRequirement,
-                   LegacyRelease>(
-                   legacyRelease.PublicationId,
-                   legacyRelease,
-                   contentDbContext =>
-                       new ViewLegacyReleaseAuthorizationHandler(
-                           new UserPublicationRoleRepository(contentDbContext)),
-                   PublicationRole.Owner);
+                await AssertHandlerOnlySucceedsWithPublicationRoles<ViewLegacyReleaseRequirement, LegacyRelease>(
+                    legacyRelease.PublicationId,
+                    legacyRelease,
+                    contentDbContext => contentDbContext.Add(legacyRelease),
+                    contentDbContext =>
+                        new ViewLegacyReleaseAuthorizationHandler(
+                            new UserPublicationRoleRepository(contentDbContext)),
+                    PublicationRole.Owner);
             }
         }
 
@@ -87,22 +88,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public void UpdateLegacyRelease_PublicationRoles()
+            public async Task UpdateLegacyRelease_PublicationRoles()
             {
                 var legacyRelease = new LegacyRelease
                 {
                     PublicationId = Guid.NewGuid(),
                 };
 
-                AssertHandlerOnlySucceedsWithPublicationRole<
-                   UpdateLegacyReleaseRequirement,
-                   LegacyRelease>(
-                   legacyRelease.PublicationId,
-                   legacyRelease,
-                   contentDbContext =>
-                       new UpdateLegacyReleaseAuthorizationHandler(
-                           new UserPublicationRoleRepository(contentDbContext)),
-                   PublicationRole.Owner);
+                await AssertHandlerOnlySucceedsWithPublicationRoles<UpdateLegacyReleaseRequirement, LegacyRelease>(
+                    legacyRelease.PublicationId,
+                    legacyRelease,
+                    contentDbContext => contentDbContext.Add(legacyRelease),
+                    contentDbContext =>
+                        new UpdateLegacyReleaseAuthorizationHandler(
+                            new UserPublicationRoleRepository(contentDbContext)),
+                    PublicationRole.Owner);
             }
         }
 
@@ -121,22 +121,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             }
 
             [Fact]
-            public void DeleteLegacyRelease_PublicationRoles()
+            public async Task DeleteLegacyRelease_PublicationRoles()
             {
                 var legacyRelease = new LegacyRelease
                 {
                     PublicationId = Guid.NewGuid(),
                 };
 
-                AssertHandlerOnlySucceedsWithPublicationRole<
-                   DeleteLegacyReleaseRequirement,
-                   LegacyRelease>(
-                   legacyRelease.PublicationId,
-                   legacyRelease,
-                   contentDbContext =>
-                       new DeleteLegacyReleaseAuthorizationHandler(
-                           new UserPublicationRoleRepository(contentDbContext)),
-                   PublicationRole.Owner);
+                await AssertHandlerOnlySucceedsWithPublicationRoles<DeleteLegacyReleaseRequirement, LegacyRelease>(
+                    legacyRelease.PublicationId,
+                    legacyRelease,
+                    contentDbContext => contentDbContext.Add(legacyRelease),
+                    contentDbContext =>
+                        new DeleteLegacyReleaseAuthorizationHandler(
+                            new UserPublicationRoleRepository(contentDbContext)),
+                    PublicationRole.Owner);
             }
         }
     }

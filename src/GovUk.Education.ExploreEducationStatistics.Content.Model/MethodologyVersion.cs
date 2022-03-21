@@ -92,8 +92,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public bool Amendment => PreviousVersionId != null && Published == null;
 
-        public bool DraftFirstVersion => PreviousVersionId == null && Status == Draft;
-
         public MethodologyVersion CreateMethodologyAmendment(DateTime createdDate, Guid createdByUserId)
         {
             var copy = (MethodologyVersion) MemberwiseClone();

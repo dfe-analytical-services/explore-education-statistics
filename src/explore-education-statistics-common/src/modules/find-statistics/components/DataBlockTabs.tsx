@@ -15,6 +15,8 @@ import { DataBlock } from '@common/services/types/blocks';
 import isAxiosError from '@common/utils/error/isAxiosError';
 import React, { ReactNode } from 'react';
 
+const testId = (dataBlock: DataBlock) => `Data block - ${dataBlock.name}`;
+
 export interface DataBlockTabsProps {
   additionalTabContent?:
     | ((props: { dataBlock: DataBlock }) => ReactNode)
@@ -56,11 +58,7 @@ const DataBlockTabs = ({
 
   return (
     <LoadingSpinner loading={isLoading}>
-      <Tabs
-        id={id}
-        testId={`Data block - ${dataBlock.name}`}
-        onToggle={onToggle}
-      >
+      <Tabs id={id} testId={testId(dataBlock)} onToggle={onToggle}>
         {firstTabs}
 
         {dataBlock.charts?.length && (
@@ -126,6 +124,7 @@ const DataBlockTabs = ({
               <ErrorBoundary fallback={errorMessage}>
                 <TimePeriodDataTable
                   key={dataBlock.id}
+                  dataBlockId={dataBlock.id}
                   fullTable={fullTable}
                   captionTitle={dataBlock?.heading}
                   source={dataBlock?.source}
@@ -153,4 +152,5 @@ const DataBlockTabs = ({
 
 export default withLazyLoad(DataBlockTabs, {
   offset: 100,
+  placeholder: ({ dataBlock }) => <span data-testid={testId(dataBlock)} />,
 });

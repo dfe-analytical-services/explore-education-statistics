@@ -17,8 +17,8 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Database.ContentDbUtils;
-using static GovUk.Education.ExploreEducationStatistics.Data.Model.Database.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                MetaGuidance = "Guidance 1"
+                DataGuidance = "Guidance 1"
 
             };
 
@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Release = statisticsRelease,
                 Subject = new Subject(),
-                MetaGuidance = "Guidance 2"
+                DataGuidance = "Guidance 2"
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -104,21 +104,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var metaGuidanceSubjectService = new Mock<IMetaGuidanceSubjectService>();
+                var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>();
+                var timePeriodService = new Mock<ITimePeriodService>();
 
-                metaGuidanceSubjectService
-                    .Setup(s => s.GetTimePeriods(releaseSubject1.SubjectId))
-                    .ReturnsAsync(new TimePeriodLabels("2020/21", "2021/22"));
+                timePeriodService
+                    .Setup(s => s.GetTimePeriodLabels(releaseSubject1.SubjectId))
+                    .Returns(new TimePeriodLabels("2020/21", "2021/22"));
 
-                metaGuidanceSubjectService
-                    .Setup(s => s.GetTimePeriods(releaseSubject2.SubjectId))
-                    .ReturnsAsync(new TimePeriodLabels("2030", "2031"));
+                timePeriodService
+                    .Setup(s => s.GetTimePeriodLabels(releaseSubject2.SubjectId))
+                    .Returns(new TimePeriodLabels("2030", "2031"));
 
-                metaGuidanceSubjectService
+                dataGuidanceSubjectService
                     .Setup(s => s.GetGeographicLevels(releaseSubject1.SubjectId))
                     .ReturnsAsync(ListOf("Local Authority", "Local Authority District"));
 
-                metaGuidanceSubjectService
+                dataGuidanceSubjectService
                     .Setup(s => s.GetGeographicLevels(releaseSubject2.SubjectId))
                     .ReturnsAsync(ListOf("National"));
 
@@ -157,13 +158,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
-                    metaGuidanceSubjectService: metaGuidanceSubjectService.Object,
+                    dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
+                    timePeriodService: timePeriodService.Object,
                     fileSizeGetter: fileInfoGetter.Object
                 );
 
                 var result = await service.ListSubjects(contentRelease.Id);
 
-                MockUtils.VerifyAllMocks(metaGuidanceSubjectService, fileInfoGetter);
+                MockUtils.VerifyAllMocks(dataGuidanceSubjectService, fileInfoGetter);
 
                 var subjects = result.AssertRight();
 
@@ -176,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("1 Mb", subjects[0].File.Size);
                 Assert.Equal("csv", subjects[0].File.Extension);
 
-                Assert.Equal(releaseSubject1.MetaGuidance, subjects[0].Content);
+                Assert.Equal(releaseSubject1.DataGuidance, subjects[0].Content);
 
                 Assert.Equal("2020/21", subjects[0].TimePeriods.From);
                 Assert.Equal("2021/22", subjects[0].TimePeriods.To);
@@ -190,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(releaseFile2.File.Id, subjects[1].File.Id);
                 Assert.Equal(releaseFile2.File.Filename, subjects[1].File.FileName);
                 Assert.Equal("2 Mb", subjects[1].File.Size);
-                Assert.Equal(releaseSubject2.MetaGuidance, subjects[1].Content);
+                Assert.Equal(releaseSubject2.DataGuidance, subjects[1].Content);
                 Assert.Equal("csv", subjects[1].File.Extension);
 
                 Assert.Equal("2030", subjects[1].TimePeriods.From);
@@ -938,7 +940,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             IPersistenceHelper<ContentDbContext>? persistenceHelper = null,
             StatisticsDbContext? statisticsDbContext = null,
             IUserService? userService = null,
-            IMetaGuidanceSubjectService? metaGuidanceSubjectService = null,
+            IDataGuidanceSubjectService? dataGuidanceSubjectService = null,
+            ITimePeriodService? timePeriodService = null,
             IReleaseService.IBlobInfoGetter? fileSizeGetter = null)
         {
             return new ReleaseService(
@@ -946,7 +949,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
-                metaGuidanceSubjectService ?? Mock.Of<IMetaGuidanceSubjectService>(),
+                dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>(),
+                timePeriodService ?? Mock.Of<ITimePeriodService>(),
                 fileSizeGetter ?? Mock.Of<IReleaseService.IBlobInfoGetter>()
             );
         }

@@ -1,7 +1,6 @@
 import metaService, {
   TimePeriodCoverageGroup,
 } from '@admin/services/metaService';
-import { IdTitlePair } from '@admin/services/types/common';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
@@ -14,6 +13,7 @@ import { SelectOption } from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import { ReleaseType, releaseTypes } from '@common/services/types/releaseType';
 import { Dictionary } from '@common/types';
 import Yup from '@common/validation/yup';
 import { Formik, FormikHelpers } from 'formik';
@@ -23,15 +23,10 @@ import { ObjectSchema } from 'yup';
 export interface ReleaseSummaryFormValues {
   timePeriodCoverageCode: string;
   timePeriodCoverageStartYear: string;
-  releaseTypeId: string;
+  releaseType?: ReleaseType;
 }
 
 const formId = 'releaseSummaryForm';
-
-interface Model {
-  releaseTypes: IdTitlePair[];
-  timePeriodCoverageGroups: TimePeriodCoverageGroup[];
-}
 
 interface Props<FormValues extends ReleaseSummaryFormValues> {
   additionalFields?: ReactNode;
@@ -56,27 +51,17 @@ const ReleaseSummaryForm = <
   onSubmit,
   onCancel,
 }: Props<FormValues>) => {
-  const { value: model, isLoading } = useAsyncRetry<Model>(async () => {
-    const [releaseTypes, timePeriodCoverageGroups] = await Promise.all([
-      metaService.getReleaseTypes(),
-      metaService.getTimePeriodCoverageGroups(),
-    ]);
-
-    return {
-      releaseTypes,
-      timePeriodCoverageGroups,
-    };
-  });
+  const { value: timePeriodCoverageGroups, isLoading } = useAsyncRetry<
+    TimePeriodCoverageGroup[]
+  >(() => metaService.getTimePeriodCoverageGroups());
 
   if (isLoading) {
     return <LoadingSpinner />;
   }
 
-  if (!model) {
+  if (!timePeriodCoverageGroups) {
     return <WarningMessage>Could not load release summary</WarningMessage>;
   }
-
-  const { timePeriodCoverageGroups, releaseTypes } = model;
 
   const timePeriodOptions = timePeriodCoverageGroups.reduce<
     Dictionary<SelectOption[]>
@@ -105,7 +90,9 @@ const ReleaseSummaryForm = <
     timePeriodCoverageStartYear: Yup.string()
       .required('Enter a year')
       .length(4, 'Year must be exactly 4 characters'),
-    releaseTypeId: Yup.string().required('Choose a release type'),
+    releaseType: Yup.mixed<ReleaseSummaryFormValues['releaseType']>()
+      .required('Choose a release type')
+      .oneOf(Object.keys(releaseTypes) as ReleaseType[]),
   });
 
   return (
@@ -155,12 +142,14 @@ const ReleaseSummaryForm = <
             </FormFieldset>
 
             <FormFieldRadioGroup<ReleaseSummaryFormValues>
-              legend="Release Type"
-              name="releaseTypeId"
-              options={releaseTypes.map(type => ({
-                label: type.title,
-                value: `${type.id}`,
-              }))}
+              legend="Release type"
+              name="releaseType"
+              options={(Object.keys(releaseTypes) as ReleaseType[]).map(
+                type => ({
+                  label: releaseTypes[type],
+                  value: type,
+                }),
+              )}
             />
 
             {additionalFields}

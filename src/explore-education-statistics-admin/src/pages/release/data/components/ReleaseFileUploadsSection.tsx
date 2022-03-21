@@ -40,17 +40,17 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'title',
     messages: {
-      FILE_UPLOAD_NAME_CANNOT_CONTAIN_SPECIAL_CHARACTERS:
+      FileUploadNameCannotContainSpecialCharacters:
         'File upload name cannot contain special characters',
     },
   }),
   mapFieldErrors<FormValues>({
     target: 'file',
     messages: {
-      CANNOT_OVERWRITE_FILE: 'Choose a unique file name',
-      FILE_CANNOT_BE_EMPTY: 'Choose a file that is not empty',
-      FILE_TYPE_INVALID: 'Choose a file of an allowed format',
-      FILENAME_CANNOT_CONTAIN_SPACES_OR_SPECIAL_CHARACTERS:
+      CannotOverwriteFile: 'Choose a unique file name',
+      FileCannotBeEmpty: 'Choose a file that is not empty',
+      FileTypeInvalid: 'Choose a file of an allowed format',
+      FilenameCannotContainSpacesOrSpecialCharacters:
         'Filename cannot contain spaces or special characters',
     },
   }),

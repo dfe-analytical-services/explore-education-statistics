@@ -28,6 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             await _blobStorageService.DeleteBlob(cacheKey.Container, cacheKey.Key);
         }
 
+        public async Task DeleteCacheFolder(IBlobCacheKey cacheFolderKey)
+        {
+            await _blobStorageService.DeleteBlobs(cacheFolderKey.Container, cacheFolderKey.Key);
+        }
+
+
         public async Task<TItem> GetItem<TItem>(
             IBlobCacheKey cacheKey,
             Func<TItem> itemSupplier)
@@ -106,10 +112,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             {
                 return await _blobStorageService.GetDeserializedJson(cacheKey.Container, cacheKey.Key, targetType);
             }
-            catch (JsonException)
+            catch (JsonException e)
             {
                 // If there's an error deserializing the blob, we should
                 // assume it's not salvageable and delete it so that it's re-built.
+                _logger.LogWarning(e, $"Error deserializing JSON for blobContainer {blobContainer} and cache " +
+                                   $"key {key} - deleting cached JSON");
                 await _blobStorageService.DeleteBlob(blobContainer, key);
             }
             catch (FileNotFoundException)
@@ -118,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
             catch (Exception e)
             {
-                _logger.LogError(e, $"Caught error fetching cache entry from: {blobContainer}/{key}");
+                _logger.LogError(e, "Caught error fetching cache entry from: {BlobContainer}/{Key}", blobContainer, key);
             }
 
             return default;

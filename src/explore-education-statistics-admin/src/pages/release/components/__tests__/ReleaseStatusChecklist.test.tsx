@@ -18,10 +18,7 @@ describe('ReleaseStatusChecklist', () => {
     publicationSlug: 'publication-1-slug',
     timePeriodCoverage: { value: 'W51', label: 'Week 51' },
     title: 'Release Title',
-    type: {
-      id: 'type-1',
-      title: 'Official Statistics',
-    },
+    type: 'OfficialStatistics',
     contact: {
       id: 'contact-1',
       teamName: 'Test name',
@@ -43,7 +40,7 @@ describe('ReleaseStatusChecklist', () => {
             errors: [
               { code: 'DataFileImportsMustBeCompleted' },
               { code: 'DataFileReplacementsMustBeCompleted' },
-              { code: 'PublicMetaGuidanceRequired' },
+              { code: 'PublicDataGuidanceRequired' },
               { code: 'ReleaseNoteRequired' },
             ],
           }}
@@ -83,11 +80,11 @@ describe('ReleaseStatusChecklist', () => {
     expect(
       screen.getByRole('link', {
         name:
-          'All summary information must be completed on the metadata guidance page',
+          'All summary information must be completed on the data guidance page',
       }),
     ).toHaveAttribute(
       'href',
-      '/publication/publication-1/release/release-1/data#metadata-guidance',
+      '/publication/publication-1/release/release-1/data#data-guidance',
     );
 
     expect(
@@ -211,7 +208,7 @@ describe('ReleaseStatusChecklist', () => {
           checklist={{
             valid: true,
             warnings: [{ code: 'NoMethodology' }],
-            errors: [{ code: 'PublicMetaGuidanceRequired' }],
+            errors: [{ code: 'PublicDataGuidanceRequired' }],
           }}
           release={testRelease}
         />
@@ -232,7 +229,7 @@ describe('ReleaseStatusChecklist', () => {
     expect(
       screen.getByRole('link', {
         name:
-          'All summary information must be completed on the metadata guidance page',
+          'All summary information must be completed on the data guidance page',
       }),
     ).toBeInTheDocument();
 

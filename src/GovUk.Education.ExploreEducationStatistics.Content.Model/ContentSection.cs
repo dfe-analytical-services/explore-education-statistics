@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string Caption { get; set; }
 
-        public List<ContentBlock> Content { get; set; } = new List<ContentBlock>();
+        public List<ContentBlock> Content { get; set; } = new();
 
         public ReleaseContentSection Release { get; set; }
 
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
             return copy;
         }
-        
+
         public ContentSection Clone(DateTime createdDate)
         {
             var copy = MemberwiseClone() as ContentSection;

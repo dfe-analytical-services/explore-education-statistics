@@ -1,4 +1,3 @@
-import { CommentsChangeHandler } from '@admin/components/editable/Comments';
 import EditableSectionBlocks from '@admin/components/editable/EditableSectionBlocks';
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
@@ -62,18 +61,6 @@ const ReleaseHeadlines = ({ release }: Props) => {
     [actions, release.id, release.headlinesSection.id],
   );
 
-  const updateBlockComments: CommentsChangeHandler = useCallback(
-    async (blockId, comments) => {
-      await actions.updateBlockComments({
-        sectionId: release.headlinesSection.id,
-        blockId,
-        sectionKey: 'headlinesSection',
-        comments,
-      });
-    },
-    [actions, release.headlinesSection.id],
-  );
-
   const headlinesTab = (
     <TabsSection title="Headlines">
       <section id="releaseHeadlines-keyStatistics">
@@ -81,15 +68,14 @@ const ReleaseHeadlines = ({ release }: Props) => {
       </section>
       <section id="releaseHeadlines-headlines">
         <EditableSectionBlocks
-          allowComments
           blocks={release.headlinesSection.content}
           sectionId={release.headlinesSection.id}
-          onBlockCommentsChange={updateBlockComments}
           renderBlock={block => (
             <ReleaseBlock block={block} releaseId={release.id} />
           )}
           renderEditableBlock={block => (
             <ReleaseEditableBlock
+              allowComments
               block={block}
               sectionId={release.headlinesSection.id}
               releaseId={release.id}

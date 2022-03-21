@@ -1,10 +1,11 @@
 *** Settings ***
-Library     SeleniumLibrary    timeout=${timeout}    implicit_wait=${implicit_wait}    run_on_failure=do this on failure
+Library     SeleniumLibrary    timeout=%{TIMEOUT}    implicit_wait=%{IMPLICIT_WAIT}    run_on_failure=do this on failure
 Library     OperatingSystem
 Library     Collections
 #Library    XvfbRobot    # sudo apt install xvfb + pip install robotframework-xvfb
 Library     file_operations.py
 Library     utilities.py
+Library     fail_fast.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
 
@@ -13,19 +14,32 @@ ${browser}=                             chrome
 ${headless}=                            1
 ${FILES_DIR}=                           ${EXECDIR}${/}tests${/}files${/}
 
-${timeout}=                             30
-${implicit_wait}=                       3
-${release_complete_wait}=               900
+${timeout}=                             %{TIMEOUT}
+${implicit_wait}=                       %{IMPLICIT_WAIT}
+${RELEASE_COMPLETE_WAIT}=               %{RELEASE_COMPLETE_WAIT}
 ${prompt_to_continue_on_failure}=       0
+${FAIL_TEST_SUITES_FAST}=               %{FAIL_TEST_SUITES_FAST}
 
 *** Keywords ***
 do this on failure
-    capture large screenshot and html
+    # See if the currently executing Test Suite is failing fast and if not, take a screenshot and HTML grab of the
+    # failing page.
+    ${currently_failing_fast}=    current test suite failing fast
+
+    IF    "${currently_failing_fast}" == "${FALSE}"
+
+        capture large screenshot and html
+
+        # Additionally, mark the current Test Suite as failing if the "FAIL_TEST_SUITES_FAST" option is enabled, and
+        # this will cause subsequent tests within this same Test Suite to fail immediately (by virtue of their "Test
+        # Setup" steps checking to see if their owning Test Suite is currently failing fast).
+        IF    ${FAIL_TEST_SUITES_FAST} == 1
+            record failing test suite
+        END
+    END
+
     IF    ${prompt_to_continue_on_failure} == 1
         prompt to continue
-    END
-    IF    ${prompt_to_continue_on_failure} == 0
-        set selenium timeout    3
     END
 
 user opens the browser
@@ -119,10 +133,6 @@ user opens firefox without xvfb
 user closes the browser
     close browser
 
-user goes to url
-    [Arguments]    ${destination}
-    go to    ${destination}
-
 user gets url
     ${url}=    get location
     [Return]    ${url}
@@ -176,7 +186,7 @@ user waits until page does not contain loading spinner
     # Also, we're only interested in loading spinners that aren't lazy loaders that are waiting for user interaction
     # prior to loading their content.
     user waits until page does not contain element    //*[@class!="lazyload-wrapper"]/*[@data-testid="loadingSpinner"]
-    ...    60
+    ...    %{WAIT_MEDIUM}
 
 user sets focus to element
     [Arguments]    ${selector}    ${parent}=css:body
@@ -212,6 +222,10 @@ user waits until element contains
 user waits until page contains link
     [Arguments]    ${link_text}    ${wait}=${timeout}
     wait until page contains element    xpath://a[.="${link_text}"]    timeout=${wait}
+
+user waits until page does not contain link
+    [Arguments]    ${link_text}    ${wait}=${timeout}
+    wait until page does not contain element    xpath://a[.="${link_text}"]    timeout=${wait}
 
 user waits until element contains link
     [Arguments]    ${element}    ${link_text}    ${wait}=${timeout}
@@ -335,7 +349,7 @@ user checks element does not contain child element
 
 user checks element contains
     [Arguments]    ${element}    ${text}
-    user waits until parent contains element    ${element}    xpath://*[contains(text(),"${text}")]
+    user waits until parent contains element    ${element}    xpath://*[contains(.,"${text}")]
 
 user checks element contains button
     [Arguments]
@@ -378,8 +392,8 @@ user checks element is not visible
     element should not be visible    ${element}    ${wait}
 
 user waits until element is enabled
-    [Arguments]    ${element}
-    wait until element is enabled    ${element}
+    [Arguments]    ${element}    ${wait}=${timeout}
+    wait until element is enabled    ${element}    ${wait}
 
 user checks element is enabled
     [Arguments]    ${element}
@@ -440,17 +454,21 @@ user waits until page contains button
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until page contains element    xpath://button[text()="${text}"]    ${wait}
 
+user checks page contains button
+    [Arguments]    ${text}
+    user checks page contains element    xpath://button[text()="${text}"]
+
 user checks page does not contain button
     [Arguments]    ${text}
     user checks page does not contain element    xpath://button[text()="${text}"]
 
 user waits until page does not contain button
-    [Arguments]    ${text}
-    user waits until page does not contain element    xpath://button[text()="${text}"]
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until page does not contain element    xpath://button[text()="${text}"]    ${wait}
 
 user waits until button is enabled
-    [Arguments]    ${text}
-    user waits until element is enabled    xpath://button[text()="${text}"]
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until element is enabled    xpath://button[text()="${text}"]    ${wait}
 
 user gets button element
     [Arguments]    ${text}    ${parent}=css:body
@@ -465,6 +483,10 @@ user checks page contains tag
 user waits until h1 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is visible    xpath://h1[text()="${text}"]    ${wait}
+
+user waits until h1 is not visible
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until element is not visible    xpath://h1[text()="${text}"]    ${wait}
 
 user waits until h2 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
@@ -509,7 +531,7 @@ user checks summary list contains
     ...    %{WAIT_MEDIUM}
     ${element}=    get child element    ${parent}
     ...    xpath:.//dl//dt[contains(text(), "${term}")]/following-sibling::dd[contains(., "${description}")]
-    user waits until element is visible    ${element}    %{WAIT_MEDIUM}
+    user waits until element is visible    ${element}    %{WAIT_LONG}
 
 user checks select contains x options
     [Arguments]    ${locator}    ${num}
@@ -540,6 +562,7 @@ user checks selected option label
 user chooses select option
     [Arguments]    ${locator}    ${label}
     user waits until page contains element    ${locator}
+    user waits until parent contains element    ${locator}    xpath:.//option
     select from list by label    ${locator}    ${label}
 
 user chooses file
@@ -568,7 +591,7 @@ user presses keys
 
 user enters text into element
     [Arguments]    ${selector}    ${text}
-    user waits until element is visible    ${selector}    60
+    user waits until element is visible    ${selector}    %{WAIT_SMALL}
     user clears element text    ${selector}
     user presses keys    ${text}    ${selector}
 
@@ -591,10 +614,10 @@ user checks page contains link with text and url
 user opens details dropdown
     [Arguments]    ${text}    ${parent}=css:body
     user waits until parent contains element    ${parent}
-    ...    xpath:.//details/summary[contains(., "${text}") and @aria-expanded]    60
+    ...    xpath:.//details/summary[contains(., "${text}") and @aria-expanded]    %{WAIT_SMALL}
     ${details}=    get child element    ${parent}    xpath:.//details[summary[contains(., "${text}")]]
     ${summary}=    get child element    ${parent}    xpath:.//details/summary[contains(., "${text}")]
-    user waits until element is visible    ${summary}    60
+    user waits until element is visible    ${summary}    %{WAIT_SMALL}
     ${is_expanded}=    get element attribute    ${summary}    aria-expanded
     IF    '${is_expanded}' != 'true'
         user clicks element    ${summary}
@@ -623,14 +646,13 @@ user gets details content element
     ${content}=    get child element    ${parent}    id:${content_id}
     [Return]    ${content}
 
-user waits until details contains element
-    [Arguments]    ${text}    ${element}    ${parent}=css:body    ${wait}=${timeout}
-    ${details}=    user gets details content element    ${text}    ${parent}
-    user waits until parent contains element    ${details}    ${element}    timeout=${wait}
+user waits until page contains details dropdown
+    [Arguments]    ${text}
+    user waits until page contains element    xpath:.//details/summary[contains(., "${text}")]
 
-user waits until details contains link
-    [Arguments]    ${text}    ${link}    ${parent}=css:body
-    user waits until details contains element    ${text}    link:${link}    ${parent}
+user checks page for details dropdown
+    [Arguments]    ${text}
+    user checks page contains element    xpath:.//details/summary[contains(., "${text}")]
 
 user checks publication bullet contains link
     [Arguments]    ${publication}    ${link}
@@ -659,6 +681,10 @@ user checks key stat definition
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-definition"]
     user checks element should contain
     ...    css:[data-testid="keyStat"]:nth-of-type(${tile}) [data-testid="keyStat-definition"]    ${definition}
+
+user checks page contains radio
+    [Arguments]    ${label}
+    page should contain radio button    xpath://label[text()="${label}"]/../input[@type="radio"]
 
 user clicks radio
     [Arguments]    ${label}
@@ -704,11 +730,16 @@ user checks list has x items
     ${items}=    get child elements    ${list}    css:li
     length should be    ${items}    ${num}
 
-user checks list item contains
-    [Arguments]    ${locator}    ${item_num}    ${content}    ${parent}=css:body
+user gets list item element
+    [Arguments]    ${locator}    ${item_num}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
     ${item}=    get child element    ${list}    css:li:nth-child(${item_num})
+    [Return]    ${item}
+
+user checks list item contains
+    [Arguments]    ${locator}    ${item_num}    ${content}    ${parent}=css:body
+    ${item}=    user gets list item element    ${locator}    ${item_num}    ${parent}
     user checks element should contain    ${item}    ${content}
 
 user checks breadcrumb count should be
@@ -719,29 +750,34 @@ user checks nth breadcrumb contains
     [Arguments]    ${num}    ${text}
     user checks element should contain    css:[data-testid="breadcrumbs--list"] li:nth-child(${num})    ${text}
 
-user checks page contains other release
-    [Arguments]    ${other_release_title}
-    user checks page contains element
-    ...    xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
+user waits until page contains other release
+    [Arguments]    ${other_release_title}    ${wait}=${timeout}
+    user waits until page contains element
+    ...    xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]    ${wait}
 
 user checks page does not contain other release
     [Arguments]    ${other_release_title}
     user checks page does not contain element
     ...    xpath://li[@data-testid="other-release-item"]/a[text()="${other_release_title}"]
 
+user navigates to admin frontend
+    [Arguments]    ${URL}=%{ADMIN_URL}
+    disable basic auth headers
+    go to    ${URL}
+
 user navigates to public frontend
-    environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}
-    user waits until h1 is visible    Explore our statistics and data
+    [Arguments]    ${URL}=%{PUBLIC_URL}
+    enable basic auth headers
+    go to    ${URL}
 
 user navigates to find statistics page on public frontend
     environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/find-statistics
+    user navigates to public frontend    %{PUBLIC_URL}/find-statistics
     user waits until h1 is visible    Find statistics and data
 
 user navigates to data tables page on public frontend
     environment variable should be set    PUBLIC_URL
-    user goes to url    %{PUBLIC_URL}/data-tables
+    user navigates to public frontend    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
 
 check that variable is not empty
@@ -751,8 +787,14 @@ check that variable is not empty
     END
 
 user waits until table tool wizard step is available
-    [Arguments]    ${table_tool_step_title}    ${wait}=${timeout}
-    user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]    ${wait}
+    [Arguments]    ${step_number}    ${table_tool_step_title}    ${wait}=%{WAIT_MEDIUM}
+    user waits until page contains element    xpath://*[@data-testid="wizardStep-${step_number}"]    ${wait}
+    user waits until page does not contain element    xpath://*[@data-testid="wizardStep-${step_number}" and @hidden]
+    ...    ${wait}
+    # this visible check passes when it should fail?!
+    user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]
+    ...    %{WAIT_SMALL}
+    user waits until page does not contain loading spinner
 
 lookup or return webelement
     [Arguments]
@@ -767,19 +809,3 @@ lookup or return webelement
         ${element}=    get child element    ${parent}    ${selector_or_webelement}
     END
     [Return]    ${element}
-
-user closes Set Page View box
-    user clicks element    id:pageViewToggleButton
-    user waits until element is not visible    id:editingMode
-
-user checks page for details section
-    [Arguments]    ${heading}
-    user checks page contains element    testid:Expand Details Section ${heading}
-
-user expands details section
-    [Arguments]    ${heading}
-    user clicks element    testid:Expand Details Section ${heading}
-
-user checks page for details dropdown
-    [Arguments]    ${text}
-    user checks page contains element    xpath:.//details/summary[contains(., "${text}")]
