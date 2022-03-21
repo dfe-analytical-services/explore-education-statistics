@@ -29,6 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
     public class DataBlockMigrationServiceTests
     {
         private readonly Country _england = new("E92000001", "England");
+        private readonly Region _northEast = new("E12000001", "North East");
         private readonly Region _eastMidlands = new("E12000004", "East Midlands");
         private readonly LocalAuthority _derby = new("E06000015", "", "Derby");
         private readonly LocalAuthority _derbyDuplicate = new("E06000015", "", "Derby (2)");
@@ -1009,6 +1010,190 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 // Assert an additional table header has been inserted for a location with the same code
                 Assert.Equal(TableHeaderType.Location, rows[1].Type);
                 Assert.Equal("school", rows[1].Level);
+                Assert.Equal(location4Duplicate.Id, Guid.Parse(rows[1].Value));
+
+                Assert.True(after.TableHeaderCountChanged);
+            }
+        }
+
+        [Fact]
+        public async Task Migrate_TableHeadersAreTransformedToMultipleHeaders_DataBlockInAllowList()
+        {
+            // Test that table header configuration for a data block with an id in the allow list is transformed into
+            // multiple adjacent headers where there are duplicate locations with identical codes
+
+            // A data block id which appears in the allow list
+            var allowedDataBlockId = Guid.Parse("4fa4f6f7-57fb-4220-b0b4-32008be6c43b");
+
+            var lep1 = new LocalEnterprisePartnership("LEP1", "Local enterprise partnership 1");
+            var lep2 = new LocalEnterprisePartnership("LEP2", "Local enterprise partnership 2");
+
+            var location1 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Country,
+                Country = _england
+            };
+
+            var location2 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.Region,
+                Country = _england,
+                Region = _eastMidlands
+            };
+
+            var location3 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalEnterprisePartnership,
+                Country = _england,
+                Region = _eastMidlands,
+                LocalEnterprisePartnership = lep1
+            };
+
+            // Location contains same Local Enterprise Partnership lep but in a different Region
+            var location3Duplicate = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalEnterprisePartnership,
+                Country = _england,
+                Region = _northEast,
+                LocalEnterprisePartnership = lep1
+            };
+
+            var location4 = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalEnterprisePartnership,
+                Country = _england,
+                Region = _eastMidlands,
+                LocalEnterprisePartnership = lep2
+            };
+
+            // Location contains same Local Enterprise Partnership lep but in a different Region
+            var location4Duplicate = new Location
+            {
+                Id = Guid.NewGuid(),
+                GeographicLevel = GeographicLevel.LocalEnterprisePartnership,
+                Country = _england,
+                Region = _northEast,
+                LocalEnterprisePartnership = lep2
+            };
+
+            var dataBlock = new DataBlock
+            {
+                Id = allowedDataBlockId,
+                Charts = new List<IChart>(),
+                Table = new TableBuilderConfiguration
+                {
+                    TableHeaders = new TableHeaders
+                    {
+                        ColumnGroups = new List<List<TableHeader>>
+                        {
+                            new()
+                            {
+                                TableHeader.NewLocationHeader(GeographicLevel.Country, _england.Code!)
+                            }
+                        },
+                        Columns = new List<TableHeader>
+                        {
+                            TableHeader.NewLocationHeader(GeographicLevel.Region, _eastMidlands.Code!)
+                        },
+                        RowGroups = new List<List<TableHeader>>
+                        {
+                            new()
+                            {
+                                TableHeader.NewLocationHeader(GeographicLevel.LocalEnterprisePartnership, lep1.Code!)
+                            },
+                        },
+                        Rows = new List<TableHeader>
+                        {
+                            TableHeader.NewLocationHeader(GeographicLevel.LocalEnterprisePartnership, lep2.Code!)
+                        }
+                    }
+                },
+                Query = new ObservationQueryContext
+                {
+                    SubjectId = _subject.Id,
+                    Locations = new LocationQuery()
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.DataBlocks.AddAsync(dataBlock);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
+            locationRepository.Setup(mock => mock.GetDistinctForSubject(_subject.Id))
+                .ReturnsAsync(ListOf(
+                    location1,
+                    location2,
+                    location3,
+                    location3Duplicate,
+                    location4,
+                    location4Duplicate));
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    locationRepository: locationRepository.Object);
+
+                var result = await service.Migrate(dataBlock.Id);
+
+                MockUtils.VerifyAllMocks(locationRepository);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = ContentDbUtils.InMemoryContentDbContext(contentDbContextId))
+            {
+                var after = await contentDbContext.DataBlocks.SingleAsync(db => db.Id == dataBlock.Id);
+
+                VerifyOriginalFieldsAreUntouched(dataBlock, after);
+                Assert.True(after.LocationsMigrated);
+
+                // Table header column group assertions
+                var columnGroup = Assert.Single(after.TableMigrated.TableHeaders.ColumnGroups);
+                var columnGroupColumn = Assert.Single(columnGroup);
+                Assert.Equal(TableHeaderType.Location, columnGroupColumn.Type);
+                Assert.Equal("country", columnGroupColumn.Level);
+                Assert.Equal(location1.Id, Guid.Parse(columnGroupColumn.Value));
+
+                // Table header columns assertions
+                var column = Assert.Single(after.TableMigrated.TableHeaders.Columns);
+                Assert.Equal(TableHeaderType.Location, column.Type);
+                Assert.Equal("region", column.Level);
+                Assert.Equal(location2.Id, Guid.Parse(column.Value));
+
+                // Table header row group assertions
+                var rowGroups = after.TableMigrated.TableHeaders.RowGroups;
+                var rowGroup = Assert.Single(rowGroups);
+                Assert.Equal(2, rowGroup.Count);
+                var rowGroupRow1 = rowGroup[0];
+                Assert.Equal(TableHeaderType.Location, rowGroupRow1.Type);
+                Assert.Equal("localEnterprisePartnership", rowGroupRow1.Level);
+                Assert.Equal(location3.Id, Guid.Parse(rowGroupRow1.Value));
+                // Assert an additional table header has been inserted for a location with the same code
+                var rowGroupRow2 = rowGroup[1];
+                Assert.Equal(TableHeaderType.Location, rowGroupRow2.Type);
+                Assert.Equal("localEnterprisePartnership", rowGroupRow2.Level);
+                Assert.Equal(location3Duplicate.Id, Guid.Parse(rowGroupRow2.Value));
+
+                // Table header rows assertions
+                var rows = after.TableMigrated.TableHeaders.Rows;
+                Assert.Equal(2, rows.Count);
+                Assert.Equal(TableHeaderType.Location, rows[0].Type);
+                Assert.Equal("localEnterprisePartnership", rows[0].Level);
+                Assert.Equal(location4.Id, Guid.Parse(rows[0].Value));
+                // Assert an additional table header has been inserted for a location with the same code
+                Assert.Equal(TableHeaderType.Location, rows[1].Type);
+                Assert.Equal("localEnterprisePartnership", rows[1].Level);
                 Assert.Equal(location4Duplicate.Id, Guid.Parse(rows[1].Value));
 
                 Assert.True(after.TableHeaderCountChanged);
