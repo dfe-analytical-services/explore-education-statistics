@@ -41,25 +41,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             return publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease());
         }
-
-        public async Task SetPublishedDate(Guid id, DateTime published)
-        {
-            var publication = await Get(id);
-
-            if (publication == null)
-            {
-                throw new ArgumentException("Publication does not exist", nameof(id));
-            }
-
-            publication.Published = published;
-
-            await UpdatePublication(publication);
-        }
-
-        private async Task UpdatePublication(Publication publication)
-        {
-            _contentDbContext.Update(publication);
-            await _contentDbContext.SaveChangesAsync();
-        }
     }
 }

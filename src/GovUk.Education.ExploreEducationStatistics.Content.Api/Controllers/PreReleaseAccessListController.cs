@@ -43,14 +43,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             string publicationSlug,
             string? releaseSlug = null)
         {
-            var publicationTask = _publicationService.Get(publicationSlug);
-            var releaseTask = _releaseService.GetCachedRelease(publicationSlug, releaseSlug);
+            var publication = await _publicationService.Get(publicationSlug);
+            var release = await _releaseService.GetCachedRelease(publicationSlug, releaseSlug);
 
-            await Task.WhenAll(publicationTask, releaseTask);
-
-            if (releaseTask.Result.IsRight && publicationTask.Result.IsRight)
+            if (release.IsRight && publication.IsRight)
             {
-                return new PreReleaseAccessListViewModel(releaseTask.Result.Right!, publicationTask.Result.Right);
+                return new PreReleaseAccessListViewModel(release.Right!, publication.Right);
             }
 
             return NotFound();

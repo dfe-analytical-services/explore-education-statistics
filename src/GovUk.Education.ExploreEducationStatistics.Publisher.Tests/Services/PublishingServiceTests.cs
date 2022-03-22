@@ -390,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             var releaseId = Guid.NewGuid();
 
             var publicBlobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Default);
+            var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             publicBlobStorageService.Setup(mock => mock.MoveDirectory(PublicContent,
@@ -398,6 +398,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     PublicContent,
                     string.Empty,
                     null))
+                .Returns(Task.CompletedTask);
+
+            publicBlobCacheService.Setup(mock =>
+                    mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
                 .Returns(Task.CompletedTask);
 
             releaseService.Setup(mock =>
@@ -409,10 +413,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 releaseService: releaseService.Object);
 
             await service.PublishStagedReleaseContent(releaseId, "publication-slug");
-
-            publicBlobCacheService.Verify(mock =>
-                    mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                Times.Once);
 
             MockUtils.VerifyAllMocks(publicBlobStorageService, publicBlobCacheService, releaseService);
         }

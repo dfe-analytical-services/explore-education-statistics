@@ -80,19 +80,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     .Where(p => p.Slug == publicationSlug))
                 .OnSuccess(async _ =>
                 {
-                    var publicationTask = _publicationService.Get(publicationSlug);
-                    var releaseTask = GetCachedRelease(publicationSlug, releaseSlug);
+                    var publication = await _publicationService.Get(publicationSlug);
+                    var release = await GetCachedRelease(publicationSlug, releaseSlug);
 
-                    await Task.WhenAll(publicationTask, releaseTask);
-
-                    if (releaseTask.Result.IsRight
-                        && releaseTask.Result.Right is not null
-                        && publicationTask.Result.IsRight
-                        && publicationTask.Result.Right is not null)
+                    if (release.IsRight
+                        && release.Right is not null
+                        && publication.IsRight
+                        && publication.Right is not null)
                     {
                         return new Either<ActionResult, ReleaseSummaryViewModel>(new ReleaseSummaryViewModel(
-                            _mapper.Map<CachedReleaseViewModel>(releaseTask.Result.Right),
-                            _mapper.Map<PublicationViewModel>(publicationTask.Result.Right)
+                            _mapper.Map<CachedReleaseViewModel>(release.Right),
+                            _mapper.Map<PublicationViewModel>(publication.Right)
                         ));
                     }
 
@@ -109,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 )
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(
-                    // @MarkFix EES-3149 Superseded releases shouldn't have "latest data" label
+                    // TODO: @MarkFix EES-3149 Releases belonging to superseded publication shouldn't have "latest data" label
                     publication => publication.Releases
                         .Where(release => release.IsLatestPublishedVersionOfRelease())
                         .OrderByDescending(r => r.Year)

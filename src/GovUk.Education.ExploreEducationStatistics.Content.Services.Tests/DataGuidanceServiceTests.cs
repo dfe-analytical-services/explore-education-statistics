@@ -210,9 +210,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             Interfaces.IReleaseService? releaseService = null)
         {
             return new DataGuidanceService(
-                dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>(),
-                publicationService ?? Mock.Of<Interfaces.IPublicationService>(),
-                releaseService ?? Mock.Of<Interfaces.IReleaseService>()
+                dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>(MockBehavior.Strict),
+                publicationService ?? Mock.Of<Interfaces.IPublicationService>(MockBehavior.Strict),
+                releaseService ?? Mock.Of<Interfaces.IReleaseService>(MockBehavior.Strict)
             );
         }
     }

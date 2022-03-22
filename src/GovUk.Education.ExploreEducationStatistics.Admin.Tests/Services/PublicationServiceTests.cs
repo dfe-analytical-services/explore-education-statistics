@@ -629,14 +629,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Default);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                // NOTE: No publicBlobCacheService Setup required for DeleteItem, because publication.Live is false
 
                 var publicationService = BuildPublicationService(context,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     publicBlobCacheService: publicBlobCacheService.Object);
 
                 methodologyVersionRepository
-                    .Setup(s => s.PublicationTitleChanged(publication.Id, publication.Slug, "New title", "new-title"))
+                    .Setup(s => s.PublicationTitleChanged(
+                        publication.Id,
+                        publication.Slug,
+                        "New title",
+                        "new-title"))
                     .Returns(Task.CompletedTask);
 
                 // Service method under test
@@ -656,10 +662,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                // NOTE: Not called because publication.Live is false
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                    Times.Never);
-                
                 VerifyAllMocks(methodologyVersionRepository, publicBlobCacheService);
 
                 Assert.Equal("New title", result.Right.Title);
@@ -730,7 +732,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Default);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<AllMethodologiesCacheKey>()))
+                    .Returns(Task.CompletedTask);
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey(null)))
+                    .Returns(Task.CompletedTask);
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData)))
+                    .Returns(Task.CompletedTask);
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData)))
+                    .Returns(Task.CompletedTask);
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                    .Returns(Task.CompletedTask);
 
                 var publicationService = BuildPublicationService(context,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
@@ -738,9 +751,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // Expect the title to change but not the slug, as the Publication is already published. 
                 methodologyVersionRepository
-                    .Setup(s => s.PublicationTitleChanged(publication.Id, publication.Slug, "New title", "old-title"))
+                    .Setup(s => s.PublicationTitleChanged(
+                        publication.Id,
+                        publication.Slug,
+                        "New title",
+                        "old-title"))
                     .Returns(Task.CompletedTask);
-                
+
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
@@ -757,17 +774,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = topic.Id
                     }
                 );
-                
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<AllMethodologiesCacheKey>()),
-                    Times.Once);
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(new PublicationTreeCacheKey(null)),
-                    Times.Once);
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData)),
-                    Times.Once);
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData)),
-                    Times.Once);
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                    Times.Once);
 
                 VerifyAllMocks(methodologyVersionRepository, publicBlobCacheService);
 
@@ -840,8 +846,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 // Expect no calls to be made on this Mock as the Publication's Title hasn't changed.  
                 var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Default);
-                
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                // NOTE: No publicBlobCacheService Setup for DeleteItem, as blob not deleted as publication.Live is false
+
                 var publicationService = BuildPublicationService(context,
                     methodologyVersionRepository: methodologyVersionRepository.Object,
                     publicBlobCacheService: publicBlobCacheService.Object);
@@ -863,10 +871,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                // NOTE: Not deleted as publication.Live is false
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                    Times.Never);
-
                 VerifyAllMocks(methodologyVersionRepository, publicBlobCacheService);
 
                 Assert.Equal("Old title", result.Right.Title);
@@ -880,6 +884,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Test title",
+                Slug = "test-slug",
                 Topic = new Topic
                 {
                     Title = "Test topic"
@@ -896,10 +901,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Default);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                // NOTE: No setup for publicBlobCacheService for DeleteItem, as blob not deleted as publication.Live is false
+
+                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+
+                methodologyVersionRepository.Setup(mock =>
+                    mock.PublicationTitleChanged(
+                        publication.Id,
+                        publication.Slug,
+                        "New title",
+                        "new-slug"))
+                    .Returns(Task.CompletedTask);
 
                 var publicationService = BuildPublicationService(context,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    publicBlobCacheService: publicBlobCacheService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -907,6 +925,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveViewModel
                     {
                         Title = "New title",
+                        Slug = "new-slug",
                         Contact = new ContactSaveViewModel
                         {
                             ContactName = "John Smith",
@@ -917,10 +936,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = publication.TopicId
                     }
                 );
-
-                // NOTE: Not deleted as publication.Live is false
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                    Times.Never);
 
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
 
@@ -946,6 +961,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Test publication",
+                Slug = "test-publication",
                 Topic = new Topic
                 {
                     Title = "Test topic"
@@ -968,10 +984,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Default);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                // NOTE: No publicBlobCacheService Setup for DeleteItem, as blob not deleted as publication.Live is false
+
+                var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(Strict);
+
+                methodologyVersionRepository.Setup(mock =>
+                    mock.PublicationTitleChanged(
+                        publication.Id,
+                        publication.Slug,
+                        "New title",
+                        "new-title"))
+                    .Returns(Task.CompletedTask);
 
                 var publicationService = BuildPublicationService(context,
-                    publicBlobCacheService: publicBlobCacheService.Object);
+                    publicBlobCacheService: publicBlobCacheService.Object,
+                    methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
@@ -989,10 +1018,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = publication.TopicId
                     }
                 );
-
-                // NOTE: Not deleted as publication.Live is false
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                    Times.Never);
 
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
 
@@ -1027,7 +1052,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Default);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
 
                 var publicationService = BuildPublicationService(context,
                     publicBlobCacheService: publicBlobCacheService.Object);
@@ -1041,9 +1066,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = Guid.NewGuid(),
                     }
                 );
-
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                    Times.Never);
 
                 result.AssertBadRequest(TopicDoesNotExist);
             }
@@ -1080,7 +1102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Default);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
 
                 var publicationService = BuildPublicationService(context,
                     userService: userService.Object,
@@ -1093,9 +1115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Title = "New publication title",
                     }
                 );
-
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                    Times.Never);
 
                 var actionResult = result.AssertLeft();
                 Assert.IsType<ForbidResult>(actionResult);
@@ -1141,7 +1160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Default);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
 
                 var publicationService = BuildPublicationService(context,
                     userService: userService.Object,
@@ -1155,9 +1174,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = newTopic.Id,
                     }
                 );
-
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                    Times.Never);
 
                 var actionResult = result.AssertLeft();
                 Assert.IsType<ForbidResult>(actionResult);
@@ -1195,7 +1211,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Default);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
 
                 var publicationService = BuildPublicationService(context,
                     publicBlobCacheService: publicBlobCacheService.Object);
@@ -1209,9 +1225,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = topic.Id,
                     }
                 );
-
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                    Times.Never);
 
                 result.AssertBadRequest(SlugNotUnique);
             }
@@ -1249,7 +1262,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Default);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                    .Returns(Task.CompletedTask);
 
                 var publicationService = BuildPublicationService(context,
                     publicBlobCacheService: publicBlobCacheService.Object);
@@ -1267,9 +1283,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }
                 );
-
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                    Times.Once);
 
                 var legacyReleases = result.Right;
 
@@ -1313,7 +1326,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Default);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                    .Returns(Task.CompletedTask);
 
                 var publicationService = BuildPublicationService(context,
                     publicBlobCacheService: publicBlobCacheService.Object);
@@ -1329,9 +1345,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }
                 );
-
-                publicBlobCacheService.Verify(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()),
-                    Times.Once);
 
                 var legacyReleases = result.Right;
 
@@ -1422,9 +1435,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 AdminMapper(),
                 new PersistenceHelper<ContentDbContext>(context),
                 userService ?? AlwaysTrueUserService().Object, 
-                publicationRepository ?? Mock.Of<IPublicationRepository>(),
-                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(),
-                publicBlobCacheService ?? Mock.Of<IBlobCacheService>());
+                publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
+                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),
+                publicBlobCacheService ?? Mock.Of<IBlobCacheService>(Strict));
         }
     }
 }

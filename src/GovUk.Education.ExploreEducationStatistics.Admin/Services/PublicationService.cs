@@ -194,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         await DeleteCachedTaxonomyBlobs();
                         await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
-                        // @MarkFix EES-3149 Need to handle superseded publication.json cache files here too?
+                        // TODO: @MarkFix EES-3149 Need to handle superseded publication.json cache files here too?
                     }
 
                     return await GetPublication(publication.Id);

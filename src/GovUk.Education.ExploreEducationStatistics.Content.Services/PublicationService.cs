@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -39,23 +40,24 @@ public class PublicationService : IPublicationService
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .Where(p => p.Slug == publicationSlug))
-            .OnSuccess(publication =>
+            .OnSuccessCombineWith(publication =>
             {
+                // NOTE: BlobCache won't cache result if GetLatestRelease returns an Either.IsLeft - i.e. if there is no latestRelease
+                return GetLatestRelease(publication);
+            })
+            .OnSuccess(tuple =>
+            {
+                var (publication, latestRelease) = tuple;
                 var publicationViewModel = _mapper.Map<PublicationViewModel>(publication);
-                // NOTE: BlobCache won't cache result if return a Either.IsLeft - if there is no latestRelease
-                return GetLatestRelease(publication)
-                    .OnSuccess(latestRelease =>
-                    {
-                        publicationViewModel.LatestReleaseId = latestRelease.Id;
-                        publicationViewModel.Releases = ListPublishedReleases(publication);
-                        return publicationViewModel;
-                    });
+                publicationViewModel.LatestReleaseId = latestRelease.Id;
+                publicationViewModel.Releases = ListPublishedReleases(publication);
+                return publicationViewModel;
             });
     }
 
     private static Either<ActionResult, Release> GetLatestRelease(Publication publication)
     {
-        // @MarkFix EES-3149 exclude superseded releases here
+        // TODO: @MarkFix EES-3149 exclude releases belonging to superseded publication here
         return publication.LatestPublishedRelease() ?? new Either<ActionResult, Release>(new NotFoundResult());
     }
 
