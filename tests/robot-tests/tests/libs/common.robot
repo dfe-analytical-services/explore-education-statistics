@@ -297,7 +297,7 @@ user opens accordion section with accordion header
         user clicks element    ${header_button}
     END
     user checks element attribute value should be    ${header_button}    aria-expanded    true
-    ${accordion}=    user gets accordion section content element    ${heading_text}    ${parent}
+    ${accordion}=    user gets accordion section content element from heading element    ${header_button}    ${parent}
     [Return]    ${accordion}
 
 user closes accordion section
@@ -328,6 +328,12 @@ user gets accordion section content element
     [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]
     ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
     ${content_id}=    get element attribute    ${header_button}    id
+    ${content}=    get child element    ${parent}    css:[aria-labelledby="${content_id}"]
+    [Return]    ${content}
+
+user gets accordion section content element from heading element
+    [Arguments]    ${heading_element}    ${parent}=css:[data-testid="accordion"]
+    ${content_id}=    get element attribute    ${heading_element}    id
     ${content}=    get child element    ${parent}    css:[aria-labelledby="${content_id}"]
     [Return]    ${content}
 
