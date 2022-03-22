@@ -20,13 +20,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? Country_Name { get; set; }
 
         [NotMapped]
-        public Country Country
+        public Country? Country
         {
-            get => new(Country_Code, Country_Name);
-            set
+            get => Country_Code == null && Country_Name == null
+                ? null
+                : new Country(Country_Code, Country_Name);
+            init
             {
-                Country_Code = value.Code;
-                Country_Name = value.Name;
+                Country_Code = value?.Code;
+                Country_Name = value?.Name;
             }
         }
 
@@ -34,13 +36,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? EnglishDevolvedArea_Name { get; set; }
 
         [NotMapped]
-        public EnglishDevolvedArea EnglishDevolvedArea
+        public EnglishDevolvedArea? EnglishDevolvedArea
         {
-            get => new(EnglishDevolvedArea_Code, EnglishDevolvedArea_Name);
-            set
+            get => EnglishDevolvedArea_Code == null && EnglishDevolvedArea_Name == null
+                ? null
+                : new EnglishDevolvedArea(EnglishDevolvedArea_Code, EnglishDevolvedArea_Name);
+            init
             {
-                EnglishDevolvedArea_Code = value.Code;
-                EnglishDevolvedArea_Name = value.Name;
+                EnglishDevolvedArea_Code = value?.Code;
+                EnglishDevolvedArea_Name = value?.Name;
             }
         }
 
@@ -48,13 +52,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? Institution_Name { get; set; }
 
         [NotMapped]
-        public Institution Institution
+        public Institution? Institution
         {
-            get => new(Institution_Code, Institution_Name);
-            set
+            get => Institution_Code == null && Institution_Name == null
+                ? null
+                : new Institution(Institution_Code, Institution_Name);
+            init
             {
-                Institution_Code = value.Code;
-                Institution_Name = value.Name;
+                Institution_Code = value?.Code;
+                Institution_Name = value?.Name;
             }
         }
 
@@ -63,14 +69,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? LocalAuthority_Name { get; set; }
 
         [NotMapped]
-        public LocalAuthority LocalAuthority
+        public LocalAuthority? LocalAuthority
         {
-            get => new(LocalAuthority_Code, LocalAuthority_OldCode, LocalAuthority_Name);
-            set
+            get => LocalAuthority_Code == null && LocalAuthority_OldCode == null && LocalAuthority_Name == null
+                ? null
+                : new LocalAuthority(LocalAuthority_Code, LocalAuthority_OldCode, LocalAuthority_Name);
+            init
             {
-                LocalAuthority_Code = value.Code;
-                LocalAuthority_OldCode = value.OldCode;
-                LocalAuthority_Name = value.Name;
+                LocalAuthority_Code = value?.Code;
+                LocalAuthority_OldCode = value?.OldCode;
+                LocalAuthority_Name = value?.Name;
             }
         }
 
@@ -78,13 +86,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? LocalAuthorityDistrict_Name { get; set; }
 
         [NotMapped]
-        public LocalAuthorityDistrict LocalAuthorityDistrict
+        public LocalAuthorityDistrict? LocalAuthorityDistrict
         {
-            get => new(LocalAuthorityDistrict_Code, LocalAuthorityDistrict_Name);
-            set
+            get => LocalAuthorityDistrict_Code == null && LocalAuthorityDistrict_Name == null
+                ? null
+                : new LocalAuthorityDistrict(LocalAuthorityDistrict_Code, LocalAuthorityDistrict_Name);
+            init
             {
-                LocalAuthorityDistrict_Code = value.Code;
-                LocalAuthorityDistrict_Name = value.Name;
+                LocalAuthorityDistrict_Code = value?.Code;
+                LocalAuthorityDistrict_Name = value?.Name;
             }
         }
 
@@ -92,13 +102,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? LocalEnterprisePartnership_Name { get; set; }
 
         [NotMapped]
-        public LocalEnterprisePartnership LocalEnterprisePartnership
+        public LocalEnterprisePartnership? LocalEnterprisePartnership
         {
-            get => new(LocalEnterprisePartnership_Code, LocalEnterprisePartnership_Name);
-            set
+            get => LocalEnterprisePartnership_Code == null && LocalEnterprisePartnership_Name == null
+                ? null
+                : new LocalEnterprisePartnership(LocalEnterprisePartnership_Code, LocalEnterprisePartnership_Name);
+            init
             {
-                LocalEnterprisePartnership_Code = value.Code;
-                LocalEnterprisePartnership_Name = value.Name;
+                LocalEnterprisePartnership_Code = value?.Code;
+                LocalEnterprisePartnership_Name = value?.Name;
             }
         }
 
@@ -106,13 +118,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? MayoralCombinedAuthority_Name { get; set; }
 
         [NotMapped]
-        public MayoralCombinedAuthority MayoralCombinedAuthority
+        public MayoralCombinedAuthority? MayoralCombinedAuthority
         {
-            get => new(MayoralCombinedAuthority_Code, MayoralCombinedAuthority_Name);
-            set
+            get => MayoralCombinedAuthority_Code == null && MayoralCombinedAuthority_Name == null
+                ? null
+                : new MayoralCombinedAuthority(MayoralCombinedAuthority_Code, MayoralCombinedAuthority_Name);
+            init
             {
-                MayoralCombinedAuthority_Code = value.Code;
-                MayoralCombinedAuthority_Name = value.Name;
+                MayoralCombinedAuthority_Code = value?.Code;
+                MayoralCombinedAuthority_Name = value?.Name;
             }
         }
 
@@ -120,13 +134,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? MultiAcademyTrust_Name { get; set; }
 
         [NotMapped]
-        public Mat MultiAcademyTrust
+        public Mat? MultiAcademyTrust
         {
-            get => new(MultiAcademyTrust_Code, MultiAcademyTrust_Name);
-            set
+            get => MultiAcademyTrust_Code == null && MultiAcademyTrust_Name == null
+                ? null
+                : new Mat(MultiAcademyTrust_Code, MultiAcademyTrust_Name);
+            init
             {
-                MultiAcademyTrust_Code = value.Code;
-                MultiAcademyTrust_Name = value.Name;
+                MultiAcademyTrust_Code = value?.Code;
+                MultiAcademyTrust_Name = value?.Name;
             }
         }
 
@@ -134,13 +150,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? OpportunityArea_Name { get; set; }
 
         [NotMapped]
-        public OpportunityArea OpportunityArea
+        public OpportunityArea? OpportunityArea
         {
-            get => new(OpportunityArea_Code, OpportunityArea_Name);
-            set
+            get => OpportunityArea_Code == null && OpportunityArea_Name == null
+                ? null
+                : new OpportunityArea(OpportunityArea_Code, OpportunityArea_Name);
+            init
             {
-                OpportunityArea_Code = value.Code;
-                OpportunityArea_Name = value.Name;
+                OpportunityArea_Code = value?.Code;
+                OpportunityArea_Name = value?.Name;
             }
         }
 
@@ -148,13 +166,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? ParliamentaryConstituency_Name { get; set; }
 
         [NotMapped]
-        public ParliamentaryConstituency ParliamentaryConstituency
+        public ParliamentaryConstituency? ParliamentaryConstituency
         {
-            get => new(ParliamentaryConstituency_Code, ParliamentaryConstituency_Name);
-            set
+            get => ParliamentaryConstituency_Code == null && ParliamentaryConstituency_Name == null
+                ? null
+                : new ParliamentaryConstituency(ParliamentaryConstituency_Code, ParliamentaryConstituency_Name);
+            init
             {
-                ParliamentaryConstituency_Code = value.Code;
-                ParliamentaryConstituency_Name = value.Name;
+                ParliamentaryConstituency_Code = value?.Code;
+                ParliamentaryConstituency_Name = value?.Name;
             }
         }
 
@@ -162,13 +182,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? PlanningArea_Name { get; set; }
 
         [NotMapped]
-        public PlanningArea PlanningArea
+        public PlanningArea? PlanningArea
         {
-            get => new(PlanningArea_Code, PlanningArea_Name);
-            set
+            get => PlanningArea_Code == null && PlanningArea_Name == null
+                ? null
+                : new PlanningArea(PlanningArea_Code, PlanningArea_Name);
+            init
             {
-                PlanningArea_Code = value.Code;
-                PlanningArea_Name = value.Name;
+                PlanningArea_Code = value?.Code;
+                PlanningArea_Name = value?.Name;
             }
         }
 
@@ -176,13 +198,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? Provider_Name { get; set; }
 
         [NotMapped]
-        public Provider Provider
+        public Provider? Provider
         {
-            get => new(Provider_Code, Provider_Name);
-            set
+            get => Provider_Code == null && Provider_Name == null
+                ? null
+                : new Provider(Provider_Code, Provider_Name);
+            init
             {
-                Provider_Code = value.Code;
-                Provider_Name = value.Name;
+                Provider_Code = value?.Code;
+                Provider_Name = value?.Name;
             }
         }
 
@@ -190,36 +214,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? Region_Name { get; set; }
 
         [NotMapped]
-        public Region Region
+        public Region? Region
         {
-            get => new(Region_Code, Region_Name);
-            set
+            get => Region_Code == null && Region_Name == null
+                ? null
+                : new Region(Region_Code, Region_Name);
+            init
             {
-                Region_Code = value.Code;
-                Region_Name = value.Name;
+                Region_Code = value?.Code;
+                Region_Name = value?.Name;
             }
         }
 
         public string? RscRegion_Code { get; set; }
 
         [NotMapped]
-        public RscRegion RscRegion
+        public RscRegion? RscRegion
         {
-            get => new(RscRegion_Code);
-            set => RscRegion_Code = value.Code;
+            get => RscRegion_Code == null
+                ? null
+                : new RscRegion(RscRegion_Code);
+            init => RscRegion_Code = value?.Code;
         }
 
         public string? School_Code { get; set; }
         public string? School_Name { get; set; }
 
         [NotMapped]
-        public School School
+        public School? School
         {
-            get => new(School_Code, School_Name);
-            set
+            get => School_Code == null && School_Name == null
+                ? null
+                : new School(School_Code, School_Name);
+            init
             {
-                School_Code = value.Code;
-                School_Name = value.Name;
+                School_Code = value?.Code;
+                School_Name = value?.Name;
             }
         }
 
@@ -227,13 +257,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? Sponsor_Name { get; set; }
 
         [NotMapped]
-        public Sponsor Sponsor
+        public Sponsor? Sponsor
         {
-            get => new(Sponsor_Code, Sponsor_Name);
-            set
+            get => Sponsor_Code == null && Sponsor_Name == null
+                ? null
+                : new Sponsor(Sponsor_Code, Sponsor_Name);
+            init
             {
-                Sponsor_Code = value.Code;
-                Sponsor_Name = value.Name;
+                Sponsor_Code = value?.Code;
+                Sponsor_Name = value?.Name;
             }
         }
 
@@ -241,53 +273,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public string? Ward_Name { get; set; }
 
         [NotMapped]
-        public Ward Ward
+        public Ward? Ward
         {
-            get => new(Ward_Code, Ward_Name);
-            set
+            get => Ward_Code == null && Ward_Name == null
+                ? null
+                : new Ward(Ward_Code, Ward_Name);
+            init
             {
-                Ward_Code = value.Code;
-                Ward_Name = value.Name;
+                Ward_Code = value?.Code;
+                Ward_Name = value?.Name;
             }
         }
 
         protected bool Equals(Location other)
         {
-            return Id.Equals(other.Id) 
-                   && GeographicLevel == other.GeographicLevel 
-                   && Country_Code == other.Country_Code 
+            return Id.Equals(other.Id)
+                   && GeographicLevel == other.GeographicLevel
+                   && Country_Code == other.Country_Code
                    && Country_Name == other.Country_Name
-                   && EnglishDevolvedArea_Code == other.EnglishDevolvedArea_Code 
-                   && EnglishDevolvedArea_Name == other.EnglishDevolvedArea_Name 
-                   && Institution_Code == other.Institution_Code 
-                   && Institution_Name == other.Institution_Name 
-                   && LocalAuthority_Code == other.LocalAuthority_Code 
-                   && LocalAuthority_OldCode == other.LocalAuthority_OldCode 
-                   && LocalAuthority_Name == other.LocalAuthority_Name 
-                   && LocalAuthorityDistrict_Code == other.LocalAuthorityDistrict_Code 
-                   && LocalAuthorityDistrict_Name == other.LocalAuthorityDistrict_Name 
-                   && LocalEnterprisePartnership_Code == other.LocalEnterprisePartnership_Code 
-                   && LocalEnterprisePartnership_Name == other.LocalEnterprisePartnership_Name 
-                   && MayoralCombinedAuthority_Code == other.MayoralCombinedAuthority_Code 
-                   && MayoralCombinedAuthority_Name == other.MayoralCombinedAuthority_Name 
-                   && MultiAcademyTrust_Code == other.MultiAcademyTrust_Code 
-                   && MultiAcademyTrust_Name == other.MultiAcademyTrust_Name 
-                   && OpportunityArea_Code == other.OpportunityArea_Code 
-                   && OpportunityArea_Name == other.OpportunityArea_Name 
-                   && ParliamentaryConstituency_Code == other.ParliamentaryConstituency_Code 
-                   && ParliamentaryConstituency_Name == other.ParliamentaryConstituency_Name 
-                   && PlanningArea_Code == other.PlanningArea_Code 
-                   && PlanningArea_Name == other.PlanningArea_Name 
-                   && Provider_Code == other.Provider_Code 
-                   && Provider_Name == other.Provider_Name 
-                   && Region_Code == other.Region_Code 
-                   && Region_Name == other.Region_Name 
-                   && RscRegion_Code == other.RscRegion_Code 
-                   && School_Code == other.School_Code 
-                   && School_Name == other.School_Name 
-                   && Sponsor_Code == other.Sponsor_Code 
-                   && Sponsor_Name == other.Sponsor_Name 
-                   && Ward_Code == other.Ward_Code 
+                   && EnglishDevolvedArea_Code == other.EnglishDevolvedArea_Code
+                   && EnglishDevolvedArea_Name == other.EnglishDevolvedArea_Name
+                   && Institution_Code == other.Institution_Code
+                   && Institution_Name == other.Institution_Name
+                   && LocalAuthority_Code == other.LocalAuthority_Code
+                   && LocalAuthority_OldCode == other.LocalAuthority_OldCode
+                   && LocalAuthority_Name == other.LocalAuthority_Name
+                   && LocalAuthorityDistrict_Code == other.LocalAuthorityDistrict_Code
+                   && LocalAuthorityDistrict_Name == other.LocalAuthorityDistrict_Name
+                   && LocalEnterprisePartnership_Code == other.LocalEnterprisePartnership_Code
+                   && LocalEnterprisePartnership_Name == other.LocalEnterprisePartnership_Name
+                   && MayoralCombinedAuthority_Code == other.MayoralCombinedAuthority_Code
+                   && MayoralCombinedAuthority_Name == other.MayoralCombinedAuthority_Name
+                   && MultiAcademyTrust_Code == other.MultiAcademyTrust_Code
+                   && MultiAcademyTrust_Name == other.MultiAcademyTrust_Name
+                   && OpportunityArea_Code == other.OpportunityArea_Code
+                   && OpportunityArea_Name == other.OpportunityArea_Name
+                   && ParliamentaryConstituency_Code == other.ParliamentaryConstituency_Code
+                   && ParliamentaryConstituency_Name == other.ParliamentaryConstituency_Name
+                   && PlanningArea_Code == other.PlanningArea_Code
+                   && PlanningArea_Name == other.PlanningArea_Name
+                   && Provider_Code == other.Provider_Code
+                   && Provider_Name == other.Provider_Name
+                   && Region_Code == other.Region_Code
+                   && Region_Name == other.Region_Name
+                   && RscRegion_Code == other.RscRegion_Code
+                   && School_Code == other.School_Code
+                   && School_Name == other.School_Name
+                   && Sponsor_Code == other.Sponsor_Code
+                   && Sponsor_Name == other.Sponsor_Name
+                   && Ward_Code == other.Ward_Code
                    && Ward_Name == other.Ward_Name;
         }
 
@@ -296,14 +330,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != this.GetType()) return false;
-            return Equals((Location)obj);
+            return Equals((Location) obj);
         }
 
         public override int GetHashCode()
         {
             var hashCode = new HashCode();
             hashCode.Add(Id);
-            hashCode.Add((int)GeographicLevel);
+            hashCode.Add((int) GeographicLevel);
             hashCode.Add(Country_Code);
             hashCode.Add(Country_Name);
             hashCode.Add(EnglishDevolvedArea_Code);
@@ -340,10 +374,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             hashCode.Add(Ward_Name);
             return hashCode.ToHashCode();
         }
-        
+
         public ILocationAttribute ToLocationAttribute()
         {
-            return GeographicLevel switch
+            ILocationAttribute? principalAttribute = GeographicLevel switch
             {
                 GeographicLevel.Country => Country,
                 GeographicLevel.EnglishDevolvedArea => EnglishDevolvedArea,
@@ -362,13 +396,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                 GeographicLevel.School => School,
                 GeographicLevel.Sponsor => Sponsor,
                 GeographicLevel.Ward => Ward,
-                _ => throw new ArgumentOutOfRangeException()
+                _ => throw new ArgumentOutOfRangeException(nameof(GeographicLevel), GeographicLevel, null)
             };
+
+            return principalAttribute ??
+                   throw new InvalidOperationException(
+                       $"{nameof(Location)} attribute corresponding with {nameof(GeographicLevel)} '{GeographicLevel}' is null");
         }
     }
-    
-    public static class LocationListExtensions {
-        
+
+    public static class LocationListExtensions
+    {
         public static Dictionary<GeographicLevel, List<LocationAttributeNode>> GetLocationAttributesHierarchical(
             this IList<Location> distinctLocations,
             Dictionary<GeographicLevel, List<string>>? hierarchies = null)
@@ -393,12 +431,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                                 hierarchyWithLocationSelectors[geographicLevel]);
                         }
 
+                        // No hierarchy configured for level so return flat list
                         return locationsForLevel
-                            .Select(location => new LocationAttributeNode(location.ToLocationAttribute()))
+                            .Select(CreateLocationLeafNode)
                             .ToList();
                     });
         }
-        
+
         private static Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute>>>
             MapLocationAttributeSelectors(Dictionary<GeographicLevel, List<string>> hierarchies)
         {
@@ -406,28 +445,54 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                 pair => pair.Key,
                 pair => pair.Value.Select(propertyName =>
                 {
+                    // Function which resolves an ILocationAttribute from a Location by property name e.g. 'Region'.
+                    // This gets used when grouping the attributes of a location by a property name configured in a hierarchy.
                     return (Func<Location, ILocationAttribute>) (location =>
                     {
                         var propertyInfo = typeof(Location).GetProperty(propertyName);
+
                         if (propertyInfo == null)
                         {
                             throw new ArgumentException($"{nameof(Location)} does not have a property {propertyName}");
                         }
 
+                        // Only allow properties of Location that implement ILocationAttribute to be used in a hierarchy 
+                        if (!typeof(ILocationAttribute).IsAssignableFrom(propertyInfo.PropertyType))
+                        {
+                            throw new ArgumentException($"{nameof(Location)} property {propertyName} is not a {nameof(ILocationAttribute)}");
+                        }
+
                         var value = propertyInfo.GetValue(location);
+
+                        // A `null` value is possible here as a property configured in a hierarchy
+                        // may not be included by all of the data, or might not even be present at all. 
+                        // E.g. a Country-Region-LA hierarchy could be defined for LA level but Country and/or Region
+                        // can be missing from the location data.
+
+                        // Rather than returning null here, create an ILocationAttribute instance corresponding with
+                        // the property type. When building the view model for the hierarchy it's useful to know the
+                        // 'level' from the type of ILocationAttribute. This couldn't be determined if the value was null.
+                        if (value == null)
+                        {
+                            var propertyType = propertyInfo.PropertyType;
+                            var constructorParams = propertyType.GetConstructors().Single().GetParameters();
+                            var nullParams = new object[constructorParams.Length];
+                            value = Activator.CreateInstance(propertyType, nullParams);
+                        }
+
                         return (value as ILocationAttribute)!;
                     });
                 }).ToList()
             );
         }
-        
+
         private static List<LocationAttributeNode> GroupLocationAttributes(
             IEnumerable<Location> locations,
             IReadOnlyList<Func<Location, ILocationAttribute>> attributeSelectors)
         {
             if (attributeSelectors.IsNullOrEmpty())
             {
-                return new List<LocationAttributeNode>();
+                return locations.Select(CreateLocationLeafNode).ToList();
             }
 
             // Recursively GroupBy the Location attributes
@@ -436,10 +501,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                 .Select(
                     grouping => new LocationAttributeNode(grouping.Key)
                     {
-                        Attribute = grouping.Key,
                         Children = GroupLocationAttributes(grouping, attributeSelectors.Skip(1).ToList())
                     })
                 .ToList();
+        }
+
+        private static LocationAttributeNode CreateLocationLeafNode(Location location)
+        {
+            return new(location.ToLocationAttribute())
+            {
+                LocationId = location.Id
+            };
         }
     }
 }

@@ -39,8 +39,6 @@ user changes to analyst1
 
 user signs out
     user clicks link    Sign out    css:#navigation
-    user waits until h1 is visible    Signed out
-    user waits until page contains    You have successfully signed out
 
 user selects theme and topic from admin dashboard
     [Arguments]    ${theme}    ${topic}

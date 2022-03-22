@@ -2,10 +2,6 @@ import { dataApi } from '@common/services/api';
 import { FileInfo } from '@common/services/types/file';
 import { Dictionary } from '@common/types';
 import { Feature, Geometry } from 'geojson';
-import {
-  deduplicateSubjectMetaLocations,
-  deduplicateTableDataLocations,
-} from './util/tableBuilderServiceUtils';
 
 export interface FilterOption {
   label: string;
@@ -62,6 +58,7 @@ export interface GeoJsonFeatureProperties {
 export type GeoJsonFeature = Feature<Geometry, GeoJsonFeatureProperties>;
 
 export interface LocationOption {
+  id?: string;
   label: string;
   value: string;
   level?: string;
@@ -70,6 +67,7 @@ export interface LocationOption {
 }
 
 export interface LocationLeafOption {
+  id?: string;
   label: string;
   value: string;
   geoJson?: GeoJsonFeature[];
@@ -133,8 +131,7 @@ export interface TableDataQuery {
   filters: string[];
   indicators: string[];
   timePeriod?: TimePeriodQuery;
-  geographicLevel?: string;
-  locations: Dictionary<string[]>;
+  locationIds: string[];
   includeGeoJson?: boolean;
   boundaryLevel?: number;
 }
@@ -167,7 +164,8 @@ export interface TableDataSubjectMeta {
 export interface TableDataResult {
   filters: string[];
   geographicLevel: string;
-  location: Dictionary<{
+  locationId?: string;
+  location?: Dictionary<{
     code: string;
     name: string;
   }>;
@@ -211,38 +209,29 @@ const tableBuilderService = {
     return dataApi.get(`/releases/${releaseId}/featured-tables`);
   },
   async getSubjectMeta(subjectId: string): Promise<SubjectMeta> {
-    return deduplicateSubjectMetaLocations(
-      await dataApi.get(`/meta/subject/${subjectId}`),
-    );
+    return dataApi.get(`/meta/subject/${subjectId}`);
   },
   async filterSubjectMeta(query: {
     subjectId: string;
     timePeriod?: TimePeriodQuery;
-    geographicLevel?: string;
-    locations?: Dictionary<string[]>;
+    locationIds?: string[];
   }): Promise<SubjectMeta> {
-    return deduplicateSubjectMetaLocations(
-      await dataApi.post('/meta/subject', query),
-    );
+    return dataApi.post('/meta/subject', query);
   },
   async getTableData({
     releaseId,
     ...query
   }: ReleaseTableDataQuery): Promise<TableDataResponse> {
-    return deduplicateTableDataLocations(
-      releaseId
-        ? await dataApi.post(`/tablebuilder/release/${releaseId}`, query)
-        : await dataApi.post('/tablebuilder', query),
-    );
+    return releaseId
+      ? dataApi.post(`/tablebuilder/release/${releaseId}`, query)
+      : dataApi.post('/tablebuilder', query);
   },
   async getDataBlockTableData(
     releaseId: string,
     dataBlockId: string,
   ): Promise<TableDataResponse> {
-    return deduplicateTableDataLocations(
-      await dataApi.get(
-        `/tablebuilder/release/${releaseId}/data-block/${dataBlockId}`,
-      ),
+    return dataApi.get(
+      `/tablebuilder/release/${releaseId}/data-block/${dataBlockId}`,
     );
   },
 };

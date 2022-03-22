@@ -99,11 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             var subject = await _subjectRepository.Get(permalink.Query.SubjectId);
             var isValid = subject != null && await _subjectRepository.IsSubjectForLatestPublishedRelease(subject.Id);
 
-            var publicationId = await _subjectRepository.FindPublicationIdForSubject(permalink.Query.SubjectId);
-
             var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
 
-            viewModel.Query.PublicationId = publicationId;
             viewModel.Invalidated = !isValid;
 
             return viewModel;

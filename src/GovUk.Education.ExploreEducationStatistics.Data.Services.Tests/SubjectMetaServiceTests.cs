@@ -178,35 +178,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var locations = ListOf(
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.Country,
                     Country = _england,
                 },
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.Region,
                     Country = _england,
                     Region = _northEast,
                 },
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.Region,
                     Country = _england,
                     Region = _northWest,
                 },
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.Region,
                     Country = _england,
                     Region = _eastMidlands,
                 },
                 new Location
                 {
-                    GeographicLevel = GeographicLevel.Region,
-                    Country = _england,
-                    Region = _eastMidlands,
-                },
-                new Location
-                {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     Country = _england,
                     Region = _eastMidlands,
@@ -214,6 +213,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 },
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     Country = _england,
                     Region = _eastMidlands,
@@ -229,8 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         new List<string>
                         {
                             "Country",
-                            "Region",
-                            "LocalAuthority"
+                            "Region"
                         }
                     }
                 }
@@ -300,7 +299,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal("National", countries.Legend);
                 var countryOption1 = Assert.Single(countries.Options);
                 Assert.NotNull(countryOption1);
-                Assert.Equal(_england.Name, countryOption1!.Label);
+                Assert.Equal(locations[0].Id, countryOption1.Id);
+                Assert.Equal(_england.Name, countryOption1.Label);
                 Assert.Equal(_england.Code, countryOption1.Value);
                 Assert.Null(countryOption1.Level);
                 Assert.Null(countryOption1.Options);
@@ -314,16 +314,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var regionOption2 = regions.Options[1];
                 var regionOption3 = regions.Options[2];
 
+                Assert.Equal(locations[1].Id, regionOption1.Id);
                 Assert.Equal(_northEast.Name, regionOption1.Label);
                 Assert.Equal(_northEast.Code, regionOption1.Value);
                 Assert.Null(regionOption1.Level);
                 Assert.Null(regionOption1.Options);
 
+                Assert.Equal(locations[2].Id, regionOption2.Id);
                 Assert.Equal(_northWest.Name, regionOption2.Label);
                 Assert.Equal(_northWest.Code, regionOption2.Value);
                 Assert.Null(regionOption2.Level);
                 Assert.Null(regionOption2.Options);
 
+                Assert.Equal(locations[3].Id, regionOption3.Id);
                 Assert.Equal(_eastMidlands.Name, regionOption3.Label);
                 Assert.Equal(_eastMidlands.Code, regionOption3.Value);
                 Assert.Null(regionOption3.Level);
@@ -333,24 +336,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var localAuthorities = locationViewModels["localAuthority"];
                 var laOption1 = Assert.Single(localAuthorities.Options);
                 Assert.NotNull(laOption1);
-                Assert.Equal(_england.Name, laOption1!.Label);
+                Assert.Null(laOption1.Id);
+                Assert.Equal(_england.Name, laOption1.Label);
                 Assert.Equal(_england.Code, laOption1.Value);
                 Assert.Equal("country", laOption1.Level);
 
                 var laOption1SubOption1 = Assert.Single(laOption1.Options!);
                 Assert.NotNull(laOption1SubOption1);
-                Assert.Equal(_eastMidlands.Name, laOption1SubOption1!.Label);
+                Assert.Null(laOption1SubOption1.Id);
+                Assert.Equal(_eastMidlands.Name, laOption1SubOption1.Label);
                 Assert.Equal(_eastMidlands.Code, laOption1SubOption1.Value);
                 Assert.Equal("region", laOption1SubOption1.Level);
                 Assert.Equal(2, laOption1SubOption1.Options!.Count);
 
                 var laOption1SubOption1SubOption1 = laOption1SubOption1.Options[0];
+                Assert.Equal(locations[4].Id, laOption1SubOption1SubOption1.Id);
                 Assert.Equal(_derby.Name, laOption1SubOption1SubOption1.Label);
                 Assert.Equal(_derby.Code, laOption1SubOption1SubOption1.Value);
                 Assert.Null(laOption1SubOption1SubOption1.Level);
                 Assert.Null(laOption1SubOption1SubOption1.Options);
 
                 var laOption1SubOption1SubOption2 = laOption1SubOption1.Options[1];
+                Assert.Equal(locations[5].Id, laOption1SubOption1SubOption2.Id);
                 Assert.Equal(_nottingham.Name, laOption1SubOption1SubOption2.Label);
                 Assert.Equal(_nottingham.Code, laOption1SubOption1SubOption2.Value);
                 Assert.Null(laOption1SubOption1SubOption2.Level);
@@ -379,12 +386,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var locations = ListOf(
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     Country = _england,
                     LocalAuthority = _derby
                 },
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     Country = _england,
                     LocalAuthority = _nottingham
@@ -399,8 +408,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         new List<string>
                         {
                             "Country",
-                            "Region",
-                            "LocalAuthority"
+                            "Region"
                         }
                     }
                 }
@@ -466,25 +474,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var localAuthorities = locationViewModels["localAuthority"];
                 var laOption1 = Assert.Single(localAuthorities.Options);
                 Assert.NotNull(laOption1);
-                Assert.Equal(_england.Name, laOption1!.Label);
+                Assert.Null(laOption1.Id);
+                Assert.Equal(_england.Name, laOption1.Label);
                 Assert.Equal(_england.Code, laOption1.Value);
                 Assert.Equal("country", laOption1.Level);
 
                 // Expect an empty Region option grouping the Local Authorities
                 var laOption1SubOption1 = Assert.Single(laOption1.Options!);
                 Assert.NotNull(laOption1SubOption1);
+                Assert.Null(laOption1SubOption1.Id);
                 Assert.Equal(string.Empty, laOption1SubOption1!.Label);
                 Assert.Equal(string.Empty, laOption1SubOption1.Value);
                 Assert.Equal("region", laOption1SubOption1.Level);
                 Assert.Equal(2, laOption1SubOption1.Options!.Count);
 
                 var laOption1SubOption1SubOption1 = laOption1SubOption1.Options[0];
+                Assert.Equal(locations[0].Id, laOption1SubOption1SubOption1.Id);
                 Assert.Equal(_derby.Name, laOption1SubOption1SubOption1.Label);
                 Assert.Equal(_derby.Code, laOption1SubOption1SubOption1.Value);
                 Assert.Null(laOption1SubOption1SubOption1.Level);
                 Assert.Null(laOption1SubOption1SubOption1.Options);
 
                 var laOption1SubOption1SubOption2 = laOption1SubOption1.Options[1];
+                Assert.Equal(locations[1].Id, laOption1SubOption1SubOption2.Id);
                 Assert.Equal(_nottingham.Name, laOption1SubOption1SubOption2.Label);
                 Assert.Equal(_nottingham.Code, laOption1SubOption1SubOption2.Value);
                 Assert.Null(laOption1SubOption1SubOption2.Level);
@@ -512,6 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var locations = ListOf(
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     LocalAuthority = _cheshireOldCode
                 });
@@ -580,6 +593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 // This Cheshire LA does not have a new code, so we fallback to
                 // providing its old code the option value.
                 var laOption1 = localAuthorities.Options[0];
+                Assert.Equal(locations[0].Id, laOption1.Id);
                 Assert.Equal(_cheshireOldCode.Name, laOption1.Label);
                 Assert.Equal(_cheshireOldCode.OldCode, laOption1.Value);
                 Assert.Null(laOption1.Level);
@@ -602,16 +616,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var locations = ListOf(
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     LocalAuthority = _derby
                 },
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     LocalAuthority = _derbyDupe
                 },
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     LocalAuthority = _nottingham
                 });
@@ -673,7 +690,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Single(locationViewModels);
                 Assert.True(locationViewModels.ContainsKey("localAuthority"));
 
-                // Expect a hierarchy of Region-LA within the Local Authority level
+                // Expect no hierarchy within the Local Authority level
                 var localAuthorities = locationViewModels["localAuthority"];
                 Assert.Equal(3, localAuthorities.Options.Count);
 
@@ -681,18 +698,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 // There are two locations with a label of Derby, so we
                 // de-duplicate these by appending the code (which is unique).
+                Assert.Equal(locations[0].Id, laOption1.Id);
                 Assert.Equal("Derby (E06000015)", laOption1.Label);
                 Assert.Equal(_derby.Code, laOption1.Value);
                 Assert.Null(laOption1.Level);
                 Assert.Null(laOption1.Options);
 
                 var laOption2 = localAuthorities.Options[1];
+                Assert.Equal(locations[1].Id, laOption2.Id);
                 Assert.Equal("Derby (E06000016)", laOption2.Label);
                 Assert.Equal(_derbyDupe.Code, laOption2.Value);
                 Assert.Null(laOption2.Level);
                 Assert.Null(laOption2.Options);
 
                 var laOption3 = localAuthorities.Options[2];
+                Assert.Equal(locations[2].Id, laOption3.Id);
                 Assert.Equal(_nottingham.Name, laOption3.Label);
                 Assert.Equal(_nottingham.Code, laOption3.Value);
                 Assert.Null(laOption3.Level);
@@ -715,18 +735,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var locations = ListOf(
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     Region = _eastMidlands,
                     LocalAuthority = _derby
                 },
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     Region = _eastMidlands,
                     LocalAuthority = _derbyDupe
                 },
                 new Location
                 {
+                    Id = Guid.NewGuid(),
                     GeographicLevel = GeographicLevel.LocalAuthority,
                     Region = _eastMidlands,
                     LocalAuthority = _nottingham
@@ -741,8 +764,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                             GeographicLevel.LocalAuthority,
                             new List<string>
                             {
-                                "Region",
-                                "LocalAuthority"
+                                "Region"
                             }
                         }
                     }
@@ -804,11 +826,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Single(locationViewModels);
                 Assert.True(locationViewModels.ContainsKey("localAuthority"));
 
-                // Expect a hierarchy of Region-LA within the Local Authority level
+                // Expect a hierarchy of Region within the Local Authority level
                 var localAuthorities = locationViewModels["localAuthority"];
                 var laOption1 = Assert.Single(localAuthorities.Options);
                 Assert.NotNull(laOption1);
-                Assert.Equal(_eastMidlands.Name, laOption1!.Label);
+                Assert.Null(laOption1.Id);
+                Assert.Equal(_eastMidlands.Name, laOption1.Label);
                 Assert.Equal(_eastMidlands.Code, laOption1.Value);
                 Assert.Equal("region", laOption1.Level);
 
@@ -818,18 +841,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 // There are two locations with a label of Derby, so we
                 // de-duplicate these by appending the code (which is unique).
+                Assert.Equal(locations[0].Id, laOption1SubOption1.Id);
                 Assert.Equal("Derby (E06000015)", laOption1SubOption1.Label);
                 Assert.Equal(_derby.Code, laOption1SubOption1.Value);
                 Assert.Null(laOption1SubOption1.Level);
                 Assert.Null(laOption1SubOption1.Options);
 
                 var laOption1SubOption2 = laOption1.Options[1];
+                Assert.Equal(locations[1].Id, laOption1SubOption2.Id);
                 Assert.Equal("Derby (E06000016)", laOption1SubOption2.Label);
                 Assert.Equal(_derbyDupe.Code, laOption1SubOption2.Value);
                 Assert.Null(laOption1SubOption2.Level);
                 Assert.Null(laOption1SubOption2.Options);
 
                 var laOption1SubOption3 = laOption1.Options[2];
+                Assert.Equal(locations[2].Id, laOption1SubOption3.Id);
                 Assert.Equal(_nottingham.Name, laOption1SubOption3.Label);
                 Assert.Equal(_nottingham.Code, laOption1SubOption3.Value);
                 Assert.Null(laOption1SubOption3.Level);
@@ -852,39 +878,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             // Regions have been ordered randomly, but we expect the returned
             // view models to be ordered by the region's location code.
             var locations = ListOf(
-
                 // Flat Regions
                 new Location
                 {
-                    GeographicLevel    = GeographicLevel.Region,
+                    Id = Guid.NewGuid(),
+                    GeographicLevel = GeographicLevel.Region,
                     Region = _northWest
                 },
                 new Location
                 {
-                    GeographicLevel    = GeographicLevel.Region,
+                    Id = Guid.NewGuid(),
+                    GeographicLevel = GeographicLevel.Region,
                     Region = _eastMidlands
                 },
                 new Location
                 {
-                    GeographicLevel    = GeographicLevel.Region,
+                    Id = Guid.NewGuid(),
+                    GeographicLevel = GeographicLevel.Region,
                     Region = _northEast
                 },
                 // Hierarchical Regions - LA
                 new Location
                 {
-                    GeographicLevel    = GeographicLevel.LocalAuthority,
+                    Id = Guid.NewGuid(),
+                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Region = _northWest,
                     LocalAuthority = _blackpool
                 },
                 new Location
                 {
-                    GeographicLevel    = GeographicLevel.LocalAuthority,
+                    Id = Guid.NewGuid(),
+                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Region = _eastMidlands,
                     LocalAuthority = _derby
                 },
                 new Location
                 {
-                    GeographicLevel    = GeographicLevel.LocalAuthority,
+                    Id = Guid.NewGuid(),
+                    GeographicLevel = GeographicLevel.LocalAuthority,
                     Region = _northEast,
                     LocalAuthority = _sunderland
                 });
@@ -897,8 +928,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         GeographicLevel.LocalAuthority,
                         new List<string>
                         {
-                            "Region",
-                            "LocalAuthority"
+                            "Region"
                         }
                     }
                 }
@@ -961,6 +991,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.True(locationViewModels.ContainsKey("region"));
                 Assert.True(locationViewModels.ContainsKey("localAuthority"));
 
+                // Expect no hierarchy within the Region level
                 var regions = locationViewModels["region"];
 
                 Assert.Equal("Regional", regions.Legend);
@@ -969,12 +1000,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var regionOption2 = regions.Options[1];
                 var regionOption3 = regions.Options[2];
 
+                Assert.Equal(locations[2].Id, regionOption1.Id);
                 Assert.Equal(_northEast.Name, regionOption1.Label);
                 Assert.Equal(_northEast.Code, regionOption1.Value);
 
+                Assert.Equal(locations[0].Id, regionOption2.Id);
                 Assert.Equal(_northWest.Name, regionOption2.Label);
                 Assert.Equal(_northWest.Code, regionOption2.Value);
 
+                Assert.Equal(locations[1].Id, regionOption3.Id);
                 Assert.Equal(_eastMidlands.Name, regionOption3.Label);
                 Assert.Equal(_eastMidlands.Code, regionOption3.Value);
 
@@ -984,6 +1018,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var laOption1 = localAuthorities.Options[0];
                 Assert.NotNull(laOption1);
+                Assert.Null(laOption1.Id);
                 Assert.Equal(_northEast.Name, laOption1.Label);
                 Assert.Equal(_northEast.Code, laOption1.Value);
                 Assert.Equal("region", laOption1.Level);
@@ -991,6 +1026,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var laOption2 = localAuthorities.Options[1];
                 Assert.NotNull(laOption2);
+                Assert.Null(laOption2.Id);
                 Assert.Equal(_northWest.Name, laOption2.Label);
                 Assert.Equal(_northWest.Code, laOption2.Value);
                 Assert.Equal("region", laOption2.Level);
@@ -998,10 +1034,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var laOption3 = localAuthorities.Options[2];
                 Assert.NotNull(laOption3);
+                Assert.Null(laOption3.Id);
                 Assert.Equal(_eastMidlands.Name, laOption3.Label);
                 Assert.Equal(_eastMidlands.Code, laOption3.Value);
                 Assert.Equal("region", laOption3.Level);
-                Assert.Single(laOption2.Options!);
+                Assert.Single(laOption3.Options!);
             }
         }
 
@@ -1015,14 +1052,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Id = Guid.NewGuid()
             };
 
+            var location1 = new Location
+            {
+                Id = Guid.NewGuid(),
+                LocalAuthority = _blackpool
+            };
+
+            var location2 = new Location
+            {
+                Id = Guid.NewGuid(),
+                LocalAuthority = _derby
+            };
+
+            var location3 = new Location
+            {
+                Id = Guid.NewGuid(),
+                Country = _england
+            };
+
+            var location4 = new Location
+            {
+                Id = Guid.NewGuid(),
+                LocalAuthority = _nottingham
+            };
+
+            var location5 = new Location
+            {
+                Id = Guid.NewGuid(),
+                LocalAuthority = _sunderland
+            };
+
             var query = new ObservationQueryContext
             {
                 SubjectId = subject.Id,
-                Locations = new LocationQuery
-                {
-                    Country = ListOf(_england.Code)!,
-                    LocalAuthority = ListOf(_blackpool.Code, _derby.Code)!
-                }
+                LocationIds = ListOf(location1.Id, location2.Id, location3.Id)
             };
 
             var observations = ListOf(
@@ -1030,28 +1093,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        LocalAuthority = _blackpool
-                    }
+                    Location = location1
                 },
                 new Observation
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        LocalAuthority = _derby
-                    }
+                    Location = location2
                 },
                 new Observation
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        Country = _england
-                    }
+                    Location = location3
                 });
 
             var observationsWithDifferentLocations = ListOf(
@@ -1059,19 +1113,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        LocalAuthority = _nottingham
-                    }
+                    Location = location4
                 },
                 new Observation
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        LocalAuthority = _sunderland
-                    }
+                    Location = location5
                 });
 
             var observationsFromAnotherSubject = ListOf(
@@ -1079,19 +1127,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        LocalAuthority = _derby
-                    }
+                    Location = location2
                 },
                 new Observation
                 {
                     Id = Guid.NewGuid(),
                     SubjectId = subject.Id,
-                    Location = new Location
-                    {
-                        Country = _england
-                    }
+                    Location = location3
                 });
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
@@ -1159,10 +1201,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var query = new ObservationQueryContext
             {
                 SubjectId = subject.Id,
-                Locations = new LocationQuery
-                {
-                    Country = ListOf(_england.Code)!
-                },
+                LocationIds = ListOf(Guid.NewGuid()),
                 TimePeriod = new TimePeriodQuery
                 {
                     StartYear = 2012,
@@ -1283,68 +1322,82 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 meta.Filters.AssertDeepEqualTo(new Dictionary<string, FilterMetaViewModel>
                 {
-                    {"Filter1", new FilterMetaViewModel
                     {
-                        Legend = "Filter 1",
-                        Options = new Dictionary<string, FilterItemsMetaViewModel>
+                        "Filter1", new FilterMetaViewModel
                         {
-                            {"FilterGroup1", new FilterItemsMetaViewModel
+                            Legend = "Filter 1",
+                            Options = new Dictionary<string, FilterItemsMetaViewModel>
                             {
-                                Label = "Filter Group 1",
-                                Options = ListOf(
-                                    new LabelValue("Filter Item 1", filter1FilterItems[0].Id.ToString()),
-                                    new LabelValue("Filter Item 2", filter1FilterItems[1].Id.ToString()))
-                            }},
-                            {"FilterGroup2", new FilterItemsMetaViewModel
-                            {
-                                Label = "Filter Group 2",
-                                Options = ListOf(
-                                    new LabelValue("Filter Item 1", filter1FilterItems[2].Id.ToString()))
-                            }}
-                        },
-                        TotalValue = filter1FilterItems[1].Id.ToString()
-                    }},
-                    {"Filter2", new FilterMetaViewModel
+                                {
+                                    "FilterGroup1", new FilterItemsMetaViewModel
+                                    {
+                                        Label = "Filter Group 1",
+                                        Options = ListOf(
+                                            new LabelValue("Filter Item 1", filter1FilterItems[0].Id.ToString()),
+                                            new LabelValue("Filter Item 2", filter1FilterItems[1].Id.ToString()))
+                                    }
+                                },
+                                {
+                                    "FilterGroup2", new FilterItemsMetaViewModel
+                                    {
+                                        Label = "Filter Group 2",
+                                        Options = ListOf(
+                                            new LabelValue("Filter Item 1", filter1FilterItems[2].Id.ToString()))
+                                    }
+                                }
+                            },
+                            TotalValue = filter1FilterItems[1].Id.ToString()
+                        }
+                    },
                     {
-                        Legend = "Filter 2",
-                        Options = new Dictionary<string, FilterItemsMetaViewModel>
+                        "Filter2", new FilterMetaViewModel
                         {
-                            {"FilterGroup1", new FilterItemsMetaViewModel
+                            Legend = "Filter 2",
+                            Options = new Dictionary<string, FilterItemsMetaViewModel>
                             {
-                                Label = "Filter Group 1",
-                                Options = ListOf(
-                                    new LabelValue("Filter Item 1", filter2FilterItems[0].Id.ToString()),
-                                    new LabelValue("Filter Item 2", filter2FilterItems[1].Id.ToString()))
-                            }}
-                        },
-                        TotalValue = ""
-                    }},
+                                {
+                                    "FilterGroup1", new FilterItemsMetaViewModel
+                                    {
+                                        Label = "Filter Group 1",
+                                        Options = ListOf(
+                                            new LabelValue("Filter Item 1", filter2FilterItems[0].Id.ToString()),
+                                            new LabelValue("Filter Item 2", filter2FilterItems[1].Id.ToString()))
+                                    }
+                                }
+                            },
+                            TotalValue = ""
+                        }
+                    },
                 });
 
                 meta.Indicators.AssertDeepEqualTo(new Dictionary<string, IndicatorsMetaViewModel>
                 {
-                    {"IndicatorGroup1", new IndicatorsMetaViewModel
                     {
-                        Label = "Indicator Group 1",
-                        Options = ListOf(
-                            new IndicatorMetaViewModel
-                            {
-                                Label = "Indicator 1",
-                                Unit = "%",
-                                Value = indicatorGroups[1].Indicators[0].Id.ToString()
-                            })
-                    }},
-                    {"IndicatorGroup2", new IndicatorsMetaViewModel
+                        "IndicatorGroup1", new IndicatorsMetaViewModel
+                        {
+                            Label = "Indicator Group 1",
+                            Options = ListOf(
+                                new IndicatorMetaViewModel
+                                {
+                                    Label = "Indicator 1",
+                                    Unit = "%",
+                                    Value = indicatorGroups[1].Indicators[0].Id.ToString()
+                                })
+                        }
+                    },
                     {
-                        Label = "Indicator Group 2",
-                        Options = ListOf(
-                            new IndicatorMetaViewModel
-                            {
-                                Label = "Indicator 2",
-                                Unit = "",
-                                Value = indicatorGroups[0].Indicators[0].Id.ToString()
-                            })
-                    }}
+                        "IndicatorGroup2", new IndicatorsMetaViewModel
+                        {
+                            Label = "Indicator Group 2",
+                            Options = ListOf(
+                                new IndicatorMetaViewModel
+                                {
+                                    Label = "Indicator 2",
+                                    Unit = "",
+                                    Value = indicatorGroups[0].Indicators[0].Id.ToString()
+                                })
+                        }
+                    }
                 });
             }
         }
@@ -1362,7 +1415,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var query = new ObservationQueryContext
             {
                 SubjectId = subject.Id,
-                Locations = null,
+                LocationIds = new List<Guid>(),
                 TimePeriod = null
             };
 
@@ -1377,7 +1430,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildSubjectMetaService(statisticsDbContext);
 
                 var exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                () => service.GetSubjectMeta(query, default));
+                    () => service.GetSubjectMeta(query, default));
 
                 Assert.Equal("Unable to determine which SubjectMeta information has requested " +
                              "(Parameter 'subjectMetaStep')", exception.Message);

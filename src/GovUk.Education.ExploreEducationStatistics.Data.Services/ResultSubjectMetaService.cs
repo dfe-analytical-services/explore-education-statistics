@@ -249,6 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     return new LocationAttributeViewModel
                     {
+                        Id = locationAttributeNode.LocationId.Value,
                         GeoJson = geoJson,
                         Label = locationAttribute.Name ?? string.Empty,
                         Value = code

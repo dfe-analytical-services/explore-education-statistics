@@ -1,6 +1,4 @@
-import LocationFiltersForm, {
-  LocationFormValues,
-} from '@common/modules/table-tool/components/LocationFiltersForm';
+import LocationFiltersForm from '@common/modules/table-tool/components/LocationFiltersForm';
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { SubjectMeta } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
@@ -27,6 +25,7 @@ describe('LocationFiltersForm', () => {
       legend: 'Country',
       options: [
         {
+          id: 'country-1',
           label: 'Country 1',
           value: 'country-1',
         },
@@ -36,14 +35,17 @@ describe('LocationFiltersForm', () => {
       legend: 'Local authority',
       options: [
         {
+          id: 'local-authority-1',
           label: 'Local authority 1',
           value: 'local-authority-1',
         },
         {
+          id: 'local-authority-2',
           label: 'Local authority 2',
           value: 'local-authority-2',
         },
         {
+          id: 'local-authority-3',
           label: 'Local authority 3',
           value: 'local-authority-3',
         },
@@ -53,10 +55,12 @@ describe('LocationFiltersForm', () => {
       legend: 'Region',
       options: [
         {
+          id: 'region-1',
           label: 'Region 1',
           value: 'region-1',
         },
         {
+          id: 'region-2',
           label: 'Region 2',
           value: 'region-2',
         },
@@ -69,6 +73,7 @@ describe('LocationFiltersForm', () => {
       legend: 'Country',
       options: [
         {
+          id: 'country-1',
           label: 'Country 1',
           value: 'country-1',
         },
@@ -83,10 +88,12 @@ describe('LocationFiltersForm', () => {
           level: 'Region',
           options: [
             {
+              id: 'local-authority-1',
               label: 'Local authority 1',
               value: 'local-authority-1',
             },
             {
+              id: 'local-authority-2',
               label: 'Local authority 2',
               value: 'local-authority-2',
             },
@@ -98,10 +105,12 @@ describe('LocationFiltersForm', () => {
           level: 'Region',
           options: [
             {
+              id: 'local-authority-3',
               label: 'Local authority 3',
               value: 'local-authority-3',
             },
             {
+              id: 'local-authority-4',
               label: 'Local authority 4',
               value: 'local-authority-4',
             },
@@ -369,10 +378,7 @@ describe('LocationFiltersForm', () => {
         {...testWizardStepProps}
         options={testLocationsFlat}
         onSubmit={noop}
-        initialValues={{
-          localAuthority: ['local-authority-1', 'local-authority-3'],
-          region: ['region-2'],
-        }}
+        initialValues={['region-2', 'local-authority-1', 'local-authority-3']}
       />,
     );
 
@@ -391,9 +397,7 @@ describe('LocationFiltersForm', () => {
         {...testWizardStepProps}
         options={testLocationsNested}
         onSubmit={noop}
-        initialValues={{
-          localAuthority: ['local-authority-1', 'local-authority-3'],
-        }}
+        initialValues={['local-authority-1', 'local-authority-3']}
       />,
     );
 
@@ -411,6 +415,7 @@ describe('LocationFiltersForm', () => {
         legend: 'Country',
         options: [
           {
+            id: 'country-1',
             label: 'Country 1',
             value: 'country-1',
           },
@@ -454,6 +459,7 @@ describe('LocationFiltersForm', () => {
             level: 'Region',
             options: [
               {
+                id: 'local-authority-1',
                 label: 'Local authority 1',
                 value: 'local-authority-1',
               },
@@ -587,11 +593,8 @@ describe('LocationFiltersForm', () => {
 
     userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
-    const expected: LocationFormValues = {
-      locations: {
-        localAuthority: ['local-authority-3'],
-        region: ['region-1'],
-      },
+    const expected = {
+      locationIds: ['local-authority-3', 'region-1'],
     };
 
     await waitFor(() => {
@@ -616,11 +619,8 @@ describe('LocationFiltersForm', () => {
 
     userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
-    const expected: LocationFormValues = {
-      locations: {
-        localAuthority: ['local-authority-1', 'local-authority-3'],
-        country: ['country-1'],
-      },
+    const expected = {
+      locationIds: ['country-1', 'local-authority-1', 'local-authority-3'],
     };
 
     await waitFor(() => {
@@ -651,10 +651,12 @@ describe('LocationFiltersForm', () => {
         legend: 'Country',
         options: [
           {
+            id: 'country-1',
             label: 'Country 1',
             value: 'country-1',
           },
           {
+            id: 'country-2',
             label: 'Country 2',
             value: 'country-2',
           },
@@ -683,10 +685,12 @@ describe('LocationFiltersForm', () => {
         legend: 'Unknown',
         options: [
           {
+            id: 'unknown-1',
             label: 'Unknown 1',
             value: 'unknown-1',
           },
           {
+            id: 'unknown-2',
             label: 'Unknown 2',
             value: 'unknown-2',
           },

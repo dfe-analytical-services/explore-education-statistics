@@ -37,12 +37,12 @@ describe('mapTableHeadersConfig', () => {
       ],
       [
         {
-          value: 'E09000003',
+          value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
           type: 'Location',
           level: 'localAuthority',
         },
         {
-          value: 'E08000016',
+          value: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
           type: 'Location',
           level: 'localAuthority',
         },
@@ -141,8 +141,16 @@ describe('mapTableHeadersConfig', () => {
       ],
       locations: {
         localAuthority: [
-          { value: 'E09000003', label: 'Barnet' },
-          { value: 'E08000016', label: 'Barnsley' },
+          {
+            id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+            value: 'E09000003',
+            label: 'Barnet',
+          },
+          {
+            id: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+            value: 'E08000016',
+            label: 'Barnsley',
+          },
         ],
       },
       boundaryLevels: [],
@@ -157,14 +165,14 @@ describe('mapTableHeadersConfig', () => {
       {
         filters: [],
         geographicLevel: '',
-        location: {},
+        locationId: '',
         measures: {},
         timePeriod: '2014_AY',
       },
       {
         filters: [],
         geographicLevel: '',
-        location: {},
+        locationId: '',
         measures: {},
         timePeriod: '2015_AY',
       },
@@ -208,12 +216,12 @@ describe('mapTableHeadersConfig', () => {
       ],
       [
         new LocationFilter({
-          value: 'E09000003',
+          value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
           label: 'Barnet',
           level: 'localAuthority',
         }),
         new LocationFilter({
-          value: 'E08000016',
+          value: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
           label: 'Barnsley',
           level: 'localAuthority',
         }),
@@ -269,12 +277,14 @@ describe('mapTableHeadersConfig', () => {
         locations: {
           localAuthority: [
             {
+              id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
               label: 'Barnet (local authority)',
               value: 'barnet',
             },
           ],
           localAuthorityDistrict: [
             {
+              id: '61a57251-cca7-4a87-df80-08d82d586d38',
               label: 'Barnet (local authority district)',
               value: 'barnet',
             },
@@ -295,12 +305,12 @@ describe('mapTableHeadersConfig', () => {
           [
             {
               type: 'Location',
-              value: 'barnet',
+              value: '61a57251-cca7-4a87-df80-08d82d586d38',
               level: 'localAuthorityDistrict',
             },
             {
               type: 'Location',
-              value: 'barnet',
+              value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
               level: 'localAuthority',
             },
           ],
@@ -308,12 +318,12 @@ describe('mapTableHeadersConfig', () => {
         rows: [
           {
             type: 'Location',
-            value: 'barnet',
+            value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
             level: 'localAuthority',
           },
           {
             type: 'Location',
-            value: 'barnet',
+            value: '61a57251-cca7-4a87-df80-08d82d586d38',
             level: 'localAuthorityDistrict',
           },
         ],
@@ -324,12 +334,12 @@ describe('mapTableHeadersConfig', () => {
     expect(headers.rowGroups).toEqual([
       [
         new LocationFilter({
-          value: 'barnet',
+          value: '61a57251-cca7-4a87-df80-08d82d586d38',
           label: 'Barnet (local authority district)',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
-          value: 'barnet',
+          value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
           label: 'Barnet (local authority)',
           level: 'localAuthority',
         }),
@@ -338,12 +348,12 @@ describe('mapTableHeadersConfig', () => {
 
     expect(headers.rows).toEqual([
       new LocationFilter({
-        value: 'barnet',
+        value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
         label: 'Barnet (local authority)',
         level: 'localAuthority',
       }),
       new LocationFilter({
-        value: 'barnet',
+        value: '61a57251-cca7-4a87-df80-08d82d586d38',
         label: 'Barnet (local authority district)',
         level: 'localAuthorityDistrict',
       }),
@@ -393,14 +403,14 @@ describe('mapTableHeadersConfig', () => {
         {
           filters: [],
           geographicLevel: '',
-          location: {},
+          locationId: '',
           measures: {},
           timePeriod: '2018_T1',
         },
         {
           filters: [],
           geographicLevel: '',
-          location: {},
+          locationId: '',
           measures: {},
           timePeriod: '2017_T1',
         },

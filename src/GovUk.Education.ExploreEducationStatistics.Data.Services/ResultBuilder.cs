@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -12,13 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class ResultBuilder : IResultBuilder<Observation, ObservationViewModel>
     {
-        private readonly IMapper _mapper;
-
-        public ResultBuilder(IMapper mapper)
-        {
-            _mapper = mapper;
-        }
-
         public ObservationViewModel BuildResult(Observation observation, IEnumerable<Guid> indicators)
         {
             return new ObservationViewModel
@@ -27,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Filters = FilterItems(observation),
                 GeographicLevel = observation.Location.GeographicLevel,
                 LocationId = observation.LocationId,
-                Location = _mapper.Map<LocationViewModel>(observation.Location),
                 Measures = Measures(observation, indicators.ToList()),
                 TimePeriod = observation.GetTimePeriod()
             };

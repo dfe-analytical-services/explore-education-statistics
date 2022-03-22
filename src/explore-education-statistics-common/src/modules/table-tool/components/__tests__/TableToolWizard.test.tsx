@@ -146,13 +146,13 @@ describe('TableToolWizard', () => {
     locations: {
       country: {
         legend: 'Country',
-        options: [{ value: 'england', label: 'England' }],
+        options: [{ id: 'england', value: 'england', label: 'England' }],
       },
       localAuthority: {
         legend: 'Local authority',
         options: [
-          { value: 'barnet', label: 'Barnet' },
-          { value: 'barnsley', label: 'Barnsley' },
+          { id: 'barnet', value: 'barnet', label: 'Barnet' },
+          { id: 'barnsley', value: 'barnsley', label: 'Barnsley' },
         ],
       },
     },
@@ -188,7 +188,7 @@ describe('TableToolWizard', () => {
           query: {
             publicationId: 'publication-1',
             subjectId: '',
-            locations: {},
+            locationIds: [],
             filters: [],
             indicators: [],
           },
@@ -212,7 +212,7 @@ describe('TableToolWizard', () => {
           query: {
             subjectId: '',
             releaseId: 'release-1',
-            locations: {},
+            locationIds: [],
             filters: [],
             indicators: [],
           },
@@ -242,9 +242,7 @@ describe('TableToolWizard', () => {
           query: {
             publicationId: 'publication-1',
             subjectId: 'subject-1',
-            locations: {
-              localAuthority: ['barnet', 'barnsley'],
-            },
+            locationIds: ['barnet', 'barnsley'],
             timePeriod: {
               startYear: 2013,
               startCode: 'AY',
@@ -338,9 +336,7 @@ describe('TableToolWizard', () => {
           query: {
             publicationId: 'publication-1',
             subjectId: 'subject-1',
-            locations: {
-              localAuthority: ['barnet'],
-            },
+            locationIds: ['barnet'],
             filters: ['ethnicity-major-asian-total'],
             indicators: ['authorised-absence-sessions'],
             timePeriod: {
@@ -435,9 +431,7 @@ describe('TableToolWizard', () => {
           query: {
             publicationId: 'publication-1',
             subjectId: 'subject-1',
-            locations: {
-              localAuthority: ['barnet'],
-            },
+            locationIds: ['barnet'],
             filters: [],
             indicators: [],
             timePeriod: {
@@ -485,9 +479,7 @@ describe('TableToolWizard', () => {
           query: {
             publicationId: 'publication-1',
             subjectId: 'subject-1',
-            locations: {
-              localAuthority: ['barnet'],
-            },
+            locationIds: ['barnet'],
             filters: ['state-funded-primary'],
             indicators: ['another-indicator'],
             timePeriod: {
@@ -533,9 +525,7 @@ describe('TableToolWizard', () => {
           query: {
             publicationId: 'publication-1',
             subjectId: 'subject-1',
-            locations: {
-              localAuthority: ['barnet'],
-            },
+            locationIds: ['barnet'],
             filters: ['another-filter'],
             indicators: [
               'authorised-absence-sessions',

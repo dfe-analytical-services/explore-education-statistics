@@ -66,13 +66,15 @@ export class LocationFilter extends Filter {
   public readonly geoJson?: GeoJsonFeature[];
 
   public constructor({
+    id,
     value,
     label,
     level,
     geoJson,
     group,
   }: GroupedFilterOption & { level: string; geoJson?: GeoJsonFeature[] }) {
-    super({ value, label, group });
+    const idOrFallback = id ?? value;
+    super({ value: idOrFallback, label, group });
 
     this.level = level;
     this.geoJson = geoJson;

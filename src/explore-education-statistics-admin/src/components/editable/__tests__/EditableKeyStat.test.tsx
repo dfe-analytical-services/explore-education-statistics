@@ -62,12 +62,7 @@ describe('EditableKeyStat', () => {
       {
         filters: ['filter-1'],
         geographicLevel: 'country',
-        location: {
-          country: {
-            name: 'england',
-            code: 'england',
-          },
-        },
+        locationId: 'england',
         timePeriod: '2020_AY',
         measures: {
           'indicator-1': '608180',

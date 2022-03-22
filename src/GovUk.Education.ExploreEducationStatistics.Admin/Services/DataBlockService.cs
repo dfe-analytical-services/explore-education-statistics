@@ -66,9 +66,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var dataBlock = _mapper.Map<DataBlock>(dataBlockCreate);
                     dataBlock.Created = DateTime.UtcNow;
 
-                    // EES-3167 Initialise the migration flag as false.
-                    // New data blocks will need migrating until EES-2955.
-                    dataBlock.LocationsMigrated = false;
+                    // TODO EES-3212 Remove this migrated flag
+                    // Initialise as true now that data blocks are being created with location id's
+                    dataBlock.LocationsMigrated = true;
 
                     var added = (await _context.DataBlocks.AddAsync(dataBlock)).Entity;
 
@@ -148,11 +148,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         }
 
                         _mapper.Map(dataBlockUpdate, dataBlock);
-
-                        // EES-3167 If the query, table and charts fields have already been cloned to temporary fields
-                        // for the locations migration then those fields will become stale as a result of this update
-                        // so reset the migration flag.
-                        dataBlock.LocationsMigrated = false;
 
                         _context.DataBlocks.Update(dataBlock);
                         await _context.SaveChangesAsync();

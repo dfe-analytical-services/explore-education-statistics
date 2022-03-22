@@ -40,11 +40,11 @@ export const testSubjectMeta: SubjectMeta = {
   locations: {
     country: {
       legend: 'Country',
-      options: [{ value: 'england', label: 'England' }],
+      options: [{ id: 'england', value: 'england', label: 'England' }],
     },
     localAuthority: {
       legend: 'Local authority',
-      options: [{ value: 'barnet', label: 'Barnet' }],
+      options: [{ id: 'barnet', value: 'barnet', label: 'Barnet' }],
     },
   },
   timePeriod: {
@@ -63,6 +63,7 @@ export const testTableData: TableDataResponse = {
     locations: {
       localAuthority: [
         {
+          id: 'barnet',
           label: 'Barnet',
           value: 'barnet',
         },
@@ -104,12 +105,7 @@ export const testTableData: TableDataResponse = {
       measures: {
         'authorised-absence-sessions': '123',
       },
-      location: {
-        localAuthority: {
-          name: 'Barnet',
-          code: 'barnet',
-        },
-      },
+      locationId: 'barnet',
       geographicLevel: 'localAuthority',
       filters: ['gender-female'],
     },

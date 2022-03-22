@@ -23,6 +23,61 @@ Array [
 ]
 `;
 
+exports[`getCsvData contains data for a Permalink table created prior to the switchover from Location codes to id's 1`] = `
+Array [
+  Array [
+    "location",
+    "location_code",
+    "geographic_level",
+    "time_period",
+    "characteristic",
+    "school_type",
+    "sess_authorised_percent",
+    "sess_authorised",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "State-funded primary",
+    "111",
+    "222",
+  ],
+  Array [
+    "England",
+    "england",
+    "country",
+    "201516",
+    "Female",
+    "State-funded secondary",
+    "333",
+    "444",
+  ],
+  Array [
+    "Barnet",
+    "barnet",
+    "localAuthority",
+    "201516",
+    "Female",
+    "State-funded primary",
+    "555",
+    "666",
+  ],
+  Array [
+    "Barnsley",
+    "barnsley",
+    "localAuthority",
+    "201516",
+    "Female",
+    "State-funded secondary",
+    "777",
+    "888",
+  ],
+]
+`;
+
 exports[`getCsvData contains full set of data 1`] = `
 Array [
   Array [

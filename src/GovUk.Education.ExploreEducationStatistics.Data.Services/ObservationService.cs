@@ -42,30 +42,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             var sw = Stopwatch.StartNew();
 
-            IList<Guid> locationIds;
-
-            // Support old Data Blocks that have Location codes rather than id's in their query
-            // TODO EES-3068 Migrate Location codes to ids in old Data Blocks to remove this support for Location
-            // codes
-            if (query.LocationIds.IsNullOrEmpty())
-            {
-                locationIds = await _context
-                    .Location
-                    .Where(LocationPredicateBuilder.Build(query.LocationIds?.ToList(), query.Locations))
-                    .Select(location => location.Id)
-                    .ToListAsync(cancellationToken);
-            }
-            else
-            {
-                locationIds = query.LocationIds.ToList();
-            }
-
             var (sql, sqlParameters, tempTables) = await QueryGenerator
                 .GetMatchingObservationsQuery(
                     _context,
                     query.SubjectId,
                     query.Filters?.ToList(),
-                    locationIds,
+                    query.LocationIds,
                     query.TimePeriod,
                     cancellationToken);
 

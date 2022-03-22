@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             CancellationToken cancellationToken)
         {
             SubjectMetaQueryStep? subjectMetaStep = null;
-            if (query.Locations != null && query.TimePeriod == null)
+            if (!query.LocationIds.IsNullOrEmpty() && query.TimePeriod == null)
             {
                 subjectMetaStep = SubjectMetaQueryStep.GetTimePeriods;
             } else if (query.TimePeriod != null && query.Filters == null)
@@ -128,20 +128,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 case SubjectMetaQueryStep.GetTimePeriods:
                 {
                     var stopwatch = Stopwatch.StartNew();
-                    
-                    var locationQuery = 
-                        LocationPredicateBuilder.Build(query.LocationIds?.ToList(), query.Locations);
-                    
-                    var locationIds = _context
-                        .Location
-                        .AsNoTracking()
-                        .Where(locationQuery)
-                        .Select(l => l.Id);
-                    
+
                     var observations = _context
                         .Observation
                         .AsNoTracking()
-                        .Where(o => o.SubjectId == query.SubjectId && locationIds.Contains(o.LocationId));
+                        .Where(o => o.SubjectId == query.SubjectId && query.LocationIds.Contains(o.LocationId));
                     
                     var timePeriods = GetTimePeriods(observations);
                         
@@ -260,6 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return locationAttributeNode.IsLeaf
                 ? new LocationAttributeViewModel
                 {
+                    Id = locationAttributeNode.LocationId.Value,
                     Label = locationAttributeNode.Attribute.Name ?? string.Empty,
                     Value = locationAttributeNode.Attribute.GetCodeOrFallback()
                 }

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 

@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 
         public static TableHeader NewLocationHeader(GeographicLevel level, string value)
         {
-            return new TableHeader
+            return new()
             {
                 Level = level.ToString().CamelCase(),
                 Value = value,

@@ -27,19 +27,19 @@ export interface LocationFormValues {
 }
 
 export type LocationFiltersFormSubmitHandler = (values: {
-  locations: Dictionary<string[]>;
+  locationIds: string[];
 }) => void;
 
 const formId = 'locationFiltersForm';
 
 interface Props extends InjectedWizardProps {
   options: SubjectMeta['locations'];
-  initialValues?: Dictionary<string[]>;
+  initialValues?: string[];
   onSubmit: LocationFiltersFormSubmitHandler;
 }
 
 const LocationFiltersForm = ({
-  initialValues = {},
+  initialValues = [],
   options,
   onSubmit,
   ...stepProps
@@ -57,44 +57,47 @@ const LocationFiltersForm = ({
 
   const formOptions = useMemo(() => Object.entries(options), [options]);
 
-  // Key options by their value to make future lookups faster/easier.
+  // Key options by level and then by id to make future lookups faster/easier.
   const keyedOptions = useMemo(
     () =>
-      formOptions.reduce<Dictionary<LocationOption>>((acc, [, level]) => {
-        level.options.forEach(option => {
+      mapValues(options, level =>
+        level.options.reduce<Dictionary<LocationOption>>((acc, option) => {
           // There are nested options, so we need
           // to iterate through these instead.
           if (option.options) {
             option.options.forEach(subOption => {
-              acc[subOption.value] = subOption;
+              acc[subOption.id ?? ''] = subOption;
             });
           } else {
-            acc[option.value] = option;
+            acc[option.id ?? ''] = option;
           }
-        });
-
-        return acc;
-      }, {}),
-    [formOptions],
+          return acc;
+        }, {}),
+      ),
+    [options],
   );
 
-  const allOptions = useMemo(() => Object.values(keyedOptions), [keyedOptions]);
-
-  const hasSingleOption = allOptions.length === 1;
+  // A single option exists when there's a single level
+  // and a single key in the dictionary of options for that level.
+  const hasSingleOption =
+    levelKeys.length === 1 &&
+    Object.keys(keyedOptions[levelKeys[0]]).length === 1;
 
   const initialFormValues = useMemo(() => {
     return {
-      locations: mapValues(options, (levelOptions, level) => {
+      locations: mapValues(options, (_, levelKey) => {
+        const level = keyedOptions[levelKey];
+        const levelValues = Object.keys(level);
         // Automatically select and expand group if
         // only one location option is available.
-        const initialLevelValues = hasSingleOption
-          ? [allOptions[0].value]
-          : initialValues[level] ?? [];
+        if (hasSingleOption) {
+          return [levelValues[0]];
+        }
 
-        return initialLevelValues.filter(value => keyedOptions[value]);
+        return levelValues.filter(value => initialValues.includes(value));
       }),
     };
-  }, [allOptions, hasSingleOption, initialValues, keyedOptions, options]);
+  }, [initialValues, hasSingleOption, keyedOptions, options]);
 
   return (
     <Formik<LocationFormValues>
@@ -110,18 +113,9 @@ const LocationFiltersForm = ({
         ),
       })}
       onSubmit={async values => {
-        const locations = Object.entries(values.locations).reduce<
-          Dictionary<string[]>
-        >((acc, [level, levelOptions]) => {
-          if (levelOptions.length > 0) {
-            acc[level] = levelOptions;
-          }
-
-          return acc;
-        }, {});
-
+        const locationIds = Object.values(values.locations).flat();
         await goToNextStep(async () => {
-          await onSubmit({ locations });
+          await onSubmit({ locationIds });
         });
       }}
     >
@@ -157,7 +151,11 @@ const LocationFiltersForm = ({
                           order={[]}
                           options={level.options.map(group => ({
                             legend: group.label,
-                            options: group.options ?? [],
+                            options:
+                              group.options?.map(option => ({
+                                label: option.label,
+                                value: option.id ?? '',
+                              })) ?? [],
                           }))}
                         />
                       ) : (
@@ -169,7 +167,10 @@ const LocationFiltersForm = ({
                           legendHidden
                           open={hasSingleOption}
                           order={[]}
-                          options={level.options}
+                          options={level.options.map(option => ({
+                            label: option.label,
+                            value: option.id ?? '',
+                          }))}
                         />
                       );
                     })}
@@ -184,10 +185,11 @@ const LocationFiltersForm = ({
 
         const locationLevels: Dictionary<FilterOption[]> = mapValues(
           form.values.locations,
-          locations =>
+          (locations, level) =>
             locations.reduce<FilterOption[]>((acc, value) => {
-              if (keyedOptions[value]) {
-                acc.push(keyedOptions[value]);
+              const levelOptions = keyedOptions[level];
+              if (levelOptions && levelOptions[value]) {
+                acc.push(levelOptions[value]);
               }
 
               return acc;
