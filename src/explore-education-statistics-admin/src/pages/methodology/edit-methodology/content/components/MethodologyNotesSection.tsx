@@ -200,7 +200,7 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
             id="methodologyNotes"
             open={editingMode === 'edit'}
           >
-            <ol className="govuk-list">
+            <ol className="govuk-list" data-testid="notes">
               {orderedNotes.map(note => (
                 <li key={note.id}>
                   {editingMode === 'edit' &&
@@ -209,10 +209,13 @@ const MethodologyNotesSection = ({ methodology }: Props) => {
                     renderEditForm()
                   ) : (
                     <>
-                      <FormattedDate className="govuk-body govuk-!-font-weight-bold">
+                      <FormattedDate
+                        className="govuk-body govuk-!-font-weight-bold"
+                        data-testId="note-displayDate"
+                      >
                         {note.displayDate}
                       </FormattedDate>
-                      <p>{note.content}</p>
+                      <p data-testid="note-content">{note.content}</p>
 
                       {editingMode === 'edit' && (
                         <ButtonGroup>
