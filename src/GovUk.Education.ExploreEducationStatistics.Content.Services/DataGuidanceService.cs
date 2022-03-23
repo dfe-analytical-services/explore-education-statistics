@@ -1,4 +1,5 @@
 ﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -26,23 +27,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
         public async Task<Either<ActionResult, DataGuidanceViewModel>> Get(string publicationSlug, string? releaseSlug = null)
         {
-            var publication = await _publicationService.Get(publicationSlug);
-            var release = await _releaseService.GetCachedRelease(publicationSlug, releaseSlug);
-
-            if (release.IsRight && publication.IsRight)
-            {
-                return await _dataGuidanceSubjectService.GetSubjects(release.Right!.Id)
-                    .OnSuccess(
-                        subjects =>
-                            new DataGuidanceViewModel(
-                                release.Right,
-                                publication.Right,
-                                subjects
-                            )
-                    );
-            }
-
-            return new Either<ActionResult, DataGuidanceViewModel>(new NotFoundResult());
+            return await _publicationService.Get(publicationSlug)
+                .OnSuccessCombineWith(_ => _releaseService.GetCachedRelease(publicationSlug, releaseSlug))
+                .OnSuccess(publicationAndRelease =>
+                {
+                    var (publication, release) = publicationAndRelease;
+                    return _dataGuidanceSubjectService.GetSubjects(release!.Id)
+                        .OnSuccess(subjects => new DataGuidanceViewModel(
+                            release,
+                            publication,
+                            subjects
+                        ));
+                });
         }
     }
 }

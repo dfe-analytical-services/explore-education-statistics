@@ -36,10 +36,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? Updated { get; set; }
 
-        public Guid? SupersededById { get; set; }
-
-        public Publication? SupersededBy { get; set; }
-
         public bool Live => Published.HasValue && DateTime.Compare(DateTime.UtcNow, Published.Value) > 0;
 
         public Release? LatestPublishedRelease()

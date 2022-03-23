@@ -53,48 +53,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .OnSuccess(async tuple =>
                 {
                     var (publication, methodologies) = tuple;
-                    var cachedRelease = await GetCachedRelease(publicationSlug, releaseSlug);
+                    return await GetCachedRelease(publicationSlug, releaseSlug)
+                        .OnSuccess(cachedRelease =>
+                        {
+                            var result = new ReleaseViewModel(
+                                _mapper.Map<CachedReleaseViewModel>(cachedRelease),
+                                _mapper.Map<PublicationViewModel>(publication)
+                            );
 
-                    if (cachedRelease.IsRight
-                        && cachedRelease.Right is not null
-                        && publication is not null)
-                    {
-                        var result = new Either<ActionResult, ReleaseViewModel>(new ReleaseViewModel(
-                            _mapper.Map<CachedReleaseViewModel>(cachedRelease.Right),
-                            _mapper.Map<PublicationViewModel>(publication)
-                        ));
-
-                        result.Right.Publication.Methodologies = methodologies;
-                        return result;
-                    }
-
-                    return new NotFoundResult();
+                            result.Publication.Methodologies = methodologies;
+                            return result;
+                        });
                 });
         }
 
         public async Task<Either<ActionResult, ReleaseSummaryViewModel>> GetSummary(string publicationSlug,
             string? releaseSlug)
         {
-            return await _persistenceHelper
-                .CheckEntityExists<Publication>(query => query
-                    .Where(p => p.Slug == publicationSlug))
-                .OnSuccess(async _ =>
+            return await _publicationService.Get(publicationSlug)
+                .OnSuccessCombineWith(_ => GetCachedRelease(publicationSlug, releaseSlug))
+                .OnSuccess(publicationAndRelease =>
                 {
-                    var publication = await _publicationService.Get(publicationSlug);
-                    var release = await GetCachedRelease(publicationSlug, releaseSlug);
-
-                    if (release.IsRight
-                        && release.Right is not null
-                        && publication.IsRight
-                        && publication.Right is not null)
-                    {
-                        return new Either<ActionResult, ReleaseSummaryViewModel>(new ReleaseSummaryViewModel(
-                            _mapper.Map<CachedReleaseViewModel>(release.Right),
-                            _mapper.Map<PublicationViewModel>(publication.Right)
-                        ));
-                    }
-
-                    return new NotFoundResult();
+                    var (publication, release) = publicationAndRelease;
+                    return new ReleaseSummaryViewModel(
+                        _mapper.Map<CachedReleaseViewModel>(release),
+                        _mapper.Map<PublicationViewModel>(publication)
+                    );
                 });
         }
 

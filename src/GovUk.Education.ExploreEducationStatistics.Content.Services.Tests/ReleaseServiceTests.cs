@@ -268,7 +268,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
-            var service = SetupReleaseService(contentDbContext);
+
+            var publicationService = new PublicationService(
+                new PersistenceHelper<ContentDbContext>(contentDbContext),
+                MapperUtils.MapperForProfile<MappingProfiles>());
+            var service = SetupReleaseService(contentDbContext,
+                publicationService: publicationService);
 
             var result = await service.GetSummary(publicationSlug, releaseSlug);
 

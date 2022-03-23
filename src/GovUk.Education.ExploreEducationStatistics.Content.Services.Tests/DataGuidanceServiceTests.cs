@@ -126,22 +126,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var dataGuidanceSubjectService = new Mock<IDataGuidanceSubjectService>(MockBehavior.Strict);
             var publicationService = new Mock<Interfaces.IPublicationService>(MockBehavior.Strict);
-            var releaseService = new Mock<Interfaces.IReleaseService>(MockBehavior.Strict);
 
             var service = SetupService(
                 dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
-                publicationService: publicationService.Object,
-                releaseService: releaseService.Object
+                publicationService: publicationService.Object
             );
 
             publicationService.Setup(mock => mock.Get(publicationSlug))
                 .ReturnsAsync(
                     new NotFoundResult()
-                );
-
-            releaseService.Setup(mock => mock.GetCachedRelease(publicationSlug, releaseSlug))
-                .ReturnsAsync(
-                    new CachedReleaseViewModel(Guid.NewGuid())
                 );
 
             var result = await service.Get( publicationSlug, releaseSlug);
@@ -151,12 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Times.Once
             );
 
-            releaseService.Verify(
-                mock => mock.GetCachedRelease(publicationSlug, releaseSlug),
-                Times.Once
-            );
-
-            VerifyAllMocks(publicationService, releaseService);
+            VerifyAllMocks(publicationService);
 
             result.AssertNotFound();
         }

@@ -40,11 +40,8 @@ public class PublicationService : IPublicationService
                 .Include(p => p.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .Where(p => p.Slug == publicationSlug))
-            .OnSuccessCombineWith(publication =>
-            {
-                // NOTE: BlobCache won't cache result if GetLatestRelease returns an Either.IsLeft - i.e. if there is no latestRelease
-                return GetLatestRelease(publication);
-            })
+            // NOTE: BlobCache won't cache result if GetLatestRelease returns an Either.IsLeft - i.e. if there is no latestRelease
+            .OnSuccessCombineWith(GetLatestRelease)
             .OnSuccess(tuple =>
             {
                 var (publication, latestRelease) = tuple;

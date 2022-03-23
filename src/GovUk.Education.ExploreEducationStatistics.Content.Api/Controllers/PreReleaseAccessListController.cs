@@ -1,5 +1,8 @@
 #nullable enable
+using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -43,15 +46,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             string publicationSlug,
             string? releaseSlug = null)
         {
-            var publication = await _publicationService.Get(publicationSlug);
-            var release = await _releaseService.GetCachedRelease(publicationSlug, releaseSlug);
 
-            if (release.IsRight && publication.IsRight)
-            {
-                return new PreReleaseAccessListViewModel(release.Right!, publication.Right);
-            }
-
-            return NotFound();
+            return await _publicationService.Get(publicationSlug)
+                .OnSuccessCombineWith(_ => _releaseService.GetCachedRelease(publicationSlug, releaseSlug))
+                .OnSuccess(publicationAndRelease =>
+                {
+                    var (publication, release) = publicationAndRelease;
+                    return new PreReleaseAccessListViewModel(release!, publication);
+                })
+                .HandleFailuresOrOk();
         }
     }
 }
