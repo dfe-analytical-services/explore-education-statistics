@@ -44,3 +44,14 @@ def take_screenshot_of_element(element: WebElement, filename: str):
     makedirs(folder, exist_ok=True)
     element.screenshot(filepath)
     return f'file://{filepath}'
+
+
+def take_html_snapshot_of_element(element: WebElement, filename: str):
+    filepath = f'{getcwd()}/{filename}'
+    folder = path.abspath(path.join(filepath, pardir))
+    makedirs(folder, exist_ok=True)
+    html = element.get_attribute('innerHTML')
+    with open(filepath, "w") as html_file:
+        html_file.write(html)
+        html_file.close()
+    return f'file://{filepath}'

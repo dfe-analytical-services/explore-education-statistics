@@ -867,3 +867,13 @@ user takes screenshot of element
     ${element}=    lookup or return webelement    ${selector_or_webelement}
     ${filepath}=    take screenshot of element    ${element}    ${filename}
     [Return]    ${filepath}
+
+user takes html snapshot of element
+    [Arguments]
+    ...    ${selector_or_webelement}
+    ...    ${filename}
+    ...    ${wait}=${timeout}
+    ...    ${limit}=None
+    ${element}=    lookup or return webelement    ${selector_or_webelement}
+    ${filepath}=    take html snapshot of element    ${element}    ${filename}
+    [Return]    ${filepath}

@@ -69,6 +69,8 @@ Check Fast Track Table
     user waits until page contains element    id:tableToolWizard
     ${filepath}=    user takes screenshot of element    id:tableToolWizard
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${FAST_TRACKS_FOLDER}/${content_block.content_block_id}-table.png
+    user takes html snapshot of element    id:tableToolWizard
+    ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${FAST_TRACKS_FOLDER}/${content_block.content_block_id}-table.html
     log content block details    ${content_block}    Fast Track    ${filepath}
     # TODO charts
 
@@ -94,6 +96,8 @@ Check Content Block Table
 #    highlight element    ${data_block}
     ${table_filepath}=    user takes screenshot of element    ${data_block}
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${CONTENT_SECTIONS_FOLDER}/${content_block.content_block_id}-table.png
+    user takes html snapshot of element    ${data_block}
+    ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${CONTENT_SECTIONS_FOLDER}/${content_block.content_block_id}-table.html
     ${chart_filepath}=    Set Variable
     IF    ${content_block.has_chart_config} is ${TRUE}
         ${data_block_chart_tab}=    get child element    ${data_block}
@@ -104,6 +108,8 @@ Check Content Block Table
 #    highlight element    ${data_block}
         ${chart_filepath}=    user takes screenshot of element    ${data_block}
         ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${CONTENT_SECTIONS_FOLDER}/${content_block.content_block_id}-${content_block.chart_type}-chart.png
+        user takes html snapshot of element    ${data_block}
+        ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${CONTENT_SECTIONS_FOLDER}/${content_block.content_block_id}-${content_block.chart_type}-chart.html
     END
     user closes accordion section with id    content-${content_block.content_section_position}    id:content
     log content block details    ${content_block}    Content Block    ${table_filepath}    ${chart_filepath}
@@ -117,6 +123,8 @@ Check Secondary Stats Table
     user waits until page contains element    testid:dataTableCaption
     ${filepath}=    user takes screenshot of element    id:releaseHeadlines-tables
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${SECONDARY_STATS_FOLDER}/${content_block.content_block_id}-table.png
+    user takes html snapshot of element    id:releaseHeadlines-tables
+    ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${SECONDARY_STATS_FOLDER}/${content_block.content_block_id}-table.html
     log content block details    ${content_block}    Secondary Stats Table    ${filepath}
     # TODO charts
 
@@ -129,6 +137,8 @@ Check Key Stats Table
     ${filepath}=    user takes screenshot of element
     ...    xpath://div[@data-testid="keyStat"][${content_block.content_block_position}]
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${KEY_STATS_FOLDER}/${content_block.content_block_id}-table.png
+    user takes html snapshot of element    xpath://div[@data-testid="keyStat"][${content_block.content_block_position}]
+    ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${KEY_STATS_FOLDER}/${content_block.content_block_id}-table.html
     log content block details    ${content_block}    Key Stats Table    ${filepath}
     # TODO charts
 
@@ -167,7 +177,3 @@ user waits for chart to appear
         Fail    Unhandled chart type ${chart_type}
     END
     user waits until page does not contain loading spinner
-
-get owning accordion from data block id
-    [Arguments]    ${data_block_id}
-    ${accordion}=    get webelement    xpath://*[@id="dataBlock-${data_block_id}"]/parent::[]
