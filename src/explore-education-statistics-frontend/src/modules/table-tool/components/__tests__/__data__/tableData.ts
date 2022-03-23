@@ -73,7 +73,8 @@ export const testTable: FullTable = {
     ],
     locations: [
       new LocationFilter({
-        value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+        id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+        value: 'england',
         label: 'England',
         level: 'country',
       }),

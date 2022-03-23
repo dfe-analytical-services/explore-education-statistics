@@ -93,7 +93,7 @@ export default function getCsvData(fullTable: WorkerFullTable): string[][] {
 
       return [
         location.label,
-        location.value,
+        location.code,
         location.level,
         timePeriod.label.replace(/\//g, ''),
         ...filterOptions.map(column => column.label),
