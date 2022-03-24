@@ -3,6 +3,7 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import { OmitStrict } from '@common/types';
 import React, { forwardRef, ReactNode, Ref, useEffect, useRef } from 'react';
 import styles from './FixedMultiHeaderDataTable.module.scss';
+import multiHeaderStyles from './MultiHeaderTable.module.scss';
 import MultiHeaderTable, { MultiHeaderTableProps } from './MultiHeaderTable';
 
 const mobileWidth = 1024;
@@ -74,8 +75,14 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
               mainTableRef.current
                 .querySelectorAll<HTMLTableCellElement>('thead td')
                 .forEach(el => {
-                  // eslint-disable-next-line no-param-reassign
-                  el.style.transform = `translate(${scrollLeft}px, ${scrollTop}px)`;
+                  if (
+                    !el.classList.contains(
+                      multiHeaderStyles.emptyColumnHeaderCell,
+                    )
+                  ) {
+                    // eslint-disable-next-line no-param-reassign
+                    el.style.transform = `translate(${scrollLeft}px, ${scrollTop}px)`;
+                  }
                 });
 
               mainTableRef.current
@@ -86,7 +93,25 @@ const FixedMultiHeaderDataTable = forwardRef<HTMLElement, Props>(
                 });
 
               mainTableRef.current
+                .querySelectorAll<HTMLTableCellElement>(
+                  `.${multiHeaderStyles.emptyColumnHeaderCell}`,
+                )
+                .forEach(el => {
+                  // eslint-disable-next-line no-param-reassign
+                  el.style.transform = `translate(0, ${scrollTop}px)`;
+                });
+
+              mainTableRef.current
                 .querySelectorAll<HTMLTableCellElement>('tbody th')
+                .forEach(el => {
+                  // eslint-disable-next-line no-param-reassign
+                  el.style.transform = `translate(${scrollLeft}px, 0)`;
+                });
+
+              mainTableRef.current
+                .querySelectorAll<HTMLTableCellElement>(
+                  `.${multiHeaderStyles.emptyRowHeaderCell}`,
+                )
                 .forEach(el => {
                   // eslint-disable-next-line no-param-reassign
                   el.style.transform = `translate(${scrollLeft}px, 0)`;

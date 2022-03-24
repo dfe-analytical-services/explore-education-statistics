@@ -161,9 +161,9 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
       >
         <thead className={styles.tableHead}>
           {expandedColumnHeaders.map((columns, rowIndex) => {
+            const headingRowKey = `row-${rowIndex}`;
             return (
-              // eslint-disable-next-line react/no-array-index-key
-              <tr key={rowIndex}>
+              <tr key={headingRowKey}>
                 {rowIndex === 0 && (
                   <td
                     colSpan={rowHeaderColumnLength}
@@ -174,6 +174,17 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
 
                 {columns.map((column, columnIndex) => {
                   const key = `${column.text}_${columnIndex}`;
+                  // Add an empty td instead of a th for empty group headers
+                  if (column.id === '') {
+                    return (
+                      <td
+                        key={key}
+                        colSpan={column.span}
+                        rowSpan={column.crossSpan}
+                        className={styles.emptyColumnHeaderCell}
+                      />
+                    );
+                  }
 
                   return (
                     <th
@@ -197,40 +208,63 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
         </thead>
 
         <tbody>
-          {rows.map((row, rowIndex) => (
-            // eslint-disable-next-line react/no-array-index-key
-            <tr key={rowIndex}>
-              {expandedRowHeaders[rowIndex]?.map((header, headerIndex) => {
-                return (
-                  <th
-                    // eslint-disable-next-line react/no-array-index-key
-                    key={headerIndex}
-                    className={classNames({
-                      [styles.borderBottom]: header.isGroup,
-                    })}
-                    rowSpan={header.span}
-                    colSpan={header.crossSpan}
-                    scope={header.isGroup ? 'rowgroup' : 'row'}
-                  >
-                    {header.text}
-                  </th>
-                );
-              })}
+          {rows.map((row, rowIndex) => {
+            const rowKey = `row-${rowIndex}`;
+            return (
+              <tr key={rowKey}>
+                {expandedRowHeaders[rowIndex]?.map((header, headerIndex) => {
+                  const key = `header-${headerIndex}`;
 
-              {row.map((cell, cellIndex) => (
-                <td
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={cellIndex}
-                  className={classNames('govuk-table__cell--numeric', {
-                    [styles.borderBottom]:
-                      (rowIndex + 1) % rowHeaders.length === 0,
-                  })}
-                >
-                  {cell}
-                </td>
-              ))}
-            </tr>
-          ))}
+                  // Add an empty td instead of a th for empty group headers
+                  if (header.id === '') {
+                    return (
+                      <td
+                        key={key}
+                        className={classNames(
+                          styles.emptyRowHeaderCell,
+                          // 'fixed',
+                          {
+                            [styles.borderBottom]: header.isGroup,
+                          },
+                        )}
+                        rowSpan={header.span}
+                        colSpan={header.crossSpan}
+                      />
+                    );
+                  }
+
+                  return (
+                    <th
+                      key={key}
+                      className={classNames({
+                        [styles.borderBottom]: header.isGroup,
+                      })}
+                      rowSpan={header.span}
+                      colSpan={header.crossSpan}
+                      scope={header.isGroup ? 'rowgroup' : 'row'}
+                    >
+                      {header.text}
+                    </th>
+                  );
+                })}
+
+                {row.map((cell, cellIndex) => {
+                  const cellKey = `cell-${cellIndex}`;
+                  return (
+                    <td
+                      key={cellKey}
+                      className={classNames('govuk-table__cell--numeric', {
+                        [styles.borderBottom]:
+                          (rowIndex + 1) % rowHeaders.length === 0,
+                      })}
+                    >
+                      {cell}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     );

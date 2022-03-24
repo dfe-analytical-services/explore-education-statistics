@@ -21,6 +21,11 @@ $border-width: 1px;
     z-index: 1;
   }
 
+  .emptyRowHeaderCell {
+    background: #fff;
+    min-width: 100px;
+  }
+
   @media print {
     font-size: 0.8rem;
     max-height: none;
@@ -54,6 +59,12 @@ $border-width: 1px;
     background: #fff;
     position: relative;
     z-index: 3;
+  }
+
+  .emptyColumnHeaderCell {
+    background: govuk-colour('light-grey');
+    height: 46px;
+    z-index: 1;
   }
 
   th {

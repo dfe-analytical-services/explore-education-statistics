@@ -125,9 +125,14 @@ function optimizeFilters(filters: Filter[], headerConfig: Filter[][]) {
           header => header.group !== firstSubGroup,
         );
 
+        // LADs can be added without regions, which results as an empty string for `group` and can cause table layout problems.
+        // So include it as an empty group and change to a td later so don't have empty header cells
+        const isMissingLocationGroup =
+          filter instanceof LocationFilter && filter.group === '';
+
         return hasMultipleSubGroups &&
-          filter.group &&
-          filter.group !== 'Default'
+          ((filter.group && filter.group !== 'Default') ||
+            isMissingLocationGroup)
           ? [new FilterGroup(filter.group), filter]
           : filter;
       })
