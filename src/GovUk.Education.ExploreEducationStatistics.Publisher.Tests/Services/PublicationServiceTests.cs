@@ -1,17 +1,13 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
@@ -220,83 +216,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
         );
 
         [Fact]
-        public async Task GetViewModel()
-        {
-            var contextId = Guid.NewGuid().ToString();
-
-            using (var context = InMemoryContentDbContext(contextId))
-            {
-                await context.AddAsync(Theme);
-                await context.AddAsync(Topic);
-                await context.AddRangeAsync(PublicationA, PublicationB, PublicationC);
-                await context.AddRangeAsync(Releases);
-                await context.SaveChangesAsync();
-            }
-
-            using (var context = InMemoryContentDbContext(contextId))
-            {
-                var releaseService = new Mock<IReleaseService>();
-
-                releaseService.Setup(s => s.GetLatestRelease(PublicationA.Id, Enumerable.Empty<Guid>()))
-                    .ReturnsAsync(PublicationARelease1V1);
-
-                var service = BuildPublicationService(context, releaseService: releaseService.Object);
-
-                var result = await service.GetViewModel(PublicationA.Id, Enumerable.Empty<Guid>());
-
-                Assert.Equal(PublicationA.Id, result.Id);
-                Assert.Equal("Publication A", result.Title);
-                Assert.Equal("publication-a", result.Slug);
-                Assert.Equal(PublicationARelease1V1.Id, result.LatestReleaseId);
-                Assert.Contains(PublicationARelease1V1.Id, result.Releases.Select(r => r.Id));
-                Assert.DoesNotContain(PublicationARelease1V0.Id, result.Releases.Select(r => r.Id));
-                Assert.DoesNotContain(PublicationARelease1V1Deleted.Id, result.Releases.Select(r => r.Id));
-
-                Assert.NotNull(result.Topic);
-                var topic = result.Topic;
-
-                Assert.NotNull(topic.Theme);
-                var theme = topic.Theme;
-                Assert.Equal(Theme.Title, theme.Title);
-
-                Assert.NotNull(result.Contact);
-                var contact = result.Contact;
-                Assert.Equal("first contact name", contact.ContactName);
-                Assert.Equal("first contact tel no", contact.ContactTelNo);
-                Assert.Equal("first@contact.com", contact.TeamEmail);
-                Assert.Equal("first contact team name", contact.TeamName);
-
-                Assert.NotNull(result.ExternalMethodology);
-                var externalMethodology = result.ExternalMethodology;
-                Assert.Equal("external methodology title", externalMethodology.Title);
-                Assert.Equal("http://external.methodology/", externalMethodology.Url);
-
-                Assert.NotNull(result.LegacyReleases);
-                var legacyReleases = result.LegacyReleases;
-                Assert.Equal(3, legacyReleases.Count);
-                Assert.Equal("Academic Year 2010/11", legacyReleases[0].Description);
-                Assert.Equal("http://link.three/", legacyReleases[0].Url);
-                Assert.Equal("Academic Year 2009/10", legacyReleases[1].Description);
-                Assert.Equal("http://link.two/", legacyReleases[1].Url);
-                Assert.Equal("Academic Year 2008/09", legacyReleases[2].Description);
-                Assert.Equal("http://link.one/", legacyReleases[2].Url);
-
-                Assert.NotNull(result.Releases);
-                var releases = result.Releases;
-                Assert.Equal(3, releases.Count);
-                Assert.Equal(PublicationARelease2.Id, releases[0].Id);
-                Assert.Equal("publication-a-release-2018-q2", releases[0].Slug);
-                Assert.Equal("Academic Year Q2 2018/19", releases[0].Title);
-                Assert.Equal(PublicationARelease1V1.Id, releases[1].Id);
-                Assert.Equal("publication-a-release-2018-q1", releases[1].Slug);
-                Assert.Equal("Academic Year Q1 2018/19", releases[1].Title);
-                Assert.Equal(PublicationARelease3.Id, releases[2].Id);
-                Assert.Equal("publication-a-release-2017-q4", releases[2].Slug);
-                Assert.Equal("Academic Year Q4 2017/18", releases[2].Title);
-            }
-        }
-
-        [Fact]
         public async Task IsPublicationPublished_TrueWhenPublicationHasPublishedReleases()
         {
             var previousRelease = new Release
@@ -393,98 +312,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         }
 
-        [Fact]
-        public async Task SetPublishedDate_AddsStatsPublication()
-        {
-            var publication = new Publication
-            {
-                Title = "Test publication",
-                Slug = "test-publication",
-                Topic = new Topic
-                {
-                    Title = "Test topic",
-                    Slug = "test-topic"
-                }
-            };
-
-            var publishDate = DateTime.Now;
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                var service = BuildPublicationService(contentDbContext);
-                await service.SetPublishedDate(publication.Id, publishDate);
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
-
-                Assert.NotNull(contentPublication);
-                Assert.Equal(publication.Id, contentPublication.Id);
-                Assert.Equal("Test publication", contentPublication.Title);
-                Assert.Equal("test-publication", contentPublication.Slug);
-                Assert.Equal(publishDate, contentPublication.Published);
-            }
-        }
-
-        [Fact]
-        public async Task SetPublishedDate_UpdatesStatsPublication()
-        {
-            var publication = new Publication
-            {
-                Title = "Test publication",
-                Slug = "test-publication",
-                Topic = new Topic
-                {
-                    Title = "Test topic",
-                    Slug = "test-topic"
-                }
-            };
-
-            var publishDate = DateTime.Now;
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                var service = BuildPublicationService(contentDbContext);
-
-                await service.SetPublishedDate(publication.Id, publishDate);
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                var contentPublication = await contentDbContext.Publications.FindAsync(publication.Id);
-
-                Assert.NotNull(contentPublication);
-                Assert.Equal(publication.Id, contentPublication.Id);
-                Assert.Equal("Test publication", contentPublication.Title);
-                Assert.Equal("test-publication", contentPublication.Slug);
-                Assert.Equal(publishDate, contentPublication.Published);
-            }
-        }
-
         private PublicationService BuildPublicationService(
-            ContentDbContext contentDbContext,
-            IMapper mapper = null,
-            IReleaseService releaseService = null
+            ContentDbContext contentDbContext
         ) {
             return new(
-                contentDbContext: contentDbContext,
-                mapper: mapper ?? MapperForProfile<MappingProfiles>(),
-                releaseService: releaseService ?? new Mock<IReleaseService>().Object
+                contentDbContext: contentDbContext
             );
         }
     }

@@ -9,7 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public PreReleaseAccessListViewModel(
             CachedReleaseViewModel release,
-            CachedPublicationViewModel publication) : base(release, publication)
+            PublicationViewModel publication) : base(release, publication)
         {
             PreReleaseAccessList = release.PreReleaseAccessList;
         }

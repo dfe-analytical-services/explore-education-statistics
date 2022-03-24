@@ -1,28 +1,33 @@
+#nullable enable
+using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
     [Route("api")]
     public class PreReleaseAccessListController : ControllerBase
     {
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IPublicationService _publicationService;
+        private readonly IReleaseService _releaseService;
 
-        public PreReleaseAccessListController(IFileStorageService fileStorageService)
+        public PreReleaseAccessListController(
+            IPublicationService publicationService,
+            IReleaseService releaseService)
         {
-            _fileStorageService = fileStorageService;
+            _publicationService = publicationService;
+            _releaseService = releaseService;
         }
 
         [HttpGet("publications/{publicationSlug}/releases/latest/prerelease-access-list")]
         public async Task<ActionResult<PreReleaseAccessListViewModel>> GetLatest(string publicationSlug)
         {
             return await GetViewModel(
-                PublicContentPublicationPath(publicationSlug),
-                PublicContentLatestReleasePath(publicationSlug)
+                publicationSlug
             );
         }
 
@@ -32,26 +37,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             string releaseSlug)
         {
             return await GetViewModel(
-                PublicContentPublicationPath(publicationSlug),
-                PublicContentReleasePath(publicationSlug, releaseSlug)
+                publicationSlug,
+                releaseSlug
             );
         }
 
         private async Task<ActionResult<PreReleaseAccessListViewModel>> GetViewModel(
-            string publicationPath,
-            string releasePath)
+            string publicationSlug,
+            string? releaseSlug = null)
         {
-            var publicationTask = _fileStorageService.GetDeserialized<CachedPublicationViewModel>(publicationPath);
-            var releaseTask = _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
 
-            await Task.WhenAll(publicationTask, releaseTask);
-
-            if (releaseTask.Result.IsRight && publicationTask.Result.IsRight)
-            {
-                return new PreReleaseAccessListViewModel(releaseTask.Result.Right, publicationTask.Result.Right);
-            }
-
-            return NotFound();
+            return await _publicationService.Get(publicationSlug)
+                .OnSuccessCombineWith(_ => _releaseService.GetCachedRelease(publicationSlug, releaseSlug))
+                .OnSuccess(publicationAndRelease =>
+                {
+                    var (publication, release) = publicationAndRelease;
+                    return new PreReleaseAccessListViewModel(release!, publication);
+                })
+                .HandleFailuresOrOk();
         }
     }
 }

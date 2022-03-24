@@ -20,9 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            releaseService.Setup(mock => mock.Get(
-                    "publications/publication-a/publication.json",
-                    "publications/publication-a/latest-release.json"))
+            releaseService.Setup(mock => mock.Get("publication-a", null))
                 .ReturnsAsync(BuildReleaseViewModel());
 
             var controller = BuildReleaseController(releaseService.Object);
@@ -41,8 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             releaseService.Setup(mock => mock.Get(
-                    "publications/publication-a/publication.json",
-                    "publications/publication-a/latest-release.json"))
+                    "publication-a", null))
                 .ReturnsAsync(new NotFoundResult());
 
             var controller = BuildReleaseController(releaseService.Object);
@@ -59,8 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             releaseService.Setup(mock => mock.Get(
-                    "publications/publication-a/publication.json",
-                    "publications/publication-a/releases/2000.json"))
+                    "publication-a", "2000"))
                 .ReturnsAsync(BuildReleaseViewModel());
 
             var controller = BuildReleaseController(releaseService.Object);
@@ -80,8 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             releaseService.Setup(mock => mock.Get(
-                    "publications/publication-a/publication.json",
-                    "publications/publication-a/releases/2000.json"))
+                    "publication-a", "2000"))
                 .ReturnsAsync(new NotFoundResult());
 
             var controller = BuildReleaseController(releaseService.Object);
@@ -98,8 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             releaseService.Setup(mock => mock.GetSummary(
-                    "publications/publication-a/publication.json",
-                    "publications/publication-a/latest-release.json"))
+                    "publication-a", null))
                 .ReturnsAsync(BuildReleaseSummaryViewModel());
 
             var controller = BuildReleaseController(releaseService.Object);
@@ -117,9 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            releaseService.Setup(mock => mock.GetSummary(
-                    "publications/publication-a/publication.json",
-                    "publications/publication-a/latest-release.json"))
+            releaseService.Setup(mock => mock.GetSummary("publication-a", null))
                 .ReturnsAsync(new NotFoundResult());
 
             var controller = BuildReleaseController(releaseService.Object);
@@ -137,8 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
             releaseService.Setup(mock => mock.GetSummary(
-                    "publications/publication-a/publication.json",
-                    "publications/publication-a/releases/2000.json"))
+                    "publication-a", "2000"))
                 .ReturnsAsync(BuildReleaseSummaryViewModel());
 
             var controller = BuildReleaseController(releaseService.Object);
@@ -156,9 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            releaseService.Setup(mock => mock.GetSummary(
-                    "publications/publication-a/publication.json",
-                    "publications/publication-a/releases/2000.json"))
+            releaseService.Setup(mock => mock.GetSummary("publication-a", "2000"))
                 .ReturnsAsync(new NotFoundResult());
 
             var controller = BuildReleaseController(releaseService.Object);
@@ -182,7 +171,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                         Title = "National Statistics"
                     }
                 },
-                new CachedPublicationViewModel
+                new PublicationViewModel
                 {
                     Releases = AsList(new ReleaseTitleViewModel
                     {
@@ -203,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                         Title = "National Statistics"
                     }
                 },
-                new CachedPublicationViewModel
+                new PublicationViewModel
                 {
                     Releases = AsList(new ReleaseTitleViewModel
                     {

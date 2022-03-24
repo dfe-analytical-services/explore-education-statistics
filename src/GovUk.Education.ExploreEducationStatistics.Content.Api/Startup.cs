@@ -121,6 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
             services.AddTransient<IDataGuidanceService, DataGuidanceService>();
+            services.AddTransient<Services.Interfaces.IPublicationService, Services.PublicationService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();

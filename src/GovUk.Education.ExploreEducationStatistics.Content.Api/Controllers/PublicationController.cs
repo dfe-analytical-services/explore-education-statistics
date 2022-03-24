@@ -1,10 +1,11 @@
-﻿using System.Net.Mime;
+﻿#nullable enable
+using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
@@ -12,18 +13,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class PublicationController : ControllerBase
     {
-        private readonly IFileStorageService _fileStorageService;
+        private readonly IPublicationService _publicationService;
 
-        public PublicationController(IFileStorageService fileStorageService)
+        public PublicationController(IPublicationService publicationService)
         {
-            _fileStorageService = fileStorageService;
+            _publicationService = publicationService;
         }
 
         [HttpGet("publications/{slug}/title")]
         public async Task<ActionResult<PublicationTitleViewModel>> GetPublicationTitle(string slug)
         {
-            return await _fileStorageService
-                .GetDeserialized<PublicationTitleViewModel>(PublicContentPublicationPath(slug))
+            return await _publicationService.Get(slug)
+                .OnSuccess(p => new PublicationTitleViewModel
+                {
+                    Id = p.Id,
+                    Title = p.Title,
+                })
                 .HandleFailuresOrOk();
         }
     }

@@ -110,7 +110,7 @@ describe('PublicationReleasePage', () => {
           },
           publication: {
             ...testRelease.publication,
-            otherReleases: [
+            releases: [
               {
                 id: 'latest-release',
                 title: 'Latest Release Title',

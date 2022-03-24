@@ -6,12 +6,16 @@ using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -24,27 +28,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _context;
         private readonly IMapper _mapper;
+        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IUserService _userService;
         private readonly IPublicationRepository _publicationRepository;
-        private readonly IPublishingService _publishingService;
-        private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
+        private readonly IBlobCacheService _publicBlobCacheService;
 
-        public PublicationService(ContentDbContext context,
+        public PublicationService(
+            ContentDbContext context,
             IMapper mapper,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IUserService userService,
             IPublicationRepository publicationRepository,
-            IPublishingService publishingService,
-            IMethodologyVersionRepository methodologyVersionRepository)
+            IMethodologyVersionRepository methodologyVersionRepository,
+            IBlobCacheService publicBlobCacheService)
         {
             _context = context;
             _mapper = mapper;
             _persistenceHelper = persistenceHelper;
             _userService = userService;
             _publicationRepository = publicationRepository;
-            _publishingService = publishingService;
             _methodologyVersionRepository = methodologyVersionRepository;
+            _publicBlobCacheService = publicBlobCacheService;
         }
 
         public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
@@ -184,11 +189,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (publication.Live)
                     {
-                        await _publishingService.PublicationChanged(publication.Id);
+                        publication.Published = DateTime.UtcNow;
+                        await _context.SaveChangesAsync();
+
+                        await DeleteCachedTaxonomyBlobs();
+                        await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
+                        // TODO: @MarkFix EES-3149 Need to handle superseded publication.json cache files here too?
                     }
 
                     return await GetPublication(publication.Id);
                 });
+        }
+
+        private async Task DeleteCachedTaxonomyBlobs()
+        {
+            await _publicBlobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
+            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateSelectedTopic(
@@ -264,6 +282,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     _context.Update(publication);
                     await _context.SaveChangesAsync();
+
+                    await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
 
                     return _mapper.Map<List<LegacyReleaseViewModel>>(
                         publication.LegacyReleases.OrderByDescending(release => release.Order)

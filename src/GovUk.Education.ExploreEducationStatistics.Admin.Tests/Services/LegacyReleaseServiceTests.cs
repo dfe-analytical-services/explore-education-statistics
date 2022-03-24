@@ -2,15 +2,20 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -41,12 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var legacyReleaseService = new LegacyReleaseService(
-                    context,
-                    AdminMapper(),
-                    MockUtils.AlwaysTrueUserService().Object,
-                    new PersistenceHelper<ContentDbContext>(context)
-                );
+                var legacyReleaseService = BuildLegacyReleaseService(context);
 
                 // Service method under test
                 var result = await legacyReleaseService.GetLegacyRelease(id);
@@ -72,12 +72,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var legacyReleaseService = new LegacyReleaseService(
-                    context,
-                    AdminMapper(),
-                    MockUtils.AlwaysTrueUserService().Object,
-                    new PersistenceHelper<ContentDbContext>(context)
-                );
+                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                    .Returns(Task.CompletedTask);
+
+                var legacyReleaseService = BuildLegacyReleaseService(
+                    context: context,
+                    publicBlobCacheService: publicBlobCacheService.Object);
 
                 // Service method under test
                 var result = await legacyReleaseService.CreateLegacyRelease(
@@ -87,6 +89,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Url = "http://test.com",
                         PublicationId = publicationId
                     });
+
+
+                VerifyAllMocks(publicBlobCacheService);
 
                 Assert.Equal("Test description", result.Right.Description);
                 Assert.Equal("http://test.com", result.Right.Url);
@@ -127,12 +132,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var legacyReleaseService = new LegacyReleaseService(
-                    context,
-                    AdminMapper(),
-                    MockUtils.AlwaysTrueUserService().Object,
-                    new PersistenceHelper<ContentDbContext>(context)
-                );
+                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                    .Returns(Task.CompletedTask);
+
+                var legacyReleaseService = BuildLegacyReleaseService(
+                    context: context,
+                    publicBlobCacheService: publicBlobCacheService.Object);
 
                 // Service method under test
                 var result = await legacyReleaseService.CreateLegacyRelease(
@@ -142,6 +149,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Url = "http://test2.com",
                         PublicationId = publicationId
                     });
+
+                VerifyAllMocks(publicBlobCacheService);
 
                 var legacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 
@@ -177,12 +186,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var legacyReleaseService = new LegacyReleaseService(
-                    context,
-                    AdminMapper(),
-                    MockUtils.AlwaysTrueUserService().Object,
-                    new PersistenceHelper<ContentDbContext>(context)
-                );
+                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                    .Returns(Task.CompletedTask);
+
+                var legacyReleaseService = BuildLegacyReleaseService(
+                    context: context,
+                    publicBlobCacheService: publicBlobCacheService.Object);
 
                 // Service method under test
                 var result = await legacyReleaseService.UpdateLegacyRelease(
@@ -194,6 +205,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Order = 1,
                         PublicationId = publicationId,
                     });
+
+                VerifyAllMocks(publicBlobCacheService);
 
                 Assert.Equal("Updated test description", result.Right.Description);
                 Assert.Equal("http://updated-test.com", result.Right.Url);
@@ -246,12 +259,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var legacyReleaseService = new LegacyReleaseService(
-                    context,
-                    AdminMapper(),
-                    MockUtils.AlwaysTrueUserService().Object,
-                    new PersistenceHelper<ContentDbContext>(context)
-                );
+                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                    .Returns(Task.CompletedTask);
+
+                var legacyReleaseService = BuildLegacyReleaseService(
+                    context: context,
+                    publicBlobCacheService: publicBlobCacheService.Object);
 
                 // Service method under test
                 await legacyReleaseService.UpdateLegacyRelease(
@@ -263,6 +278,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Order = 1,
                         PublicationId = publicationId,
                     });
+
+                VerifyAllMocks(publicBlobCacheService);
 
                 var legacyReleases = context.LegacyReleases
                     .AsQueryable()
@@ -320,12 +337,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var legacyReleaseService = new LegacyReleaseService(
-                    context,
-                    AdminMapper(),
-                    MockUtils.AlwaysTrueUserService().Object,
-                    new PersistenceHelper<ContentDbContext>(context)
-                );
+                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                    .Returns(Task.CompletedTask);
+
+                var legacyReleaseService = BuildLegacyReleaseService(
+                    context: context,
+                    publicBlobCacheService: publicBlobCacheService.Object);
 
                 // Service method under test
                 await legacyReleaseService.UpdateLegacyRelease(
@@ -337,6 +356,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Order = 5,
                         PublicationId = publicationId,
                     });
+
+                VerifyAllMocks(publicBlobCacheService);
 
                 var legacyReleases = context.LegacyReleases
                     .AsQueryable()
@@ -379,16 +400,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var legacyReleaseService = new LegacyReleaseService(
-                    context,
-                    AdminMapper(),
-                    MockUtils.AlwaysTrueUserService().Object,
-                    new PersistenceHelper<ContentDbContext>(context)
-                );
+                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                    .Returns(Task.CompletedTask);
+
+                var legacyReleaseService = BuildLegacyReleaseService(
+                    context: context,
+                    publicBlobCacheService: publicBlobCacheService.Object);
 
                 // Service method under test
                 await legacyReleaseService.DeleteLegacyRelease(id);
 
+                VerifyAllMocks(publicBlobCacheService);
                 Assert.Empty(context.LegacyReleases);
                 Assert.Empty(
                     context.Publications
@@ -437,12 +461,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var legacyReleaseService = new LegacyReleaseService(
-                    context,
-                    AdminMapper(),
-                    MockUtils.AlwaysTrueUserService().Object,
-                    new PersistenceHelper<ContentDbContext>(context)
-                );
+                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
+                    .Returns(Task.CompletedTask);
+
+                var legacyReleaseService = BuildLegacyReleaseService(
+                    context: context,
+                    publicBlobCacheService: publicBlobCacheService.Object);
 
                 // Service method under test
                 await legacyReleaseService.DeleteLegacyRelease(id);
@@ -466,6 +492,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test description 3", legacyReleases[1].Description);
                 Assert.Equal(2, legacyReleases[1].Order);
             }
+        }
+
+        private LegacyReleaseService BuildLegacyReleaseService(
+            ContentDbContext context,
+            IMapper mapper = null,
+            IUserService userService = null,
+            IBlobCacheService publicBlobCacheService = null)
+        {
+                return new LegacyReleaseService(
+                    context,
+                    mapper ?? AdminMapper(),
+                    userService ?? AlwaysTrueUserService().Object,
+                    new PersistenceHelper<ContentDbContext>(context),
+                    publicBlobCacheService ?? Mock.Of<IBlobCacheService>()
+                );
         }
     }
 }

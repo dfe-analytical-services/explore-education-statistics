@@ -14,7 +14,7 @@ export interface Publication {
   id: string;
   slug: string;
   title: string;
-  otherReleases: {
+  releases: {
     id: string;
     slug: string;
     title: string;

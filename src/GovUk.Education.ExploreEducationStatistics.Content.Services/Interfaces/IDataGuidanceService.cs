@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 {
     public interface IDataGuidanceService
     {
-        public Task<Either<ActionResult, DataGuidanceViewModel>> Get(string publicationPath, string releasePath);
+        public Task<Either<ActionResult, DataGuidanceViewModel>> Get(string publicationSlug, string? releaseSlug = null);
     }
 }
