@@ -45,7 +45,8 @@ describe('getCsvData', () => {
     ],
     locations: [
       {
-        value: 'england',
+        code: 'england',
+        value: 'england-id',
         label: 'England',
         level: 'country',
       } as WorkerLocationFilter,
@@ -86,7 +87,8 @@ describe('getCsvData', () => {
         locations: [
           ...testTableMeta.locations,
           {
-            value: 'barnsley',
+            code: 'barnsley',
+            value: 'barnsley-id',
             label: 'Barnsley',
             level: 'localAuthority',
           } as WorkerLocationFilter,
@@ -97,7 +99,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_primary'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          locationId: 'england',
+          locationId: 'england-id',
           measures: {
             authAbsRate: '111',
             authAbsSess: '222',
@@ -107,7 +109,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_secondary'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          locationId: 'england',
+          locationId: 'england-id',
           measures: {
             authAbsRate: '333',
             authAbsSess: '444',
@@ -117,7 +119,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_primary'],
           timePeriod: '2015_AY',
           geographicLevel: 'localAuthority',
-          locationId: 'barnsley',
+          locationId: 'barnsley-id',
           measures: {
             authAbsRate: '555',
             authAbsSess: '666',
@@ -127,7 +129,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_secondary'],
           timePeriod: '2015_AY',
           geographicLevel: 'localAuthority',
-          locationId: 'barnsley',
+          locationId: 'barnsley-id',
           measures: {
             authAbsRate: '777',
             authAbsSess: '888',
@@ -141,18 +143,30 @@ describe('getCsvData', () => {
     expect(data[0]).toHaveLength(8);
 
     expect(data[1]).toHaveLength(8);
+    expect(data[1][0]).toBe('England');
+    expect(data[1][1]).toBe('england');
+    expect(data[1][2]).toBe('country');
     expect(data[1][6]).toBe('111');
     expect(data[1][7]).toBe('222');
 
     expect(data[2]).toHaveLength(8);
+    expect(data[2][0]).toBe('England');
+    expect(data[2][1]).toBe('england');
+    expect(data[2][2]).toBe('country');
     expect(data[2][6]).toBe('333');
     expect(data[2][7]).toBe('444');
 
     expect(data[3]).toHaveLength(8);
+    expect(data[3][0]).toBe('Barnsley');
+    expect(data[3][1]).toBe('barnsley');
+    expect(data[3][2]).toBe('localAuthority');
     expect(data[3][6]).toBe('555');
     expect(data[3][7]).toBe('666');
 
     expect(data[4]).toHaveLength(8);
+    expect(data[4][0]).toBe('Barnsley');
+    expect(data[4][1]).toBe('barnsley');
+    expect(data[4][2]).toBe('localAuthority');
     expect(data[4][6]).toBe('777');
     expect(data[4][7]).toBe('888');
 
@@ -187,7 +201,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_primary'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          locationId: 'england',
+          locationId: 'england-id',
           measures: {
             authAbsRate: '111',
           },
@@ -196,7 +210,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_secondary'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          locationId: 'england',
+          locationId: 'england-id',
           measures: {
             authAbsSess: '222',
           },
@@ -247,7 +261,7 @@ describe('getCsvData', () => {
           filters: ['gender_female', 'school_primary'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          locationId: 'england',
+          locationId: 'england-id',
           measures: {
             authAbsRate: '111',
             authAbsSess: '222',
@@ -288,7 +302,7 @@ describe('getCsvData', () => {
           filters: ['gender_female'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          locationId: 'england',
+          locationId: 'england-id',
           measures: {
             authAbsSess: '111',
           },
@@ -315,7 +329,7 @@ describe('getCsvData', () => {
           filters: ['gender_female'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          locationId: 'england',
+          locationId: 'england-id',
           measures: {
             authAbsRate: '12300000',
             authAbsSess: '44255667.2356',
@@ -343,7 +357,7 @@ describe('getCsvData', () => {
           filters: ['gender_female'],
           timePeriod: '2015_AY',
           geographicLevel: 'country',
-          locationId: 'england',
+          locationId: 'england-id',
           measures: {
             authAbsRate: '13.4',
             authAbsSess: 'x',
@@ -386,13 +400,20 @@ describe('getCsvData', () => {
           },
         },
         locations: [
-          ...testTableMeta.locations,
           {
+            code: 'england',
+            value: 'england',
+            label: 'England',
+            level: 'country',
+          } as WorkerLocationFilter,
+          {
+            code: 'barnet',
             value: 'barnet',
             label: 'Barnet',
             level: 'localAuthority',
           } as WorkerLocationFilter,
           {
+            code: 'barnsley',
             value: 'barnsley',
             label: 'Barnsley',
             level: 'localAuthority',

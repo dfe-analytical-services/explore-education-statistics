@@ -61,6 +61,8 @@ export interface LocationCompositeId {
 }
 
 export class LocationFilter extends Filter {
+  public readonly code: string;
+
   public readonly level: string;
 
   public readonly geoJson?: GeoJsonFeature[];
@@ -73,9 +75,12 @@ export class LocationFilter extends Filter {
     geoJson,
     group,
   }: GroupedFilterOption & { level: string; geoJson?: GeoJsonFeature[] }) {
+    // Fallback to using the code if there's no id.
+    // This is the case for historical Permalinks created prior to EES-2955.
     const idOrFallback = id ?? value;
     super({ value: idOrFallback, label, group });
-
+    // Always set the code so that it can be included in the downloadable CSV file.
+    this.code = value;
     this.level = level;
     this.geoJson = geoJson;
   }

@@ -22,6 +22,7 @@ export interface WorkerCategoryFilter extends WorkerFilter {
 }
 
 export interface WorkerLocationFilter extends WorkerFilter {
+  code: string;
   level: string;
   geoJson: GeoJsonFeature;
 }
