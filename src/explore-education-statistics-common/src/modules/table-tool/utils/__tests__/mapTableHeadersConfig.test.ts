@@ -216,12 +216,14 @@ describe('mapTableHeadersConfig', () => {
       ],
       [
         new LocationFilter({
-          value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+          id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+          value: 'E09000003',
           label: 'Barnet',
           level: 'localAuthority',
         }),
         new LocationFilter({
-          value: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+          id: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+          value: 'E08000016',
           label: 'Barnsley',
           level: 'localAuthority',
         }),
@@ -278,15 +280,15 @@ describe('mapTableHeadersConfig', () => {
           localAuthority: [
             {
               id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+              value: 'E09000003',
               label: 'Barnet (local authority)',
-              value: 'barnet',
             },
           ],
           localAuthorityDistrict: [
             {
               id: '61a57251-cca7-4a87-df80-08d82d586d38',
+              value: 'E09000003',
               label: 'Barnet (local authority district)',
-              value: 'barnet',
             },
           ],
         },
@@ -334,12 +336,14 @@ describe('mapTableHeadersConfig', () => {
     expect(headers.rowGroups).toEqual([
       [
         new LocationFilter({
-          value: '61a57251-cca7-4a87-df80-08d82d586d38',
+          id: '61a57251-cca7-4a87-df80-08d82d586d38',
+          value: 'E09000003',
           label: 'Barnet (local authority district)',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
-          value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+          id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+          value: 'E09000003',
           label: 'Barnet (local authority)',
           level: 'localAuthority',
         }),
@@ -348,12 +352,14 @@ describe('mapTableHeadersConfig', () => {
 
     expect(headers.rows).toEqual([
       new LocationFilter({
-        value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+        id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+        value: 'E09000003',
         label: 'Barnet (local authority)',
         level: 'localAuthority',
       }),
       new LocationFilter({
-        value: '61a57251-cca7-4a87-df80-08d82d586d38',
+        id: '61a57251-cca7-4a87-df80-08d82d586d38',
+        value: 'E09000003',
         label: 'Barnet (local authority district)',
         level: 'localAuthorityDistrict',
       }),
