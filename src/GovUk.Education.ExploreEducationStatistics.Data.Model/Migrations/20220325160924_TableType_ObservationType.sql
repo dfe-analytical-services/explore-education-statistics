@@ -1,4 +1,4 @@
-create type ObservationType as table
+﻿create type ObservationType as table
 (
     Id              uniqueidentifier not null,
     SubjectId       uniqueidentifier not null,
