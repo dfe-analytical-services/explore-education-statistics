@@ -826,23 +826,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (dataSet.Location != null)
                     {
-                        if (Guid.TryParse(dataSet.Location.Value, out var idAsGuid))
+                        if (locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
                         {
-                            if (locationTargets.TryGetValue(idAsGuid, out var targetLocationId))
-                            {
-                                dataSet.Location.Value = targetLocationId.ToString();
-                            }
-                            else
-                            {
-                                throw new InvalidOperationException(
-                                    $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set location: {dataSet.Location.Value}"
-                                );
-                            }
+                            dataSet.Location.Value = targetLocationId;
                         }
                         else
                         {
                             throw new InvalidOperationException(
-                                $"Expected Guid for dataBlock {dataBlock.Id} chart legend data set location: {dataSet.Location.Value}");
+                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart legend data set location: {dataSet.Location.Value}"
+                            );
                         }
                     }
                 }
@@ -886,23 +878,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (dataSet.Location != null)
                     {
-                        if (Guid.TryParse(dataSet.Location.Value, out var idAsGuid))
+                        if (locationTargets.TryGetValue(dataSet.Location.Value, out var targetLocationId))
                         {
-                            if (locationTargets.TryGetValue(idAsGuid, out var targetLocationId))
-                            {
-                                dataSet.Location.Value = targetLocationId.ToString();
-                            }
-                            else
-                            {
-                                throw new InvalidOperationException(
-                                    $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set location: {dataSet.Location.Value}"
-                                );
-                            }
+                            dataSet.Location.Value = targetLocationId;
                         }
                         else
                         {
                             throw new InvalidOperationException(
-                                $"Expected Guid for dataBlock {dataBlock.Id} chart data set location: {dataSet.Location.Value}");
+                                $"Expected target replacement value for dataBlock {dataBlock.Id} chart data set location: {dataSet.Location.Value}"
+                            );
                         }
                     }
                 }
