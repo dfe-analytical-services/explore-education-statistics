@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
@@ -16,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class DataBlockMigrationServicePermissionTests
     {
         [Fact]
-        public async Task MigrateAll()
+        public async Task Migrate()
         {
             await PolicyCheckBuilder()
                 .SetupCheck(SecurityPolicies.CanRunReleaseMigrations, false)
@@ -30,19 +29,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService: userService.Object
                         );
 
-                        return await service.MigrateAll();
+                        return await service.Migrate();
                     }
                 );
         }
 
         private static DataBlockMigrationService SetupService(
             ContentDbContext contentDbContext,
-            IStorageQueueService? storageQueueService = null,
             IUserService? userService = null)
         {
             return new DataBlockMigrationService(
                 contentDbContext,
-                storageQueueService ?? Mock.Of<IStorageQueueService>(MockBehavior.Strict),
                 userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
                 Mock.Of<ILogger<DataBlockMigrationService>>()
             );

@@ -825,10 +825,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(savedRelease);
                 Assert.Single(savedRelease!.ContentBlocks);
                 Assert.Equal(dataBlock, savedRelease.ContentBlocks[0].ContentBlock);
-
-                // TODO EES-3212 Remove this
-                // Should be true now that data blocks are being created with location id's
-                Assert.True(dataBlock.LocationsMigrated);
             }
         }
 

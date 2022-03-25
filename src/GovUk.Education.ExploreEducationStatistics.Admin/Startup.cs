@@ -400,8 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 new StorageQueueService(Configuration.GetValue<string>("CoreStorage")));
             services.AddTransient<IDataBlockMigrationService, DataBlockMigrationService>(provider =>
                 new DataBlockMigrationService(
-                    context: provider.GetRequiredService<ContentDbContext>(),
-                    storageQueueService: new StorageQueueService(Configuration.GetValue<string>("PublisherStorage")),
+                    contentDbContext: provider.GetRequiredService<ContentDbContext>(),
                     userService: provider.GetRequiredService<IUserService>(),
                     logger: provider.GetRequiredService<ILogger<DataBlockMigrationService>>()));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();

@@ -21,15 +21,19 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
-using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
-using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
-using IPublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IPublicationService;
+using IFileStorageService =
+    GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
+using IMethodologyService =
+    GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
+using IPublicationService =
+    GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IPublicationService;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.PublicationService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
+
 namespace GovUk.Education.ExploreEducationStatistics.Publisher
 {
     public class Startup : FunctionsStartup
@@ -99,9 +103,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IQueueService, QueueService>(provider =>
                     new QueueService(
                         storageQueueService: new StorageQueueService(
-                            storageConnectionString: GetConfigurationValue(provider, "PublisherStorage")),
-                            releasePublishingStatusService: provider.GetService<IReleasePublishingStatusService>(),
-                            logger: provider.GetRequiredService<ILogger<QueueService>>()))
+                            storageConnectionString: GetConfigurationValue(provider, "PublisherStorage")
+                        ),
+                        releasePublishingStatusService: provider.GetService<IReleasePublishingStatusService>(),
+                        logger: provider.GetRequiredService<ILogger<QueueService>>()))
                 .AddScoped<IReleasePublishingStatusService, ReleasePublishingStatusService>()
                 .AddScoped<IValidationService, ValidationService>()
                 .AddScoped<IReleaseSubjectRepository, ReleaseSubjectRepository>(provider =>
@@ -111,11 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     ))
                 .AddScoped<IFilterRepository, FilterRepository>()
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
-                .AddScoped<IIndicatorRepository, IndicatorRepository>()
-
-                // Services temporarily added to migrate data blocks for EES-3167.
-                .AddScoped<ILocationRepository, LocationRepository>()
-                .AddScoped<IDataBlockMigrationService, DataBlockMigrationService>();
+                .AddScoped<IIndicatorRepository, IndicatorRepository>();
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
