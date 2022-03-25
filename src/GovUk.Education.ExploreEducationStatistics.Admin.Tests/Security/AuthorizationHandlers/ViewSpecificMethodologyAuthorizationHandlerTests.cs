@@ -27,7 +27,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         private static readonly MethodologyVersion MethodologyVersion = new()
         {
             Id = Guid.NewGuid(),
-            MethodologyId = Guid.NewGuid()
+            MethodologyId = Guid.NewGuid(),
+            Status = MethodologyStatus.Approved,
         };
 
         private static readonly Publication OwningPublication = new()
@@ -63,6 +64,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         userReleaseRoleRepository
                             .Setup(s => s.IsUserEditorOrApproverOnLatestRelease(UserId, OwningPublication.Id))
+                            .ReturnsAsync(false);
+
+                        userReleaseRoleRepository
+                            .Setup(s => s.IsUserPrereleaseViewerOnLatestPreReleaseRelease(UserId, OwningPublication.Id))
                             .ReturnsAsync(false);
                     }
 
@@ -151,6 +156,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         .Setup(s => s.IsUserEditorOrApproverOnLatestRelease(UserId, OwningPublication.Id))
                         .ReturnsAsync(expectedReleaseRolesToPass.Contains(releaseRole));
 
+                    userReleaseRoleRepository
+                        .Setup(s => s.IsUserPrereleaseViewerOnLatestPreReleaseRelease(UserId, OwningPublication.Id))
+                        .ReturnsAsync(false);
+
+                    var user = CreateClaimsPrincipal(UserId);
+                    var authContext =
+                        CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
+                            (user, MethodologyVersion);
+
+                    await handler.HandleAsync(authContext);
+                    VerifyAllMocks(
+                        methodologyRepository,
+                        userPublicationRoleRepository,
+                        userReleaseRoleRepository);
+
+                    // As the user has a role on the latest Release of the owning Publication of this Methodology
+                    // they are allowed to view it.
+                    Assert.Equal(expectedReleaseRolesToPass.Contains(releaseRole), authContext.HasSucceeded);
+                });
+            }
+
+            [Fact]
+            public async Task PrereleaseViewersOnOwningPublicationsLatestReleaseCanViewMethodology()
+            {
+                var expectedReleaseRolesToPass = ListOf(PrereleaseViewer);
+
+                await ForEachReleaseRoleAsync(async releaseRole =>
+                {
+                    var (
+                        handler,
+                        methodologyRepository,
+                        userPublicationRoleRepository,
+                        userReleaseRoleRepository
+                        ) = CreateHandlerAndDependencies();
+
+                    methodologyRepository.Setup(s =>
+                            s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                        .ReturnsAsync(OwningPublication);
+
+                    userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
+                        UserId, OwningPublication, false);
+
+                    userReleaseRoleRepository
+                        .Setup(s => s.IsUserEditorOrApproverOnLatestRelease(UserId, OwningPublication.Id))
+                        .ReturnsAsync(false);
+
+                    userReleaseRoleRepository
+                        .Setup(s => s.IsUserPrereleaseViewerOnLatestPreReleaseRelease(UserId, OwningPublication.Id))
+                        .ReturnsAsync(expectedReleaseRolesToPass.Contains(releaseRole));
+
                     var user = CreateClaimsPrincipal(UserId);
                     var authContext =
                         CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
@@ -187,6 +242,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 
                 userReleaseRoleRepository
                     .Setup(s => s.IsUserEditorOrApproverOnLatestRelease(UserId, OwningPublication.Id))
+                    .ReturnsAsync(false);
+
+                userReleaseRoleRepository
+                    .Setup(s => s.IsUserPrereleaseViewerOnLatestPreReleaseRelease(UserId, OwningPublication.Id))
                     .ReturnsAsync(false);
 
                 var user = CreateClaimsPrincipal(UserId);

@@ -59,6 +59,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             {
                 context.Succeed(requirement);
             }
+
+            // If the user is an PrereleaseViewer of the latest non-Live, Approved Release of the owning Publication
+            // of this Methodology, and the methodology is approved, they can view it
+            if (await _userReleaseRoleRepository.IsUserPrereleaseViewerOnLatestPreReleaseRelease(
+                context.User.GetUserId(),
+                owningPublication.Id)
+                && methodologyVersion.Approved)
+            {
+                context.Succeed(requirement);
+            }
         }
     }
 }

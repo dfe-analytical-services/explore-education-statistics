@@ -361,22 +361,21 @@ Create and validate custom table
     user chooses location, time period and filters
     user validates table rows
 
-# EES-3034 - awaiting permissions change
-# Go to prerelease methodology page
-#    user clicks link    Methodologies
-#    user waits until h1 is visible    Methodologies    %{WAIT_SMALL}
+ Go to prerelease methodology page
+    user clicks link    Methodologies
+    user waits until h1 is visible    Methodologies    %{WAIT_SMALL}
 
-# Validate no methodologies
-#    user waits until page contains    No Methodologies available
+ Validate no methodologies
+    user waits until page contains    No Methodologies available
 
-# Create and validate methodology
-#    user creates methodology for publication    ${PUBLICATION_NAME}
-#    approve methodology from methodology view
-#    user navigates to admin frontend    ${RELEASE_URL}/prerelease/methodologies
-#    user waits until h1 is visible    Methodologies    %{WAIT_SMALL}
-#    user waits until page contains    ${PUBLICATION_NAME} (Owned)
-#    user clicks link    ${PUBLICATION_NAME} (Owned)
-#    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+ Create and validate methodology
+    user creates methodology for publication    ${PUBLICATION_NAME}
+    approve methodology from methodology view
+    user navigates to admin frontend    ${RELEASE_URL}/prerelease/methodologies
+    user waits until h1 is visible    Methodologies    %{WAIT_SMALL}
+    user waits until page contains    ${PUBLICATION_NAME} (Owned)
+    user clicks link    ${PUBLICATION_NAME} (Owned)
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
 Validate prerelease has started for Analyst user
     user changes to analyst1
@@ -481,15 +480,14 @@ Create and validate custom table as Analyst user
     user chooses location, time period and filters
     user validates table rows
 
-# EES-3034 - awaiting permissions change
-# Go to prerelease methodology page as Analyst user
-#    user clicks link    Methodologies
-#    user waits until h1 is visible    Methodologies    %{WAIT_SMALL}
+Go to prerelease methodology page as Analyst user
+    user clicks link    Methodologies
+    user waits until h1 is visible    Methodologies    %{WAIT_SMALL}
 
-# Validate methodology as Analyst user
-#    user waits until page contains    ${PUBLICATION_NAME} (Owned)
-#    user clicks link    ${PUBLICATION_NAME} (Owned)
-#    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+Validate methodology as Analyst user
+    user waits until page contains    ${PUBLICATION_NAME} (Owned)
+    user clicks link    ${PUBLICATION_NAME} (Owned)
+    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
 
 Unschedule release
     [Documentation]    EES-2826

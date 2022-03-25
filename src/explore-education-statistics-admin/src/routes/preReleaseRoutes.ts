@@ -49,7 +49,7 @@ export const preReleaseTableToolRoute: ReleaseRouteProps = {
 export const preReleaseNavRoutes = [
   preReleaseContentRoute,
   preReleaseTableToolRoute,
-  // preReleaseMethodologiesRoute,  EES-3034 - uncomment when permissions are done.
+  preReleaseMethodologiesRoute,
 ];
 
 export const preReleaseRoutes = [
