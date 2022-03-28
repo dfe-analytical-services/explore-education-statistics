@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
 {
     /**
-     * Temporary controller used to migrate data blocks for EES-3167.
+     * Controller used to migrate data blocks. Intended to be adapted as needed when migrations are required.
      */
     [Route("api")]
     [ApiController]
@@ -24,11 +24,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             _dataBlockMigrationService = dataBlockMigrationService;
         }
 
-        [HttpPatch("releases/migrate-all-data-blocks")]
-        public async Task<ActionResult<Unit>> MigrateAllDataBlocks()
+        [HttpPatch("releases/migrate-data-blocks")]
+        public async Task<ActionResult<Unit>> MigrateDataBlocks()
         {
             return await _dataBlockMigrationService
-                .MigrateAll()
+                .Migrate()
                 .HandleFailuresOrOk();
         }
     }

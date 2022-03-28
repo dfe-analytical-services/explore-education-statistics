@@ -354,28 +354,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Query)
-                // TODO EES-3212 rename back to DataBlock_Query
-                .HasColumnName("DataBlock_QueryMigrated")
+                .HasColumnName("DataBlock_Query")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<ObservationQueryContext>(v));
 
-            // TODO EES-3212 remove these temporary fields related to the migration from Location codes to id's.
-            modelBuilder.Entity<DataBlock>()
-                .Property(block => block.TableHeaderCountChanged)
-                .HasColumnName("DataBlock_TableHeaderCountChanged")
-                .HasDefaultValue(false)
-                .IsRequired();
-            modelBuilder.Entity<DataBlock>()
-                .Property(block => block.LocationsMigrated)
-                .HasColumnName("DataBlock_LocationsMigrated")
-                .HasDefaultValue(true)
-                .IsRequired();
-
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Charts)
-                // TODO EES-3212 rename back to DataBlock_Charts
-                .HasColumnName("DataBlock_ChartsMigrated")
+                .HasColumnName("DataBlock_Charts")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<IChart>>(v));
@@ -389,8 +375,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<DataBlock>()
                 .Property(block => block.Table)
-                // TODO EES-3212 rename this back to DataBlock_Table
-                .HasColumnName("DataBlock_TableMigrated")
+                .HasColumnName("DataBlock_Table")
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<TableBuilderConfiguration>(v));

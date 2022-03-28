@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     /**
-     * Temporary interface used to migrate data blocks for EES-3167.
+     * Interface used to migrate data blocks. Intended to be adapted as needed when migrations are required.  
      */
     public interface IDataBlockMigrationService
     {
-        Task<Either<ActionResult, Unit>> MigrateAll();
+        Task<Either<ActionResult, Unit>> Migrate();
     }
 }
