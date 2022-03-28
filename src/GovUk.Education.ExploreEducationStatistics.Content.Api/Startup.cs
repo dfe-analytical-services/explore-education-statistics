@@ -58,6 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHealthChecks();
+            
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             services.AddApplicationInsightsTelemetry()
@@ -200,6 +202,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 .AllowAnyHeader());
 
             app.UseMvc();
+            app.UseHealthChecks("/api/health");
         }
 
         /**
