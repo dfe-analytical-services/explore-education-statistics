@@ -125,9 +125,16 @@ function optimizeFilters(filters: Filter[], headerConfig: Filter[][]) {
           header => header.group !== firstSubGroup,
         );
 
+        // The location hierarchy expects grouping, for example the LAD attribute is grouped by Region.
+        // However, the screener does not require the data to have all attributes of the hierarchy.
+        // When this data is missing the backend returns an empty string, this causes table layout problems as there is a missing header cell where the group would have been.
+        // To fix this an empty header for the missing group data is added, When the table is rendered these empty header cells are converted to <td> as empty <th>'s cause accessibility problems.
+        const isMissingLocationGroup =
+          filter instanceof LocationFilter && filter.group === '';
+
         return hasMultipleSubGroups &&
-          filter.group &&
-          filter.group !== 'Default'
+          ((filter.group && filter.group !== 'Default') ||
+            isMissingLocationGroup)
           ? [new FilterGroup(filter.group), filter]
           : filter;
       })

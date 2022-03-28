@@ -717,6 +717,185 @@ describe('TimePeriodDataTable', () => {
     expect(screen.getByRole('table')).toMatchSnapshot();
   });
 
+  test('renders table with empty cells when region group is missing', () => {
+    const fullTable = mapFullTable({
+      subjectMeta: {
+        filters: {},
+        footnotes: [],
+        indicators: [
+          {
+            value: 'authorised-absence-rate',
+            label: 'Authorised absence rate',
+            unit: '%',
+            name: 'sess_authorised_percent',
+            decimalPlaces: 1,
+          },
+        ],
+        // LADs without region info
+        locations: {
+          country: [
+            {
+              id: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              value: 'england',
+              label: 'England',
+            },
+          ],
+          localAuthorityDistrict: [
+            {
+              value: '',
+              label: '',
+              level: 'region',
+              options: [
+                {
+                  id: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+                  value: 'barnsley',
+                  label: 'Barnsley',
+                },
+                {
+                  id: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+                  value: 'barnet',
+                  label: 'Barnet',
+                },
+              ],
+            },
+          ],
+        },
+        boundaryLevels: [],
+        publicationName: 'Pupil absence in schools in England',
+        subjectName: 'Absence in prus',
+        timePeriodRange: [{ label: '2014/15', code: 'AY', year: 2014 }],
+        geoJsonAvailable: false,
+      },
+      results: [
+        {
+          filters: [],
+          geographicLevel: 'country',
+          locationId: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+          measures: { 'authorised-absence-rate': '18.3' },
+          timePeriod: '2014_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: 'localAuthorityDistrict',
+          locationId: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+          measures: { 'authorised-absence-rate': '20.2' },
+          timePeriod: '2014_AY',
+        },
+        {
+          filters: [],
+          geographicLevel: 'localAuthorityDistrict',
+          locationId: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+          measures: { 'authorised-absence-rate': '21.5' },
+          timePeriod: '2014_AY',
+        },
+      ],
+    } as TableDataResponse);
+
+    const tableHeadersConfig = mapTableHeadersConfig(
+      {
+        columnGroups: [],
+        rowGroups: [
+          [
+            {
+              value: 'dd590fcf-b0c1-4fa3-8599-d13c0f540793',
+              level: 'country',
+              type: 'Location',
+            },
+            {
+              value: 'c6f2a76f-d959-452f-a8e5-593066c7d6d4',
+              level: 'localAuthorityDistrict',
+              type: 'Location',
+            },
+            {
+              value: 'b63e4d6d-973c-4c29-9b49-2fbc83eff666',
+              level: 'localAuthorityDistrict',
+              type: 'Location',
+            },
+          ],
+        ],
+        columns: [{ value: '2014_AY', type: 'TimePeriod' }],
+        rows: [
+          {
+            value: 'authorised-absence-rate',
+            type: 'Indicator',
+          },
+        ],
+      },
+      fullTable,
+    );
+
+    render(
+      <TimePeriodDataTable
+        fullTable={fullTable}
+        tableHeadersConfig={tableHeadersConfig}
+      />,
+    );
+
+    const table = screen.getByRole('table');
+
+    expect(table.querySelectorAll('thead tr')).toHaveLength(1);
+    expect(table.querySelectorAll('thead th')).toHaveLength(1);
+    expect(table.querySelectorAll('thead th[scope="colgroup"]')).toHaveLength(
+      0,
+    );
+    expect(table.querySelectorAll('thead th[scope="col"]')).toHaveLength(1);
+    expect(table.querySelector('thead th[scope="col"]')).toHaveTextContent(
+      '2014/15',
+    );
+    expect(table.querySelectorAll('thead td')).toHaveLength(1);
+
+    const rows = table.querySelectorAll('tbody tr');
+
+    expect(rows).toHaveLength(3);
+
+    // Row 1
+
+    const row1Headers = rows[0].querySelectorAll('th');
+    const row1Cells = rows[0].querySelectorAll('td');
+
+    expect(row1Headers).toHaveLength(1);
+
+    // England should take up two columns so that we don't get an
+    // asymmetric table due to the local authority options having hierarchies
+    expect(row1Headers[0]).toHaveAttribute('scope', 'row');
+    expect(row1Headers[0]).toHaveAttribute('colspan', '2');
+    expect(row1Headers[0]).toHaveTextContent('England');
+
+    expect(row1Cells).toHaveLength(1);
+    expect(row1Cells[0]).toHaveTextContent('18.3%');
+
+    // Row 2
+
+    const row2Headers = rows[1].querySelectorAll('th');
+    const row2Cells = rows[1].querySelectorAll('td');
+
+    expect(row2Headers).toHaveLength(1);
+
+    expect(row2Headers[0]).toHaveAttribute('scope', 'row');
+    expect(row2Headers[0]).toHaveAttribute('colspan', '1');
+    expect(row2Headers[0]).toHaveTextContent('Barnsley');
+
+    expect(row2Cells).toHaveLength(2);
+    expect(row2Cells[0]).toHaveTextContent('');
+    expect(row2Cells[0]).toHaveAttribute('rowspan', '2');
+    expect(row2Cells[1]).toHaveTextContent('21.5%');
+
+    // Row 3
+    const row3Headers = rows[2].querySelectorAll('th');
+    const row3Cells = rows[2].querySelectorAll('td');
+
+    expect(row3Headers).toHaveLength(1);
+
+    expect(row3Headers[0]).toHaveAttribute('scope', 'row');
+    expect(row3Headers[0]).toHaveAttribute('colspan', '1');
+    expect(row3Headers[0]).toHaveTextContent('Barnet');
+
+    expect(row3Cells).toHaveLength(1);
+    expect(row3Cells[0]).toHaveTextContent('20.2%');
+
+    expect(screen.getByRole('table')).toMatchSnapshot();
+  });
+
   test('renders table with completely empty rows removed', () => {
     const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
 

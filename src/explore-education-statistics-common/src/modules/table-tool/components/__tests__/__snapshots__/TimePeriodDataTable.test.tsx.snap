@@ -460,6 +460,85 @@ exports[`TimePeriodDataTable renders table with completely empty rows removed 1`
 </table>
 `;
 
+exports[`TimePeriodDataTable renders table with empty cells when region group is missing 1`] = `
+<table
+  aria-labelledby="dataTableCaption"
+  class="govuk-table table"
+  data-testid="dataTableCaption-table"
+>
+  <thead
+    class="tableHead"
+  >
+    <tr>
+      <td
+        class="borderBottom"
+        colspan="2"
+        rowspan="1"
+      />
+      <th
+        colspan="1"
+        rowspan="1"
+        scope="col"
+      >
+        2014/15
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th
+        class=""
+        colspan="2"
+        rowspan="1"
+        scope="row"
+      >
+        England
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        18.3%
+      </td>
+    </tr>
+    <tr>
+      <td
+        class="emptyRowHeaderCell borderBottom"
+        colspan="1"
+        rowspan="2"
+      />
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnsley
+      </th>
+      <td
+        class="govuk-table__cell--numeric borderBottom"
+      >
+        21.5%
+      </td>
+    </tr>
+    <tr>
+      <th
+        class=""
+        colspan="1"
+        rowspan="1"
+        scope="row"
+      >
+        Barnet
+      </th>
+      <td
+        class="govuk-table__cell--numeric"
+      >
+        20.2%
+      </td>
+    </tr>
+  </tbody>
+</table>
+`;
+
 exports[`TimePeriodDataTable renders table with location hierarchies 1`] = `
 <table
   aria-labelledby="dataTableCaption"
