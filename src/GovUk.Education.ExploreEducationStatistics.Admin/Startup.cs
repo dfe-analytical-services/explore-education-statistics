@@ -103,6 +103,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddHealthChecks();
+            
             services.AddApplicationInsightsTelemetry()
                 .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
 
@@ -467,7 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Enable caching and register any caching services.
+        // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
 
@@ -533,6 +536,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseAuthentication();
             app.UseIdentityServer();
             app.UseAuthorization();
+            app.UseRouting();
+            app.UseHealthChecks("/api/health");
 
             // deny access to all Identity routes other than /Identity/Account/Login and
             // /Identity/Account/ExternalLogin
