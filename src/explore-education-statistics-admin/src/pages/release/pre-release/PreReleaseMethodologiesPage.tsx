@@ -26,8 +26,7 @@ const PreReleaseMethodologiesPage = ({
 
   const methodologies = publication?.methodologies.filter(
     ({ methodology }) =>
-      methodology.status !== 'Draft' ||
-      (methodology.status === 'Draft' && methodology.amendment),
+      methodology.status !== 'Draft' || methodology.amendment,
   );
 
   return (
@@ -39,7 +38,7 @@ const PreReleaseMethodologiesPage = ({
             <>
               {methodologies?.length === 0 &&
               !publication.externalMethodology ? (
-                <WarningMessage>No Methodologies available.</WarningMessage>
+                <WarningMessage>No methodologies available.</WarningMessage>
               ) : (
                 <ul className="govuk-list">
                   {methodologies?.map(({ methodology, owner }) => (

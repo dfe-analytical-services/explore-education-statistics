@@ -50,7 +50,7 @@ describe('PreReleaseMethodologiesPage', () => {
     expect(screen.getByRole('heading', { name: 'Methodologies' }));
 
     await waitFor(() => {
-      expect(screen.getByText('No Methodologies available.'));
+      expect(screen.getByText('No methodologies available.'));
     });
   });
 
@@ -210,7 +210,7 @@ describe('PreReleaseMethodologiesPage', () => {
     renderPage();
 
     await waitFor(() => {
-      expect(screen.getByText('No Methodologies available.'));
+      expect(screen.getByText('No methodologies available.'));
     });
 
     expect(
