@@ -220,13 +220,9 @@ const MultiHeaderTable = forwardRef<HTMLTableElement, MultiHeaderTableProps>(
                     return (
                       <td
                         key={key}
-                        className={classNames(
-                          styles.emptyRowHeaderCell,
-                          // 'fixed',
-                          {
-                            [styles.borderBottom]: header.isGroup,
-                          },
-                        )}
+                        className={classNames(styles.emptyRowHeaderCell, {
+                          [styles.borderBottom]: header.isGroup,
+                        })}
                         rowSpan={header.span}
                         colSpan={header.crossSpan}
                       />
