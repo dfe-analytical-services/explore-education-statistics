@@ -1,0 +1,283 @@
+import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
+import _legacyReleaseService from '@admin/services/legacyReleaseService';
+import { MyPublication } from '@admin/services/publicationService';
+import { render, screen, waitFor, within } from '@testing-library/react';
+import { MemoryRouter, Router } from 'react-router';
+import userEvent from '@testing-library/user-event';
+import { createMemoryHistory } from 'history';
+import React from 'react';
+
+jest.mock('@admin/services/legacyReleaseService');
+const legacyReleaseService = _legacyReleaseService as jest.Mocked<
+  typeof _legacyReleaseService
+>;
+
+describe('LegacyReleasesTable', () => {
+  const testPublication: MyPublication = {
+    id: 'publication-id-1',
+    title: 'Publication 1',
+    releases: [],
+    legacyReleases: [
+      {
+        description: 'Legacy release 3',
+        id: 'legacy-release-3',
+        order: 3,
+        publicationId: 'publication-id-1',
+        url: 'http://gov.uk/3',
+      },
+      {
+        description: 'Legacy release 2',
+        id: 'legacy-release-2',
+        order: 2,
+        publicationId: 'publication-id-1',
+        url: 'http://gov.uk/2',
+      },
+      {
+        description: 'Legacy release 1',
+        id: 'legacy-release-1',
+        order: 1,
+        publicationId: 'publication-id-1',
+        url: 'http://gov.uk/1',
+      },
+    ],
+    methodologies: [],
+    themeId: 'theme-1',
+    topicId: 'topic-1',
+    permissions: {
+      canAdoptMethodologies: true,
+      canCreateReleases: true,
+      canUpdatePublication: true,
+      canUpdatePublicationTitle: true,
+      canCreateMethodologies: true,
+      canManageExternalMethodology: true,
+    },
+  };
+  test('renders the legacy releases table correctly', () => {
+    render(<LegacyReleasesTable publication={testPublication} />);
+
+    const table = screen.getByRole('table');
+    const rows = within(table).getAllByRole('row');
+
+    expect(rows).toHaveLength(4);
+
+    const row1Cells = within(rows[0]).getAllByRole('columnheader');
+    expect(row1Cells[0]).toHaveTextContent('Order');
+    expect(row1Cells[1]).toHaveTextContent('Description');
+    expect(row1Cells[2]).toHaveTextContent('URL');
+    expect(row1Cells[3]).toHaveTextContent('Actions');
+
+    const row2Cells = within(rows[1]).getAllByRole('cell');
+    expect(row2Cells[0]).toHaveTextContent('3');
+    expect(row2Cells[1]).toHaveTextContent('Legacy release 3');
+    expect(row2Cells[2]).toHaveTextContent('http://gov.uk/3');
+    expect(within(row2Cells[3]).getByRole('button', { name: 'Edit release' }));
+    expect(
+      within(row2Cells[3]).getByRole('button', { name: 'Delete release' }),
+    );
+
+    const row3Cells = within(rows[2]).getAllByRole('cell');
+    expect(row3Cells[0]).toHaveTextContent('2');
+    expect(row3Cells[1]).toHaveTextContent('Legacy release 2');
+    expect(row3Cells[2]).toHaveTextContent('http://gov.uk/2');
+    expect(within(row3Cells[3]).getByRole('button', { name: 'Edit release' }));
+    expect(
+      within(row3Cells[3]).getByRole('button', { name: 'Delete release' }),
+    );
+
+    const row4Cells = within(rows[3]).getAllByRole('cell');
+    expect(row4Cells[0]).toHaveTextContent('1');
+    expect(row4Cells[1]).toHaveTextContent('Legacy release 1');
+    expect(row4Cells[2]).toHaveTextContent('http://gov.uk/1');
+    expect(within(row4Cells[3]).getByRole('button', { name: 'Edit release' }));
+    expect(
+      within(row4Cells[3]).getByRole('button', { name: 'Delete release' }),
+    );
+
+    expect(screen.getByRole('button', { name: 'Create legacy release' }));
+    expect(screen.getByRole('button', { name: 'Reorder legacy releases' }));
+  });
+
+  describe('editing', () => {
+    test('shows a warning modal when the edit release button is clicked', async () => {
+      const history = createMemoryHistory();
+      render(
+        <Router history={history}>
+          <LegacyReleasesTable publication={testPublication} />
+        </Router>,
+      );
+      userEvent.click(
+        screen.getAllByRole('button', { name: 'Edit release' })[0],
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Warning'));
+      });
+      expect(
+        screen.getByText(
+          'All changes made to legacy releases appear immediately on the public website.',
+        ),
+      );
+      expect(screen.getByRole('button', { name: 'Cancel' }));
+      expect(screen.getByRole('button', { name: 'OK' }));
+    });
+
+    test('goes to the edit page when OK is clicked', async () => {
+      const history = createMemoryHistory();
+      render(
+        <Router history={history}>
+          <LegacyReleasesTable publication={testPublication} />
+        </Router>,
+      );
+      userEvent.click(
+        screen.getAllByRole('button', { name: 'Edit release' })[0],
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Warning'));
+      });
+
+      userEvent.click(screen.getByRole('button', { name: 'OK' }));
+
+      await waitFor(() => {
+        expect(history.location.pathname).toBe(
+          `/publication/${testPublication.id}/legacy-releases/${testPublication.legacyReleases[0].id}/edit`,
+        );
+      });
+    });
+  });
+
+  describe('deleting', () => {
+    test('shows a warning modal when the delete release button is clicked', async () => {
+      render(<LegacyReleasesTable publication={testPublication} />);
+      userEvent.click(
+        screen.getAllByRole('button', { name: 'Delete release' })[0],
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Delete legacy release'));
+      });
+      expect(
+        screen.getByText(
+          'Are you sure you want to delete this legacy release?',
+        ),
+      );
+      expect(
+        screen.getByText(
+          'All changes made to legacy releases appear immediately on the public website.',
+        ),
+      );
+      expect(screen.getByRole('button', { name: 'Cancel' }));
+      expect(screen.getByRole('button', { name: 'Confirm' }));
+    });
+
+    test('sends the delete request and updates the releases table when confirm is clicked', async () => {
+      render(<LegacyReleasesTable publication={testPublication} />);
+      userEvent.click(
+        screen.getAllByRole('button', { name: 'Delete release' })[0],
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Delete legacy release'));
+      });
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+      expect(legacyReleaseService.deleteLegacyRelease).toHaveBeenCalledWith(
+        testPublication.legacyReleases[0].id,
+      );
+
+      await waitFor(() => {
+        const table = screen.getByRole('table');
+        const rows = within(table).getAllByRole('row');
+        expect(rows).toHaveLength(3);
+      });
+    });
+  });
+
+  describe('creating', () => {
+    test('shows a warning modal when the create legacy release button is clicked', async () => {
+      const history = createMemoryHistory();
+      render(
+        <Router history={history}>
+          <LegacyReleasesTable publication={testPublication} />
+        </Router>,
+      );
+      userEvent.click(
+        screen.getByRole('button', { name: 'Create legacy release' }),
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Warning'));
+      });
+      expect(
+        screen.getByText(
+          'All changes made to legacy releases appear immediately on the public website.',
+        ),
+      );
+      expect(screen.getByRole('button', { name: 'Cancel' }));
+      expect(screen.getByRole('button', { name: 'OK' }));
+    });
+    test('goes to the create page when OK is clicked', async () => {
+      const history = createMemoryHistory();
+      render(
+        <Router history={history}>
+          <LegacyReleasesTable publication={testPublication} />
+        </Router>,
+      );
+      userEvent.click(
+        screen.getByRole('button', { name: 'Create legacy release' }),
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Warning'));
+      });
+      userEvent.click(screen.getByRole('button', { name: 'OK' }));
+
+      await waitFor(() => {
+        expect(history.location.pathname).toBe(
+          `/publication/${testPublication.id}/legacy-releases/create`,
+        );
+      });
+    });
+  });
+
+  describe('reordering', () => {
+    test('shows a warning modal when the reorder legacy releases button is clicked', async () => {
+      render(<LegacyReleasesTable publication={testPublication} />);
+      userEvent.click(
+        screen.getByRole('button', { name: 'Reorder legacy releases' }),
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Warning'));
+      });
+      expect(
+        screen.getByText(
+          'All changes made to legacy releases appear immediately on the public website.',
+        ),
+      );
+      expect(screen.getByRole('button', { name: 'Cancel' }));
+      expect(screen.getByRole('button', { name: 'OK' }));
+    });
+
+    test('shows the reordering UI when OK is clicked', async () => {
+      render(<LegacyReleasesTable publication={testPublication} />);
+      userEvent.click(
+        screen.getByRole('button', { name: 'Reorder legacy releases' }),
+      );
+      await waitFor(() => {
+        expect(screen.getByText('Warning'));
+      });
+      userEvent.click(screen.getByRole('button', { name: 'OK' }));
+
+      await waitFor(() => {
+        expect(screen.getByText('Sort'));
+      });
+
+      expect(screen.getByRole('button', { name: 'Confirm order' }));
+      expect(screen.getByRole('button', { name: 'Cancel reordering' }));
+
+      expect(
+        screen.queryByRole('button', { name: 'Edit release' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Delete release' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Create legacy release' }),
+      ).not.toBeInTheDocument();
+    });
+  });
+});

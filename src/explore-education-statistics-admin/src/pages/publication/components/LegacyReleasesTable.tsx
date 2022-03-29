@@ -1,4 +1,3 @@
-import ButtonLink from '@admin/components/ButtonLink';
 import {
   legacyReleaseCreateRoute,
   legacyReleaseEditRoute,
@@ -20,12 +19,20 @@ import classNames from 'classnames';
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { generatePath } from 'react-router';
+import { useHistory } from 'react-router-dom';
+
+interface legacyConfirmActions {
+  type: 'create' | 'edit' | 'reordering';
+  id?: string;
+}
 
 interface Props {
   publication: MyPublication;
 }
 const LegacyReleasesTable = ({ publication }: Props) => {
+  const history = useHistory();
   const [isReordering, toggleReordering] = useToggle(false);
+  const [legacyConfirm, setLegacyConfirm] = useState<legacyConfirmActions>();
   const [deleteLegacyRelease, setDeleteLegacyRelease] = useState<
     LegacyRelease
   >();
@@ -125,17 +132,16 @@ const LegacyReleasesTable = ({ publication }: Props) => {
                           {!isReordering && (
                             <td>
                               <ButtonGroup className="govuk-!-margin-bottom-0">
-                                <ButtonLink
-                                  to={generatePath(
-                                    legacyReleaseEditRoute.path,
-                                    {
-                                      publicationId: publication.id,
-                                      legacyReleaseId: release.id,
-                                    },
-                                  )}
+                                <Button
+                                  onClick={() =>
+                                    setLegacyConfirm({
+                                      type: 'edit',
+                                      id: release.id,
+                                    })
+                                  }
                                 >
                                   Edit release
-                                </ButtonLink>
+                                </Button>
                                 <Button
                                   variant="warning"
                                   onClick={() => {
@@ -162,43 +168,17 @@ const LegacyReleasesTable = ({ publication }: Props) => {
         <p>No legacy releases for this publication.</p>
       )}
 
-      <ModalConfirm
-        open={!!deleteLegacyRelease}
-        onConfirm={async () => {
-          if (deleteLegacyRelease) {
-            await legacyReleaseService.deleteLegacyRelease(
-              deleteLegacyRelease?.id,
-            );
-
-            const nextLegacyReleases = legacyReleases.filter(
-              release => release.id !== deleteLegacyRelease.id,
-            );
-            setLegacyReleases(nextLegacyReleases);
-          }
-
-          setDeleteLegacyRelease(undefined);
-        }}
-        onExit={() => setDeleteLegacyRelease(undefined)}
-        title="Delete legacy release"
-      >
-        <p>Are you sure you want to delete this legacy release?</p>
-      </ModalConfirm>
-
       {!isReordering ? (
         <ButtonGroup>
-          <ButtonLink
-            to={generatePath<PublicationRouteParams>(
-              legacyReleaseCreateRoute.path,
-              {
-                publicationId: publication.id,
-              },
-            )}
-          >
+          <Button onClick={() => setLegacyConfirm({ type: 'create' })}>
             Create legacy release
-          </ButtonLink>
+          </Button>
 
           {legacyReleases.length > 0 && (
-            <Button variant="secondary" onClick={toggleReordering.on}>
+            <Button
+              variant="secondary"
+              onClick={() => setLegacyConfirm({ type: 'reordering' })}
+            >
               Reorder legacy releases
             </Button>
           )}
@@ -231,6 +211,74 @@ const LegacyReleasesTable = ({ publication }: Props) => {
           </Button>
         </ButtonGroup>
       )}
+
+      <ModalConfirm
+        open={!!deleteLegacyRelease}
+        onConfirm={async () => {
+          if (deleteLegacyRelease) {
+            await legacyReleaseService.deleteLegacyRelease(
+              deleteLegacyRelease?.id,
+            );
+
+            const nextLegacyReleases = legacyReleases.filter(
+              release => release.id !== deleteLegacyRelease.id,
+            );
+            setLegacyReleases(nextLegacyReleases);
+          }
+
+          setDeleteLegacyRelease(undefined);
+        }}
+        onExit={() => setDeleteLegacyRelease(undefined)}
+        title="Delete legacy release"
+      >
+        <p>Are you sure you want to delete this legacy release?</p>
+        <p>
+          All changes made to legacy releases appear immediately on the public
+          website.
+        </p>
+      </ModalConfirm>
+
+      <ModalConfirm
+        confirmText="OK"
+        open={!!legacyConfirm}
+        title="Warning"
+        onConfirm={() => {
+          if (legacyConfirm?.type === 'create') {
+            history.push(
+              generatePath<PublicationRouteParams>(
+                legacyReleaseCreateRoute.path,
+                {
+                  publicationId: publication.id,
+                },
+              ),
+            );
+          }
+          if (legacyConfirm?.type === 'edit') {
+            history.push(
+              generatePath(legacyReleaseEditRoute.path, {
+                publicationId: publication.id,
+                legacyReleaseId: legacyConfirm.id,
+              }),
+            );
+          }
+
+          if (legacyConfirm?.type === 'reordering') {
+            toggleReordering.on();
+          }
+          setLegacyConfirm(undefined);
+        }}
+        onExit={() => {
+          setLegacyConfirm(undefined);
+        }}
+        onCancel={() => {
+          setLegacyConfirm(undefined);
+        }}
+      >
+        <p>
+          All changes made to legacy releases appear immediately on the public
+          website.
+        </p>
+      </ModalConfirm>
     </>
   );
 };
