@@ -194,7 +194,7 @@ const PublicationForm = ({
                 id="supersede"
                 legend="Archive this publication"
                 legendSize="m"
-                hint="words words words put some words here." // TO DO - put some real words here
+                hint="Select the publication that will be superseding this publication."
               >
                 <FormSelect
                   id="supersededById"
@@ -205,6 +205,9 @@ const PublicationForm = ({
                     value: publication.id,
                   }))}
                   placeholder="None selected"
+                  value={
+                    form.values.supersededById ?? initialValues?.supersededById
+                  }
                   onChange={event =>
                     form.setFieldValue('supersededById', event.target.value)
                   }

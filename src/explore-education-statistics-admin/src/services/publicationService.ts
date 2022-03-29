@@ -53,6 +53,7 @@ export interface MyPublication {
     canCreateMethodologies: boolean;
     canManageExternalMethodology: boolean;
   };
+  supersededById?: string;
 }
 
 export interface MyPublicationMethodology {

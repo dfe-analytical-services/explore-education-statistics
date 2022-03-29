@@ -37,6 +37,9 @@ const PublicationSummary = ({
 
   return (
     <>
+      {publication.supersededById && (
+        <WarningMessage>This publication is archived.</WarningMessage>
+      )}
       <div className={styles.section}>
         <h5 className={`govuk-heading-s ${styles.sectionHeading}`}>Releases</h5>
         <div
