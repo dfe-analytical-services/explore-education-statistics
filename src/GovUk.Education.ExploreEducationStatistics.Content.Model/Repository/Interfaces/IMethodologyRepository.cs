@@ -7,10 +7,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
 {
     public interface IMethodologyRepository
     {
-        public Task<List<Methodology>> GetByPublication(Guid publicationId);
+        Task<List<Methodology>> GetByPublication(Guid publicationId);
 
         Task<Publication> GetOwningPublication(Guid methodologyId);
 
-        public Task<List<Methodology>> GetUnrelatedToPublication(Guid publicationId);
+        Task<List<Guid>> GetAllPublicationIds(Guid methodologyId);
+
+        Task<List<Methodology>> GetUnrelatedToPublication(Guid publicationId);
     }
 }

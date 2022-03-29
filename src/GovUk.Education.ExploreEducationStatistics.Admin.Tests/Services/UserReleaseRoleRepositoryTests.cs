@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -356,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new UserReleaseRoleRepository(contentDbContext);
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.Remove(userReleaseRole, deletedById);
 
                 var updatedReleaseRole = contentDbContext.UserReleaseRoles
@@ -389,7 +391,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new UserReleaseRoleRepository(contentDbContext);
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.Remove(userReleaseRole, deletedById);
 
                 var updatedReleaseRole = contentDbContext.UserReleaseRoles
@@ -452,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new UserReleaseRoleRepository(contentDbContext);
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.RemoveMany(
                     ListOf(userReleaseRole1, userReleaseRole2, userReleaseRole3),
                     deletedById);
@@ -511,7 +513,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new UserReleaseRoleRepository(contentDbContext);
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.RemoveMany(
                     ListOf(userReleaseRole1, userReleaseRole2, userReleaseRole3),
                     deletedById);
@@ -612,7 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new UserReleaseRoleRepository(contentDbContext);
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.RemoveAllForPublication(user.Id, publication, Contributor,
                     deletedById);
 
@@ -1040,6 +1042,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var latestReleaseOtherPublication = new Release
             {
                 Publication = new Publication(),
+                ApprovalStatus = Approved,
                 ReleaseName = "2020",
                 TimePeriodCoverage = CalendarYear
             };
@@ -1115,6 +1118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var latestReleaseOtherPublication = new Release
             {
                 Publication = new Publication(),
+                ApprovalStatus = Approved,
                 ReleaseName = "2020",
                 TimePeriodCoverage = CalendarYear
             };
@@ -1190,6 +1194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var latestReleaseOtherPublication = new Release
             {
                 Publication = new Publication(),
+                ApprovalStatus = Approved,
                 ReleaseName = "2020",
                 TimePeriodCoverage = CalendarYear
             };
@@ -1265,6 +1270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var latestReleaseOtherPublication = new Release
             {
                 Publication = new Publication(),
+                ApprovalStatus = Approved,
                 ReleaseName = "2020",
                 TimePeriodCoverage = CalendarYear
             };
@@ -1588,7 +1594,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static UserReleaseRoleRepository SetupUserReleaseRoleRepository(
-            ContentDbContext contentDbContext)
+            ContentDbContext contentDbContext,
+            IPreReleaseService? preReleaseService = null)
         {
             return new(contentDbContext);
         }

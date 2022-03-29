@@ -42,6 +42,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             return owningPublicationLink.Publication;
         }
 
+        public Task<List<Guid>> GetAllPublicationIds(Guid methodologyId)
+        {
+            return _contentDbContext.PublicationMethodologies
+                .Where(pm => pm.MethodologyId == methodologyId)
+                .Select(pm => pm.PublicationId)
+                .ToListAsync();
+        }
+
         public async Task<List<Methodology>> GetUnrelatedToPublication(Guid publicationId)
         {
             return await _contentDbContext.Methodologies

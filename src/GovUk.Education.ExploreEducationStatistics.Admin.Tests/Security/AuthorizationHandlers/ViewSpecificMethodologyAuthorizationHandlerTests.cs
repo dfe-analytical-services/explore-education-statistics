@@ -1,10 +1,15 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Moq;
 using Xunit;
@@ -45,9 +50,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     var (
                         handler,
+                        contentDbContext,
                         methodologyRepository,
                         userPublicationRoleRepository,
-                        userReleaseRoleRepository
+                        userReleaseRoleRepository,
+                        preReleaseService
                         ) = CreateHandlerAndDependencies();
 
                     // Only the AccessAllMethodologies claim should allow a Methodology to be viewed.
@@ -58,6 +65,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         methodologyRepository.Setup(s =>
                                 s.GetOwningPublication(MethodologyVersion.MethodologyId))
                             .ReturnsAsync(OwningPublication);
+
+                        methodologyRepository.Setup(s =>
+                                s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+                            .ReturnsAsync(new List<Guid>{ OwningPublication.Id });
 
                         userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
                             UserId, OwningPublication, false);
@@ -93,9 +104,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     var (
                         handler,
+                        contentDbContext,
                         methodologyRepository,
                         userPublicationRoleRepository,
-                        userReleaseRoleRepository
+                        userReleaseRoleRepository,
+                        preReleaseService
                         ) = CreateHandlerAndDependencies();
 
                     methodologyRepository.Setup(s =>
@@ -140,14 +153,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 {
                     var (
                         handler,
+                        contentDbContext,
                         methodologyRepository,
                         userPublicationRoleRepository,
-                        userReleaseRoleRepository
+                        userReleaseRoleRepository,
+                        preReleaseService
                         ) = CreateHandlerAndDependencies();
 
                     methodologyRepository.Setup(s =>
                             s.GetOwningPublication(MethodologyVersion.MethodologyId))
                         .ReturnsAsync(OwningPublication);
+
+                        methodologyRepository.Setup(s =>
+                                s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+                            .ReturnsAsync(new List<Guid>{ OwningPublication.Id });
 
                     userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
                         UserId, OwningPublication, false);
@@ -184,42 +203,79 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 await ForEachReleaseRoleAsync(async releaseRole =>
                 {
-                    var (
-                        handler,
-                        methodologyRepository,
-                        userPublicationRoleRepository,
+                    var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
+                    var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
+                    var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+                    var preReleaseService = new Mock<IPreReleaseService>(Strict);
+
+                    var release = new Release
+                    {
+                        ReleaseName = "2000",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        PublicationId = OwningPublication.Id,
+                    };
+
+                    var contentDbContextId = Guid.NewGuid().ToString();
+                    await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        await contentDbContext.AddRangeAsync(
+                            OwningPublication,
+                            release);
+                        await contentDbContext.SaveChangesAsync();
+                    }
+
+                    await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+                    {
+                        var handler = new ViewSpecificMethodologyAuthorizationHandler(
+                            contentDbContext,
+                            methodologyRepository.Object,
+                            userPublicationRoleRepository.Object,
+                            userReleaseRoleRepository.Object,
+                            preReleaseService.Object
+                        );
+
+                        methodologyRepository.Setup(s =>
+                                s.GetOwningPublication(MethodologyVersion.MethodologyId))
+                            .ReturnsAsync(OwningPublication);
+
+                        methodologyRepository.Setup(s =>
+                                s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+                            .ReturnsAsync(new List<Guid> { OwningPublication.Id });
+
+                        userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
+                            UserId, OwningPublication, false);
+
                         userReleaseRoleRepository
-                        ) = CreateHandlerAndDependencies();
+                            .Setup(s => s.IsUserEditorOrApproverOnLatestRelease(UserId, OwningPublication.Id))
+                            .ReturnsAsync(false);
 
-                    methodologyRepository.Setup(s =>
-                            s.GetOwningPublication(MethodologyVersion.MethodologyId))
-                        .ReturnsAsync(OwningPublication);
+                        userReleaseRoleRepository
+                            .Setup(s => s.IsUserPrereleaseViewerOnLatestPreReleaseRelease(UserId, OwningPublication.Id))
+                            .ReturnsAsync(expectedReleaseRolesToPass.Contains(releaseRole));
 
-                    userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
-                        UserId, OwningPublication, false);
+                        if (releaseRole == PrereleaseViewer)
+                        {
+                            preReleaseService
+                                .Setup(s => s.GetPreReleaseWindowStatus(It.IsAny<Release>(), It.IsAny<DateTime>()))
+                                .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
+                        }
 
-                    userReleaseRoleRepository
-                        .Setup(s => s.IsUserEditorOrApproverOnLatestRelease(UserId, OwningPublication.Id))
-                        .ReturnsAsync(false);
+                        var user = CreateClaimsPrincipal(UserId);
+                        var authContext =
+                            CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
+                                (user, MethodologyVersion);
 
-                    userReleaseRoleRepository
-                        .Setup(s => s.IsUserPrereleaseViewerOnLatestPreReleaseRelease(UserId, OwningPublication.Id))
-                        .ReturnsAsync(expectedReleaseRolesToPass.Contains(releaseRole));
+                        await handler.HandleAsync(authContext);
+                        VerifyAllMocks(
+                            methodologyRepository,
+                            userPublicationRoleRepository,
+                            userReleaseRoleRepository,
+                            preReleaseService);
 
-                    var user = CreateClaimsPrincipal(UserId);
-                    var authContext =
-                        CreateAuthorizationHandlerContext<ViewSpecificMethodologyRequirement, MethodologyVersion>
-                            (user, MethodologyVersion);
-
-                    await handler.HandleAsync(authContext);
-                    VerifyAllMocks(
-                        methodologyRepository,
-                        userPublicationRoleRepository,
-                        userReleaseRoleRepository);
-
-                    // As the user has a role on the latest Release of the owning Publication of this Methodology
-                    // they are allowed to view it.
-                    Assert.Equal(expectedReleaseRolesToPass.Contains(releaseRole), authContext.HasSucceeded);
+                        // As the user has a role on the latest Release of the owning Publication of this Methodology
+                        // they are allowed to view it.
+                        Assert.Equal(expectedReleaseRolesToPass.Contains(releaseRole), authContext.HasSucceeded);
+                    }
                 });
             }
 
@@ -228,14 +284,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 var (
                     handler,
+                    contentDbContext,
                     methodologyRepository,
                     userPublicationRoleRepository,
-                    userReleaseRoleRepository
+                    userReleaseRoleRepository,
+                    preReleaseServiceUser
                     ) = CreateHandlerAndDependencies();
 
                 methodologyRepository.Setup(s =>
                         s.GetOwningPublication(MethodologyVersion.MethodologyId))
                     .ReturnsAsync(OwningPublication);
+
+                methodologyRepository.Setup(s =>
+                        s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
+                    .ReturnsAsync(new List<Guid> { OwningPublication.Id });
 
                 userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
                     UserId, OwningPublication, false);
@@ -266,27 +328,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
         private static (
             ViewSpecificMethodologyAuthorizationHandler,
+            Mock<ContentDbContext>,
             Mock<IMethodologyRepository>,
             Mock<IUserPublicationRoleRepository>,
-            Mock<IUserReleaseRoleRepository>
+            Mock<IUserReleaseRoleRepository>,
+            Mock<IPreReleaseService>
             )
             CreateHandlerAndDependencies()
         {
+            var contentDbContext = new Mock<ContentDbContext>(Strict);
             var methodologyRepository = new Mock<IMethodologyRepository>(Strict);
             var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
             var userReleaseRoleRepository = new Mock<IUserReleaseRoleRepository>(Strict);
+            var preReleaseService = new Mock<IPreReleaseService>(Strict);
 
             var handler = new ViewSpecificMethodologyAuthorizationHandler(
+                contentDbContext.Object,
                 methodologyRepository.Object,
                 userPublicationRoleRepository.Object,
-                userReleaseRoleRepository.Object
+                userReleaseRoleRepository.Object,
+                preReleaseService.Object
             );
 
             return (
                 handler,
+                contentDbContext,
                 methodologyRepository,
                 userPublicationRoleRepository,
-                userReleaseRoleRepository
+                userReleaseRoleRepository,
+                preReleaseService
             );
         }
     }
