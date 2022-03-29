@@ -1,10 +1,12 @@
 import FormFieldThemeTopicSelect from '@admin/components/form/FormFieldThemeTopicSelect';
+import publicationService from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormSelect from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
@@ -21,6 +23,7 @@ export interface FormValues {
   teamEmail: string;
   contactName: string;
   contactTelNo: string;
+  supersededById?: string;
 }
 
 const errorMappings = [
@@ -33,25 +36,59 @@ const errorMappings = [
 ];
 interface Props {
   cancelButton?: ReactNode;
+  confirmOnSubmit?: boolean;
   id?: string;
   initialValues?: FormValues;
-  onSubmit: (values: FormValues) => void;
-  confirmOnSubmit?: boolean;
+  publicationId?: string;
+  showSupersededBy?: boolean;
   showTitleInput?: boolean;
+  onSubmit: (values: FormValues) => void;
 }
 
 const PublicationForm = ({
   cancelButton,
+  confirmOnSubmit = false,
   id = 'publicationForm',
   initialValues,
-  confirmOnSubmit = false,
+  publicationId,
+  showSupersededBy = false,
   showTitleInput = true,
   onSubmit,
 }: Props) => {
-  const {
-    value: themes = [],
-    isLoading: isThemesLoading,
-  } = useAsyncHandledRetry(themeService.getThemes);
+  const { value, isLoading: isThemesLoading } = useAsyncHandledRetry(
+    async () => {
+      const themes = await themeService.getThemes();
+      if (!showSupersededBy) {
+        return { themes };
+      }
+
+      // Getting publications by topic
+      // TO DO - can we get these in one request?
+      const allPublications = await Promise.all(
+        themes
+          .flatMap(theme => theme.topics)
+          .map(topic => {
+            return publicationService.getMyPublicationsByTopic(topic.id);
+          }),
+      );
+      // Filter out ones without published releases and the current one
+      const publications = allPublications.flat().filter(publication => {
+        return (
+          publication.id !== publicationId &&
+          publication.releases.some(
+            release => release.published || release.amendment,
+          )
+        );
+      });
+
+      return {
+        themes,
+        publications,
+      };
+    },
+  );
+
+  const { themes, publications } = value ?? {};
 
   const [showConfirmSubmitModal, setShowConfirmSubmitModal] = useState<boolean>(
     false,
@@ -66,6 +103,7 @@ const PublicationForm = ({
         .email('Enter a valid team email address'),
       contactName: Yup.string().required('Enter a contact name'),
       contactTelNo: Yup.string().required('Enter a contact telephone number'),
+      supersededById: Yup.string(),
     });
 
     if (initialValues?.topicId) {
@@ -73,7 +111,6 @@ const PublicationForm = ({
         topicId: Yup.string().required('Choose a topic'),
       });
     }
-
     return schema;
   }, [initialValues?.topicId]);
 
@@ -111,7 +148,7 @@ const PublicationForm = ({
               />
             )}
 
-            {initialValues?.topicId && (
+            {themes && initialValues?.topicId && (
               <FormFieldThemeTopicSelect<FormValues>
                 name="topicId"
                 legend="Choose a topic for this publication"
@@ -151,6 +188,29 @@ const PublicationForm = ({
                 width={10}
               />
             </FormFieldset>
+
+            {publications && (
+              <FormFieldset
+                id="supersede"
+                legend="Archive this publication"
+                legendSize="m"
+                hint="words words words put some words here." // TO DO - put some real words here
+              >
+                <FormSelect
+                  id="supersededById"
+                  label="Select publication"
+                  name="supersededById"
+                  options={publications.map(publication => ({
+                    label: publication.title,
+                    value: publication.id,
+                  }))}
+                  placeholder="None selected"
+                  onChange={event =>
+                    form.setFieldValue('supersededById', event.target.value)
+                  }
+                />
+              </FormFieldset>
+            )}
 
             <ButtonGroup>
               <Button

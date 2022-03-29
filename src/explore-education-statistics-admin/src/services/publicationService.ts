@@ -86,6 +86,7 @@ export interface SavePublicationRequest {
   contact: SavePublicationContact;
   selectedMethodologyId?: string;
   externalMethodology?: ExternalMethodology;
+  supersededById?: string;
   topicId: string;
 }
 
