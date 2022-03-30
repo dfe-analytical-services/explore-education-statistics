@@ -84,23 +84,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> ListPublications()
-        {
-            return await _userService
-                .CheckCanManageAllUsers()
-                .OnSuccess(_ =>
-                {
-                    return _contentDbContext.Publications
-                        .AsQueryable()
-                        .Select(p => new TitleAndIdViewModel
-                        {
-                            Id = p.Id,
-                            Title = p.Title
-                        })
-                        .ToList();
-                });
-        }
-
         public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> ListReleases()
         {
             return await _userService

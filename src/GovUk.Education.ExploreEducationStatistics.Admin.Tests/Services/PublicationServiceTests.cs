@@ -467,6 +467,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task ListPublications()
+        {
+            var publication1 = new Publication
+            {
+                Title = "Test Publication 1"
+            };
+
+            var publication2 = new Publication
+            {
+                Title = "Test Publication 2"
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddRangeAsync(publication1, publication2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildPublicationService(contentDbContext);
+
+                var result = await service.ListPublications();
+
+                Assert.True(result.IsRight);
+
+                var publicationViewModels = result.Right;
+                Assert.Equal(2, publicationViewModels.Count);
+
+                Assert.Equal(publication1.Id, publicationViewModels[0].Id);
+                Assert.Equal(publication1.Title, publicationViewModels[0].Title);
+
+                Assert.Equal(publication2.Id, publicationViewModels[1].Id);
+                Assert.Equal(publication2.Title, publicationViewModels[1].Title);
+            }
+        }
+
+        [Fact]
+        public async Task ListPublications_NoPublications()
+        {
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
+            var service = BuildPublicationService(contentDbContext);
+
+            var result = await service.ListPublications();
+
+            Assert.True(result.IsRight);
+
+            var publicationViewModels = result.Right;
+            Assert.Empty(publicationViewModels);
+        }
+
+        [Fact]
         public async Task CreatePublication()
         {
             var topic = new Topic
@@ -614,6 +669,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Old team",
                     TeamEmail = "old.smith@test.com",
                 },
+                SupersededById = Guid.NewGuid(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -645,6 +701,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         "new-title"))
                     .Returns(Task.CompletedTask);
 
+                var newSupersededById = Guid.NewGuid();
+
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
@@ -658,7 +716,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TeamName = "Test team",
                             TeamEmail = "john.smith@test.com",
                         },
-                        TopicId = topic.Id
+                        TopicId = topic.Id,
+                        SupersededById = newSupersededById,
                     }
                 );
 
@@ -673,6 +732,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(topic.Id, result.Right.TopicId);
 
+                Assert.Equal(newSupersededById, result.Right.SupersededById);
+
                 // Do an in depth check of the saved release
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
 
@@ -682,6 +743,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedPublication.Updated!.Value).Milliseconds, 0, 1500);
                 Assert.Equal("new-title", updatedPublication.Slug);
                 Assert.Equal("New title", updatedPublication.Title);
+                Assert.Equal(newSupersededById, updatedPublication.SupersededById);
 
                 Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
                 Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
@@ -776,6 +838,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         "old-title"))
                     .Returns(Task.CompletedTask);
 
+                var newSupersededById = Guid.NewGuid();
+
                 // Service method under test
                 var result = await publicationService.UpdatePublication(
                     publication.Id,
@@ -790,7 +854,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TeamEmail = "john.smith@test.com",
                         },
                         TopicId = topic.Id,
-                        SupersededById = Guid.NewGuid(), // no action necessary when adding a new superseding publication
+                        SupersededById = newSupersededById,
                     }
                 );
 
@@ -804,6 +868,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("john.smith@test.com", result.Right.Contact.TeamEmail);
 
                 Assert.Equal(topic.Id, result.Right.TopicId);
+
+                Assert.Equal(newSupersededById, result.Right.SupersededById);
 
                 // Do an in depth check of the saved release
                 var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
@@ -823,11 +889,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(topic.Id, updatedPublication.TopicId);
                 Assert.Equal("New topic", updatedPublication.Topic.Title);
+
+                Assert.Equal(newSupersededById, updatedPublication.SupersededById);
             }
         }
 
         [Fact]
-        public async void UpdatePublication_NoTitleChange()
+        public async void UpdatePublication_NoTitleOrSupersededByChange()
         {
             var topic = new Topic
             {
@@ -849,6 +917,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Old team",
                     TeamEmail = "old.smith@test.com",
                 },
+                SupersededById = Guid.NewGuid(),
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -886,7 +955,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             TeamName = "Test team",
                             TeamEmail = "john.smith@test.com",
                         },
-                        TopicId = topic.Id
+                        TopicId = topic.Id,
+                        SupersededById = publication.SupersededById,
                     }
                 );
 
@@ -894,6 +964,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Old title", result.Right.Title);
                 Assert.Equal("John Smith", result.Right.Contact.ContactName);
+                Assert.Equal(publication.SupersededById, result.Right.SupersededById);
             }
         }
 
@@ -907,11 +978,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Topic = new Topic
                 {
                     Title = "Test topic"
-                }
+                },
             };
 
             var contextId = Guid.NewGuid().ToString();
-
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Add(publication);
@@ -1132,6 +1202,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveViewModel
                     {
                         Title = "New publication title",
+                    }
+                );
+
+                var actionResult = result.AssertLeft();
+                Assert.IsType<ForbidResult>(actionResult);
+            }
+        }
+
+        [Fact]
+        public async Task UpdatePublication_NoPermissionToChangeSupersededBy()
+        {
+            var publication = new Publication
+            {
+                Title = "Old publication title",
+                Slug = "publication-slug",
+                Topic = new Topic { Title = "Old topic title" },
+                SupersededById = Guid.NewGuid(),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var userService = new Mock<IUserService>(Strict);
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        SecurityPolicies.CanUpdateSpecificPublication))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublicationSupersededBy))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                var publicationService = BuildPublicationService(context,
+                    userService: userService.Object,
+                    publicBlobCacheService: publicBlobCacheService.Object);
+
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new PublicationSaveViewModel
+                    {
+                        Title = "Old publication title",
+                        Slug = "publication-slug",
+                        SupersededById = Guid.NewGuid(),
                     }
                 );
 

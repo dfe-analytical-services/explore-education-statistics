@@ -82,6 +82,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }));
         }
 
+        public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> ListPublications()
+        {
+            return await _userService
+                .CheckCanManageAllUsers()
+                .OnSuccess(_ =>
+                {
+                    return _context.Publications
+                        .Select(p => new TitleAndIdViewModel
+                        {
+                            Id = p.Id,
+                            Title = p.Title
+                        })
+                        .ToList();
+                });
+        }
+
         public async Task<Either<ActionResult, PublicationViewModel>> CreatePublication(
             PublicationSaveViewModel publication)
         {
@@ -128,6 +144,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     if (publication.Title != updatedPublication.Title)
                     {
                         return await _userService.CheckCanUpdatePublicationTitle();
+                    }
+
+                    return Unit.Instance;
+                })
+                .OnSuccessDo(async publication =>
+                {
+                    if (publication.SupersededById != updatedPublication.SupersededById)
+                    {
+                        return await _userService.CheckCanUpdatePublicationSupersededBy();
                     }
 
                     return Unit.Instance;

@@ -433,7 +433,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-
                 var service = BuildPublishingService(
                     contentDbContext: contentDbContext,
                     publicBlobStorageService: publicBlobStorageService.Object,

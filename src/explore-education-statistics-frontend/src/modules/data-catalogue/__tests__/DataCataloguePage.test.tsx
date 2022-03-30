@@ -11,6 +11,7 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import preloadAll from 'jest-next-dynamic';
 import React from 'react';
+import produce from 'immer';
 
 jest.mock('@common/services/downloadService');
 jest.mock('@common/services/publicationService');
@@ -197,9 +198,13 @@ describe('DataCataloguePage', () => {
 
     const releaseRadios = step2.getAllByRole('radio');
     expect(releaseRadios).toHaveLength(3);
+
     expect(releaseRadios[0]).toEqual(
       step2.getByLabelText('Academic Year 2021/22'),
     );
+    const div = screen.getByTestId('Radio item for Academic Year 2021/22');
+    expect(within(div).getByText('This is the latest data'));
+
     expect(releaseRadios[1]).toEqual(
       step2.getByLabelText('Academic Year 2020/21'),
     );
@@ -252,6 +257,40 @@ describe('DataCataloguePage', () => {
         Parameters<typeof downloadService.downloadFiles>
       >('release-3', ['file-1', 'file-3']);
     });
+  });
+
+  test('does not render Latest data tag if isSuperseded is true', async () => {
+    publicationService.listReleases.mockResolvedValue(testReleases);
+
+    const testThemesSuperseded = produce(testThemes, draft => {
+      draft[0].topics[0].publications[0].isSuperseded = true;
+    });
+    render(<DataCataloguePage themes={testThemesSuperseded} />);
+
+    // Step 1
+
+    const step1 = within(screen.getByTestId('wizardStep-1'));
+    userEvent.click(step1.getByRole('button', { name: 'Pupils and schools' }));
+    userEvent.click(step1.getByRole('button', { name: 'Admission appeals' }));
+    userEvent.click(step1.getByRole('radio', { name: 'Test publication' }));
+    userEvent.click(step1.getByRole('button', { name: 'Next step' }));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('wizardStep-1')).not.toHaveAttribute(
+        'aria-current',
+        'step',
+      );
+      expect(screen.getByTestId('wizardStep-2')).toHaveAttribute(
+        'aria-current',
+        'step',
+      );
+    });
+
+    // Step 2
+
+    expect(
+      screen.queryByText('This is the latest data'),
+    ).not.toBeInTheDocument();
   });
 
   test('direct link to step 2', async () => {

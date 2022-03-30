@@ -31,6 +31,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpGet("api/me/publications/titles")]
+        public async Task<ActionResult<List<TitleAndIdViewModel>>> GetPublicationTitles()
+        {
+            return await _publicationService
+                .ListPublications()
+                .HandleFailuresOrOk();
+        }
+
         [HttpGet("api/me/publication/{publicationId}")]
         public async Task<ActionResult<MyPublicationViewModel>> GetMyPublication(
             [FromRoute(Name = "publicationId"), Required] Guid publicationId)

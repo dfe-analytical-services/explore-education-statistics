@@ -23,6 +23,7 @@ import ReleaseAccessForm, {
 import PublicationAccessForm, {
   AddPublicationRoleFormValues,
 } from '@admin/pages/users/components/PublicationAccessForm';
+import publicationService from '@admin/services/publicationService';
 
 const updateRoleFormErrorMappings = [
   mapFieldErrors<UpdateRoleFormValues>({
@@ -80,7 +81,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
   const { value: roles } = useAsyncRetry(() => userService.getRoles());
   const { value: releases } = useAsyncRetry(() => userService.getReleases());
   const { value: publications } = useAsyncRetry(() =>
-    userService.getPublications(),
+    publicationService.getPublicationTitles(),
   );
   const { value: resourceRoles } = useAsyncRetry(() =>
     userService.getResourceRoles(),

@@ -51,6 +51,7 @@ const PublicationCreatePage = ({
       </div>
 
       <PublicationForm
+        showTitleInput
         cancelButton={
           <Link
             unvisited

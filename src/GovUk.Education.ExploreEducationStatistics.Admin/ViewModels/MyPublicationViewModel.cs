@@ -36,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         {
             public bool CanUpdatePublication { get; set; }
             public bool CanUpdatePublicationTitle { get; set; }
+            public bool CanUpdatePublicationSupersededBy { get; set; }
             public bool CanCreateReleases { get; set; }
             public bool CanAdoptMethodologies { get; set; }
             public bool CanCreateMethodologies { get; set; }

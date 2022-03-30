@@ -116,6 +116,7 @@ const testPublicationNoMethodology: MyPublication = {
     canCreateReleases: true,
     canUpdatePublication: true,
     canUpdatePublicationTitle: true,
+    canUpdatePublicationSupersededBy: true,
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
   },

@@ -43,6 +43,8 @@ export const testPublication: Publication = {
       title: 'Pupil absence statistics: methodology',
     },
   ],
+  supersededById: 'superseding-publication-id',
+  isSuperseded: false,
 };
 
 export const testRelease: Release = {

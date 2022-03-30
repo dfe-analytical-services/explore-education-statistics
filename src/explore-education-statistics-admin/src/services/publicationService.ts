@@ -50,6 +50,7 @@ export interface MyPublication {
     canCreateReleases: boolean;
     canUpdatePublication: boolean;
     canUpdatePublicationTitle: boolean;
+    canUpdatePublicationSupersededBy: boolean;
     canCreateMethodologies: boolean;
     canManageExternalMethodology: boolean;
   };
@@ -101,10 +102,15 @@ export type UpdatePublicationLegacyRelease = Partial<
 
 const publicationService = {
   getMyPublicationsByTopic(topicId: string): Promise<MyPublication[]> {
-    return client.get<MyPublication[]>('/me/publications', {
+    return client.get('/me/publications', {
       params: { topicId },
     });
   },
+
+  getPublicationTitles(): Promise<IdTitlePair[]> {
+    return client.get('/me/publications/titles');
+  },
+
   createPublication(
     publication: CreatePublicationRequest,
   ): Promise<BasicPublicationDetails> {

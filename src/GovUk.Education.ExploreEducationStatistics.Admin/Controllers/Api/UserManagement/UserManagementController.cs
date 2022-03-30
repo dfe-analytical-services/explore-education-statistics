@@ -89,19 +89,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         }
 
         /// <summary>
-        /// Provides a list of publications that are available within the service
-        /// </summary>
-        /// <returns>Id and Title of the publications</returns>
-        [HttpGet("publications")]
-        [ProducesResponseType(200)]
-        public async Task<ActionResult<List<TitleAndIdViewModel>>> GetPublications()
-        {
-            return await _userManagementService
-                .ListPublications()
-                .HandleFailuresOrOk();
-        }
-
-        /// <summary>
         /// Provides a list of releases that are available within the service
         /// </summary>
         /// <returns>Id and Title of the releases</returns>

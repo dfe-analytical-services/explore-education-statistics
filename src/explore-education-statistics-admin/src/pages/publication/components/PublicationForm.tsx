@@ -52,7 +52,7 @@ const PublicationForm = ({
   initialValues,
   publicationId,
   showSupersededBy = false,
-  showTitleInput = true,
+  showTitleInput = false,
   onSubmit,
 }: Props) => {
   const { value, isLoading: isThemesLoading } = useAsyncHandledRetry(
@@ -62,23 +62,9 @@ const PublicationForm = ({
         return { themes };
       }
 
-      // Getting publications by topic
-      // TO DO - can we get these in one request?
-      const allPublications = await Promise.all(
-        themes
-          .flatMap(theme => theme.topics)
-          .map(topic => {
-            return publicationService.getMyPublicationsByTopic(topic.id);
-          }),
-      );
-      // Filter out ones without published releases and the current one
-      const publications = allPublications.flat().filter(publication => {
-        return (
-          publication.id !== publicationId &&
-          publication.releases.some(
-            release => release.published || release.amendment,
-          )
-        );
+      const allPublications = await publicationService.getPublicationTitles();
+      const publications = allPublications.filter(publication => {
+        return publication.id !== publicationId;
       });
 
       return {
@@ -189,7 +175,7 @@ const PublicationForm = ({
               />
             </FormFieldset>
 
-            {publications && (
+            {publications && showSupersededBy && (
               <FormFieldset
                 id="supersede"
                 legend="Archive this publication"

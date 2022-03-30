@@ -63,7 +63,7 @@ describe('PublicationForm', () => {
   ];
 
   test('does not render any theme/topic fields when no `initialValues`', async () => {
-    render(<PublicationForm onSubmit={noop} />);
+    render(<PublicationForm onSubmit={noop} showTitleInput />);
 
     await waitFor(() => {
       expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe('PublicationForm', () => {
   });
 
   test('shows validation error when there is no title', async () => {
-    render(<PublicationForm onSubmit={noop} />);
+    render(<PublicationForm onSubmit={noop} showTitleInput />);
 
     await waitFor(() => {
       expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
@@ -183,7 +183,7 @@ describe('PublicationForm', () => {
   test('can submit with valid values', async () => {
     const handleSubmit = jest.fn();
 
-    render(<PublicationForm onSubmit={handleSubmit} />);
+    render(<PublicationForm onSubmit={handleSubmit} showTitleInput />);
 
     await waitFor(() => {
       expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
@@ -506,6 +506,7 @@ describe('PublicationForm', () => {
         canCreateReleases: true,
         canUpdatePublication: true,
         canUpdatePublicationTitle: true,
+        canUpdatePublicationSupersededBy: true,
         canCreateMethodologies: true,
         canManageExternalMethodology: true,
       },
@@ -534,6 +535,9 @@ describe('PublicationForm', () => {
 
     test('does not render the `Archive publication` field when showSupersededBy is false', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
+      publicationService.getPublicationTitles.mockResolvedValue([
+        { id: testPublication1.id, title: testPublication1.title },
+      ]);
 
       render(
         <PublicationForm
@@ -545,6 +549,7 @@ describe('PublicationForm', () => {
             contactTelNo: '0123456789',
             contactName: 'John Smith',
           }}
+          showTitleInput
           showSupersededBy={false}
           onSubmit={noop}
         />,
@@ -561,8 +566,8 @@ describe('PublicationForm', () => {
 
     test('renders the `Archive publication` field when showSupersededBy is true', async () => {
       themeService.getThemes.mockResolvedValue([testSingleTheme]);
-      publicationService.getMyPublicationsByTopic.mockResolvedValue([
-        testPublication1,
+      publicationService.getPublicationTitles.mockResolvedValue([
+        { id: testPublication1.id, title: testPublication1.title },
       ]);
 
       render(
@@ -597,11 +602,12 @@ describe('PublicationForm', () => {
 
     test('only shows publications with a published release in the superseded by select', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
-      publicationService.getMyPublicationsByTopic
-        .mockResolvedValueOnce([testPublication1])
-        .mockResolvedValueOnce([testPublication2])
-        .mockResolvedValueOnce([testPublication3])
-        .mockResolvedValueOnce([testPublication4]);
+      publicationService.getPublicationTitles.mockResolvedValueOnce([
+        testPublication1,
+        testPublication2,
+        testPublication3,
+        testPublication4,
+      ]);
 
       render(
         <PublicationForm
@@ -628,11 +634,12 @@ describe('PublicationForm', () => {
         'option',
       ) as HTMLOptionElement[];
 
-      expect(publications).toHaveLength(4);
+      expect(publications).toHaveLength(5);
       expect(publications[0]).toHaveTextContent('None selected');
       expect(publications[1]).toHaveTextContent('Publication 1');
-      expect(publications[2]).toHaveTextContent('Publication 3');
-      expect(publications[3]).toHaveTextContent('Publication 4');
+      expect(publications[2]).toHaveTextContent('Publication 2');
+      expect(publications[3]).toHaveTextContent('Publication 3');
+      expect(publications[4]).toHaveTextContent('Publication 4');
     });
   });
 });

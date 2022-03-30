@@ -32,6 +32,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     .CheckCanUpdatePublicationTitle()
                     .Result
                     .IsRight,
+                CanUpdatePublicationSupersededBy = _userService
+                    .CheckCanUpdatePublicationSupersededBy()
+                    .Result
+                    .IsRight,
                 CanCreateReleases = _userService
                     .CheckCanCreateReleaseForPublication(source)
                     .Result

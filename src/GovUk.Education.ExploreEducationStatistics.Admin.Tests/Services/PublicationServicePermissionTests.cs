@@ -146,6 +146,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task ListPublications()
+        {
+            var mocks = Mocks();
+
+            await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
+                .ExpectCheckToFail(SecurityPolicies.CanManageUsersOnSystem)
+                .AssertForbidden(async userService =>
+                {
+                    mocks.UserService = userService;
+                    var service = BuildPublicationService(mocks);
+                    return await service.ListPublications();
+                });
+        }
+
+        [Fact]
         public async Task CreatePublication()
         {
             await using var context = DbUtils.InMemoryApplicationDbContext();

@@ -44,12 +44,20 @@ const PublicationEditPage = ({
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
-          {publication.supersededById && (
+          {publication.isSuperseded && (
             <WarningMessage>This publication is archived.</WarningMessage>
+          )}
+          {publication.supersededById && !publication.isSuperseded && (
+            <WarningMessage>
+              This publication will be archived when its superseding publication
+              has a live release published.
+            </WarningMessage>
           )}
           <PublicationForm
             publicationId={publicationId}
-            showSupersededBy
+            showSupersededBy={
+              publication.permissions.canUpdatePublicationSupersededBy
+            }
             showTitleInput={publication.permissions.canUpdatePublicationTitle}
             cancelButton={
               <Link

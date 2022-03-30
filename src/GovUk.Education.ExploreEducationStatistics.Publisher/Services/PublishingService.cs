@@ -64,7 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
             await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publicationSlug));
 
-            // Invalidate publication cache for any other affected publications
+            // Invalidate publication cache for superseded publications, as potentially affected. If newly
+            // published release is first Live release for the publication, the superseding is now enforced
             var supersededPublications = await _contentDbContext.Publications
                 .Where(p =>
                     p.SupersededById == _contentDbContext.Publications

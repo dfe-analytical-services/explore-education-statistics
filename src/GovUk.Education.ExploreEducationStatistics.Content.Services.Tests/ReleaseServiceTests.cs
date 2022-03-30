@@ -360,18 +360,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Type = ReleaseType.NationalStatistics
             };
 
-            var supersedingPublication = new Publication
-            {
-                Releases = new List<Release>
-                {
-                    new () { Published = null }
-                }
-            };
             var publication = new Publication
             {
                 Slug = "publication-slug",
-                Releases = ListOf(release1, release2),
-                SupersededBy = supersedingPublication,
+                Releases = ListOf(release1, release2)
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -415,81 +407,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 release1.NextReleaseDate.AssertDeepEqualTo(releases[1].NextReleaseDate);
                 Assert.Equal(release1.Type, releases[1].Type);
                 Assert.Equal(release1.DataLastPublished, releases[1].DataLastPublished);
-                Assert.False(releases[1].LatestRelease);
-            }
-        }
-
-        [Fact]
-        public async Task List_IsSuperseded()
-        {
-            var release1 = new Release
-            {
-                Slug = "release-1",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                ReleaseName = "2020",
-                Published = new DateTime(2020, 1, 1),
-                Type = ReleaseType.NationalStatistics
-            };
-            var release2 = new Release
-            {
-                Slug = "release-2",
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                ReleaseName = "2021",
-                Published = new DateTime(2021, 1, 1),
-                Type = ReleaseType.NationalStatistics
-            };
-
-            var supersedingPublication = new Publication
-            {
-                Releases = new List<Release>
-                {
-                    new () { Published = DateTime.UtcNow }
-                }
-            };
-            var publication = new Publication
-            {
-                Slug = "publication-slug",
-                Releases = ListOf(release1, release2),
-                SupersededBy = supersedingPublication,
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
-            {
-                var service = SetupReleaseService(contentDbContext);
-
-                var result = await service.List(publication.Slug);
-
-                var releases = result.AssertRight();
-
-                Assert.Equal(2, releases.Count);
-
-                // Ordered from most newest to oldest
-                Assert.Equal(release2.Id, releases[0].Id);
-                Assert.Equal(release2.Title, releases[0].Title);
-                Assert.Equal(release2.ReleaseName, releases[0].ReleaseName);
-                Assert.Equal(release2.Slug, releases[0].Slug);
-                Assert.Equal(release2.TimePeriodCoverage.GetEnumLabel(), releases[0].CoverageTitle);
-                Assert.Equal(release2.YearTitle, releases[0].YearTitle);
-                Assert.Equal(release2.Published, releases[0].Published);
-                Assert.Equal(release2.Type, releases[0].Type);
-                Assert.True(releases[0].LatestRelease);
-
-                Assert.Equal(release1.Id, releases[1].Id);
-                Assert.Equal(release1.Title, releases[1].Title);
-                Assert.Equal(release1.ReleaseName, releases[1].ReleaseName);
-                Assert.Equal(release1.Slug, releases[1].Slug);
-                Assert.Equal(release1.TimePeriodCoverage.GetEnumLabel(), releases[1].CoverageTitle);
-                Assert.Equal(release1.YearTitle, releases[1].YearTitle);
-                Assert.Equal(release1.Published, releases[1].Published);
-                Assert.Equal(release1.Type, releases[1].Type);
                 Assert.False(releases[1].LatestRelease);
             }
         }

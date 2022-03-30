@@ -90,17 +90,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .Where(p => p.Slug == publicationSlug)
                 )
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(publication =>
-                    {
-                        var releases = publication.Releases
-                            .Where(release => release.IsLatestPublishedVersionOfRelease())
-                            .OrderByDescending(r => r.Year)
-                            .ThenByDescending(r => r.TimePeriodCoverage)
-                            .Select(release => new ReleaseSummaryViewModel(release))
-                            .ToList();
-
-                        return releases;
-                    }
+                .OnSuccess(publication => publication.Releases
+                    .Where(release => release.IsLatestPublishedVersionOfRelease())
+                    .OrderByDescending(r => r.Year)
+                    .ThenByDescending(r => r.TimePeriodCoverage)
+                    .Select(release => new ReleaseSummaryViewModel(release))
+                    .ToList()
                 );
         }
 
