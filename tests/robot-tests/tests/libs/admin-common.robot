@@ -721,8 +721,9 @@ user removes release access from analyst
 user goes to manage user
     [Arguments]    ${EMAIL_ADDRESS}
     user navigates to admin frontend    %{ADMIN_URL}/administration/users
+    user waits until h1 is visible    Users    %{WAIT_SMALL}
+    user waits until table is visible
     user clicks link    Manage    xpath://td[text()="${EMAIL_ADDRESS}"]/..
-    user waits until page does not contain loading spinner
     # stale element exception if you don't wait until it's enabled
     user waits until element is enabled    css:[name="selectedPublicationId"]
     user waits until element is enabled    css:[name="selectedReleaseId"]

@@ -380,7 +380,11 @@ Edit footnote
     user checks page does not contain    ${FOOTNOTE_ALL_INDICATOR}
 
 Check footnote was updated on data block
+    # set focus to 'data blocks' link to ensure the click doesn't set focus to the data blocks link
+    # This results in a failure whereby the tests stay on the footnote page
+    user sets focus to element    //a[text()="Data blocks"]    //*[@aria-label="Release"]
     user clicks link    Data blocks
+
     user waits until h2 is visible    Data blocks    %{WAIT_SMALL}
 
     user clicks link    Edit block    css:tbody > tr:first-child

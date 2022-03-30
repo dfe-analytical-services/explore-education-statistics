@@ -15,7 +15,6 @@ ${CONTENT_BLOCK_BODY_1}=        Adding some content that is incorrect
 
 *** Test Cases ***
 Create publication
-    [Tags]    HappyPath
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}
     ...    UI test topic %{RUN_IDENTIFIER}
     user clicks link    Create new publication
@@ -23,17 +22,14 @@ Create publication
     user creates publication    ${PUBLICATION_NAME}
 
 Create new release
-    [Tags]    HappyPath
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
     user clicks link    Create new release
     user creates release for publication    ${PUBLICATION_NAME}    Academic Year Q1    2020
 
 Give analyst1 publication owner permissions to work on release
-    [Tags]    HappyPath
     user gives analyst publication owner access    ${PUBLICATION_NAME}
 
 Switch to analyst1 to work on release content blocks
-    [Tags]    HappyPath
     user changes to analyst1
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
@@ -62,7 +58,6 @@ Add first text block
     ...    ${CONTENT_BLOCK_BODY_1}    css:#releaseMainContent
 
 Switch to bau1 to add review comments
-    [Tags]    HappyPath
     user changes to bau1
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
@@ -73,12 +68,10 @@ Switch to bau1 to add review comments
     user clicks link    Edit release
 
 Navigate to content section as bau1
-    [Tags]    HappyPath
     user clicks link    Content
     user closes Set Page View box
 
 Add review comment for first content block
-    [Tags]    HappyPath
     user clicks button    First content section
     user clicks button    Edit block
     # select the text to enable the add comment button
@@ -93,7 +86,6 @@ Add review comment for first content block
     user clicks button    Save & close
 
 Switch to analyst1 and navigate to release
-    [Tags]    HappyPath
     user changes to analyst1
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
@@ -104,12 +96,10 @@ Switch to analyst1 and navigate to release
     user clicks link    Edit release
 
 Navigate to content section to resolve comments
-    [Tags]    HappyPath
     user clicks link    Content
     user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Resolve comments
-    [Tags]    HappyPath
     user closes Set Page View box
     user scrolls to element    testid:accordionSection
     user clicks button    First content section
