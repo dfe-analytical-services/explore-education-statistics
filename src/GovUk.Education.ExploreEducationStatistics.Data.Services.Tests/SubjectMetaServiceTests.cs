@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -1380,7 +1379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                                 new IndicatorMetaViewModel
                                 {
                                     Label = "Indicator 1",
-                                    Unit = "%",
+                                    Unit = Unit.Percent,
                                     Value = indicatorGroups[1].Indicators[0].Id.ToString()
                                 })
                         }
@@ -1393,7 +1392,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                                 new IndicatorMetaViewModel
                                 {
                                     Label = "Indicator 2",
-                                    Unit = "",
+                                    Unit = Unit.Number,
                                     Value = indicatorGroups[0].Indicators[0].Id.ToString()
                                 })
                         }

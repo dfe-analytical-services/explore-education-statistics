@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                                 {
                                     Label = indicator.Label,
                                     Name = indicator.Name,
-                                    Unit = indicator.Unit.GetEnumValue(),
+                                    Unit = indicator.Unit,
                                     Value = indicator.Id.ToString(),
                                     DecimalPlaces = indicator.DecimalPlaces
                                 }

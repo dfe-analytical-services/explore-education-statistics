@@ -20,6 +20,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using static Newtonsoft.Json.JsonConvert;
+using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
@@ -225,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                             {
                                 Label = "A label",
                                 Name = "A name",
-                                Unit = "cm",
+                                Unit = Unit.Percent,
                                 Value = "1234",
                                 DecimalPlaces = 2
                             }

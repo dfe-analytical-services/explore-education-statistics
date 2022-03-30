@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     Label = indicator.Label,
                     Name = indicator.Name,
-                    Unit = indicator.Unit.GetEnumValue(),
+                    Unit = indicator.Unit,
                     Value = indicator.Id.ToString(),
                     DecimalPlaces = indicator.DecimalPlaces
                 })

@@ -25,6 +25,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using static Newtonsoft.Json.JsonConvert;
+using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
 {
@@ -95,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     {
                         Label = "A label",
                         Name = "A name",
-                        Unit = "cm",
+                        Unit = Unit.Percent,
                         Value = "1234",
                         DecimalPlaces = 2
                     }
@@ -268,13 +269,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public void TableBuilderResultViewModel_SerialiseAndDeserialise()
+        public void TableBuilderResultViewModel_SerialiseAndDeserialize()
         {
             var converted = DeserializeObject<TableBuilderResultViewModel>(SerializeObject(_tableBuilderResults));
             converted.AssertDeepEqualTo(_tableBuilderResults);
         }
 
-        private (TableBuilderController controller,
+        private static (TableBuilderController controller,
             (
             Mock<ITableBuilderService> tableBuilderService,
             Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,

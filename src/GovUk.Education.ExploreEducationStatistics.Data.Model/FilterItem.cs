@@ -1,16 +1,16 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class FilterItem : IEquatable<FilterItem>
     {
         public Guid Id { get; set; }
-        public string Label { get; set; }
-        public FilterGroup FilterGroup { get; set; }
+        public string Label { get; set; } = string.Empty;
+        public FilterGroup FilterGroup { get; set; } = null!;
         public Guid FilterGroupId { get; set; }
-        public ICollection<FilterItemFootnote> Footnotes { get; set; }
+        public List<FilterItemFootnote> Footnotes { get; set; } = new();
 
         public FilterItem()
         {
@@ -24,12 +24,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             FilterGroupId = filterGroup.Id;
         }
 
-        public bool Equals(FilterItem other)
+        public bool Equals(FilterItem? other)
         {
             return other?.Id == Id;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
