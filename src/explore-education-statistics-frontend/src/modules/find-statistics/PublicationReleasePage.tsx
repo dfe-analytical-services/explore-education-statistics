@@ -74,7 +74,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
         <div className="govuk-grid-column-two-thirds">
           <div className="dfe-flex dfe-align-items--center dfe-justify-content--space-between govuk-!-margin-bottom-3">
             <div>
-              {release.latestRelease && !release.isSuperseded ? (
+              {release.latestRelease && !release.publication.isSuperseded ? (
                 <Tag className="govuk-!-margin-right-3 govuk-!-margin-bottom-3">
                   This is the latest data
                 </Tag>

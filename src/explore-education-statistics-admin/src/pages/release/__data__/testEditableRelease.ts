@@ -45,7 +45,6 @@ export const testEditableRelease: EditableRelease = {
     ],
   },
   latestRelease: false,
-  isSuperseded: false,
   type: 'OfficialStatistics',
   updates: [
     {

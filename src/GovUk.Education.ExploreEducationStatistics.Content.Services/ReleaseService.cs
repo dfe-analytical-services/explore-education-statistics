@@ -22,7 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
     public class ReleaseService : IReleaseService
     {
-        private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IFileStorageService _fileStorageService;
         private readonly IMethodologyService _methodologyService;
@@ -31,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         private readonly IMapper _mapper;
 
         public ReleaseService(
-            ContentDbContext contentDbContext,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IFileStorageService fileStorageService,
             IMethodologyService methodologyService,
@@ -40,7 +38,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             IMapper mapper)
 
         {
-            _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _fileStorageService = fileStorageService;
             _methodologyService = methodologyService;
@@ -60,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .OnSuccess(cachedRelease =>
                         {
                             var result = new ReleaseViewModel(
-                                _mapper.Map<CachedReleaseViewModel>(cachedRelease),
-                                _mapper.Map<PublicationViewModel>(publication)
+                                cachedRelease,
+                                publication
                             );
 
                             result.Publication.Methodologies = methodologies;
@@ -102,11 +99,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                             .Select(release => new ReleaseSummaryViewModel(release))
                             .ToList();
 
-                        if (IsSuperseded(publication))
-                        {
-                            releases.ForEach(r => r.IsSuperseded = true);
-                        }
-
                         return releases;
                     }
                 );
@@ -119,16 +111,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 ? PublicContentReleasePath(publicationSlug, releaseSlug)
                 : PublicContentLatestReleasePath(publicationSlug);
             return _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
-        }
-
-        private bool IsSuperseded(Publication publication)
-        {
-        return publication.SupersededById != null
-               // To be superseded, superseding publication must have Live release
-               && _contentDbContext.Releases
-                   .Where(r => r.PublicationId == publication.SupersededById)
-                   .ToList()
-                   .Any(r => r.Live);
         }
     }
 }

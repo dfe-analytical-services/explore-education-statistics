@@ -54,6 +54,7 @@ export interface MyPublication {
     canManageExternalMethodology: boolean;
   };
   supersededById?: string;
+  isSuperseded?: boolean;
 }
 
 export interface MyPublicationMethodology {

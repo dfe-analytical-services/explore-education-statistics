@@ -47,7 +47,6 @@ export const testPublication: Publication = {
 
 export const testRelease: Release = {
   latestRelease: true,
-  isSuperseded: false,
   publication: testPublication,
   id: '4fa4fe8e-9a15-46bb-823f-49bf8e0cdec5',
   title: 'Academic Year 2016/17',

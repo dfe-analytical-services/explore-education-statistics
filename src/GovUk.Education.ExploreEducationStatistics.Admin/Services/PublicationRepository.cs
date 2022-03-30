@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToListAsync();
 
             return results
-                .Select(publication => _mapper.Map<MyPublicationViewModel>(publication))
+                .Select(GenerateMyPublicationViewModel)
                 .ToList();
         }
 
@@ -109,7 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var hydratedPublication = await HydratePublicationForPublicationViewModel(_context.Publications)
                 .FirstAsync(p => p.Id == publicationId);
 
-            return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
+            return GenerateMyPublicationViewModel(hydratedPublication);
         }
 
         public async Task<List<Release>> ListActiveReleases(Guid publicationId)
@@ -149,7 +149,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             hydratedPublication.Releases = hydratedPublication.Releases
                 .FindAll(r => releaseIds.Contains(r.Id));
 
-            return _mapper.Map<MyPublicationViewModel>(hydratedPublication);
+            return GenerateMyPublicationViewModel(hydratedPublication);
+        }
+
+        private MyPublicationViewModel GenerateMyPublicationViewModel(Publication publication)
+        {
+            var viewModel = _mapper.Map<MyPublicationViewModel>(publication);
+            viewModel.IsSuperseded = IsSuperseded(publication);
+            return viewModel;
+        }
+
+        private bool IsSuperseded(Publication publication)
+        {
+            return publication.SupersededById != null
+                   // To be superseded, superseding publication must have Live release
+                   && _context.Releases
+                       .Where(r => r.PublicationId == publication.SupersededById)
+                       .ToList()
+                       .Any(r => r.Live);
         }
     }
 }

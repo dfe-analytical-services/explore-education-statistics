@@ -8,6 +8,7 @@ export interface PublicationSummary {
   slug: string;
   type: PublicationType;
   legacyPublicationUrl?: string;
+  isSuperseded: boolean;
 }
 
 export interface PublicationMethodologySummary {

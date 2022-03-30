@@ -43,6 +43,7 @@ describe('DataCataloguePage', () => {
               title: 'Test publication',
               slug: 'test-publication',
               type: 'NationalAndOfficial',
+              isSuperseded: false,
             },
           ],
         },

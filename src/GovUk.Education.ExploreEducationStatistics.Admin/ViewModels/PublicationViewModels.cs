@@ -30,6 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public ContactViewModel Contact { get; set; }
 
         public Guid? SupersededById { get; set; }
+
+        public bool IsSuperseded { get; set; }
     }
 
     public class PublicationSaveViewModel

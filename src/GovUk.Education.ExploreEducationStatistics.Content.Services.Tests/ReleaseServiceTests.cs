@@ -404,7 +404,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(release2.Type, releases[0].Type);
                 Assert.Equal(release2.DataLastPublished, releases[0].DataLastPublished);
                 Assert.True(releases[0].LatestRelease);
-                Assert.False(releases[0].IsSuperseded); // because no Live release on superseding publication
 
                 Assert.Equal(release1.Id, releases[1].Id);
                 Assert.Equal(release1.Title, releases[1].Title);
@@ -417,7 +416,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(release1.Type, releases[1].Type);
                 Assert.Equal(release1.DataLastPublished, releases[1].DataLastPublished);
                 Assert.False(releases[1].LatestRelease);
-                Assert.False(releases[1].IsSuperseded); // because no Live release on superseding publication
             }
         }
 
@@ -483,7 +481,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(release2.Published, releases[0].Published);
                 Assert.Equal(release2.Type, releases[0].Type);
                 Assert.True(releases[0].LatestRelease);
-                Assert.True(releases[0].IsSuperseded);
 
                 Assert.Equal(release1.Id, releases[1].Id);
                 Assert.Equal(release1.Title, releases[1].Title);
@@ -494,7 +491,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(release1.Published, releases[1].Published);
                 Assert.Equal(release1.Type, releases[1].Type);
                 Assert.False(releases[1].LatestRelease);
-                Assert.True(releases[1].IsSuperseded);
             }
         }
 
@@ -618,7 +614,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             IMapper? mapper = null)
         {
             return new(
-                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentDbContext is null
                     ? Mock.Of<IPersistenceHelper<ContentDbContext>>()
                     : new PersistenceHelper<ContentDbContext>(contentDbContext),

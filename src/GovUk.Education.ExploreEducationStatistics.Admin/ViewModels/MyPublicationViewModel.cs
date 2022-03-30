@@ -28,6 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public Guid? SupersededById { get; set; }
 
+        public bool IsSuperseded { get; set; }
+
         public PermissionsSet Permissions { get; set; }
 
         public class PermissionsSet

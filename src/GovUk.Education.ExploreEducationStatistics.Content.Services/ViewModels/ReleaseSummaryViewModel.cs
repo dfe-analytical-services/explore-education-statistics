@@ -32,8 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public bool LatestRelease { get; }
 
-        public bool IsSuperseded { get; set; }
-
         public DateTime? DataLastPublished { get; }
 
         public PublicationSummaryViewModel? Publication { get; }

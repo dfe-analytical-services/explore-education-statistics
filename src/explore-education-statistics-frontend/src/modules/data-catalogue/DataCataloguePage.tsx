@@ -167,6 +167,7 @@ const DataCataloguePage: NextPage<Props> = ({
               releases={state.releases}
               selectedRelease={state.query.release}
               onSubmit={handleReleaseFormSubmit}
+              hideLatestDataTag={state.query.publication?.isSuperseded}
             />
           )}
         </WizardStep>

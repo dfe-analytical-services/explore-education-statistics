@@ -131,7 +131,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .AnyAsync(rf => rf.ReleaseId == release.Id && rf.File.Type == FileType.Data);
         }
 
-        private static PublicationTreeNode BuildPublicationNode(Publication publication)
+        private PublicationTreeNode BuildPublicationNode(Publication publication)
         {
             var latestRelease = publication.LatestPublishedRelease();
             var type = GetPublicationType(latestRelease?.Type);
@@ -144,7 +144,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 Type = type,
                 LegacyPublicationUrl = type == PublicationType.Legacy
                     ? publication.LegacyPublicationUrl?.ToString()
-                    : null
+                    : null,
+                IsSuperseded = IsSuperseded(publication),
             };
         }
 

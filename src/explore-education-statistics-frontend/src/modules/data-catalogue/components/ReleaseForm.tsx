@@ -29,6 +29,7 @@ interface Props {
   initialValues?: { releaseId: string };
   onSubmit: ReleaseFormSubmitHandler;
   options: ReleaseSummary[];
+  hideLatestDataTag?: boolean;
 }
 
 const ReleaseForm = ({
@@ -38,6 +39,7 @@ const ReleaseForm = ({
   },
   onSubmit,
   options,
+  hideLatestDataTag,
   ...stepProps
 }: Props & InjectedWizardProps) => {
   const { isActive, currentStep, stepNumber, goToNextStep } = stepProps;
@@ -48,14 +50,14 @@ const ReleaseForm = ({
         return {
           label: option.title,
           hint:
-            option.latestRelease && !option.isSuperseded ? (
+            option.latestRelease && !hideLatestDataTag ? (
               <Tag strong>This is the latest data</Tag>
             ) : undefined,
           inlineHint: true,
           value: option.id,
         };
       }),
-    [options],
+    [options, hideLatestDataTag],
   );
 
   const handleSubmit = useFormSubmit(

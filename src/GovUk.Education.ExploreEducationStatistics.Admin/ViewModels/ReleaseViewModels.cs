@@ -48,8 +48,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public bool LatestRelease { get; set; }
 
-        public bool IsSuperseded { get; set; }
-
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseType Type { get; set; }
 

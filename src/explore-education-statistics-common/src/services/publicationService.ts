@@ -32,6 +32,8 @@ export interface Publication {
   contact: PublicationContact;
   methodologies: MethodologySummary[];
   externalMethodology?: ExternalMethodology;
+  supersededById?: string;
+  isSuperseded?: boolean;
 }
 
 export interface PublicationSummary {
@@ -98,7 +100,6 @@ export interface Release<
   headlinesSection: ContentSection<ContentBlockType>;
   publication: PublicationType;
   latestRelease: boolean;
-  isSuperseded: boolean;
   nextReleaseDate?: PartialDate;
   relatedInformation: BasicLink[];
   type: ReleaseType;
@@ -121,7 +122,6 @@ export interface ReleaseSummary {
   nextReleaseDate: PartialDate;
   type: ReleaseType;
   latestRelease: boolean;
-  isSuperseded: boolean;
   dataLastPublished: string;
 }
 
