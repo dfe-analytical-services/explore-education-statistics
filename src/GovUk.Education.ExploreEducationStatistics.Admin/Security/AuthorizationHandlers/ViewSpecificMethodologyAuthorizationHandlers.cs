@@ -70,8 +70,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 context.Succeed(requirement);
             }
 
-            // If the user is an PrereleaseViewer of the latest non-Live, Approved Release of the owning Publication
-            // of this Methodology, and the methodology is approved, and the latest release under that publication
+            // If the user is a PrereleaseViewer of the latest non-Live, Approved Release of any Publication
+            // using this Methodology, and the methodology is approved, and the latest release under that publication
             // is within the prerelease time window, they can view it
             if (methodologyVersion.Approved)
             {

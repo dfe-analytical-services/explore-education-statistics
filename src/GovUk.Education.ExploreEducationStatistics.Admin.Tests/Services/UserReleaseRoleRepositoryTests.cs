@@ -1593,9 +1593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static UserReleaseRoleRepository SetupUserReleaseRoleRepository(
-            ContentDbContext contentDbContext,
-            IPreReleaseService? preReleaseService = null)
+        private static UserReleaseRoleRepository SetupUserReleaseRoleRepository(ContentDbContext contentDbContext)
         {
             return new(contentDbContext);
         }

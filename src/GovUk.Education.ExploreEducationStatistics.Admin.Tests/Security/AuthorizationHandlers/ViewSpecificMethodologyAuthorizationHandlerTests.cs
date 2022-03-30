@@ -212,15 +212,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     {
                         ReleaseName = "2000",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
-                        PublicationId = OwningPublication.Id,
+                        Publication = new Publication(),
                     };
 
                     var contentDbContextId = Guid.NewGuid().ToString();
                     await using (var contentDbContext = DbUtils.InMemoryApplicationDbContext(contentDbContextId))
                     {
-                        await contentDbContext.AddRangeAsync(
-                            OwningPublication,
-                            release);
+                        await contentDbContext.AddAsync(release);
                         await contentDbContext.SaveChangesAsync();
                     }
 
@@ -236,27 +234,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                         methodologyRepository.Setup(s =>
                                 s.GetOwningPublication(MethodologyVersion.MethodologyId))
-                            .ReturnsAsync(OwningPublication);
+                            .ReturnsAsync(release.Publication);
 
                         methodologyRepository.Setup(s =>
                                 s.GetAllPublicationIds(MethodologyVersion.MethodologyId))
-                            .ReturnsAsync(new List<Guid> { OwningPublication.Id });
+                            .ReturnsAsync(new List<Guid> { release.Publication.Id });
 
                         userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
-                            UserId, OwningPublication, false);
+                            UserId, release.Publication, false);
 
                         userReleaseRoleRepository
-                            .Setup(s => s.IsUserEditorOrApproverOnLatestRelease(UserId, OwningPublication.Id))
+                            .Setup(s => s.IsUserEditorOrApproverOnLatestRelease(UserId, release.Publication.Id))
                             .ReturnsAsync(false);
 
                         userReleaseRoleRepository
-                            .Setup(s => s.IsUserPrereleaseViewerOnLatestPreReleaseRelease(UserId, OwningPublication.Id))
+                            .Setup(s => s.IsUserPrereleaseViewerOnLatestPreReleaseRelease(UserId, release.Publication.Id))
                             .ReturnsAsync(expectedReleaseRolesToPass.Contains(releaseRole));
 
                         if (releaseRole == PrereleaseViewer)
                         {
                             preReleaseService
-                                .Setup(s => s.GetPreReleaseWindowStatus(It.IsAny<Release>(), It.IsAny<DateTime>()))
+                                .Setup(s => s.GetPreReleaseWindowStatus(
+                                    It.Is<Release>(r => r.Id == release.Id),
+                                    It.IsAny<DateTime>()))
                                 .Returns(new PreReleaseWindowStatus { Access = PreReleaseAccess.Within });
                         }
 
