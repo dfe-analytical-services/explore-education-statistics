@@ -37,7 +37,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
             migrationBuilder.Sql("DROP PROCEDURE InsertObservations");
             migrationBuilder.Sql("DROP TYPE ObservationType");
             migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_TableType_ObservationType.sql");
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{PreviousInsertObservationsMigrationId}_Routine_InsertObservations.sql");
+
+            // Not strictly necessary but the current InsertObservations stored procedure inserts into the Observation
+            // table in the same order as the columns defined in the ObservationType table type with insert statement:
+            //
+            // INSERT INTO Observation SELECT * FROM @Observations
+            //
+            // If the order of the table columns was to ever alter (such as if we decide to drop a column but then
+            // rollback appending it as the last column of the table) the insert would break.
+            //
+            // Change the insert statement to be explicit about the column names and values
+            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_Routine_InsertObservations.sql");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
