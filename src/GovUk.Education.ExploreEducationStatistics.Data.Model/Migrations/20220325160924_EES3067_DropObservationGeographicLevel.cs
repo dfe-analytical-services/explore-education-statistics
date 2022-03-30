@@ -15,8 +15,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Recreate the non clustered index NCI_WI_Observation_SubjectId without the GeographicLevel column
-            migrationBuilder.Sql("CREATE NONCLUSTERED INDEX NCI_WI_Observation_SubjectId ON dbo.Observation (SubjectId) INCLUDE (LocationId, TimeIdentifier, Year) WITH (ONLINE = ON, DROP_EXISTING = ON);");
+            // *** Warning***
+            // This migration depends on the Observation table non-clustered index being rebuilt.
+            // without the GeographicLevel column.
+            // This should be done before deploying the migration otherwise the column will fail to drop.
+            //
+            // Sql:
+            // CREATE NONCLUSTERED INDEX NCI_WI_Observation_SubjectId ON dbo.Observation (SubjectId) INCLUDE (LocationId, TimeIdentifier, Year) WITH (ONLINE = ON, DROP_EXISTING = ON);");
 
             // Drop the index on the GeographicLevel column
             migrationBuilder.DropIndex(
