@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 
@@ -5,6 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 {
     public interface IIndicatorGroupRepository : IRepository<IndicatorGroup, Guid>
     {
-        IEnumerable<IndicatorGroup> GetIndicatorGroups(Guid subjectId);
+        List<IndicatorGroup> GetIndicatorGroups(Guid subjectId);
     }
 }

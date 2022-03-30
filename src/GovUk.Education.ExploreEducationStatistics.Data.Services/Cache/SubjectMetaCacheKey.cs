@@ -2,10 +2,9 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Cache
 {
     public record SubjectMetaCacheKey : IBlobCacheKey
     {

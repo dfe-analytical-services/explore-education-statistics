@@ -142,16 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                         Label = group.Label,
                         Options = group.Indicators
                             .OrderBy(indicator => indicator.Label, LabelComparer)
-                            .Select(
-                                indicator => new IndicatorMetaViewModel
-                                {
-                                    Label = indicator.Label,
-                                    Name = indicator.Name,
-                                    Unit = indicator.Unit,
-                                    Value = indicator.Id.ToString(),
-                                    DecimalPlaces = indicator.DecimalPlaces
-                                }
-                            )
+                            .Select(indicator => new IndicatorMetaViewModel(indicator))
                             .ToList()
                     }
                 );

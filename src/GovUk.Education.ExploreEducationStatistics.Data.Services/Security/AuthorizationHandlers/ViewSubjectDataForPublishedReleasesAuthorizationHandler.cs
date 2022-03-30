@@ -7,10 +7,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers
 {
-    public class ViewSubjectDataRequirement : IAuthorizationRequirement
-    {
-    }
-
     public class ViewSubjectDataForPublishedReleasesAuthorizationHandler : AuthorizationHandler<
         ViewSubjectDataRequirement, Subject>
     {

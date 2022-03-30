@@ -10,7 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interface
     public interface ICacheKeyService
     {
         Task<Either<ActionResult, FastTrackResultsCacheKey>> CreateCacheKeyForFastTrackResults(Guid fastTrackId);
-        Task<Either<ActionResult, SubjectMetaCacheKey>> CreateCacheKeyForSubjectMeta(Guid subjectId);
         Task<Either<ActionResult, ReleaseSubjectsCacheKey>> CreateCacheKeyForReleaseSubjects(Guid releaseId);
     }
 }

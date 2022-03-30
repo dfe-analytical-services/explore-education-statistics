@@ -31,7 +31,7 @@ describe('DownloadTable', () => {
         name: 'characteristic',
         options: [
           new CategoryFilter({
-            value: 'gender_female',
+            value: 'gender-female',
             label: 'Female',
             group: 'Gender',
             category: 'Characteristic',
@@ -42,13 +42,14 @@ describe('DownloadTable', () => {
     indicators: [
       new Indicator({
         label: 'Authorised absence rate',
-        value: 'authAbsRate',
+        value: 'authorised-absence-rate',
         unit: '%',
         name: 'sess_authorised_percent',
       }),
     ],
     locations: [
       new LocationFilter({
+        id: 'england-id',
         value: 'england',
         label: 'England',
         level: 'country',

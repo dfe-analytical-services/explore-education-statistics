@@ -14,11 +14,13 @@ describe('FiltersForm', () => {
   const testSubjectMeta: SubjectMeta = {
     filters: {
       SchoolType: {
+        id: 'school-type',
         totalValue: '',
         hint: 'Filter by school type',
         legend: 'School type',
         options: {
           Default: {
+            id: 'default',
             label: 'Default',
             options: [
               {
@@ -30,16 +32,20 @@ describe('FiltersForm', () => {
                 value: 'special',
               },
             ],
+            order: 0,
           },
         },
         name: 'school_type',
+        order: 0,
       },
       Characteristic: {
+        id: 'characteristic',
         totalValue: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         options: {
           EthnicGroupMajor: {
+            id: 'ethnic-group-major',
             label: 'Ethnic group major',
             options: [
               {
@@ -55,8 +61,10 @@ describe('FiltersForm', () => {
                 value: 'ethnicity-major-asian-total',
               },
             ],
+            order: 0,
           },
           Gender: {
+            id: 'Gender',
             label: 'Gender',
             options: [
               {
@@ -68,8 +76,10 @@ describe('FiltersForm', () => {
                 value: 'gender-male',
               },
             ],
+            order: 1,
           },
           Total: {
+            id: 'total',
             label: 'Total',
             options: [
               {
@@ -77,13 +87,16 @@ describe('FiltersForm', () => {
                 value: 'total',
               },
             ],
+            order: 2,
           },
         },
         name: 'characteristic',
+        order: 1,
       },
     },
     indicators: {
       AbsenceByReason: {
+        id: 'absence-by-reason',
         label: 'Absence by reason',
         options: [
           {
@@ -99,8 +112,10 @@ describe('FiltersForm', () => {
             name: 'sess_unauth_totalreasons',
           },
         ],
+        order: 0,
       },
       AbsenceFields: {
+        id: 'absence-fields',
         label: 'Absence fields',
         options: [
           {
@@ -122,6 +137,7 @@ describe('FiltersForm', () => {
             name: 'sess_unauthorised_percent',
           },
         ],
+        order: 1,
       },
     },
     locations: {},
@@ -136,11 +152,13 @@ describe('FiltersForm', () => {
     ...testSubjectMeta,
     filters: {
       Characteristic: {
+        id: 'characteristic',
         totalValue: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         options: {
           EthnicGroupMajor: {
+            id: 'ethnic-group-major',
             label: 'Ethnic group major',
             options: [
               {
@@ -148,16 +166,20 @@ describe('FiltersForm', () => {
                 value: 'ethnicity-major-black-total',
               },
             ],
+            order: 0,
           },
         },
         name: 'characteristic',
+        order: 0,
       },
       SchoolType: {
+        id: 'school-type',
         totalValue: '',
         hint: 'Filter by school type',
         legend: 'School type',
         options: {
           Default: {
+            id: 'default',
             label: 'Default',
             options: [
               {
@@ -165,16 +187,20 @@ describe('FiltersForm', () => {
                 value: 'state-funded-secondary',
               },
             ],
+            order: 0,
           },
         },
         name: 'school_type',
+        order: 1,
       },
       FilterWithMultipleOptions: {
+        id: 'filter-with-multiple-options',
         totalValue: '',
         hint: 'Filter by Filter With Multiple Options',
         legend: 'Filter With Multiple Options',
         options: {
           OptionGroup1: {
+            id: 'option-group-1',
             label: 'Option group 1',
             options: [
               {
@@ -182,8 +208,10 @@ describe('FiltersForm', () => {
                 value: 'option-group-1-option-1',
               },
             ],
+            order: 0,
           },
           OptionGroup2: {
+            id: 'option-group-2',
             label: 'Option group 2',
             options: [
               {
@@ -195,9 +223,11 @@ describe('FiltersForm', () => {
                 value: 'option-group-2-option-2',
               },
             ],
+            order: 1,
           },
         },
         name: 'characteristic',
+        order: 2,
       },
     },
   };
@@ -206,6 +236,7 @@ describe('FiltersForm', () => {
     ...testSubjectMeta,
     indicators: {
       AbsenceByReason: {
+        id: 'absence-by-reason',
         label: 'Absence by reason',
         options: [
           {
@@ -215,6 +246,7 @@ describe('FiltersForm', () => {
             name: 'sess_auth_excluded',
           },
         ],
+        order: 0,
       },
     },
   };

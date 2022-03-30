@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 
@@ -5,6 +6,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 {
     public interface IFilterRepository : IRepository<Filter, Guid>
     {
-        IEnumerable<Filter> GetFiltersIncludingItems(Guid subjectId);
+        List<Filter> GetFiltersIncludingItems(Guid subjectId);
     }
 }

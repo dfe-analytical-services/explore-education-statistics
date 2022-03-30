@@ -163,8 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
         {
-            var filtersIncludingItems = _filterRepository.GetFiltersIncludingItems(subjectId)
-                .ToList();
+            var filtersIncludingItems = _filterRepository.GetFiltersIncludingItems(subjectId);
 
             var filters = filtersIncludingItems
                 .ToDictionary(filter => filter.Name, filter => filter);

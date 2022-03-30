@@ -65,20 +65,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             Hint = "A hint",
                             Legend = "A legend",
                             Name = "A name",
-                            Options = new Dictionary<string, FilterItemsMetaViewModel>
+                            Options = new Dictionary<string, FilterGroupMetaViewModel>
                             {
                                 {
-                                    "option1", new FilterItemsMetaViewModel
+                                    "option1", new FilterGroupMetaViewModel
                                     {
                                         Label = "filter",
-                                        Options = new List<LabelValue>
+                                        Options = new List<FilterItemMetaViewModel>
                                         {
-                                            new("label", "value")
+                                            new("label", Guid.NewGuid())
                                         }
                                     }
                                 }
                             },
-                            TotalValue = "1234"
+                            TotalValue = Guid.NewGuid()
                         }
                     }
                 },
@@ -97,7 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                         Label = "A label",
                         Name = "A name",
                         Unit = Unit.Percent,
-                        Value = "1234",
+                        Value = Guid.NewGuid(),
                         DecimalPlaces = 2
                     }
                 },
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public void TableBuilderResultViewModel_SerialiseAndDeserialize()
+        public void TableBuilderResultViewModel_SerializeAndDeserialize()
         {
             var converted = DeserializeObject<TableBuilderResultViewModel>(SerializeObject(_tableBuilderResults));
             converted.AssertDeepEqualTo(_tableBuilderResults);

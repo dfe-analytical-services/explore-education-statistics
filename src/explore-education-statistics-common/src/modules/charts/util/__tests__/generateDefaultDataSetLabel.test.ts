@@ -34,6 +34,7 @@ describe('generateDefaultDataSetLabel', () => {
       order: 0,
     }),
     location: new LocationFilter({
+      id: 'location-1-id',
       label: 'Location 1',
       level: 'country',
       value: 'location-1',
@@ -63,6 +64,7 @@ describe('generateDefaultDataSetLabel', () => {
     const label = generateDefaultDataSetLabel(
       testDataSet,
       new LocationFilter({
+        id: 'location-1-id',
         label: 'Location 1',
         level: 'country',
         value: 'location-1',

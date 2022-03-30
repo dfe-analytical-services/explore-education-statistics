@@ -14,6 +14,7 @@ import InsetText from '@common/components/InsetText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import adminTableBuilderService from '@admin/services/tableBuilderService';
 
 import React, { useState } from 'react';
 
@@ -33,13 +34,27 @@ const ReleaseDataReorderSection = ({ releaseId, canUpdateRelease }: Props) => {
   const [reorderingFilters, setReorderingFilters] = useState<Subject>();
   const [reorderingIndicators, setReorderingIndicators] = useState<Subject>();
 
-  const handleSaveFilters = (updatedFilters: UpdateFiltersRequest) => {
+  const handleSaveFilters = (
+    subjectId: string,
+    updatedFilters: UpdateFiltersRequest,
+  ) => {
     setReorderingFilters(undefined);
-    // TO DO: send the update request.
+    adminTableBuilderService.updateFilters(
+      releaseId,
+      subjectId,
+      updatedFilters,
+    );
   };
-  const handleSaveIndicators = (updatedIndicators: UpdateIndicatorsRequest) => {
+  const handleSaveIndicators = (
+    subjectId: string,
+    updatedIndicators: UpdateIndicatorsRequest,
+  ) => {
     setReorderingIndicators(undefined);
-    // TO DO: send the update request.
+    adminTableBuilderService.updateIndicators(
+      releaseId,
+      subjectId,
+      updatedIndicators,
+    );
   };
 
   return (
@@ -108,6 +123,7 @@ const ReleaseDataReorderSection = ({ releaseId, canUpdateRelease }: Props) => {
           <div aria-live="polite">
             {reorderingFilters && (
               <ReorderFiltersList
+                releaseId={releaseId}
                 subject={reorderingFilters}
                 onCancel={() => setReorderingFilters(undefined)}
                 onSave={handleSaveFilters}
@@ -115,6 +131,7 @@ const ReleaseDataReorderSection = ({ releaseId, canUpdateRelease }: Props) => {
             )}
             {reorderingIndicators && (
               <ReorderIndicatorsList
+                releaseId={releaseId}
                 subject={reorderingIndicators}
                 onCancel={() => setReorderingIndicators(undefined)}
                 onSave={handleSaveIndicators}

@@ -32,13 +32,14 @@ describe('DataTableCaption', () => {
     indicators: [
       new Indicator({
         label: 'Authorised absence rate',
-        value: 'authAbsRate',
+        value: 'authorised-absence-rate',
         unit: '%',
         name: 'sess_authorised_percent',
       }),
     ],
     locations: [
       new LocationFilter({
+        id: 'england-id',
         value: 'england',
         label: 'England',
         level: 'country',
@@ -183,21 +184,25 @@ describe('DataTableCaption', () => {
       locations: [
         ...testFullTableMeta.locations,
         new LocationFilter({
+          id: 'barking-and-dagenham-id',
           value: 'barking-and-dagenham',
           label: 'Barking and Dagenham',
           level: 'localAuthority',
         }),
         new LocationFilter({
+          id: 'barnet-id',
           value: 'barnet',
           label: 'Barnet',
           level: 'localAuthority',
         }),
         new LocationFilter({
+          id: 'adur-id',
           value: 'adur',
           label: 'Adur',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
+          id: 'allerdale-id',
           value: 'allerdale',
           label: 'Allerdale',
           level: 'localAuthorityDistrict',
@@ -221,56 +226,67 @@ describe('DataTableCaption', () => {
       locations: [
         ...testFullTableMeta.locations,
         new LocationFilter({
+          id: 'eleven-id',
           value: 'eleven',
           label: 'Eleven',
           level: 'localAuthority',
         }),
         new LocationFilter({
+          id: 'ten-id',
           value: 'ten',
           label: 'Ten',
           level: 'localAuthority',
         }),
         new LocationFilter({
+          id: 'nine-id',
           value: 'nine',
           label: 'Nine',
           level: 'localAuthority',
         }),
         new LocationFilter({
+          id: 'eight-id',
           value: 'eight',
           label: 'Eight',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
+          id: 'seven-id',
           value: 'seven',
           label: 'Seven',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
+          id: 'one-id',
           value: 'one',
           label: 'One',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
+          id: 'two-id',
           value: 'two',
           label: 'Two',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
+          id: 'three-id',
           value: 'three',
           label: 'Three',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
+          id: 'four-id',
           value: 'four',
           label: 'Four',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
+          id: 'five-id',
           value: 'five',
           label: 'Five',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
+          id: 'six-id',
           value: 'six',
           label: 'Six',
           level: 'localAuthorityDistrict',
@@ -319,7 +335,7 @@ describe('DataTableCaption', () => {
         ...testFullTableMeta.indicators,
         new Indicator({
           label: 'Number of authorised absence sessions',
-          value: 'authAbsSess',
+          value: 'authorised-absence-sessions',
           unit: '',
           name: 'sess_authorised',
         }),

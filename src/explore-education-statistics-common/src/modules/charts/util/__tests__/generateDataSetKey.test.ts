@@ -61,6 +61,7 @@ describe('generateDataSetKey', () => {
     const key = generateDataSetKey(
       testDataSet,
       new LocationFilter({
+        id: 'location-1-id',
         value: 'location-1',
         level: 'country',
         label: 'Location 1',

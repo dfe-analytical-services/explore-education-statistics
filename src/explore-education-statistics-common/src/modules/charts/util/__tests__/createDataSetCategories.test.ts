@@ -15,6 +15,7 @@ describe('createDataSetCategories', () => {
           legend: 'Characteristic',
           options: {
             EthnicGroupMajor: {
+              id: 'ethnic-group-major',
               label: 'Ethnic group major',
               options: [
                 {
@@ -26,6 +27,7 @@ describe('createDataSetCategories', () => {
                   value: 'ethnicity-major-black-total',
                 },
               ],
+              order: 0,
             },
           },
           name: 'characteristic',
@@ -36,6 +38,7 @@ describe('createDataSetCategories', () => {
           legend: 'School type',
           options: {
             Default: {
+              id: 'default',
               label: 'Default',
               options: [
                 {
@@ -47,6 +50,7 @@ describe('createDataSetCategories', () => {
                   value: 'state-funded-secondary',
                 },
               ],
+              order: 0,
             },
           },
           name: 'school_type',
@@ -1141,6 +1145,7 @@ describe('createDataSetCategories', () => {
             legend: 'School type',
             options: {
               Default: {
+                id: 'default',
                 label: 'Default',
                 options: [
                   {
@@ -1152,6 +1157,7 @@ describe('createDataSetCategories', () => {
                     value: 'state-funded-secondary',
                   },
                 ],
+                order: 0,
               },
             },
             name: 'school_type',

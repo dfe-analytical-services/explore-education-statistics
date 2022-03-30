@@ -10,17 +10,17 @@ export interface FormattedOption {
   label: string;
 }
 export interface FormattedGroup {
-  id?: string;
+  id: string;
   label: string;
   items: FormattedOption[];
 }
 export interface FormattedFilters {
-  id?: string;
+  id: string;
   label: string;
   groups: FormattedGroup[];
 }
 export interface FormattedIndicators {
-  id?: string;
+  id: string;
   label: string;
   items: FormattedOption[];
 }

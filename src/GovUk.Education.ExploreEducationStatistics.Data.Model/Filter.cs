@@ -31,6 +31,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             FilterGroups = new List<FilterGroup>();
         }
 
+        public Filter Clone()
+        {
+            return (Filter) MemberwiseClone();
+        }
+
         private sealed class IdEqualityComparer : IEqualityComparer<Filter>
         {
             public bool Equals(Filter x, Filter y)

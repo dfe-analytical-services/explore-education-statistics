@@ -24,6 +24,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
@@ -84,18 +85,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 Title = "Test Publication"
             };
-
-            var releaseFile = new ReleaseFile
-            {
-                Name = "Test File"
-            };
-
+            var release = new Release();
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
             };
 
-            var releaseId = Guid.NewGuid();
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
+
+            var releaseFile = new ReleaseFile
+            {
+                Name = "Test File"
+            };
 
             var observations = new List<Observation>();
 
@@ -116,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -136,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
+                    release.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -145,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
+            releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(releaseFile);
 
             subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
@@ -171,7 +176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId,
+                    release.Id,
                     query,
                     observations);
 
@@ -203,10 +208,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task GetSubjectMeta_BoundaryLevelViewModelsReturnedForSubject()
         {
             var publication = new Publication();
-
+            var release = new Release();
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
             };
 
             var observations = ListOf(
@@ -261,8 +272,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             });
 
-            var releaseId = Guid.NewGuid();
-
             var query = new ObservationQueryContext
             {
                 Indicators = new List<Guid>(),
@@ -280,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -312,7 +321,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
+                    release.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -321,7 +330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
+            releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
             subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
@@ -348,7 +357,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId,
+                    release.Id,
                     query,
                     observations);
 
@@ -379,13 +388,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task GetSubjectMeta_HierarchicalLocationViewModelsReturnedForSubject()
         {
             var publication = new Publication();
-
+            var release = new Release();
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
             };
 
-            var releaseId = Guid.NewGuid();
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
 
@@ -504,7 +517,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -534,7 +547,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
+                    release.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -543,7 +556,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
+            releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
             subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
@@ -570,7 +583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId,
+                    release.Id,
                     query,
                     observations);
 
@@ -672,13 +685,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task GetSubjectMeta_HierarchicalLocationViewModelsReturnedForSubject_SpecificBoundaryLevelId()
         {
             var publication = new Publication();
-
+            var release = new Release();
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
             };
 
-            var releaseId = Guid.NewGuid();
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
 
             var observations = ListOf(
                 new Observation
@@ -745,7 +762,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -773,7 +790,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
+                    release.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -804,7 +821,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
+            releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
             subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
@@ -832,7 +849,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId,
+                    release.Id,
                     query,
                     observations);
 
@@ -902,13 +919,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task GetSubjectMeta_LocationsAreDeduplicated_Flat()
         {
             var publication = new Publication();
-
+            var release = new Release();
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
             };
 
-            var releaseId = Guid.NewGuid();
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
 
             var observations = ListOf(
                 new Observation
@@ -959,7 +980,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -990,7 +1011,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             footnoteRepository
                 .Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
+                    release.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -1001,7 +1022,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<Indicator>());
 
             releaseDataFileRepository
-                .Setup(s => s.GetBySubject(releaseId, subject.Id))
+                .Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
             subjectRepository
@@ -1029,7 +1050,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId,
+                    release.Id,
                     query,
                     observations);
 
@@ -1081,13 +1102,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task GetSubjectMeta_LocationsAreDeduplicated_Hierarchy()
         {
             var publication = new Publication();
-
+            var release = new Release();
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
             };
 
-            var releaseId = Guid.NewGuid();
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
 
             var observations = ListOf(
                 new Observation
@@ -1152,7 +1177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1183,7 +1208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             footnoteRepository
                 .Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
+                    release.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -1194,7 +1219,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<Indicator>());
 
             releaseDataFileRepository
-                .Setup(s => s.GetBySubject(releaseId, subject.Id))
+                .Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
             subjectRepository
@@ -1222,7 +1247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId,
+                    release.Id,
                     query,
                     observations);
 
@@ -1284,13 +1309,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task GetSubjectMeta_LocationsForSpecialCases()
         {
             var publication = new Publication();
-
+            var release = new Release();
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
             };
 
-            var releaseId = Guid.NewGuid();
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
             var observations = ListOf(
@@ -1332,7 +1361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1360,7 +1389,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(new List<FilterItem>());
 
             footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
+                    release.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -1369,7 +1398,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
                 .Returns(Enumerable.Empty<Indicator>());
 
-            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
+            releaseDataFileRepository.Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
             subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
@@ -1396,7 +1425,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId,
+                    release.Id,
                     query,
                     observations);
 
@@ -1432,13 +1461,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task GetSubjectMeta_Locations_RegionsOrderedByCode()
         {
             var publication = new Publication();
-
+            var release = new Release();
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
             };
 
-            var releaseId = Guid.NewGuid();
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject
+            };
 
             var observations = ListOf(
                 // Flat Regions
@@ -1538,7 +1571,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                await statisticsDbContext.Subject.AddAsync(subject);
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
                 await statisticsDbContext.SaveChangesAsync();
             }
 
@@ -1570,7 +1603,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             footnoteRepository
                 .Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
+                    release.Id,
                     subject.Id,
                     new List<Guid>(),
                     query.Indicators))
@@ -1581,7 +1614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Returns(Enumerable.Empty<Indicator>());
 
             releaseDataFileRepository
-                .Setup(s => s.GetBySubject(releaseId, subject.Id))
+                .Setup(s => s.GetBySubject(release.Id, subject.Id))
                 .ReturnsAsync(new ReleaseFile());
 
             subjectRepository
@@ -1609,7 +1642,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 );
 
                 var result = await service.GetSubjectMeta(
-                    releaseId,
+                    release.Id,
                     query,
                     observations);
 
@@ -1701,8 +1734,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             return new(
                 contentDbContext ?? InMemoryContentDbContext(),
-                filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
                 boundaryLevelRepository ?? Mock.Of<IBoundaryLevelRepository>(MockBehavior.Strict),
+                filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
                 geoJsonRepository ?? Mock.Of<IGeoJsonRepository>(MockBehavior.Strict),
                 indicatorRepository ?? Mock.Of<IIndicatorRepository>(MockBehavior.Strict),

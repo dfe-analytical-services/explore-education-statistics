@@ -92,7 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
             Release release,
-            ObservationQueryContext queryContext, 
+            ObservationQueryContext queryContext,
             CancellationToken cancellationToken)
         {
             return await _statisticsPersistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)
@@ -104,10 +104,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         return ValidationUtils.ValidationResult(QueryExceedsMaxAllowableTableSize);
                     }
 
-                    var matchedObservationIds = 
+                    var matchedObservationIds =
                         (await _observationService.GetMatchedObservations(queryContext, cancellationToken))
                         .Select(row => row.Id);
-                    
+
                     var observations = await _context
                         .Observation
                         .AsNoTracking()
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         .Include(o => o.FilterItems)
                         .Where(o => matchedObservationIds.Contains(o.Id))
                         .ToListAsync(cancellationToken);
-                    
+
                     if (!observations.Any())
                     {
                         return new TableBuilderResultViewModel();
@@ -123,7 +123,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     return await _resultSubjectMetaService
                         .GetSubjectMeta(
-                            release.Id, 
+                            release.Id,
                             queryContext,
                             observations)
                         .OnSuccess(subjectMetaViewModel =>

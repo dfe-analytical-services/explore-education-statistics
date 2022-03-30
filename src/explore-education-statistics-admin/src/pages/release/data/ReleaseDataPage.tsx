@@ -67,7 +67,6 @@ const ReleaseDataPage = () => {
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
-        {/* EES-1243 
         <TabsSection
           id={releaseDataPageTabIds.reordering}
           title="Reorder filters and indicators"
@@ -78,7 +77,7 @@ const ReleaseDataPage = () => {
             releaseId={releaseId}
             canUpdateRelease={canUpdateRelease}
           />
-        </TabsSection> */}
+        </TabsSection>
       </Tabs>
     </LoadingSpinner>
   );

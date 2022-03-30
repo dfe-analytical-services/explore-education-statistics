@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            // Not directly related to EES-1238 and EES-1243 but corrects nullability of the Name and Label columns,
+            // Not directly related to EES-1238 but corrects nullability of the Name and Label columns,
             // seen after enbabling nullable on types Filter/FilterGroup/FilterItem/IndicatorGroup/Indicator. 
             migrationBuilder.AlterColumn<string>(
                 name: "Label",

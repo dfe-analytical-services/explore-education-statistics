@@ -41,9 +41,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
         /// <returns>a set of <see cref="FilterItem" />s, their <see cref="FilterGroup" />s and
         /// <see cref="Filter" />s</returns>
         IList<FilterItem> GetFilterItemsFromObservationList(IList<Observation> observations);
-
-        FilterItem? GetTotal(Filter filter);
-
-        FilterItem? GetTotal(IEnumerable<FilterItem> filterItems);
     }
 }

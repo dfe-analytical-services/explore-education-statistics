@@ -81,12 +81,14 @@ describe('TableToolWizard', () => {
   const testSubjectMeta: SubjectMeta = {
     filters: {
       Characteristic: {
+        id: 'characteristic',
         totalValue: '',
         hint: 'Filter by pupil characteristic',
         legend: 'Characteristic',
         name: 'characteristic',
         options: {
           EthnicGroupMajor: {
+            id: 'ethnic-group-major',
             label: 'Ethnic group major',
             options: [
               {
@@ -98,16 +100,20 @@ describe('TableToolWizard', () => {
                 value: 'ethnicity-major-black-total',
               },
             ],
+            order: 0,
           },
         },
+        order: 0,
       },
       SchoolType: {
+        id: 'school-type',
         totalValue: '',
         hint: 'Filter by school type',
         legend: 'School type',
         name: 'school_type',
         options: {
           Default: {
+            id: 'default',
             label: 'Default',
             options: [
               {
@@ -119,12 +125,15 @@ describe('TableToolWizard', () => {
                 value: 'state-funded-secondary',
               },
             ],
+            order: 0,
           },
         },
+        order: 1,
       },
     },
     indicators: {
       AbsenceFields: {
+        id: 'absence-fields',
         label: 'Absence fields',
         options: [
           {
@@ -142,6 +151,7 @@ describe('TableToolWizard', () => {
             decimalPlaces: 2,
           },
         ],
+        order: 0,
       },
     },
     locations: {

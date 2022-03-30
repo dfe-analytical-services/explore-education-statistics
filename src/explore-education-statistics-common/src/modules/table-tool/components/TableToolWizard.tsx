@@ -171,6 +171,7 @@ const TableToolWizard = ({
   }) => {
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
       selectedSubjectId,
+      state.query.releaseId,
     );
 
     setReorderedTableHeaders(undefined);
@@ -186,9 +187,12 @@ const TableToolWizard = ({
   };
 
   const handleLocationStepBack = async () => {
-    const { subjectId } = state.query;
+    const { releaseId, subjectId } = state.query;
 
-    const nextSubjectMeta = await tableBuilderService.getSubjectMeta(subjectId);
+    const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
+      subjectId,
+      releaseId,
+    );
 
     updateState(draft => {
       draft.subjectMeta = nextSubjectMeta;
@@ -199,6 +203,7 @@ const TableToolWizard = ({
     locationIds,
   }) => {
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+      releaseId: state.query.releaseId,
       locationIds,
       subjectId: state.query.subjectId,
     });
@@ -236,9 +241,10 @@ const TableToolWizard = ({
   };
 
   const handleTimePeriodStepBack = async () => {
-    const { subjectId, locationIds } = state.query;
+    const { releaseId, subjectId, locationIds } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+      releaseId,
       subjectId,
       locationIds,
     });
@@ -249,12 +255,14 @@ const TableToolWizard = ({
   };
 
   const handleTimePeriodFormSubmit: TimePeriodFormSubmitHandler = async values => {
+    const { releaseId, subjectId, locationIds } = state.query;
     const [startYear, startCode] = parseYearCodeTuple(values.start);
     const [endYear, endCode] = parseYearCodeTuple(values.end);
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
-      locationIds: state.query.locationIds,
-      subjectId: state.query.subjectId,
+      releaseId,
+      subjectId,
+      locationIds,
       timePeriod: {
         startYear,
         startCode,
@@ -298,9 +306,10 @@ const TableToolWizard = ({
   };
 
   const handleFiltersStepBack = async () => {
-    const { subjectId, locationIds, timePeriod } = state.query;
+    const { releaseId, subjectId, locationIds, timePeriod } = state.query;
 
     const nextSubjectMeta = await tableBuilderService.filterSubjectMeta({
+      releaseId,
       subjectId,
       locationIds,
       timePeriod,

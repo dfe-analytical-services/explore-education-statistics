@@ -5,22 +5,26 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.FilterAndIndicatorViewModelBuilders;
+using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -32,91 +36,168 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             GetFilterItems
         }
 
-        private readonly StatisticsDbContext _context;
+        private readonly ContentDbContext _contentDbContext;
+        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IFilterRepository _filterRepository;
+        private readonly IFilterItemRepository _filterItemRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
         private readonly ILocationRepository _locationRepository;
         private readonly ILogger _logger;
         private readonly IObservationService _observationService;
-        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
+        private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly ITimePeriodService _timePeriodService;
-        private readonly IUserService _userService;
         private readonly LocationsOptions _locationOptions;
 
         public SubjectMetaService(
-            StatisticsDbContext context,
+            ContentDbContext contentDbContext,
+            StatisticsDbContext statisticsDbContext,
             IFilterRepository filterRepository,
             IFilterItemRepository filterItemRepository,
             IIndicatorGroupRepository indicatorGroupRepository,
             ILocationRepository locationRepository,
             ILogger<SubjectMetaService> logger,
             IObservationService observationService,
+            IReleaseSubjectRepository releaseSubjectRepository,
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
-            IOptions<LocationsOptions> locationOptions) :
-            base(filterItemRepository)
+            IOptions<LocationsOptions> locationOptions) : base(
+            persistenceHelper,
+            userService)
         {
-            _context = context;
+            _contentDbContext = contentDbContext;
+            _statisticsDbContext = statisticsDbContext;
             _filterRepository = filterRepository;
+            _filterItemRepository = filterItemRepository;
             _indicatorGroupRepository = indicatorGroupRepository;
             _locationRepository = locationRepository;
             _logger = logger;
             _observationService = observationService;
-            _persistenceHelper = persistenceHelper;
+            _releaseSubjectRepository = releaseSubjectRepository;
             _timePeriodService = timePeriodService;
-            _userService = userService;
             _locationOptions = locationOptions.Value;
         }
 
-        public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
+        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(subjectId)
-                .OnSuccess(GetSubjectMetaViewModel);
+            return await CheckSubjectExistsOnLatestPublishedVersion(subjectId)
+                .OnSuccessCombineWith(CreateCacheKeyForSubjectMeta)
+                .OnSuccess(releaseSubjectAndCacheKey =>
+                {
+                    var (releaseSubject, cacheKey) = releaseSubjectAndCacheKey;
+                    return GetSubjectMeta(releaseSubject, cacheKey);
+                });
         }
 
-        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(Guid subjectId)
+        [BlobCache(typeof(SubjectMetaCacheKey))]
+        private Task<SubjectMetaViewModel> GetSubjectMeta(ReleaseSubject releaseSubject, SubjectMetaCacheKey cacheKey)
         {
-            return await _persistenceHelper.CheckEntityExists<Subject>(subjectId)
+            return GetSubjectMetaViewModel(releaseSubject);
+        }
+
+        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(
+            Guid releaseId,
+            Guid subjectId)
+        {
+            return await CheckReleaseSubjectExists(releaseId, subjectId)
                 .OnSuccess(CheckCanViewSubjectData)
                 .OnSuccess(GetSubjectMetaViewModel);
         }
 
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(
-            ObservationQueryContext query, CancellationToken cancellationToken)
+            ObservationQueryContext query,
+            CancellationToken cancellationToken)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
-                .OnSuccess(_ => GetSubjectMetaViewModelFromQuery(query, cancellationToken));
+            return CheckSubjectExistsOnLatestPublishedVersion(query.SubjectId)
+                .OnSuccess(releaseSubject =>
+                    GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
         }
 
         public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(
-            ObservationQueryContext query, CancellationToken cancellationToken)
+            Guid releaseId,
+            ObservationQueryContext query,
+            CancellationToken cancellationToken)
         {
-            return _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
+            return CheckReleaseSubjectExists(releaseId, query.SubjectId)
                 .OnSuccess(CheckCanViewSubjectData)
-                .OnSuccess(_ => GetSubjectMetaViewModelFromQuery(query, cancellationToken));
+                .OnSuccess(releaseSubject =>
+                    GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
         }
 
-        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModel(Subject subject)
+        public async Task<Either<ActionResult, Unit>> UpdateSubjectFilters(
+            Guid releaseId,
+            Guid subjectId,
+            List<FilterUpdateViewModel> request)
         {
-            return new()
+            return await CheckReleaseSubjectExists(releaseId, subjectId)
+                .OnSuccessVoid(async rs =>
+                {
+                    // TODO EES-3345 Validate all entries are present and only entries that relate to the subject
+
+                    // Set the sequence based on the order of filters, filter groups and indicators observed
+                    // in the request
+                    rs.FilterSequence = request.Select(filter =>
+                            new FilterSequenceEntry
+                            {
+                                Id = filter.Id,
+                                ChildSequence = filter.FilterGroups.Select(filterGroup =>
+                                        new FilterGroupSequenceEntry
+                                        {
+                                            Id = filterGroup.Id,
+                                            ChildSequence = filterGroup.FilterItems
+                                        })
+                                    .ToList()
+                            })
+                        .ToList();
+                    await _statisticsDbContext.SaveChangesAsync();
+                });
+        }
+
+        public async Task<Either<ActionResult, Unit>> UpdateSubjectIndicators(
+            Guid releaseId,
+            Guid subjectId,
+            List<IndicatorGroupUpdateViewModel> request)
+        {
+            return await CheckReleaseSubjectExists(releaseId, subjectId)
+                .OnSuccessVoid(async releaseSubject =>
+                {
+                    // TODO EES-3345 Validate all entries are present and only entries that relate to the subject
+
+                    // Set the sequence based on the order of indicator groups and indicators observed
+                    // in the request
+                    releaseSubject.IndicatorSequence = request.Select(indicatorGroup =>
+                            new IndicatorGroupSequenceEntry
+                            {
+                                Id = indicatorGroup.Id,
+                                ChildSequence = indicatorGroup.Indicators
+                            })
+                        .ToList();
+                    await _statisticsDbContext.SaveChangesAsync();
+                });
+        }
+
+        private async Task<SubjectMetaViewModel> GetSubjectMetaViewModel(ReleaseSubject releaseSubject)
+        {
+            return new SubjectMetaViewModel
             {
-                Filters = GetFilters(subject.Id),
-                Indicators = GetIndicators(subject.Id),
-                Locations = await GetLocations(subject.Id),
-                TimePeriod = GetTimePeriods(subject.Id)
+                Filters = GetFilters(releaseSubject),
+                Indicators = GetIndicators(releaseSubject),
+                Locations = await GetLocations(releaseSubject.SubjectId),
+                TimePeriod = GetTimePeriods(releaseSubject.SubjectId)
             };
         }
 
         private async Task<SubjectMetaViewModel> GetSubjectMetaViewModelFromQuery(
             ObservationQueryContext query,
+            ReleaseSubject releaseSubject,
             CancellationToken cancellationToken)
         {
             SubjectMetaQueryStep? subjectMetaStep = null;
             if (!query.LocationIds.IsNullOrEmpty() && query.TimePeriod == null)
             {
                 subjectMetaStep = SubjectMetaQueryStep.GetTimePeriods;
-            } else if (query.TimePeriod != null && query.Filters == null)
+            }
+            else if (query.TimePeriod != null && query.Filters == null)
             {
                 subjectMetaStep = SubjectMetaQueryStep.GetFilterItems;
             }
@@ -129,15 +210,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     var stopwatch = Stopwatch.StartNew();
 
-                    var observations = _context
+                    var observations = _statisticsDbContext
                         .Observation
                         .AsNoTracking()
                         .Where(o => o.SubjectId == query.SubjectId && query.LocationIds.Contains(o.LocationId));
-                    
+
                     var timePeriods = GetTimePeriods(observations);
-                        
+
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                    
+
                     return new SubjectMetaViewModel
                     {
                         TimePeriod = timePeriods
@@ -147,21 +228,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 case SubjectMetaQueryStep.GetFilterItems:
                 {
                     var stopwatch = Stopwatch.StartNew();
-                    
-                    var observations = 
+
+                    var observations =
                         await _observationService.GetMatchedObservations(query, cancellationToken);
                     _logger.LogTrace("Got Observations in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
-                    
-                    var filterItems = await 
+
+                    var filterItems = await
                         _filterItemRepository.GetFilterItemsFromMatchedObservationIds(query.SubjectId, observations);
-                    var filters = BuildFilterHierarchy(filterItems);
+                    var filters =
+                        FiltersViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
+                            releaseSubject.FilterSequence);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var indicators = GetIndicators(query.SubjectId);
+                    var indicators = GetIndicators(releaseSubject);
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
-                    
+
                     return new SubjectMetaViewModel
                     {
                         Filters = filters,
@@ -169,27 +252,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     };
                 }
                 default:
-                    throw new ArgumentOutOfRangeException($"{nameof(subjectMetaStep)}", 
+                    throw new ArgumentOutOfRangeException($"{nameof(subjectMetaStep)}",
                         "Unable to determine which SubjectMeta information has requested");
             }
         }
 
-        private Dictionary<string, FilterMetaViewModel> GetFilters(Guid subjectId)
+        private Dictionary<string, FilterMetaViewModel> GetFilters(ReleaseSubject releaseSubject)
         {
-            return _filterRepository.GetFiltersIncludingItems(subjectId)
-                .ToDictionary(
-                    filter => filter.Label.PascalCase(),
-                    filter => new FilterMetaViewModel
-                    {
-                        Hint = filter.Hint,
-                        Legend = filter.Label,
-                        Options = filter.FilterGroups
-                            .OrderBy(filterGroup => filterGroup.Label, LabelComparer)
-                            .ToDictionary(
-                                filterGroup => filterGroup.Label.PascalCase(),
-                                filterGroup => BuildFilterItemsViewModel(filterGroup, filterGroup.FilterItems)),
-                        TotalValue = GetTotalValue(filter)
-                    });
+            var filters = _filterRepository.GetFiltersIncludingItems(releaseSubject.SubjectId);
+            return FiltersViewModelBuilder.BuildFilters(filters, releaseSubject.FilterSequence);
         }
 
         private TimePeriodsMetaViewModel GetTimePeriods(Guid subjectId)
@@ -207,23 +278,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private async Task<Dictionary<string, LocationsMetaViewModel>> GetLocations(Guid subjectId)
         {
             var locations = await _locationRepository.GetDistinctForSubject(subjectId);
-            var locationsHierarchical = 
+            var locationsHierarchical =
                 locations.GetLocationAttributesHierarchical(_locationOptions.Hierarchies);
             return BuildLocationAttributeViewModels(locationsHierarchical);
         }
 
-        private Dictionary<string, IndicatorsMetaViewModel> GetIndicators(Guid subjectId)
+        private Dictionary<string, IndicatorGroupMetaViewModel> GetIndicators(ReleaseSubject releaseSubject)
         {
-            return _indicatorGroupRepository.GetIndicatorGroups(subjectId)
-                .OrderBy(group => group.Label, LabelComparer)
-                .ToDictionary(
-                    group => group.Label.PascalCase(),
-                    group => new IndicatorsMetaViewModel
-                    {
-                        Label = group.Label,
-                        Options = BuildIndicatorViewModels(group.Indicators)
-                    }
-                );
+            var indicators = _indicatorGroupRepository.GetIndicatorGroups(releaseSubject.SubjectId);
+            return IndicatorsViewModelBuilder.BuildIndicatorGroups(indicators,
+                releaseSubject.IndicatorSequence);
         }
 
         private static Dictionary<string, LocationsMetaViewModel> BuildLocationAttributeViewModels(
@@ -292,19 +356,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             };
         }
 
-        private string GetTotalValue(Filter filter)
+        private async Task<Either<ActionResult, ReleaseSubject>> CheckSubjectExistsOnLatestPublishedVersion(
+            Guid subjectId)
         {
-            return _filterItemRepository.GetTotal(filter)?.Id.ToString() ?? string.Empty;
+            return await _releaseSubjectRepository.GetReleaseSubjectForLatestPublishedVersion(subjectId) ??
+                   new Either<ActionResult, ReleaseSubject>(new NotFoundResult());
         }
 
-        private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
+        private async Task<Either<ActionResult, SubjectMetaCacheKey>> CreateCacheKeyForSubjectMeta(
+            ReleaseSubject releaseSubject)
         {
-            if (await _userService.MatchesPolicy(subject, CanViewSubjectData))
-            {
-                return subject;
-            }
+            var release = await _contentDbContext
+                .Releases
+                .Include(release => release.Publication)
+                .SingleAsync(release => release.Id == releaseSubject.ReleaseId);
 
-            return new ForbidResult();
+            return new SubjectMetaCacheKey(release.Publication.Slug, release.Slug, releaseSubject.SubjectId);
         }
     }
 }
