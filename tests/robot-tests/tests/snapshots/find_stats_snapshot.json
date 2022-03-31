@@ -344,6 +344,9 @@
             "publication_type_heading": "National and official statistics",
             "publications": [
               {
+                "publication_heading": "Further education skills index"
+              },
+              {
                 "publication_heading": "Further education: outcome-based success measures"
               }
             ]
@@ -534,6 +537,14 @@
             "publications": [
               {
                 "publication_heading": "Schools, pupils and their characteristics"
+              }
+            ]
+          },
+          {
+            "publication_type_heading": "Experimental statistics",
+            "publications": [
+              {
+                "publication_heading": "National Tutoring Programme"
               }
             ]
           },
