@@ -2,7 +2,7 @@ import LegacyReleasesTable from '@admin/pages/publication/components/LegacyRelea
 import _legacyReleaseService from '@admin/services/legacyReleaseService';
 import { MyPublication } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
-import { MemoryRouter, Router } from 'react-router';
+import { Router } from 'react-router';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
 import React from 'react';
@@ -73,7 +73,7 @@ describe('LegacyReleasesTable', () => {
     expect(within(row2Cells[3]).getByRole('button', { name: 'Edit release' }));
     expect(
       within(row2Cells[3]).getByRole('button', { name: 'Delete release' }),
-    );
+    ).toBeInTheDocument();
 
     const row3Cells = within(rows[2]).getAllByRole('cell');
     expect(row3Cells[0]).toHaveTextContent('2');
@@ -82,7 +82,7 @@ describe('LegacyReleasesTable', () => {
     expect(within(row3Cells[3]).getByRole('button', { name: 'Edit release' }));
     expect(
       within(row3Cells[3]).getByRole('button', { name: 'Delete release' }),
-    );
+    ).toBeInTheDocument();
 
     const row4Cells = within(rows[3]).getAllByRole('cell');
     expect(row4Cells[0]).toHaveTextContent('1');
@@ -91,10 +91,14 @@ describe('LegacyReleasesTable', () => {
     expect(within(row4Cells[3]).getByRole('button', { name: 'Edit release' }));
     expect(
       within(row4Cells[3]).getByRole('button', { name: 'Delete release' }),
-    );
+    ).toBeInTheDocument();
 
-    expect(screen.getByRole('button', { name: 'Create legacy release' }));
-    expect(screen.getByRole('button', { name: 'Reorder legacy releases' }));
+    expect(
+      screen.getByRole('button', { name: 'Create legacy release' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Reorder legacy releases' }),
+    ).toBeInTheDocument();
   });
 
   describe('editing', () => {
@@ -109,15 +113,17 @@ describe('LegacyReleasesTable', () => {
         screen.getAllByRole('button', { name: 'Edit release' })[0],
       );
       await waitFor(() => {
-        expect(screen.getByText('Warning'));
+        expect(screen.getByText('Warning')).toBeInTheDocument();
       });
+      const modal = within(screen.getByRole('dialog'));
+      expect(modal.getByRole('heading', { name: 'Edit legacy release' }));
       expect(
-        screen.getByText(
+        modal.getByText(
           'All changes made to legacy releases appear immediately on the public website.',
         ),
-      );
-      expect(screen.getByRole('button', { name: 'Cancel' }));
-      expect(screen.getByRole('button', { name: 'OK' }));
+      ).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'OK' })).toBeInTheDocument();
     });
 
     test('goes to the edit page when OK is clicked', async () => {
@@ -131,10 +137,10 @@ describe('LegacyReleasesTable', () => {
         screen.getAllByRole('button', { name: 'Edit release' })[0],
       );
       await waitFor(() => {
-        expect(screen.getByText('Warning'));
+        expect(screen.getByText('Edit legacy release')).toBeInTheDocument();
       });
-
-      userEvent.click(screen.getByRole('button', { name: 'OK' }));
+      const modal = within(screen.getByRole('dialog'));
+      userEvent.click(modal.getByRole('button', { name: 'OK' }));
 
       await waitFor(() => {
         expect(history.location.pathname).toBe(
@@ -151,20 +157,21 @@ describe('LegacyReleasesTable', () => {
         screen.getAllByRole('button', { name: 'Delete release' })[0],
       );
       await waitFor(() => {
-        expect(screen.getByText('Delete legacy release'));
+        expect(screen.getByText('Delete legacy release')).toBeInTheDocument();
       });
+      const modal = within(screen.getByRole('dialog'));
       expect(
-        screen.getByText(
-          'Are you sure you want to delete this legacy release?',
-        ),
-      );
+        modal.getByText('Are you sure you want to delete this legacy release?'),
+      ).toBeInTheDocument();
       expect(
-        screen.getByText(
+        modal.getByText(
           'All changes made to legacy releases appear immediately on the public website.',
         ),
-      );
-      expect(screen.getByRole('button', { name: 'Cancel' }));
-      expect(screen.getByRole('button', { name: 'Confirm' }));
+      ).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+      expect(
+        modal.getByRole('button', { name: 'Confirm' }),
+      ).toBeInTheDocument();
     });
 
     test('sends the delete request and updates the releases table when confirm is clicked', async () => {
@@ -173,19 +180,21 @@ describe('LegacyReleasesTable', () => {
         screen.getAllByRole('button', { name: 'Delete release' })[0],
       );
       await waitFor(() => {
-        expect(screen.getByText('Delete legacy release'));
+        expect(screen.getByText('Delete legacy release')).toBeInTheDocument();
       });
-      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      const modal = within(screen.getByRole('dialog'));
+      userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
       expect(legacyReleaseService.deleteLegacyRelease).toHaveBeenCalledWith(
         testPublication.legacyReleases[0].id,
       );
 
+      const table = within(screen.getByRole('table'));
       await waitFor(() => {
-        const table = screen.getByRole('table');
-        const rows = within(table).getAllByRole('row');
-        expect(rows).toHaveLength(3);
+        expect(table.queryByText('Legacy release 3')).not.toBeInTheDocument();
       });
+      const rows = table.getAllByRole('row');
+      expect(rows).toHaveLength(3);
     });
   });
 
@@ -201,16 +210,19 @@ describe('LegacyReleasesTable', () => {
         screen.getByRole('button', { name: 'Create legacy release' }),
       );
       await waitFor(() => {
-        expect(screen.getByText('Warning'));
+        expect(screen.getByText('Warning')).toBeInTheDocument();
       });
+      const modal = within(screen.getByRole('dialog'));
+      expect(modal.getByRole('heading', { name: 'Create legacy release' }));
       expect(
-        screen.getByText(
+        modal.getByText(
           'All changes made to legacy releases appear immediately on the public website.',
         ),
-      );
-      expect(screen.getByRole('button', { name: 'Cancel' }));
-      expect(screen.getByRole('button', { name: 'OK' }));
+      ).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'OK' })).toBeInTheDocument();
     });
+
     test('goes to the create page when OK is clicked', async () => {
       const history = createMemoryHistory();
       render(
@@ -222,10 +234,10 @@ describe('LegacyReleasesTable', () => {
         screen.getByRole('button', { name: 'Create legacy release' }),
       );
       await waitFor(() => {
-        expect(screen.getByText('Warning'));
+        expect(screen.getByText('Warning')).toBeInTheDocument();
       });
-      userEvent.click(screen.getByRole('button', { name: 'OK' }));
-
+      const modal = within(screen.getByRole('dialog'));
+      userEvent.click(modal.getByRole('button', { name: 'OK' }));
       await waitFor(() => {
         expect(history.location.pathname).toBe(
           `/publication/${testPublication.id}/legacy-releases/create`,
@@ -241,15 +253,17 @@ describe('LegacyReleasesTable', () => {
         screen.getByRole('button', { name: 'Reorder legacy releases' }),
       );
       await waitFor(() => {
-        expect(screen.getByText('Warning'));
+        expect(screen.getByText('Warning')).toBeInTheDocument();
       });
+      const modal = within(screen.getByRole('dialog'));
+      expect(modal.getByRole('heading', { name: 'Reorder legacy releases' }));
       expect(
-        screen.getByText(
+        modal.getByText(
           'All changes made to legacy releases appear immediately on the public website.',
         ),
-      );
-      expect(screen.getByRole('button', { name: 'Cancel' }));
-      expect(screen.getByRole('button', { name: 'OK' }));
+      ).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+      expect(modal.getByRole('button', { name: 'OK' })).toBeInTheDocument();
     });
 
     test('shows the reordering UI when OK is clicked', async () => {
@@ -258,16 +272,21 @@ describe('LegacyReleasesTable', () => {
         screen.getByRole('button', { name: 'Reorder legacy releases' }),
       );
       await waitFor(() => {
-        expect(screen.getByText('Warning'));
+        expect(screen.getByText('Warning')).toBeInTheDocument();
       });
-      userEvent.click(screen.getByRole('button', { name: 'OK' }));
+      const modal = within(screen.getByRole('dialog'));
+      userEvent.click(modal.getByRole('button', { name: 'OK' }));
 
       await waitFor(() => {
-        expect(screen.getByText('Sort'));
+        expect(screen.getByText('Sort')).toBeInTheDocument();
       });
 
-      expect(screen.getByRole('button', { name: 'Confirm order' }));
-      expect(screen.getByRole('button', { name: 'Cancel reordering' }));
+      expect(
+        screen.getByRole('button', { name: 'Confirm order' }),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: 'Cancel reordering' }),
+      ).toBeInTheDocument();
 
       expect(
         screen.queryByRole('button', { name: 'Edit release' }),
