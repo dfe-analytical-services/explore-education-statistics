@@ -74,13 +74,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
+                    var contentSections = release
+                        .GenericContent
+                        .ToList();
+
                     newSectionOrder.ToList().ForEach(kvp =>
                     {
                         var (sectionId, newOrder) = kvp;
-                        release
-                            .GenericContent
-                            .ToList()
-                            .Find(section => section.Id == sectionId).Order = newOrder;
+
+                        var matchingSection = contentSections.Find(section => section.Id == sectionId);
+
+                        if (matchingSection is not null)
+                        {
+                            matchingSection.Order = newOrder;
+                        }
                     });
 
                     _context.Releases.Update(release);
@@ -179,7 +186,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
         }
 
-        public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
+        public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
+            Guid releaseId,
+            Guid contentSectionId,
+            Dictionary<Guid, int> newBlocksOrder)
         {
             return
                 CheckContentSectionExists(releaseId, contentSectionId)
@@ -191,7 +201,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         newBlocksOrder.ToList().ForEach(kvp =>
                         {
                             var (blockId, newOrder) = kvp;
-                            section.Content.Find(block => block.Id == blockId).Order = newOrder;
+
+                            var matchingBlock = section.Content.Find(block => block.Id == blockId);
+
+                            if (matchingBlock is not null)
+                            {
+                                matchingBlock.Order = newOrder;
+                            }
                         });
 
                         _context.ContentSections.Update(section);
