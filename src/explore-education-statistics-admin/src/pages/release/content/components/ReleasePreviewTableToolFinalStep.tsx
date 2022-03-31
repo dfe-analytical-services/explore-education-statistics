@@ -7,7 +7,7 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useRef } from 'react';
 
 interface ReleasePreviewTableToolFinalStepProps {
   publication?: BasicPublicationDetails;
@@ -24,13 +24,6 @@ const ReleasePreviewTableToolFinalStep = ({
   onReorderTableHeaders,
 }: ReleasePreviewTableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
-  const [currentTableHeaders, setCurrentTableHeaders] = useState<
-    TableHeadersConfig
-  >(tableHeaders);
-
-  useEffect(() => {
-    setCurrentTableHeaders(tableHeaders);
-  }, [tableHeaders]);
 
   const getMethodologyLinks = () => {
     const links: ReactNode[] =
@@ -52,9 +45,8 @@ const ReleasePreviewTableToolFinalStep = ({
   return (
     <div className="govuk-!-margin-bottom-4">
       <TableHeadersForm
-        initialValues={currentTableHeaders}
+        initialValues={tableHeaders}
         onSubmit={nextTableHeaders => {
-          setCurrentTableHeaders(nextTableHeaders);
           onReorderTableHeaders(nextTableHeaders);
 
           if (dataTableRef.current) {
@@ -65,12 +57,12 @@ const ReleasePreviewTableToolFinalStep = ({
           }
         }}
       />
-      {table && currentTableHeaders && (
+      {table && tableHeaders && (
         <TimePeriodDataTable
           ref={dataTableRef}
           fullTable={table}
           query={query}
-          tableHeadersConfig={currentTableHeaders}
+          tableHeadersConfig={tableHeaders}
         />
       )}
       {publication && table && (

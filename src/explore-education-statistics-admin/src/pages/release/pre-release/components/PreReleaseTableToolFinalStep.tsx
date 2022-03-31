@@ -9,7 +9,7 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
-import React, { memo, useEffect, useRef, useState } from 'react';
+import React, { memo, useRef } from 'react';
 import { generatePath } from 'react-router-dom';
 
 interface TableToolFinalStepProps {
@@ -30,20 +30,12 @@ const PreReleaseTableToolFinalStep = ({
   onReorderTableHeaders,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
-  const [currentTableHeaders, setCurrentTableHeaders] = useState<
-    TableHeadersConfig
-  >(tableHeaders);
-
-  useEffect(() => {
-    setCurrentTableHeaders(tableHeaders);
-  }, [tableHeaders]);
 
   return (
     <div className="govuk-!-margin-bottom-4">
       <TableHeadersForm
-        initialValues={currentTableHeaders}
+        initialValues={tableHeaders}
         onSubmit={nextTableHeaders => {
-          setCurrentTableHeaders(nextTableHeaders);
           onReorderTableHeaders(nextTableHeaders);
           if (dataTableRef.current) {
             dataTableRef.current.scrollIntoView({
@@ -53,12 +45,12 @@ const PreReleaseTableToolFinalStep = ({
           }
         }}
       />
-      {table && currentTableHeaders && (
+      {table && tableHeaders && (
         <TimePeriodDataTable
           ref={dataTableRef}
           query={query}
           fullTable={table}
-          tableHeadersConfig={currentTableHeaders}
+          tableHeadersConfig={tableHeaders}
         />
       )}
 

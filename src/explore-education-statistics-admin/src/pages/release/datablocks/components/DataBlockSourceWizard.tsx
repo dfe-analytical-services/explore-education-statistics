@@ -14,13 +14,7 @@ import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import WarningMessage from '@common/components/WarningMessage';
-import React, {
-  createRef,
-  memo,
-  useCallback,
-  useEffect,
-  useState,
-} from 'react';
+import React, { createRef, memo, useCallback, useState } from 'react';
 
 export type DataBlockSourceWizardSaveHandler = (params: {
   details: DataBlockDetailsFormValues;
@@ -47,39 +41,29 @@ const DataBlockSourceWizardFinalStep = ({
   onSave,
 }: DataBlockSourceWizardFinalStepProps) => {
   const dataTableRef = createRef<HTMLTableElement>();
-  const [currentTableHeaders, setCurrentTableHeaders] = useState<
-    TableHeadersConfig
-  >(tableHeaders);
   const [captionTitle, setCaptionTitle] = useState<string>(
     dataBlock?.heading ?? '',
   );
-
-  useEffect(() => {
-    // Synchronize table headers if the table
-    // has been changed by the user.
-    setCurrentTableHeaders(tableHeaders);
-  }, [tableHeaders]);
 
   const handleSubmit = useCallback(
     (details: DataBlockDetailsFormValues) => {
       onSave({
         details,
         table,
-        tableHeaders: currentTableHeaders,
+        tableHeaders,
         query,
       });
     },
-    [currentTableHeaders, onSave, query, table],
+    [onSave, query, table, tableHeaders],
   );
 
   return (
     <>
       <div className="govuk-!-margin-bottom-4">
         <TableHeadersForm
-          initialValues={currentTableHeaders}
+          initialValues={tableHeaders}
           id="dataBlockSourceWizard-tableHeadersForm"
           onSubmit={async nextTableHeaders => {
-            setCurrentTableHeaders(nextTableHeaders);
             onReorderTableHeaders(nextTableHeaders);
             if (dataTableRef.current) {
               dataTableRef.current.scrollIntoView({
@@ -95,7 +79,7 @@ const DataBlockSourceWizardFinalStep = ({
           fullTable={table}
           captionTitle={captionTitle}
           query={query}
-          tableHeadersConfig={currentTableHeaders}
+          tableHeadersConfig={tableHeaders}
         />
       </div>
 

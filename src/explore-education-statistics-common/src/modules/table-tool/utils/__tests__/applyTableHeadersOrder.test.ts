@@ -246,7 +246,7 @@ const testIndicators = [
     name: 'Indicator 5 name',
   }),
 ];
-const testHeaders: TableHeadersConfig = {
+const testDefaultBaseHeaders: TableHeadersConfig = {
   columnGroups: [],
   columns: testTimePeriodFilters,
   rowGroups: [],
@@ -254,47 +254,65 @@ const testHeaders: TableHeadersConfig = {
 };
 
 describe('applyTableHeadersOrder', () => {
-  describe('rows', () => {
-    const testReorderedHeadersForRows: TableHeadersConfig = {
-      ...testHeaders,
-      rows: [testIndicators[1], testIndicators[0], testIndicators[2]],
+  test('does not change the ordering when the table has not been reordered', () => {
+    const testHeadersUnorderedHeaders: TableHeadersConfig = {
+      ...testDefaultBaseHeaders,
+      columnGroups: [testLocationFilters, testCategoryFilters1],
+      rowGroups: [testCategoryFilters2, testCategoryFilters2],
     };
+    const result = applyTableHeadersOrder({
+      reorderedTableHeaders: testHeadersUnorderedHeaders,
+      defaultTableHeaders: testHeadersUnorderedHeaders,
+    });
+    expect(result).toEqual(testHeadersUnorderedHeaders);
+  });
 
+  describe('rows', () => {
     test('retains the order of reordered rows', () => {
-      const testUpdatedHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rows: [testIndicators[1], testIndicators[0], testIndicators[2]],
+      };
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rows: [testIndicators[0], testIndicators[1], testIndicators[2]],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRows,
-        updatedTableHeaders: testUpdatedHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
-      expect(result).toEqual(testReorderedHeadersForRows);
+      expect(result).toEqual(testReorderedHeaders);
     });
 
     test('retains the order when rows have been removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rows: [testIndicators[1], testIndicators[0], testIndicators[2]],
+      };
+      // testIndicators[2] removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rows: [testIndicators[0], testIndicators[1]],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rows: [testIndicators[1], testIndicators[0]],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRows,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('adds new rows after reordered rows', () => {
       const testReorderedHeaders: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rows: [testIndicators[3], testIndicators[1], testIndicators[4]],
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      // testIndicators[0] and testIndicators[2] added
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rows: [
           testIndicators[0],
           testIndicators[1],
@@ -304,7 +322,7 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rows: [
           testIndicators[3],
           testIndicators[1],
@@ -315,14 +333,20 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order when rows have been added and removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rows: [testIndicators[1], testIndicators[0], testIndicators[2]],
+      };
+      // testIndicators[3] and testIndicators[4] added
+      // testIndicators[2] removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rows: [
           testIndicators[0],
           testIndicators[1],
@@ -331,7 +355,7 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rows: [
           testIndicators[1],
           testIndicators[0],
@@ -340,19 +364,20 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRows,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('if rows have not been reordered new rows are added in their default positions', () => {
       const testReorderedHeaders: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rows: [testIndicators[2], testIndicators[3]],
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      // testIndicators[0], testIndicators[1] and testIndicators[4] added
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rows: [
           testIndicators[0],
           testIndicators[1],
@@ -363,9 +388,9 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
-      expect(result).toEqual(testUpdatedTableHeaders);
+      expect(result).toEqual(testDefaultTableHeaders);
     });
 
     test('populate rows when the only row group has been removed', () => {
@@ -379,7 +404,8 @@ describe('applyTableHeadersOrder', () => {
         rowGroups: [],
         rows: testCategoryFilters1,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
+      // testCategoryFilters1 removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
         columnGroups: [testLocationFilters],
         columns: testIndicators,
         rowGroups: [testCategoryFilters2],
@@ -393,27 +419,26 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
   });
 
   describe('rows in rowGroups', () => {
-    const testReorderedHeadersForRowsInRowGroups: TableHeadersConfig = {
-      ...testHeaders,
-      rowGroups: [
-        [
-          testCategoryFilters1[2],
-          testCategoryFilters1[0],
-          testCategoryFilters1[1],
-        ],
-      ],
-    };
-
     test('retains the order of rows in rowGroups when rows have not been added or removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rowGroups: [
+          [
+            testCategoryFilters1[2],
+            testCategoryFilters1[0],
+            testCategoryFilters1[1],
+          ],
+        ],
+      };
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rowGroups: [
           [
             testCategoryFilters1[0],
@@ -423,31 +448,53 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRowsInRowGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
-      expect(result).toEqual(testReorderedHeadersForRowsInRowGroups);
+      expect(result).toEqual(testReorderedHeaders);
     });
 
     test('retains the order of rows in rowGroups when rows have been removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rowGroups: [
+          [
+            testCategoryFilters1[2],
+            testCategoryFilters1[0],
+            testCategoryFilters1[1],
+          ],
+        ],
+      };
+      //  testCategoryFilters1[1] removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rowGroups: [[testCategoryFilters1[0], testCategoryFilters1[2]]],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rowGroups: [[testCategoryFilters1[2], testCategoryFilters1[0]]],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRowsInRowGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order of rows in rowGroups when rows have been added', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rowGroups: [
+          [
+            testCategoryFilters1[2],
+            testCategoryFilters1[0],
+            testCategoryFilters1[1],
+          ],
+        ],
+      };
+      // testCategoryFilters1[3] and testCategoryFilters1[4] added
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rowGroups: [
           [
             testCategoryFilters1[0],
@@ -459,7 +506,7 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rowGroups: [
           [
             testCategoryFilters1[2],
@@ -471,15 +518,27 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRowsInRowGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order of rows in rowGroups when rows have been added and removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rowGroups: [
+          [
+            testCategoryFilters1[2],
+            testCategoryFilters1[0],
+            testCategoryFilters1[1],
+          ],
+        ],
+      };
+      // testCategoryFilters1[3] and testCategoryFilters1[4] added
+      // testCategoryFilters1[1] removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rowGroups: [
           [
             testCategoryFilters1[0],
@@ -490,7 +549,7 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rowGroups: [
           [
             testCategoryFilters1[2],
@@ -501,27 +560,26 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRowsInRowGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
   });
 
   describe('rowGroups', () => {
-    const testReorderedHeadersForRowGroups: TableHeadersConfig = {
-      ...testHeaders,
-      rowGroups: [
-        testCategoryFilters2,
-        testLocationFilters,
-        testCategoryFilters1,
-      ],
-      rows: testIndicators,
-    };
-
     test('retains the order of reordered rowGroups', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rowGroups: [
+          testCategoryFilters2,
+          testLocationFilters,
+          testCategoryFilters1,
+        ],
+        rows: testIndicators,
+      };
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rowGroups: [
           testCategoryFilters1,
           testCategoryFilters2,
@@ -530,15 +588,15 @@ describe('applyTableHeadersOrder', () => {
         rows: testIndicators,
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRowGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
-      expect(result).toEqual(testReorderedHeadersForRowGroups);
+      expect(result).toEqual(testReorderedHeaders);
     });
 
     test('retains the order when rowGroups have been removed', () => {
       const testReorderedHeaders: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rowGroups: [
           testLocationFilters,
           testCategoryFilters1,
@@ -546,27 +604,62 @@ describe('applyTableHeadersOrder', () => {
         ],
         rows: testIndicators,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      // testCategoryFilters1 removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rowGroups: [testCategoryFilters2, testLocationFilters],
         rows: testIndicators,
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rowGroups: [testLocationFilters, testCategoryFilters2],
         rows: testIndicators,
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
 
       expect(result).toEqual(expected);
     });
 
-    test('adds new rowGroups after reordered rowGroups', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+    test('handles when all rowGroups have been removed', () => {
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rowGroups: [testCategoryFilters1, testCategoryFilters2, testIndicators],
+        rows: testLocationFilters,
+      };
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rowGroups: [],
+        rows: testCategoryFilters2,
+      };
+      const expected: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rowGroups: [],
+        rows: testCategoryFilters2,
+      };
+      const result = applyTableHeadersOrder({
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
+      });
+
+      expect(result).toEqual(expected);
+    });
+
+    test('adds new row groups after reordered row groups', () => {
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rowGroups: [
+          testCategoryFilters2,
+          testLocationFilters,
+          testCategoryFilters1,
+        ],
+        rows: testIndicators,
+      };
+      // testCategoryFilters3 and testCategoryFilters4 added
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rowGroups: [
           testCategoryFilters1,
           testCategoryFilters2,
@@ -576,8 +669,12 @@ describe('applyTableHeadersOrder', () => {
         ],
         rows: testIndicators,
       };
+      // From a user's perspective there isn't a distinction between rows and rowGroups,
+      // rows is an internal term for the last of the row groups (same for columns).
+      // This means that adding new groups causes rows to change as well as rowGroups,
+      // as the group previously in rows will be shifted into rowGroups
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rowGroups: [
           testCategoryFilters2,
           testLocationFilters,
@@ -588,15 +685,26 @@ describe('applyTableHeadersOrder', () => {
         rows: testCategoryFilters4,
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRowGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order of rowGroups and rows when groups have been added and removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        rowGroups: [
+          testCategoryFilters2,
+          testLocationFilters,
+          testCategoryFilters1,
+        ],
+        rows: testIndicators,
+      };
+      // testCategoryFilters3 and testCategoryFilters4 added
+      // testCategoryFilters2 removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rowGroups: [
           testCategoryFilters1,
           testLocationFilters,
@@ -606,7 +714,7 @@ describe('applyTableHeadersOrder', () => {
         rows: testIndicators,
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rowGroups: [
           testLocationFilters,
           testCategoryFilters1,
@@ -616,20 +724,20 @@ describe('applyTableHeadersOrder', () => {
         rows: testCategoryFilters4,
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRowGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order when the rows group has been moved into rowGroups', () => {
       const testReorderedHeaders: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rowGroups: [testCategoryFilters1, testCategoryFilters2, testIndicators],
         rows: testLocationFilters,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rowGroups: [
           testCategoryFilters1,
           testCategoryFilters2,
@@ -639,37 +747,38 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(testReorderedHeaders);
     });
 
     test('retains order when when the rows group has been moved into rowGroups and a new group has been added as rows', () => {
       const testReorderedHeaders: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rowGroups: [testCategoryFilters2, testIndicators],
         rows: testCategoryFilters1,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      // testCategoryFilters3 added
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rowGroups: [testCategoryFilters1, testIndicators, testCategoryFilters2],
         rows: testCategoryFilters3,
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rowGroups: [testCategoryFilters2, testIndicators, testCategoryFilters1],
         rows: testCategoryFilters3,
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('if rowGroups have not been reordered new rowGroups are added in their default positions', () => {
       const testReorderedHeaders: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         rowGroups: [
           testCategoryFilters3,
           testCategoryFilters4,
@@ -677,8 +786,9 @@ describe('applyTableHeadersOrder', () => {
         ],
         rows: testIndicators,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      // testCategoryFilters1 and testCategoryFilters2 added
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         rowGroups: [
           testCategoryFilters1,
           testCategoryFilters2,
@@ -690,25 +800,24 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
-      expect(result).toEqual(testUpdatedTableHeaders);
+      expect(result).toEqual(testDefaultTableHeaders);
     });
   });
 
   describe('columns', () => {
-    const testReorderedHeadersForColumns: TableHeadersConfig = {
-      ...testHeaders,
-      columns: [
-        testTimePeriodFilters[1],
-        testTimePeriodFilters[0],
-        testTimePeriodFilters[2],
-      ],
-    };
-
     test('retains the order of columns when no options have changed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columns: [
+          testTimePeriodFilters[1],
+          testTimePeriodFilters[0],
+          testTimePeriodFilters[2],
+        ],
+      };
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columns: [
           testTimePeriodFilters[0],
           testTimePeriodFilters[1],
@@ -716,31 +825,49 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForColumns,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
-      expect(result).toEqual(testReorderedHeadersForColumns);
+      expect(result).toEqual(testReorderedHeaders);
     });
 
     test('retains the order of columns when columns have been removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columns: [
+          testTimePeriodFilters[1],
+          testTimePeriodFilters[0],
+          testTimePeriodFilters[2],
+        ],
+      };
+      // testTimePeriodFilters[2] removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columns: [testTimePeriodFilters[0], testTimePeriodFilters[1]],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columns: [testTimePeriodFilters[1], testTimePeriodFilters[0]],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForColumns,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('adds new columns after reordered columns', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columns: [
+          testTimePeriodFilters[1],
+          testTimePeriodFilters[0],
+          testTimePeriodFilters[2],
+        ],
+      };
+      // testTimePeriodFilters[3] and testTimePeriodFilters[4] added
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columns: [
           testTimePeriodFilters[0],
           testTimePeriodFilters[1],
@@ -750,7 +877,7 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columns: [
           testTimePeriodFilters[1],
           testTimePeriodFilters[0],
@@ -760,15 +887,25 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForColumns,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order of columns when columns have been added and removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columns: [
+          testTimePeriodFilters[1],
+          testTimePeriodFilters[0],
+          testTimePeriodFilters[2],
+        ],
+      };
+      // testTimePeriodFilters[3] and testTimePeriodFilters[4] added
+      // testTimePeriodFilters[2] removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columns: [
           testTimePeriodFilters[0],
           testTimePeriodFilters[1],
@@ -777,7 +914,7 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columns: [
           testTimePeriodFilters[1],
           testTimePeriodFilters[0],
@@ -786,8 +923,8 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForColumns,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
@@ -803,7 +940,8 @@ describe('applyTableHeadersOrder', () => {
         ],
         rows: testIndicators,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
+      // testCategoryFilters1 removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
         columnGroups: [testCategoryFilters2],
         columns: testTimePeriodFilters,
         rowGroups: [testLocationFilters],
@@ -817,27 +955,26 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedTableHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
   });
 
   describe('columns in columnGroups', () => {
-    const testReorderedHeadersForColumnsInColumnGroups: TableHeadersConfig = {
-      ...testHeaders,
-      columnGroups: [
-        [
-          testCategoryFilters1[2],
-          testCategoryFilters1[0],
-          testCategoryFilters1[1],
-        ],
-      ],
-    };
-
     test('retains the order of columns in columnGroups when no options have changed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columnGroups: [
+          [
+            testCategoryFilters1[2],
+            testCategoryFilters1[0],
+            testCategoryFilters1[1],
+          ],
+        ],
+      };
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columnGroups: [
           [
             testCategoryFilters1[0],
@@ -847,31 +984,53 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForColumnsInColumnGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
-      expect(result).toEqual(testReorderedHeadersForColumnsInColumnGroups);
+      expect(result).toEqual(testReorderedHeaders);
     });
 
     test('retains the order of columns in columnGroups when columns have been removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columnGroups: [
+          [
+            testCategoryFilters1[2],
+            testCategoryFilters1[0],
+            testCategoryFilters1[1],
+          ],
+        ],
+      };
+      // testCategoryFilters1[1] removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columnGroups: [[testCategoryFilters1[0], testCategoryFilters1[2]]],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columnGroups: [[testCategoryFilters1[2], testCategoryFilters1[0]]],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForColumnsInColumnGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order of columns in columnGroups when columns have been added', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columnGroups: [
+          [
+            testCategoryFilters1[2],
+            testCategoryFilters1[0],
+            testCategoryFilters1[1],
+          ],
+        ],
+      };
+      // testCategoryFilters1[3] and testCategoryFilters1[4] added
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columnGroups: [
           [
             testCategoryFilters1[0],
@@ -883,7 +1042,7 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columnGroups: [
           [
             testCategoryFilters1[2],
@@ -895,15 +1054,27 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForColumnsInColumnGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order of columns in columnGroups when columns have been added and removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columnGroups: [
+          [
+            testCategoryFilters1[2],
+            testCategoryFilters1[0],
+            testCategoryFilters1[1],
+          ],
+        ],
+      };
+      // testCategoryFilters1[3] and testCategoryFilters1[4] added
+      // testCategoryFilters1[1] removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columnGroups: [
           [
             testCategoryFilters1[0],
@@ -914,7 +1085,7 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columnGroups: [
           [
             testCategoryFilters1[2],
@@ -925,27 +1096,26 @@ describe('applyTableHeadersOrder', () => {
         ],
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForColumnsInColumnGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
   });
 
   describe('columnGroups', () => {
-    const testReorderedHeadersForColumnGroups: TableHeadersConfig = {
-      ...testHeaders,
-      columnGroups: [
-        testCategoryFilters2,
-        testLocationFilters,
-        testCategoryFilters1,
-      ],
-      columns: testTimePeriodFilters,
-    };
-
     test('retains the order of columnGroups when no options have changed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columnGroups: [
+          testCategoryFilters2,
+          testLocationFilters,
+          testCategoryFilters1,
+        ],
+        columns: testTimePeriodFilters,
+      };
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columnGroups: [
           testCategoryFilters1,
           testCategoryFilters2,
@@ -954,15 +1124,15 @@ describe('applyTableHeadersOrder', () => {
         columns: testTimePeriodFilters,
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForColumnGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
-      expect(result).toEqual(testReorderedHeadersForColumnGroups);
+      expect(result).toEqual(testReorderedHeaders);
     });
 
     test('retains the order of columnGroups when columnGroups have been removed', () => {
       const testReorderedHeaders: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columnGroups: [
           testLocationFilters,
           testCategoryFilters1,
@@ -970,26 +1140,64 @@ describe('applyTableHeadersOrder', () => {
         ],
         columns: testTimePeriodFilters,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columnGroups: [testCategoryFilters2, testLocationFilters],
         columns: testTimePeriodFilters,
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columnGroups: [testLocationFilters, testCategoryFilters2],
         columns: testTimePeriodFilters,
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
-    test('retains the order of columnGroups when columnGroups have been added', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+    test('handles when all columnGroups have been removed', () => {
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columnGroups: [
+          testLocationFilters,
+          testCategoryFilters1,
+          testTimePeriodFilters,
+        ],
+        columns: testCategoryFilters2,
+      };
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columnGroups: [],
+        columns: testTimePeriodFilters,
+      };
+      const expected: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columnGroups: [],
+        columns: testTimePeriodFilters,
+      };
+      const result = applyTableHeadersOrder({
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
+      });
+
+      expect(result).toEqual(expected);
+    });
+
+    test('retains the order of column groups when column groups have been added', () => {
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columnGroups: [
+          testCategoryFilters2,
+          testLocationFilters,
+          testCategoryFilters1,
+        ],
+        columns: testTimePeriodFilters,
+      };
+      // testCategoryFilters3 and testCategoryFilters4 added
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columnGroups: [
           testCategoryFilters1,
           testCategoryFilters2,
@@ -999,8 +1207,12 @@ describe('applyTableHeadersOrder', () => {
         ],
         columns: testTimePeriodFilters,
       };
+      // From a user's perspective there isn't a distinction between columns and columnGroups,
+      // columns is an internal term for the last of the column groups (same for rows).
+      // This means that adding new groups causes columns to change as well as columnGroups,
+      // as the group previously in columns will be shifted into columnGroups
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columnGroups: [
           testCategoryFilters2,
           testLocationFilters,
@@ -1011,15 +1223,26 @@ describe('applyTableHeadersOrder', () => {
         columns: testCategoryFilters4,
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForColumnGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order of columnGroups and columns when groups have been added and removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testReorderedHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
+        columnGroups: [
+          testCategoryFilters2,
+          testLocationFilters,
+          testCategoryFilters1,
+        ],
+        columns: testTimePeriodFilters,
+      };
+      // testCategoryFilters3 and testCategoryFilters4 added
+      // testCategoryFilters2 removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columnGroups: [
           testCategoryFilters1,
           testLocationFilters,
@@ -1029,7 +1252,7 @@ describe('applyTableHeadersOrder', () => {
         columns: testTimePeriodFilters,
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columnGroups: [
           testLocationFilters,
           testCategoryFilters1,
@@ -1039,15 +1262,15 @@ describe('applyTableHeadersOrder', () => {
         columns: testCategoryFilters4,
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForColumnGroups,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order when the columns group has been moved into columnGroups and nothing has been added or removed', () => {
       const testReorderedHeaders: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columnGroups: [
           testCategoryFilters1,
           testCategoryFilters2,
@@ -1055,8 +1278,8 @@ describe('applyTableHeadersOrder', () => {
         ],
         columns: testLocationFilters,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columnGroups: [
           testCategoryFilters1,
           testCategoryFilters2,
@@ -1066,19 +1289,20 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(testReorderedHeaders);
     });
 
     test('retains order when when the columns group has been moved into columnGroups and a new group has been added as columns', () => {
       const testReorderedHeaders: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columnGroups: [testCategoryFilters2, testTimePeriodFilters],
         columns: testCategoryFilters1,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        ...testHeaders,
+      // testCategoryFilters3 added
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        ...testDefaultBaseHeaders,
         columnGroups: [
           testCategoryFilters1,
           testTimePeriodFilters,
@@ -1087,7 +1311,7 @@ describe('applyTableHeadersOrder', () => {
         columns: testCategoryFilters3,
       };
       const expected: TableHeadersConfig = {
-        ...testHeaders,
+        ...testDefaultBaseHeaders,
         columnGroups: [
           testCategoryFilters2,
           testTimePeriodFilters,
@@ -1097,39 +1321,53 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
   });
 
   describe('mixing up rows and columns', () => {
-    const testReorderedHeadersForRowsAndColumns: TableHeadersConfig = {
-      columnGroups: [
-        testCategoryFilters3,
-        testCategoryFilters1,
-        testCategoryFilters2,
-      ],
-      columns: testTimePeriodFilters,
-      rowGroups: [testLocationFilters],
-      rows: testIndicators,
-    };
     test('retains the order when a rowGroup has been moved to columnGroups and no options have changed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
+      // testCategoryFilters3 moved from rowGroups to columnGroups
+      const testReorderedHeaders: TableHeadersConfig = {
+        columnGroups: [
+          testCategoryFilters3,
+          testCategoryFilters1,
+          testCategoryFilters2,
+        ],
+        columns: testTimePeriodFilters,
+        rowGroups: [testLocationFilters],
+        rows: testIndicators,
+      };
+      const testDefaultTableHeaders: TableHeadersConfig = {
         columnGroups: [testCategoryFilters1, testCategoryFilters2],
         columns: testTimePeriodFilters,
         rowGroups: [testCategoryFilters3, testLocationFilters],
         rows: testIndicators,
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRowsAndColumns,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
-      expect(result).toEqual(testReorderedHeadersForRowsAndColumns);
+      expect(result).toEqual(testReorderedHeaders);
     });
 
     test('retains the order when a rowGroup has been moved to columnGroups and options have been added and removed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
+      // testCategoryFilters3 moved from rowGroups to columnGroups
+      const testReorderedHeaders: TableHeadersConfig = {
+        columnGroups: [
+          testCategoryFilters3,
+          testCategoryFilters1,
+          testCategoryFilters2,
+        ],
+        columns: testTimePeriodFilters,
+        rowGroups: [testLocationFilters],
+        rows: testIndicators,
+      };
+      // testCategoryFilters4 added
+      // testCategoryFilters2 removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
         columnGroups: [testCategoryFilters1],
         columns: testTimePeriodFilters,
         rowGroups: [
@@ -1146,13 +1384,14 @@ describe('applyTableHeadersOrder', () => {
         rows: testCategoryFilters4,
       };
       const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRowsAndColumns,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order when rows has been moved to columnGroups and options have been added and removed', () => {
+      // testIndicators moved from rows to columnGroups
       const testReorderedHeaders: TableHeadersConfig = {
         columnGroups: [
           testIndicators,
@@ -1163,7 +1402,9 @@ describe('applyTableHeadersOrder', () => {
         rowGroups: [testLocationFilters],
         rows: testCategoryFilters3,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
+      // testCategoryFilters4 added
+      // testCategoryFilters3 removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
         columnGroups: [
           testCategoryFilters1,
           testCategoryFilters2,
@@ -1186,19 +1427,20 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order when rows has been moved to columns and options have not changed', () => {
+      // testIndicators moved from rows to columns
       const testReorderedHeaders: TableHeadersConfig = {
         columnGroups: [testCategoryFilters2, testCategoryFilters1],
         columns: testIndicators,
         rowGroups: [testCategoryFilters3, testLocationFilters],
         rows: testTimePeriodFilters,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
+      const testDefaultTableHeaders: TableHeadersConfig = {
         columnGroups: [testCategoryFilters1, testCategoryFilters2],
         columns: testTimePeriodFilters,
         rowGroups: [testCategoryFilters3, testLocationFilters],
@@ -1212,19 +1454,22 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order when rows has been moved to columns and options have been added and removed', () => {
+      // testIndicators moved from rows to columns
       const testReorderedHeaders: TableHeadersConfig = {
         columnGroups: [testCategoryFilters2, testCategoryFilters1],
         columns: testIndicators,
         rowGroups: [testCategoryFilters3, testLocationFilters],
         rows: testTimePeriodFilters,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
+      // testCategoryFilters4 added
+      // testCategoryFilters3 removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
         columnGroups: [
           testCategoryFilters1,
           testCategoryFilters2,
@@ -1246,78 +1491,97 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order when a columnGroup has been moved to rowGroups and no options have changed', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        rowGroups: [testCategoryFilters1, testCategoryFilters2],
+      // testCategoryFilters3 moved from columnGroups to rowGroups
+      const testReorderedHeaders: TableHeadersConfig = {
+        columnGroups: [testLocationFilters],
+        columns: testIndicators,
+        rowGroups: [
+          testCategoryFilters1,
+          testCategoryFilters3,
+          testCategoryFilters2,
+        ],
         rows: testTimePeriodFilters,
+      };
+      const testDefaultTableHeaders: TableHeadersConfig = {
         columnGroups: [testCategoryFilters3, testLocationFilters],
         columns: testIndicators,
-      };
-      const result = applyTableHeadersOrder({
-        reorderedTableHeaders: testReorderedHeadersForRowsAndColumns,
-        updatedTableHeaders: testUpdatedTableHeaders,
-      });
-      expect(result).toEqual(testReorderedHeadersForRowsAndColumns);
-    });
-
-    test('retains the order when a columnGroup has been moved to rowGroups and options have been added and removed', () => {
-      const testReorderedHeaders: TableHeadersConfig = {
-        rowGroups: [testIndicators, testCategoryFilters1, testCategoryFilters2],
+        rowGroups: [testCategoryFilters1, testCategoryFilters2],
         rows: testTimePeriodFilters,
-        columnGroups: [testLocationFilters],
-        columns: testCategoryFilters3,
-      };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        rowGroups: [
-          testCategoryFilters1,
-          testCategoryFilters2,
-          testTimePeriodFilters,
-        ],
-        rows: testCategoryFilters4,
-        columnGroups: [testLocationFilters],
-        columns: testIndicators,
-      };
-      const expected: TableHeadersConfig = {
-        rowGroups: [
-          testIndicators,
-          testCategoryFilters1,
-          testCategoryFilters2,
-          testTimePeriodFilters,
-        ],
-        rows: testCategoryFilters4,
-        columnGroups: [],
-        columns: testLocationFilters,
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
+      });
+      expect(result).toEqual(testReorderedHeaders);
+    });
+
+    test('retains the order when a columnGroup has been moved to rowGroups and options have been added and removed', () => {
+      // testCategoryFilters3 moved from columnGroups to rowGroups
+      const testReorderedHeaders: TableHeadersConfig = {
+        columnGroups: [testLocationFilters],
+        columns: testIndicators,
+        rowGroups: [
+          testCategoryFilters1,
+          testCategoryFilters3,
+          testCategoryFilters2,
+        ],
+        rows: testTimePeriodFilters,
+      };
+      // testCategoryFilters4 added
+      // testCategoryFilters2 removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        columnGroups: [testCategoryFilters3, testLocationFilters],
+        columns: testIndicators,
+        rowGroups: [testCategoryFilters1, testCategoryFilters4],
+        rows: testTimePeriodFilters,
+      };
+
+      const expected: TableHeadersConfig = {
+        columnGroups: [testLocationFilters],
+        columns: testIndicators,
+        rowGroups: [
+          testCategoryFilters1,
+          testCategoryFilters3,
+          testTimePeriodFilters,
+        ],
+        rows: testCategoryFilters4,
+      };
+      const result = applyTableHeadersOrder({
+        reorderedTableHeaders: testReorderedHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order when columns has been moved to rowGroups and options have been added and removed', () => {
+      // testIndicators moved from columns to rowGroups
       const testReorderedHeaders: TableHeadersConfig = {
-        rowGroups: [testIndicators, testCategoryFilters1, testCategoryFilters2],
-        rows: testTimePeriodFilters,
         columnGroups: [testLocationFilters],
         columns: testCategoryFilters3,
+        rowGroups: [testIndicators, testCategoryFilters1, testCategoryFilters2],
+        rows: testTimePeriodFilters,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
+      // testCategoryFilters4 added
+      // testCategoryFilters3 removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
+        columnGroups: [testLocationFilters],
+        columns: testIndicators,
         rowGroups: [
           testCategoryFilters1,
           testCategoryFilters2,
           testTimePeriodFilters,
         ],
         rows: testCategoryFilters4,
-        columnGroups: [testLocationFilters],
-        columns: testIndicators,
       };
       const expected: TableHeadersConfig = {
+        columnGroups: [],
+        columns: testLocationFilters,
         rowGroups: [
           testIndicators,
           testCategoryFilters1,
@@ -1325,50 +1589,52 @@ describe('applyTableHeadersOrder', () => {
           testTimePeriodFilters,
         ],
         rows: testCategoryFilters4,
-        columnGroups: [],
-        columns: testLocationFilters,
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order when columns has been moved to rows and options have not changed', () => {
+      // testIndicators moved from columns to rows
       const testReorderedHeaders: TableHeadersConfig = {
-        rowGroups: [testCategoryFilters2, testCategoryFilters1],
-        rows: testIndicators,
         columnGroups: [testCategoryFilters3, testLocationFilters],
         columns: testTimePeriodFilters,
+        rowGroups: [testCategoryFilters2, testCategoryFilters1],
+        rows: testIndicators,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        rowGroups: [testCategoryFilters1, testCategoryFilters2],
-        rows: testTimePeriodFilters,
+      const testDefaultTableHeaders: TableHeadersConfig = {
         columnGroups: [testCategoryFilters3, testLocationFilters],
         columns: testIndicators,
+        rowGroups: [testCategoryFilters1, testCategoryFilters2],
+        rows: testTimePeriodFilters,
       };
       const expected: TableHeadersConfig = {
-        rowGroups: [testCategoryFilters2, testCategoryFilters1],
-        rows: testIndicators,
         columnGroups: [testCategoryFilters3, testLocationFilters],
         columns: testTimePeriodFilters,
+        rowGroups: [testCategoryFilters2, testCategoryFilters1],
+        rows: testIndicators,
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains the order when columns has been moved to rows and options have been added and removed', () => {
+      // testIndicators moved from columns to rows
       const testReorderedHeaders: TableHeadersConfig = {
         columnGroups: [testCategoryFilters3, testLocationFilters],
         columns: testTimePeriodFilters,
         rowGroups: [testCategoryFilters2, testCategoryFilters1],
         rows: testIndicators,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
+      // testCategoryFilters4 added
+      // testCategoryFilters3 removed
+      const testDefaultTableHeaders: TableHeadersConfig = {
         columnGroups: [testLocationFilters],
         columns: testIndicators,
         rowGroups: [
@@ -1386,12 +1652,13 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(expected);
     });
 
     test('retains order when a reordered group has moved to the other axis', () => {
+      // testCategoryFilters2 moved from columnGroups to rowGroups
       const testReorderedHeaders: TableHeadersConfig = {
         columnGroups: [],
         columns: testTimePeriodFilters,
@@ -1405,7 +1672,7 @@ describe('applyTableHeadersOrder', () => {
         ],
         rows: testIndicators,
       };
-      const testUpdatedTableHeaders: TableHeadersConfig = {
+      const testDefaultTableHeaders: TableHeadersConfig = {
         columnGroups: [
           [
             testCategoryFilters2[0],
@@ -1419,124 +1686,9 @@ describe('applyTableHeadersOrder', () => {
       };
       const result = applyTableHeadersOrder({
         reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
+        defaultTableHeaders: testDefaultTableHeaders,
       });
       expect(result).toEqual(testReorderedHeaders);
-    });
-  });
-
-  describe('saved orders', () => {
-    const testOriginalHeadersForSavedOrder: TableHeadersConfig = {
-      rowGroups: [
-        testCategoryFilters2,
-        testCategoryFilters1,
-        testCategoryFilters3,
-      ],
-      rows: [testIndicators[4], testIndicators[2], testIndicators[0]],
-      columnGroups: [[testTimePeriodFilters[3], testTimePeriodFilters[1]]],
-      columns: testLocationFilters,
-    };
-    const testUpdatedTableHeadersForSavedOrder: TableHeadersConfig = {
-      rowGroups: [testCategoryFilters1, testCategoryFilters2],
-      rows: [testIndicators[0], testIndicators[2], testIndicators[4]],
-      columnGroups: [
-        testCategoryFilters3,
-        [testTimePeriodFilters[1], testTimePeriodFilters[3]],
-      ],
-      columns: testLocationFilters,
-    };
-    test('retains saved order when update without changing options', () => {
-      const result = applyTableHeadersOrder({
-        originalTableHeaders: testOriginalHeadersForSavedOrder,
-        updatedTableHeaders: testUpdatedTableHeadersForSavedOrder,
-      });
-      expect(result).toEqual(testOriginalHeadersForSavedOrder);
-    });
-
-    test('retains saved order when change options', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        rowGroups: [testCategoryFilters2],
-        rows: [testIndicators[0], testIndicators[1], testIndicators[4]],
-        columnGroups: [
-          testCategoryFilters3,
-          [testTimePeriodFilters[1], testTimePeriodFilters[3]],
-          testCategoryFilters4,
-        ],
-        columns: testLocationFilters,
-      };
-      const expected: TableHeadersConfig = {
-        rowGroups: [testCategoryFilters2, testCategoryFilters3],
-        rows: [testIndicators[4], testIndicators[0], testIndicators[1]],
-        columnGroups: [
-          [testTimePeriodFilters[3], testTimePeriodFilters[1]],
-          testLocationFilters,
-        ],
-        columns: testCategoryFilters4,
-      };
-      const result = applyTableHeadersOrder({
-        originalTableHeaders: testOriginalHeadersForSavedOrder,
-        updatedTableHeaders: testUpdatedTableHeaders,
-      });
-      expect(result).toEqual(expected);
-    });
-
-    test('retains correct order when reorder and update without changing options', () => {
-      const testReorderedHeaders: TableHeadersConfig = {
-        rowGroups: [
-          testCategoryFilters3,
-          testCategoryFilters2,
-          testCategoryFilters1,
-        ],
-        rows: [testIndicators[2], testIndicators[4], testIndicators[0]],
-        columnGroups: [testLocationFilters],
-        columns: [testTimePeriodFilters[3], testTimePeriodFilters[1]],
-      };
-
-      const result = applyTableHeadersOrder({
-        originalTableHeaders: testOriginalHeadersForSavedOrder,
-        reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeadersForSavedOrder,
-      });
-      expect(result).toEqual(testReorderedHeaders);
-    });
-
-    test('retains saved order when reorder and change options', () => {
-      const testUpdatedTableHeaders: TableHeadersConfig = {
-        rowGroups: [testCategoryFilters2],
-        rows: [testIndicators[0], testIndicators[1], testIndicators[4]],
-        columnGroups: [
-          testCategoryFilters3,
-          [testTimePeriodFilters[1], testTimePeriodFilters[3]],
-          testCategoryFilters4,
-        ],
-        columns: testLocationFilters,
-      };
-      const testReorderedHeaders: TableHeadersConfig = {
-        rowGroups: [
-          testCategoryFilters3,
-          testCategoryFilters2,
-          testCategoryFilters1,
-        ],
-        rows: [testIndicators[2], testIndicators[4], testIndicators[0]],
-        columnGroups: [testLocationFilters],
-        columns: [testTimePeriodFilters[3], testTimePeriodFilters[1]],
-      };
-      const expected: TableHeadersConfig = {
-        rowGroups: [testCategoryFilters3, testCategoryFilters2],
-        rows: [testIndicators[4], testIndicators[0], testIndicators[1]],
-        columnGroups: [
-          testLocationFilters,
-          [testTimePeriodFilters[3], testTimePeriodFilters[1]],
-        ],
-        columns: testCategoryFilters4,
-      };
-
-      const result = applyTableHeadersOrder({
-        originalTableHeaders: testOriginalHeadersForSavedOrder,
-        reorderedTableHeaders: testReorderedHeaders,
-        updatedTableHeaders: testUpdatedTableHeaders,
-      });
-      expect(result).toEqual(expected);
     });
   });
 });

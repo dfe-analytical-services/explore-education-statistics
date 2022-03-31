@@ -121,9 +121,6 @@ const TableToolWizard = ({
   const [reorderedTableHeaders, setReorderedTableHeaders] = useState<
     TableHeadersConfig
   >();
-  const [updatedTableHeaders, setUpdatedTableHeaders] = useState<
-    TableHeadersConfig
-  >();
 
   const handlePublicationStepBack = () => {
     router.push('/data-tables', undefined, { shallow: true });
@@ -175,6 +172,8 @@ const TableToolWizard = ({
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
       selectedSubjectId,
     );
+
+    setReorderedTableHeaders(undefined);
 
     updateState(draft => {
       draft.subjectMeta = nextSubjectMeta;
@@ -337,7 +336,6 @@ const TableToolWizard = ({
 
     const table = mapFullTable(tableData);
     const tableHeaders = getDefaultTableHeaderConfig(table);
-    setUpdatedTableHeaders(tableHeaders);
 
     if (onSubmit) {
       onSubmit(table);
@@ -353,17 +351,19 @@ const TableToolWizard = ({
   };
 
   const orderedTableHeaders: TableHeadersConfig | undefined = useMemo(() => {
-    return updatedTableHeaders
+    const reorderedOrSavedTableHeaders =
+      reorderedTableHeaders ?? initialState.response?.tableHeaders;
+
+    return state.response?.tableHeaders && reorderedOrSavedTableHeaders
       ? applyTableHeadersOrder({
-          originalTableHeaders: initialState.response?.tableHeaders,
-          reorderedTableHeaders,
-          updatedTableHeaders,
+          reorderedTableHeaders: reorderedOrSavedTableHeaders,
+          defaultTableHeaders: state.response.tableHeaders,
         })
-      : initialState.response?.tableHeaders;
+      : state.response?.tableHeaders;
   }, [
     initialState.response?.tableHeaders,
     reorderedTableHeaders,
-    updatedTableHeaders,
+    state.response?.tableHeaders,
   ]);
 
   return (
