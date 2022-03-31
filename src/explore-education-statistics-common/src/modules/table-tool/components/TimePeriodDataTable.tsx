@@ -16,6 +16,7 @@ import {
   FullTableMeta,
 } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import { Dictionary, PartialBy } from '@common/types';
 import cartesian from '@common/utils/cartesian';
 import formatPretty from '@common/utils/number/formatPretty';
@@ -60,6 +61,54 @@ function getExcludedFilters(
     subjectMetaFilter => !tableHeaderFilters.includes(subjectMetaFilter),
   );
 }
+
+/**
+ * Determines whether any rows or columns are excluded from the table because they have no data.
+ * For filters, indicators and locations:
+ *  - when there's no data, these aren't included in subjectMeta.
+ *  - compare subjectMeta with the query to find the excluded ones.
+ *  For timePeriod:
+ *  - when there's no data, these are in subjectMeta but aren't in tableHeadersConfig.
+ *  - compare subjectMeta with tableHeadersConfig to find the excluded ones.
+ *  - the query isn't useful here as just has the start and end timePeriods.
+ */
+const hasExcludedRowsOrColumns = (
+  query: ReleaseTableDataQuery,
+  subjectMeta: FullTableMeta,
+  tableHeadersConfig: TableHeadersConfig,
+): boolean => {
+  if (
+    query.locationIds.length !== subjectMeta.locations.length ||
+    query.indicators.length !== subjectMeta.indicators.length
+  ) {
+    return true;
+  }
+
+  const subjectMetaFilters = Object.values(subjectMeta.filters)
+    .flatMap(filterGroup => filterGroup.options)
+    .map(filter => filter.id);
+
+  if (query.filters.length !== subjectMetaFilters.length) {
+    return true;
+  }
+
+  const tableHeaderFilters = [
+    ...tableHeadersConfig.columnGroups.flatMap(filterGroup => filterGroup),
+    ...tableHeadersConfig.rowGroups.flatMap(filterGroup => filterGroup),
+    ...tableHeadersConfig.columns,
+    ...tableHeadersConfig.rows,
+  ].map(filter => filter.id);
+
+  if (
+    !subjectMeta.timePeriodRange.every(timePeriod =>
+      tableHeaderFilters.includes(timePeriod.value),
+    )
+  ) {
+    return true;
+  }
+
+  return false;
+};
 
 function getCellText(
   measuresByDataSet: Dictionary<unknown>,
@@ -183,19 +232,21 @@ interface Props {
   captionTitle?: string;
   dataBlockId?: string;
   fullTable: FullTable;
-  tableHeadersConfig: TableHeadersConfig;
+  query?: ReleaseTableDataQuery;
   source?: string;
+  tableHeadersConfig: TableHeadersConfig;
   onError?: (message: string) => void;
 }
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   function TimePeriodDataTable(
     {
-      fullTable,
-      tableHeadersConfig,
       captionTitle,
       dataBlockId,
+      fullTable,
+      query,
       source,
+      tableHeadersConfig,
       onError,
     }: Props,
     dataTableRef,
@@ -334,23 +385,35 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
 
       const rows = filteredCartesian.map(row => row.map(cell => cell.text));
 
+      const showExcludedRowsOrColumnsWarning =
+        query &&
+        hasExcludedRowsOrColumns(query, subjectMeta, tableHeadersConfig);
+
       return (
-        <FixedMultiHeaderDataTable
-          caption={
-            <DataTableCaption
-              {...subjectMeta}
-              title={captionTitle}
-              id={captionId}
-            />
-          }
-          captionId={captionId}
-          columnHeaders={columnHeaders}
-          rowHeaders={rowHeaders}
-          rows={rows}
-          ref={dataTableRef}
-          footnotes={subjectMeta.footnotes}
-          source={source}
-        />
+        <>
+          {showExcludedRowsOrColumnsWarning && (
+            <WarningMessage>
+              Some rows and columns are not shown in this table as the data does
+              not exist in the underlying file.
+            </WarningMessage>
+          )}
+          <FixedMultiHeaderDataTable
+            caption={
+              <DataTableCaption
+                {...subjectMeta}
+                title={captionTitle}
+                id={captionId}
+              />
+            }
+            captionId={captionId}
+            columnHeaders={columnHeaders}
+            rowHeaders={rowHeaders}
+            rows={rows}
+            ref={dataTableRef}
+            footnotes={subjectMeta.footnotes}
+            source={source}
+          />
+        </>
       );
     } catch (error) {
       onError?.(isErrorLike(error) ? error.message : 'Unknown error');
