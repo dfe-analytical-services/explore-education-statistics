@@ -12,6 +12,7 @@ export type MethodologyContextDispatch = (
 export type MethodologyContextState = {
   methodology: MethodologyContent;
   canUpdateMethodology: boolean;
+  isPreRelease?: boolean;
 };
 
 const MethodologyStateContext = createContext<

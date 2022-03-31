@@ -4,10 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -357,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new UserReleaseRoleRepository(contentDbContext);
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.Remove(userReleaseRole, deletedById);
 
                 var updatedReleaseRole = contentDbContext.UserReleaseRoles
@@ -390,7 +391,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new UserReleaseRoleRepository(contentDbContext);
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.Remove(userReleaseRole, deletedById);
 
                 var updatedReleaseRole = contentDbContext.UserReleaseRoles
@@ -399,7 +400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .SingleOrDefault(urr => urr.Id == userReleaseRole.Id);
 
                 Assert.NotNull(updatedReleaseRole);
-                Assert.Equal(userReleaseRole.ReleaseId, updatedReleaseRole.ReleaseId);
+                Assert.Equal(userReleaseRole.ReleaseId, updatedReleaseRole!.ReleaseId);
                 Assert.Equal(userReleaseRole.Role, updatedReleaseRole.Role);
                 Assert.InRange(DateTime.UtcNow.Subtract(updatedReleaseRole.Deleted!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(deletedById, updatedReleaseRole.DeletedById);
@@ -453,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new UserReleaseRoleRepository(contentDbContext);
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.RemoveMany(
                     ListOf(userReleaseRole1, userReleaseRole2, userReleaseRole3),
                     deletedById);
@@ -512,7 +513,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new UserReleaseRoleRepository(contentDbContext);
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.RemoveMany(
                     ListOf(userReleaseRole1, userReleaseRole2, userReleaseRole3),
                     deletedById);
@@ -613,7 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = new UserReleaseRoleRepository(contentDbContext);
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
                 await service.RemoveAllForPublication(user.Id, publication, Contributor,
                     deletedById);
 
@@ -1003,6 +1004,327 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task IsUserPrereleaseViewerOnLatestPreReleaseRelease()
+        {
+            var publication = new Publication();
+            var user = new User();
+
+            var olderRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                ReleaseName = "2019",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var latestPublishedRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = DateTime.UtcNow,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                Version = 0
+            };
+
+            var latestRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = null,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                PreviousVersionId = latestPublishedRelease.Id,
+                Version = 1
+            };
+
+            var latestReleaseOtherPublication = new Release
+            {
+                Publication = new Publication(),
+                ApprovalStatus = Approved,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var userReleaseRole = new UserReleaseRole
+            {
+                User = user,
+                Release = latestRelease,
+                Role = PrereleaseViewer,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddRangeAsync(
+                    olderRelease,
+                    latestPublishedRelease,
+                    latestRelease,
+                    latestReleaseOtherPublication);
+                await contentDbContext.Users.AddRangeAsync(user);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.True(await service.IsUserPrereleaseViewerOnLatestPreReleaseRelease(
+                    user.Id,
+                    publication.Id));
+            }
+        }
+
+        [Fact]
+        public async Task IsUserPrereleaseViewerOnLatestPreReleaseRelease_ReleasePublished()
+        {
+            var publication = new Publication();
+            var user = new User();
+
+            var olderRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                ReleaseName = "2019",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var latestPublishedRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = DateTime.UtcNow,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                Version = 0
+            };
+
+            var latestRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = DateTime.UtcNow,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                PreviousVersionId = latestPublishedRelease.Id,
+                Version = 1
+            };
+
+            var latestReleaseOtherPublication = new Release
+            {
+                Publication = new Publication(),
+                ApprovalStatus = Approved,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var userReleaseRole = new UserReleaseRole
+            {
+                User = user,
+                Release = latestRelease,
+                Role = PrereleaseViewer,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddRangeAsync(
+                    olderRelease,
+                    latestPublishedRelease,
+                    latestRelease,
+                    latestReleaseOtherPublication);
+                await contentDbContext.Users.AddRangeAsync(user);
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.False(await service.IsUserPrereleaseViewerOnLatestPreReleaseRelease(
+                    user.Id,
+                    publication.Id));
+            }
+        }
+
+        [Fact]
+        public async Task IsUserPrereleaseViewerOnLatestPreReleaseRelease_DraftRelease()
+        {
+            var publication = new Publication();
+            var user = new User();
+
+            var olderRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                ReleaseName = "2019",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var latestPublishedRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = DateTime.UtcNow,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                Version = 0
+            };
+
+            var latestRelease = new Release
+            {
+                ApprovalStatus = Draft,
+                Publication = publication,
+                Published = null,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                PreviousVersionId = latestPublishedRelease.Id,
+                Version = 1
+            };
+
+            var latestReleaseOtherPublication = new Release
+            {
+                Publication = new Publication(),
+                ApprovalStatus = Approved,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var userReleaseRole = new UserReleaseRole
+            {
+                User = user,
+                Release = latestRelease,
+                Role = PrereleaseViewer,
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddRangeAsync(
+                    olderRelease,
+                    latestPublishedRelease,
+                    latestRelease,
+                    latestReleaseOtherPublication);
+                await contentDbContext.Users.AddRangeAsync(user);
+                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.False(await service.IsUserPrereleaseViewerOnLatestPreReleaseRelease(
+                    user.Id,
+                    publication.Id));
+            }
+        }
+
+        [Fact]
+        public async Task IsUserPrereleaseViewerOnLatestPreReleaseRelease_NoReleaseRole()
+        {
+            var publication = new Publication();
+            var user = new User();
+
+            var olderRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                ReleaseName = "2019",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var latestPublishedRelease = new Release
+            {
+                Id = Guid.NewGuid(),
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = DateTime.UtcNow,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                Version = 0
+            };
+
+            var latestRelease = new Release
+            {
+                ApprovalStatus = Approved,
+                Publication = publication,
+                Published = null,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear,
+                PreviousVersionId = latestPublishedRelease.Id,
+                Version = 1
+            };
+
+            var latestReleaseOtherPublication = new Release
+            {
+                Publication = new Publication(),
+                ApprovalStatus = Approved,
+                ReleaseName = "2020",
+                TimePeriodCoverage = CalendarYear
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Releases.AddRangeAsync(
+                    olderRelease,
+                    latestPublishedRelease,
+                    latestRelease,
+                    latestReleaseOtherPublication);
+                await contentDbContext.Users.AddRangeAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.False(await service.IsUserPrereleaseViewerOnLatestPreReleaseRelease(
+                    user.Id,
+                    publication.Id));
+            }
+        }
+
+        [Fact]
+        public async Task IsUserPrereleaseViewerOnLatestPreReleaseRelease_NoLatestRelease()
+        {
+            var publication = new Publication();
+            var user = new User();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Users.AddRangeAsync(user);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                Assert.False(await service.IsUserPrereleaseViewerOnLatestPreReleaseRelease(
+                    user.Id,
+                    publication.Id));
+            }
+        }
+
+        [Fact]
         public async Task GetUserReleaseRole_ReturnRoleIfExists()
         {
             var userReleaseRole = new UserReleaseRole
@@ -1271,8 +1593,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
-        private static UserReleaseRoleRepository SetupUserReleaseRoleRepository(
-            ContentDbContext contentDbContext)
+        private static UserReleaseRoleRepository SetupUserReleaseRoleRepository(ContentDbContext contentDbContext)
         {
             return new(contentDbContext);
         }

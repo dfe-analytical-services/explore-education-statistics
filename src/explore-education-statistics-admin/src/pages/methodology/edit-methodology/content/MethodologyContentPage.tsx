@@ -1,5 +1,6 @@
 import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
+import PageTitle from '@admin/components/PageTitle';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import PrintThisPage from '@admin/components/PrintThisPage';
 import { MethodologyRouteParams } from '@admin/routes/methodologyRoutes';
@@ -22,11 +23,15 @@ import SummaryListItem from '@common/components/SummaryListItem';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 
-const MethodologyContentPageInternal = () => {
-  const { methodology, canUpdateMethodology } = useMethodologyContentState();
+export const MethodologyContentPageInternal = () => {
+  const {
+    methodology,
+    canUpdateMethodology,
+    isPreRelease,
+  } = useMethodologyContentState();
 
   const canUpdateContent =
-    canUpdateMethodology && methodology.status === 'Draft';
+    !isPreRelease && canUpdateMethodology && methodology.status === 'Draft';
 
   return (
     <EditingContextProvider editingMode={canUpdateContent ? 'edit' : 'preview'}>
@@ -48,13 +53,17 @@ const MethodologyContentPageInternal = () => {
                 </BrowserWarning>
               )}
 
-              <h2
-                aria-hidden
-                className="govuk-heading-lg"
-                data-testid="page-title"
-              >
-                {methodology.title}
-              </h2>
+              {isPreRelease ? (
+                <PageTitle caption="Methodology" title={methodology.title} />
+              ) : (
+                <h2
+                  aria-hidden
+                  className="govuk-heading-lg"
+                  data-testid="page-title"
+                >
+                  {methodology.title}
+                </h2>
+              )}
 
               <SummaryList>
                 <SummaryListItem term="Publish date">
@@ -68,8 +77,8 @@ const MethodologyContentPageInternal = () => {
               </SummaryList>
               {editingMode !== 'edit' && (
                 <>
-                  <PrintThisPage />
                   <PageSearchForm inputLabel="Search in this methodology page." />
+                  <PrintThisPage />
                 </>
               )}
 
