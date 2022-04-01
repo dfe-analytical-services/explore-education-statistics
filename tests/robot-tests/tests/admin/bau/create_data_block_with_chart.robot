@@ -189,18 +189,18 @@ Validate data block is in list
 Embed data block into release content
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
-
+    user closes Set Page View box
     user creates new content section    1    ${CONTENT_SECTION_NAME}
     user clicks button    Add data block
     user chooses and embeds data block    ${DATABLOCK_NAME}
 
 Check footnote is displayed in content Tab
-    user closes Set Page View box
     user checks accordion section contains x blocks    ${CONTENT_SECTION_NAME}    1    id:releaseMainContent
     user scrolls to accordion section content    ${CONTENT_SECTION_NAME}    id:releaseMainContent
-    # scroll footnotes section into view (since `user scrolls to element    testid:footnotes` isn't available in the current viewport)
-    user scrolls down    300
-    user scrolls to element    testid:footnotes
+    user waits until results table appears  %{WAIT_SMALL}
+    user waits until page does not contain loading spinner
+    # Avoid: Element with locator 'testid:footnotes' not found error when running full test suite with pabot
+    user scrolls down  500
     user checks list has x items    testid:footnotes    1
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_1}
 
@@ -209,7 +209,6 @@ Update footnote
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
     user clicks link    Edit footnote    testid:Footnote - ${FOOTNOTE_1}
-
     user waits until h2 is visible    Edit footnote
     user enters text into element    label:Footnote    ${FOOTNOTE_UPDATED}
     user clicks button    Save footnote

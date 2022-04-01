@@ -7,11 +7,11 @@ verify_ssl = true
 docker = "==4.1.0"
 
 [packages]
-robotframework = "~=4.1.2"
+robotframework = "~=5.0"
 robotframework-seleniumlibrary = "~=6.0.0"
 requests = "~=2.27.1"
 python-dotenv = "~=0.19.1"
-robotframework-pabot = "~=2.1.0"
+robotframework-pabot = "~=2.5.2"
 pyderman = "~=2.0.2"
 pytz = "~=2021.3"
 beautifulsoup4 = "~=4.10.0"
@@ -22,4 +22,4 @@ azure-storage-blob = "~=12.9.0"
 autopep8 = "~=1.6.0"
 
 [requires]
-python_version = "3.8"
+python_version = "3.10"

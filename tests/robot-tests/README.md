@@ -1,17 +1,29 @@
 # Explore Education Statistics Robot Framework tests
 
-- [What is this?](#what-is-this)
-- [What do I need to install?](#what-do-i-need-to-install)
-- [How do I run the tests?](#how-do-i-run-the-tests)
-- [Running tests on the pipeline](#running-tests-on-the-pipeline)
-- [Webdriver](#webdriver)
-- [Authentication](#authentication)
-- [How do I backup and restore the test data on my local environment?](#how-do-i-backup-and-restore-the-test-data-on-my-local-environment)
-- [Directory structure](#directory-structure)
-- [Snapshots](#snapshots)
-- [Guidelines for people writing UI tests](#guidelines-for-people-writing-ui-tests)
-- [Troubleshooting](#troubleshooting)
-- [Who should I talk to?](#who-should-i-talk-to)
+- [Explore Education Statistics Robot Framework tests](#explore-education-statistics-robot-framework-tests)
+  - [**What is this?**](#what-is-this)
+  - [**What do I need to install?**](#what-do-i-need-to-install)
+  - [**How do I run the tests?**](#how-do-i-run-the-tests)
+  - [**Running tests on the pipeline**](#running-tests-on-the-pipeline)
+  - [**Authentication**](#authentication)
+  - [**Webdriver**](#webdriver)
+  - [**Directory structure**](#directory-structure)
+  - [**scripts**](#scripts)
+  - [**test-results**](#test-results)
+  - [**tests**](#tests)
+  - [**webdriver**](#webdriver-1)
+  - [**Snapshots**](#snapshots)
+  - [**Guidelines for people writing UI tests**](#guidelines-for-people-writing-ui-tests)
+  - [**Parallelism / Pabot**](#parallelism--pabot)
+  - [**Test data:**](#test-data)
+  - [**IDE**](#ide)
+    - [**Additional IntelliJ settings**](#additional-intellij-settings)
+  - [**Troubleshooting**](#troubleshooting)
+    - [The tests are flaky when I run them locally.](#the-tests-are-flaky-when-i-run-them-locally)
+    - [Test fails after not finding an element after x amount of seconds.](#test-fails-after-not-finding-an-element-after-x-amount-of-seconds)
+    - [I get the following error when trying to run a UI test](#i-get-the-following-error-when-trying-to-run-a-ui-test)
+    - [When I run the test, it automatically downloads chromedriver for ARM?](#when-i-run-the-test-it-automatically-downloads-chromedriver-for-arm)
+- [**Who should I talk to?**](#who-should-i-talk-to)
 
 
 ## **What is this?**
@@ -21,13 +33,13 @@ Currently, these tests are being maintained so they can be run on Windows. They'
 
 ## **What do I need to install?**
 
-Firstly, install Python 3.8 or greater
+Firstly, install Python 3.10 or greater
    * For Windows, you'll need to download Python3 from here: https://www.python.org/downloads/
-   * For Linux, use the package manager (i.e. On Ubuntu, `sudo apt-get install python3.8`)
-   * For Mac, use the package manager: `brew install python@3.8`. You then need to change the default python symlink to the version you've just installed `ln -s -f /usr/local/bin/python3.8 /usr/local/bin/python` 
+   * For Linux, use the package manager (i.e. On Ubuntu, `sudo apt-get install python3.10`)
+   * For Mac, use the package manager: `brew install python@3.10`. You then need to change the default python symlink to the version you've just installed `ln -s -f /usr/local/bin/python3.10 /usr/local/bin/python` 
 
 Then ensure python and pip are included in your PATH environment variable
-   * `python --version` should return a version >= 3.8. If it doesn't you can try using the commands `python3` or `python3.8`, if you have multiple versions of python installed on your machine.
+   * `python --version` should return a version >= 3.10. If it doesn't you can try using the commands `python3` or `python3.10`, if you have multiple versions of python installed on your machine.
    * To verify `pip` is installed, it is probably easiest to run entering `python -m pip` into a terminal. You should see the pip help text in response.
    * For Windows, I needed to add `C:\Program Files\Python38` and `C:\Program Files\Python38\Scripts` to the `PATH` system variable. Check your Program Files directory to find out where Python is installed on your computer. A search engine will tell you how to add them to the `PATH`.
    
