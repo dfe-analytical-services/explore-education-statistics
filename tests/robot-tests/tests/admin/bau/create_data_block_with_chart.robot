@@ -197,9 +197,11 @@ Embed data block into release content
 Check footnote is displayed in content Tab
     user checks accordion section contains x blocks    ${CONTENT_SECTION_NAME}    1    id:releaseMainContent
     user scrolls to accordion section content    ${CONTENT_SECTION_NAME}    id:releaseMainContent
+    user waits until results table appears  %{WAIT_SMALL}
     user waits until page does not contain loading spinner
-    user scrolls to element    //*[@data-testid="footnotes"]
-    user waits until element is visible    //h3[text()="Footnotes"]    %{WAIT_SMALL}
+    # Avoid: Element with locator 'testid:footnotes' not found error when running full test suite with pabot
+    user scrolls down  500
+
     user checks list has x items    testid:footnotes    1
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_1}
 
@@ -208,7 +210,6 @@ Update footnote
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
     user clicks link    Edit footnote    testid:Footnote - ${FOOTNOTE_1}
-
     user waits until h2 is visible    Edit footnote
     user enters text into element    label:Footnote    ${FOOTNOTE_UPDATED}
     user clicks button    Save footnote
