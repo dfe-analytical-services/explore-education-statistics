@@ -11,6 +11,7 @@
 - [Snapshots](#snapshots)
 - [Guidelines for people writing UI tests](#guidelines-for-people-writing-ui-tests)
 - [Troubleshooting](#troubleshooting)
+- [Running snapshot tests](#running-snapshot-tests)
 - [Who should I talk to?](#who-should-i-talk-to)
 
 
@@ -206,6 +207,9 @@ This error typically occurs when the BAU user password has expired and `setup_au
 * BAU 
 * Analyst 
 * Pre-release
+
+### running-snapshot-tests
+Refer to the `create_snapshots.py` script for more information (located in `robot-tests/scripts`).
 
 ### When I run the test, it automatically downloads chromedriver for ARM?
 
