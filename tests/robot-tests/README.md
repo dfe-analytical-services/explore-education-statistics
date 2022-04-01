@@ -219,6 +219,9 @@ This error typically occurs when the BAU user password has expired and `setup_au
 * Analyst 
 * Pre-release
 
+### running-snapshot-tests
+Refer to the `create_snapshots.py` script for more information (located in `robot-tests/scripts`).
+
 ### When I run the test, it automatically downloads chromedriver for ARM?
 
 There is a known bug with pyderman which is responsible for downloading chromedriver whereby it defaults to downloading the ARM version of chrome if you're using an intel based mac. This means that if you are running the UI tests on an intel based mac the tests fail due to the wrong arch of Chrome being downloaded.

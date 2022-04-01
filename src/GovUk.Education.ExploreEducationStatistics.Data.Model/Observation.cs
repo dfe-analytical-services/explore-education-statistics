@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
@@ -12,9 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public Subject Subject { get; set; }
 
         public Guid SubjectId { get; set; }
-
-        // TODO EES-3067 Potentially drop this by changing older methods of querying Observations to use Location.GeographicLevel
-        public GeographicLevel GeographicLevel { get; set; }
 
         public Location Location { get; set; }
 

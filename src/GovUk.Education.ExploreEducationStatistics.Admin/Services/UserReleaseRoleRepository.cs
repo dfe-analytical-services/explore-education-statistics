@@ -176,6 +176,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 EditorAndApproverRoles);
         }
 
+        public async Task<bool> IsUserPrereleaseViewerOnLatestPreReleaseRelease(Guid userId, Guid publicationId)
+        {
+            var publication = await _contentDbContext.Publications
+                .Include(p => p.Releases)
+                .SingleAsync(p => p.Id == publicationId);
+
+            var latestRelease = publication.LatestRelease();
+
+            // Publication may have no releases
+            if (latestRelease == null
+                // Release should be in prerelease
+                || latestRelease.Published != null
+                || latestRelease.ApprovalStatus != ReleaseApprovalStatus.Approved)
+            {
+                return false;
+            }
+
+            return await HasUserReleaseRole(
+                userId,
+                latestRelease.Id,
+                ReleaseRole.PrereleaseViewer);
+        }
+
         public async Task<UserReleaseRole?> GetUserReleaseRole(Guid userId, Guid releaseId, ReleaseRole role)
         {
             return await _contentDbContext.UserReleaseRoles

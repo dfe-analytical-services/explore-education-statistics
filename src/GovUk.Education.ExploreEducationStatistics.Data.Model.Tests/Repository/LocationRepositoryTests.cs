@@ -24,74 +24,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         public async Task GetDistinctForSubject()
         {
             var subject1Id = Guid.NewGuid();
-            
+
             var location1 = new Location
             {
                 Country = _england,
                 Region = _eastMidlands,
-                LocalAuthority = _derby
+                LocalAuthority = _derby,
+                GeographicLevel = GeographicLevel.LocalAuthority
             };
 
             var location2 = new Location
             {
                 Country = _england,
                 Region = _northEast,
-                LocalAuthority = _derby
+                LocalAuthority = _derby,
+                GeographicLevel = GeographicLevel.LocalAuthority
             };
-            
+
             var location3 = new Location
             {
                 Country = _england,
                 Region = _eastMidlands,
-                LocalAuthority = _nottingham
+                LocalAuthority = _nottingham,
+                GeographicLevel = GeographicLevel.LocalAuthority
             };
-            
+
             // This Location is not used by subject1
             var location4 = new Location
             {
                 Country = _england,
                 Region = _northWest,
-                LocalAuthority = _nottingham
+                LocalAuthority = _nottingham,
+                GeographicLevel = GeographicLevel.LocalAuthority
             };
-            
+
             var subject1Observations = new List<Observation>
             {
                 new()
                 {
                     Location = location1,
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     SubjectId = subject1Id
                 },
                 new()
                 {
                     Location = location2,
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     SubjectId = subject1Id
                 },
                 new()
                 {
                     Location = location3,
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     SubjectId = subject1Id
                 },
                 new()
                 {
                     Location = location1,
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     SubjectId = subject1Id
                 }
             };
-            
+
             var subject2Observations = new List<Observation>
             {
                 new()
                 {
                     Location = location4,
-                    GeographicLevel = GeographicLevel.LocalAuthority,
                     SubjectId = Guid.NewGuid()
                 }
             };
-            
+
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -118,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Repository
         private static LocationRepository BuildRepository(
             StatisticsDbContext? statisticsDbContext = null)
         {
-            return new(statisticsDbContext ?? Mock.Of<StatisticsDbContext>());
+            return new LocationRepository(statisticsDbContext ?? Mock.Of<StatisticsDbContext>());
         }
     }
 }

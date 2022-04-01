@@ -201,6 +201,7 @@ Check footnote is displayed in content Tab
     user waits until page does not contain loading spinner
     # Avoid: Element with locator 'testid:footnotes' not found error when running full test suite with pabot
     user scrolls down  500
+
     user checks list has x items    testid:footnotes    1
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_1}
 

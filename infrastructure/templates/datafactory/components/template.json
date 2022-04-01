@@ -1782,16 +1782,6 @@
                                     },
                                     {
                                         "source": {
-                                            "name": "GeographicLevel",
-                                            "type": "String"
-                                        },
-                                        "sink": {
-                                            "name": "GeographicLevel",
-                                            "type": "String"
-                                        }
-                                    },
-                                    {
-                                        "source": {
                                             "name": "LocationId",
                                             "type": "Guid"
                                         },
