@@ -405,6 +405,19 @@
       {
         "publication_types": [
           {
+            "publication_type_heading": "Ad hoc statistics",
+            "publications": [
+              {
+                "publication_heading": "Higher Level Learners in England"
+              }
+            ]
+          }
+        ],
+        "topic_heading": "Higher level learners in England"
+      },
+      {
+        "publication_types": [
+          {
             "publication_type_heading": "National and official statistics",
             "publications": [
               {
@@ -414,19 +427,6 @@
           }
         ],
         "topic_heading": "Participation measures in higher education"
-      },
-      {
-        "publication_types": [
-          {
-            "publication_type_heading": "Ad hoc statistics",
-            "publications": [
-              {
-                "publication_heading": "Higher Level Learners in England"
-              }
-            ]
-          }
-        ],
-        "topic_heading": "Skills Bill: Higher level learners"
       },
       {
         "publication_types": [
