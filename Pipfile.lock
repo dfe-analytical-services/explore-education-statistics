@@ -1,11 +1,11 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "69a5a180e8347410a31a5131450c19852303ccf79d2f1681ee1608e3bece53bc"
+            "sha256": "e16e4293d18d608bdb931ef2227168d64ceaa5d69bf254e9191a38e9f323193c"
         },
         "pipfile-spec": 6,
         "requires": {
-            "python_version": "3.8"
+            "python_version": "3.10"
         },
         "sources": [
             {
@@ -42,11 +42,11 @@
         },
         "azure-core": {
             "hashes": [
-                "sha256:23c1389a115c328878c4eface3ca3899c2468313ea6f883f2347d6924cd887b2",
-                "sha256:a56a6f720d0948d3f3e4a25a5fe46df2f1b7f865c358d74e2ce47dbb49262608"
+                "sha256:28a01dfbaf0a6812c4e2a82d1642ea30956a9739f25bc77c9b23b91f4ea68f0f",
+                "sha256:c3e8a9a3ec9d89f59b5d5b2f19d19a30d76a5b5c0cee3788ecad3cb72b9bd028"
             ],
             "markers": "python_version >= '3.6'",
-            "version": "==1.23.0"
+            "version": "==1.23.1"
         },
         "azure-storage-blob": {
             "hashes": [
@@ -137,11 +137,11 @@
         },
         "click": {
             "hashes": [
-                "sha256:5e0d195c2067da3136efb897449ec1e9e6c98282fbf30d7f9e164af9be901a6b",
-                "sha256:7ab900e38149c9872376e8f9b5986ddcaf68c0f413cf73678a0bca5547e6f976"
+                "sha256:24e1a4a9ec5bf6299411369b208c1df2188d9eb8d916302fe6bf03faed227f1e",
+                "sha256:479707fe14d9ec9a0757618b7a100a0ae4c4e236fac5b7f80ca68028141a1a72"
             ],
             "markers": "python_version >= '3.7'",
-            "version": "==8.1.1"
+            "version": "==8.1.2"
         },
         "colorama": {
             "hashes": [
@@ -491,7 +491,6 @@
             "version": "==4.1.1"
         },
         "urllib3": {
-            "extras": [],
             "hashes": [
                 "sha256:44ece4d53fb1706f667c9bd1c648f5469a2ec925fcf3a776667042d645472c14",
                 "sha256:aabaf16477806a5e1dd19aa41f8c2b7950dd3c746362d7e3223dbe6de6ac448e"
@@ -582,7 +581,6 @@
             "version": "==1.16.0"
         },
         "urllib3": {
-            "extras": [],
             "hashes": [
                 "sha256:44ece4d53fb1706f667c9bd1c648f5469a2ec925fcf3a776667042d645472c14",
                 "sha256:aabaf16477806a5e1dd19aa41f8c2b7950dd3c746362d7e3223dbe6de6ac448e"
