@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -121,7 +120,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
             ConfigureBoundaryLevel(modelBuilder);
             ConfigureIndicator(modelBuilder);
-            ConfigureGeographicLevel(modelBuilder);
             ConfigureGeoJson(modelBuilder);
             ConfigureFilter(modelBuilder);
             ConfigureFilterFootnote(modelBuilder);
@@ -341,19 +339,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
             modelBuilder.Entity<Observation>()
                 .HasIndex(observation => observation.TimeIdentifier);
-        }
-
-        private static void ConfigureGeographicLevel(ModelBuilder modelBuilder)
-        {
-            var geographicLevelConverter = new EnumToEnumValueConverter<GeographicLevel>();
-
-            modelBuilder.Entity<Observation>()
-                .Property(observation => observation.GeographicLevel)
-                .HasConversion(geographicLevelConverter)
-                .HasMaxLength(6);
-
-            modelBuilder.Entity<Observation>()
-                .HasIndex(observation => observation.GeographicLevel);
         }
 
         private static void ConfigureIndicator(ModelBuilder modelBuilder)

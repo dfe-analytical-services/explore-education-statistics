@@ -42,7 +42,7 @@ interface Props {
 
 const PublicationReleasePage: NextPage<Props> = ({ release }) => {
   const releaseCount =
-    release.publication.otherReleases.length +
+    release.publication.releases.length +
     release.publication.legacyReleases.length;
 
   // Re-order updates in descending order in-case the cached
@@ -86,7 +86,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 >
                   View latest data:{' '}
                   <span className="govuk-!-font-weight-bold">
-                    {release.publication.otherReleases[0].title}
+                    {release.publication.releases[0].title}
                   </span>
                 </Link>
               )}
@@ -281,7 +281,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 >
                   <ul className="govuk-list">
                     {[
-                      ...release.publication.otherReleases.map(
+                      ...release.publication.releases.map(
                         ({ id, slug, title }) => (
                           <li key={id} data-testid="other-release-item">
                             <Link

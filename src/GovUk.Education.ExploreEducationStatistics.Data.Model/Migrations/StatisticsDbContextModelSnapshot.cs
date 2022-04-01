@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+#nullable disable
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 {
     [DbContext(typeof(StatisticsDbContext))]
@@ -15,16 +17,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "3.1.18")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "6.0.2")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Common.Model.Data.BoundaryLevel", b =>
                 {
                     b.Property<long>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"), 1L, 1);
 
                     b.Property<string>("Label")
                         .HasColumnType("nvarchar(max)");
@@ -165,6 +169,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.ToTable("Footnote");
                 });
 
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.GeoJson", b =>
+                {
+                    b.Property<long>("BoundaryLevelId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToView("geojson");
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", b =>
                 {
                     b.Property<Guid>("Id")
@@ -250,8 +271,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.Property<string>("GeographicLevel")
                         .IsRequired()
-                        .HasColumnType("nvarchar(6)")
-                        .HasMaxLength(6);
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
 
                     b.Property<string>("Institution_Code")
                         .HasColumnType("nvarchar(450)");
@@ -395,11 +416,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<long>("CsvRow")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("GeographicLevel")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(6)")
-                        .HasMaxLength(6);
-
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
 
@@ -411,15 +427,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.Property<string>("TimeIdentifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(6)")
-                        .HasMaxLength(6);
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("GeographicLevel");
 
                     b.HasIndex("LocationId");
 
@@ -472,8 +486,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
 
                     b.Property<string>("TimeIdentifier")
                         .IsRequired()
-                        .HasColumnType("nvarchar(6)")
-                        .HasMaxLength(6);
+                        .HasMaxLength(6)
+                        .HasColumnType("nvarchar(6)");
 
                     b.Property<int>("Year")
                         .HasColumnType("int");
@@ -549,6 +563,229 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.ToTable("SubjectFootnote");
                 });
 
+            modelBuilder.Entity("Thinktecture:TempTable:GovUk.Education.ExploreEducationStatistics.Data.Model.Database.IdTempTable", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("#IdTempTable", null, t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:GovUk.Education.ExploreEducationStatistics.Data.Model.Database.MatchedObservation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("#MatchedObservation", null, t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<bool?>", b =>
+                {
+                    b.Property<bool?>("Column1")
+                        .HasColumnType("bit");
+
+                    b.ToTable("#TempTable<bool?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<bool>", b =>
+                {
+                    b.Property<bool>("Column1")
+                        .HasColumnType("bit");
+
+                    b.ToTable("#TempTable<bool>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<byte?>", b =>
+                {
+                    b.Property<byte?>("Column1")
+                        .HasColumnType("tinyint");
+
+                    b.ToTable("#TempTable<byte?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<byte>", b =>
+                {
+                    b.Property<byte>("Column1")
+                        .HasColumnType("tinyint");
+
+                    b.ToTable("#TempTable<byte>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<DateTime?>", b =>
+                {
+                    b.Property<DateTime?>("Column1")
+                        .HasColumnType("datetime2");
+
+                    b.ToTable("#TempTable<DateTime?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<DateTime>", b =>
+                {
+                    b.Property<DateTime>("Column1")
+                        .HasColumnType("datetime2");
+
+                    b.ToTable("#TempTable<DateTime>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<DateTimeOffset?>", b =>
+                {
+                    b.Property<DateTimeOffset?>("Column1")
+                        .HasColumnType("datetimeoffset");
+
+                    b.ToTable("#TempTable<DateTimeOffset?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<DateTimeOffset>", b =>
+                {
+                    b.Property<DateTimeOffset>("Column1")
+                        .HasColumnType("datetimeoffset");
+
+                    b.ToTable("#TempTable<DateTimeOffset>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<decimal?>", b =>
+                {
+                    b.Property<decimal?>("Column1")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.ToTable("#TempTable<decimal?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<decimal>", b =>
+                {
+                    b.Property<decimal>("Column1")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.ToTable("#TempTable<decimal>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<double?>", b =>
+                {
+                    b.Property<double?>("Column1")
+                        .HasColumnType("float");
+
+                    b.ToTable("#TempTable<double?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<double>", b =>
+                {
+                    b.Property<double>("Column1")
+                        .HasColumnType("float");
+
+                    b.ToTable("#TempTable<double>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<float?>", b =>
+                {
+                    b.Property<float?>("Column1")
+                        .HasColumnType("real");
+
+                    b.ToTable("#TempTable<float?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<float>", b =>
+                {
+                    b.Property<float>("Column1")
+                        .HasColumnType("real");
+
+                    b.ToTable("#TempTable<float>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<Guid?>", b =>
+                {
+                    b.Property<Guid?>("Column1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.ToTable("#TempTable<Guid?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<Guid>", b =>
+                {
+                    b.Property<Guid>("Column1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.ToTable("#TempTable<Guid>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<int?>", b =>
+                {
+                    b.Property<int?>("Column1")
+                        .HasColumnType("int");
+
+                    b.ToTable("#TempTable<int?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<int>", b =>
+                {
+                    b.Property<int>("Column1")
+                        .HasColumnType("int");
+
+                    b.ToTable("#TempTable<int>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<long?>", b =>
+                {
+                    b.Property<long?>("Column1")
+                        .HasColumnType("bigint");
+
+                    b.ToTable("#TempTable<long?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<long>", b =>
+                {
+                    b.Property<long>("Column1")
+                        .HasColumnType("bigint");
+
+                    b.ToTable("#TempTable<long>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<short?>", b =>
+                {
+                    b.Property<short?>("Column1")
+                        .HasColumnType("smallint");
+
+                    b.ToTable("#TempTable<short?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<short>", b =>
+                {
+                    b.Property<short>("Column1")
+                        .HasColumnType("smallint");
+
+                    b.ToTable("#TempTable<short>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<string>", b =>
+                {
+                    b.Property<string>("Column1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.ToTable("#TempTable<string>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<TimeSpan?>", b =>
+                {
+                    b.Property<TimeSpan?>("Column1")
+                        .HasColumnType("time");
+
+                    b.ToTable("#TempTable<TimeSpan?>", t => t.ExcludeFromMigrations());
+                });
+
+            modelBuilder.Entity("Thinktecture:TempTable:Thinktecture.EntityFrameworkCore.TempTables.TempTable<TimeSpan>", b =>
+                {
+                    b.Property<TimeSpan>("Column1")
+                        .HasColumnType("time");
+
+                    b.ToTable("#TempTable<TimeSpan>", t => t.ExcludeFromMigrations());
+                });
+
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", b =>
                 {
                     b.HasOne("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", "Subject")
@@ -556,6 +793,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterFootnote", b =>
@@ -571,6 +810,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("Filter");
+
+                    b.Navigation("Footnote");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", b =>
@@ -580,6 +823,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("FilterId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Filter");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroupFootnote", b =>
@@ -595,6 +840,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("FilterGroup");
+
+                    b.Navigation("Footnote");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", b =>
@@ -604,6 +853,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("FilterGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("FilterGroup");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItemFootnote", b =>
@@ -619,6 +870,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("FootnoteId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.Navigation("FilterItem");
+
+                    b.Navigation("Footnote");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", b =>
@@ -628,6 +883,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("IndicatorGroupId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("IndicatorGroup");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorFootnote", b =>
@@ -643,6 +900,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("IndicatorId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Footnote");
+
+                    b.Navigation("Indicator");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorGroup", b =>
@@ -652,6 +913,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>
@@ -667,6 +930,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Location");
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ObservationFilterItem", b =>
@@ -687,6 +954,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("ObservationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Filter");
+
+                    b.Navigation("FilterItem");
+
+                    b.Navigation("Observation");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseFootnote", b =>
@@ -702,6 +975,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("ReleaseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Footnote");
+
+                    b.Navigation("Release");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.ReleaseSubject", b =>
@@ -717,6 +994,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Release");
+
+                    b.Navigation("Subject");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.SubjectFootnote", b =>
@@ -732,6 +1013,75 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Footnote");
+
+                    b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Filter", b =>
+                {
+                    b.Navigation("FilterGroups");
+
+                    b.Navigation("Footnotes");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterGroup", b =>
+                {
+                    b.Navigation("FilterItems");
+
+                    b.Navigation("Footnotes");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.FilterItem", b =>
+                {
+                    b.Navigation("Footnotes");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Footnote", b =>
+                {
+                    b.Navigation("FilterGroups");
+
+                    b.Navigation("FilterItems");
+
+                    b.Navigation("Filters");
+
+                    b.Navigation("Indicators");
+
+                    b.Navigation("Releases");
+
+                    b.Navigation("Subjects");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Indicator", b =>
+                {
+                    b.Navigation("Footnotes");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.IndicatorGroup", b =>
+                {
+                    b.Navigation("Indicators");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Observation", b =>
+                {
+                    b.Navigation("FilterItems");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Release", b =>
+                {
+                    b.Navigation("Footnotes");
+                });
+
+            modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Data.Model.Subject", b =>
+                {
+                    b.Navigation("Filters");
+
+                    b.Navigation("Footnotes");
+
+                    b.Navigation("IndicatorGroups");
+
+                    b.Navigation("Observations");
                 });
 #pragma warning restore 612, 618
         }

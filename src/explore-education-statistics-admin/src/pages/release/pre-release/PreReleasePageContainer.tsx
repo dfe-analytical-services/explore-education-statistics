@@ -2,7 +2,10 @@ import NavBar from '@admin/components/NavBar';
 import Page from '@admin/components/Page';
 import { useAuthContext } from '@admin/contexts/AuthContext';
 import { useConfig } from '@admin/contexts/ConfigContext';
-import { preReleaseNavRoutes } from '@admin/routes/preReleaseRoutes';
+import {
+  preReleaseNavRoutes,
+  preReleaseRoutes,
+} from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import permissionService, {
   PreReleaseWindowStatus,
@@ -145,7 +148,7 @@ const PreReleasePageContainer = ({
           />
 
           <Switch>
-            {preReleaseNavRoutes.map(route => (
+            {preReleaseRoutes.map(route => (
               <Route key={route.path} {...route} />
             ))}
           </Switch>

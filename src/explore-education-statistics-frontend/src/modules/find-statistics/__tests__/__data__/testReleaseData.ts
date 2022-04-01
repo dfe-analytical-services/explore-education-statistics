@@ -4,7 +4,7 @@ export const testPublication: Publication = {
   id: 'publication-1',
   title: 'Pupil absence in schools in England',
   slug: 'pupil-absence-in-schools-in-england',
-  otherReleases: [],
+  releases: [],
   legacyReleases: [
     {
       id: 'legacy-release-3',

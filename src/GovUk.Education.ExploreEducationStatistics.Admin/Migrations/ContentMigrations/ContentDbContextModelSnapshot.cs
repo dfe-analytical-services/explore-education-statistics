@@ -925,10 +925,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Charts");
 
-                    b.Property<string>("ChartsMigrated")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("DataBlock_ChartsMigrated");
-
                     b.Property<string>("Heading")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Heading");
@@ -941,22 +937,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_HighlightName");
 
-                    b.Property<bool>("LocationsMigrated")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("DataBlock_LocationsMigrated");
-
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Query")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Query");
-
-                    b.Property<string>("QueryMigrated")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("DataBlock_QueryMigrated");
 
                     b.Property<string>("Source")
                         .HasColumnType("nvarchar(max)");
@@ -968,16 +954,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("Table")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Table");
-
-                    b.Property<bool>("TableHeaderCountChanged")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false)
-                        .HasColumnName("DataBlock_TableHeaderCountChanged");
-
-                    b.Property<string>("TableMigrated")
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("DataBlock_TableMigrated");
 
                     b.HasDiscriminator().HasValue("DataBlock");
                 });

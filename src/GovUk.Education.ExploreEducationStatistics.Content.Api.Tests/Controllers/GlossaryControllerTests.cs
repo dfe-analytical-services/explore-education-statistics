@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             
             Assert.Equal(glossaryEntries, result);
         }
-        
+
         [Fact]
         public async Task GetGlossaryEntry()
         {

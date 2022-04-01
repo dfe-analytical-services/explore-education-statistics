@@ -1,47 +1,44 @@
-﻿using System.Threading.Tasks;
+﻿#nullable enable
+using System;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 {
     public class DataGuidanceService : IDataGuidanceService
     {
-        private readonly IFileStorageService _fileStorageService;
         private readonly IDataGuidanceSubjectService _dataGuidanceSubjectService;
+        private readonly Interfaces.IPublicationService _publicationService;
+        private readonly Interfaces.IReleaseService _releaseService;
 
         public DataGuidanceService(
-            IFileStorageService fileStorageService,
-            IDataGuidanceSubjectService dataGuidanceSubjectService)
+            IDataGuidanceSubjectService dataGuidanceSubjectService,
+            Interfaces.IPublicationService publicationService,
+            Interfaces.IReleaseService releaseService)
         {
-            _fileStorageService = fileStorageService;
             _dataGuidanceSubjectService = dataGuidanceSubjectService;
+            _publicationService = publicationService;
+            _releaseService = releaseService;
         }
 
-        public async Task<Either<ActionResult, DataGuidanceViewModel>> Get(string publicationPath, string releasePath)
+        public async Task<Either<ActionResult, DataGuidanceViewModel>> Get(string publicationSlug, string? releaseSlug = null)
         {
-            var publicationTask = _fileStorageService.GetDeserialized<CachedPublicationViewModel>(publicationPath);
-            var releaseTask = _fileStorageService.GetDeserialized<CachedReleaseViewModel>(releasePath);
-
-            await Task.WhenAll(publicationTask, releaseTask);
-
-            if (releaseTask.Result.IsRight && publicationTask.Result.IsRight)
-            {
-                return await _dataGuidanceSubjectService.GetSubjects(releaseTask.Result.Right.Id)
-                    .OnSuccess(
-                        subjects =>
-                            new DataGuidanceViewModel(
-                                releaseTask.Result.Right,
-                                publicationTask.Result.Right,
-                                subjects
-                            )
-                    );
-            }
-
-            return new Either<ActionResult, DataGuidanceViewModel>(new NotFoundResult());
+            return await _publicationService.Get(publicationSlug)
+                .OnSuccessCombineWith(_ => _releaseService.GetCachedRelease(publicationSlug, releaseSlug))
+                .OnSuccess(publicationAndRelease =>
+                {
+                    var (publication, release) = publicationAndRelease;
+                    return _dataGuidanceSubjectService.GetSubjects(release!.Id)
+                        .OnSuccess(subjects => new DataGuidanceViewModel(
+                            release,
+                            publication,
+                            subjects
+                        ));
+                });
         }
     }
 }

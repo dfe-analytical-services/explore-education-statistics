@@ -66,10 +66,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var dataBlock = _mapper.Map<DataBlock>(dataBlockCreate);
                     dataBlock.Created = DateTime.UtcNow;
 
-                    // TODO EES-3212 Remove this migrated flag
-                    // Initialise as true now that data blocks are being created with location id's
-                    dataBlock.LocationsMigrated = true;
-
                     var added = (await _context.DataBlocks.AddAsync(dataBlock)).Entity;
 
                     release.AddContentBlock(added);

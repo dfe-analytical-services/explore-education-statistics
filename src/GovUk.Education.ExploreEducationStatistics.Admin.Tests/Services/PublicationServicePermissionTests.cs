@@ -7,6 +7,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -290,32 +291,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private static PublicationService BuildPublicationService(
-            (Mock<ContentDbContext>, Mock<IMapper>,
+            (
+                Mock<ContentDbContext>,
+                Mock<IMapper>,
                 Mock<IUserService> userService,
                 Mock<IPublicationRepository> publicationRepository,
-                Mock<IPublishingService> publishingService,
                 Mock<IMethodologyVersionRepository> methodologyVersionRepository,
-                Mock<IPersistenceHelper<ContentDbContext>>) mocks)
+                Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,
+                Mock<IBlobCacheService> publicBlobCacheService) mocks)
+
         {
-            var (context, mapper, userService, publicationRepository, publishingService, methodologyVersionRepository, persistenceHelper) = mocks;
+            var (
+                context,
+                mapper,
+                userService,
+                publicationRepository,
+                methodologyVersionRepository,
+                persistenceHelper,
+                publicBlobCacheService
+                ) = mocks;
 
             return new PublicationService(
                 context.Object,
                 mapper.Object,
                 persistenceHelper.Object,
-                userService.Object, 
+                userService.Object,
                 publicationRepository.Object, 
-                publishingService.Object, 
-                methodologyVersionRepository.Object);
+                methodologyVersionRepository.Object,
+                publicBlobCacheService.Object);
         }
 
         private (Mock<ContentDbContext> ContentDbContext,
             Mock<IMapper> Mapper,
             Mock<IUserService> UserService,
             Mock<IPublicationRepository> PublicationRepository,
-            Mock<IPublishingService> PublishingService,
             Mock<IMethodologyVersionRepository> MethodologyVersionRepository,
-            Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelper) Mocks()
+            Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelper,
+            Mock<IBlobCacheService> PublicBlobCacheService) Mocks()
         {
             var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
             MockUtils.SetupCall(persistenceHelper, _topic.Id, _topic);
@@ -326,9 +338,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<IMapper>(),
                 MockUtils.AlwaysTrueUserService(),
                 new Mock<IPublicationRepository>(),
-                new Mock<IPublishingService>(),
                 new Mock<IMethodologyVersionRepository>(),
-                persistenceHelper);
+                persistenceHelper,
+                new Mock<IBlobCacheService>());
         }
     }
 }

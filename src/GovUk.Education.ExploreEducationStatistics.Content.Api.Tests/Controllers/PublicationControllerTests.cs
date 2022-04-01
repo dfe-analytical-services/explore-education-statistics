@@ -1,9 +1,10 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -17,54 +18,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var publicationId = Guid.NewGuid();
 
-            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
 
-            fileStorageService
-                .Setup(s =>
-                    s.GetDeserialized<PublicationTitleViewModel>("publications/publication-a/publication.json")
-                )
-                .ReturnsAsync(new PublicationTitleViewModel
+            publicationService.Setup(mock => mock.Get("publication-a"))
+                .ReturnsAsync(new PublicationViewModel
                 {
                     Id = publicationId,
-                    Title = "Test title"
+                    Title = "Test title",
                 });
 
-            var controller = BuildPublicationController(fileStorageService.Object);
+            var controller = BuildPublicationController(publicationService.Object);
 
             var publicationTitleViewModel = (await controller.GetPublicationTitle("publication-a")).Value;
 
+            Assert.NotNull(publicationTitleViewModel);
             Assert.IsType<PublicationTitleViewModel>(publicationTitleViewModel);
-
-            Assert.Equal(publicationId, publicationTitleViewModel.Id);
+            Assert.Equal(publicationId, publicationTitleViewModel!.Id);
             Assert.Equal("Test title", publicationTitleViewModel.Title);
 
-            MockUtils.VerifyAllMocks(fileStorageService);
+            MockUtils.VerifyAllMocks(publicationService);
         }
 
         [Fact]
         public async Task GetPublicationTitle_NotFound()
         {
-            var fileStorageService = new Mock<IFileStorageService>(MockBehavior.Strict);
+            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
 
-            fileStorageService
-                .Setup(s => s.GetDeserialized<PublicationTitleViewModel>(It.IsAny<string>()))
+            publicationService.Setup(mock => mock.Get("missing-publication"))
                 .ReturnsAsync(new NotFoundResult());
 
-            var controller = BuildPublicationController(fileStorageService.Object);
+            var controller = BuildPublicationController(publicationService.Object);
 
             var result = await controller.GetPublicationTitle("missing-publication");
 
             Assert.IsType<NotFoundResult>(result.Result);
 
-            MockUtils.VerifyAllMocks(fileStorageService);
+            MockUtils.VerifyAllMocks(publicationService);
         }
 
         private static PublicationController BuildPublicationController(
-            IFileStorageService fileStorageService = null
+            IPublicationService? publicationService = null
         )
         {
             return new PublicationController(
-                fileStorageService ?? new Mock<IFileStorageService>().Object
+                publicationService ?? Mock.Of<IPublicationService>()
             );
         }
     }

@@ -296,11 +296,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.Equal("Legacy 2017/18", contentPublicationLegacyReleases[1].Description);
                 Assert.Equal("https://legacy-2017-18", contentPublicationLegacyReleases[1].Url);
 
-                var contentPublicationOtherReleases = contentPublication.OtherReleases;
-                Assert.Single(contentPublicationOtherReleases);
-                Assert.Equal(otherRelease.Id, contentPublicationOtherReleases[0].Id);
-                Assert.Equal("2019-20", contentPublicationOtherReleases[0].Slug);
-                Assert.Equal("Academic Year 2019/20", contentPublicationOtherReleases[0].Title);
+                var contentPublicationReleases = contentPublication.Releases;
+                Assert.Single(contentPublicationReleases);
+                Assert.Equal(otherRelease.Id, contentPublicationReleases[0].Id);
+                Assert.Equal("2019-20", contentPublicationReleases[0].Slug);
+                Assert.Equal("Academic Year 2019/20", contentPublicationReleases[0].Title);
 
                 Assert.Equal(2, contentPublication.Methodologies.Count);
                 Assert.Equal(methodologies[0].Id, contentPublication.Methodologies[0].Id);

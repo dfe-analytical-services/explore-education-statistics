@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
 {
@@ -31,18 +30,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("publications/{publicationSlug}/releases/latest")]
         public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
         {
-            return await _releaseService.Get(
-                    PublicContentPublicationPath(publicationSlug),
-                    PublicContentLatestReleasePath(publicationSlug))
+            return await _releaseService.Get(publicationSlug)
                 .HandleFailuresOrOk();
         }
 
         [HttpGet("publications/{publicationSlug}/releases/latest/summary")]
         public async Task<ActionResult<ReleaseSummaryViewModel>> GetLatestReleaseSummary(string publicationSlug)
         {
-            return await _releaseService.GetSummary(
-                    PublicContentPublicationPath(publicationSlug),
-                    PublicContentLatestReleasePath(publicationSlug))
+            return await _releaseService.GetSummary(publicationSlug)
                 .HandleFailuresOrOk();
         }
 
@@ -50,8 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
         {
             return await _releaseService.Get(
-                    PublicContentPublicationPath(publicationSlug),
-                    PublicContentReleasePath(publicationSlug, releaseSlug))
+                    publicationSlug,
+                    releaseSlug)
                 .HandleFailuresOrOk();
         }
 
@@ -60,8 +55,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             string releaseSlug)
         {
             return await _releaseService.GetSummary(
-                    PublicContentPublicationPath(publicationSlug),
-                    PublicContentReleasePath(publicationSlug, releaseSlug))
+                    publicationSlug,
+                    releaseSlug)
                 .HandleFailuresOrOk();
         }
     }

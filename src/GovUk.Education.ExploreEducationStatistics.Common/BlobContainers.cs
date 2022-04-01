@@ -13,7 +13,6 @@
         public static readonly IBlobContainer PrivateContent = new PrivateBlobContainer("cache");
         public static readonly IBlobContainer PublicContent = new PublicBlobContainer("cache");
         public static readonly IBlobContainer Permalinks = new BlobContainer("permalinks");
-        public static readonly IBlobContainer PermalinkMigrations = new BlobContainer("permalink-migrations");
         public static readonly IBlobContainer PublisherLeases = new BlobContainer("leases");
         public static readonly IBlobContainer PrivateMethodologyFiles = new PrivateBlobContainer("methodologies");
         public static readonly IBlobContainer PublicMethodologyFiles = new PublicBlobContainer("methodologies");

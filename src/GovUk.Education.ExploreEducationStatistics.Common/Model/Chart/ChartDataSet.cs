@@ -8,7 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     public class ChartDataSet
     {
         public Guid Indicator;
-        public List<Guid> Filters = new List<Guid>();
+        public List<Guid> Filters = new();
         public ChartDataSetLocation Location;
         public string TimePeriod;
         public int? Order;
@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     public class ChartDataSetLocation
     {
         public string Level;
-        public string Value;
+        public Guid Value;
     }
 
     [Obsolete("Use legend item configurations")]

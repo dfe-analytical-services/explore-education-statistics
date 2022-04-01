@@ -344,6 +344,9 @@
             "publication_type_heading": "National and official statistics",
             "publications": [
               {
+                "publication_heading": "Further education skills index"
+              },
+              {
                 "publication_heading": "Further education: outcome-based success measures"
               }
             ]
@@ -402,6 +405,19 @@
       {
         "publication_types": [
           {
+            "publication_type_heading": "Ad hoc statistics",
+            "publications": [
+              {
+                "publication_heading": "Higher Level Learners in England"
+              }
+            ]
+          }
+        ],
+        "topic_heading": "Higher level learners in England"
+      },
+      {
+        "publication_types": [
+          {
             "publication_type_heading": "National and official statistics",
             "publications": [
               {
@@ -411,19 +427,6 @@
           }
         ],
         "topic_heading": "Participation measures in higher education"
-      },
-      {
-        "publication_types": [
-          {
-            "publication_type_heading": "Ad hoc statistics",
-            "publications": [
-              {
-                "publication_heading": "Higher Level Learners in England"
-              }
-            ]
-          }
-        ],
-        "topic_heading": "Skills Bill: Higher level learners"
       },
       {
         "publication_types": [
@@ -538,6 +541,14 @@
             ]
           },
           {
+            "publication_type_heading": "Experimental statistics",
+            "publications": [
+              {
+                "publication_heading": "National Tutoring Programme"
+              }
+            ]
+          },
+          {
             "publication_type_heading": "Ad hoc statistics",
             "publications": [
               {
@@ -623,7 +634,7 @@
                 "publication_heading": "A level and other 16 to 18 results"
               },
               {
-                "publication_heading": "Level 2 and 3 attainment by young people aged 19"
+                "publication_heading": "Level 2 and 3 attainment age 16 to 25"
               }
             ]
           }

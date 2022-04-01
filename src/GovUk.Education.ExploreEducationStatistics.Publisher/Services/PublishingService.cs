@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -19,6 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly string _publicStorageConnectionString;
         private readonly IBlobStorageService _privateBlobStorageService;
         private readonly IBlobStorageService _publicBlobStorageService;
+        private readonly IBlobCacheService _publicBlobCacheService;
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationService _publicationService;
         private readonly IReleaseService _releaseService;
@@ -28,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             string publicStorageConnectionString,
             IBlobStorageService privateBlobStorageService,
             IBlobStorageService publicBlobStorageService,
+            IBlobCacheService publicBlobCacheService,
             IMethodologyService methodologyService,
             IPublicationService publicationService,
             IReleaseService releaseService,
@@ -36,13 +39,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _publicStorageConnectionString = publicStorageConnectionString;
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
+            _publicBlobCacheService = publicBlobCacheService;
             _methodologyService = methodologyService;
             _publicationService = publicationService;
             _releaseService = releaseService;
             _logger = logger;
         }
 
-        public async Task PublishStagedReleaseContent(Guid releaseId)
+        public async Task PublishStagedReleaseContent(Guid releaseId, string publicationSlug)
         {
             await _publicBlobStorageService.MoveDirectory(
                 sourceContainerName: PublicContent,
@@ -52,6 +56,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             );
 
             await _releaseService.SetPublishedDates(releaseId, DateTime.UtcNow);
+
+            await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publicationSlug));
+            // TODO: @MarkFix EES-3149 Delete superseded publication's cache here too?
         }
 
         public async Task PublishMethodologyFiles(Guid methodologyId)

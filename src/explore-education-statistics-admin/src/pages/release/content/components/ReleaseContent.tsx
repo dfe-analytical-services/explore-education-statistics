@@ -61,7 +61,7 @@ const ReleaseContent = () => {
   const releaseCount = useMemo(() => {
     if (release) {
       return (
-        release.publication.otherReleases.length +
+        release.publication.releases.length +
         release.publication.legacyReleases.length
       );
     }
@@ -272,7 +272,7 @@ const ReleaseContent = () => {
                 <Details summary={`See other releases (${releaseCount})`}>
                   <ul className="govuk-list">
                     {[
-                      ...release.publication.otherReleases.map(
+                      ...release.publication.releases.map(
                         ({ id, title, slug }) => (
                           <li key={id} data-testid="other-release-item">
                             <Link

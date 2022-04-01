@@ -236,7 +236,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             foreach (DataRow row in rows)
             {
                 var rowValues = CsvUtil.GetRowValues(row).ToArray();
-                var geographicLevel = CsvUtil.GetGeographicLevel(rowValues, colValues);
 
                 if (CsvUtil.IsRowAllowed(soleGeographicLevel, rowValues, colValues))
                 {
@@ -244,7 +243,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                         context,
                         rowValues,
                         colValues,
-                        geographicLevel,
                         subject,
                         subjectMeta,
                         ((batchNo - 1) * import.RowsPerBatch) + i++ + 2);
@@ -259,7 +257,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             StatisticsDbContext context,
             string[] rowValues,
             List<string> colValues,
-            GeographicLevel geographicLevel,
             Subject subject,
             SubjectMeta subjectMeta,
             int csvRowNum)
@@ -270,7 +267,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             {
                 Id = observationId,
                 FilterItems = GetFilterItems(context, rowValues, colValues, subjectMeta.Filters, observationId),
-                GeographicLevel = geographicLevel,
                 LocationId = GetLocationIdOrCreate(rowValues, colValues, context),
                 Measures = GetMeasures(rowValues, colValues, subjectMeta.Indicators),
                 SubjectId = subject.Id,
@@ -473,12 +469,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 new PlanningArea(values[0], values[1]));
         }
 
-        private async Task InsertObservations(DbContext context, IEnumerable<Observation> observations)
+        private static async Task InsertObservations(DbContext context, IEnumerable<Observation> observations)
         {
             var observationsTable = new DataTable();
             observationsTable.Columns.Add("Id", typeof(Guid));
             observationsTable.Columns.Add("SubjectId", typeof(Guid));
-            observationsTable.Columns.Add("GeographicLevel", typeof(string));
             observationsTable.Columns.Add("LocationId", typeof(Guid));
             observationsTable.Columns.Add("Year", typeof(int));
             observationsTable.Columns.Add("TimeIdentifier", typeof(string));
@@ -495,7 +490,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 observationsTable.Rows.Add(
                     o.Id,
                     o.SubjectId,
-                    o.GeographicLevel.GetEnumValue(),
                     o.LocationId,
                     o.Year,
                     o.TimeIdentifier.GetEnumValue(),

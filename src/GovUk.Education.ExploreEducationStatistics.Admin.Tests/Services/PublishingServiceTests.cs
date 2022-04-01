@@ -153,63 +153,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task PublicationChanged()
-        {
-            var publication = new Publication();
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await context.Publications.AddAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
-
-            storageQueueService.Setup(
-                    mock => mock.AddMessageAsync(PublishPublicationQueue,
-                        It.Is<PublishPublicationMessage>(message =>
-                            message.PublicationId == publication.Id)))
-                .Returns(Task.CompletedTask);
-
-            await using (var context = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var publishingService = BuildPublishingService(contentDbContext: context,
-                    storageQueueService: storageQueueService.Object);
-
-                var result = await publishingService.PublicationChanged(publication.Id);
-
-                storageQueueService.Verify(
-                    mock => mock.AddMessageAsync(PublishPublicationQueue,
-                        It.Is<PublishPublicationMessage>(message =>
-                            message.PublicationId == publication.Id)), Times.Once());
-
-                result.AssertRight();
-            }
-
-            MockUtils.VerifyAllMocks(storageQueueService);
-        }
-
-        [Fact]
-        public async Task PublicationChanged_PublicationNotFound()
-        {
-            var storageQueueService = new Mock<IStorageQueueService>(MockBehavior.Strict);
-
-            await using (var context = InMemoryApplicationDbContext())
-            {
-                var publishingService = BuildPublishingService(contentDbContext: context,
-                    storageQueueService: storageQueueService.Object);
-
-                var result = await publishingService.PublicationChanged(Guid.NewGuid());
-
-                result.AssertNotFound();
-            }
-
-            MockUtils.VerifyAllMocks(storageQueueService);
-        }
-
-        [Fact]
         public async Task PublishMethodologyFiles()
         {
             var methodologyVersion = new MethodologyVersion();

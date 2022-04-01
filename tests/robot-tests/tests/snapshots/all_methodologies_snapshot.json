@@ -141,6 +141,7 @@
       },
       {
         "methodologies": [
+          "Further education skills index",
           "Further education: outcome-based success measures"
         ],
         "topic_heading": "Further education outcomes"
@@ -167,15 +168,15 @@
       },
       {
         "methodologies": [
-          "Participation measures in higher education"
+          "Higher Level Learners in England"
         ],
-        "topic_heading": "Participation measures in higher education"
+        "topic_heading": "Higher level learners in England"
       },
       {
         "methodologies": [
-          "Higher Level Learners in England"
+          "Participation measures in higher education"
         ],
-        "topic_heading": "Skills Bill: Higher level learners"
+        "topic_heading": "Participation measures in higher education"
       },
       {
         "methodologies": [
@@ -255,7 +256,7 @@
       {
         "methodologies": [
           "A level and other 16 to 18 results",
-          "Level 2 and 3 attainment by young people aged 19"
+          "Level 2 and 3 attainment age 16 to 25"
         ],
         "topic_heading": "16 to 19 attainment"
       },

@@ -27,7 +27,7 @@ export const testEditableRelease: EditableRelease = {
     id: '8586c490-7027-4a8b-9df5-cf105c3e88ec',
     title: 'My Pub',
     slug: 'my-pub',
-    otherReleases: [],
+    releases: [],
     legacyReleases: [],
     topic: { theme: { title: 'Children, early years and social care' } },
     contact: {

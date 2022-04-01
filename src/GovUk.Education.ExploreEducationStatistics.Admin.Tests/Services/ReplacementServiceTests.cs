@@ -2924,7 +2924,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                             Location = new ChartDataSetLocation
                                             {
                                                 Level = GeographicLevel.LocalAuthority.ToString().CamelCase(),
-                                                Value = originalLocation.Id.ToString()
+                                                Value = originalLocation.Id
                                             }
                                         }
                                     }
@@ -2947,7 +2947,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                         Location = new ChartDataSetLocation
                                         {
                                             Level = GeographicLevel.LocalAuthority.ToString().CamelCase(),
-                                            Value = originalLocation.Id.ToString()
+                                            Value = originalLocation.Id
                                         }
                                     }
                                 }
@@ -3148,7 +3148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(dataSet.Filters);
                 Assert.Equal(replacementFilterItem1.Id, dataSet.Filters[0]);
                 Assert.Equal(replacementIndicator.Id, dataSet.Indicator);
-                Assert.Equal(replacementLocation.Id, Guid.Parse(dataSet.Location.Value));
+                Assert.Equal(replacementLocation.Id, dataSet.Location.Value);
 
                 var chartLegendItems = replacedDataBlock.Charts[0].Legend?.Items;
                 Assert.NotNull(chartLegendItems);
@@ -3158,7 +3158,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(replacementFilterItem1.Id, filter);
                 Assert.Equal(replacementIndicator.Id, chartLegendItem.DataSet.Indicator);
                 Assert.NotNull(chartLegendItem.DataSet.Location);
-                Assert.Equal(replacementLocation.Id, Guid.Parse(chartLegendItem.DataSet.Location!.Value));
+                Assert.Equal(replacementLocation.Id, chartLegendItem.DataSet.Location!.Value);
 
                 var replacedFootnoteForFilter = await GetFootnoteById(statisticsDbContext, footnoteForFilter.Id);
                 Assert.NotNull(replacedFootnoteForFilter);

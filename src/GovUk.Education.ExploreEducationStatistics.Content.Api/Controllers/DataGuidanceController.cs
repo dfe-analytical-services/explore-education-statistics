@@ -20,10 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("publications/{publicationSlug}/releases/latest/data-guidance")]
         public async Task<ActionResult<DataGuidanceViewModel>> GetLatest(string publicationSlug)
         {
-            return await _dataGuidanceService.Get(
-                    publicationPath: PublicContentPublicationPath(publicationSlug),
-                    releasePath: PublicContentLatestReleasePath(publicationSlug)
-                )
+            return await _dataGuidanceService.Get(publicationSlug)
                 .HandleFailuresOrOk();
         }
 
@@ -33,8 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             string releaseSlug)
         {
             return await _dataGuidanceService.Get(
-                    publicationPath: PublicContentPublicationPath(publicationSlug),
-                    releasePath: PublicContentReleasePath(publicationSlug, releaseSlug)
+                    publicationSlug,
+                    releaseSlug
                 )
                 .HandleFailuresOrOk();
         }

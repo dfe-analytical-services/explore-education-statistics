@@ -269,7 +269,7 @@ export const testPublicationRelease: Release = {
     id: '',
     slug: '',
     title: '',
-    otherReleases: [],
+    releases: [],
     legacyReleases: [],
     topic: {
       theme: {
