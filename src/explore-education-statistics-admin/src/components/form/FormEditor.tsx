@@ -160,7 +160,19 @@ const FormEditor = ({
 
   const handleBlur = useCallback<CKEditorProps['onBlur']>(() => {
     toggleFocused.off();
-    onBlur?.();
+
+    // Add a tiny timeout to prevent form submit events being lost during
+    // the blur (but only when there is a large DOM change e.g. element renders).
+    // By 'deferring' the blur event slightly, the higher priority submit
+    // event can take place without interruption.
+    //
+    // I'm fairly sure this is due to CKEditor's event system not being
+    // handled by React. This means React is not aware the CKEditor
+    // blur should not take precedence over the submit event.
+    // This may be fixable in React 18 with the new `useTransition` hook.
+    setTimeout(() => {
+      onBlur?.();
+    }, 100);
   }, [onBlur, toggleFocused]);
 
   // Change editor to add attributes like `aria-describedby`
