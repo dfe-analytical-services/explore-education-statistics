@@ -36,21 +36,34 @@ const applyTableHeadersOrder = ({
     reorderedTableHeaders.columns,
   ];
 
-  const allOrderedColumnGroups = orderGroups({
-    defaultGroups: defaultColGroups,
-    reorderedGroups: reorderedColGroups,
-    otherAxisDefaultGroups: defaultRowGroups,
-    otherAxisReorderedGroups: reorderedRowGroups,
-  });
-
-  const allOrderedRowGroups = orderGroups({
+  const { orderedGroups: orderedRowGroups } = orderGroups({
     defaultGroups: defaultRowGroups,
     reorderedGroups: reorderedRowGroups,
     otherAxisDefaultGroups: defaultColGroups,
     otherAxisReorderedGroups: reorderedColGroups,
   });
 
+  const moveNewColumnGroupsToRows = orderedRowGroups.length <= 1;
+
+  const {
+    orderedGroups: allOrderedColumnGroups,
+    newGroups: newColumnGroups,
+  } = orderGroups({
+    defaultGroups: defaultColGroups,
+    reorderedGroups: reorderedColGroups,
+    otherAxisDefaultGroups: defaultRowGroups,
+    otherAxisReorderedGroups: reorderedRowGroups,
+    returnNewGroups: moveNewColumnGroupsToRows,
+  });
+
   const allOrderedColumnGroupsLength = allOrderedColumnGroups.length;
+
+  // If there's zero or one row groups then add any new column groups
+  // to row groups instead to avoid causing horizontal scrolling
+  // by having lots of columns.
+  const allOrderedRowGroups = moveNewColumnGroupsToRows
+    ? [...orderedRowGroups, ...newColumnGroups]
+    : orderedRowGroups;
   const allOrderedRowGroupsLength = allOrderedRowGroups.length;
 
   // For safety - can't think how this would be possible,
@@ -93,18 +106,22 @@ const applyTableHeadersOrder = ({
  * checks both axes
  * - adds groups that have been added to the headers after the reordered ones
  * or in default order if groups have not been reordered
+ * - if returnNewGroups is true then the new groups are returned from here
+ * instead of being added to the reordered groups
  */
 function orderGroups({
   defaultGroups,
   reorderedGroups,
   otherAxisDefaultGroups,
   otherAxisReorderedGroups,
+  returnNewGroups = false,
 }: {
   defaultGroups: Filter[][];
   reorderedGroups: Filter[][];
   otherAxisDefaultGroups: Filter[][];
   otherAxisReorderedGroups: Filter[][];
-}): Filter[][] {
+  returnNewGroups?: boolean;
+}): { orderedGroups: Filter[][]; newGroups: Filter[][] } {
   const orderedGroups = filterReorderedGroups({
     reorderedGroups,
     defaultGroups,
@@ -140,9 +157,7 @@ function orderGroups({
     defaultGroups,
   });
 
-  // If the groups were reordered append new groups to the end,
-  // else maintain the default order.
-  return groupsAreReordered
+  const allGroups = groupsAreReordered
     ? [...orderedGroups, ...newGroups]
     : [...orderedGroups, ...newGroups].sort((a, b) => {
         return (
@@ -150,6 +165,11 @@ function orderGroups({
           defaultGroupsOrder.indexOf(getFilterType(b[0]))
         );
       });
+
+  return {
+    orderedGroups: returnNewGroups ? orderedGroups : allGroups,
+    newGroups: returnNewGroups ? newGroups : [],
+  };
 }
 
 /**
