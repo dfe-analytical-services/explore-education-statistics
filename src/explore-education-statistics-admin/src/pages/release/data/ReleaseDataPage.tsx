@@ -15,6 +15,7 @@ export const releaseDataPageTabIds = {
   dataUploads: 'data-uploads',
   fileUploads: 'file-uploads',
   dataGuidance: 'data-guidance',
+  reordering: 'reordering',
 };
 
 const ReleaseDataPage = () => {
@@ -67,8 +68,13 @@ const ReleaseDataPage = () => {
           />
         </TabsSection>
         {/* EES-1243 
-        <TabsSection id="test-id" title="Reorder filters and indicators">
+        <TabsSection
+          id={releaseDataPageTabIds.reordering}
+          title="Reorder filters and indicators"
+          lazy
+        >
           <ReleaseDataReorderSection
+            key={dataFiles.filter(file => file.status === 'COMPLETE').length}
             releaseId={releaseId}
             canUpdateRelease={canUpdateRelease}
           />

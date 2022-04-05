@@ -89,6 +89,11 @@ const ReorderList = ({
       ? listItems[0].items
       : listItems;
 
+  const parentCategoryId =
+    listItems.length === 1 && 'items' in listItems[0]
+      ? listItems[0].id
+      : categoryId;
+
   return (
     <DragDropContext
       onDragEnd={result => {
@@ -113,7 +118,7 @@ const ReorderList = ({
             }
             return option;
           }),
-          parentCategoryId: categoryId,
+          parentCategoryId,
           parentGroupId: groupId,
         });
       }}
