@@ -27,7 +27,10 @@ Go to manage publication page
     user waits until h1 is visible    Manage publication
 
 Create legacy release
-    user clicks link    Create legacy release
+    user clicks button    Create legacy release
+    user waits until modal is visible    Create legacy release
+    user clicks button    OK
+    user waits until modal is not visible    Create legacy release
     user waits until h1 is visible    Create legacy release
     user enters text into element    id:legacyReleaseForm-description    Test collection
     user enters text into element    id:legacyReleaseForm-url    http://test.com
@@ -42,6 +45,9 @@ Validate created legacy release
 
 Update legacy release
     user clicks element    xpath://tr[1]//*[text()="Edit release"]
+    user waits until modal is visible    Edit legacy release
+    user clicks button    OK
+    user waits until modal is not visible    Edit legacy release
     user waits until h1 is visible    Edit legacy release
     user enters text into element    id:legacyReleaseForm-description    Test collection 2
     user enters text into element    id:legacyReleaseForm-url    http://test-2.com
@@ -84,6 +90,9 @@ Validate legacy release order
 
 Reorder legacy releases
     user clicks button    Reorder legacy releases
+    user waits until modal is visible    Reorder legacy releases
+    user clicks button    OK
+    user waits until modal is not visible    Reorder legacy releases
     user waits until page contains button    Confirm order
     user sets focus to element    css:tbody tr:first-child
     user presses keys    ${SPACE}
@@ -111,7 +120,10 @@ Validate reordered legacy releases
 *** Keywords ***
 user creates legacy release
     [Arguments]    ${description}    ${url}
-    user clicks link    Create legacy release
+    user clicks button    Create legacy release
+    user waits until modal is visible    Create legacy release
+    user clicks button    OK
+    user waits until modal is not visible    Create legacy release
     user waits until h1 is visible    Create legacy release
     user enters text into element    id:legacyReleaseForm-description    ${description}
     user enters text into element    id:legacyReleaseForm-url    ${url}
