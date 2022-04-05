@@ -22,21 +22,18 @@ const testSubjectMeta: SubjectMeta = {
       label: 'Category 1',
       options: [
         {
-          id: 'category-1-item-1-id',
           value: 'category-1-item-1',
           label: 'Category 1 Item 1',
           unit: '',
           name: 'category_1_item_1',
         },
         {
-          id: 'category-1-item-2-id',
           value: 'category-1-item-2',
           label: 'Category 1 Item 2',
           unit: '',
           name: 'category_1_item_2',
         },
         {
-          id: 'category-1-item-3-id',
           value: 'category-1-item-3',
           label: 'Category 1 Item 3',
           unit: '',
@@ -50,7 +47,6 @@ const testSubjectMeta: SubjectMeta = {
       label: 'Category 2',
       options: [
         {
-          id: 'category-2-item-1-id',
           value: 'category-2-item-1',
           label: 'Category 2 Item 1',
           unit: '',
@@ -70,7 +66,7 @@ const testSubjectMeta: SubjectMeta = {
 
 interface UpdatedIndicator {
   id?: string;
-  indicatorItems: (string | undefined)[];
+  indicatorItems: string[];
 }
 export type UpdateIndicatorsRequest = UpdatedIndicator[];
 
@@ -104,7 +100,10 @@ const ReorderIndicatorsList = ({ subject, onCancel, onSave }: Props) => {
           id: item.id,
           label: item.label,
           order: item.order,
-          items: item.options,
+          items: item.options.map(option => ({
+            id: option.value,
+            label: option.label,
+          })),
         };
       }),
       'order',

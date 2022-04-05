@@ -1,18 +1,18 @@
 import styles from '@admin/pages/release/data/components/ReorderList.module.scss';
 import ButtonText from '@common/components/ButtonText';
-import {
-  FilterOption,
-  IndicatorOption,
-} from '@common/services/tableBuilderService';
 import reorder from '@common/utils/reorder';
 import classNames from 'classnames';
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 
+export interface FormattedOption {
+  id: string;
+  label: string;
+}
 export interface FormattedGroup {
   id?: string;
   label: string;
-  items: FilterOption[];
+  items: FormattedOption[];
 }
 export interface FormattedFilters {
   id?: string;
@@ -22,14 +22,13 @@ export interface FormattedFilters {
 export interface FormattedIndicators {
   id?: string;
   label: string;
-  items: IndicatorOption[];
+  items: FormattedOption[];
 }
 export interface ReorderProps {
   reordered: (
     | FormattedIndicators
-    | IndicatorOption
     | FormattedFilters
-    | FilterOption
+    | FormattedOption
     | FormattedGroup
   )[];
   parentCategoryId?: string;
@@ -40,28 +39,32 @@ const getChildItems = (
   option:
     | FormattedFilters
     | FormattedGroup
-    | FilterOption
-    | IndicatorOption
+    | FormattedOption
     | FormattedIndicators,
-): (IndicatorOption | FilterOption | FormattedGroup)[] | undefined => {
+): {
+  childOptions: (FormattedOption | FormattedGroup)[] | undefined;
+  parentGroupId?: string | undefined;
+} => {
   if ('groups' in option && option.groups.length > 1) {
-    return option.groups;
+    return { childOptions: option.groups };
   }
   if ('groups' in option && option.groups.length === 1) {
-    return option.groups[0].items;
+    return {
+      childOptions: option.groups[0].items,
+      parentGroupId: option.groups[0].id,
+    };
   }
   if ('items' in option && option.items.length > 1) {
-    return option.items;
+    return { childOptions: option.items, parentGroupId: option.id };
   }
-  return undefined;
+  return { childOptions: undefined };
 };
 
 interface ReorderListProps {
   listItems: (
     | FormattedIndicators
-    | IndicatorOption
     | FormattedFilters
-    | FilterOption
+    | FormattedOption
     | FormattedGroup
   )[];
   categoryId?: string;
@@ -85,11 +88,6 @@ const ReorderList = ({
     listItems.length === 1 && 'items' in listItems[0]
       ? listItems[0].items
       : listItems;
-
-  const parentGroupId =
-    listItems.length === 1 && 'items' in listItems[0]
-      ? listItems[0].id
-      : groupId;
 
   return (
     <DragDropContext
@@ -116,7 +114,7 @@ const ReorderList = ({
             return option;
           }),
           parentCategoryId: categoryId,
-          parentGroupId,
+          parentGroupId: groupId,
         });
       }}
     >
@@ -130,9 +128,9 @@ const ReorderList = ({
             ref={droppableProvided.innerRef}
           >
             {options.map((option, index) => {
-              const key = option.id || `key-${index}`; // EES-1243 - temp key here while the id is optional
+              const key = option.id || `key-${index}`;
               const isExpanded = reorderingGroups.includes(key);
-              const childOptions = getChildItems(option);
+              const { childOptions, parentGroupId } = getChildItems(option);
               return (
                 <Draggable
                   draggableId={key}
@@ -189,7 +187,7 @@ const ReorderList = ({
                           <ReorderList
                             listItems={childOptions}
                             categoryId={categoryId || option.id}
-                            groupId={option.id}
+                            groupId={parentGroupId}
                             onReorder={onReorder}
                           />
                         )}

@@ -33,7 +33,6 @@ const testSubjectMeta: SubjectMeta = {
             {
               label: 'Category 1 Group 1 Item 1',
               value: 'category-1-group-1-item-1',
-              id: 'category-1-group-1-item-1-id',
             },
           ],
           order: 1,
@@ -45,17 +44,14 @@ const testSubjectMeta: SubjectMeta = {
             {
               label: 'Category 1 Group 2 Item 1',
               value: 'category-1-group-2-item-1',
-              id: 'category-1-group-2-item-1-id',
             },
             {
               label: 'Category 1 Group 2 Item 2',
               value: 'category-1-group-2-item-2',
-              id: 'category-1-group-2-item-2-id',
             },
             {
               label: 'Category 1 Group 2 Item 3',
               value: 'category-1-group-2-item-3',
-              id: 'category-1-group-2-item-3-id',
             },
           ],
           order: 0,
@@ -67,12 +63,10 @@ const testSubjectMeta: SubjectMeta = {
             {
               label: 'Category 1 Group 3 Item 1',
               value: 'category-1-group-3-item-1',
-              id: 'category-1-group-3-item-1-id',
             },
             {
               label: 'Category 1 Group 3 Item 2',
               value: 'category-1-group-3-item-2',
-              id: 'category-1-group-3-item-2-id',
             },
           ],
           order: 2,
@@ -92,12 +86,10 @@ const testSubjectMeta: SubjectMeta = {
             {
               label: 'Category 2 Group 1 Item 1',
               value: 'category-2-group-1-item-1',
-              id: 'category-2-group-1-item-1-id',
             },
             {
               label: 'Category 2 Group 1 Item 2',
               value: 'category-2-group-1-item-2',
-              id: 'category-2-group-1-item-2-id',
             },
           ],
           order: 0,
@@ -394,7 +386,7 @@ describe('ReorderFiltersList', () => {
     expect(within(options[1]).getByText('Category 2 Group 1 Item 2'));
   });
 
-  test('clicking the `save` button calls handleSave with the redoreded list formatted for the update request', async () => {
+  test('clicking the `save` button calls handleSave with the reordeded list formatted for the update request', async () => {
     const handleSave = jest.fn();
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
@@ -415,8 +407,8 @@ describe('ReorderFiltersList', () => {
         filterGroups: [
           {
             filterItems: [
-              'category-2-group-1-item-1-id',
-              'category-2-group-1-item-2-id',
+              'category-2-group-1-item-1',
+              'category-2-group-1-item-2',
             ],
             id: 'category-2-group-1-id',
           },
@@ -428,20 +420,20 @@ describe('ReorderFiltersList', () => {
           {
             id: 'category-1-group-2-id',
             filterItems: [
-              'category-1-group-2-item-1-id',
-              'category-1-group-2-item-2-id',
-              'category-1-group-2-item-3-id',
+              'category-1-group-2-item-1',
+              'category-1-group-2-item-2',
+              'category-1-group-2-item-3',
             ],
           },
           {
             id: 'category-1-group-1-id',
-            filterItems: ['category-1-group-1-item-1-id'],
+            filterItems: ['category-1-group-1-item-1'],
           },
           {
             id: 'category-1-group-3-id',
             filterItems: [
-              'category-1-group-3-item-1-id',
-              'category-1-group-3-item-2-id',
+              'category-1-group-3-item-1',
+              'category-1-group-3-item-2',
             ],
           },
         ],

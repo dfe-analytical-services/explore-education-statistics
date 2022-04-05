@@ -74,7 +74,11 @@ export class LocationFilter extends Filter {
     level,
     geoJson,
     group,
-  }: GroupedFilterOption & { level: string; geoJson?: GeoJsonFeature[] }) {
+  }: GroupedFilterOption & {
+    id?: string;
+    level: string;
+    geoJson?: GeoJsonFeature[];
+  }) {
     // Fallback to using the code if there's no id.
     // This is the case for historical Permalinks created prior to EES-2955.
     const idOrFallback = id ?? value;
