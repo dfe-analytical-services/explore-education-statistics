@@ -15,6 +15,8 @@ def compare_images_in_folder_trees(
 
     for folder, _, original_files in os.walk(first_folderpath_absolute):
         for original_filename in original_files:
+            if not original_filename.endswith('.png'):
+                continue
             original_folder_relative_path = os.path.relpath(folder, first_folderpath_absolute)
             second_filepath = f'{second_folderpath_absolute}/{original_folder_relative_path}/{original_filename}'
 

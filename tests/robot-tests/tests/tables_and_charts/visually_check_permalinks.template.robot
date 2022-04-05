@@ -2,7 +2,7 @@
 Resource            ../libs/public-common.robot
 Resource            permalinks.robot
 
-Force Tags          GeneralPublic    Local    Dev    Test    Preprod
+Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 
 Suite Setup         user opens the browser
 Suite Teardown      user closes the browser

@@ -19,8 +19,13 @@ permalink_ids = []
 with open(permalinks_csv_filepath, 'r', encoding='utf-8-sig') as csv_file:
     csv_reader = csv.reader(csv_file, delimiter=',')
     next(csv_reader)
+    count = 0
+    max = 150
     for row in csv_reader:
         permalink_ids.append(row[0])
+        count += 1
+        if count > max:
+            break
 
 with open('visually_check_permalinks.template.robot', 'r', encoding='utf-8-sig') as robot_template_file:
 
