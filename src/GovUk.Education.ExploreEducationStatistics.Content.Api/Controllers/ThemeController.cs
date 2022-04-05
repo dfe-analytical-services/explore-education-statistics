@@ -1,5 +1,6 @@
 #nullable enable
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -28,9 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("themes")]
-        [BlobCache(typeof(PublicationTreeCacheKey))]
-        public async Task<IList<ThemeTree<PublicationTreeNode>>> GetThemes(
-            [FromQuery(Name = "publicationFilter")] PublicationTreeFilter? filter = null)
+        public async Task<IList<ThemeTree<PublicationTreeNode>>> GetPublicationTree(
+            [Required][FromQuery(Name = "publicationFilter")] PublicationTreeFilter filter)
         {
             return await _themeService.GetPublicationTree(filter);
         }

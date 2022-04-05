@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -75,8 +76,7 @@ public class PublicationService : IPublicationService
         return publication.SupersededById != null
                // To be superseded, superseding publication must have Live release
                && _contentDbContext.Releases
-                   .Where(r => r.PublicationId == publication.SupersededById)
-                   .ToList()
-                   .Any(r => r.Live);
+                   .Any(r => r.PublicationId == publication.SupersededById
+                             && r.Published.HasValue && DateTime.UtcNow >= r.Published.Value);
     }
 }

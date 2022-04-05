@@ -100,7 +100,7 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
   const themes = await themeService.listThemes({
-    publicationFilter: 'NotSuperseded',
+    publicationFilter: 'FindStatistics',
   });
 
   return {

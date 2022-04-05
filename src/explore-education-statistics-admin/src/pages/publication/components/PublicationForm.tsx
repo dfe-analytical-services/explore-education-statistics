@@ -3,7 +3,7 @@ import publicationService from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { FormFieldset } from '@common/components/form';
+import { FormFieldSelect, FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import FormSelect from '@common/components/form/FormSelect';
@@ -62,10 +62,10 @@ const PublicationForm = ({
         return { themes };
       }
 
-      const allPublications = await publicationService.getPublicationTitles();
-      const publications = allPublications.filter(publication => {
-        return publication.id !== publicationId;
-      });
+      const allPublications = await publicationService.getPublicationSummaries();
+      const publications = allPublications.filter(
+        publication => publication.id !== publicationId,
+      );
 
       return {
         themes,
@@ -180,23 +180,16 @@ const PublicationForm = ({
                 id="supersede"
                 legend="Archive this publication"
                 legendSize="m"
-                hint="Select the publication that will be superseding this publication."
               >
-                <FormSelect
-                  id="supersededById"
-                  label="Select publication"
+                <FormFieldSelect<FormValues>
+                  label="Superseding publication"
+                  hint="If superseded by a publication with a live release, this will archive the current publication immediately"
                   name="supersededById"
                   options={publications.map(publication => ({
                     label: publication.title,
                     value: publication.id,
                   }))}
                   placeholder="None selected"
-                  value={
-                    form.values.supersededById ?? initialValues?.supersededById
-                  }
-                  onChange={event =>
-                    form.setFieldValue('supersededById', event.target.value)
-                  }
                 />
               </FormFieldset>
             )}

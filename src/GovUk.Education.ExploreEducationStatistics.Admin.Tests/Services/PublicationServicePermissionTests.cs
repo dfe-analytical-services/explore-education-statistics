@@ -2,13 +2,13 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -17,6 +17,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -37,13 +41,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetMyPublicationsAndReleasesByTopic_NoAccessOfSystem()
         {
-            var mocks = Mocks();
-            var userService = mocks.UserService;
-            var publicationRepository = mocks.PublicationRepository;
+            var userService = AlwaysTrueUserService();
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
             var topicId = Guid.NewGuid();
 
-            var publicationService = BuildPublicationService(mocks);
+            var publicationService = BuildPublicationService(
+                context: new Mock<ContentDbContext>(Strict).Object,
+                userService: userService.Object,
+                publicationRepository: publicationRepository.Object);
 
             userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(false);
 
@@ -70,13 +76,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetMyPublicationsAndReleasesByTopic_CanViewAllReleases()
         {
-            var mocks = Mocks();
-            var userService = mocks.UserService;
-            var publicationRepository = mocks.PublicationRepository;
+            var userService = AlwaysTrueUserService();
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
             var topicId = Guid.NewGuid();
 
-            var publicationService = BuildPublicationService(mocks);
+            var publicationService = BuildPublicationService(
+                context: new Mock<ContentDbContext>(Strict).Object,
+                userService: userService.Object,
+                publicationRepository: publicationRepository.Object);
 
             userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(true);
 
@@ -107,14 +115,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void GetMyPublicationsAndReleasesByTopic_CanViewRelatedReleases()
         {
-            var mocks = Mocks();
-            var userService = mocks.UserService;
-            var publicationRepository = mocks.PublicationRepository;
+            var userService = AlwaysTrueUserService();
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
             var topicId = Guid.NewGuid();
             var userId = Guid.NewGuid();
 
-            var publicationService = BuildPublicationService(mocks);
+            var publicationService = BuildPublicationService(
+                context: new Mock<ContentDbContext>(Strict).Object,
+                userService: userService.Object,
+                publicationRepository: publicationRepository.Object);
 
             userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem)).ReturnsAsync(true);
 
@@ -146,30 +156,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListPublications()
+        public async Task ListPublicationSummaries()
         {
-            var mocks = Mocks();
-
             await PermissionTestUtils.PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(SecurityPolicies.CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                 {
-                    mocks.UserService = userService;
-                    var service = BuildPublicationService(mocks);
-                    return await service.ListPublications();
+                    var service = BuildPublicationService(
+                        context: new Mock<ContentDbContext>(Strict).Object,
+                        userService: userService.Object);
+                    return await service.ListPublicationSummaries();
                 });
         }
 
         [Fact]
         public async Task CreatePublication()
         {
-            await using var context = DbUtils.InMemoryApplicationDbContext();
-
-            var mocks = Mocks();
-
+            await using var context = InMemoryApplicationDbContext();
             context.Add(_topic);
-
             await context.SaveChangesAsync();
+
+            var userService = AlwaysTrueUserService();
+            var publicationService = BuildPublicationService(
+                context: new Mock<ContentDbContext>(Strict).Object,
+                userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service =>
@@ -178,22 +188,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         TopicId = _topic.Id,
                     }),
                 _topic,
-                mocks.UserService,
-                BuildPublicationService(mocks),
+                userService,
+                publicationService,
                 SecurityPolicies.CanCreatePublicationForSpecificTopic);
         }
 
         [Fact]
         public async Task UpdatePublication_CanUpdatePublicationTitles()
         {
-            await using var context = DbUtils.InMemoryApplicationDbContext();
-
-            var mocks = Mocks();
-
+            await using var context = InMemoryApplicationDbContext();
             context.Add(_topic);
             context.Add(_publication);
-
             await context.SaveChangesAsync();
+
+            var userService = AlwaysTrueUserService();
+            var publicationService = BuildPublicationService(
+                context: new Mock<ContentDbContext>(Strict).Object,
+                userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service =>
@@ -210,22 +221,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }),
                 _publication,
-                mocks.UserService,
-                BuildPublicationService(mocks),
+                userService,
+                publicationService,
                 SecurityPolicies.CanUpdatePublicationTitles);
         }
 
         [Fact]
         public async Task UpdatePublication_CanUpdatePublication()
         {
-            await using var context = DbUtils.InMemoryApplicationDbContext();
-
-            var mocks = Mocks();
-
+            await using var context = InMemoryApplicationDbContext();
             context.Add(_topic);
             context.Add(_publication);
-
             await context.SaveChangesAsync();
+
+            var userService = AlwaysTrueUserService();
+            var publicationService = BuildPublicationService(
+                context: new Mock<ContentDbContext>(Strict).Object,
+                userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service =>
@@ -242,22 +254,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }),
                 _publication,
-                mocks.UserService,
-                BuildPublicationService(mocks),
+                userService,
+                publicationService,
                 SecurityPolicies.CanUpdateSpecificPublication);
         }
 
         [Fact]
         public async Task UpdatePublication_CanCreatePublicationForSpecificTopic()
         {
-            await using var context = DbUtils.InMemoryApplicationDbContext();
-
-            var mocks = Mocks();
-
+            await using var context = InMemoryApplicationDbContext();
             context.Add(_topic);
             context.Add(_publication);
-
             await context.SaveChangesAsync();
+
+            var userService = AlwaysTrueUserService();
+            var publicationService = BuildPublicationService(
+                context: new Mock<ContentDbContext>(Strict).Object,
+                userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service =>
@@ -274,88 +287,220 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                     }),
                 _topic,
-                mocks.UserService,
-                BuildPublicationService(mocks),
+                userService,
+                publicationService,
                 SecurityPolicies.CanCreatePublicationForSpecificTopic);
+        }
+
+        [Fact]
+        public async Task UpdatePublication_NoPermissionToChangeTitle()
+        {
+            var publication = new Publication
+            {
+                Title = "Old publication title",
+                Slug = "publication-slug",
+                Topic = new Topic { Title = "Old topic title" },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var userService = new Mock<IUserService>(Strict);
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        SecurityPolicies.CanUpdateSpecificPublication))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublicationTitles))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                var publicationService = BuildPublicationService(context,
+                    userService: userService.Object,
+                    publicBlobCacheService: publicBlobCacheService.Object);
+
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new PublicationSaveViewModel
+                    {
+                        Title = "New publication title",
+                    }
+                );
+
+                var actionResult = result.AssertLeft();
+                Assert.IsType<ForbidResult>(actionResult);
+            }
+        }
+
+        [Fact]
+        public async Task UpdatePublication_NoPermissionToChangeSupersededBy()
+        {
+            var publication = new Publication
+            {
+                Title = "Old publication title",
+                Slug = "publication-slug",
+                Topic = new Topic { Title = "Old topic title" },
+                SupersededById = Guid.NewGuid(),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            var userService = new Mock<IUserService>(Strict);
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        SecurityPolicies.CanUpdateSpecificPublication))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublicationSupersededBy))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                var publicationService = BuildPublicationService(context,
+                    userService: userService.Object,
+                    publicBlobCacheService: publicBlobCacheService.Object);
+
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new PublicationSaveViewModel
+                    {
+                        Title = "Old publication title",
+                        Slug = "publication-slug",
+                        SupersededById = Guid.NewGuid(),
+                    }
+                );
+
+                var actionResult = result.AssertLeft();
+                Assert.IsType<ForbidResult>(actionResult);
+            }
+        }
+
+        [Fact]
+        public async Task UpdatePublication_NoPermissionToChangeTopic()
+        {
+            var newTopic = new Topic
+            {
+                Title = "New topic title"
+            };
+            var publication = new Publication
+            {
+                Title = "Publication title",
+                Slug = "publication-slug",
+                Topic = new Topic { Title = "Old topic title" },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication, newTopic);
+                await context.SaveChangesAsync();
+            }
+
+            var userService = new Mock<IUserService>(Strict);
+
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        SecurityPolicies.CanUpdateSpecificPublication))
+                .ReturnsAsync(true);
+
+            userService
+                .Setup(s =>
+                    s.MatchesPolicy(
+                        It.Is<Topic>(t => t.Id == newTopic.Id),
+                        SecurityPolicies.CanCreatePublicationForSpecificTopic))
+                .ReturnsAsync(false);
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                var publicationService = BuildPublicationService(context,
+                    userService: userService.Object,
+                    publicBlobCacheService: publicBlobCacheService.Object);
+
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new PublicationSaveViewModel
+                    {
+                        Title = "Publication title",
+                        TopicId = newTopic.Id,
+                    }
+                );
+
+                var actionResult = result.AssertLeft();
+                Assert.IsType<ForbidResult>(actionResult);
+            }
         }
 
         [Fact]
         public void GetPublication()
         {
-            var mocks = Mocks();
+            var userService = AlwaysTrueUserService();
+            var publicationService = BuildPublicationService(
+                context: new Mock<ContentDbContext>(Strict).Object,
+                userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service => await service.GetPublication(_publication.Id),
                 _publication,
-                mocks.UserService,
-                BuildPublicationService(mocks),
+                userService,
+                publicationService,
                 SecurityPolicies.CanViewSpecificPublication);
         }
 
         [Fact]
         public void GetLatestReleaseVersions()
         {
-            var mocks = Mocks();
+            var userService = AlwaysTrueUserService();
+            var publicationService = BuildPublicationService(
+                context: new Mock<ContentDbContext>(Strict).Object,
+                userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
                 async service => await service.ListActiveReleases(_publication.Id),
                 _publication,
-                mocks.UserService,
-                BuildPublicationService(mocks),
+                userService,
+                publicationService,
                 SecurityPolicies.CanViewSpecificPublication);
         }
 
         private static PublicationService BuildPublicationService(
-            (
-                Mock<ContentDbContext>,
-                Mock<IMapper>,
-                Mock<IUserService> userService,
-                Mock<IPublicationRepository> publicationRepository,
-                Mock<IMethodologyVersionRepository> methodologyVersionRepository,
-                Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,
-                Mock<IBlobCacheService> publicBlobCacheService) mocks)
-
+            ContentDbContext context,
+            IUserService? userService = null,
+            IPublicationRepository? publicationRepository = null,
+            IMethodologyVersionRepository? methodologyVersionRepository = null,
+            IBlobCacheService? publicBlobCacheService = null)
         {
-            var (
+            return new(
                 context,
-                mapper,
-                userService,
-                publicationRepository,
-                methodologyVersionRepository,
-                persistenceHelper,
-                publicBlobCacheService
-                ) = mocks;
-
-            return new PublicationService(
-                context.Object,
-                mapper.Object,
-                persistenceHelper.Object,
-                userService.Object,
-                publicationRepository.Object, 
-                methodologyVersionRepository.Object,
-                publicBlobCacheService.Object);
-        }
-
-        private (Mock<ContentDbContext> ContentDbContext,
-            Mock<IMapper> Mapper,
-            Mock<IUserService> UserService,
-            Mock<IPublicationRepository> PublicationRepository,
-            Mock<IMethodologyVersionRepository> MethodologyVersionRepository,
-            Mock<IPersistenceHelper<ContentDbContext>> PersistenceHelper,
-            Mock<IBlobCacheService> PublicBlobCacheService) Mocks()
-        {
-            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext>();
-            MockUtils.SetupCall(persistenceHelper, _topic.Id, _topic);
-            MockUtils.SetupCall(persistenceHelper, _publication.Id, _publication);
-
-            return (
-                new Mock<ContentDbContext>(),
-                new Mock<IMapper>(),
-                MockUtils.AlwaysTrueUserService(),
-                new Mock<IPublicationRepository>(),
-                new Mock<IMethodologyVersionRepository>(),
-                persistenceHelper,
-                new Mock<IBlobCacheService>());
+                AdminMapper(),
+                new PersistenceHelper<ContentDbContext>(context),
+                userService ?? AlwaysTrueUserService().Object,
+                publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
+                methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),
+                publicBlobCacheService ?? Mock.Of<IBlobCacheService>(Strict));
         }
     }
 }

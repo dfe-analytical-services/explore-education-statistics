@@ -467,7 +467,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListPublications()
+        public async Task ListPublicationSummaries()
         {
             var publication1 = new Publication
             {
@@ -491,11 +491,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = BuildPublicationService(contentDbContext);
 
-                var result = await service.ListPublications();
+                var result = await service.ListPublicationSummaries();
 
-                Assert.True(result.IsRight);
-
-                var publicationViewModels = result.Right;
+                var publicationViewModels = result.AssertRight();
                 Assert.Equal(2, publicationViewModels.Count);
 
                 Assert.Equal(publication1.Id, publicationViewModels[0].Id);
@@ -507,17 +505,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListPublications_NoPublications()
+        public async Task ListPublicationSummaries_NoPublications()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
             await using var contentDbContext = InMemoryApplicationDbContext(contentDbContextId);
             var service = BuildPublicationService(contentDbContext);
 
-            var result = await service.ListPublications();
+            var result = await service.ListPublicationSummaries();
 
-            Assert.True(result.IsRight);
-
-            var publicationViewModels = result.Right;
+            var publicationViewModels = result.AssertRight();
             Assert.Empty(publicationViewModels);
         }
 
@@ -557,7 +553,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var publicationViewModel = result.Right;
+                var publicationViewModel = result.AssertRight();
                 Assert.Equal("Test publication", publicationViewModel.Title);
 
                 Assert.Equal("John Smith", publicationViewModel.Contact.ContactName);
@@ -723,19 +719,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(methodologyVersionRepository, publicBlobCacheService);
 
-                Assert.Equal("New title", result.Right.Title);
+                var viewModel = result.AssertRight();
 
-                Assert.Equal("John Smith", result.Right.Contact.ContactName);
-                Assert.Equal("0123456789", result.Right.Contact.ContactTelNo);
-                Assert.Equal("Test team", result.Right.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", result.Right.Contact.TeamEmail);
+                Assert.Equal("New title", viewModel.Title);
 
-                Assert.Equal(topic.Id, result.Right.TopicId);
+                Assert.Equal("John Smith", viewModel.Contact.ContactName);
+                Assert.Equal("0123456789", viewModel.Contact.ContactTelNo);
+                Assert.Equal("Test team", viewModel.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", viewModel.Contact.TeamEmail);
 
-                Assert.Equal(newSupersededById, result.Right.SupersededById);
+                Assert.Equal(topic.Id, viewModel.TopicId);
+
+                Assert.Equal(newSupersededById, viewModel.SupersededById);
 
                 // Do an in depth check of the saved release
-                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
+                var updatedPublication = await context.Publications.FindAsync(viewModel.Id);
 
                 Assert.NotNull(updatedPublication);
                 Assert.False(updatedPublication!.Live);
@@ -808,19 +806,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<AllMethodologiesCacheKey>()))
                     .Returns(Task.CompletedTask);
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey(null)))
-                    .Returns(Task.CompletedTask);
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData)))
-                    .Returns(Task.CompletedTask);
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData)))
-                    .Returns(Task.CompletedTask);
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.NotSuperseded)))
-                    .Returns(Task.CompletedTask);
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestDataNotSuperseded)))
+                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationTreeCacheKey()))
                     .Returns(Task.CompletedTask);
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationCacheKey(publication.Slug)))
-                    .Returns(Task.CompletedTask);
-                publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationCacheKey(supersedingPublicationToRemove.Slug)))
                     .Returns(Task.CompletedTask);
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(new PublicationCacheKey(supersededPublication.Slug)))
                     .Returns(Task.CompletedTask);
@@ -860,19 +848,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(methodologyVersionRepository, publicBlobCacheService);
 
-                Assert.Equal("New title", result.Right.Title);
+                var viewModel = result.AssertRight();
 
-                Assert.Equal("John Smith", result.Right.Contact.ContactName);
-                Assert.Equal("0123456789", result.Right.Contact.ContactTelNo);
-                Assert.Equal("Test team", result.Right.Contact.TeamName);
-                Assert.Equal("john.smith@test.com", result.Right.Contact.TeamEmail);
+                Assert.Equal("New title", viewModel.Title);
 
-                Assert.Equal(topic.Id, result.Right.TopicId);
+                Assert.Equal("John Smith", viewModel.Contact.ContactName);
+                Assert.Equal("0123456789", viewModel.Contact.ContactTelNo);
+                Assert.Equal("Test team", viewModel.Contact.TeamName);
+                Assert.Equal("john.smith@test.com", viewModel.Contact.TeamEmail);
 
-                Assert.Equal(newSupersededById, result.Right.SupersededById);
+                Assert.Equal(topic.Id, viewModel.TopicId);
+
+                Assert.Equal(newSupersededById, viewModel.SupersededById);
 
                 // Do an in depth check of the saved release
-                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
+                var updatedPublication = await context.Publications.FindAsync(viewModel.Id);
 
                 Assert.NotNull(updatedPublication);
                 Assert.True(updatedPublication!.Live);
@@ -962,9 +952,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 VerifyAllMocks(methodologyVersionRepository, publicBlobCacheService);
 
-                Assert.Equal("Old title", result.Right.Title);
-                Assert.Equal("John Smith", result.Right.Contact.ContactName);
-                Assert.Equal(publication.SupersededById, result.Right.SupersededById);
+                var viewModel = result.AssertRight();
+
+                Assert.Equal("Old title", viewModel.Title);
+                Assert.Equal("John Smith", viewModel.Contact.ContactName);
+                Assert.Equal(publication.SupersededById, viewModel.SupersededById);
             }
         }
 
@@ -1026,7 +1018,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
+                var viewModel = result.AssertRight();
+
+                var updatedPublication = await context.Publications.FindAsync(viewModel.Id);
 
                 Assert.NotNull(updatedPublication);
                 Assert.Equal("John Smith", updatedPublication!.Contact.ContactName);
@@ -1108,7 +1102,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var updatedPublication = await context.Publications.FindAsync(result.Right.Id);
+                var viewModel = result.AssertRight();
+
+                var updatedPublication = await context.Publications.FindAsync(viewModel.Id);
 
                 Assert.NotNull(updatedPublication);
                 Assert.NotEqual(sharedContact.Id, updatedPublication!.Contact.Id);
@@ -1157,168 +1153,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 result.AssertBadRequest(TopicDoesNotExist);
-            }
-        }
-
-        [Fact]
-        public async Task UpdatePublication_NoPermissionToChangeTitle()
-        {
-            var publication = new Publication
-            {
-                Title = "Old publication title",
-                Slug = "publication-slug",
-                Topic = new Topic { Title = "Old topic title" },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            var userService = new Mock<IUserService>(Strict);
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanUpdateSpecificPublication))
-                .ReturnsAsync(true);
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublicationTitles))
-                .ReturnsAsync(false);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
-
-                var publicationService = BuildPublicationService(context,
-                    userService: userService.Object,
-                    publicBlobCacheService: publicBlobCacheService.Object);
-
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveViewModel
-                    {
-                        Title = "New publication title",
-                    }
-                );
-
-                var actionResult = result.AssertLeft();
-                Assert.IsType<ForbidResult>(actionResult);
-            }
-        }
-
-        [Fact]
-        public async Task UpdatePublication_NoPermissionToChangeSupersededBy()
-        {
-            var publication = new Publication
-            {
-                Title = "Old publication title",
-                Slug = "publication-slug",
-                Topic = new Topic { Title = "Old topic title" },
-                SupersededById = Guid.NewGuid(),
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(publication);
-                await context.SaveChangesAsync();
-            }
-
-            var userService = new Mock<IUserService>(Strict);
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanUpdateSpecificPublication))
-                .ReturnsAsync(true);
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(SecurityPolicies.CanUpdatePublicationSupersededBy))
-                .ReturnsAsync(false);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
-
-                var publicationService = BuildPublicationService(context,
-                    userService: userService.Object,
-                    publicBlobCacheService: publicBlobCacheService.Object);
-
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveViewModel
-                    {
-                        Title = "Old publication title",
-                        Slug = "publication-slug",
-                        SupersededById = Guid.NewGuid(),
-                    }
-                );
-
-                var actionResult = result.AssertLeft();
-                Assert.IsType<ForbidResult>(actionResult);
-            }
-        }
-
-        [Fact]
-        public async Task UpdatePublication_NoPermissionToChangeTopic()
-        {
-            var newTopic = new Topic
-            {
-                Title = "New topic title"
-            };
-            var publication = new Publication
-            {
-                Title = "Publication title",
-                Slug = "publication-slug",
-                Topic = new Topic { Title = "Old topic title" },
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                await context.AddRangeAsync(publication, newTopic);
-                await context.SaveChangesAsync();
-            }
-
-            var userService = new Mock<IUserService>(Strict);
-
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Publication>(p => p.Id == publication.Id),
-                        SecurityPolicies.CanUpdateSpecificPublication))
-                .ReturnsAsync(true);
-
-            userService
-                .Setup(s =>
-                    s.MatchesPolicy(
-                        It.Is<Topic>(t => t.Id == newTopic.Id),
-                        SecurityPolicies.CanCreatePublicationForSpecificTopic))
-                .ReturnsAsync(false);
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
-
-                var publicationService = BuildPublicationService(context,
-                    userService: userService.Object,
-                    publicBlobCacheService: publicBlobCacheService.Object);
-
-                var result = await publicationService.UpdatePublication(
-                    publication.Id,
-                    new PublicationSaveViewModel
-                    {
-                        Title = "Publication title",
-                        TopicId = newTopic.Id,
-                    }
-                );
-
-                var actionResult = result.AssertLeft();
-                Assert.IsType<ForbidResult>(actionResult);
             }
         }
 
@@ -1426,7 +1260,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var legacyReleases = result.Right;
+                var legacyReleases = result.AssertRight();
 
                 Assert.Equal(2, legacyReleases.Count);
 
@@ -1488,7 +1322,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
-                var legacyReleases = result.Right;
+                var legacyReleases = result.AssertRight();
 
                 Assert.Single(legacyReleases);
 

@@ -92,13 +92,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                 // Invalidate publication cache for superseded publications, as potentially affected. If newly
                 // published release is first Live release for the publication, the superseding is now enforced
-                var supersededPublications = await _contentDbContext.Publications
+                await _contentDbContext.Publications
                     .Where(p => p.SupersededById == release.Publication.Id)
-                    .ToListAsync();
-                foreach (var p in supersededPublications)
-                {
-                    await _blobCacheService.DeleteItem(new PublicationCacheKey(p.Slug));
-                }
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(publication =>
+                        _blobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug)));
 
                 await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
                 await _contentService.DeletePreviousVersionsContent(message.ReleaseId);

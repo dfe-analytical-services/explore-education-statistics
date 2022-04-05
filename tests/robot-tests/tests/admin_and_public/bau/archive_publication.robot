@@ -10,21 +10,21 @@ Test Setup          fail test fast if required
 Force Tags          Admin    Local    Dev    AltersData
 
 *** Variables ***
-${PUB_NAME_ARCHIVE}=            UI tests - archived publication %{RUN_IDENTIFIER}
-${RELEASE_NAME_ARCHIVE}=        Financial Year 3000-01
-${SUBJECT_NAME_ARCHIVE}=        Subject for archived publication
+${PUBLICATION_NAME_ARCHIVE}=        UI tests - archived publication %{RUN_IDENTIFIER}
+${RELEASE_NAME_ARCHIVE}=            Financial Year 3000-01
+${SUBJECT_NAME_ARCHIVE}=            Subject for archived publication
 
-${PUB_NAME_SUPERSEDE}=          UI tests - superseding publication %{RUN_IDENTIFIER}
-${RELEASE_NAME_SUPERSEDE}=      Financial Year 2000-01
-${SUBJECT_NAME_SUPERSEDE}=      Subject for superseding publication
+${PUBLICATION_NAME_SUPERSEDE}=      UI tests - superseding publication %{RUN_IDENTIFIER}
+${RELEASE_NAME_SUPERSEDE}=          Financial Year 2000-01
+${SUBJECT_NAME_SUPERSEDE}=          Subject for superseding publication
 
 *** Test Cases ***
 Create new publication to be archived and release via API
-    ${PUB_ID_ARCHIVE}=    user creates test publication via api    ${PUB_NAME_ARCHIVE}
+    ${PUB_ID_ARCHIVE}=    user creates test publication via api    ${PUBLICATION_NAME_ARCHIVE}
     user create test release via api    ${PUB_ID_ARCHIVE}    FY    3000
 
 Navigate to archive-publication release
-    user navigates to editable release summary from admin dashboard    ${PUB_NAME_ARCHIVE}
+    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME_ARCHIVE}
     ...    ${RELEASE_NAME_ARCHIVE} (not Live)
 
 Import archive-publication subject to release
@@ -32,7 +32,7 @@ Import archive-publication subject to release
 
 Add data guidance to archive-publication subject
     user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
+    user waits until h2 is visible    Public data guidance    %{WAIT_SMALL}
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_ARCHIVE}
@@ -47,19 +47,19 @@ Go to "Sign off" page and approve archive-publication release
     user approves original release for immediate publication
 
 Create new publication to supersede other publication and release via API
-    ${PUB_ID_SUPERSEDE}=    user creates test publication via api    ${PUB_NAME_SUPERSEDE}
+    ${PUB_ID_SUPERSEDE}=    user creates test publication via api    ${PUBLICATION_NAME_SUPERSEDE}
     user create test release via api    ${PUB_ID_SUPERSEDE}    FY    2000
 
 Set archive-publication to be superseded by superseding-publication
     user navigates to admin dashboard
-    user opens accordion section    ${PUB_NAME_ARCHIVE}
-    ${ARCHIVE_ACCORDION}=    user gets accordion section content element    ${PUB_NAME_ARCHIVE}
+    user opens accordion section    ${PUBLICATION_NAME_ARCHIVE}
+    ${ARCHIVE_ACCORDION}=    user gets accordion section content element    ${PUBLICATION_NAME_ARCHIVE}
     user clicks link    Manage publication    ${ARCHIVE_ACCORDION}
 
-    user waits until h1 is visible    Manage publication
+    user waits until h1 is visible    Manage publication    %{WAIT_SMALL}
     user waits until page contains element    id:publicationForm-supersede
 
-    user chooses select option    id:supersededById    ${PUB_NAME_SUPERSEDE}
+    user chooses select option    id:publicationForm-supersededById    ${PUBLICATION_NAME_SUPERSEDE}
 
     user clicks button    Save publication
     user waits until modal is visible    Confirm publication changes
@@ -67,7 +67,7 @@ Set archive-publication to be superseded by superseding-publication
     user waits until modal is not visible    Confirm publication changes
 
 Validate archive warning is on Admin dashboard for archive-publication release
-    ${accordion}=    user opens publication on the admin dashboard    ${PUB_NAME_ARCHIVE}
+    ${accordion}=    user opens publication on the admin dashboard    ${PUBLICATION_NAME_ARCHIVE}
     user checks element should contain    ${accordion}
     ...    This publication will be archived when its superseding publication has a live release published.
 
@@ -79,12 +79,12 @@ Check public site, that archive-publication still appears correctly
     user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
 
     user opens details dropdown    %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUB_NAME_ARCHIVE}
-    user checks publication bullet contains link    ${PUB_NAME_ARCHIVE}    View statistics and data
+    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME_ARCHIVE}
+    user checks publication bullet contains link    ${PUBLICATION_NAME_ARCHIVE}    View statistics and data
 
-    user clicks element    testid:View stats link for ${PUB_NAME_ARCHIVE}
+    user clicks element    testid:View stats link for ${PUBLICATION_NAME_ARCHIVE}
 
-    user waits until h1 is visible    ${PUB_NAME_ARCHIVE}    %{WAIT_MEDIUM}
+    user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user waits until page contains    This is the latest data
     ${PUB_ARCHIVE_URL}=    user gets url
     set global variable    ${PUB_ARCHIVE_URL}
@@ -95,24 +95,60 @@ Check Data tables and Data catalogue pages, that archive-publication still appea
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
 
-    user checks page does not contain    ${PUB_NAME_SUPERSEDE}
+    user checks page does not contain    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user clicks radio    ${PUB_NAME_ARCHIVE}
+    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Choose a subject
-    user checks previous table tool step contains    1    Publication    ${PUB_NAME_ARCHIVE}
+    user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME_ARCHIVE}
 
     user checks page contains    ${SUBJECT_NAME_ARCHIVE}
 
+Generate permalink for archive-publication
+    user clicks element    id:publicationSubjectForm-submit
+
+    user waits until table tool wizard step is available    3    Choose locations
+    user checks previous table tool step contains    2    Subject    ${SUBJECT_NAME_ARCHIVE}
+    user opens details dropdown    Regional
+    user clicks checkbox    North East
+    user clicks element    id:locationFiltersForm-submit
+
+    user waits until table tool wizard step is available    4    Choose time period
+    user checks previous table tool step contains    3    Regional    North East
+    user chooses select option    id:timePeriodForm-start    2005
+    user chooses select option    id:timePeriodForm-end    2016
+    user clicks element    id:timePeriodForm-submit
+
+    user waits until table tool wizard step is available    5    Choose your filters
+    user checks previous table tool step contains    4    Time period    2005 to 2016
+    user clicks element    id:filtersForm-submit
+
+    user waits until results table appears    %{WAIT_SMALL}
+    user waits until page contains button    Generate shareable link
+
+    user clicks button    Generate shareable link
+    user waits until page contains testid    permalink-generated-url    %{WAIT_MEDIUM}
+    user checks generated permalink is valid
+
+    user clicks link    View share link
+    user waits until h1 is visible
+    ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
+
+    ${PERMALINK_URL}=    user gets url
+    set global variable    ${PERMALINK_URL}
+
+    user checks page does not contain    WARNING
+
+Check Data catalogue page, that archive-publication still appears correctly
     user navigates to data catalogue page on public frontend
 
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
 
-    user checks page contains    ${PUB_NAME_ARCHIVE}
-    user checks page does not contain    ${PUB_NAME_SUPERSEDE}
+    user checks page contains    ${PUBLICATION_NAME_ARCHIVE}
+    user checks page does not contain    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user clicks radio    ${PUB_NAME_ARCHIVE}
+    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks button    Next step
     user waits until page contains    Choose a release
     user waits until page contains    ${RELEASE_NAME_ARCHIVE}
@@ -121,7 +157,7 @@ Check Data tables and Data catalogue pages, that archive-publication still appea
     user checks page contains    This is the latest data
 
 Navigate to superseding-publication release on Admin site
-    user navigates to editable release summary from admin dashboard    ${PUB_NAME_SUPERSEDE}
+    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME_SUPERSEDE}
     ...    ${RELEASE_NAME_SUPERSEDE} (not Live)
 
 Import superseding-publication subject to release
@@ -129,7 +165,7 @@ Import superseding-publication subject to release
 
 Add data guidance to superseding-publication subject
     user clicks link    Data guidance
-    user waits until h2 is visible    Public data guidance
+    user waits until h2 is visible    Public data guidance    %{WAIT_SMALL}
 
     user waits until page contains element    id:dataGuidance-dataFiles
     user waits until page contains accordion section    ${SUBJECT_NAME_SUPERSEDE}
@@ -151,20 +187,20 @@ Check public Find stats page, that archive-publication is now archived and super
     user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
 
     user opens details dropdown    %{TEST_TOPIC_NAME}
-    user checks page does not contain    ${PUB_NAME_ARCHIVE}
+    user checks page does not contain    ${PUBLICATION_NAME_ARCHIVE}
 
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUB_NAME_SUPERSEDE}
-    user checks publication bullet contains link    ${PUB_NAME_SUPERSEDE}    View statistics and data
+    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME_SUPERSEDE}
+    user checks publication bullet contains link    ${PUBLICATION_NAME_SUPERSEDE}    View statistics and data
 
 Check public superseding-publication release page displays correctly
-    user clicks element    testid:View stats link for ${PUB_NAME_SUPERSEDE}
+    user clicks element    testid:View stats link for ${PUBLICATION_NAME_SUPERSEDE}
 
-    user waits until h1 is visible    ${PUB_NAME_SUPERSEDE}    %{WAIT_MEDIUM}
+    user waits until h1 is visible    ${PUBLICATION_NAME_SUPERSEDE}    %{WAIT_MEDIUM}
     user waits until page contains    This is the latest data
 
 Check public archive-publication release page displays correctly
     go to    ${PUB_ARCHIVE_URL}
-    user waits until h1 is visible    ${PUB_NAME_ARCHIVE}    %{WAIT_MEDIUM}
+    user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user checks page does not contain    This is the latest data
 
 Check public data tables page is correct
@@ -173,12 +209,12 @@ Check public data tables page is correct
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
 
-    user checks page does not contain    ${PUB_NAME_ARCHIVE}
+    user checks page does not contain    ${PUBLICATION_NAME_ARCHIVE}
 
-    user clicks radio    ${PUB_NAME_SUPERSEDE}
+    user clicks radio    ${PUBLICATION_NAME_SUPERSEDE}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Choose a subject
-    user checks previous table tool step contains    1    Publication    ${PUB_NAME_SUPERSEDE}
+    user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME_SUPERSEDE}
 
     user checks page contains    ${SUBJECT_NAME_SUPERSEDE}
 
@@ -188,10 +224,10 @@ Check data catalogue page is correct
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
 
-    user checks page contains    ${PUB_NAME_ARCHIVE}
-    user checks page contains    ${PUB_NAME_SUPERSEDE}
+    user checks page contains    ${PUBLICATION_NAME_ARCHIVE}
+    user checks page contains    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user clicks radio    ${PUB_NAME_ARCHIVE}
+    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks button    Next step
     user waits until page contains    Choose a release
     user waits until page contains    ${RELEASE_NAME_ARCHIVE}
@@ -200,9 +236,9 @@ Check data catalogue page is correct
     user checks page does not contain    This is the latest data
 
     user clicks button    Previous step
-    user waits until page contains    ${PUB_NAME_SUPERSEDE}
+    user waits until page contains    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user clicks radio    ${PUB_NAME_SUPERSEDE}
+    user clicks radio    ${PUBLICATION_NAME_SUPERSEDE}
     user clicks button    Next step
     user waits until page contains    Choose a release
     user waits until page contains    ${RELEASE_NAME_SUPERSEDE}
@@ -210,23 +246,32 @@ Check data catalogue page is correct
     user checks page contains radio    ${RELEASE_NAME_SUPERSEDE}
     user checks page contains    This is the latest data
 
+Check archive-publication permalink has out-of-date warning
+    go to    ${PERMALINK_URL}
+
+    user waits until h1 is visible
+    ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
+
+    user waits until page contains    WARNING - The data used in this permalink may be out-of-date.
+
 Set archive-publication to be no longer be superseded
     user navigates to admin dashboard
-    user opens accordion section    ${PUB_NAME_ARCHIVE}
-    ${ARCHIVE_ACCORDION}=    user gets accordion section content element    ${PUB_NAME_ARCHIVE}
+    user opens accordion section    ${PUBLICATION_NAME_ARCHIVE}
+    ${ARCHIVE_ACCORDION}=    user gets accordion section content element    ${PUBLICATION_NAME_ARCHIVE}
     user clicks link    Manage publication    ${ARCHIVE_ACCORDION}
 
-    user waits until h1 is visible    Manage publication
+    user waits until h1 is visible    Manage publication    %{WAIT_SMALL}
     user waits until page contains element    id:publicationForm-supersede
 
-    user chooses select option    id:supersededById    None selected
+    user chooses select option    id:publicationForm-supersededById    None selected
 
     user clicks button    Save publication
     user waits until modal is visible    Confirm publication changes
     user clicks button    Confirm
     user waits until modal is not visible    Confirm publication changes
 
-    user waits until h1 is visible    Dashboard    # Otherwise gets to Find Stats page before cache is invalidated
+    # Otherwise gets to Find Stats page before cache is invalidated
+    user waits until h1 is visible    Dashboard    %{WAIT_SMALL}
 
 Check public Find stats page and check archive-publication is no longer archived
     user navigates to find statistics page on public frontend
@@ -237,16 +282,16 @@ Check public Find stats page and check archive-publication is no longer archived
 
     user opens details dropdown    %{TEST_TOPIC_NAME}
 
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUB_NAME_SUPERSEDE}
-    user checks publication bullet contains link    ${PUB_NAME_SUPERSEDE}    View statistics and data
+    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME_SUPERSEDE}
+    user checks publication bullet contains link    ${PUBLICATION_NAME_SUPERSEDE}    View statistics and data
 
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUB_NAME_ARCHIVE}
-    user checks publication bullet contains link    ${PUB_NAME_ARCHIVE}    View statistics and data
+    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME_ARCHIVE}
+    user checks publication bullet contains link    ${PUBLICATION_NAME_ARCHIVE}    View statistics and data
 
 Check public archive-publication release page displays correctly after being unarchived
-    user clicks element    testid:View stats link for ${PUB_NAME_ARCHIVE}
+    user clicks element    testid:View stats link for ${PUBLICATION_NAME_ARCHIVE}
 
-    user waits until h1 is visible    ${PUB_NAME_ARCHIVE}    %{WAIT_MEDIUM}
+    user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user waits until page contains    This is the latest data
 
 Check public data tables page is correct after archive-publication has been unarchived
@@ -255,12 +300,12 @@ Check public data tables page is correct after archive-publication has been unar
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
 
-    user checks page contains    ${PUB_NAME_ARCHIVE}
+    user checks page contains    ${PUBLICATION_NAME_ARCHIVE}
 
-    user clicks radio    ${PUB_NAME_ARCHIVE}
+    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Choose a subject
-    user checks previous table tool step contains    1    Publication    ${PUB_NAME_ARCHIVE}
+    user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME_ARCHIVE}
 
     user checks page contains    ${SUBJECT_NAME_ARCHIVE}
 
@@ -270,10 +315,10 @@ Check data catalogue page is correct after archive-publication has been unarchiv
     user opens details dropdown    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
 
-    user checks page contains    ${PUB_NAME_ARCHIVE}
-    user checks page contains    ${PUB_NAME_SUPERSEDE}
+    user checks page contains    ${PUBLICATION_NAME_ARCHIVE}
+    user checks page contains    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user clicks radio    ${PUB_NAME_ARCHIVE}
+    user clicks radio    ${PUBLICATION_NAME_ARCHIVE}
     user clicks button    Next step
     user waits until page contains    Choose a release
     user waits until page contains    ${RELEASE_NAME_ARCHIVE}
@@ -282,12 +327,20 @@ Check data catalogue page is correct after archive-publication has been unarchiv
     user checks page contains    This is the latest data
 
     user clicks button    Previous step
-    user waits until page contains    ${PUB_NAME_SUPERSEDE}
+    user waits until page contains    ${PUBLICATION_NAME_SUPERSEDE}
 
-    user clicks radio    ${PUB_NAME_SUPERSEDE}
+    user clicks radio    ${PUBLICATION_NAME_SUPERSEDE}
     user clicks button    Next step
     user waits until page contains    Choose a release
     user waits until page contains    ${RELEASE_NAME_SUPERSEDE}
 
     user checks page contains radio    ${RELEASE_NAME_SUPERSEDE}
     user checks page contains    This is the latest data
+
+Check archive-publication permalink no longer has out-of-date warning after archive-publication has been unarchived
+    go to    ${PERMALINK_URL}
+
+    user waits until h1 is visible
+    ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
+
+    user checks page does not contain    WARNING

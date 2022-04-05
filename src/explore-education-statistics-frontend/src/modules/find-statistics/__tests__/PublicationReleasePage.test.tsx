@@ -23,7 +23,7 @@ describe('PublicationReleasePage', () => {
     expect(screen.queryByText('This is the latest data')).toBeInTheDocument();
   });
 
-  test('does not render latest data tag publication is superseded', () => {
+  test('does not render latest data tag when publication is superseded', () => {
     const testReleaseSuperseded = {
       ...testRelease,
       publication: { ...testPublication, isSuperseded: true },

@@ -16,10 +16,14 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
+using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
+using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -82,17 +86,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }));
         }
 
-        public async Task<Either<ActionResult, List<TitleAndIdViewModel>>> ListPublications()
+        public async Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries()
         {
             return await _userService
                 .CheckCanManageAllUsers()
                 .OnSuccess(_ =>
                 {
                     return _context.Publications
-                        .Select(p => new TitleAndIdViewModel
+                        .Select(p => new PublicationSummaryViewModel
                         {
                             Id = p.Id,
-                            Title = p.Title
+                            Title = p.Title,
+                            Slug = p.Slug,
                         })
                         .ToList();
                 });
@@ -223,19 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
 
-                        var supersededPublications = await _context.Publications
-                            .Where(p =>
-                                p.SupersededById == publication.Id
-                                // in case removing superseding release
-                                || (originalSupersededById != publication.SupersededById
-                                    && p.Id == originalSupersededById))
-                                // NOTE: If publication.SupersededById newly set, no need to remove cache blob for
-                                // publication with Id of publication.SupersededById
-                            .ToListAsync();
-                        foreach (var p in supersededPublications)
-                        {
-                            await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(p.Slug));
-                        }
+                        await DeleteCachedSupersededPublicationBlobs(publication, originalSupersededById);
                     }
 
                     return await GetPublication(publication.Id);
@@ -246,10 +239,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             await _publicBlobCacheService.DeleteItem(new AllMethodologiesCacheKey());
             await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey());
-            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
-            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
-            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestDataNotSuperseded));
-            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.NotSuperseded));
+        }
+
+        private async Task DeleteCachedSupersededPublicationBlobs(Publication publication,
+            Guid? originalSupersededById)
+        {
+            // NOTE: When a publication's SupersededById column is updated, we only need to invalidate the cache
+            // if the updated publication is now superseded OR if the updated publication is now no longer superseded.
+            // If the updated publication has a new superseding publication or a different superseding publication,
+            // any old or new superseding publication will be unaffected, so there is no need to invalidate their caches
+            var supersededPublications = await _context.Publications
+                .Where(p =>
+                    p.SupersededById == publication.Id
+                    || (originalSupersededById == null
+                        && p.Id == originalSupersededById))
+                .ToListAsync();
+            foreach (var p in supersededPublications)
+            {
+                await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(p.Slug));
+            }
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateSelectedTopic(

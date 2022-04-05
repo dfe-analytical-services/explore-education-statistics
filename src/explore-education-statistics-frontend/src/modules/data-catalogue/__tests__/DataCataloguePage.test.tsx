@@ -202,8 +202,12 @@ describe('DataCataloguePage', () => {
     expect(releaseRadios[0]).toEqual(
       step2.getByLabelText('Academic Year 2021/22'),
     );
-    const div = screen.getByTestId('Radio item for Academic Year 2021/22');
-    expect(within(div).getByText('This is the latest data'));
+
+    expect(
+      within(
+        screen.getByTestId('Radio item for Academic Year 2021/22'),
+      ).getByText('This is the latest data'),
+    );
 
     expect(releaseRadios[1]).toEqual(
       step2.getByLabelText('Academic Year 2020/21'),

@@ -453,39 +453,6 @@ describe('PublicationForm', () => {
       type: 'AdHocStatistics',
     };
 
-    const testRelease2: MyRelease = {
-      ...testRelease1,
-      id: 'release-id-2',
-      slug: 'release-slug-2',
-      title: 'Release 2',
-      publicationId: 'publication-id-3',
-      publicationSlug: 'publication-slug-3',
-      publicationTitle: 'Publication 3',
-    };
-
-    const testRelease3: MyRelease = {
-      ...testRelease1,
-      approvalStatus: 'Draft',
-      id: 'release-id-3',
-      slug: 'release-slug-3',
-      title: 'Release 3',
-      publicationId: 'publication-id-3',
-      publicationSlug: 'publication-slug-3',
-      publicationTitle: 'Publication 3',
-    };
-
-    const testRelease4: MyRelease = {
-      ...testRelease1,
-      amendment: true,
-      approvalStatus: 'Draft',
-      id: 'release-id-4',
-      slug: 'release-slug-4',
-      title: 'Release 4',
-      publicationId: 'publication-id-3',
-      publicationSlug: 'publication-slug-3',
-      publicationTitle: 'Publication 3',
-    };
-
     const testPublication1: MyPublication = {
       id: 'publication-id-1',
       title: 'Publication 1',
@@ -519,24 +486,14 @@ describe('PublicationForm', () => {
       releases: [],
     };
 
-    const testPublication3: MyPublication = {
-      ...testPublication1,
-      id: 'publication-id-3',
-      title: 'Publication 3',
-      releases: [testRelease2, testRelease3],
-    };
-
-    const testPublication4: MyPublication = {
-      ...testPublication1,
-      id: 'publication-id-4',
-      title: 'Publication 4',
-      releases: [testRelease4],
-    };
-
     test('does not render the `Archive publication` field when showSupersededBy is false', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
-      publicationService.getPublicationTitles.mockResolvedValue([
-        { id: testPublication1.id, title: testPublication1.title },
+      publicationService.getPublicationSummaries.mockResolvedValue([
+        {
+          id: testPublication1.id,
+          title: testPublication1.title,
+          slug: 'slug-1',
+        },
       ]);
 
       render(
@@ -560,14 +517,18 @@ describe('PublicationForm', () => {
       });
 
       expect(
-        screen.queryByLabelText('Select publication'),
+        screen.queryByLabelText('Superseding publication'),
       ).not.toBeInTheDocument();
     });
 
     test('renders the `Archive publication` field when showSupersededBy is true', async () => {
       themeService.getThemes.mockResolvedValue([testSingleTheme]);
-      publicationService.getPublicationTitles.mockResolvedValue([
-        { id: testPublication1.id, title: testPublication1.title },
+      publicationService.getPublicationSummaries.mockResolvedValue([
+        {
+          id: testPublication1.id,
+          title: testPublication1.title,
+          slug: 'slug-1',
+        },
       ]);
 
       render(
@@ -586,10 +547,12 @@ describe('PublicationForm', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByLabelText('Select publication'));
+        expect(screen.getByLabelText('Superseding publication'));
       });
 
-      const publicationSelect = screen.getByLabelText('Select publication');
+      const publicationSelect = screen.getByLabelText(
+        'Superseding publication',
+      );
 
       const publications = within(publicationSelect).getAllByRole(
         'option',
@@ -600,13 +563,11 @@ describe('PublicationForm', () => {
       expect(publications[1]).toHaveTextContent('Publication 1');
     });
 
-    test('only shows publications with a published release in the superseded by select', async () => {
+    test('shows correct publications in the superseded by select', async () => {
       themeService.getThemes.mockResolvedValue(testThemes);
-      publicationService.getPublicationTitles.mockResolvedValueOnce([
-        testPublication1,
-        testPublication2,
-        testPublication3,
-        testPublication4,
+      publicationService.getPublicationSummaries.mockResolvedValueOnce([
+        { ...testPublication1, slug: 'slug-1' },
+        { ...testPublication2, slug: 'slug-2' },
       ]);
 
       render(
@@ -625,21 +586,21 @@ describe('PublicationForm', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByLabelText('Select publication'));
+        expect(screen.getByLabelText('Superseding publication'));
       });
 
-      const publicationSelect = screen.getByLabelText('Select publication');
+      const publicationSelect = screen.getByLabelText(
+        'Superseding publication',
+      );
 
       const publications = within(publicationSelect).getAllByRole(
         'option',
       ) as HTMLOptionElement[];
 
-      expect(publications).toHaveLength(5);
+      expect(publications).toHaveLength(3);
       expect(publications[0]).toHaveTextContent('None selected');
       expect(publications[1]).toHaveTextContent('Publication 1');
       expect(publications[2]).toHaveTextContent('Publication 2');
-      expect(publications[3]).toHaveTextContent('Publication 3');
-      expect(publications[4]).toHaveTextContent('Publication 4');
     });
   });
 });

@@ -215,18 +215,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publicationViewModel = result.AssertRight();
 
                 Assert.Equal(publication.Id, publicationViewModel.Id);
-                Assert.Equal(publication.Title, publicationViewModel.Title);
-                Assert.Equal(publication.Slug, publicationViewModel.Slug);
                 Assert.True(publicationViewModel.IsSuperseded);
 
                 Assert.Single(publicationViewModel.Releases);
                 Assert.Equal(publication.Releases[0].Id, publicationViewModel.LatestReleaseId);
-
-                Assert.Equal(publication.Releases[0].Id, publicationViewModel.Releases[0].Id);
-                Assert.Equal(publication.Releases[0].Slug, publicationViewModel.Releases[0].Slug);
-                Assert.Equal(publication.Releases[0].Title, publicationViewModel.Releases[0].Title);
-
-                Assert.Equal(publication.Topic.Theme.Title, publicationViewModel.Topic.Theme.Title);
             }
         }
 
@@ -239,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var result = await service.Get("nonexistant-publication");
+                var result = await service.Get("nonexistent-publication");
 
                 result.AssertNotFound();
             }

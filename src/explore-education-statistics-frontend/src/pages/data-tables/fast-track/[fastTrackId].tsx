@@ -17,7 +17,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
   const [fastTrack, themeMeta] = await Promise.all([
     fastTrackService.getFastTrackTableAndReleaseMeta(fastTrackId),
     themeService.listThemes({
-      publicationFilter: 'LatestData',
+      publicationFilter: 'FastTrack',
     }),
   ]);
 

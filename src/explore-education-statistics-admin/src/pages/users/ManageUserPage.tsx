@@ -81,7 +81,7 @@ const ManageUserPage = ({ match }: RouteComponentProps<{ userId: string }>) => {
   const { value: roles } = useAsyncRetry(() => userService.getRoles());
   const { value: releases } = useAsyncRetry(() => userService.getReleases());
   const { value: publications } = useAsyncRetry(() =>
-    publicationService.getPublicationTitles(),
+    publicationService.getPublicationSummaries(),
   );
   const { value: resourceRoles } = useAsyncRetry(() =>
     userService.getResourceRoles(),

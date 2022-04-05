@@ -14,6 +14,7 @@ import {
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
+import { PublicationSummary } from '@common/services/publicationService';
 
 export interface PublicationContactDetails {
   id: string;
@@ -107,8 +108,8 @@ const publicationService = {
     });
   },
 
-  getPublicationTitles(): Promise<IdTitlePair[]> {
-    return client.get('/me/publications/titles');
+  getPublicationSummaries(): Promise<PublicationSummary[]> {
+    return client.get('/publication-summaries');
   },
 
   createPublication(

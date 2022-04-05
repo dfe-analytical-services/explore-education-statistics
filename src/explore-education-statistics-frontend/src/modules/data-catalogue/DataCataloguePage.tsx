@@ -193,7 +193,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
   } = context.query as Dictionary<string>;
 
   const themes = await themeService.listThemes({
-    publicationFilter: 'AnyData',
+    publicationFilter: 'DataCatalogue',
   });
 
   const selectedPublication = themes

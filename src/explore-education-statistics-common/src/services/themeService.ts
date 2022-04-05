@@ -35,10 +35,10 @@ export type MethodologyTheme = Theme<PublicationMethodologySummary>;
 
 interface ListThemesOptions {
   publicationFilter?:
-    | 'LatestData'
-    | 'LatestDataNotSuperseded'
-    | 'AnyData'
-    | 'NotSuperseded';
+    | 'FindStatistics'
+    | 'DataTables'
+    | 'DataCatalogue'
+    | 'FastTrack';
 }
 
 const themeService = {

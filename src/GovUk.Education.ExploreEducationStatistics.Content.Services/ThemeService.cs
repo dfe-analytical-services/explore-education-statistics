@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -24,25 +26,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         }
 
         public async Task<IList<ThemeTree<PublicationTreeNode>>> GetPublicationTree(
-            PublicationTreeFilter? filter = null)
+            PublicationTreeFilter filter)
         {
-            var themes = await ListThemes();
+            var fullPublicationTree = await GetFullPublicationTree();
 
-            return await themes
+            return await fullPublicationTree
                 .ToAsyncEnumerable()
-                .SelectAwait(async theme => await BuildThemeTree(theme, filter))
+                .SelectAwait(async theme => await FilterThemeTree(theme, filter))
                 .Where(theme => theme.Topics.Any())
                 .OrderBy(theme => theme.Title)
                 .ToListAsync();
         }
 
-        private async Task<ThemeTree<PublicationTreeNode>> BuildThemeTree(
-            Theme theme,
-            PublicationTreeFilter? filter)
+        [BlobCache(typeof(PublicationTreeCacheKey))]
+        private async Task<IList<ThemeTree<PublicationTreeNode>>> GetFullPublicationTree()
+        {
+            var themes = await _contentDbContext.Themes
+                .Include(theme => theme.Topics)
+                .ThenInclude(topic => topic.Publications)
+                .ThenInclude(publication => publication.Releases)
+                .ToListAsync();
+
+            return await themes
+                .ToAsyncEnumerable()
+                .SelectAwait(async theme => await BuildThemeTree(theme))
+                .Where(theme => theme.Topics.Any())
+                .OrderBy(theme => theme.Title)
+                .ToListAsync();
+        }
+
+        private async Task<ThemeTree<PublicationTreeNode>> BuildThemeTree(Theme theme)
         {
             var topics = await theme.Topics
                 .ToAsyncEnumerable()
-                .SelectAwait(async topic => await BuildTopicTree(topic, filter))
+                .SelectAwait(async topic => await BuildTopicTree(topic))
                 .Where(topic => topic.Publications.Any())
                 .OrderBy(topic => topic.Title)
                 .ToListAsync();
@@ -56,14 +73,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             };
         }
 
-        private async Task<TopicTree<PublicationTreeNode>> BuildTopicTree(
-            Topic topic,
-            PublicationTreeFilter? filter)
+        private async Task<TopicTree<PublicationTreeNode>> BuildTopicTree(Topic topic)
         {
             var publications = await topic.Publications
                 .ToAsyncEnumerable()
-                .WhereAwait(async publication => await FilterPublication(publication, filter))
-                .Select(BuildPublicationNode)
+                .Where(publication => publication
+                                          .Releases
+                                          .Any(r => r.IsLatestPublishedVersionOfRelease())
+                                      || !string.IsNullOrEmpty(publication.LegacyPublicationUrl?.ToString()))
+                .SelectAwait(async publication =>
+                    await BuildPublicationNode(publication))
                 .OrderBy(publication => publication.Title)
                 .ToListAsync();
 
@@ -75,63 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             };
         }
 
-        private async Task<bool> FilterPublication(
-            Publication publication,
-            PublicationTreeFilter? filter)
-        {
-            switch (filter)
-            {
-                case PublicationTreeFilter.AnyData:
-                    return await publication.Releases
-                        .ToAsyncEnumerable()
-                        .AnyAwaitAsync(async release => release.IsLatestPublishedVersionOfRelease()
-                                                        && await HasAnyDataFiles(release));
-
-                case PublicationTreeFilter.LatestData:
-                {
-                    var latestLiveRelease = publication.LatestPublishedRelease();
-                    return latestLiveRelease != null && await HasAnyDataFiles(latestLiveRelease);
-                }
-
-                case PublicationTreeFilter.LatestDataNotSuperseded:
-                {
-                    var latestLiveRelease = publication.LatestPublishedRelease();
-                    return latestLiveRelease != null
-                           && await HasAnyDataFiles(latestLiveRelease)
-                           && !IsSuperseded(publication);
-                }
-
-                case PublicationTreeFilter.NotSuperseded:
-                    return (!string.IsNullOrEmpty(publication.LegacyPublicationUrl?.ToString()) ||
-                            publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease()))
-                           && !IsSuperseded(publication);
-
-                case null:
-                    return !string.IsNullOrEmpty(publication.LegacyPublicationUrl?.ToString()) ||
-                           publication.Releases.Any(release => release.IsLatestPublishedVersionOfRelease());
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(filter), filter, null);
-            }
-        }
-
-        private bool IsSuperseded(Publication publication)
-        {
-            return publication.SupersededById != null
-                   && _contentDbContext.Releases
-                       .Include(r => r.Publication)
-                       .Where(r => r.PublicationId == publication.SupersededById)
-                       .ToList()
-                       .Any(r => r.IsLatestPublishedVersionOfRelease());
-        }
-
-        private async Task<bool> HasAnyDataFiles(Release release)
-        {
-            return await _contentDbContext.ReleaseFiles
-                .Include(rf => rf.File)
-                .AnyAsync(rf => rf.ReleaseId == release.Id && rf.File.Type == FileType.Data);
-        }
-
-        private PublicationTreeNode BuildPublicationNode(Publication publication)
+        private async Task<PublicationTreeNode> BuildPublicationNode(Publication publication)
         {
             var latestRelease = publication.LatestPublishedRelease();
             var type = GetPublicationType(latestRelease?.Type);
@@ -146,16 +109,87 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     ? publication.LegacyPublicationUrl?.ToString()
                     : null,
                 IsSuperseded = IsSuperseded(publication),
+                LatestReleaseHasData = latestRelease != null && await HasAnyDataFiles(latestRelease),
+                AnyLiveReleaseHasData = await publication.Releases
+                    .ToAsyncEnumerable()
+                    .AnyAwaitAsync(async r => r.IsLatestPublishedVersionOfRelease()
+                                              && await HasAnyDataFiles(r))
             };
         }
 
-        private async Task<List<Theme>> ListThemes()
+        private async Task<ThemeTree<PublicationTreeNode>> FilterThemeTree(
+            ThemeTree<PublicationTreeNode> themeTree,
+            PublicationTreeFilter filter)
         {
-            return await _contentDbContext.Themes
-                .Include(theme => theme.Topics)
-                .ThenInclude(topic => topic.Publications)
-                .ThenInclude(publication => publication.Releases)
+            var topics = await themeTree.Topics
+                .ToAsyncEnumerable()
+                .SelectAwait(async topic => await FilterTopicTree(topic, filter))
+                .Where(topic => topic.Publications.Any())
+                .OrderBy(topic => topic.Title)
                 .ToListAsync();
+
+            return new ThemeTree<PublicationTreeNode>
+            {
+                Id = themeTree.Id,
+                Title = themeTree.Title,
+                Summary = themeTree.Summary,
+                Topics = topics,
+            };
+        }
+
+        private async Task<TopicTree<PublicationTreeNode>> FilterTopicTree(
+            TopicTree<PublicationTreeNode> topicTree,
+            PublicationTreeFilter filter)
+        {
+            var publications = await topicTree.Publications
+                .ToAsyncEnumerable()
+                .Where(publication => FilterPublicationTreeNode(publication, filter))
+                .OrderBy(publication => publication.Title)
+                .ToListAsync();
+
+            return new TopicTree<PublicationTreeNode>
+            {
+                Id = topicTree.Id,
+                Title = topicTree.Title,
+                Publications = publications
+            };
+        }
+
+        private bool FilterPublicationTreeNode(
+            PublicationTreeNode publicationTree,
+            PublicationTreeFilter filter)
+        {
+            switch (filter)
+            {
+                case PublicationTreeFilter.FindStatistics:
+                    return !publicationTree.IsSuperseded
+                           && (publicationTree.LatestReleaseHasData ||
+                               !string.IsNullOrEmpty(publicationTree.LegacyPublicationUrl));
+                case PublicationTreeFilter.DataTables:
+                    return publicationTree.LatestReleaseHasData
+                           && !publicationTree.IsSuperseded;
+                case PublicationTreeFilter.DataCatalogue:
+                case PublicationTreeFilter.FastTrack:
+                    return publicationTree.AnyLiveReleaseHasData;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(filter), filter, null);
+            }
+        }
+
+        private bool IsSuperseded(Publication publication)
+        {
+            return publication.SupersededById != null
+                   && _contentDbContext.Releases
+                       .Include(r => r.Publication)
+                       .Any(r => r.PublicationId == publication.SupersededById
+                                 && r.Published.HasValue && DateTime.UtcNow >= r.Published.Value);
+        }
+
+        private async Task<bool> HasAnyDataFiles(Release release)
+        {
+            return await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .AnyAsync(rf => rf.ReleaseId == release.Id && rf.File.Type == FileType.Data);
         }
 
         private static PublicationType GetPublicationType(ReleaseType? releaseType)

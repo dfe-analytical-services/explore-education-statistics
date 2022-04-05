@@ -118,16 +118,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var contentDbContextId = Guid.NewGuid().ToString();
             await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
-            var publicationService = new PublicationService(
-                contentDbContext,
-                new PersistenceHelper<ContentDbContext>(contentDbContext),
-                MapperUtils.MapperForProfile<MappingProfiles>()
-            );
+            var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
+            publicationService.Setup(mock => mock.Get(publicationSlug))
+                .ReturnsAsync(new NotFoundResult());
 
             var service = SetupReleaseService(contentDbContext,
-                publicationService: publicationService);
+                publicationService: publicationService.Object);
 
             var result = await service.Get(publicationSlug, releaseSlug);
+
+            VerifyAllMocks(publicationService);
 
             result.AssertNotFound();
         }
@@ -270,16 +270,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var contentDbContextId = Guid.NewGuid().ToString();
             await using var contentDbContext = InMemoryContentDbContext(contentDbContextId);
 
-            var publicationService = new PublicationService(
-                contentDbContext,
-                new PersistenceHelper<ContentDbContext>(contentDbContext),
-                MapperUtils.MapperForProfile<MappingProfiles>());
-            var service = SetupReleaseService(contentDbContext,
-                publicationService: publicationService);
+           var publicationService = new Mock<IPublicationService>(MockBehavior.Strict);
+           publicationService.Setup(mock => mock.Get(publicationSlug))
+               .ReturnsAsync(new NotFoundResult());
 
-            var result = await service.GetSummary(publicationSlug, releaseSlug);
+           var service = SetupReleaseService(contentDbContext,
+               publicationService: publicationService.Object);
 
-            result.AssertNotFound();
+           var result = await service.GetSummary(publicationSlug, releaseSlug);
+
+           result.AssertNotFound();
         }
 
         [Fact]

@@ -9,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Moq;
 using Xunit;
@@ -70,27 +71,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         };
         
         [Fact]
-        public async Task GetThemes()
+        public async Task GetPublicationTree()
         {
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            mocks.cacheService
-                .Setup(s => s.GetItem(
-                    It.IsAny<PublicationTreeCacheKey>(),
-                    typeof(IList<ThemeTree<PublicationTreeNode>>)))
-                .ReturnsAsync(null);
-            
             mocks.themeService
-                .Setup(s => s.GetPublicationTree(null))
+                .Setup(s => s.GetPublicationTree(PublicationTreeFilter.FindStatistics))
                 .ReturnsAsync(Themes);
 
-            mocks.cacheService
-                .Setup(s => s.SetItem<object>(
-                    It.IsAny<PublicationTreeCacheKey>(), 
-                    Themes))
-                .Returns(Task.CompletedTask);
-            
-            var result = await controller.GetThemes();
+            var result = await controller.GetPublicationTree(PublicationTreeFilter.FindStatistics);
             VerifyAllMocks(mocks);
 
             var theme = Assert.Single(result);
