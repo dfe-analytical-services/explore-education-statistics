@@ -197,8 +197,11 @@ Embed data block into release content
 Check footnote is displayed in content Tab
     user checks accordion section contains x blocks    ${CONTENT_SECTION_NAME}    1    id:releaseMainContent
     user scrolls to accordion section content    ${CONTENT_SECTION_NAME}    id:releaseMainContent
-    user scrolls to element    //*[@data-testid="Data block - ${DATABLOCK_NAME}"]
-    user waits until table is visible    //*[@data-testid="Data block - ${DATABLOCK_NAME}"]    10
+
+    user waits until page contains element    testid:Data block - ${DATABLOCK_NAME}
+    user scrolls to element    testid:Data block - ${DATABLOCK_NAME}
+    user waits until table is visible    testid:Data block - ${DATABLOCK_NAME}    10
+
     user scrolls to element    testid:footnotes
     user checks list has x items    testid:footnotes    1
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_1}
@@ -230,7 +233,7 @@ Check updated footnote is displayed in content Tab
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_UPDATED}
 
 Validate embedded table rows
-    ${datablock}=    set variable    //*[@data-testid="Data block - ${DATABLOCK_NAME}"]
+    ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
     user scrolls to element    id:releaseMainContent
 
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
@@ -397,6 +400,8 @@ Validate line chart embeds correctly
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    user waits until page contains element    ${datablock}
+
     # Need to scroll to block to load it
     user scrolls to element    ${datablock}
     user waits until element contains line chart    ${datablock}
@@ -493,6 +498,8 @@ Save and validate vertical bar chart embeds correctly
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    user waits until page contains element    ${datablock}
+
     # Need to scroll to block to load it
     user scrolls to element    ${datablock}
     user waits until element does not contain line chart    ${datablock}
@@ -577,6 +584,8 @@ Save and validate horizontal bar chart embeds correctly
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    user waits until page contains element    ${datablock}
+
     # Need to scroll to block to load it
     user scrolls to element    ${datablock}
     user waits until element contains bar chart    ${datablock}
@@ -662,6 +671,8 @@ Save and validate geographic chart embeds correctly
     user waits until page does not contain loading spinner
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    user waits until page contains element    ${datablock}
+
     # Need to scroll to block to load it
     user scrolls to element    ${datablock}
     user waits until element does not contain bar chart    ${datablock}
@@ -702,6 +713,8 @@ Save and validate infographic chart embeds correctly
     user opens accordion section    ${CONTENT_SECTION_NAME}    css:#releaseMainContent
 
     ${datablock}=    set variable    testid:Data block - ${DATABLOCK_NAME}
+    user waits until page contains element    ${datablock}
+
     # Need to scroll to block to load it
     user scrolls to element    ${datablock}
     user checks chart title contains    ${datablock}    Test chart title

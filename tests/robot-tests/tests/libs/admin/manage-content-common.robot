@@ -14,6 +14,22 @@ ${METHODOLOGY_CONTENT_READONLY_ACCORDION}=      id:methodologyAccordion-content
 ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}=      id:methodologyAccordion-annexes
 
 *** Keywords ***
+user adds basic release content
+    [Arguments]    ${publication}
+    user adds summary text block
+    user adds content to summary text block    Test summary text for ${publication}
+
+    user adds headlines text block
+    user adds content to headlines text block    Test headlines summary text for ${publication}
+
+    user waits until button is enabled    Add new section
+    user clicks button    Add new section
+
+    user changes accordion section title    1    Test section one    id:releaseMainContent
+    user adds text block to editable accordion section    Test section one    id:releaseMainContent
+    user adds content to autosaving accordion section text block    Test section one    1
+    ...    Test content block for ${publication}    id:releaseMainContent
+
 user creates new content section
     [Arguments]
     ...    ${section_number}
@@ -181,6 +197,14 @@ user checks accordion section contains x blocks
     ${blocks}=    get child elements    ${section}    css:[data-testid="editableSectionBlock"]
     length should be    ${blocks}    ${num_blocks}
 
+user adds summary text block
+    user clicks button    Add a summary text block    id:releaseSummary
+    user waits until element contains    id:releaseSummary    This section is empty    %{WAIT_SMALL}
+
+user adds headlines text block
+    user clicks button    Add a headlines text block    id:releaseHeadlines
+    user waits until element contains    id:releaseHeadlines    This section is empty    %{WAIT_SMALL}
+
 user adds text block to editable accordion section
     [Arguments]
     ...    ${section_name}
@@ -205,15 +229,40 @@ user adds data block to editable accordion section
     user clicks button    Embed    ${section}
     user waits until parent does not contain element    ${section}    xpath://button[text()="Embed"]
 
-user edits accordion section text block
+user starts editing accordion section text block
     [Arguments]
     ...    ${section_name}
     ...    ${block_num}
     ...    ${parent}=[data-testid="accordion"]
 
     ${block}=    get accordion section text block    ${section_name}    ${block_num}    ${parent}
-    user clicks button    Edit block    ${block}
+    user starts editing text block    ${block}
     [Return]    ${block}
+
+user starts editing text block
+    [Arguments]    ${parent}
+    user clicks button    Edit block    ${parent}
+    user waits until parent does not contain button    ${parent}    Edit block
+    user waits until parent contains element    ${parent}    css:[role="textbox"]
+    ${element}=    get child element    ${parent}    css:[role="textbox"]
+    user waits until element is enabled    ${element}
+
+user adds content to autosaving text block
+    [Arguments]    ${parent}    ${content}
+    user starts editing text block    ${parent}
+    user presses keys    CTRL+a
+    user presses keys    BACKSPACE
+    user presses keys    ${content}
+    user saves autosaving text block    ${parent}
+    user waits until element contains    ${parent}    ${content}    %{WAIT_SMALL}
+
+user adds content to summary text block
+    [Arguments]    ${content}
+    user adds content to autosaving text block    id:releaseSummary    ${content}
+
+user adds content to headlines text block
+    [Arguments]    ${content}
+    user adds content to autosaving text block    id:releaseHeadlines    ${content}
 
 user adds content to accordion section text block
     [Arguments]
@@ -222,7 +271,7 @@ user adds content to accordion section text block
     ...    ${content}
     ...    ${parent}=[data-testid="accordion"]
 
-    ${block}=    user edits accordion section text block    ${section_name}    ${block_num}    ${parent}
+    ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
     user presses keys    CTRL+a
     user presses keys    BACKSPACE
     user presses keys    ${content}
@@ -236,12 +285,8 @@ user adds content to autosaving accordion section text block
     ...    ${content}
     ...    ${parent}=[data-testid="accordion"]
 
-    ${block}=    user edits accordion section text block    ${section_name}    ${block_num}    ${parent}
-    user presses keys    CTRL+a
-    user presses keys    BACKSPACE
-    user presses keys    ${content}
-    user clicks button    Save & close    ${block}
-    user waits until element contains    ${block}    ${content}
+    ${block}=    get accordion section text block    ${section_name}    ${block_num}    ${parent}
+    user adds content to autosaving text block    ${block}    ${content}
 
 user adds image to accordion section text block
     [Arguments]
@@ -251,7 +296,7 @@ user adds image to accordion section text block
     ...    ${alt_text}=Alt text for ${filename}
     ...    ${parent}=[data-testid="accordion"]
 
-    ${block}=    user edits accordion section text block    ${section_name}    ${block_num}    ${parent}
+    ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
 
     # If we don't do this, `Insert paragraph after block` circle button on image doesn't appear
     user presses keys    ${\n}
@@ -284,7 +329,7 @@ user removes image from accordion section text block
     ...    ${parent}=[data-testid="accordion"]
     ...    ${save_button}=Save & close
 
-    ${block}=    user edits accordion section text block    ${section_name}    ${block_num}    ${parent}
+    ${block}=    user starts editing accordion section text block    ${section_name}    ${block_num}    ${parent}
     user waits until parent contains element    ${block}    xpath://img[@alt="${alt_text}"]
 
     # Currently assumes that the image is the first element in the text block.    Wait for the image to take focus,
@@ -297,6 +342,11 @@ user removes image from accordion section text block
     # Delete the empty line left by the deleted image.
     user presses keys    DELETE
     user clicks button    ${save_button}    ${block}
+
+user saves autosaving text block
+    [Arguments]    ${parent}
+    user clicks button    Save & close    ${parent}
+    user waits until parent does not contain button    ${parent}    Save & close
 
 user checks accordion section text block contains
     [Arguments]
@@ -349,9 +399,9 @@ user deletes editable accordion section
 
     ${section}=    user gets accordion section content element    ${section_name}    ${parent}
     user clicks button    Remove this section    ${section}
-    user waits until modal is visible    Are you sure?
+    user waits until modal is visible    Removing section
     user clicks button    Confirm
-    user waits until modal is not visible    Are you sure?
+    user waits until modal is not visible    Removing section
 
 get accordion section text block
     [Arguments]

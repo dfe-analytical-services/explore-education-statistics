@@ -50,12 +50,12 @@ Add first content section
     user scrolls to element    xpath://button[text()="Add new section"]
     user waits until button is enabled    Add new section
     user clicks button    Add new section
-    user changes accordion section title    1    ${CONTENT_BLOCK_TITLE_1}    css:#releaseMainContent
+    user changes accordion section title    1    ${CONTENT_BLOCK_TITLE_1}    id:releaseMainContent
 
 Add first text block
-    user adds text block to editable accordion section    ${CONTENT_BLOCK_TITLE_1}    css:#releaseMainContent
+    user adds text block to editable accordion section    ${CONTENT_BLOCK_TITLE_1}    id:releaseMainContent
     user adds content to autosaving accordion section text block    ${CONTENT_BLOCK_TITLE_1}    1
-    ...    ${CONTENT_BLOCK_BODY_1}    css:#releaseMainContent
+    ...    ${CONTENT_BLOCK_BODY_1}    id:releaseMainContent
 
 Switch to bau1 to add review comments
     user changes to bau1
@@ -72,8 +72,8 @@ Navigate to content section as bau1
     user closes Set Page View box
 
 Add review comment for first content block
-    user clicks button    First content section
-    user clicks button    Edit block
+    user opens accordion section    First content section    id:releaseMainContent
+    user starts editing accordion section text block    First content section    1    id:releaseMainContent
     # select the text to enable the add comment button
     user presses keys    CTRL+a
     user clicks element    xpath://*[@aria-label="Editor toolbar"]//button[9]    # CKEditor comment button
@@ -101,15 +101,14 @@ Navigate to content section to resolve comments
 
 Resolve comments
     user closes Set Page View box
-    user scrolls to element    testid:accordionSection
-    user clicks button    First content section
+    user opens accordion section    First content section    id:releaseMainContent
     user clicks element    testid:view-comments
 
     # avoid set page view box getting in the way
     user scrolls down    600
 
     # resolve the comment left by bau1
-    ${comment}=    user gets comment    This section needs fixing
+    ${comment}=    user gets unresolved comment    This section needs fixing
     user clicks button    Resolve    ${comment}
     user waits until page contains element
     ...    testid:Expand Details Section Resolved comments (1)    10

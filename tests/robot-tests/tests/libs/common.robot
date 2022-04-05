@@ -470,6 +470,10 @@ user waits until button is enabled
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is enabled    xpath://button[text()="${text}"]    ${wait}
 
+user waits until parent does not contain button
+    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
+    user waits until parent does not contain element    ${parent}    xpath://button[text()="${text}"]    ${wait}
+
 user gets button element
     [Arguments]    ${text}    ${parent}=css:body
     user waits until parent contains element    ${parent}    xpath:.//button[text()="${text}"]
