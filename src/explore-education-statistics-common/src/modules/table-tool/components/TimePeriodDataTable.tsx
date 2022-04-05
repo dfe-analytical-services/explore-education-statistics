@@ -38,16 +38,9 @@ class FilterGroup extends Filter {
 }
 
 function getExcludedFilters(
-  tableHeadersConfig: TableHeadersConfig,
+  tableHeaderFilters: string[],
   subjectMeta: FullTableMeta,
-): string[] {
-  const tableHeaderFilters = [
-    ...tableHeadersConfig.columnGroups.flatMap(filterGroup => filterGroup),
-    ...tableHeadersConfig.rowGroups.flatMap(filterGroup => filterGroup),
-    ...tableHeadersConfig.columns,
-    ...tableHeadersConfig.rows,
-  ].map(filter => filter.id);
-
+): Set<string> {
   const subjectMetaFilters = [
     ...Object.values(subjectMeta.filters).flatMap(
       filterGroup => filterGroup.options,
@@ -57,8 +50,10 @@ function getExcludedFilters(
     ...subjectMeta.indicators,
   ].map(filter => filter.id);
 
-  return subjectMetaFilters.filter(
-    subjectMetaFilter => !tableHeaderFilters.includes(subjectMetaFilter),
+  return new Set(
+    subjectMetaFilters.filter(
+      subjectMetaFilter => !tableHeaderFilters.includes(subjectMetaFilter),
+    ),
   );
 }
 
@@ -72,10 +67,10 @@ function getExcludedFilters(
  *  - compare subjectMeta with tableHeadersConfig to find the excluded ones.
  *  - the query isn't useful here as just has the start and end timePeriods.
  */
-const hasExcludedRowsOrColumns = (
+const excludesRowsOrColumnsWithNoData = (
   query: ReleaseTableDataQuery,
   subjectMeta: FullTableMeta,
-  tableHeadersConfig: TableHeadersConfig,
+  tableHeaderFilters: string[],
 ): boolean => {
   if (
     query.locationIds.length !== subjectMeta.locations.length ||
@@ -91,13 +86,6 @@ const hasExcludedRowsOrColumns = (
   if (query.filters.length !== subjectMetaFilters.length) {
     return true;
   }
-
-  const tableHeaderFilters = [
-    ...tableHeadersConfig.columnGroups.flatMap(filterGroup => filterGroup),
-    ...tableHeadersConfig.rowGroups.flatMap(filterGroup => filterGroup),
-    ...tableHeadersConfig.columns,
-    ...tableHeadersConfig.rows,
-  ].map(filter => filter.id);
 
   if (
     !subjectMeta.timePeriodRange.every(timePeriod =>
@@ -277,8 +265,15 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       // as we want to remove empty ones later.
       const columnsWithText = columnHeadersCartesian.map(() => false);
 
+      const tableHeaderFilters = [
+        ...tableHeadersConfig.columnGroups.flatMap(filterGroup => filterGroup),
+        ...tableHeadersConfig.rowGroups.flatMap(filterGroup => filterGroup),
+        ...tableHeadersConfig.columns,
+        ...tableHeadersConfig.rows,
+      ].map(filter => filter.id);
+
       const excludedFilters = getExcludedFilters(
-        tableHeadersConfig,
+        tableHeaderFilters,
         subjectMeta,
       );
 
@@ -288,6 +283,10 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         results,
         excludedFilters,
       );
+
+      const showExcludedRowsOrColumnsWarning =
+        query &&
+        excludesRowsOrColumnsWithNoData(query, subjectMeta, tableHeaderFilters);
 
       const tableCartesian: TableCell[][] = rowHeadersCartesian.map(
         rowFilterCombination => {
@@ -384,10 +383,6 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         : 'dataTableCaption';
 
       const rows = filteredCartesian.map(row => row.map(cell => cell.text));
-
-      const showExcludedRowsOrColumnsWarning =
-        query &&
-        hasExcludedRowsOrColumns(query, subjectMeta, tableHeadersConfig);
 
       return (
         <>

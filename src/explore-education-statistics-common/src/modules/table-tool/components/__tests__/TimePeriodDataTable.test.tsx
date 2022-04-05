@@ -10,6 +10,7 @@ import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
 import {
   ReleaseTableDataQuery,
   TableDataResponse,
+  TableDataResult,
 } from '@common/services/tableBuilderService';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
@@ -1287,7 +1288,7 @@ describe('TimePeriodDataTable', () => {
       geoJsonAvailable: true,
     };
 
-    const testResults = [
+    const testResults: TableDataResult[] = [
       {
         filters: ['filter-1', 'filter-2'],
         geographicLevel: 'country',

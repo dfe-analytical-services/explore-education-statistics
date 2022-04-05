@@ -26,7 +26,7 @@ import set from 'lodash/set';
  */
 export default function groupResultMeasuresByCombination(
   results: TableDataResult[],
-  excludedFilterIds: string[] = [],
+  excludedFilterIds: Set<string> = new Set(),
 ): Dictionary<unknown> {
   return results.reduce<MeasuresGroupedByDataSet>((acc, result) => {
     const {
@@ -57,7 +57,7 @@ export default function groupResultMeasuresByCombination(
         : undefined,
     });
 
-    const filteredPath = path.filter(id => !excludedFilterIds.includes(id));
+    const filteredPath = path.filter(id => !excludedFilterIds.has(id));
     const existing = get(acc, filteredPath);
 
     if (existing) {
