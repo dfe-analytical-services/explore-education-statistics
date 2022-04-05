@@ -118,7 +118,7 @@ const ReorderList = ({
             }
             return option;
           }),
-          parentCategoryId: categoryId || parentCategoryId,
+          parentCategoryId,
           parentGroupId: groupId,
         });
       }}
