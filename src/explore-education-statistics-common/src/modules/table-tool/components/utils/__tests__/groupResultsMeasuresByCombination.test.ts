@@ -262,12 +262,12 @@ describe('groupResultMeasuresByCombination', () => {
   });
 
   test('can exclude grouping by location', () => {
-    const excludedFilterIds = [
+    const excludedFilterIds = new Set([
       LocationFilter.createId({
         level: 'localAuthority',
         value: 'location-1',
       }),
-    ];
+    ]);
 
     const resultMeasures = groupResultMeasuresByCombination(
       [
@@ -311,12 +311,12 @@ describe('groupResultMeasuresByCombination', () => {
 
   // Test for Permalinks created prior to the switchover to using location id's.
   test('can exclude grouping by location code', () => {
-    const excludedFilterIds = [
+    const excludedFilterIds = new Set([
       LocationFilter.createId({
         level: 'localAuthority',
         value: 'location-1',
       }),
-    ];
+    ]);
 
     const resultMeasures = groupResultMeasuresByCombination(
       // Results contain a 'location' object with codes rather than a 'locationId'
@@ -370,7 +370,7 @@ describe('groupResultMeasuresByCombination', () => {
   });
 
   test('can exclude grouping by time period', () => {
-    const excludedFilterIds = ['2018_AY'];
+    const excludedFilterIds = new Set(['2018_AY']);
 
     const resultMeasures = groupResultMeasuresByCombination(
       [
@@ -416,7 +416,7 @@ describe('groupResultMeasuresByCombination', () => {
   });
 
   test('can exclude grouping by single filter', () => {
-    const excludedFilterIds = ['filter-2'];
+    const excludedFilterIds = new Set(['filter-2']);
 
     const resultMeasures = groupResultMeasuresByCombination(
       [
@@ -462,7 +462,7 @@ describe('groupResultMeasuresByCombination', () => {
   });
 
   test('can exclude grouping by multiple filters', () => {
-    const excludedFilterIds = ['filter-1', 'filter-2'];
+    const excludedFilterIds = new Set(['filter-1', 'filter-2']);
 
     const resultMeasures = groupResultMeasuresByCombination(
       [
@@ -506,14 +506,14 @@ describe('groupResultMeasuresByCombination', () => {
   });
 
   test('can exclude grouping of different filter types', () => {
-    const excludedFilterIds = [
+    const excludedFilterIds = new Set([
       LocationFilter.createId({
         level: 'localAuthority',
         value: 'location-1',
       }),
       '2018_AY',
       'filter-1',
-    ];
+    ]);
 
     const resultMeasures = groupResultMeasuresByCombination(
       [

@@ -94,6 +94,7 @@ const DataBlockSourceWizardFinalStep = ({
           ref={dataTableRef}
           fullTable={table}
           captionTitle={captionTitle}
+          query={query}
           tableHeadersConfig={currentTableHeaders}
         />
       </div>

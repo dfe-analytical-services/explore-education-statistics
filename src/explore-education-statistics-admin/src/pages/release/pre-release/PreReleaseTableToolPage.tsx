@@ -135,6 +135,7 @@ const PreReleaseTableToolPage = ({
                     {response && query && (
                       <PreReleaseTableToolFinalStep
                         publication={publication}
+                        query={query}
                         releaseId={releaseId}
                         table={response.table}
                         tableHeaders={response.tableHeaders}

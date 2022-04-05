@@ -120,6 +120,7 @@ const TableToolFinalStep = ({
           <TimePeriodDataTable
             ref={dataTableRef}
             fullTable={table}
+            query={query}
             tableHeadersConfig={currentTableHeaders}
             onError={message => {
               toggleHasTableError.on();

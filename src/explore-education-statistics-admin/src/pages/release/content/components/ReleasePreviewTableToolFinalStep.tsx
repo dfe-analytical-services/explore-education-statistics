@@ -1,20 +1,23 @@
+import Link from '@admin/components/Link';
+import { BasicPublicationDetails } from '@admin/services/publicationService';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
-import Link from '@admin/components/Link';
-import { BasicPublicationDetails } from '@admin/services/publicationService';
+import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import React, { ReactNode, useEffect, useRef, useState } from 'react';
 
 interface ReleasePreviewTableToolFinalStepProps {
   publication?: BasicPublicationDetails;
+  query: ReleaseTableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
 }
 const ReleasePreviewTableToolFinalStep = ({
   publication,
+  query,
   table,
   tableHeaders,
 }: ReleasePreviewTableToolFinalStepProps) => {
@@ -63,6 +66,7 @@ const ReleasePreviewTableToolFinalStep = ({
         <TimePeriodDataTable
           ref={dataTableRef}
           fullTable={table}
+          query={query}
           tableHeadersConfig={currentTableHeaders}
         />
       )}

@@ -7,11 +7,23 @@ import {
 } from '@common/modules/table-tool/components/__tests__/__data__/TimePeriodDataTable.data';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
-import { TableDataResponse } from '@common/services/tableBuilderService';
+import {
+  ReleaseTableDataQuery,
+  TableDataResponse,
+  TableDataResult,
+} from '@common/services/tableBuilderService';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
+import {
+  CategoryFilter,
+  Indicator,
+  LocationFilter,
+  TimePeriodFilter,
+} from '@common/modules/table-tool/types/filters';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
+import { FullTable, FullTableMeta } from '../../types/fullTable';
+import { TableHeadersConfig } from '../../types/tableHeaders';
 
 describe('TimePeriodDataTable', () => {
   test('renders table with two of every option', () => {
@@ -1208,5 +1220,361 @@ describe('TimePeriodDataTable', () => {
       'id',
       'dataTableCaption-test-datablock-id',
     );
+  });
+
+  describe('excluded rows or columns warning', () => {
+    const testSubjectMeta: FullTableMeta = {
+      filters: {
+        Category1: {
+          name: 'category_1',
+          options: [
+            new CategoryFilter({
+              value: 'filter-1',
+              label: 'Filter 1 Option 1',
+              category: 'Category 1',
+            }),
+          ],
+        },
+        Category2: {
+          name: 'category_2',
+          options: [
+            new CategoryFilter({
+              value: 'filter-2',
+              label: 'Filter 2 Option 1',
+              category: 'Category 2',
+            }),
+          ],
+        },
+      },
+      footnotes: [],
+      indicators: [
+        new Indicator({
+          value: 'indicator-1',
+          label: 'Indicator 1',
+          unit: '',
+          name: 'indicator_1',
+        }),
+      ],
+      locations: [
+        new LocationFilter({
+          value: 'location-1',
+          label: 'England',
+          level: 'country',
+        }),
+      ],
+      boundaryLevels: [],
+      publicationName: 'Permanent and fixed-period exclusions in England',
+      subjectName: 'Duration of fixed exclusions',
+      timePeriodRange: [
+        new TimePeriodFilter({
+          label: '2006/07',
+          year: 2006,
+          code: 'AY',
+          order: 0,
+        }),
+        new TimePeriodFilter({
+          label: '2007/08',
+          year: 2007,
+          code: 'AY',
+          order: 1,
+        }),
+        new TimePeriodFilter({
+          label: '2008/09',
+          year: 2008,
+          code: 'AY',
+          order: 2,
+        }),
+      ],
+      geoJsonAvailable: true,
+    };
+
+    const testResults: TableDataResult[] = [
+      {
+        filters: ['filter-1', 'filter-2'],
+        geographicLevel: 'country',
+        locationId: 'location-1',
+        measures: {
+          'indicator-1': '370',
+        },
+        timePeriod: '2006_AY',
+      },
+      {
+        filters: ['filter-1', 'filter-2'],
+        geographicLevel: 'country',
+        locationId: 'location-1',
+        measures: {
+          'indicator-1': '5',
+        },
+        timePeriod: '2007_AY',
+      },
+      {
+        filters: ['filter-1', 'filter-2'],
+        geographicLevel: 'country',
+        locationId: 'location-1',
+        measures: {
+          'indicator-1': '35',
+        },
+        timePeriod: '2008_AY',
+      },
+    ];
+
+    const testTableHeadersConfig: TableHeadersConfig = {
+      columnGroups: [],
+      rowGroups: [],
+      columns: [
+        new Indicator({
+          value: 'indicator-1',
+          label: 'Indicator 1',
+          name: 'indicator_1_name',
+          unit: '',
+        }),
+      ],
+      rows: [
+        new TimePeriodFilter({
+          label: '2006/07',
+          year: 2006,
+          code: 'AY',
+          order: 0,
+        }),
+        new TimePeriodFilter({
+          label: '2007/08',
+          year: 2007,
+          code: 'AY',
+          order: 1,
+        }),
+        new TimePeriodFilter({
+          label: '2008/09',
+          year: 2008,
+          code: 'AY',
+          order: 2,
+        }),
+      ],
+    };
+
+    test('shows the warning when a row or column for an indicator is excluded because it has no data', () => {
+      const testFullTable: FullTable = {
+        subjectMeta: testSubjectMeta,
+        results: testResults,
+      };
+
+      const testQuery: ReleaseTableDataQuery = {
+        subjectId: 'subject-1-id',
+        timePeriod: {
+          startYear: 2006,
+          startCode: 'AY',
+          endYear: 2008,
+          endCode: 'AY',
+        },
+        filters: ['filter-2', 'filter-1'],
+        indicators: ['indicator-1', 'indicator-2'],
+        locationIds: ['location-1'],
+        includeGeoJson: false,
+        releaseId: 'release-1-id',
+      };
+
+      render(
+        <TimePeriodDataTable
+          fullTable={testFullTable}
+          query={testQuery}
+          tableHeadersConfig={testTableHeadersConfig}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'Some rows and columns are not shown in this table as the data does not exist in the underlying file.',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    test('shows the warning when a row or column for a filter is excluded because it has no data', () => {
+      const testFullTable: FullTable = {
+        subjectMeta: testSubjectMeta,
+        results: testResults,
+      };
+
+      const testQuery: ReleaseTableDataQuery = {
+        subjectId: 'subject-1-id',
+        timePeriod: {
+          startYear: 2006,
+          startCode: 'AY',
+          endYear: 2008,
+          endCode: 'AY',
+        },
+        filters: ['filter-2', 'filter-1', 'filter-3'],
+        indicators: ['indicator-1'],
+        locationIds: ['location-1'],
+        includeGeoJson: false,
+        releaseId: 'release-1-id',
+      };
+
+      render(
+        <TimePeriodDataTable
+          fullTable={testFullTable}
+          query={testQuery}
+          tableHeadersConfig={testTableHeadersConfig}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'Some rows and columns are not shown in this table as the data does not exist in the underlying file.',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    test('shows the warning when a row or column for a location is excluded because it has no data', () => {
+      const testFullTable: FullTable = {
+        subjectMeta: testSubjectMeta,
+        results: testResults,
+      };
+
+      const testQuery: ReleaseTableDataQuery = {
+        subjectId: 'subject-1-id',
+        timePeriod: {
+          startYear: 2006,
+          startCode: 'AY',
+          endYear: 2008,
+          endCode: 'AY',
+        },
+        filters: ['filter-2', 'filter-1', 'filter-3'],
+        indicators: ['indicator-1'],
+        locationIds: ['location-1', 'location-2'],
+        includeGeoJson: false,
+        releaseId: 'release-1-id',
+      };
+
+      render(
+        <TimePeriodDataTable
+          fullTable={testFullTable}
+          query={testQuery}
+          tableHeadersConfig={testTableHeadersConfig}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'Some rows and columns are not shown in this table as the data does not exist in the underlying file.',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    test('shows the warning when a row or column for a time period is excluded because it has no data', () => {
+      const testFullTable: FullTable = {
+        subjectMeta: testSubjectMeta,
+        results: [
+          {
+            filters: ['filter-1', 'filter-2'],
+            geographicLevel: 'country',
+            locationId: 'location-1',
+            measures: {
+              'indicator-1': '370',
+            },
+            timePeriod: '2006_AY',
+          },
+          {
+            filters: ['filter-1', 'filter-2'],
+            geographicLevel: 'country',
+            locationId: 'location-1',
+            measures: {
+              'indicator-1': '35',
+            },
+            timePeriod: '2008_AY',
+          },
+        ],
+      };
+
+      const testTableHeadersConfigTimePeriods: TableHeadersConfig = {
+        columnGroups: [],
+        rowGroups: [],
+        columns: [
+          new Indicator({
+            value: 'indicator-1',
+            label: 'Indicator 1',
+            name: 'indicator_1_name',
+            unit: '',
+          }),
+        ],
+        rows: [
+          new TimePeriodFilter({
+            label: '2006/07',
+            year: 2006,
+            code: 'AY',
+            order: 0,
+          }),
+          new TimePeriodFilter({
+            label: '2008/09',
+            year: 2008,
+            code: 'AY',
+            order: 2,
+          }),
+        ],
+      };
+
+      const testQuery: ReleaseTableDataQuery = {
+        subjectId: 'subject-1-id',
+        timePeriod: {
+          startYear: 2006,
+          startCode: 'AY',
+          endYear: 2008,
+          endCode: 'AY',
+        },
+        filters: ['filter-2', 'filter-1'],
+        indicators: ['indicator-1'],
+        locationIds: ['location-1'],
+        includeGeoJson: false,
+        releaseId: 'release-1-id',
+      };
+
+      render(
+        <TimePeriodDataTable
+          fullTable={testFullTable}
+          query={testQuery}
+          tableHeadersConfig={testTableHeadersConfigTimePeriods}
+        />,
+      );
+
+      expect(
+        screen.getByText(
+          'Some rows and columns are not shown in this table as the data does not exist in the underlying file.',
+        ),
+      ).toBeInTheDocument();
+    });
+
+    test('does not show the warning when no rows or columns are excluded', () => {
+      const testFullTable: FullTable = {
+        subjectMeta: testSubjectMeta,
+        results: testResults,
+      };
+
+      const testQuery: ReleaseTableDataQuery = {
+        subjectId: 'subject-1-id',
+        timePeriod: {
+          startYear: 2006,
+          startCode: 'AY',
+          endYear: 2008,
+          endCode: 'AY',
+        },
+        filters: ['filter-2', 'filter-1'],
+        indicators: ['indicator-1'],
+        locationIds: ['location-1'],
+        includeGeoJson: false,
+        releaseId: 'release-1-id',
+      };
+
+      render(
+        <TimePeriodDataTable
+          fullTable={testFullTable}
+          query={testQuery}
+          tableHeadersConfig={testTableHeadersConfig}
+        />,
+      );
+
+      expect(
+        screen.queryByText(
+          'Some rows and columns are not shown in this table as the data does not exist in the underlying file.',
+        ),
+      ).not.toBeInTheDocument();
+    });
   });
 });
