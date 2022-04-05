@@ -6,7 +6,6 @@ import { Feature, Geometry } from 'geojson';
 export interface FilterOption {
   label: string;
   value: string;
-  id?: string; // EES-1243 - not optional when backend done?
 }
 
 export interface IndicatorOption extends FilterOption {
