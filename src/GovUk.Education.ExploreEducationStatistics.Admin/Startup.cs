@@ -69,8 +69,10 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtil
 using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.FootnoteService;
 using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
-using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
-using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
+using IMethodologyImageService =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
+using IMethodologyService =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
@@ -79,7 +81,8 @@ using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
-using MethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
+using MethodologyImageService =
+    GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyService;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
@@ -103,9 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddHealthChecks();
-            
+
             services.AddApplicationInsightsTelemetry()
                 .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
 
@@ -119,10 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services
                 .AddControllers(
-                    options =>
-                    {
-                        options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(","));
-                    }
+                    options => { options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(",")); }
                 )
                 .AddControllersAsServices();
 
@@ -136,10 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddDbContext<ContentDbContext>(options =>
                 options
                     .UseSqlServer(Configuration.GetConnectionString("ContentDb"),
-                        builder =>
-                        {
-                            builder.MigrationsAssembly(typeof(Startup).Assembly.FullName);
-                        })
+                        builder => { builder.MigrationsAssembly(typeof(Startup).Assembly.FullName); })
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
@@ -298,7 +294,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPublicationService, PublicationService>();
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
-            services.AddTransient<ILegacyReleaseService, LegacyReleaseService>();
+            services.AddTransient<ILegacyReleaseService, LegacyReleaseService>(provider =>
+                new LegacyReleaseService(
+                    context: provider.GetService<ContentDbContext>(),
+                    mapper: provider.GetService<IMapper>(),
+                    userService: provider.GetService<IUserService>(),
+                    persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                    publicBlobCacheService: new BlobCacheService(
+                        GetBlobStorageService(provider, "PublicStorage"),
+                        provider.GetRequiredService<ILogger<BlobCacheService>>())
+                )
+            );
             services.AddTransient<IReleaseService, ReleaseService>();
             services.AddTransient<IReleaseApprovalService, ReleaseApprovalService>();
             services.AddTransient<ReleaseSubjectRepository.SubjectDeleter, ReleaseSubjectRepository.SubjectDeleter>();
@@ -384,7 +390,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IReleaseContentSectionRepository, ReleaseContentSectionRepository>();
             services.AddTransient<IReleaseNoteService, ReleaseNoteService>();
             services.AddTransient<IResultBuilder<Observation, ObservationViewModel>, ResultBuilder>();
-            services.AddTransient<Data.Model.Repository.Interfaces.IReleaseRepository, Data.Model.Repository.ReleaseRepository>();
+            services
+                .AddTransient<Data.Model.Repository.Interfaces.IReleaseRepository,
+                    Data.Model.Repository.ReleaseRepository>();
             services.AddTransient<ISubjectRepository, SubjectRepository>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
@@ -444,7 +452,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1",
-                    new OpenApiInfo {Title = "Explore education statistics - Admin API", Version = "v1"});
+                    new OpenApiInfo { Title = "Explore education statistics - Admin API", Version = "v1" });
                 c.CustomSchemaIds((type) => type.FullName);
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
@@ -460,7 +468,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         {
                             Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
                         },
-                        new[] {string.Empty}
+                        new[] { string.Empty }
                     }
                 });
             });
@@ -469,7 +477,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-        // Enable caching and register any caching services.
+            // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
 
@@ -568,7 +576,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         private void UpdateDatabase(IApplicationBuilder app, IWebHostEnvironment env)
         {
             using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-                .CreateScope())
+                       .CreateScope())
             {
                 using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
                 {
