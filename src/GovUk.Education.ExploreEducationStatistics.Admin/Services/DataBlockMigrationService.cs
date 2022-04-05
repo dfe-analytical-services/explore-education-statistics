@@ -4,28 +4,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Services;
-using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.DataBlockMigrationService.DataBlockMapMigrationPlan.MigrationStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.DataBlockMigrationService.DataBlockMapMigrationPlan.MigrationType;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
-using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
-using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -33,58 +25,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _context;
         private readonly StatisticsDbContext _statisticsDbContext;
-        private readonly IStorageQueueService _storageQueueService;
-        private readonly IUserService _userService;
-        private readonly ILogger<DataBlockMigrationService> _logger;
 
         public DataBlockMigrationService(
             ContentDbContext context,
-            StatisticsDbContext statisticsDbContext,
-            IStorageQueueService storageQueueService,
-            IUserService userService,
-            ILogger<DataBlockMigrationService> logger)
+            StatisticsDbContext statisticsDbContext)
         {
             _context = context;
             _statisticsDbContext = statisticsDbContext;
-            _storageQueueService = storageQueueService;
-            _userService = userService;
-            _logger = logger;
             _statisticsDbContext = statisticsDbContext;
-        }
-
-        public async Task<Either<ActionResult, Unit>> MigrateAll()
-        {
-            return await _userService.CheckCanRunMigrations()
-                .OnSuccess<ActionResult, Unit, Unit>(async _ =>
-                {
-                    var messageCount = await _storageQueueService.GetApproximateMessageCount(MigrateDataBlocksQueue);
-
-                    switch (messageCount)
-                    {
-                        case null:
-                            return new BadRequestObjectResult(
-                                $"Unexpected null message count for queue {MigrateDataBlocksQueue}");
-                        case > 0:
-                            return new BadRequestObjectResult(
-                                $"Found non-empty queue {MigrateDataBlocksQueue}. Message count: {messageCount}");
-                    }
-
-                    // Create migration queue messages for all data blocks that have not already been marked as migrated 
-                    var dataBlocks = await _context.DataBlocks
-                        .AsNoTracking()
-                        .Where(dataBlock => dataBlock.LocationsMigrated == null || !dataBlock.LocationsMigrated)
-                        .Select(dataBlock => new MigrateDataBlockMessage(dataBlock.Id))
-                        .ToListAsync();
-
-                    if (dataBlocks.Any())
-                    {
-                        _logger.LogInformation("Adding {count} messages to the '{queue}' queue", dataBlocks.Count,
-                            MigrateDataBlocksQueue);
-                        await _storageQueueService.AddMessages(MigrateDataBlocksQueue, dataBlocks);
-                    }
-
-                    return Unit.Instance;
-                });
         }
 
         public async Task<Either<ActionResult, List<DataBlockMapMigrationPlan>>> GetMigrateMapPlans()
@@ -104,12 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             var specificBoundaryLevel = db.Query.BoundaryLevel;
                             
-                            var dataBlockLocationsQuery =
-                                LocationPredicateBuilder
-                                    .Build(db.Query.LocationIds?.ToList(), db.Query.Locations);
-
                             var dataBlockGeographicLevels = await locations
-                                .Where(dataBlockLocationsQuery)
+                                .Where(l => db.Query.LocationIds.Contains(l.Id))
                                 .Select(l => l.GeographicLevel)
                                 .Distinct()
                                 .ToListAsync();
@@ -155,99 +99,169 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return locations;
         }
 
-        public async Task<Either<ActionResult, List<DataBlockMapMigrationPlan>>> MigrateMaps()
+        public async Task<Either<ActionResult, List<MapMigrationResult>>> MigrateMaps()
         {
-            // return 
-            //     await _userService
-            //     .CheckCanRunMigrations()
-            //     .OnSuccess(async _ =>
-            //     {
-            
             var boundaryLevels = await GetAllBoundaryLevels();
-            var boundaryLevelDateRanges = GetBoundaryLevelsWithDateRanges();
 
-            return
-                GetMigrateMapPlans()
-                    .OnSuccess(plans =>
-                    {
-                        plans
-                            .ToAsyncEnumerable()
-                            .ForEachAwaitAsync(async plan =>
+            return await GetMigrateMapPlans()
+                .OnSuccess(async plans =>
+                {
+                    var migrationResults = await plans
+                        .ToAsyncEnumerable()
+                        .SelectAwait(async plan =>
+                        {
+                            var dataBlock = await _context
+                                .DataBlocks
+                                .SingleAsync(db => db.Id == plan.DataBlockId);
+
+                            var map = (MapChart)dataBlock.Charts[0];
+
+                            switch (plan.Strategy)
                             {
-                                var dataBlock = await _context
-                                    .DataBlocks
-                                    .SingleAsync(db => db.Id == plan.DataBlockId);
-
-                                var map = (MapChart) dataBlock.Charts[0];
-                                
-                                switch (plan.Strategy)
+                                case RetainChosenBoundaryLevel:
                                 {
-                                    case RetainChosenBoundaryLevel:
-                                    {
-                                        map.BoundaryLevel = dataBlock.Query.BoundaryLevel ?? 0;
-                                        break;
-                                    }
-                                    case SetBoundaryLevelToMatchSingleDataSetGeoLevel:
-                                    {
-                                        var geographicLevel = plan
-                                            .DataSetGeographicLevels
-                                            .Single();
-                                        
-                                        var boundaryLevel = GetLatestBoundaryLevelAtCreationTime(
-                                            dataBlock.Created, 
-                                            geographicLevel,
-                                            boundaryLevels);
-                                        
-                                        dataBlock.Query.BoundaryLevel = boundaryLevel.Id;
-                                        map.BoundaryLevel = boundaryLevel.Id;
-                                        break;
-                                    }
-                                    case SetBoundaryLevelToMatchSingleNonCountryDataSetLevel:
-                                    {
-                                        var nonCountryGeographicLevel = plan
-                                            .DataSetGeographicLevels
-                                            .Single(geographicLevel => geographicLevel != GeographicLevel.Country);
-                                        
-                                        var boundaryLevel = GetLatestBoundaryLevelAtCreationTime(
-                                            dataBlock.Created, 
-                                            nonCountryGeographicLevel,
-                                            boundaryLevels);
-                                        
-                                        dataBlock.Query.BoundaryLevel = boundaryLevel.Id;
-                                        map.BoundaryLevel = boundaryLevel.Id;
-                                        break;
-                                    }
-                                    case QuestionWhichCorrectGeoLevelToSelect:
-                                        break;
-                                    case FixMapConfigNoDataSetGeographicLevels:
-                                        break;
-                                    default: 
-                                        throw new ArgumentOutOfRangeException($"Unknown migration strategy {plan.Strategy}");
+                                    map.BoundaryLevel = dataBlock.Query.BoundaryLevel ?? 0;
+                                    return new MapMigrationResult(plan.DataBlockId, plan.Strategy,
+                                        map.BoundaryLevel,
+                                        boundaryLevels.Single(level => level.Id == map.BoundaryLevel).Level);
                                 }
-                            });
-                    });
+                                case SetBoundaryLevelToMatchSingleDataSetGeoLevel:
+                                {
+                                    var geographicLevel = plan
+                                        .DataSetGeographicLevels
+                                        .Single();
+
+                                    var createdDate = await GetDataBlockCreatedDate(dataBlock);
+                                    
+                                    var boundaryLevel = GetLatestBoundaryLevelAtCreationTime(
+                                        createdDate,
+                                        geographicLevel,
+                                        boundaryLevels);
+
+                                    dataBlock.Query.BoundaryLevel = boundaryLevel.Id;
+                                    map.BoundaryLevel = boundaryLevel.Id;
+                                    return new MapMigrationResult(plan.DataBlockId, plan.Strategy,
+                                        map.BoundaryLevel,
+                                        boundaryLevels.Single(level => level.Id == map.BoundaryLevel).Level);
+                                }
+                                case SetBoundaryLevelToMatchSingleNonCountryDataSetLevel:
+                                {
+                                    var nonCountryGeographicLevel = plan
+                                        .DataSetGeographicLevels
+                                        .Single(geographicLevel => geographicLevel != GeographicLevel.Country);
+
+                                    var createdDate = await GetDataBlockCreatedDate(dataBlock);
+
+                                    var boundaryLevel = GetLatestBoundaryLevelAtCreationTime(
+                                        createdDate,
+                                        nonCountryGeographicLevel,
+                                        boundaryLevels);
+
+                                    dataBlock.Query.BoundaryLevel = boundaryLevel.Id;
+                                    map.BoundaryLevel = boundaryLevel.Id;
+                                    return new MapMigrationResult(plan.DataBlockId, plan.Strategy,
+                                        map.BoundaryLevel,
+                                        boundaryLevels.Single(level => level.Id == map.BoundaryLevel).Level);
+                                }
+                                case QuestionWhichCorrectGeoLevelToSelect:
+                                    return new MapMigrationResult(plan.DataBlockId, plan.Strategy,
+                                        null,
+                                        null);
+                                case FixMapConfigNoDataSetGeographicLevels:
+                                    return new MapMigrationResult(plan.DataBlockId, plan.Strategy,
+                                        null,
+                                        null);
+                                default:
+                                    throw new ArgumentOutOfRangeException(
+                                        $"Unknown migration strategy {plan.Strategy}");
+                            }
+                        })
+                        .ToListAsync();
+
+                    return migrationResults;
+                });
         }
 
-        private Dictionary<
-            (
+        private async Task<DateTime> GetDataBlockCreatedDate(DataBlock dataBlock)
+        {
+            DateTime createdDate;
+
+            if (dataBlock.Created != null)
+            {
+                createdDate = dataBlock.Created.Value;
+            }
+            else
+            {
+                var releaseIds = await _statisticsDbContext
+                    .ReleaseSubject
+                    .Where(rs => rs.SubjectId == dataBlock.Query.SubjectId)
+                    .Select(rs => rs.ReleaseId)
+                    .ToListAsync();
+
+                var firstRelease = await _context
+                    .Releases
+                    .Where(release => releaseIds.Contains(release.Id))
+                    .OrderBy(release => release.Created)
+                    .FirstAsync();
+
+                createdDate = firstRelease.Created;
+            }
+
+            return createdDate;
+        }
+
+        private 
+            List<(
                 GeographicLevel geographicLevel, 
                 DateTime start, 
-                DateTime end
-            ), 
-            BoundaryLevel> 
+                DateTime end,
+                BoundaryLevel boundaryLevel
+            )>
             GetBoundaryLevelsWithDateRanges(List<BoundaryLevel> boundaryLevels)
         {
-            return boundaryLevels
-                .ToDictionary(boundaryLevel => boundaryLevel.Label)
+            var groupedByGeographicLevel = boundaryLevels
+                .GroupBy(boundary => boundary.Level)
+                .ToDictionary(
+                    group => group.Key,
+                    group => group.OrderBy(boundary => boundary.Created).ToList());
+
+            return groupedByGeographicLevel
+                .SelectMany(levelAndBoundaries =>
+                {
+                    var (level, boundaries) = levelAndBoundaries;
+                    return boundaries
+                        .Select(boundary =>
+                        {
+                            var indexOfBoundary = boundaries.IndexOf(boundary);
+                            var previousBoundary = indexOfBoundary > 0 ? boundaries[indexOfBoundary - 1] : null;
+                            var nextBoundary = indexOfBoundary < boundaries.Count - 1 ? boundaries[indexOfBoundary + 1] : null;
+                            return (
+                                level,
+                                previousBoundary == null ? boundary.Created.AddYears(-10) : boundary.Created,
+                                nextBoundary?.Created.AddMilliseconds(-1) ?? boundary.Created.AddYears(10),
+                                boundary
+                            );
+                        });
+                })
+                .ToList();
         }
 
         private BoundaryLevel GetLatestBoundaryLevelAtCreationTime(
-            DateTime? dataBlockCreated,
+            DateTime dataBlockCreated,
             GeographicLevel geographicLevel, 
             List<BoundaryLevel> boundaryLevels)
         {
-            boundaryLevels.SingleOrDefault(bl => bl.Published)
-            throw new NotImplementedException();
+            var boundaryLevelsWithDateRanges = GetBoundaryLevelsWithDateRanges(boundaryLevels);
+            return boundaryLevelsWithDateRanges
+                .Single(boundary =>
+                {
+                    var (level, start, end, _) = boundary;
+
+                    return level == geographicLevel &&
+                           dataBlockCreated.CompareTo(start) >= 0 &&
+                           dataBlockCreated.CompareTo(end) <= 0;
+                })
+                .boundaryLevel;
         }
 
         public record DataBlockMapMigrationPlan
@@ -371,6 +385,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         Strategy = QuestionWhichCorrectGeoLevelToSelect;
                     }
                 }
+            }
+        }
+            
+        public record MapMigrationResult
+        {
+            public Guid DataBlockId { get; }
+            public DataBlockMapMigrationPlan.MigrationStrategy Strategy { get; } = FixMapConfigNoDataSetGeographicLevels;
+            public long? BoundaryLevelId { get; }
+
+            [JsonConverter(typeof(StringEnumConverter))]
+            public GeographicLevel? GeographicLevel { get; }
+
+            public MapMigrationResult(Guid dataBlockId, DataBlockMapMigrationPlan.MigrationStrategy strategy, long? boundaryLevelId, GeographicLevel? geographicLevel)
+            {
+                DataBlockId = dataBlockId;
+                Strategy = strategy;
+                BoundaryLevelId = boundaryLevelId;
+                GeographicLevel = geographicLevel;
             }
         }
     }

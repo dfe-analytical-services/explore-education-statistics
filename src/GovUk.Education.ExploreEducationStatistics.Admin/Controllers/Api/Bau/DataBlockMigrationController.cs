@@ -52,5 +52,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                 })
                 .HandleFailuresOrOk();
         }
+        
+        [AllowAnonymous]
+        [HttpPatch("releases/migrate-all-maps")]
+        public async Task<ActionResult<List<MapMigrationResult>>> MigrateAllMapsDo()
+        {
+            return await _dataBlockMigrationService
+                .MigrateMaps()
+                .HandleFailuresOrOk();
+        }
     }
 }
