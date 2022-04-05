@@ -67,7 +67,7 @@ function getExcludedFilters(
  *  - compare subjectMeta with tableHeadersConfig to find the excluded ones.
  *  - the query isn't useful here as just has the start and end timePeriods.
  */
-const excludesRowsOrColumnsWithNoData = (
+const hasMissingRowsOrColumns = (
   query: ReleaseTableDataQuery,
   subjectMeta: FullTableMeta,
   tableHeaderFilters: string[],
@@ -284,9 +284,9 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         excludedFilters,
       );
 
-      const showExcludedRowsOrColumnsWarning =
+      const showMissingRowsOrColumnsWarning =
         query &&
-        excludesRowsOrColumnsWithNoData(query, subjectMeta, tableHeaderFilters);
+        hasMissingRowsOrColumns(query, subjectMeta, tableHeaderFilters);
 
       const tableCartesian: TableCell[][] = rowHeadersCartesian.map(
         rowFilterCombination => {
@@ -386,7 +386,7 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
 
       return (
         <>
-          {showExcludedRowsOrColumnsWarning && (
+          {showMissingRowsOrColumnsWarning && (
             <WarningMessage>
               Some rows and columns are not shown in this table as the data does
               not exist in the underlying file.
