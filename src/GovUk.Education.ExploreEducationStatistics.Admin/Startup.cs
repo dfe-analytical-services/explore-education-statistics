@@ -291,7 +291,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             );
             services.AddTransient<IThemeService, ThemeService>();
             services.AddTransient<ITopicService, TopicService>();
-            services.AddTransient<IPublicationService, PublicationService>();
+            services.AddTransient<IPublicationService, PublicationService>(provider =>
+                new PublicationService(
+                    context: provider.GetService<ContentDbContext>(),
+                    mapper: provider.GetService<IMapper>(),
+                    persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                    userService: provider.GetService<IUserService>(),
+                    publicationRepository: provider.GetService<IPublicationRepository>(),
+                    methodologyVersionRepository: provider.GetService<IMethodologyVersionRepository>(),
+                    publicBlobCacheService: new BlobCacheService(
+                        GetBlobStorageService(provider, "PublicStorage"),
+                        provider.GetRequiredService<ILogger<BlobCacheService>>())
+                )
+            );
             services.AddTransient<IPublicationRepository, PublicationRepository>();
             services.AddTransient<IMetaService, MetaService>();
             services.AddTransient<ILegacyReleaseService, LegacyReleaseService>(provider =>
