@@ -43,42 +43,43 @@ do this on failure
     END
 
 user opens the browser
+    [Arguments]    ${alias}=main
     IF    "${browser}" == "chrome"
-        user opens chrome
+        user opens chrome    ${alias}
     END
     IF    "${browser}" == "firefox"
-        user opens firefox
+        user opens firefox    ${alias}
     END
     IF    "${browser}" == "ie"
-        user opens ie
+        user opens ie    ${alias}
     END
     go to    about:blank
 
 user opens chrome
+    [Arguments]    ${alias}=chrome
     IF    ${headless} == 1
-        user opens chrome headless
+        user opens chrome headlessly    ${alias}
     END
-    #run keyword if    ${headless} == 1    user opens chrome with xvfb
     IF    ${headless} == 0
-        user opens chrome without xvfb
+        user opens chrome visually    ${alias}
     END
 
 user opens firefox
+    [Arguments]    ${alias}=firefox
     IF    ${headless} == 1
-        user opens firefox headless
+        user opens firefox headlessly    ${alias}
     END
-    #run keyword if    ${headless} == 1    user opens firefox with xvfb
     IF    ${headless} == 0
-        user opens firefox without xvfb
+        user opens firefox visually    ${alias}
     END
 
 user opens ie
-    open browser    about:blank    ie
+    [Arguments]    ${alias}=ie
+    open browser    about:blank    ie    alias=${alias}
     maximize browser window
 
-# Requires chromedriver v2.31+ -- you can alternatively use "user opens chrome with xvfb"
-
-user opens chrome headless
+user opens chrome headlessly
+    [Arguments]    ${alias}=headless_chrome
     ${c_opts}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
     Call Method    ${c_opts}    add_argument    headless
     Call Method    ${c_opts}    add_argument    start-maximized
@@ -92,46 +93,39 @@ user opens chrome headless
     Call Method    ${c_opts}    add_argument    log-level\=3
     Call Method    ${c_opts}    add_argument    disable-logging
 
-    Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
+    Create Webdriver    Chrome    ${alias}    chrome_options=${c_opts}
 
-user opens chrome with xvfb
-    start virtual display    1920    1080
-    ${options}=    evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-
-    # --no-sandbox allows chrome to run in a docker container: https://github.com/jessfraz/dockerfiles/issues/149
-    IF    ${docker} == 1
-        Call Method    ${options}    add_argument    --no-sandbox --ignore-certificate-errors
-    END
-
-    create webdriver    Chrome    chrome_options=${options}
-    set window size    1920    1080
-
-user opens chrome without xvfb
+user opens chrome visually
+    [Arguments]    ${alias}=chrome
     ${c_opts}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
     Call Method    ${c_opts}    add_argument    no-sandbox
     Call Method    ${c_opts}    add_argument    disable-gpu
     Call Method    ${c_opts}    add_argument    disable-extensions
     Call Method    ${c_opts}    add_argument    window-size\=1920,1080
     Call Method    ${c_opts}    add_argument    ignore-certificate-errors
-    Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
+    Create Webdriver    Chrome    ${alias}    chrome_options=${c_opts}
     maximize browser window
 
-user opens firefox headless
+user opens firefox headlessly
+    [Arguments]    ${alias}=headless_firefox
     ${f_opts}=    Evaluate    sys.modules['selenium.webdriver'].firefox.options.Options()    sys, selenium.webdriver
     Call Method    ${f_opts}    add_argument    -headless
-    Create Webdriver    Firefox    firefox_options=${f_opts}
+    Create Webdriver    Firefox    ${alias}    firefox_options=${f_opts}
 
-user opens firefox with xvfb
-    start virtual display    1920    1080
-    open browser    about:blank    firefox
-    set window size    1920    1080
-
-user opens firefox without xvfb
-    open browser    about:blank    firefox
+user opens firefox visually
+    [Arguments]    ${alias}=firefox
+    open browser    about:blank    firefox    alias=${alias}
     maximize browser window
+
+user switches browser
+    [Arguments]    ${alias}
+    switch browser    ${alias}
 
 user closes the browser
     close browser
+
+user closes all browsers
+    close all browsers
 
 user gets url
     ${url}=    get location
