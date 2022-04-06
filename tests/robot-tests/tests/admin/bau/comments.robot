@@ -77,9 +77,8 @@ Add review comment for first content block
     # select the text to enable the add comment button
     user presses keys    CTRL+a
     user clicks element    xpath://*[@aria-label="Editor toolbar"]//button[9]    # CKEditor comment button
-    user waits until page contains element
-    ...    testid:comment-textarea    5
-    user presses keys    This section needs fixing    testid:comment-textarea
+    user waits until page contains element    testid:comment-textarea    5
+    user enters text into element    testid:comment-textarea    This section needs fixing
     # ensure 'Set page view' box doesn't intercept button click
     user scrolls down    100
     user clicks button    Add comment

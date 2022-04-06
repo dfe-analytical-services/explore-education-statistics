@@ -190,13 +190,7 @@ user waits until page does not contain loading spinner
 
 user sets focus to element
     [Arguments]    ${selector}    ${parent}=css:body
-    ${webelement}=    is webelement    ${selector}
-    IF    ${webelement} is ${TRUE}
-        ${element}=    set variable    ${selector}
-    ELSE
-        user waits until parent contains element    ${parent}    ${selector}
-        ${element}=    get child element    ${parent}    ${selector}
-    END
+    ${element}=    lookup or return webelement    ${selector}    ${parent}
     set focus to element    ${element}
 
 user waits until page contains
@@ -587,27 +581,21 @@ user chooses file
 user clears element text
     [Arguments]    ${selector}
     user clicks element    ${selector}
-    user presses keys    CTRL+a+BACKSPACE    ${selector}
+    press keys    ${selector}    CTRL+a+BACKSPACE
     sleep    0.1
 
 user presses keys
-    [Arguments]
-    ...    ${keys}
-    ...    ${selector}=${EMPTY}
-    IF    '${selector}' != '${EMPTY}'
-        ${element}=    lookup or return webelement    ${selector}
-        user waits until element is visible    ${element}
-        user sets focus to element    ${element}
-        user clicks element    ${element}
-    END
-    press keys    ${NONE}    ${keys}    # No selector as sometimes leads to text not being input
+    [Arguments]    @{keys}
+    press keys    ${NONE}    @{keys}    # No selector as sometimes leads to text not being input
     sleep    0.1
 
 user enters text into element
     [Arguments]    ${selector}    ${text}
+    user sets focus to element    ${selector}
     user waits until element is visible    ${selector}    %{WAIT_SMALL}
     user clears element text    ${selector}
-    user presses keys    ${text}    ${selector}
+    press keys    ${selector}    ${text}
+    sleep    0.1
 
 user checks element count is x
     [Arguments]    ${locator}    ${amount}
