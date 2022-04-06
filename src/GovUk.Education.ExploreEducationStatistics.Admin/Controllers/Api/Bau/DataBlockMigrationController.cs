@@ -27,38 +27,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         {
             _dataBlockMigrationService = dataBlockMigrationService;
         }
-
-        [HttpPatch("releases/migrate-data-blocks")]
-        public async Task<ActionResult<Unit>> MigrateDataBlocks()
-        {
-            return await _dataBlockMigrationService
-                .Migrate()
-                .HandleFailuresOrOk();
-        }
-        
-        [AllowAnonymous]
-        [HttpGet("releases/migrate-all-maps")]
-        public async Task<ActionResult<Dictionary<MigrationType, List<DataBlockMapMigrationPlan>>>> MigrateAllMaps()
-        {
-            return await _dataBlockMigrationService
-                .GetMigrateMapPlans()
-                .OnSuccess(plans =>
-                {
-                    return plans
-                        .GroupBy(plan => plan.Type)
-                        .ToDictionary(
-                            group => group.Key, 
-                            group => group.ToList());
-                })
-                .HandleFailuresOrOk();
-        }
         
         [AllowAnonymous]
         [HttpPatch("releases/migrate-all-maps")]
-        public async Task<ActionResult<List<MapMigrationResult>>> MigrateAllMapsDo()
+        public async Task<ActionResult<List<MapMigrationResult>>> MigrateAllMaps(
+            [FromQuery] bool dryRun = true)
         {
             return await _dataBlockMigrationService
-                .MigrateMaps()
+                .MigrateMaps(dryRun)
                 .HandleFailuresOrOk();
         }
     }

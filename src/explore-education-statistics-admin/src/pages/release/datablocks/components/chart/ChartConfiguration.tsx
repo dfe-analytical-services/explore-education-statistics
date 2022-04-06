@@ -27,6 +27,7 @@ import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { ObjectSchema } from 'yup';
+import FormGroup from '@common/components/form/FormGroup';
 
 type FormValues = Partial<ChartOptions>;
 
