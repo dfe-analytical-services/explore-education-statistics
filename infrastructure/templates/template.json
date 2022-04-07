@@ -1811,7 +1811,7 @@
     {
       "type": "Microsoft.SignalRService/signalR",
       "apiVersion": "2021-10-01",
-      "name": "[parameters('adminSignalRName')]",
+      "name": "[variables('adminSignalRName')]",
       "location": "[resourceGroup().location]",
       "sku": {
         "capacity": "[parameters('adminSignalRCapacity')]",
