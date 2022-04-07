@@ -248,12 +248,14 @@ user starts editing text block
     user waits until element is enabled    ${element}
 
 user adds content to autosaving text block
-    [Arguments]    ${parent}    ${content}
+    [Arguments]    ${parent}    ${content}    ${save}=True
     user starts editing text block    ${parent}
     user presses keys    CTRL+a
     user presses keys    BACKSPACE
     user presses keys    ${content}
-    user saves autosaving text block    ${parent}
+    IF    ${save}
+        user saves autosaving text block    ${parent}
+    END
     user waits until element contains    ${parent}    ${content}    %{WAIT_SMALL}
 
 user adds content to summary text block
@@ -284,9 +286,10 @@ user adds content to autosaving accordion section text block
     ...    ${block_num}
     ...    ${content}
     ...    ${parent}=[data-testid="accordion"]
+    ...    ${save}=True
 
     ${block}=    get accordion section block    ${section_name}    ${block_num}    ${parent}
-    user adds content to autosaving text block    ${block}    ${content}
+    user adds content to autosaving text block    ${block}    ${content}    ${save}
 
 user adds image to accordion section text block
     [Arguments]

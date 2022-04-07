@@ -61,9 +61,9 @@ Add first text block
 Add second text block
     user adds text block to editable accordion section    ${SECTION_1_TITLE}    id:releaseMainContent
     user adds content to autosaving accordion section text block    ${SECTION_1_TITLE}    2
-    ...    ${BLOCK_2_CONTENT}    id:releaseMainContent
+    ...    ${BLOCK_2_CONTENT}    id:releaseMainContent    save=False
 
-Switch to bau1 to add review comments
+Switch to bau1 to view release
     user switches to bau1 browser
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}
@@ -73,13 +73,25 @@ Switch to bau1 to add review comments
     user waits until parent contains element    ${details}    link:Edit release
     user clicks link    Edit release
 
-Navigate to content section as bau1
     user clicks link    Content
     user closes Set Page View box
 
-Add review comments for first text block as bau1
+Check second text block is locked as bau1
+    ${block}=    get accordion section block    First content section    2    id:releaseMainContent
+    user checks element contains    ${block}
+    ...    Analyst1 User1 (ees-analyst1@education.gov.uk) is currently editing this block
+    user checks element contains    ${block}    Analyst1 User1 is editing
+
+Switch to analyst1 to save second text block
+    user switches to analyst1 browser
+    ${block}=    get accordion section block    First content section    2    id:releaseMainContent
+    user saves autosaving text block    ${block}
+
+Switch to bau1 to add review comments for first text block
+    user switches to bau1 browser
     user opens accordion section    ${SECTION_1_TITLE}    id:releaseMainContent
-    ${block}=    user starts editing accordion section text block    First content section    1    id:releaseMainContent
+    ${block}=    user starts editing accordion section text block    First content section    1
+    ...    id:releaseMainContent
     ${editor}=    get editor    ${block}
     ${toolbar}=    get editor toolbar    ${block}
     ${comments}=    get comments sidebar    ${block}
@@ -113,11 +125,12 @@ Add review comments for first text block as bau1
     user checks list item contains    testid:unresolvedComments    1    Test comment 1    ${block}
     user checks list item contains    testid:unresolvedComments    2    Test comment 2    ${block}
 
-    user clicks button    Save & close
+    user saves autosaving text block    ${block}
 
 Add review comment for second text block as bau1
     user opens accordion section    ${SECTION_1_TITLE}    id:releaseMainContent
-    ${block}=    user starts editing accordion section text block    First content section    2    id:releaseMainContent
+    ${block}=    user starts editing accordion section text block    First content section    2
+    ...    id:releaseMainContent
     ${editor}=    get editor    ${block}
     ${toolbar}=    get editor toolbar    ${block}
     ${comments}=    get comments sidebar    ${block}
@@ -135,15 +148,49 @@ Add review comment for second text block as bau1
     user checks list has x items    testid:unresolvedComments    1    ${block}
     user checks list item contains    testid:unresolvedComments    1    Test comment 3    ${block}
 
-    user clicks button    Save & close
+Switch to analyst1 to check second text block is locked
+    user switches to analyst1 browser
+    ${block}=    get accordion section block    First content section    2    id:releaseMainContent
 
-Switch to analyst1 and resolve comment for first text block
+    user waits until element contains    ${block}
+    ...    Bau1 User1 (ees-bau1@education.gov.uk) is currently editing this block
+    user waits until element contains    ${block}    Bau1 User1 is editing
+
+Switch to bau1 to save second text block
+    user switches to bau1 browser
+    ${block}=    get accordion section block    First content section    2    id:releaseMainContent
+
+    user saves autosaving text block    ${block}
+
+Switch to analyst1 to start resolving comments
     user switches to analyst1 browser
     ${block}=    get accordion section block    First content section    1    id:releaseMainContent
 
+    user checks element does not contain    ${block}
+    ...    Bau1 User1 (ees-bau1@education.gov.uk) is currently editing this block
+    user checks element does not contain    ${block}    Bau1 User1 is editing
+
+    # Start resolving comments
     user clicks button    View comments    ${block}
+
+    user checks element does not contain    ${block}
+    ...    Analyst1 User1 (ees-analyst1@education.gov.uk) is currently editing this block
+    user checks element does not contain    ${block}    Analyst1 User1 is editing
+
     # avoid set page view box getting in the way
     user scrolls down    600
+
+Switch to bau1 to check first text block is locked
+    user switches to bau1 browser
+    ${block}=    get accordion section block    First content section    1    id:releaseMainContent
+
+    user waits until element contains    ${block}
+    ...    Analyst1 User1 (ees-analyst1@education.gov.uk) is currently editing this block
+    user waits until element contains    ${block}    Analyst1 User1 is editing
+
+Switch to analyst1 to resolve comment for first text block
+    user switches to analyst1 browser
+    ${block}=    get accordion section block    First content section    1    id:releaseMainContent
 
     user checks list has x items    testid:unresolvedComments    2    ${block}
     user checks list item contains    testid:unresolvedComments    1    Test comment 1    ${block}
@@ -170,9 +217,18 @@ Switch to analyst1 and resolve comment for first text block
     ${comment}=    user gets resolved comment    Test comment 1    ${block}
     user waits until element contains    ${comment}    Resolved by Analyst1 User1
 
-    user clicks button    Save & close
+    user saves autosaving text block    ${block}
 
-Resolve comment for second text block as analyst1
+Switch to bau1 to check first text block is unlocked
+    user switches to bau1 browser
+    ${block}=    get accordion section block    First content section    1    id:releaseMainContent
+
+    user checks element does not contain    ${block}
+    ...    Analyst1 User1 (ees-analyst1@education.gov.uk) is currently editing this block
+    user checks element does not contain    ${block}    Analyst1 User1 is editing
+
+Switch back to analyst1 to resolve second text block
+    user switches to analyst1 browser
     ${block}=    get accordion section block    First content section    2    id:releaseMainContent
 
     user clicks button    View comments    ${block}
@@ -201,7 +257,7 @@ Resolve comment for second text block as analyst1
     ${comment}=    user gets resolved comment    Test comment 3    ${block}
     user waits until element contains    ${comment}    Resolved by Analyst1 User1
 
-    user clicks button    Save & close
+    user saves autosaving text block    ${block}
 
 Switch back to bau1 to update unresolved comment
     user switches to bau1 browser
@@ -222,4 +278,4 @@ Delete unresolved comment as bau1
     user clicks button    Delete    ${comment}
     user waits until parent does not contain element    ${block}    testid:unresolvedComments
 
-    user clicks button    Save & close
+    user saves autosaving text block    ${block}
