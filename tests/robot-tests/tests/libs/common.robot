@@ -464,8 +464,9 @@ user waits until parent does not contain button
 
 user gets button element
     [Arguments]    ${text}    ${parent}=css:body
-    user waits until parent contains element    ${parent}    xpath:.//button[text()="${text}"]
-    ${button}=    get child element    ${parent}    xpath:.//button[text()="${text}"]
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]
+    ${button}=    get child element    ${parent}    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]
     [Return]    ${button}
 
 user checks page contains tag
@@ -723,6 +724,7 @@ user checks list has x items
     [Arguments]    ${locator}    ${num}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
+    user waits until parent contains element    ${list}    css:li    limit=${num}
     ${items}=    get child elements    ${list}    css:li
     length should be    ${items}    ${num}
 

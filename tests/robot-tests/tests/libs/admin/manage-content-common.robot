@@ -235,7 +235,7 @@ user starts editing accordion section text block
     ...    ${block_num}
     ...    ${parent}=[data-testid="accordion"]
 
-    ${block}=    get accordion section text block    ${section_name}    ${block_num}    ${parent}
+    ${block}=    get accordion section block    ${section_name}    ${block_num}    ${parent}
     user starts editing text block    ${block}
     [Return]    ${block}
 
@@ -285,7 +285,7 @@ user adds content to autosaving accordion section text block
     ...    ${content}
     ...    ${parent}=[data-testid="accordion"]
 
-    ${block}=    get accordion section text block    ${section_name}    ${block_num}    ${parent}
+    ${block}=    get accordion section block    ${section_name}    ${block_num}    ${parent}
     user adds content to autosaving text block    ${block}    ${content}
 
 user adds image to accordion section text block
@@ -355,7 +355,7 @@ user checks accordion section text block contains
     ...    ${content}
     ...    ${parent}=[data-testid="accordion"]
 
-    ${block}=    get accordion section text block    ${section_name}    ${block_num}    ${parent}
+    ${block}=    get accordion section block    ${section_name}    ${block_num}    ${parent}
     user waits until element contains    ${block}    ${content}
 
 user checks accordion section text block contains image with alt text
@@ -365,7 +365,7 @@ user checks accordion section text block contains image with alt text
     ...    ${alt_text}
     ...    ${parent}=[data-testid="accordion"]
 
-    ${block}=    get accordion section text block    ${section_name}    ${block_num}    ${parent}
+    ${block}=    get accordion section block    ${section_name}    ${block_num}    ${parent}
     user waits until parent contains element    ${block}    xpath://img[@alt="${alt_text}"]
 
 user checks accordion section text block does not contain image with alt text
@@ -375,7 +375,7 @@ user checks accordion section text block does not contain image with alt text
     ...    ${alt_text}
     ...    ${parent}=[data-testid="accordion"]
 
-    ${block}=    get accordion section text block    ${section_name}    ${block_num}    ${parent}
+    ${block}=    get accordion section block    ${section_name}    ${block_num}    ${parent}
     user waits until parent does not contain element    ${block}    xpath://img[@alt="${alt_text}"]
 
 user deletes editable accordion section content block
@@ -384,7 +384,7 @@ user deletes editable accordion section content block
     ...    ${block_num}
     ...    ${parent}=[data-testid="accordion"]
 
-    ${block}=    get accordion section text block    ${section_name}    ${block_num}    ${parent}
+    ${block}=    get accordion section block    ${section_name}    ${block_num}    ${parent}
     user clicks button    Remove block    ${block}
     user clicks button    Confirm
     # avoid blocks being lazy loaded
@@ -403,7 +403,7 @@ user deletes editable accordion section
     user clicks button    Confirm
     user waits until modal is not visible    Removing section
 
-get accordion section text block
+get accordion section block
     [Arguments]
     ...    ${section_name}
     ...    ${block_num}
@@ -412,3 +412,18 @@ get accordion section text block
     ${section}=    user gets accordion section content element    ${section_name}    ${parent}
     ${block}=    get child element    ${section}    css:[data-testid="editableSectionBlock"]:nth-of-type(${block_num})
     [Return]    ${block}
+
+get editor toolbar
+    [Arguments]    ${block}
+    ${toolbar}=    lookup or return webelement    css:[aria-label="Editor toolbar"]    ${block}
+    [Return]    ${toolbar}
+
+get editor
+    [Arguments]    ${block}
+    ${editor}=    lookup or return webelement    css:[aria-label="Rich Text Editor, main"]    ${block}
+    [Return]    ${editor}
+
+get comments sidebar
+    [Arguments]    ${block}
+    ${comments}=    lookup or return webelement    testid:comments-sidebar    ${block}
+    [Return]    ${comments}

@@ -116,20 +116,22 @@ const EditableContentForm = ({
 
   return (
     <div className={styles.container} ref={containerRef}>
-      {showCommentAddForm && (
-        <CommentAddForm
-          baseId={id}
-          containerRef={containerRef}
-          onCancel={toggleCommentAddForm.off}
-          onSave={toggleCommentAddForm.off}
-        />
-      )}
-      <div
-        className={classNames(styles.commentsSidebar, {
-          [styles.showCommentAddForm]: showCommentAddForm,
-        })}
-      >
-        {allowComments && comments.length > 0 && <CommentsList />}
+      <div data-testid="comments-sidebar">
+        {showCommentAddForm && (
+          <CommentAddForm
+            baseId={id}
+            containerRef={containerRef}
+            onCancel={toggleCommentAddForm.off}
+            onSave={toggleCommentAddForm.off}
+          />
+        )}
+        <div
+          className={classNames(styles.commentsSidebar, {
+            [styles.showCommentAddForm]: showCommentAddForm,
+          })}
+        >
+          {allowComments && comments.length > 0 && <CommentsList />}
+        </div>
       </div>
 
       <div className={styles.form}>

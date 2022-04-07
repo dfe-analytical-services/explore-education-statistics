@@ -728,6 +728,12 @@ user waits until modal is not visible
     user waits until page does not contain element    css:[role="dialog"]    ${wait}
     user waits until h2 is not visible    ${modal_title}
 
+user gets resolved comments
+    [Arguments]    ${parent}=css:body
+    user waits until parent contains element    ${parent}    testid:resolvedComments
+    ${comments}=    get child element    ${parent}    testid:resolvedComments
+    [Return]    ${comments}
+
 user gets unresolved comments
     [Arguments]    ${parent}=css:body
     user waits until parent contains element    ${parent}    testid:unresolvedComments
@@ -737,6 +743,15 @@ user gets unresolved comments
 user gets unresolved comment
     [Arguments]    ${comment_text}    ${parent}=css:body
     ${comments}=    user gets unresolved comments    ${parent}
+    user waits until parent contains element    ${comments}
+    ...    xpath:./li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]
+    ${result}=    get child element    ${comments}
+    ...    xpath:./li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]
+    [Return]    ${result}
+
+user gets resolved comment
+    [Arguments]    ${comment_text}    ${parent}=css:body
+    ${comments}=    user gets resolved comments    ${parent}
     user waits until parent contains element    ${comments}
     ...    xpath:./li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]
     ${result}=    get child element    ${comments}

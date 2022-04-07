@@ -16,11 +16,14 @@ const CommentsList = () => {
 
   return (
     <>
-      <ol className={styles.list} data-testid="unresolvedComments">
-        {unresolvedComments.map(comment => (
-          <Comment key={comment.id} comment={comment} />
-        ))}
-      </ol>
+      {unresolvedComments.length > 0 && (
+        <ol className={styles.list} data-testid="unresolvedComments">
+          {unresolvedComments.map(comment => (
+            <Comment key={comment.id} comment={comment} />
+          ))}
+        </ol>
+      )}
+
       {resolvedComments.length > 0 && (
         <Details summary={`Resolved comments (${resolvedComments.length})`}>
           <ol className={styles.list} data-testid="resolvedComments">

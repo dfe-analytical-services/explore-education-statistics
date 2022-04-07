@@ -66,7 +66,9 @@ const Comment = ({ comment }: Props) => {
           onClick={handleCommentSelection}
         >
           <p className="govuk-!-margin-bottom-0 govuk-body-s">
-            <strong>{`${createdBy.firstName} ${createdBy.lastName} `}</strong>
+            <strong data-testid="comment-author">
+              {`${createdBy.firstName} ${createdBy.lastName} `}
+            </strong>
             <span className="govuk-visually-hidden"> commented on </span>
             <br />
             <FormattedDate format="d MMM yyyy, HH:mm">{created}</FormattedDate>
