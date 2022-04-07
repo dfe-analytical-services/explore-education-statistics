@@ -2,11 +2,15 @@
 Resource    ./common.robot
 Library     admin-utilities.py
 
+*** Variables ***
+${BAU1_BROWSER}         bau1
+${ANALYST1_BROWSER}     analyst1
+
 *** Keywords ***
 user signs in as bau1
-    [Arguments]    ${open_browser}=True
+    [Arguments]    ${open_browser}=True    ${alias}=${BAU1_BROWSER}
     IF    ${open_browser}
-        user opens the browser
+        user opens the browser    ${alias}
     END
     user navigates to admin frontend
     user waits until h1 is visible    Sign in    %{WAIT_MEDIUM}
@@ -17,9 +21,9 @@ user signs in as bau1
     user checks nth breadcrumb contains    2    Administrator dashboard
 
 user signs in as analyst1
-    [Arguments]    ${open_browser}=True
+    [Arguments]    ${open_browser}=True    ${alias}=${ANALYST1_BROWSER}
     IF    ${open_browser}
-        user opens the browser
+        user opens the browser    ${alias}
     END
     user navigates to admin frontend
     user waits until h1 is visible    Sign in
@@ -28,6 +32,12 @@ user signs in as analyst1
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Administrator dashboard
+
+user switches to bau1 browser
+    user switches browser    ${BAU1_BROWSER}
+
+user switches to analyst1 browser
+    user switches browser    ${ANALYST1_BROWSER}
 
 user changes to bau1
     user signs out
