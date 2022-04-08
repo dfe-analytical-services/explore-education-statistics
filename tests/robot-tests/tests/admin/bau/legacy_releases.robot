@@ -24,9 +24,10 @@ Go to manage publication page
     user opens accordion section    ${PUBLICATION_NAME}
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
     user waits until page contains title caption    ${PUBLICATION_NAME}
-    user waits until h1 is visible    Manage publication
+    user waits until h1 is visible    Manage publication    %{WAIT_SMALL}
 
 Create legacy release
+    user scrolls to element    //*[button[contains(text(),'Create legacy release')]]
     user clicks button    Create legacy release
     user waits until modal is visible    Create legacy release
     user clicks button    OK
