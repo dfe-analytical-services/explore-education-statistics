@@ -8,7 +8,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
     {
         IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels);
         BoundaryLevel? FindLatestByGeographicLevel(GeographicLevel geographicLevel);
-        // TODO DW - remove
-        IEnumerable<BoundaryLevel> FindRelatedByBoundaryLevel(long boundaryLevelId);
     }
 }

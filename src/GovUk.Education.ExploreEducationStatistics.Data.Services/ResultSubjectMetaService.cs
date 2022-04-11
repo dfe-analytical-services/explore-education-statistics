@@ -285,7 +285,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 long boundaryLevelId,
                 Dictionary<GeographicLevel, List<LocationAttributeNode>> locations)
             {
-                // TODO DW - can we throw away IncludeGeoJson flag if we now explicitly ask for a BoundaryLevel Id?
                 // TODO DW - handle async
                 // TODO DW - handle Either failure
                 var selectedBoundaryLevel = _boundaryLevelRepository

@@ -644,7 +644,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var laOption1SubOption1 = Assert.Single(laOption1.Options!);
                 Assert.NotNull(laOption1SubOption1);
                 Assert.Null(laOption1SubOption1.Id);
-                Assert.Equal(_eastMidlands.Name, laOption1SubOption1!.Label);
+                Assert.Equal(_eastMidlands.Name, laOption1SubOption1.Label);
                 Assert.Equal(_eastMidlands.Code, laOption1SubOption1.Value);
                 Assert.Equal("region", laOption1SubOption1.Level);
                 Assert.NotNull(laOption1SubOption1.Options);
@@ -663,278 +663,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(_nottingham.Code, laOption1SubOption1SubOption2.Value);
                 Assert.Null(laOption1SubOption1SubOption2.Level);
                 Assert.Null(laOption1SubOption1SubOption2.Options);
-            }
-        }
-
-        [Fact]
-        public async Task GetSubjectMeta_HierarchicalLocationViewModelsReturnedForSubject_IncludeGeoJson()
-        {
-            var publication = new Publication();
-
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
-
-            var releaseId = Guid.NewGuid();
-
-            var observations = ListOf(
-                // No hierarchy in Country level data
-                new Observation
-                {
-                    Location = new Location
-                    {
-                        Id = Guid.NewGuid(),
-                        GeographicLevel = GeographicLevel.Country,
-                        Country = _england,
-                    }
-                },
-                // Country-Region hierarchy in the Region level data
-                new Observation
-                {
-                    Location = new Location
-                    {
-                        Id = Guid.NewGuid(),
-                        GeographicLevel = GeographicLevel.Region,
-                        Country = _england,
-                        Region = _northEast
-                    }
-                },
-                new Observation
-                {
-                    Location = new Location
-                    {
-                        Id = Guid.NewGuid(),
-                        GeographicLevel = GeographicLevel.Region,
-                        Country = _england,
-                        Region = _northWest
-                    }
-                },
-                new Observation
-                {
-                    Location = new Location
-                    {
-                        Id = Guid.NewGuid(),
-                        GeographicLevel = GeographicLevel.Region,
-                        Country = _england,
-                        Region = _eastMidlands
-                    }
-                });
-
-            var options = Options.Create(new LocationsOptions
-            {
-                Hierarchies = new Dictionary<GeographicLevel, List<string>>
-                {
-                    {
-                        GeographicLevel.Region,
-                        new List<string>
-                        {
-                            "Country"
-                        }
-                    }
-                }
-            });
-
-            // Setup a query requesting geoJson but not with any specific boundary level id
-            var query = new ObservationQueryContext
-            {
-                BoundaryLevel = null,
-                IncludeGeoJson = true,
-                Indicators = new List<Guid>(),
-                SubjectId = subject.Id
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.Subject.AddAsync(subject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var boundaryLevelRepository = new Mock<IBoundaryLevelRepository>(MockBehavior.Strict);
-            var filterItemRepository = new Mock<IFilterItemRepository>(MockBehavior.Strict);
-            var footnoteRepository = new Mock<IFootnoteRepository>(MockBehavior.Strict);
-            var geoJsonRepository = new Mock<IGeoJsonRepository>(MockBehavior.Strict);
-            var indicatorRepository = new Mock<IIndicatorRepository>(MockBehavior.Strict);
-            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(GeographicLevel.Country))
-                .Returns(_countriesBoundaryLevel);
-
-            boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(GeographicLevel.Region))
-                .Returns(_regionsBoundaryLevel);
-
-            boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(
-                    new List<GeographicLevel>
-                    {
-                        GeographicLevel.Country,
-                        GeographicLevel.Region
-                    }))
-                .Returns(new List<BoundaryLevel>());
-
-            filterItemRepository.Setup(s => s.GetFilterItemsFromObservationList(observations))
-                .Returns(new List<FilterItem>());
-
-            footnoteRepository.Setup(s => s.GetFilteredFootnotes(
-                    releaseId,
-                    subject.Id,
-                    new List<Guid>(),
-                    query.Indicators))
-                .Returns(Enumerable.Empty<Footnote>());
-
-            geoJsonRepository.Setup(s => s.FindByBoundaryLevelAndCodes(
-                _countriesBoundaryLevel.Id,
-                new List<string>
-                {
-                    _england.Code!
-                })).Returns(new Dictionary<string, GeoJson>
-            {
-                {
-                    _england.Code!,
-                    _geoJson
-                }
-            });
-
-            geoJsonRepository.Setup(s => s.FindByBoundaryLevelAndCodes(
-                    _regionsBoundaryLevel.Id,
-                    new List<string>
-                    {
-                        _northEast.Code!, _northWest.Code!, _eastMidlands.Code!
-                    }))
-                .Returns(new Dictionary<string, GeoJson>
-                {
-                    {
-                        _northEast.Code!,
-                        _geoJson
-                    },
-                    {
-                        _northWest.Code!,
-                        _geoJson
-                    },
-                    {
-                        _eastMidlands.Code!,
-                        _geoJson
-                    }
-                });
-
-            indicatorRepository.Setup(s => s.GetIndicators(subject.Id, query.Indicators))
-                .Returns(Enumerable.Empty<Indicator>());
-
-            releaseDataFileRepository.Setup(s => s.GetBySubject(releaseId, subject.Id))
-                .ReturnsAsync(new ReleaseFile());
-
-            subjectRepository.Setup(s => s.GetPublicationIdForSubject(subject.Id))
-                .ReturnsAsync(publication.Id);
-
-            timePeriodService
-                .Setup(s => s.GetTimePeriodRange(observations))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildResultSubjectMetaService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    boundaryLevelRepository: boundaryLevelRepository.Object,
-                    filterItemRepository: filterItemRepository.Object,
-                    footnoteRepository: footnoteRepository.Object,
-                    geoJsonRepository: geoJsonRepository.Object,
-                    indicatorRepository: indicatorRepository.Object,
-                    releaseDataFileRepository: releaseDataFileRepository.Object,
-                    subjectRepository: subjectRepository.Object,
-                    timePeriodService: timePeriodService.Object,
-                    options: options
-                );
-
-                var result = await service.GetSubjectMeta(
-                    releaseId,
-                    query,
-                    observations);
-
-                MockUtils.VerifyAllMocks(
-                    boundaryLevelRepository,
-                    filterItemRepository,
-                    footnoteRepository,
-                    geoJsonRepository,
-                    indicatorRepository,
-                    locationRepository,
-                    releaseDataFileRepository,
-                    subjectRepository,
-                    timePeriodService);
-
-                var viewModel = result.AssertRight();
-
-                Assert.True(viewModel.GeoJsonAvailable);
-
-                var locationViewModels = viewModel.Locations;
-
-                // Result has Country and Region levels
-                Assert.Equal(2, locationViewModels.Count);
-                Assert.True(locationViewModels.ContainsKey("country"));
-                Assert.True(locationViewModels.ContainsKey("region"));
-
-                // Expect no hierarchy within the Country level but the option should have GeoJson
-                var countries = locationViewModels["country"];
-
-                var countryOption1 = Assert.Single(countries);
-                Assert.Equal(observations[0].Location.Id, countryOption1.Id);
-                Assert.NotNull(countryOption1);
-                Assert.Equal(_england.Name, countryOption1.Label);
-                Assert.Equal(_england.Code, countryOption1.Value);
-                Assert.NotNull(countryOption1.GeoJson);
-                Assert.Null(countryOption1.Level);
-                Assert.Null(countryOption1.Options);
-
-                // Expect a hierarchy of Country-Region within the Region level
-                var regions = locationViewModels["region"];
-
-                // Country option that groups the Regions does not have GeoJson
-                var regionOption1 = Assert.Single(regions);
-                Assert.NotNull(regionOption1);
-                Assert.Null(regionOption1.Id);
-                Assert.Equal(_england.Name, regionOption1.Label);
-                Assert.Equal(_england.Code, regionOption1.Value);
-                Assert.Null(regionOption1.GeoJson);
-                Assert.Equal("country", regionOption1.Level);
-                Assert.NotNull(regionOption1.Options);
-                Assert.Equal(3, regionOption1.Options!.Count);
-
-                // Each Region option should have GeoJson
-                var regionOption1SubOption1 = regionOption1.Options[0];
-                Assert.Equal(observations[1].Location.Id, regionOption1SubOption1.Id);
-                Assert.Equal(_northEast.Name, regionOption1SubOption1.Label);
-                Assert.Equal(_northEast.Code, regionOption1SubOption1.Value);
-                Assert.NotNull(regionOption1SubOption1.GeoJson);
-                Assert.Null(regionOption1SubOption1.Level);
-                Assert.Null(regionOption1SubOption1.Options);
-
-                var regionOption1SubOption2 = regionOption1.Options[1];
-                Assert.Equal(observations[2].Location.Id, regionOption1SubOption2.Id);
-                Assert.Equal(_northWest.Name, regionOption1SubOption2.Label);
-                Assert.Equal(_northWest.Code, regionOption1SubOption2.Value);
-                Assert.NotNull(regionOption1SubOption2.GeoJson);
-                Assert.Null(regionOption1SubOption2.Level);
-                Assert.Null(regionOption1SubOption2.Options);
-
-                var regionOption1SubOption3 = regionOption1.Options[2];
-                Assert.Equal(observations[3].Location.Id, regionOption1SubOption3.Id);
-                Assert.Equal(_eastMidlands.Name, regionOption1SubOption3.Label);
-                Assert.Equal(_eastMidlands.Code, regionOption1SubOption3.Value);
-                Assert.NotNull(regionOption1SubOption3.GeoJson);
-                Assert.Null(regionOption1SubOption3.Level);
-                Assert.Null(regionOption1SubOption3.Options);
             }
         }
 
@@ -996,11 +724,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 }
             });
 
-            // Setup a query requesting geoJson with a specific boundary level id
+            // Setup a query requesting GeoJSON (by virtue of having a boundary level set)
             var query = new ObservationQueryContext
             {
                 BoundaryLevel = 123,
-                IncludeGeoJson = true,
                 Indicators = new List<Guid>(),
                 SubjectId = subject.Id
             };
@@ -1032,12 +759,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(GeographicLevel.Region))
                 .Returns(_regionsBoundaryLevel);
-
-            boundaryLevelRepository.Setup(s => s.FindRelatedByBoundaryLevel(query.BoundaryLevel.Value))
-                .Returns(new List<BoundaryLevel>
-                {
-                    _regionsBoundaryLevel
-                });
 
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
@@ -1519,7 +1240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var laOption1 = Assert.Single(localAuthorities);
                 Assert.NotNull(laOption1);
                 Assert.Null(laOption1.Id);
-                Assert.Equal(_eastMidlands.Name, laOption1!.Label);
+                Assert.Equal(_eastMidlands.Name, laOption1.Label);
                 Assert.Equal(_eastMidlands.Code, laOption1.Value);
                 Assert.Equal("region", laOption1.Level);
                 Assert.NotNull(laOption1.Options);

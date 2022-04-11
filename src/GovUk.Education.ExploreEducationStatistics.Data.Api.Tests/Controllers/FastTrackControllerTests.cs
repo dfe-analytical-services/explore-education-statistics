@@ -144,8 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                         EndCode = TimeIdentifier.August,
                         EndYear = 2010,
                         StartYear = 2000
-                    },
-                    IncludeGeoJson = true
+                    }
                 },
                 Configuration = new TableBuilderConfiguration
                 {

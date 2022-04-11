@@ -40,16 +40,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
             return boundaryLevel;
         }
-
-        public IEnumerable<BoundaryLevel> FindRelatedByBoundaryLevel(long boundaryLevelId)
-        {
-            var boundaryLevel = _cache.GetOrCreate(boundaryLevelId, cacheEntry => Find(boundaryLevelId));
-            if (boundaryLevel == null)
-            {
-                throw new ArgumentException("Boundary Level does not exist", nameof(boundaryLevelId));
-            }
-
-            return FindByGeographicLevel(boundaryLevel.Level);
-        }
     }
 }
