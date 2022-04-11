@@ -290,7 +290,7 @@ export interface MapBlockProps extends ChartProps {
   axes: {
     major: AxisConfiguration;
   };
-  boundaryLevel: number;
+  boundaryLevel?: number;
   id: string;
   legend: LegendConfiguration;
   maxBounds?: LatLngBounds;

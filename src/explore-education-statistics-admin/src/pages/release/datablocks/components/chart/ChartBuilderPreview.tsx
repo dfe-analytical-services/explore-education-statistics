@@ -35,11 +35,7 @@ const ChartBuilderPreview = ({ chart, definition, loading }: Props) => {
           </LoadingSpinner>
         ) : (
           <div className={styles.previewPlaceholder}>
-            {!chart || Object.keys(chart.axes).length > 0 ? (
-              <p>{getChartPreviewText(chart)}</p>
-            ) : (
-              <p>Configure the {definition.name} to view a preview</p>
-            )}
+            <p>{getChartPreviewText(chart)}</p>
           </div>
         )}
       </div>

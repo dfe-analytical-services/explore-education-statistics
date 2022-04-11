@@ -111,6 +111,51 @@ describe('ChartBuilderPreview', () => {
     },
   };
 
+  const testVerticalBarChartRenderer: ChartRendererProps = {
+    type: 'verticalbar',
+    data: [],
+    meta: testFullTableMeta,
+    alt: '',
+    height: 100,
+    axes: {
+      major: testAxisConfiguration,
+      minor: testAxisConfiguration,
+    },
+    legend: {
+      items: [],
+    },
+  };
+
+  const testHorizontalBarChartRenderer: ChartRendererProps = {
+    type: 'horizontalbar',
+    data: [],
+    meta: testFullTableMeta,
+    alt: '',
+    height: 100,
+    axes: {
+      major: testAxisConfiguration,
+      minor: testAxisConfiguration,
+    },
+    legend: {
+      items: [],
+    },
+  };
+
+  const testMapChartRenderer: ChartRendererProps = {
+    type: 'map',
+    data: [],
+    meta: testFullTableMeta,
+    alt: '',
+    height: 100,
+    axes: {
+      major: testAxisConfiguration,
+    },
+    legend: {
+      items: [],
+    },
+    boundaryLevel: 1,
+  };
+
   test('renders the loading spinner when the loading flag is indicating that it is loading', () => {
     render(
       <ChartBuilderPreview
@@ -124,47 +169,62 @@ describe('ChartBuilderPreview', () => {
     expect(detailsSection).toHaveTextContent('Loading chart data');
   });
 
-  [testLineChartRenderer, testInfographicChartRenderer].forEach(
-    chartRenderer => {
-      test(`renders chart of type '${chartRenderer.type}' when all mandatory fields are provided`, () => {
-        render(
-          <ChartBuilderPreview
-            definition={verticalBarBlockDefinition}
-            chart={chartRenderer}
-            loading={false}
-          />,
-        );
-        const detailsSection = screen.queryByTestId(
-          'chartBuilderPreviewContainer',
-        );
-        expect(detailsSection).toBeInTheDocument();
+  [
+    testInfographicChartRenderer,
+    testLineChartRenderer,
+    testVerticalBarChartRenderer,
+    testHorizontalBarChartRenderer,
+    testMapChartRenderer,
+  ].forEach(chartRenderer => {
+    test(`renders chart of type '${chartRenderer.type}' when all mandatory fields are provided`, () => {
+      render(
+        <ChartBuilderPreview
+          definition={verticalBarBlockDefinition}
+          chart={chartRenderer}
+          loading={false}
+        />,
+      );
+      const detailsSection = screen.queryByTestId(
+        'chartBuilderPreviewContainer',
+      );
+      expect(detailsSection).toBeInTheDocument();
 
-        // We don't need to test a fully rendering chart here, just that the component is attempting to render it.
-        expect(detailsSection).toHaveTextContent(
-          'Unable to render chart, invalid data configured',
-        );
-      });
-    },
-  );
-
-  test('renders preview help text when no data sets are yet added', () => {
-    render(
-      <ChartBuilderPreview
-        definition={verticalBarBlockDefinition}
-        chart={produce(testLineChartRenderer, draft => {
-          draft.axes.major.dataSets = [];
-        })}
-        loading={false}
-      />,
-    );
-    const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
-    expect(detailsSection).toBeInTheDocument();
-    expect(detailsSection).toHaveTextContent(
-      'Add data to view a preview of the chart',
-    );
+      // We don't need to test a fully rendering chart here, just that the component is attempting to render it.
+      expect(detailsSection).toHaveTextContent(
+        'Unable to render chart, invalid data configured',
+      );
+    });
   });
 
-  test('renders preview help text for infographics when no fileId is provided', () => {
+  [
+    testLineChartRenderer,
+    testVerticalBarChartRenderer,
+    testHorizontalBarChartRenderer,
+    testMapChartRenderer,
+  ].forEach(chartRenderer => {
+    test(`renders preview help text for chart of type '${chartRenderer.type}' when no data sets are yet added`, () => {
+      render(
+        <ChartBuilderPreview
+          definition={verticalBarBlockDefinition}
+          chart={produce(chartRenderer, draft => {
+            draft.axes.major.dataSets = [];
+          })}
+          loading={false}
+        />,
+      );
+      const detailsSection = screen.queryByTestId(
+        'chartBuilderPreviewContainer',
+      );
+      expect(detailsSection).toBeInTheDocument();
+      const expectedHelpText =
+        chartRenderer.type === 'map'
+          ? 'Add data and choose a version of geographic data to view a preview'
+          : 'Configure the chart and add data to view a preview';
+      expect(detailsSection).toHaveTextContent(expectedHelpText);
+    });
+  });
+
+  test(`renders preview help text for chart of type 'infographic' when no fileId is selected`, () => {
     render(
       <ChartBuilderPreview
         definition={verticalBarBlockDefinition}
@@ -177,16 +237,16 @@ describe('ChartBuilderPreview', () => {
     const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
     expect(detailsSection).toBeInTheDocument();
     expect(detailsSection).toHaveTextContent(
-      'Add data to view a preview of the chart',
+      'Choose an infographic file to view a preview',
     );
   });
 
-  test('renders preview help text for infographics when no fileId is provided', () => {
+  test(`renders preview help text for chart of type 'map' when no boundaryLevel is selected`, () => {
     render(
       <ChartBuilderPreview
         definition={verticalBarBlockDefinition}
-        chart={produce(testInfographicChartRenderer, draft => {
-          draft.fileId = '';
+        chart={produce(testMapChartRenderer, draft => {
+          draft.boundaryLevel = undefined;
         })}
         loading={false}
       />,
@@ -194,7 +254,7 @@ describe('ChartBuilderPreview', () => {
     const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
     expect(detailsSection).toBeInTheDocument();
     expect(detailsSection).toHaveTextContent(
-      'Add data to view a preview of the chart',
+      'Add data and choose a version of geographic data to view a preview',
     );
   });
 });

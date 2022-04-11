@@ -20,7 +20,14 @@ export default function isChartRenderable(props: ChartRendererProps): boolean {
 export function getChartPreviewText(
   props: ChartRendererProps | undefined,
 ): string | undefined {
-  return props?.type === 'map'
-    ? 'Add data sets and choose a version of geographic data to view a preview of the chart'
-    : 'Add data to view a preview of the chart';
+  switch (props?.type) {
+    case undefined:
+      return undefined;
+    case 'map':
+      return 'Add data and choose a version of geographic data to view a preview';
+    case 'infographic':
+      return 'Choose an infographic file to view a preview';
+    default:
+      return 'Configure the chart and add data to view a preview';
+  }
 }
