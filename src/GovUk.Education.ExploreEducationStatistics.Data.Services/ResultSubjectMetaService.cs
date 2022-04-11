@@ -249,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     return new LocationAttributeViewModel
                     {
-                        Id = locationAttributeNode.LocationId.Value,
+                        Id = locationAttributeNode.LocationId!.Value,
                         GeoJson = geoJson,
                         Label = locationAttribute.Name ?? string.Empty,
                         Value = code
@@ -285,11 +285,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 long boundaryLevelId,
                 Dictionary<GeographicLevel, List<LocationAttributeNode>> locations)
             {
-                // TODO DW - handle async
-                // TODO DW - handle Either failure
                 var selectedBoundaryLevel = _boundaryLevelRepository
-                    .FindOrNotFoundAsync(boundaryLevelId)
-                    .Result
+                    .FindOrNotFound(boundaryLevelId)
                     .OrElse(() => null!)
                     .Right;
 

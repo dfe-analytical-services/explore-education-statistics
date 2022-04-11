@@ -38,6 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             return await DbSet().FindAsync(id);
         }
 
+        public Either<ActionResult, TEntity> FindOrNotFound(TKey id)
+        {
+            return Find(id) ?? new Either<ActionResult, TEntity>(new NotFoundResult());
+        }
+
         public async Task<Either<ActionResult, TEntity>> FindOrNotFoundAsync(TKey id)
         {
             return await FindAsync(id) ?? new Either<ActionResult, TEntity>(new NotFoundResult());

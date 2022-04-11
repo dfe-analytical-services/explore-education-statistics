@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -22,6 +21,7 @@ using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 
@@ -43,13 +43,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         private readonly BoundaryLevel _countriesBoundaryLevel = new()
         {
             Id = 1,
-            Label = "Countries November 2021"
+            Label = "Countries November 2021",
+            Level = GeographicLevel.Country
         };
 
         private readonly BoundaryLevel _regionsBoundaryLevel = new()
         {
             Id = 2,
-            Label = "Regions November 2021"
+            Label = "Regions November 2021",
+            Level = GeographicLevel.Region
         };
 
         private readonly GeoJson _geoJson = new()
@@ -173,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     query,
                     observations);
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     boundaryLevelRepository,
                     filterItemRepository,
                     footnoteRepository,
@@ -350,7 +352,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     query,
                     observations);
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     boundaryLevelRepository,
                     filterItemRepository,
                     footnoteRepository,
@@ -572,7 +574,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     query,
                     observations);
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     boundaryLevelRepository,
                     filterItemRepository,
                     footnoteRepository,
@@ -760,6 +762,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(GeographicLevel.Region))
                 .Returns(_regionsBoundaryLevel);
 
+            boundaryLevelRepository.Setup(s => s.FindOrNotFound(query.BoundaryLevel.Value))
+                .Returns(_regionsBoundaryLevel);
+
+            boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(ItIs.ListSequenceEqualTo(ListOf(GeographicLevel.Region))))
+                .Returns(ListOf(_regionsBoundaryLevel));
+
             filterItemRepository
                 .Setup(s => s.GetFilterItemsFromObservationList(observations))
                 .Returns(new List<FilterItem>());
@@ -828,7 +836,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     query,
                     observations);
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     boundaryLevelRepository,
                     filterItemRepository,
                     footnoteRepository,
@@ -1025,7 +1033,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     query,
                     observations);
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     boundaryLevelRepository,
                     filterItemRepository,
                     footnoteRepository,
@@ -1218,7 +1226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     query,
                     observations);
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     boundaryLevelRepository,
                     filterItemRepository,
                     footnoteRepository,
@@ -1392,7 +1400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     query,
                     observations);
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     boundaryLevelRepository,
                     filterItemRepository,
                     footnoteRepository,
@@ -1605,7 +1613,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     query,
                     observations);
 
-                MockUtils.VerifyAllMocks(
+                VerifyAllMocks(
                     boundaryLevelRepository,
                     filterItemRepository,
                     footnoteRepository,
@@ -1700,7 +1708,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 indicatorRepository ?? Mock.Of<IIndicatorRepository>(MockBehavior.Strict),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 timePeriodService ?? Mock.Of<ITimePeriodService>(MockBehavior.Strict),
-                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                userService ?? AlwaysTrueUserService().Object,
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
                 releaseDataFileRepository ?? Mock.Of<IReleaseDataFileRepository>(MockBehavior.Strict),
                 options ?? DefaultLocationOptions(),
