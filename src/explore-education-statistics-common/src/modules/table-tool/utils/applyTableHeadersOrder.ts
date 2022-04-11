@@ -8,6 +8,7 @@ import {
 import isEqual from 'lodash/isEqual';
 import intersectionWith from 'lodash/intersectionWith';
 import intersection from 'lodash/intersection';
+import orderBy from 'lodash/orderBy';
 
 /**
  * Apply previous ordering to default table headers.
@@ -36,34 +37,33 @@ const applyTableHeadersOrder = ({
     reorderedTableHeaders.columns,
   ];
 
-  const { orderedGroups: orderedRowGroups } = orderGroups({
+  const {
+    orderedGroups: orderedRowGroups,
+    newGroups: newRowGroups,
+  } = orderGroups({
     defaultGroups: defaultRowGroups,
     reorderedGroups: reorderedRowGroups,
     otherAxisDefaultGroups: defaultColGroups,
     otherAxisReorderedGroups: reorderedColGroups,
   });
 
-  const moveNewColumnGroupsToRows = orderedRowGroups.length <= 1;
-
   const {
-    orderedGroups: allOrderedColumnGroups,
+    orderedGroups: orderedColumnGroups,
     newGroups: newColumnGroups,
   } = orderGroups({
     defaultGroups: defaultColGroups,
     reorderedGroups: reorderedColGroups,
     otherAxisDefaultGroups: defaultRowGroups,
     otherAxisReorderedGroups: reorderedRowGroups,
-    returnNewGroups: moveNewColumnGroupsToRows,
+  });
+
+  const { allOrderedColumnGroups, allOrderedRowGroups } = appendNewGroups({
+    columnGroups: orderedColumnGroups,
+    newGroups: [...newRowGroups, ...newColumnGroups],
+    rowGroups: orderedRowGroups,
   });
 
   const allOrderedColumnGroupsLength = allOrderedColumnGroups.length;
-
-  // If there's zero or one row groups then add any new column groups
-  // to row groups instead to avoid causing horizontal scrolling
-  // by having lots of columns.
-  const allOrderedRowGroups = moveNewColumnGroupsToRows
-    ? [...orderedRowGroups, ...newColumnGroups]
-    : orderedRowGroups;
   const allOrderedRowGroupsLength = allOrderedRowGroups.length;
 
   // For safety - can't think how this would be possible,
@@ -104,23 +104,19 @@ const applyTableHeadersOrder = ({
  * Order the groups for an axis:
  * - filters the reordered groups to remove those no longer in the headers,
  * checks both axes
- * - adds groups that have been added to the headers after the reordered ones
- * or in default order if groups have not been reordered
- * - if returnNewGroups is true then the new groups are returned from here
- * instead of being added to the reordered groups
+ * - if groups have been reordered, return the new groups seperately
+ * - if groups have not been reordered return all groups in the default order.
  */
 function orderGroups({
   defaultGroups,
   reorderedGroups,
   otherAxisDefaultGroups,
   otherAxisReorderedGroups,
-  returnNewGroups = false,
 }: {
   defaultGroups: Filter[][];
   reorderedGroups: Filter[][];
   otherAxisDefaultGroups: Filter[][];
   otherAxisReorderedGroups: Filter[][];
-  returnNewGroups?: boolean;
 }): { orderedGroups: Filter[][]; newGroups: Filter[][] } {
   const orderedGroups = filterReorderedGroups({
     reorderedGroups,
@@ -157,18 +153,16 @@ function orderGroups({
     defaultGroups,
   });
 
-  const allGroups = groupsAreReordered
-    ? [...orderedGroups, ...newGroups]
-    : [...orderedGroups, ...newGroups].sort((a, b) => {
-        return (
-          defaultGroupsOrder.indexOf(getFilterType(a[0])) -
-          defaultGroupsOrder.indexOf(getFilterType(b[0]))
-        );
-      });
-
   return {
-    orderedGroups: returnNewGroups ? orderedGroups : allGroups,
-    newGroups: returnNewGroups ? newGroups : [],
+    orderedGroups: groupsAreReordered
+      ? orderedGroups
+      : [...orderedGroups, ...newGroups].sort((a, b) => {
+          return (
+            defaultGroupsOrder.indexOf(getFilterType(a[0])) -
+            defaultGroupsOrder.indexOf(getFilterType(b[0]))
+          );
+        }),
+    newGroups: groupsAreReordered ? newGroups : [],
   };
 }
 
@@ -236,6 +230,50 @@ function filterItemsAndAddNew(
           !reorderedItems.find(item => item.value === defaultItem.value),
       ),
     );
+}
+
+/**
+ * Distribute new groups between rows and columns
+ * with preference for populating rows.
+ */
+function appendNewGroups({
+  columnGroups,
+  newGroups,
+  rowGroups,
+}: {
+  columnGroups: Filter[][];
+  newGroups: Filter[][];
+  rowGroups: Filter[][];
+}): { allOrderedColumnGroups: Filter[][]; allOrderedRowGroups: Filter[][] } {
+  if (!newGroups.length) {
+    return {
+      allOrderedRowGroups: rowGroups,
+      allOrderedColumnGroups: columnGroups,
+    };
+  }
+  const nextRowGroups = [...rowGroups];
+  const nextColumnGroups = [...columnGroups];
+
+  // Do a pre-sort so the bigger groups with with more options
+  // and wordier labels get placed first
+  const sortedNewGroups = orderBy(newGroups, [
+    options => options.length,
+    options => options.reduce((acc, option) => acc + option.label.length, 0),
+  ]);
+
+  sortedNewGroups.forEach(group => {
+    // Bias it towards putting new groups in rows
+    if (nextRowGroups.length > nextColumnGroups.length) {
+      nextColumnGroups.push(group);
+    } else {
+      nextRowGroups.push(group);
+    }
+  });
+
+  return {
+    allOrderedRowGroups: nextRowGroups,
+    allOrderedColumnGroups: nextColumnGroups,
+  };
 }
 
 function getMatchingGroup(
