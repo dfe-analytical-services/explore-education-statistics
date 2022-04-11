@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -72,22 +71,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
                         _mapper.Map<List<TitleAndIdViewModel>>(methodologies);
-                    
-                    releaseViewModel.Content.ForEach(c => c.Content.ForEach(cb =>
-                    {
-                        if (cb is DataBlockViewModel)
-                        {
-                            var db = cb as DataBlockViewModel;
-                            db.Charts.ForEach(c =>
-                            {
-                                if (c.Type == ChartType.Map)
-                                {
-                                    var ch = c as MapChart;
-                                    ch.BoundaryLevel = db.Query.BoundaryLevel ?? -1;
-                                };
-                            });
-                        }
-                    }));
 
                     return new ManageContentPageViewModel
                     {

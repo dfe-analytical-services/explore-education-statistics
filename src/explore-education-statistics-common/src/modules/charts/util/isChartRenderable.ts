@@ -11,6 +11,10 @@ export default function isChartRenderable(
     return true;
   }
 
+  if (props.type === 'map' && !props.boundaryLevel) {
+    return false;
+  }
+
   return Boolean(
     props.type &&
       props.axes?.major?.dataSets.length &&

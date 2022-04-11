@@ -136,18 +136,17 @@ const ChartConfiguration = ({
     }
 
     if (definition.type === 'map' && meta.boundaryLevels?.length) {
-      // schema = schema.shape({
-      //   boundaryLevel: Yup.number()
-      //     .oneOf(meta.boundaryLevels.map(level => level.id))
-      //     .required('Choose a boundary level'),
-      // });
+      schema = schema.shape({
+        boundaryLevel: Yup.number()
+          .oneOf(meta.boundaryLevels.map(level => level.id))
+          .required('Choose a boundary level'),
+      });
     }
 
     return schema;
   }, [definition.capabilities.stackable, definition.type, meta.boundaryLevels]);
 
   const initialValues = useMemo<FormValues>(() => {
-    // TODO DW - include boundaryLevel as optional param in ChartOptions as per file and fileId?
     return pick(chartOptions, Object.keys(validationSchema.fields));
   }, [chartOptions, validationSchema]);
 
