@@ -56,7 +56,7 @@ function HelpSupportPage() {
             <p>
               You can also download data files of those statistics currently
               published via the service through our{' '}
-              <a href="/download-latest-data">Download data files</a> section.
+              <a href="/data-catalogue">Data catalogue</a> section.
             </p>
             <p>
               These files are currently only available in csv format but other
