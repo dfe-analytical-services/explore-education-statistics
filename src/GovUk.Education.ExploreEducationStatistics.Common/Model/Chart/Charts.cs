@@ -60,6 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public override ChartType Type => Map;
         
+        // TODO EES-3319 - make mandatory when all Map Charts are migrated to have a Boundary Level set
         public long? BoundaryLevel { get; set; }
     }
 

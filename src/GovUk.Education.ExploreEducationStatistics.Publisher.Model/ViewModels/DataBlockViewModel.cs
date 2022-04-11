@@ -20,7 +20,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public ObservationQueryContext Query { get; set; }
 
-        public List<IChart> Charts { get; set; }
+        // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
+        // own Boundary Level selection
+        public List<IChart> Charts
+        {
+            get => Charts;
+            set
+            {
+                value.ForEach(chart =>
+                {
+                    if (chart is MapChart { BoundaryLevel: null } mapChart)
+                    {
+                        mapChart.BoundaryLevel = Query.BoundaryLevel;       
+                    }
+                }); 
+            }
+        }
 
         public DataBlockSummaryViewModel Summary { get; set; }
 
