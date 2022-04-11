@@ -4,15 +4,10 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ChartBuilderPreview from '@admin/pages/release/datablocks/components/chart/ChartBuilderPreview';
 import { ChartRendererProps } from '@common/modules/charts/components/ChartRenderer';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
-import {
-  CategoryFilter,
-  Indicator,
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/table-tool/types/filters';
 import produce from 'immer';
 import { DataSet } from '@common/modules/charts/types/dataSet';
+import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
+import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 
 describe('ChartBuilderPreview', () => {
   const testDataSets: DataSet[] = [
@@ -42,55 +37,13 @@ describe('ChartBuilderPreview', () => {
     },
   };
 
-  const testFullTableMeta: FullTableMeta = {
-    geoJsonAvailable: false,
-    publicationName: 'Pupil absence in schools in England',
-    subjectName: 'Absence by characteristic',
-    footnotes: [],
-    boundaryLevels: [],
-    filters: {
-      Characteristic: {
-        name: 'characteristic',
-        options: [
-          new CategoryFilter({
-            value: 'total',
-            label: 'Total',
-            group: 'Gender',
-            category: 'Characteristic',
-          }),
-        ],
-      },
-    },
-    indicators: [
-      new Indicator({
-        label: 'Authorised absence rate',
-        value: 'authAbsRate',
-        unit: '%',
-        name: 'sess_authorised_percent',
-      }),
-    ],
-    locations: [
-      new LocationFilter({
-        value: 'england',
-        label: 'England',
-        level: 'country',
-      }),
-    ],
-    timePeriodRange: [
-      new TimePeriodFilter({
-        code: 'AY',
-        year: 2015,
-        label: '2015/16',
-        order: 0,
-      }),
-    ],
-  };
+  const testFullTableMeta = mapFullTable(testChartTableData);
 
   const testInfographicChartRenderer: ChartRendererProps = {
     type: 'infographic',
     fileId: '1',
     data: [],
-    meta: testFullTableMeta,
+    meta: testFullTableMeta.subjectMeta,
     alt: '',
     height: 100,
     axes: {},
@@ -99,7 +52,7 @@ describe('ChartBuilderPreview', () => {
   const testLineChartRenderer: ChartRendererProps = {
     type: 'line',
     data: [],
-    meta: testFullTableMeta,
+    meta: testFullTableMeta.subjectMeta,
     alt: '',
     height: 100,
     axes: {
@@ -114,7 +67,7 @@ describe('ChartBuilderPreview', () => {
   const testVerticalBarChartRenderer: ChartRendererProps = {
     type: 'verticalbar',
     data: [],
-    meta: testFullTableMeta,
+    meta: testFullTableMeta.subjectMeta,
     alt: '',
     height: 100,
     axes: {
@@ -129,7 +82,7 @@ describe('ChartBuilderPreview', () => {
   const testHorizontalBarChartRenderer: ChartRendererProps = {
     type: 'horizontalbar',
     data: [],
-    meta: testFullTableMeta,
+    meta: testFullTableMeta.subjectMeta,
     alt: '',
     height: 100,
     axes: {
@@ -144,7 +97,7 @@ describe('ChartBuilderPreview', () => {
   const testMapChartRenderer: ChartRendererProps = {
     type: 'map',
     data: [],
-    meta: testFullTableMeta,
+    meta: testFullTableMeta.subjectMeta,
     alt: '',
     height: 100,
     axes: {

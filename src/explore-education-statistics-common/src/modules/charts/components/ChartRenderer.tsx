@@ -62,27 +62,28 @@ function ChartRenderer({
         return <p>Unable to render invalid chart type</p>;
     }
   }, [id, props]);
-  const footnotes = [...meta.footnotes];
 
-  const boundaryFootnoteId = 'map-footnote';
-  if (
-    type === 'map' &&
-    footnotes.findIndex(footnote => footnote.id === boundaryFootnoteId) === -1
-  ) {
-    const selectedBoundaryLevel = meta.boundaryLevels.find(
-      boundaryLevel => boundaryLevel.id === props.boundaryLevel,
-    );
-    if (selectedBoundaryLevel) {
-      footnotes.push({
-        id: boundaryFootnoteId,
-        label: `This map uses the boundary data ${selectedBoundaryLevel.label}`,
-      });
+  if (data?.length > 0 && meta) {
+    const footnotes = [...meta.footnotes];
+
+    const boundaryFootnoteId = 'map-footnote';
+    if (
+      type === 'map' &&
+      footnotes.findIndex(footnote => footnote.id === boundaryFootnoteId) === -1
+    ) {
+      const selectedBoundaryLevel = meta.boundaryLevels.find(
+        boundaryLevel => boundaryLevel.id === props.boundaryLevel,
+      );
+      if (selectedBoundaryLevel) {
+        footnotes.push({
+          id: boundaryFootnoteId,
+          label: `This map uses the boundary data ${selectedBoundaryLevel.label}`,
+        });
+      }
     }
-  }
 
-  if (data && meta && data.length > 0) {
     return (
-      <figure className="govuk-!-margin-0" id={id}>
+      <figure className="govuk-!-margin-0" id={id} data-testid={id}>
         {title && <figcaption className="govuk-heading-s">{title}</figcaption>}
 
         {chart}
