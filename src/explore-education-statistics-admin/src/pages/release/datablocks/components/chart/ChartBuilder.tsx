@@ -298,7 +298,6 @@ const ChartBuilder = ({
 
       {definition && (
         <ChartBuilderPreview
-          axes={axes}
           chart={chartProps}
           definition={definition}
           loading={isDataLoading}

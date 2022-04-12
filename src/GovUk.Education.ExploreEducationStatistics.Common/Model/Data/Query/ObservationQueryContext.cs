@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query
         public Guid SubjectId { get; set; }
         public TimePeriodQuery TimePeriod { get; set; }
         public IEnumerable<Guid> Filters { get; set; }
+        // TODO EES-3328 - remove BoundaryLevel from ObservationQueryContext as we now store it on
+        // MapChart configuration instead
         public long? BoundaryLevel { get; set; }
         public IEnumerable<Guid> Indicators { get; set; }
         public List<Guid> LocationIds { get; set; } = new();
