@@ -11,6 +11,7 @@ import {
   testPublicationRelease,
 } from '@frontend/modules/table-tool/components/__tests__/__data__/tableData';
 import userEvent from '@testing-library/user-event';
+import noop from 'lodash/noop';
 import React from 'react';
 
 jest.mock('@common/services/publicationService');
@@ -31,6 +32,7 @@ describe('TableToolFinalStep', () => {
         table={testTable}
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
+        onReorderTableHeaders={noop}
       />,
     );
 
@@ -122,6 +124,7 @@ describe('TableToolFinalStep', () => {
         table={testTable}
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
+        onReorderTableHeaders={noop}
       />,
     );
 
@@ -152,6 +155,7 @@ describe('TableToolFinalStep', () => {
         table={testTable}
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithNonLatestRelease}
+        onReorderTableHeaders={noop}
       />,
     );
 
@@ -181,6 +185,7 @@ describe('TableToolFinalStep', () => {
         table={testTable}
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
+        onReorderTableHeaders={noop}
       />,
     );
 
@@ -211,6 +216,7 @@ describe('TableToolFinalStep', () => {
         table={testTable}
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
+        onReorderTableHeaders={noop}
       />,
     );
 
@@ -233,6 +239,7 @@ describe('TableToolFinalStep', () => {
         table={testTable}
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithNonLatestRelease}
+        onReorderTableHeaders={noop}
       />,
     );
 
@@ -280,6 +287,7 @@ describe('TableToolFinalStep', () => {
         table={testTable}
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
+        onReorderTableHeaders={noop}
       />,
     );
 
@@ -320,6 +328,7 @@ describe('TableToolFinalStep', () => {
         table={testTable}
         tableHeaders={testTableHeaders}
         selectedPublication={testSelectedPublicationWithLatestRelease}
+        onReorderTableHeaders={noop}
       />,
     );
 

@@ -19,6 +19,7 @@ import Wizard from '@common/modules/table-tool/components/Wizard';
 import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import applyTableHeadersOrder from '@common/modules/table-tool/utils/applyTableHeadersOrder';
 import getDefaultTableHeaderConfig from '@common/modules/table-tool/utils/getDefaultTableHeadersConfig';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import parseYearCodeTuple from '@common/modules/table-tool/utils/parseYearCodeTuple';
@@ -31,7 +32,7 @@ import tableBuilderService, {
   SubjectMeta,
 } from '@common/services/tableBuilderService';
 import { Theme } from '@common/services/themeService';
-import React, { ReactElement, ReactNode } from 'react';
+import React, { ReactElement, ReactNode, useMemo, useState } from 'react';
 import { useImmer } from 'use-immer';
 import { useRouter } from 'next/router';
 
@@ -57,11 +58,10 @@ interface TableToolState extends InitialTableToolState {
 
 export interface FinalStepRenderProps {
   query?: ReleaseTableDataQuery;
-  response?: {
-    table: FullTable;
-    tableHeaders: TableHeadersConfig;
-  };
   selectedPublication?: SelectedPublication;
+  table?: FullTable;
+  tableHeaders?: TableHeadersConfig;
+  onReorder: (reorderedTableHeaders: TableHeadersConfig) => void;
 }
 
 export interface TableToolWizardProps {
@@ -118,6 +118,9 @@ const TableToolWizard = ({
     },
     ...initialState,
   });
+  const [reorderedTableHeaders, setReorderedTableHeaders] = useState<
+    TableHeadersConfig
+  >();
 
   const handlePublicationStepBack = () => {
     router.push('/data-tables', undefined, { shallow: true });
@@ -169,6 +172,8 @@ const TableToolWizard = ({
     const nextSubjectMeta = await tableBuilderService.getSubjectMeta(
       selectedSubjectId,
     );
+
+    setReorderedTableHeaders(undefined);
 
     updateState(draft => {
       draft.subjectMeta = nextSubjectMeta;
@@ -345,6 +350,22 @@ const TableToolWizard = ({
     });
   };
 
+  const orderedTableHeaders: TableHeadersConfig | undefined = useMemo(() => {
+    const reorderedOrSavedTableHeaders =
+      reorderedTableHeaders ?? initialState.response?.tableHeaders;
+
+    return state.response?.tableHeaders && reorderedOrSavedTableHeaders
+      ? applyTableHeadersOrder({
+          reorderedTableHeaders: reorderedOrSavedTableHeaders,
+          defaultTableHeaders: state.response.tableHeaders,
+        })
+      : state.response?.tableHeaders;
+  }, [
+    initialState.response?.tableHeaders,
+    reorderedTableHeaders,
+    state.response?.tableHeaders,
+  ]);
+
   return (
     <ConfirmContextProvider>
       {({ askConfirm }) => (
@@ -433,8 +454,10 @@ const TableToolWizard = ({
             {finalStep &&
               finalStep({
                 query: state.query,
-                response: state.response,
                 selectedPublication: state.selectedPublication,
+                table: state.response?.table,
+                tableHeaders: orderedTableHeaders,
+                onReorder: reordered => setReorderedTableHeaders(reordered),
               })}
           </Wizard>
 

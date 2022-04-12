@@ -7,28 +7,23 @@ import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeader
 import DownloadTable from '@common/modules/table-tool/components/DownloadTable';
 import TableToolInfo from '@common/modules/table-tool/components/TableToolInfo';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
-import React, { ReactNode, useEffect, useRef, useState } from 'react';
+import React, { ReactNode, useRef } from 'react';
 
 interface ReleasePreviewTableToolFinalStepProps {
   publication?: BasicPublicationDetails;
   query: ReleaseTableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
+  onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
 }
 const ReleasePreviewTableToolFinalStep = ({
   publication,
   query,
   table,
   tableHeaders,
+  onReorderTableHeaders,
 }: ReleasePreviewTableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
-  const [currentTableHeaders, setCurrentTableHeaders] = useState<
-    TableHeadersConfig
-  >();
-
-  useEffect(() => {
-    setCurrentTableHeaders(tableHeaders);
-  }, [tableHeaders]);
 
   const getMethodologyLinks = () => {
     const links: ReactNode[] =
@@ -50,9 +45,9 @@ const ReleasePreviewTableToolFinalStep = ({
   return (
     <div className="govuk-!-margin-bottom-4">
       <TableHeadersForm
-        initialValues={currentTableHeaders}
-        onSubmit={tableHeaderConfig => {
-          setCurrentTableHeaders(tableHeaderConfig);
+        initialValues={tableHeaders}
+        onSubmit={nextTableHeaders => {
+          onReorderTableHeaders(nextTableHeaders);
 
           if (dataTableRef.current) {
             dataTableRef.current.scrollIntoView({
@@ -62,12 +57,12 @@ const ReleasePreviewTableToolFinalStep = ({
           }
         }}
       />
-      {table && currentTableHeaders && (
+      {table && tableHeaders && (
         <TimePeriodDataTable
           ref={dataTableRef}
           fullTable={table}
           query={query}
-          tableHeadersConfig={currentTableHeaders}
+          tableHeadersConfig={tableHeaders}
         />
       )}
       {publication && table && (
