@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +16,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     public class ReleaseController : ControllerBase
     {
         private readonly IReleaseService _releaseService;
+        private readonly IMethodologyService _methodologyService;
 
-        public ReleaseController(IReleaseService releaseService)
+        public ReleaseController(
+            IReleaseService releaseService, 
+            IMethodologyService methodologyService)
         {
             _releaseService = releaseService;
+            _methodologyService = methodologyService;
         }
 
         [HttpGet("publications/{publicationSlug}/releases")]

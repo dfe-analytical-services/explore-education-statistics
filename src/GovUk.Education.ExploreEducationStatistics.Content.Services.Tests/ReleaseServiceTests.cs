@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     }
                 );
 
-            methodologyService.Setup(mock => mock.GetSummariesByPublication(publicationId))
+            methodologyService.Setup(mock => mock.GetCachedSummariesByPublication(publicationId))
                 .ReturnsAsync(AsList(methodology));
 
             fileStorageService
@@ -157,7 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     }
                 );
 
-            methodologyService.Setup(mock => mock.GetSummariesByPublication(publicationId))
+            methodologyService.Setup(mock => mock.GetCachedSummariesByPublication(publicationId))
                 .ReturnsAsync(AsList(new MethodologyVersionSummaryViewModel()));
 
             fileStorageService

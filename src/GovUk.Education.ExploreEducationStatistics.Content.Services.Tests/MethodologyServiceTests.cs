@@ -557,7 +557,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = (await service.GetSummariesByPublication(publication.Id)).AssertRight();
+                var result = (await service.GetCachedSummariesByPublication(publication.Id)).AssertRight();
 
                 Assert.Equal(2, result.Count);
 
@@ -596,7 +596,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = (await service.GetSummariesByPublication(publication.Id)).AssertRight();
+                var result = (await service.GetCachedSummariesByPublication(publication.Id)).AssertRight();
 
                 Assert.Empty(result);
             }
@@ -614,7 +614,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = await service.GetSummariesByPublication(Guid.NewGuid());
+                var result = await service.GetCachedSummariesByPublication(Guid.NewGuid());
 
                 result.AssertNotFound();
             }
@@ -692,7 +692,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var themes = (await service.GetTree()).AssertRight();
+                var themes = (await service.GetCachedSummariesTree()).AssertRight();
 
                 Assert.Single(themes);
 
@@ -752,7 +752,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = (await service.GetTree()).AssertRight();
+                var result = (await service.GetCachedSummariesTree()).AssertRight();
 
                 Assert.Empty(result);
             }
@@ -793,7 +793,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = await service.GetTree();
+                var result = await service.GetCachedSummariesTree();
 
                 result.AssertRight();
 
@@ -853,7 +853,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = SetupMethodologyService(contentDbContext: contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = await service.GetTree();
+                var result = await service.GetCachedSummariesTree();
 
                 result.AssertRight();
 

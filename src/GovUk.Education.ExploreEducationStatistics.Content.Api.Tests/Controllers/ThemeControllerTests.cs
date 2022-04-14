@@ -103,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
                 .ReturnsAsync(null);
             
             mocks.methodologyService
-                .Setup(mock => mock.GetTree())
+                .Setup(mock => mock.GetCachedSummariesTree())
                 .ReturnsAsync(MethodologyThemes);
 
             mocks.cacheService
