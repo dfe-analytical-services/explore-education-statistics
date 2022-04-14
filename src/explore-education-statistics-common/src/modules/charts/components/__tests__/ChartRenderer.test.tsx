@@ -1,31 +1,11 @@
-import {
-  testChartConfiguration,
-  testChartTableData,
-} from '@common/modules/charts/components/__tests__/__data__/testChartData';
-import { expectTicks } from '@common/modules/charts/components/__tests__/testUtils';
-import HorizontalBarBlock, {
-  HorizontalBarProps,
-} from '@common/modules/charts/components/HorizontalBarBlock';
-import {
-  verticalBarBlockDefinition,
-  VerticalBarProps,
-} from '@common/modules/charts/components/VerticalBarBlock';
-import { LegendConfiguration } from '@common/modules/charts/types/legend';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { testChartTableData } from '@common/modules/charts/components/__tests__/__data__/testChartData';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
-import { TableDataResponse } from '@common/services/tableBuilderService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import React from 'react';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
-import {
-  CategoryFilter,
-  Indicator,
-  LocationFilter,
-  TimePeriodFilter,
-} from '@common/modules/table-tool/types/filters';
 import { DataSet } from '@common/modules/charts/types/dataSet';
 import produce from 'immer';
 

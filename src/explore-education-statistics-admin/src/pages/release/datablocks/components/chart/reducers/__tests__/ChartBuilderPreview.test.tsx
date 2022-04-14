@@ -1,4 +1,3 @@
-import { verticalBarBlockDefinition } from '@common/modules/charts/components/VerticalBarBlock';
 import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import React from 'react';
 import { render, screen } from '@testing-library/react';
@@ -110,13 +109,7 @@ describe('ChartBuilderPreview', () => {
   };
 
   test('renders the loading spinner when the loading flag is indicating that it is loading', () => {
-    render(
-      <ChartBuilderPreview
-        definition={verticalBarBlockDefinition}
-        chart={testLineChartRenderer}
-        loading
-      />,
-    );
+    render(<ChartBuilderPreview chart={testLineChartRenderer} loading />);
     const detailsSection = screen.queryByTestId('chartBuilderPreviewContainer');
     expect(detailsSection).toBeInTheDocument();
     expect(detailsSection).toHaveTextContent('Loading chart data');
@@ -130,13 +123,7 @@ describe('ChartBuilderPreview', () => {
     testMapChartRenderer,
   ].forEach(chartRenderer => {
     test(`renders chart of type '${chartRenderer.type}' when all mandatory fields are provided`, () => {
-      render(
-        <ChartBuilderPreview
-          definition={verticalBarBlockDefinition}
-          chart={chartRenderer}
-          loading={false}
-        />,
-      );
+      render(<ChartBuilderPreview chart={chartRenderer} loading={false} />);
       const detailsSection = screen.queryByTestId(
         'chartBuilderPreviewContainer',
       );
@@ -158,7 +145,6 @@ describe('ChartBuilderPreview', () => {
     test(`renders preview help text for chart of type '${chartRenderer.type}' when no data sets are yet added`, () => {
       render(
         <ChartBuilderPreview
-          definition={verticalBarBlockDefinition}
           chart={produce(chartRenderer, draft => {
             draft.axes.major.dataSets = [];
           })}
@@ -180,7 +166,6 @@ describe('ChartBuilderPreview', () => {
   test(`renders preview help text for chart of type 'infographic' when no fileId is selected`, () => {
     render(
       <ChartBuilderPreview
-        definition={verticalBarBlockDefinition}
         chart={produce(testInfographicChartRenderer, draft => {
           draft.fileId = '';
         })}
@@ -197,7 +182,6 @@ describe('ChartBuilderPreview', () => {
   test(`renders preview help text for chart of type 'map' when no boundaryLevel is selected`, () => {
     render(
       <ChartBuilderPreview
-        definition={verticalBarBlockDefinition}
         chart={produce(testMapChartRenderer, draft => {
           draft.boundaryLevel = undefined;
         })}

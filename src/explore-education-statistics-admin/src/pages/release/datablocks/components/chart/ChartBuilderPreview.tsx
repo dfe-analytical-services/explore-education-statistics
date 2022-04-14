@@ -4,7 +4,6 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import ChartRenderer, {
   ChartRendererProps,
 } from '@common/modules/charts/components/ChartRenderer';
-import { ChartDefinition } from '@common/modules/charts/types/chart';
 import isChartRenderable, {
   getChartPreviewText,
 } from '@common/modules/charts/util/isChartRenderable';
@@ -12,11 +11,10 @@ import React, { useRef } from 'react';
 
 interface Props {
   chart?: ChartRendererProps;
-  definition: ChartDefinition;
   loading: boolean;
 }
 
-const ChartBuilderPreview = ({ chart, definition, loading }: Props) => {
+const ChartBuilderPreview = ({ chart, loading }: Props) => {
   const renderCount = useRef(0);
 
   return (

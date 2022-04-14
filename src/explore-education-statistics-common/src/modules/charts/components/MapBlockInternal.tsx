@@ -13,10 +13,6 @@ import createDataSetCategories from '@common/modules/charts/util/createDataSetCa
 import getDataSetCategoryConfigs, {
   DataSetCategoryConfig,
 } from '@common/modules/charts/util/getDataSetCategoryConfigs';
-import {
-  KeyStatColumn,
-  KeyStatContainer,
-} from '@common/modules/find-statistics/components/KeyStat';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import {
   GeoJsonFeature,

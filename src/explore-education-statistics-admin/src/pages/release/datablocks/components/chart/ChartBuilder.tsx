@@ -297,11 +297,7 @@ const ChartBuilder = ({
       />
 
       {definition && (
-        <ChartBuilderPreview
-          chart={chartProps}
-          definition={definition}
-          loading={isDataLoading}
-        />
+        <ChartBuilderPreview chart={chartProps} loading={isDataLoading} />
       )}
 
       {definition && (
