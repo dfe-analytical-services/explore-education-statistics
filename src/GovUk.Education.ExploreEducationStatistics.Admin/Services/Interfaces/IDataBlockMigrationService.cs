@@ -11,7 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
      */
     public interface IDataBlockMigrationService
     {
-        Task<Either<ActionResult, List<DataBlockMigrationService.DataBlockMapMigrationPlan>>> GetMigrateMapPlans();
         Task<Either<ActionResult, List<DataBlockMigrationService.MapMigrationResult>>> MigrateMaps(bool dryRun = true);
     }
 }

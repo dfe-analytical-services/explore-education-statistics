@@ -157,19 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         boundaryLevels.Single(level => level.Id == map.BoundaryLevel).Level);
                                 }
                                 case QuestionWhichCorrectGeoLevelToSelect:
-                                    return new MapMigrationResult(
-                                        plan.DataBlockId,
-                                        plan.Type,
-                                        plan.Strategy,
-                                        null,
-                                        null);
                                 case FixMapConfigNoDataSetGeographicLevels:
-                                    return new MapMigrationResult(
-                                        plan.DataBlockId,
-                                        plan.Type,
-                                        plan.Strategy,
-                                        null,
-                                        null);
                                 case FixMapConfigInvalidDataSetGeographicLevels:
                                     return new MapMigrationResult(
                                         plan.DataBlockId,
@@ -330,10 +318,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             public MigrationStrategy Strategy { get; } = FixMapConfigNoDataSetGeographicLevels;
 
-            public long? SpecificBoundaryLevelId { get; }
-            [JsonConverter(typeof(StringEnumConverter))]
-            public GeographicLevel? SpecificBoundaryLevelGeographicLevel { get; }
-
             [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
             public List<GeographicLevel> DataBlockGeographicLevels { get; }
 
@@ -347,8 +331,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 List<ChartAxisConfiguration>? chartAxisConfigurations)
             {
                 DataBlockId = dataBlockId;
-                SpecificBoundaryLevelGeographicLevel = specificBoundaryLevel?.Level;
-                SpecificBoundaryLevelId = specificBoundaryLevel?.Id;
                 DataBlockGeographicLevels = dataBlockGeographicLevels;
                 
                 var dataSets = chartAxisConfigurations?

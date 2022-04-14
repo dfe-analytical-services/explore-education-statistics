@@ -28,7 +28,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             _dataBlockMigrationService = dataBlockMigrationService;
         }
         
-        [AllowAnonymous]
         [HttpPatch("releases/migrate-all-maps")]
         public async Task<ActionResult<List<MapMigrationResult>>> MigrateAllMaps(
             [FromQuery] bool dryRun = true)
