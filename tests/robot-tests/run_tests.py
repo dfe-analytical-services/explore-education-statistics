@@ -11,21 +11,21 @@ import cProfile
 import datetime
 import json
 import os
-import platform
 import pstats
 import shutil
 from pathlib import Path
-
-import pyderman
 import requests
 from dotenv import load_dotenv
 from pabot.pabot import main as pabot_run_cli
 from robot import rebot_cli as robot_rebot_cli
 from robot import run_cli as robot_run_cli
+from scripts.get_webdriver import get_webdriver
 import scripts.keyword_profile as kp
 from tests.libs.setup_auth_variables import setup_auth_variables
 from tests.libs.slack import send_slack_report
 from tests.libs.create_emulator_release_files import ReleaseFilesGenerator
+
+
 current_dir = Path(__file__).absolute().parent
 os.chdir(current_dir)
 
@@ -174,15 +174,7 @@ if args.analyst_pass:
     os.environ['ANALYST_PASSWORD'] = args.analyst_pass
 
 # Install chromedriver and add it to PATH
-chromedriver_filename = 'chromedriver.exe' if platform.system() == "Windows" else 'chromedriver'
-pyderman.install(file_directory='./webdriver/',
-                 filename=chromedriver_filename,
-                 verbose=True,
-                 chmod=True,
-                 overwrite=False,
-                 version=args.chromedriver_version)
-
-os.environ["PATH"] += os.pathsep + str(Path('webdriver').absolute())
+get_webdriver(args.chromedriver_version or "latest")
 
 output_file = "rerun.xml" if args.rerun_failed_tests or args.rerun_failed_suites else "output.xml"
 

@@ -3,7 +3,8 @@ import time
 import argparse
 import json
 from selenium import webdriver
-import pyderman
+from typing import Union
+from .get_webdriver import get_webdriver
 
 
 def wait_until_page_contains_xpath(context, selector):
@@ -21,27 +22,21 @@ def wait_until_page_contains_xpath(context, selector):
 
 
 def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADMIN",
-                      driver=None) -> (str, str):
-    os.environ["PATH"] += os.pathsep + os.getcwd() + os.sep + 'webdriver'
+                      driver=None) -> Union[str, str]:
 
     using_existing_driver = driver is not None
 
     if not driver:
-        pyderman.install(file_directory="../webdriver/",
-                         filename='chromedriver',
-                         verbose=False,
-                         chmod=True,
-                         overwrite=False,
-                         version="latest")
+        get_webdriver("latest")
 
-        chrome_options = webdriver.ChromeOptions()
-        chrome_options.add_argument('--no-sandbox')
-        chrome_options.add_argument('--headless')
-        chrome_options.add_argument('--disable-gpu')
-        chrome_options.add_argument('--ignore-certificate-errors')
-        chrome_options.add_argument('--disable-logging')
-        chrome_options.add_argument('--log-level=\3')
-        driver = webdriver.Chrome(options=chrome_options)
+    chrome_options = webdriver.ChromeOptions()
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--headless')
+    chrome_options.add_argument('--disable-gpu')
+    chrome_options.add_argument('--ignore-certificate-errors')
+    chrome_options.add_argument('--disable-logging')
+    chrome_options.add_argument('--log-level=\3')
+    driver = webdriver.Chrome(options=chrome_options)
 
     try:
         driver.get(url)
