@@ -569,6 +569,12 @@ user chooses select option
     user waits until parent contains element    ${locator}    xpath:.//option
     select from list by label    ${locator}    ${label}
 
+user chooses select option at index
+    [Arguments]    ${locator}    ${index}
+    user waits until page contains element    ${locator}
+    user waits until parent contains element    ${locator}    xpath:.//option
+    select from list by index    ${locator}    ${index}
+
 user chooses file
     [Arguments]    ${locator}    ${file_path}
     user waits until element is visible    ${locator}
