@@ -15,7 +15,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -175,7 +174,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var originalTitle = publication.Title;
                     var originalSlug = publication.Slug;
-                    var originalSupersededById = publication.SupersededById;
 
                     if (!publication.Live) {
 
@@ -228,7 +226,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                         await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug));
 
-                        await DeleteCachedSupersededPublicationBlobs(publication, originalSupersededById);
+                        await DeleteCachedSupersededPublicationBlobs(publication);
                     }
 
                     return await GetPublication(publication.Id);
@@ -241,18 +239,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey());
         }
 
-        private async Task DeleteCachedSupersededPublicationBlobs(Publication publication,
-            Guid? originalSupersededById)
+        private async Task DeleteCachedSupersededPublicationBlobs(Publication publication)
         {
-            // NOTE: When a publication's SupersededById column is updated, we only need to invalidate the cache
-            // if the updated publication is now superseded OR if the updated publication is now no longer superseded.
-            // If the updated publication has a new superseding publication or a different superseding publication,
-            // any old or new superseding publication will be unaffected, so there is no need to invalidate their caches
+            // NOTE: When a publication is updated, any publication that is superseded by it can be affected, so
+            // invalidate the superseded publications' caches
             var supersededPublications = await _context.Publications
-                .Where(p =>
-                    p.SupersededById == publication.Id
-                    || (originalSupersededById == null
-                        && p.Id == originalSupersededById))
+                .Where(p => p.SupersededById == publication.Id)
                 .ToListAsync();
             foreach (var p in supersededPublications)
             {

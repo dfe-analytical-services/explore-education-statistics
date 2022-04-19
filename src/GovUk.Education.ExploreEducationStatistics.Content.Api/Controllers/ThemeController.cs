@@ -1,11 +1,9 @@
 #nullable enable
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
@@ -29,10 +27,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("themes")]
-        public async Task<IList<ThemeTree<PublicationTreeNode>>> GetPublicationTree(
-            [Required][FromQuery(Name = "publicationFilter")] PublicationTreeFilter filter)
+        public async Task<ActionResult<IList<ThemeTree<PublicationTreeNode>>>> GetPublicationTree(
+            [FromQuery(Name = "publicationFilter")] PublicationTreeFilter? filter = null)
         {
-            return await _themeService.GetPublicationTree(filter);
+            if (filter == null)
+            {
+                return new BadRequestResult();
+            }
+            return await _themeService.GetPublicationTree(filter.Value)
+                .HandleFailuresOrOk();
         }
 
         [HttpGet("methodology-themes")]

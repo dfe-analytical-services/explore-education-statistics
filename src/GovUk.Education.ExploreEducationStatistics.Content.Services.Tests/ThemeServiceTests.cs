@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
@@ -23,12 +24,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var service = BuildThemeService(context);
 
             var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+            var publicationTree = result.AssertRight();
 
-            Assert.Empty(result);
+            Assert.Empty(publicationTree);
         }
 
         [Fact]
-        public async Task GetPublicationTree_MultipleThemesTopics()
+        public async Task GetPublicationTree_FindStatistics_MultipleThemesTopics()
         {
             var publicationA = new Publication
             {
@@ -124,22 +126,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
 
-                Assert.Equal(2, result.Count);
-                Assert.Equal("Theme A", result[0].Title);
-                Assert.Equal("Theme A summary", result[0].Summary);
+                Assert.Equal(2, publicationTree.Count);
+                Assert.Equal("Theme A", publicationTree[0].Title);
+                Assert.Equal("Theme A summary", publicationTree[0].Summary);
 
-                Assert.Equal("Theme B", result[1].Title);
-                Assert.Equal("Theme B summary", result[1].Summary);
+                Assert.Equal("Theme B", publicationTree[1].Title);
+                Assert.Equal("Theme B summary", publicationTree[1].Summary);
 
-                Assert.Equal(2, result[0].Topics.Count);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
-                Assert.Equal("Topic B", result[0].Topics[1].Title);
+                Assert.Equal(2, publicationTree[0].Topics.Count);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
+                Assert.Equal("Topic B", publicationTree[0].Topics[1].Title);
 
-                Assert.Single(result[1].Topics);
-                Assert.Equal("Topic C", result[1].Topics[0].Title);
+                Assert.Single(publicationTree[1].Topics);
+                Assert.Equal("Topic C", publicationTree[1].Topics[0].Title);
 
-                var topicAPublications = result[0].Topics[0].Publications;
+                var topicAPublications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(topicAPublications);
                 Assert.Equal("publication-a", topicAPublications[0].Slug);
@@ -148,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 // Publication has a legacy url but it's not set because Releases exist
                 Assert.Null(topicAPublications[0].LegacyPublicationUrl);
 
-                var topicBPublications = result[0].Topics[1].Publications;
+                var topicBPublications = publicationTree[0].Topics[1].Publications;
 
                 Assert.Single(topicBPublications);
                 Assert.Equal("publication-b", topicBPublications[0].Slug);
@@ -157,7 +160,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 // Publication has a legacy url but it's not set because Releases exist
                 Assert.Null(topicBPublications[0].LegacyPublicationUrl);
 
-                var topicCPublications = result[1].Topics[0].Publications;
+                var topicCPublications = publicationTree[1].Topics[0].Publications;
 
                 Assert.Single(topicCPublications);
                 Assert.Equal("publication-c", topicCPublications[0].Slug);
@@ -233,14 +236,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme B", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme B", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(publications);
                 Assert.Equal("Publication A", publications[0].Title);
@@ -355,18 +359,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
 
-                Assert.Equal(2, result.Count);
-                Assert.Equal("Theme B", result[0].Title);
-                Assert.Equal("Theme C", result[1].Title);
+                Assert.Equal(2, publicationTree.Count);
+                Assert.Equal("Theme B", publicationTree[0].Title);
+                Assert.Equal("Theme C", publicationTree[1].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic B", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic B", publicationTree[0].Topics[0].Title);
 
-                Assert.Single(result[1].Topics);
-                Assert.Equal("Topic C", result[1].Topics[0].Title);
+                Assert.Single(publicationTree[1].Topics);
+                Assert.Equal("Topic C", publicationTree[1].Topics[0].Title);
 
-                var topicBPublications = result[0].Topics[0].Publications;
+                var topicBPublications = publicationTree[0].Topics[0].Publications;
 
                 // Publication has a published release, hence it is visible
                 Assert.Single(topicBPublications);
@@ -374,7 +379,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(PublicationType.NationalAndOfficial, topicBPublications[0].Type);
                 Assert.Null(topicBPublications[0].LegacyPublicationUrl);
 
-                var topicCPublications = result[1].Topics[0].Publications;
+                var topicCPublications = publicationTree[1].Topics[0].Publications;
 
                 // Publication has a legacy URL, hence it is visible
                 Assert.Single(topicCPublications);
@@ -471,15 +476,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Equal(2, result[0].Topics.Count);
-                Assert.Equal("Topic B", result[0].Topics[0].Title);
-                Assert.Equal("Topic C", result[0].Topics[1].Title);
+                Assert.Equal(2, publicationTree[0].Topics.Count);
+                Assert.Equal("Topic B", publicationTree[0].Topics[0].Title);
+                Assert.Equal("Topic C", publicationTree[0].Topics[1].Title);
 
-                var topicBPublications = result[0].Topics[0].Publications;
+                var topicBPublications = publicationTree[0].Topics[0].Publications;
 
                 // Publication has a published release, hence it is visible
                 Assert.Single(topicBPublications);
@@ -487,7 +493,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(PublicationType.NationalAndOfficial, topicBPublications[0].Type);
                 Assert.Null(topicBPublications[0].LegacyPublicationUrl);
 
-                var topicCPublications = result[0].Topics[1].Publications;
+                var topicCPublications = publicationTree[0].Topics[1].Publications;
 
                 // Publication has a legacy URL, hence it is visible
                 Assert.Single(topicCPublications);
@@ -586,14 +592,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Equal(2, publications.Count);
                 Assert.Equal("Publication A", publications[0].Title);
@@ -682,15 +689,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
-                Assert.Equal("Theme A summary", result[0].Summary);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
+                Assert.Equal("Theme A summary", publicationTree[0].Summary);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Equal(3, publications.Count);
                 Assert.Equal("publication-a", publications[0].Slug);
@@ -740,8 +748,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     new()
                     {
                         Title = "Topic A",
-                        // Publications are in random order
-                        // to check that ordering is done by title
                         Publications = ListOf(publicationB, publicationA)
                     },
                 },
@@ -784,14 +790,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
                 Assert.Single(publications);
                 Assert.Equal("Publication A", publications[0].Title);
             }
@@ -815,8 +822,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     new()
                     {
                         Title = "Topic A",
-                        // Publications are in random order
-                        // to check that ordering is done by title
                         Publications = ListOf(publicationA)
                     },
                 },
@@ -843,8 +848,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
 
-                Assert.Empty(result);
+                Assert.Empty(publicationTree);
             }
         }
 
@@ -910,8 +916,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Equal(2, publications.Count);
                 Assert.Equal("Publication A", publications[0].Title);
@@ -1003,15 +1010,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
-                Assert.Equal("Theme A summary", result[0].Summary);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
+                Assert.Equal("Theme A summary", publicationTree[0].Summary);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(publications);
                 Assert.Equal("publication-a", publications[0].Slug);
@@ -1113,15 +1121,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
-                Assert.Equal("Theme A summary", result[0].Summary);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
+                Assert.Equal("Theme A summary", publicationTree[0].Summary);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(publications);
                 Assert.Equal("publication-a", publications[0].Slug);
@@ -1165,8 +1174,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     new()
                     {
                         Title = "Topic A",
-                        // Publications are in random order
-                        // to check that ordering is done by title
                         Publications = ListOf(publicationB, publicationA)
                     },
                 },
@@ -1222,15 +1229,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var result = await service.GetPublicationTree(
                     PublicationTreeFilter.DataTables);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
-                Assert.Equal("Theme A summary", result[0].Summary);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
+                Assert.Equal("Theme A summary", publicationTree[0].Summary);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(publications);
                 Assert.Equal("publication-a", publications[0].Slug);
@@ -1359,22 +1367,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataTables);
+                var publicationTree = result.AssertRight();
 
-                Assert.Equal(2, result.Count);
-                Assert.Equal("Theme A", result[0].Title);
-                Assert.Equal("Theme A summary", result[0].Summary);
+                Assert.Equal(2, publicationTree.Count);
+                Assert.Equal("Theme A", publicationTree[0].Title);
+                Assert.Equal("Theme A summary", publicationTree[0].Summary);
 
-                Assert.Equal("Theme B", result[1].Title);
-                Assert.Equal("Theme B summary", result[1].Summary);
+                Assert.Equal("Theme B", publicationTree[1].Title);
+                Assert.Equal("Theme B summary", publicationTree[1].Summary);
 
-                Assert.Equal(2, result[0].Topics.Count);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
-                Assert.Equal("Topic B", result[0].Topics[1].Title);
+                Assert.Equal(2, publicationTree[0].Topics.Count);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
+                Assert.Equal("Topic B", publicationTree[0].Topics[1].Title);
 
-                Assert.Single(result[1].Topics);
-                Assert.Equal("Topic C", result[1].Topics[0].Title);
+                Assert.Single(publicationTree[1].Topics);
+                Assert.Equal("Topic C", publicationTree[1].Topics[0].Title);
 
-                var topicAPublications = result[0].Topics[0].Publications;
+                var topicAPublications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(topicAPublications);
                 Assert.Equal("publication-a", topicAPublications[0].Slug);
@@ -1382,7 +1391,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(PublicationType.NationalAndOfficial, topicAPublications[0].Type);
                 Assert.Null(topicAPublications[0].LegacyPublicationUrl);
 
-                var topicBPublications = result[0].Topics[1].Publications;
+                var topicBPublications = publicationTree[0].Topics[1].Publications;
 
                 Assert.Single(topicBPublications);
                 Assert.Equal("publication-b", topicBPublications[0].Slug);
@@ -1390,7 +1399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(PublicationType.NationalAndOfficial, topicBPublications[0].Type);
                 Assert.Null(topicBPublications[0].LegacyPublicationUrl);
 
-                var topicCPublications = result[1].Topics[0].Publications;
+                var topicCPublications = publicationTree[1].Topics[0].Publications;
 
                 Assert.Single(topicCPublications);
                 Assert.Equal("publication-c", topicCPublications[0].Slug);
@@ -1473,14 +1482,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataTables);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme B", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme B", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(publications);
                 Assert.Equal("Publication A", publications[0].Title);
@@ -1577,14 +1587,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataTables);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var topicAPublications = result[0].Topics[0].Publications;
+                var topicAPublications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(topicAPublications);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
@@ -1674,14 +1685,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataTables);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var topicAPublications = result[0].Topics[0].Publications;
+                var topicAPublications = publicationTree[0].Topics[0].Publications;
 
                 // Publication has a published release, hence it is visible
                 Assert.Single(topicAPublications);
@@ -1790,14 +1802,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataTables);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(publications);
                 Assert.Equal("Publication A", publications[0].Title);
@@ -1805,7 +1818,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublicationTree_DataTables_DoesNotFilterPublicationWithDataOnLatestRelease()
+        public async Task GetPublicationTree_DataTables_DoesFilterPublicationWithoutDataOnLatestRelease()
         {
             var publication = new Publication
             {
@@ -1881,7 +1894,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataTables);
-                Assert.Empty(result);
+                var publicationTree = result.AssertRight();
+                Assert.Empty(publicationTree);
             }
         }
 
@@ -1957,117 +1971,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataTables);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
                 Assert.Single(publications);
                 Assert.Equal("Publication A", publications[0].Title);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_DataCatalogue_SingleThemeTopic()
-        {
-            var publicationA = new Publication
-            {
-                Title = "Publication A",
-                Slug = "publication-a",
-                LegacyPublicationUrl = new Uri("https://legacy.url/")
-            };
-            var publicationB = new Publication
-            {
-                Title = "Publication B",
-                Slug = "publication-b",
-            };
-
-            var theme = new Theme
-            {
-                Title = "Theme A",
-                Summary = "Theme A summary",
-                Topics = new List<Topic>
-                {
-                    new()
-                    {
-                        Title = "Topic A",
-                        Publications = ListOf(publicationB, publicationA)
-                    },
-                },
-            };
-
-            var releaseFiles = new List<ReleaseFile>
-            {
-                new()
-                {
-                    Release = new Release
-                    {
-                        Publication = publicationA,
-                        ReleaseName = "2020",
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = ReleaseType.OfficialStatistics,
-                        Published = new DateTime(2020, 1, 1),
-                    },
-                    File = new File
-                    {
-                        Type = FileType.Data
-                    }
-                },
-                new()
-                {
-                    Release = new Release
-                    {
-                        Publication = publicationB,
-                        ReleaseName = "2020",
-                        TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                        Type = ReleaseType.NationalStatistics,
-                        Published = new DateTime(2020, 2, 1),
-                    },
-                    File = new File
-                    {
-                        Type = FileType.Data
-                    }
-                }
-            };
-
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                await context.AddAsync(theme);
-                await context.AddRangeAsync(releaseFiles);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contextId))
-            {
-                var service = BuildThemeService(context);
-
-                var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
-
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
-                Assert.Equal("Theme A summary", result[0].Summary);
-
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
-
-                var publications = result[0].Topics[0].Publications;
-
-                Assert.Equal(2, publications.Count);
-                Assert.Equal("publication-a", publications[0].Slug);
-                Assert.Equal("Publication A", publications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, publications[0].Type);
-                // Publication has a legacy url but it's not set because Releases exist
-                Assert.Null(publications[0].LegacyPublicationUrl);
-
-                Assert.Equal("publication-b", publications[1].Slug);
-                Assert.Equal("Publication B", publications[1].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, publications[1].Type);
-                Assert.Null(publications[1].LegacyPublicationUrl);
             }
         }
 
@@ -2165,21 +2079,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+                var publicationTree = result.AssertRight();
 
-                Assert.Equal(2, result.Count);
-                Assert.Equal("Theme A", result[0].Title);
-                Assert.Equal("Theme A summary", result[0].Summary);
+                Assert.Equal(2, publicationTree.Count);
+                Assert.Equal("Theme A", publicationTree[0].Title);
+                Assert.Equal("Theme A summary", publicationTree[0].Summary);
 
-                Assert.Equal("Theme B", result[1].Title);
-                Assert.Equal("Theme B summary", result[1].Summary);
+                Assert.Equal("Theme B", publicationTree[1].Title);
+                Assert.Equal("Theme B summary", publicationTree[1].Summary);
 
-                Assert.Single(result[1].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[1].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                Assert.Single(result[1].Topics);
-                Assert.Equal("Topic B", result[1].Topics[0].Title);
+                Assert.Single(publicationTree[1].Topics);
+                Assert.Equal("Topic B", publicationTree[1].Topics[0].Title);
 
-                var topicAPublications = result[0].Topics[0].Publications;
+                var topicAPublications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(topicAPublications);
                 Assert.Equal("publication-a", topicAPublications[0].Slug);
@@ -2187,7 +2102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(PublicationType.NationalAndOfficial, topicAPublications[0].Type);
                 Assert.Null(topicAPublications[0].LegacyPublicationUrl);
 
-                var topicBPublications = result[1].Topics[0].Publications;
+                var topicBPublications = publicationTree[1].Topics[0].Publications;
 
                 Assert.Single(topicBPublications);
                 Assert.Equal("publication-b", topicBPublications[0].Slug);
@@ -2267,14 +2182,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme B", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme B", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(publications);
                 Assert.Equal("Publication A", publications[0].Title);
@@ -2371,14 +2287,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var topicAPublications = result[0].Topics[0].Publications;
+                var topicAPublications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(topicAPublications);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
@@ -2470,14 +2387,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var topicAPublications = result[0].Topics[0].Publications;
+                var topicAPublications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(topicAPublications);
                 Assert.Equal("Publication A", topicAPublications[0].Title);
@@ -2581,14 +2499,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(publications);
                 Assert.Equal("Publication A", publications[0].Title);
@@ -2596,7 +2515,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublicationTree_DataCatalogue_DoesNotFilterPublicationWithDataOnLatestRelease()
+        public async Task GetPublicationTree_DataCatalogue_DoesNotFilterPublicationWithDataOnPreviousRelease()
         {
             var publication = new Publication
             {
@@ -2670,14 +2589,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Single(publications);
                 Assert.Equal("Publication A", publications[0].Title);
@@ -2759,8 +2679,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+                var publicationTree = result.AssertRight();
 
-                Assert.Empty(result);
+                Assert.Empty(publicationTree);
             }
         }
 
@@ -2843,15 +2764,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+                var publicationTree = result.AssertRight();
 
-                Assert.Single(result);
-                Assert.Equal("Theme A", result[0].Title);
-                Assert.Equal("Theme A summary", result[0].Summary);
+                Assert.Single(publicationTree);
+                Assert.Equal("Theme A", publicationTree[0].Title);
+                Assert.Equal("Theme A summary", publicationTree[0].Summary);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Equal(2, publications.Count);
                 Assert.Equal("publication-a", publications[0].Slug);
@@ -2863,89 +2785,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal("Publication B", publications[1].Title);
                 Assert.Equal(PublicationType.NationalAndOfficial, publications[1].Type);
                 Assert.Null(publications[1].LegacyPublicationUrl);
-            }
-        }
-
-        [Fact]
-        public async Task GetPublicationTree_DataCatalogue_FiltersPublicationWithNoDataOnLatestAmendedRelease()
-        {
-            var publication = new Publication
-            {
-                Title = "Publication A",
-            };
-
-            var theme = new Theme
-            {
-                Title = "Theme A",
-                Topics = new List<Topic>
-                {
-                    new()
-                    {
-                        Title = "Topic A",
-                        Publications = new List<Publication>
-                        {
-                            publication,
-                        }
-                    }
-                }
-            };
-
-            var originalRelease = new Release
-            {
-                Publication = publication,
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                ReleaseName = "2020",
-                Type = ReleaseType.OfficialStatistics,
-                Published = new DateTime(2020, 1, 1),
-            };
-            var amendedRelease = new Release
-            {
-                Publication = publication,
-                TimePeriodCoverage = TimeIdentifier.CalendarYear,
-                ReleaseName = "2020",
-                Type = ReleaseType.OfficialStatistics,
-                Published = new DateTime(2020, 2, 1),
-                PreviousVersion = originalRelease
-            };
-
-            var releaseFiles = new List<ReleaseFile>
-            {
-                // Previous version has data, but
-                // not the amended release.
-                new()
-                {
-                    Release = originalRelease,
-                    File = new File
-                    {
-                        Type = FileType.Data
-                    }
-                },
-                new()
-                {
-                    Release = amendedRelease,
-                    File = new File
-                    {
-                        Type = FileType.Ancillary
-                    }
-                },
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
-            {
-                await context.AddRangeAsync(theme);
-                await context.AddRangeAsync(releaseFiles);
-                await context.AddRangeAsync(amendedRelease);
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = BuildThemeService(context);
-
-                var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
-                Assert.Empty(result);
             }
         }
 
@@ -3021,14 +2860,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var service = BuildThemeService(context);
 
                 var result = await service.GetPublicationTree(PublicationTreeFilter.DataCatalogue);
+                var publicationTree = result.AssertRight();
 
-                Assert.Equal(1, result.Count);
-                Assert.Equal("Theme A", result[0].Title);
+                Assert.Equal(1, publicationTree.Count);
+                Assert.Equal("Theme A", publicationTree[0].Title);
 
-                Assert.Single(result[0].Topics);
-                Assert.Equal("Topic A", result[0].Topics[0].Title);
+                Assert.Single(publicationTree[0].Topics);
+                Assert.Equal("Topic A", publicationTree[0].Topics[0].Title);
 
-                var publications = result[0].Topics[0].Publications;
+                var publications = publicationTree[0].Topics[0].Publications;
                 Assert.Equal(2, publications.Count);
 
                 Assert.Equal("Publication A", publications[0].Title);

@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services
@@ -25,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _contentDbContext = contentDbContext;
         }
 
-        public async Task<IList<ThemeTree<PublicationTreeNode>>> GetPublicationTree(
+        public async Task<Either<ActionResult, IList<ThemeTree<PublicationTreeNode>>>> GetPublicationTree(
             PublicationTreeFilter filter)
         {
             var fullPublicationTree = await GetFullPublicationTree();
@@ -156,21 +157,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         }
 
         private bool FilterPublicationTreeNode(
-            PublicationTreeNode publicationTree,
+            PublicationTreeNode publicationTreeNode,
             PublicationTreeFilter filter)
         {
             switch (filter)
             {
                 case PublicationTreeFilter.FindStatistics:
-                    return !publicationTree.IsSuperseded
-                           && (publicationTree.LatestReleaseHasData ||
-                               !string.IsNullOrEmpty(publicationTree.LegacyPublicationUrl));
+                    return !publicationTreeNode.IsSuperseded
+                           && (publicationTreeNode.LatestReleaseHasData ||
+                               !string.IsNullOrEmpty(publicationTreeNode.LegacyPublicationUrl));
                 case PublicationTreeFilter.DataTables:
-                    return publicationTree.LatestReleaseHasData
-                           && !publicationTree.IsSuperseded;
+                    return publicationTreeNode.LatestReleaseHasData
+                           && !publicationTreeNode.IsSuperseded;
                 case PublicationTreeFilter.DataCatalogue:
                 case PublicationTreeFilter.FastTrack:
-                    return publicationTree.AnyLiveReleaseHasData;
+                    return publicationTreeNode.AnyLiveReleaseHasData;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(filter), filter, null);
             }

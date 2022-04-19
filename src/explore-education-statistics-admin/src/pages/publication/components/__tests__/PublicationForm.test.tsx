@@ -513,7 +513,7 @@ describe('PublicationForm', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByLabelText('Publication title'));
+        expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
       });
 
       expect(
@@ -547,7 +547,9 @@ describe('PublicationForm', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByLabelText('Superseding publication'));
+        expect(
+          screen.getByLabelText('Superseding publication'),
+        ).toBeInTheDocument();
       });
 
       const publicationSelect = screen.getByLabelText(
@@ -586,7 +588,9 @@ describe('PublicationForm', () => {
       );
 
       await waitFor(() => {
-        expect(screen.getByLabelText('Superseding publication'));
+        expect(
+          screen.getByLabelText('Superseding publication'),
+        ).toBeInTheDocument();
       });
 
       const publicationSelect = screen.getByLabelText(

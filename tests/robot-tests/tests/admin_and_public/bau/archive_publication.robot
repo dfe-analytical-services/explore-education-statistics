@@ -20,8 +20,8 @@ ${SUBJECT_NAME_SUPERSEDE}=          Subject for superseding publication
 
 *** Test Cases ***
 Create new publication to be archived and release via API
-    ${PUB_ID_ARCHIVE}=    user creates test publication via api    ${PUBLICATION_NAME_ARCHIVE}
-    user create test release via api    ${PUB_ID_ARCHIVE}    FY    3000
+    ${PUBLICATION_ID_ARCHIVE}=    user creates test publication via api    ${PUBLICATION_NAME_ARCHIVE}
+    user create test release via api    ${PUBLICATION_ID_ARCHIVE}    FY    3000
 
 Navigate to archive-publication release
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME_ARCHIVE}
@@ -47,8 +47,8 @@ Go to "Sign off" page and approve archive-publication release
     user approves original release for immediate publication
 
 Create new publication to supersede other publication and release via API
-    ${PUB_ID_SUPERSEDE}=    user creates test publication via api    ${PUBLICATION_NAME_SUPERSEDE}
-    user create test release via api    ${PUB_ID_SUPERSEDE}    FY    2000
+    ${PUBLICATION_ID_SUPERSEDE}=    user creates test publication via api    ${PUBLICATION_NAME_SUPERSEDE}
+    user create test release via api    ${PUBLICATION_ID_SUPERSEDE}    FY    2000
 
 Set archive-publication to be superseded by superseding-publication
     user navigates to admin dashboard
@@ -71,7 +71,7 @@ Validate archive warning is on Admin dashboard for archive-publication release
     user checks element should contain    ${accordion}
     ...    This publication will be archived when its superseding publication has a live release published.
 
-Check public site, that archive-publication still appears correctly
+Validate that archive-publication appears correctly on Find stats page
     user navigates to find statistics page on public frontend
 
     user waits until page contains accordion section    %{TEST_THEME_NAME}
@@ -86,10 +86,10 @@ Check public site, that archive-publication still appears correctly
 
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user waits until page contains    This is the latest data
-    ${PUB_ARCHIVE_URL}=    user gets url
-    set global variable    ${PUB_ARCHIVE_URL}
+    ${PUBLICATION_ARCHIVE_URL}=    user gets url
+    set suite variable    ${PUBLICATION_ARCHIVE_URL}
 
-Check Data tables and Data catalogue pages, that archive-publication still appears correctly
+Check that archive-publication subject appears correctly on Data tables page
     user navigates to data tables page on public frontend
 
     user opens details dropdown    %{TEST_THEME_NAME}
@@ -132,14 +132,14 @@ Generate permalink for archive-publication
 
     user clicks link    View share link
     user waits until h1 is visible
-    ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
+    ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'    %{WAIT_SMALL}
 
     ${PERMALINK_URL}=    user gets url
-    set global variable    ${PERMALINK_URL}
+    set suite variable    ${PERMALINK_URL}
 
     user checks page does not contain    WARNING
 
-Check Data catalogue page, that archive-publication still appears correctly
+Check that archive-publication subject appears correctly on Data catalogue page
     user navigates to data catalogue page on public frontend
 
     user opens details dropdown    %{TEST_THEME_NAME}
@@ -179,7 +179,7 @@ Go to "Sign off" page and approve superseding-publication release
     user clicks link    Sign off
     user approves original release for immediate publication
 
-Check public Find stats page, that archive-publication is now archived and superseding-publication appears
+Check archive-publication is now archived and superseding-publication now appears on Find stats page
     user navigates to find statistics page on public frontend
 
     user waits until page contains accordion section    %{TEST_THEME_NAME}
@@ -199,11 +199,11 @@ Check public superseding-publication release page displays correctly
     user waits until page contains    This is the latest data
 
 Check public archive-publication release page displays correctly
-    go to    ${PUB_ARCHIVE_URL}
+    user navigates to public frontend    ${PUBLICATION_ARCHIVE_URL}
     user waits until h1 is visible    ${PUBLICATION_NAME_ARCHIVE}    %{WAIT_MEDIUM}
     user checks page does not contain    This is the latest data
 
-Check public data tables page is correct
+Check public data tables page contains superseding-publication's subject
     user navigates to data tables page on public frontend
 
     user opens details dropdown    %{TEST_THEME_NAME}
@@ -218,7 +218,7 @@ Check public data tables page is correct
 
     user checks page contains    ${SUBJECT_NAME_SUPERSEDE}
 
-Check data catalogue page is correct
+Check data catalogue page contains archive and superseding publication subjects
     user navigates to data catalogue page on public frontend
 
     user opens details dropdown    %{TEST_THEME_NAME}
@@ -247,7 +247,7 @@ Check data catalogue page is correct
     user checks page contains    This is the latest data
 
 Check archive-publication permalink has out-of-date warning
-    go to    ${PERMALINK_URL}
+    user navigates to public frontend    ${PERMALINK_URL}
 
     user waits until h1 is visible
     ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
@@ -338,7 +338,7 @@ Check data catalogue page is correct after archive-publication has been unarchiv
     user checks page contains    This is the latest data
 
 Check archive-publication permalink no longer has out-of-date warning after archive-publication has been unarchived
-    go to    ${PERMALINK_URL}
+    user navigates to public frontend    ${PERMALINK_URL}
 
     user waits until h1 is visible
     ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'

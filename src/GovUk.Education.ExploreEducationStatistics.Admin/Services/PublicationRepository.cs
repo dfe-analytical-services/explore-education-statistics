@@ -164,9 +164,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publication.SupersededById != null
                    // To be superseded, superseding publication must have Live release
                    && _context.Releases
-                       .Where(r => r.PublicationId == publication.SupersededById)
-                       .ToList()
-                       .Any(r => r.Live);
+                       .Any(r => r.PublicationId == publication.SupersededById
+                                 && r.Published.HasValue && DateTime.UtcNow >= r.Published.Value);
         }
     }
 }

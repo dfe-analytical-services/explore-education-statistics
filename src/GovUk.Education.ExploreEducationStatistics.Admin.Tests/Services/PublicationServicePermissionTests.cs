@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var topicId = Guid.NewGuid();
 
             var publicationService = BuildPublicationService(
-                context: new Mock<ContentDbContext>(Strict).Object,
+                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object,
                 publicationRepository: publicationRepository.Object);
 
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var topicId = Guid.NewGuid();
 
             var publicationService = BuildPublicationService(
-                context: new Mock<ContentDbContext>(Strict).Object,
+                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object,
                 publicationRepository: publicationRepository.Object);
 
@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userId = Guid.NewGuid();
 
             var publicationService = BuildPublicationService(
-                context: new Mock<ContentDbContext>(Strict).Object,
+                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object,
                 publicationRepository: publicationRepository.Object);
 
@@ -163,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(async userService =>
                 {
                     var service = BuildPublicationService(
-                        context: new Mock<ContentDbContext>(Strict).Object,
+                        context: Mock.Of<ContentDbContext>(Strict),
                         userService: userService.Object);
                     return await service.ListPublicationSummaries();
                 });
@@ -178,7 +178,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: new Mock<ContentDbContext>(Strict).Object,
+                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -203,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: new Mock<ContentDbContext>(Strict).Object,
+                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -236,7 +236,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: new Mock<ContentDbContext>(Strict).Object,
+                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -269,7 +269,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: new Mock<ContentDbContext>(Strict).Object,
+                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -459,7 +459,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: new Mock<ContentDbContext>(Strict).Object,
+                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(
@@ -475,7 +475,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var userService = AlwaysTrueUserService();
             var publicationService = BuildPublicationService(
-                context: new Mock<ContentDbContext>(Strict).Object,
+                context: Mock.Of<ContentDbContext>(Strict),
                 userService: userService.Object);
 
             PermissionTestUtil.AssertSecurityPoliciesChecked(

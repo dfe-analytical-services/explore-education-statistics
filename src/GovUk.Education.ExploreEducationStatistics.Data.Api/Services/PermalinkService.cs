@@ -108,34 +108,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private async Task<PermalinkViewModel> BuildViewModel(Permalink permalink)
         {
-            var subject = await _subjectRepository.Get(permalink.Query.SubjectId);
-
-            var isValid = subject != null
-                          && !IsSuperseded(subject.Id)
-                          && await _subjectRepository.IsSubjectForLatestPublishedRelease(subject.Id);
-
             var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
 
-            viewModel.Invalidated = !isValid;
+            viewModel.Invalidated = !await IsValid(permalink.Query.SubjectId);
 
             return viewModel;
         }
 
-        private bool IsSuperseded(Guid subjectId)
+        private async Task<bool> IsValid(Guid subjectId)
         {
-            var releaseId = _statisticsDbContext.ReleaseSubject
+            var subject = await _subjectRepository.Get(subjectId);
+            if (subject == null)
+            {
+                return false;
+            }
+
+            var releaseSubject = _statisticsDbContext.ReleaseSubject
+                .Include(rs => rs.Release)
                 .Where(rs => rs.SubjectId == subjectId)
-                .Select(rs => rs.ReleaseId)
-                .Single();
+                .ToList()
+                .SingleOrDefault(rs =>
+                    _releaseRepository.IsLatestVersionOfRelease(rs.Release.PublicationId, rs.Release.Id));
+            if (releaseSubject == null)
+            {
+                return false;
+            }
 
-            var publication = _contentDbContext.Releases
+            var publication = await _contentDbContext.Releases
                 .Include(r => r.Publication)
-                .Where(r => r.Id == releaseId)
+                .ThenInclude(p => p.SupersededBy)
+                .Where(r => r.Id == releaseSubject.ReleaseId)
                 .Select(r => r.Publication)
-                .Single();
+                .Distinct()
+                .SingleAsync();
 
-            return publication.SupersededById != null
-                   && _contentDbContext.Releases
+            return publication.SupersededById == null
+                   || !_contentDbContext.Releases
                        .Include(p => p.Publication)
                        .Where(r => r.PublicationId == publication.SupersededById)
                        .ToList()

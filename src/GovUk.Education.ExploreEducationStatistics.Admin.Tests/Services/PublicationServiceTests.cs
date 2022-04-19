@@ -17,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -1112,6 +1111,95 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
                 Assert.Equal("Test team", updatedPublication.Contact.TeamName);
                 Assert.Equal("john.smith@test.com", updatedPublication.Contact.TeamEmail);
+            }
+        }
+
+        [Fact]
+        public async Task UpdatePublication_RemovesSupersededPublicationCacheBlobs()
+        {
+            var publication = new Publication
+            {
+                Title = "Test title",
+                Slug = "test-slug",
+                Topic = new Topic
+                {
+                    Title = "Test topic"
+                },
+                Published = DateTime.UtcNow,
+            };
+
+            var supersededPublication1 = new Publication
+            {
+                Title = "Superseded title 1",
+                Slug = "superseded-slug-1",
+                SupersededBy = publication,
+            };
+
+            var supersededPublication2 = new Publication
+            {
+                Title = "Superseded title 2",
+                Slug = "superseded-slug-2",
+                SupersededBy = publication,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                context.AddRange(
+                    publication,
+                    supersededPublication1,
+                    supersededPublication2);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
+
+                publicBlobCacheService.Setup(mock =>
+                        mock.DeleteItem(new AllMethodologiesCacheKey()))
+                    .Returns(Task.CompletedTask);
+
+                publicBlobCacheService.Setup(mock =>
+                        mock.DeleteItem(new PublicationTreeCacheKey()))
+                    .Returns(Task.CompletedTask);
+
+                publicBlobCacheService.Setup(mock =>
+                        mock.DeleteItem(new PublicationCacheKey(publication.Slug)))
+                    .Returns(Task.CompletedTask);
+
+                publicBlobCacheService.Setup(mock =>
+                        mock.DeleteItem(new PublicationCacheKey(supersededPublication1.Slug)))
+                    .Returns(Task.CompletedTask);
+
+                publicBlobCacheService.Setup(mock =>
+                        mock.DeleteItem(new PublicationCacheKey(supersededPublication2.Slug)))
+                    .Returns(Task.CompletedTask);
+
+                var publicationService = BuildPublicationService(context,
+                    publicBlobCacheService: publicBlobCacheService.Object);
+
+                var result = await publicationService.UpdatePublication(
+                    publication.Id,
+                    new PublicationSaveViewModel
+                    {
+                        Title = "Test title",
+                        Slug = "test-slug",
+                        Contact = new ContactSaveViewModel
+                        {
+                            ContactName = "John Smith",
+                            ContactTelNo = "0123456789",
+                            TeamName = "Test team",
+                            TeamEmail = "john.smith@test.com",
+                        },
+                        TopicId = publication.TopicId,
+                    }
+                );
+
+                var viewModel = result.AssertRight();
+
+                var updatedPublication = await context.Publications.FindAsync(viewModel.Id);
+                Assert.NotNull(updatedPublication);
             }
         }
 
