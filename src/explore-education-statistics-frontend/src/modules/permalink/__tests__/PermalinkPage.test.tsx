@@ -186,19 +186,77 @@ describe('PermalinkPage', () => {
     ).toBeInTheDocument();
   });
 
-  test('renders warning message with invalidated permalink', () => {
+  test('renders no warning message with permalink status Current', () => {
     render(
       <PermalinkPage
         data={{
           ...testPermalink,
-          invalidated: true,
+          status: 'Current',
+        }}
+      />,
+    );
+
+    expect(screen.queryByText(/WARNING/)).not.toBeInTheDocument();
+
+    // Table still renders
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')).toHaveLength(2);
+  });
+
+  test('renders warning message with permalink status SubjectRemoved', () => {
+    render(
+      <PermalinkPage
+        data={{
+          ...testPermalink,
+          status: 'SubjectRemoved',
         }}
       />,
     );
 
     expect(
       screen.getByText(
-        'WARNING - The data used in this permalink may be out-of-date.',
+        'WARNING - The data used in this table is no longer valid.',
+      ),
+    ).toBeInTheDocument();
+
+    // Table still renders
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')).toHaveLength(2);
+  });
+
+  test('renders warning message with permalink status SubjectReplaced', () => {
+    render(
+      <PermalinkPage
+        data={{
+          ...testPermalink,
+          status: 'SubjectReplaced',
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        'WARNING - The data used in this table may be invalid as the subject file has been amended since its creation.',
+      ),
+    ).toBeInTheDocument();
+
+    // Table still renders
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')).toHaveLength(2);
+  });
+  test('renders warning message with permalink status NotForLatestRelease', () => {
+    render(
+      <PermalinkPage
+        data={{
+          ...testPermalink,
+          status: 'NotForLatestRelease',
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        'WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.',
       ),
     ).toBeInTheDocument();
 

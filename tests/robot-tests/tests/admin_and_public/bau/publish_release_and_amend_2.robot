@@ -235,7 +235,7 @@ Generate the permalink
 Go to permalink
     user navigates to public frontend    ${PERMA_LOCATION_URL}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
-    user checks page does not contain    WARNING - The data used in this permalink may be out-of-date.
+    user checks page does not contain    WARNING
     user checks page contains    Footnote 1 ${SUBJECT_NAME}
 
 Return to Admin
@@ -310,7 +310,8 @@ Approve release amendment
 
 Go to permalink page & check for error element to be present
     user navigates to public frontend    ${PERMA_LOCATION_URL}
-    user waits until page contains    WARNING - The data used in this permalink may be out-of-date.
+    user waits until page contains
+    ...    WARNING - The data used in this table may be invalid as the subject file has been amended since its creation.
 
 Check the table has the same results as original table
     user checks results table row heading contains    1    1    Total
@@ -501,5 +502,5 @@ Generate the new permalink
 Go to new permalink
     user navigates to public frontend    ${PERMA_LOCATION_URL_TWO}
     user waits until h1 is visible    '${SUBJECT_NAME}' from '${PUBLICATION_NAME}'
-    user checks page does not contain    WARNING - The data used in this permalink may be out-of-date.
+    user checks page does not contain    WARNING
     user checks page contains    Updating ${SUBJECT_NAME} footnote

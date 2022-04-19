@@ -112,7 +112,7 @@ describe('permalinkService', () => {
           },
         ],
       },
-      invalidated: false,
+      status: 'Current',
     };
 
     const expectedPermalink: Permalink = {
@@ -200,7 +200,7 @@ describe('permalinkService', () => {
           },
         ],
       },
-      invalidated: false,
+      status: 'Current',
     };
 
     test('locations returned in `getPermalink` response are deduplicated', async () => {

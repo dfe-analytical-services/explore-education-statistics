@@ -63,9 +63,21 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
         />
       </div>
 
-      {data.invalidated && (
+      {data.status === 'SubjectRemoved' && (
         <WarningMessage error>
-          WARNING - The data used in this permalink may be out-of-date.
+          WARNING - The data used in this table is no longer valid.
+        </WarningMessage>
+      )}
+      {data.status === 'NotForLatestRelease' && (
+        <WarningMessage error>
+          WARNING - The data used in this table may now be out-of-date as a new
+          release has been published since its creation.
+        </WarningMessage>
+      )}
+      {data.status === 'SubjectReplaced' && (
+        <WarningMessage error>
+          WARNING - The data used in this table may be invalid as the subject
+          file has been amended since its creation.
         </WarningMessage>
       )}
 

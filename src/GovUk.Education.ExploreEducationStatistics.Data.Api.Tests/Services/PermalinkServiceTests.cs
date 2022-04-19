@@ -3,11 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Mappings;
@@ -15,9 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -28,6 +28,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using MapperUtils = GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
+using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 {
@@ -51,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(_publicationId))
-                .Returns((Release?) null);
+                .Returns((Release?)null);
 
             subjectRepository
                 .Setup(s => s.GetPublicationIdForSubject(request.Query.SubjectId))
@@ -85,10 +86,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var release = new Release
+            var contentRelease = new Content.Model.Release
             {
                 Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
+                Publication = new Publication { Id = _publicationId },
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+                Published = DateTime.UtcNow,
             };
 
             var tableResult = new TableBuilderResultViewModel
@@ -116,13 +120,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     It.IsAny<JsonSerializerSettings>()))
                 .Returns(Task.CompletedTask);
 
-            releaseRepository
-                .Setup(s => s.GetLatestPublishedRelease(_publicationId))
-                .Returns(release);
+           releaseRepository
+               .Setup(s => s.GetLatestPublishedRelease(_publicationId))
+               .Returns(new Release
+               {
+                   Id = contentRelease.Id,
+                   PublicationId = _publicationId,
+                   TimeIdentifier = TimeIdentifier.AcademicYear,
+                   Year = 2000,
+               });
 
-            releaseRepository
-                .Setup(s => s.IsLatestVersionOfRelease(_publicationId, release.Id))
-                .Returns(true);
 
             subjectRepository
                 .Setup(s => s.Get(subject.Id))
@@ -133,46 +140,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .ReturnsAsync(_publicationId);
 
             tableBuilderService
-                .Setup(s => s.Query(release.Id, request.Query, CancellationToken.None))
+                .Setup(s => s.Query(contentRelease.Id, request.Query, CancellationToken.None))
                 .ReturnsAsync(tableResult);
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(new ReleaseSubject
-                {
-                    Release = release,
-                    Subject = subject,
-                });
-
-                await statisticsDbContext.SaveChangesAsync();
-            }
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(
-                    new Content.Model.Release
+                await contentDbContext.AddRangeAsync(
+                    contentRelease,
+                    new ReleaseFile
                     {
-                        Id = release.Id,
-                        Publication = new Content.Model.Publication { Id = _publicationId },
+                        Release = contentRelease,
+                        File = new File
+                        {
+                            SubjectId = subject.Id,
+                            Type = FileType.Data,
+                        },
                     });
 
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
                     blobStorageService: blobStorageService.Object,
                     releaseRepository: releaseRepository.Object,
                     subjectRepository: subjectRepository.Object,
                     tableBuilderService: tableBuilderService.Object);
 
-                var result = (await service.Create(request)).AssertRight();
+                var result = await service.Create(request);
+                var permalinkViewModel = result.AssertRight();
 
                 MockUtils.VerifyAllMocks(
                     blobStorageService,
@@ -180,9 +179,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     subjectRepository,
                     tableBuilderService);
 
-                Assert.Equal(Guid.Parse(blobPath), result.Id);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
-                Assert.False(result.Invalidated);
+                Assert.Equal(Guid.Parse(blobPath), permalinkViewModel.Id);
+                Assert.InRange(DateTime.UtcNow.Subtract(permalinkViewModel.Created).Milliseconds, 0, 1500);
+                Assert.Equal(PermalinkStatus.Current, permalinkViewModel.Status);
             }
         }
 
@@ -192,12 +191,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
-            };
-
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
             };
 
             var request = new PermalinkCreateViewModel
@@ -213,9 +206,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 SubjectMeta = new ResultSubjectMetaViewModel()
             };
 
+            var release = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = new Publication { Id = _publicationId },
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Published = DateTime.UtcNow,
+            };
+
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             // Permalink id is assigned on creation and used as the blob path
@@ -237,48 +238,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.Get(subject.Id))
                 .ReturnsAsync(subject);
 
-            releaseRepository
-                .Setup(s => s.IsLatestVersionOfRelease(release.PublicationId, release.Id))
-                .Returns(true);
-
             tableBuilderService
                 .Setup(s => s.Query(release.Id, request.Query, CancellationToken.None))
                 .ReturnsAsync(tableResult);
 
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(new ReleaseSubject
-                {
-                    Release = release,
-                    Subject = subject,
-                });
-
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(
-                    new Content.Model.Release
+                await contentDbContext.AddRangeAsync(
+                    release,
+                    new ReleaseFile
                     {
-                        Id = release.Id,
-                        Publication = new Content.Model.Publication { Id = _publicationId },
+                        Release = release,
+                        File = new File
+                        {
+                            SubjectId = subject.Id,
+                            Type = FileType.Data,
+                        },
                     });
 
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
                     blobStorageService: blobStorageService.Object,
                     subjectRepository: subjectRepository.Object,
-                    releaseRepository: releaseRepository.Object,
                     tableBuilderService: tableBuilderService.Object);
 
                 var result = (await service.Create(release.Id, request)).AssertRight();
@@ -286,22 +273,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 MockUtils.VerifyAllMocks(
                     blobStorageService,
                     subjectRepository,
-                    releaseRepository,
                     tableBuilderService);
 
                 Assert.Equal(Guid.Parse(blobPath), result.Id);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
-                Assert.False(result.Invalidated);
+                Assert.Equal(PermalinkStatus.Current, result.Status);
             }
         }
 
         [Fact]
         public async Task Get()
         {
-            var release = new Release
+            var release = new Content.Model.Release
             {
                 Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
+                Publication = new Publication { Id = _publicationId },
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Published = DateTime.UtcNow,
             };
 
             var subject = new Subject
@@ -322,7 +311,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
@@ -333,55 +321,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.Get(subject.Id))
                 .ReturnsAsync(subject);
 
-            releaseRepository
-                .Setup(s => s.IsLatestVersionOfRelease(release.PublicationId, release.Id))
-                .Returns(true);
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(new ReleaseSubject
-                {
-                    Release = release,
-                    Subject = subject,
-                });
-
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(
-                    new Content.Model.Release
+                await contentDbContext.AddRangeAsync(
+                    release,
+                    new ReleaseFile
                     {
-                        Id = release.Id,
-                        Publication = new Content.Model.Publication { Id = _publicationId },
+                        Release = release,
+                        File = new File
+                        {
+                            SubjectId = subject.Id,
+                            Type = FileType.Data,
+                        },
                     });
 
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
                     blobStorageService: blobStorageService.Object,
-                    subjectRepository: subjectRepository.Object,
-                    releaseRepository: releaseRepository.Object);
+                    subjectRepository: subjectRepository.Object);
 
                 var result = (await service.Get(permalink.Id)).AssertRight();
 
                 MockUtils.VerifyAllMocks(
                     blobStorageService,
-                    subjectRepository,
-                    releaseRepository);
+                    subjectRepository);
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
-                Assert.False(result.Invalidated);
+                Assert.Equal(PermalinkStatus.Current, result.Status);
             }
         }
 
@@ -454,37 +427,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .Setup(s => s.Get(subject.Id))
                 .ReturnsAsync(subject);
 
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(new ReleaseSubject
-                {
-                    ReleaseId = releaseId,
-                    Subject = subject,
-                });
-
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddAsync(
+                await contentDbContext.AddRangeAsync(
                     new Content.Model.Release
                     {
                         Id = releaseId,
-                        Publication = new Content.Model.Publication { Id = _publicationId },
+                        Publication = new Publication { Id = _publicationId },
+                        ReleaseName = "2000",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        Published = DateTime.UtcNow,
+                    },
+                    new ReleaseFile
+                    {
+                        ReleaseId = releaseId,
+                        File = new File
+                        {
+                            SubjectId = subject.Id,
+                            Type = FileType.Data,
+                        }
                     });
 
                 await contentDbContext.SaveChangesAsync();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
                     blobStorageService: blobStorageService.Object,
                     subjectRepository: subjectRepository.Object);
 
@@ -563,7 +534,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             subjectRepository
                 .Setup(s => s.Get(permalink.Query.SubjectId))
-                .ReturnsAsync((Subject?) null);
+                .ReturnsAsync((Subject?)null);
 
             var service = BuildService(blobStorageService: blobStorageService.Object,
                 subjectRepository: subjectRepository.Object);
@@ -575,104 +546,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 subjectRepository);
 
             Assert.Equal(permalink.Id, result.Id);
-            // Expect invalidated Permalink
-            Assert.True(result.Invalidated);
+            Assert.Equal(PermalinkStatus.SubjectRemoved, result.Status);
         }
 
         [Fact]
         public async Task Get_SubjectIsNotFromLatestPublishedRelease()
         {
-            var release = new Release
+            var publication = new Publication { Id = _publicationId };
+            var release = new Content.Model.Release
             {
                 Id = Guid.NewGuid(),
-                PublicationId = _publicationId,
+                Publication = publication,
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Published = DateTime.UtcNow,
             };
 
-            var subject = new Subject
+            var latestRelease = new Content.Model.Release
             {
-                Id = Guid.NewGuid()
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Published = DateTime.UtcNow,
             };
-
-            var permalink = new Permalink(
-                new TableBuilderConfiguration(),
-                new PermalinkTableBuilderResult
-                {
-                    SubjectMeta = new PermalinkResultSubjectMeta()
-                },
-                new ObservationQueryContext
-                {
-                    SubjectId = subject.Id
-                });
-
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
-            var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
-
-            blobStorageService.SetupDownloadBlobText(
-                container: Permalinks,
-                path: permalink.Id.ToString(),
-                blobText: JsonConvert.SerializeObject(permalink));
-
-            subjectRepository
-                .Setup(s => s.Get(subject.Id))
-                .ReturnsAsync(subject);
-
-            releaseRepository
-                .Setup(s => s.IsLatestVersionOfRelease(release.PublicationId, release.Id))
-                .Returns(false);
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(new ReleaseSubject
-                {
-                    Release = release,
-                    Subject = subject,
-                });
-
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(
-                    new Content.Model.Release
-                    {
-                        Id = release.Id,
-                        Publication = new Content.Model.Publication { Id = _publicationId },
-                    });
-
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildService(
-                    contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
-                    blobStorageService: blobStorageService.Object,
-                    subjectRepository: subjectRepository.Object,
-                    releaseRepository: releaseRepository.Object);
-
-                var result = (await service.Get(permalink.Id)).AssertRight();
-
-                MockUtils.VerifyAllMocks(
-                    blobStorageService,
-                    subjectRepository,
-                    releaseRepository);
-
-                Assert.Equal(permalink.Id, result.Id);
-                Assert.True(result.Invalidated);
-            }
-        }
-
-        [Fact]
-        public async Task Get_SubjectIsFromSupersededPublication()
-        {
-            var releaseId = Guid.NewGuid();
-            var supersededPublicationId = Guid.NewGuid();
 
             var subject = new Subject
             {
@@ -701,41 +598,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             subjectRepository
                 .Setup(s => s.Get(subject.Id))
                 .ReturnsAsync(subject);
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.AddAsync(new ReleaseSubject
-                {
-                    ReleaseId = releaseId,
-                    Subject = subject,
-                });
-
-                await statisticsDbContext.SaveChangesAsync();
-            }
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
-                    new Content.Model.Release
+                    release,
+                    latestRelease,
+                    new ReleaseFile
                     {
-                        Id = releaseId,
-                        Publication = new Content.Model.Publication
+                        Release = release,
+                        File = new File
                         {
-                            Id = _publicationId,
-                            SupersededById = supersededPublicationId,
-                        },
-                    },
-                    new Content.Model.Publication
-                    {
-                        Id = supersededPublicationId,
-                        Releases = new List<Content.Model.Release>
-                        {
-                            new ()
-                            {
-                                Published = DateTime.UtcNow,
-                            }
+                            SubjectId = subject.Id,
+                            Type = FileType.Data,
                         }
                     });
 
@@ -743,11 +619,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            await using (var statisticsDbContext = StatisticsDbUtils.InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    statisticsDbContext: statisticsDbContext,
                     blobStorageService: blobStorageService.Object,
                     subjectRepository: subjectRepository.Object);
 
@@ -758,12 +632,104 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     subjectRepository);
 
                 Assert.Equal(permalink.Id, result.Id);
-                Assert.True(result.Invalidated);
+                Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);
+            }
+        }
+
+        [Fact]
+        public async Task Get_SubjectIsFromSupersededPublication()
+        {
+            var supersededPublicationId = Guid.NewGuid();
+
+            var releaseId = Guid.NewGuid();
+
+            var subject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var permalink = new Permalink(
+                new TableBuilderConfiguration(),
+                new PermalinkTableBuilderResult
+                {
+                    SubjectMeta = new PermalinkResultSubjectMeta()
+                },
+                new ObservationQueryContext
+                {
+                    SubjectId = subject.Id
+                });
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
+
+            blobStorageService.SetupDownloadBlobText(
+                container: Permalinks,
+                path: permalink.Id.ToString(),
+                blobText: JsonConvert.SerializeObject(permalink));
+
+            subjectRepository
+                .Setup(s => s.Get(subject.Id))
+                .ReturnsAsync(subject);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(
+                    new Content.Model.Release
+                    {
+                        Id = releaseId,
+                        Publication = new Publication
+                        {
+                            Id = _publicationId,
+                            SupersededById = supersededPublicationId,
+                        },
+                        ReleaseName = "2000",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        Published = DateTime.UtcNow,
+                    },
+                    new ReleaseFile
+                    {
+                        ReleaseId = releaseId,
+                        File = new File
+                        {
+                            SubjectId = subject.Id,
+                            Type = FileType.Data,
+                        }
+                    },
+                    new Publication
+                    {
+                        Id = supersededPublicationId,
+                        Releases = new List<Content.Model.Release>
+                        {
+                            new()
+                            {
+                                Published = DateTime.UtcNow,
+                            }
+                        }
+                    });
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    subjectRepository: subjectRepository.Object);
+
+                var result = (await service.Get(permalink.Id)).AssertRight();
+
+                MockUtils.VerifyAllMocks(
+                    blobStorageService,
+                    subjectRepository);
+
+                Assert.Equal(permalink.Id, result.Id);
+                Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);
             }
         }
 
         private static PermalinkService BuildService(
-            StatisticsDbContext? statisticsDbContext = null,
             ContentDbContext? contentDbContext = null,
             ITableBuilderService? tableBuilderService = null,
             IBlobStorageService? blobStorageService = null,
@@ -771,7 +737,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             ISubjectRepository? subjectRepository = null)
         {
             return new(
-                statisticsDbContext ?? new Mock<StatisticsDbContext>(MockBehavior.Strict).Object,
                 contentDbContext ?? new Mock<ContentDbContext>(MockBehavior.Strict).Object,
                 tableBuilderService ?? new Mock<ITableBuilderService>(MockBehavior.Strict).Object,
                 blobStorageService ?? new Mock<IBlobStorageService>(MockBehavior.Strict).Object,
