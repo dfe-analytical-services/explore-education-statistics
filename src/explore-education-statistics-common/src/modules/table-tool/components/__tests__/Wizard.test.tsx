@@ -630,7 +630,7 @@ describe('Wizard', () => {
     expect(step3).not.toHaveFocus();
   });
 
-  test('scrolls to and focuses first step when `scrollOnMount` is true', () => {
+  test('does not scroll and focus first step when `scrollOnMount` is true', () => {
     jest.useFakeTimers();
 
     render(
@@ -647,8 +647,8 @@ describe('Wizard', () => {
 
     jest.runAllTimers();
 
-    expect(step1).toHaveFocus();
-    expect(step1).toHaveScrolledIntoView();
+    expect(step1).not.toHaveFocus();
+    expect(step1).not.toHaveScrolledIntoView();
 
     expect(step2).not.toHaveScrolledIntoView();
     expect(step2).not.toHaveFocus();

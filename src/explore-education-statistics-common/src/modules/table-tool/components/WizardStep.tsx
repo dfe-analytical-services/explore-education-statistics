@@ -29,7 +29,9 @@ const WizardStep = ({
   const ref = useRef<HTMLLIElement>(null);
 
   useEffect(() => {
-    if (isActive && shouldScroll) {
+    // Don't re-focus on initial page render as this is confusing
+    // for screen reader users (initial focus should be on the body)
+    if (isActive && shouldScroll && document.activeElement !== document.body) {
       setTimeout(() => {
         if (ref.current) {
           ref.current.scrollIntoView({
