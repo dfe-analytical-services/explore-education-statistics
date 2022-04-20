@@ -33,8 +33,4 @@
         </Content>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Model\Data\Query" />
-    </ItemGroup>
-
 </Project>
