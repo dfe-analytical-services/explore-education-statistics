@@ -14,6 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.DataBlockMigrationService.DataBlockMapMigrationPlan.MigrationStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -1796,7 +1798,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new DataBlockMigrationService(
                 contentDbContext,
                 statisticsDbContext,
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                Mock.Of<ILogger<DataBlockMigrationService>>()
             );
         }
     }

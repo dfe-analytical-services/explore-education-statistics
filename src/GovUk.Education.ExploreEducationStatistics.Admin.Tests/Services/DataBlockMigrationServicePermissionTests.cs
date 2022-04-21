@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
@@ -46,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new DataBlockMigrationService(
                 contentDbContext,
                 statisticsDbContext,
-                userService ?? Mock.Of<IUserService>(Strict)
+                userService ?? Mock.Of<IUserService>(Strict),
+                Mock.Of<ILogger<DataBlockMigrationService>>()
             );
         }
     }
