@@ -215,7 +215,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
   >;
 
   const themeMeta = await themeService.listThemes({
-    publicationFilter: 'LatestData',
+    publicationFilter: 'DataTables',
   });
 
   const selectedPublication = themeMeta

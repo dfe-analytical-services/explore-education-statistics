@@ -33,18 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListPublications()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserManagementService(userService: userService.Object);
-                    return await service.ListPublications();
-                });
-        }
-
-        [Fact]
         public async Task ListReleases()
         {
             await PolicyCheckBuilder<SecurityPolicies>()

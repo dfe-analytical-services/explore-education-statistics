@@ -2,7 +2,7 @@ import PublicationReleasePage from '@frontend/modules/find-statistics/Publicatio
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { testRelease } from './__data__/testReleaseData';
+import { testPublication, testRelease } from './__data__/testReleaseData';
 
 describe('PublicationReleasePage', () => {
   test('renders national statistics image', () => {
@@ -15,6 +15,24 @@ describe('PublicationReleasePage', () => {
         'img[alt="UK statistics authority quality mark"]',
       ),
     ).toBeDefined();
+  });
+
+  test('renders latest data tag', () => {
+    render(<PublicationReleasePage release={testRelease} />);
+
+    expect(screen.queryByText('This is the latest data')).toBeInTheDocument();
+  });
+
+  test('does not render latest data tag when publication is superseded', () => {
+    const testReleaseSuperseded = {
+      ...testRelease,
+      publication: { ...testPublication, isSuperseded: true },
+    };
+    render(<PublicationReleasePage release={testReleaseSuperseded} />);
+
+    expect(
+      screen.queryByText('This is the latest data'),
+    ).not.toBeInTheDocument();
   });
 
   test('renders national statistics section', () => {

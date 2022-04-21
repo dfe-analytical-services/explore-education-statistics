@@ -9,6 +9,7 @@ import {
 import publicationService from '@admin/services/publicationService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
+import WarningMessage from '@common/components/WarningMessage';
 import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
@@ -43,7 +44,20 @@ const PublicationEditPage = ({
     >
       <div className="govuk-grid-row">
         <div className="govuk-grid-column-three-quarters">
+          {publication.isSuperseded && (
+            <WarningMessage>This publication is archived.</WarningMessage>
+          )}
+          {publication.supersededById && !publication.isSuperseded && (
+            <WarningMessage>
+              This publication will be archived when its superseding publication
+              has a live release published.
+            </WarningMessage>
+          )}
           <PublicationForm
+            publicationId={publicationId}
+            showSupersededBy={
+              publication.permissions.canUpdatePublicationSupersededBy
+            }
             showTitleInput={publication.permissions.canUpdatePublicationTitle}
             cancelButton={
               <Link
@@ -63,6 +77,7 @@ const PublicationEditPage = ({
               teamEmail: contact?.teamEmail ?? '',
               contactName: contact?.contactName ?? '',
               contactTelNo: contact?.contactTelNo ?? '',
+              supersededById: publication.supersededById,
             }}
             onSubmit={async ({
               teamName,

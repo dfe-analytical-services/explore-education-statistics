@@ -32,6 +32,8 @@ export interface Publication {
   contact: PublicationContact;
   methodologies: MethodologySummary[];
   externalMethodology?: ExternalMethodology;
+  supersededById?: string;
+  isSuperseded?: boolean;
 }
 
 export interface PublicationSummary {

@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         // be published and the Published date set.
         public DateTime? PublishScheduled { get; set; }
 
-        [NotMapped] public bool Live => Published.HasValue && (Compare(UtcNow, Published.Value) > 0);
+        [NotMapped] public bool Live => Published.HasValue && UtcNow >= Published.Value;
 
         [NotMapped] public bool Amendment => Version > 0 && !Live;
 

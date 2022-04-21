@@ -30,6 +30,9 @@ Enters contact details
     user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
     user enters text into element    id:publicationForm-contactTelNo    0123456789
 
+Option to set superseding publication should not appear
+    user checks page does not contain element    id:publicationForm-supersede
+
 Error message appears when submitting and title is empty
     user checks element is not visible    id:publicationForm-title-error    %{WAIT_SMALL}
     user clicks button    Save publication

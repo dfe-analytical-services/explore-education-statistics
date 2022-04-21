@@ -14,7 +14,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public TimeIdentifier TimeIdentifier { get; set; }
         public int Year { get; set; }
         public ICollection<ReleaseFootnote> Footnotes { get; set; }
-        public bool Live => Published.HasValue && Compare(UtcNow, Published.Value) > 0;
+        public bool Live => Published.HasValue && UtcNow >= Published.Value;
         public Guid? PreviousVersionId { get; set; }
 
         public Release CreateReleaseAmendment(Guid contentAmendmentId, Guid? amendmentPreviousVersionId)

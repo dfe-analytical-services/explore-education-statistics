@@ -57,8 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .OnSuccess(cachedRelease =>
                         {
                             var result = new ReleaseViewModel(
-                                _mapper.Map<CachedReleaseViewModel>(cachedRelease),
-                                _mapper.Map<PublicationViewModel>(publication)
+                                cachedRelease,
+                                publication
                             );
 
                             result.Publication.Methodologies = methodologies;
@@ -90,14 +90,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .Where(p => p.Slug == publicationSlug)
                 )
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(
-                    // TODO: @MarkFix EES-3149 Releases belonging to superseded publication shouldn't have "latest data" label
-                    publication => publication.Releases
-                        .Where(release => release.IsLatestPublishedVersionOfRelease())
-                        .OrderByDescending(r => r.Year)
-                        .ThenByDescending(r => r.TimePeriodCoverage)
-                        .Select(release => new ReleaseSummaryViewModel(release))
-                        .ToList()
+                .OnSuccess(publication => publication.Releases
+                    .Where(release => release.IsLatestPublishedVersionOfRelease())
+                    .OrderByDescending(r => r.Year)
+                    .ThenByDescending(r => r.TimePeriodCoverage)
+                    .Select(release => new ReleaseSummaryViewModel(release))
+                    .ToList()
                 );
         }
 

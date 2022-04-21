@@ -48,6 +48,7 @@ describe('LegacyReleasesTable', () => {
       canCreateReleases: true,
       canUpdatePublication: true,
       canUpdatePublicationTitle: true,
+      canUpdatePublicationSupersededBy: true,
       canCreateMethodologies: true,
       canManageExternalMethodology: true,
     },

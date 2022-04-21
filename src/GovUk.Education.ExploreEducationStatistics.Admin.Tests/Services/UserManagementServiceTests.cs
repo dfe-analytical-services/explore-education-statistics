@@ -157,46 +157,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListPublications()
-        {
-            var publication1 = new Publication
-            {
-                Title = "Test Publication 1"
-            };
-
-            var publication2 = new Publication
-            {
-                Title = "Test Publication 2"
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Publications.AddRangeAsync(publication1, publication2);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupUserManagementService(contentDbContext: contentDbContext);
-
-                var result = await service.ListPublications();
-
-                Assert.True(result.IsRight);
-
-                var publicationViewModels = result.Right;
-                Assert.Equal(2, publicationViewModels.Count);
-
-                Assert.Equal(publication1.Id, publicationViewModels[0].Id);
-                Assert.Equal(publication1.Title, publicationViewModels[0].Title);
-
-                Assert.Equal(publication2.Id, publicationViewModels[1].Id);
-                Assert.Equal(publication2.Title, publicationViewModels[1].Title);
-            }
-        }
-
-        [Fact]
         public async Task UpdateUser_UserHasExistingRole()
         {
             var user = new ApplicationUser

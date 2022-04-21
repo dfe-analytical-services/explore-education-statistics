@@ -63,7 +63,6 @@ export interface ResourceRoles {
 export interface UsersService {
   getRoles(): Promise<Role[]>;
   getReleases(): Promise<IdTitlePair[]>;
-  getPublications(): Promise<IdTitlePair[]>;
   getResourceRoles(): Promise<ResourceRoles>;
   getUser(userId: string): Promise<User>;
   addUserReleaseRole: (
@@ -107,11 +106,6 @@ const userService: UsersService = {
   },
   getReleases(): Promise<IdTitlePair[]> {
     return client.get<IdTitlePair[]>('/user-management/releases');
-  },
-  // user-management/releases (ID,Title)
-
-  getPublications(): Promise<IdTitlePair[]> {
-    return client.get<IdTitlePair[]>('/user-management/publications');
   },
 
   getUsers(): Promise<UserStatus[]> {

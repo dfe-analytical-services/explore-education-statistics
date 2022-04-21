@@ -93,7 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
                 LegacyReleases = publication.LegacyReleases,
                 Topic = publication.Topic,
                 Contact = publication.Contact,
-                ExternalMethodology = publication.ExternalMethodology
+                ExternalMethodology = publication.ExternalMethodology,
+                IsSuperseded = publication.IsSuperseded,
             };
         }
 

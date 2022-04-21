@@ -26,6 +26,7 @@ describe('PublicationSummary', () => {
     canCreateReleases: true,
     canUpdatePublication: true,
     canUpdatePublicationTitle: true,
+    canUpdatePublicationSupersededBy: true,
     canCreateMethodologies: true,
     canManageExternalMethodology: true,
   };
@@ -44,6 +45,7 @@ describe('PublicationSummary', () => {
       canCreateReleases: false,
       canUpdatePublication: false,
       canUpdatePublicationTitle: false,
+      canUpdatePublicationSupersededBy: false,
       canCreateMethodologies: false,
       canManageExternalMethodology: false,
     },

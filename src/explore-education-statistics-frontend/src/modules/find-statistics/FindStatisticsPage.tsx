@@ -99,7 +99,9 @@ const FindStatisticsPage: NextPage<Props> = ({ themes = [] }) => {
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async () => {
-  const themes = await themeService.listThemes();
+  const themes = await themeService.listThemes({
+    publicationFilter: 'FindStatistics',
+  });
 
   return {
     props: {

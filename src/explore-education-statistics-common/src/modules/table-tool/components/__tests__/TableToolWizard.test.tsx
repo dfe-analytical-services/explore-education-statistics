@@ -31,6 +31,7 @@ describe('TableToolWizard', () => {
               title: 'Publication 1',
               slug: 'publication-1',
               type: 'NationalAndOfficial',
+              isSuperseded: false,
             },
           ],
         },

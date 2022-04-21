@@ -33,7 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             await _blobStorageService.DeleteBlobs(cacheFolderKey.Container, cacheFolderKey.Key);
         }
 
-
         public async Task<TItem> GetItem<TItem>(
             IBlobCacheKey cacheKey,
             Func<TItem> itemSupplier)

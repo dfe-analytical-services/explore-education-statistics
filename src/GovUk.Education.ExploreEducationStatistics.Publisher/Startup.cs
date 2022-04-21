@@ -64,6 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         methodologyService: provider.GetRequiredService<IMethodologyService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
+                        contentDbContext: provider.GetService<ContentDbContext>(),
                         logger: provider.GetRequiredService<ILogger<PublishingService>>()))
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(

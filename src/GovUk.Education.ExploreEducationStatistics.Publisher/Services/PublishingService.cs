@@ -6,7 +6,9 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -24,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IMethodologyService _methodologyService;
         private readonly IPublicationService _publicationService;
         private readonly IReleaseService _releaseService;
+        private readonly ContentDbContext _contentDbContext;
         private readonly ILogger<PublishingService> _logger;
 
         public PublishingService(
@@ -34,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IMethodologyService methodologyService,
             IPublicationService publicationService,
             IReleaseService releaseService,
+            ContentDbContext contentDbContext,
             ILogger<PublishingService> logger)
         {
             _publicStorageConnectionString = publicStorageConnectionString;
@@ -43,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _methodologyService = methodologyService;
             _publicationService = publicationService;
             _releaseService = releaseService;
+            _contentDbContext = contentDbContext;
             _logger = logger;
         }
 
@@ -58,7 +63,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             await _releaseService.SetPublishedDates(releaseId, DateTime.UtcNow);
 
             await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publicationSlug));
-            // TODO: @MarkFix EES-3149 Delete superseded publication's cache here too?
+
+            // Invalidate publication cache for superseded publications, as potentially affected. If newly
+            // published release is first Live release for the publication, the superseding is now enforced
+            var supersededPublications = await _contentDbContext.Publications
+                .Where(p =>
+                    p.SupersededById == _contentDbContext.Publications
+                        .Single(publication => publication.Slug == publicationSlug)
+                        .Id)
+                .ToListAsync();
+            foreach (var p in supersededPublications)
+            {
+                await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(p.Slug));
+            }
         }
 
         public async Task PublishMethodologyFiles(Guid methodologyId)

@@ -8,6 +8,7 @@ export interface PublicationSummary {
   slug: string;
   type: PublicationType;
   legacyPublicationUrl?: string;
+  isSuperseded: boolean;
 }
 
 export interface PublicationMethodologySummary {
@@ -33,7 +34,11 @@ export interface Theme<PublicationNode = PublicationSummary> {
 export type MethodologyTheme = Theme<PublicationMethodologySummary>;
 
 interface ListThemesOptions {
-  publicationFilter?: 'LatestData' | 'AnyData';
+  publicationFilter?:
+    | 'FindStatistics'
+    | 'DataTables'
+    | 'DataCatalogue'
+    | 'FastTrack';
 }
 
 const themeService = {

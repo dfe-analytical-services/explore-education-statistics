@@ -167,6 +167,7 @@ const DataCataloguePage: NextPage<Props> = ({
               releases={state.releases}
               selectedRelease={state.query.release}
               onSubmit={handleReleaseFormSubmit}
+              hideLatestDataTag={state.query.publication?.isSuperseded}
             />
           )}
         </WizardStep>
@@ -192,7 +193,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async context => {
   } = context.query as Dictionary<string>;
 
   const themes = await themeService.listThemes({
-    publicationFilter: 'AnyData',
+    publicationFilter: 'DataCatalogue',
   });
 
   const selectedPublication = themes

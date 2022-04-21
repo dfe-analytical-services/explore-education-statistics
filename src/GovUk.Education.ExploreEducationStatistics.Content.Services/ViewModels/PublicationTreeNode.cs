@@ -10,6 +10,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         [JsonConverter(typeof(StringEnumConverter))]
         public PublicationType Type { get; set; }
+
+        public bool IsSuperseded { get; set; }
+
+        public bool LatestReleaseHasData { get; set; }
+
+        public bool AnyLiveReleaseHasData { get; set; }
     }
 
     public enum PublicationType
