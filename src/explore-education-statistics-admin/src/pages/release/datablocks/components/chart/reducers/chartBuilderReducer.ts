@@ -19,6 +19,7 @@ import { Reducer } from 'use-immer';
 export interface ChartOptions extends ChartDefinitionOptions {
   file?: File;
   fileId?: string;
+  boundaryLevel?: number;
 }
 
 export interface ChartBuilderState {

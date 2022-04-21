@@ -187,6 +187,10 @@ user configures basic chart
     user enters text into element    id:chartConfigurationForm-height    ${CHART_HEIGHT}
     user enters text into element    id:chartConfigurationForm-width    ${CHART_WIDTH}
 
+    IF    "${CHART_TYPE}" == "Geographic"
+        user chooses select option at index    id:chartConfigurationForm-chartConfigurationForm-boundaryLevel    1
+    END
+
     # Prevent intermittent failure when trying to switch to other chart tab
     # after running this keyword
     user clicks link    Chart configuration

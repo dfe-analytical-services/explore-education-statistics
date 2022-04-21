@@ -92,12 +92,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 return new NotFoundResult();
             }
             
-            var query = dataBlock.Query.Clone();
-            query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
-
             return await _userService
                 .CheckCanViewRelease(block.Release)
-                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, query, cancellationToken));
+                .OnSuccess(_ => _tableBuilderService.Query(block.ReleaseId, dataBlock.Query, cancellationToken));
         }
     }
 }

@@ -10,7 +10,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import DataTableCaption from '../DataTableCaption';
 
 describe('DataTableCaption', () => {
-  const testfullTableMeta: FullTableMeta = {
+  const testFullTableMeta: FullTableMeta = {
     geoJsonAvailable: false,
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
@@ -55,7 +55,7 @@ describe('DataTableCaption', () => {
   };
 
   test('with given title', () => {
-    render(<DataTableCaption title="Test title" {...testfullTableMeta} />);
+    render(<DataTableCaption title="Test title" {...testFullTableMeta} />);
 
     expect(screen.queryByText('Test title')).toBeInTheDocument();
     expect(
@@ -65,9 +65,9 @@ describe('DataTableCaption', () => {
 
   test('with multiple filters labelled "Total"', () => {
     const props: FullTableMeta = {
-      ...testfullTableMeta,
+      ...testFullTableMeta,
       filters: {
-        ...testfullTableMeta.filters,
+        ...testFullTableMeta.filters,
         'School Type': {
           name: 'school_type',
           options: [
@@ -93,13 +93,13 @@ describe('DataTableCaption', () => {
 
   test('with multiple filters', () => {
     const props: FullTableMeta = {
-      ...testfullTableMeta,
+      ...testFullTableMeta,
       filters: {
-        ...testfullTableMeta.filters,
+        ...testFullTableMeta.filters,
         Characteristic: {
-          ...testfullTableMeta.filters.Characteristic,
+          ...testFullTableMeta.filters.Characteristic,
           options: [
-            ...testfullTableMeta.filters.Characteristic.options,
+            ...testFullTableMeta.filters.Characteristic.options,
             new CategoryFilter({
               value: 'gender_female',
               label: 'Female',
@@ -143,9 +143,9 @@ describe('DataTableCaption', () => {
 
   test('with more than one TimePeriodFilter', () => {
     const props: FullTableMeta = {
-      ...testfullTableMeta,
+      ...testFullTableMeta,
       timePeriodRange: [
-        ...testfullTableMeta.timePeriodRange,
+        ...testFullTableMeta.timePeriodRange,
         new TimePeriodFilter({
           code: 'AY',
           year: 2016,
@@ -179,9 +179,9 @@ describe('DataTableCaption', () => {
 
   test('with multiple LocationFilters but less than 10', () => {
     const props: FullTableMeta = {
-      ...testfullTableMeta,
+      ...testFullTableMeta,
       locations: [
-        ...testfullTableMeta.locations,
+        ...testFullTableMeta.locations,
         new LocationFilter({
           value: 'barking-and-dagenham',
           label: 'Barking and Dagenham',
@@ -217,9 +217,9 @@ describe('DataTableCaption', () => {
 
   test('with more than 10 LocationFilters', () => {
     const props: FullTableMeta = {
-      ...testfullTableMeta,
+      ...testFullTableMeta,
       locations: [
-        ...testfullTableMeta.locations,
+        ...testFullTableMeta.locations,
         new LocationFilter({
           value: 'eleven',
           label: 'Eleven',
@@ -314,9 +314,9 @@ describe('DataTableCaption', () => {
 
   test('with multiple indicators', () => {
     const props: FullTableMeta = {
-      ...testfullTableMeta,
+      ...testFullTableMeta,
       indicators: [
-        ...testfullTableMeta.indicators,
+        ...testFullTableMeta.indicators,
         new Indicator({
           label: 'Number of authorised absence sessions',
           value: 'authAbsSess',

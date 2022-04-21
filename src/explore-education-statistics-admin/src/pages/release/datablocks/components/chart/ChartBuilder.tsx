@@ -96,7 +96,6 @@ export type TableQueryUpdateHandler = (
 ) => Promise<void>;
 
 interface Props {
-  boundaryLevel?: number;
   data: TableDataResult[];
   meta: FullTableMeta;
   releaseId: string;
@@ -108,7 +107,6 @@ interface Props {
 }
 
 const ChartBuilder = ({
-  boundaryLevel,
   data,
   meta,
   releaseId,
@@ -179,6 +177,7 @@ const ChartBuilder = ({
       case 'map':
         return {
           ...(baseProps as MapBlockProps),
+          boundaryLevel: options.boundaryLevel ?? 0,
           type: 'map',
         };
       default:
@@ -298,12 +297,7 @@ const ChartBuilder = ({
       />
 
       {definition && (
-        <ChartBuilderPreview
-          axes={axes}
-          chart={chartProps}
-          definition={definition}
-          loading={isDataLoading}
-        />
+        <ChartBuilderPreview chart={chartProps} loading={isDataLoading} />
       )}
 
       {definition && (
@@ -320,7 +314,6 @@ const ChartBuilder = ({
                   id={forms.options.id}
                 >
                   <ChartConfiguration
-                    boundaryLevel={boundaryLevel}
                     buttons={deleteButton}
                     submitError={submitError}
                     definition={definition}

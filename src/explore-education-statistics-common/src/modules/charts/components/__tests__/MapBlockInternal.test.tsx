@@ -294,7 +294,7 @@ describe('MapBlockInternal', () => {
     );
   });
 
-  test('reseting the map when select None Selected', async () => {
+  test('resetting the map when select None Selected', async () => {
     const { container } = render(<MapBlockInternal {...testBlockProps} />);
 
     await waitFor(() => {

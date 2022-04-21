@@ -10,6 +10,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 {
     public interface IRepository<TEntity, in TKey> where TEntity : class
     {
+        Either<ActionResult, TEntity> FindOrNotFound(TKey id);
+        
         Task<Either<ActionResult, TEntity>> FindOrNotFoundAsync(TKey id);
         
         IQueryable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,

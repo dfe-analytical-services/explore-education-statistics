@@ -149,6 +149,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             modelBuilder.Entity<BoundaryLevel>()
                 .Property(boundaryLevel => boundaryLevel.Level)
                 .HasConversion(geographicLevelConverter);
+            
+            modelBuilder.Entity<BoundaryLevel>()
+                .Property(block => block.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+            
+            modelBuilder.Entity<BoundaryLevel>()
+                .Property(block => block.Published)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         }
 
         private static void ConfigureLocation(ModelBuilder modelBuilder)

@@ -110,7 +110,6 @@ const ChartBuilderTabSection = ({
 
   return (
     <ChartBuilder
-      boundaryLevel={query.boundaryLevel}
       releaseId={releaseId}
       data={table.results}
       meta={meta}
