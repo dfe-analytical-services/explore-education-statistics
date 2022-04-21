@@ -185,26 +185,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
-        private async Task<DateTime> GetDataBlockCreatedDate(DataBlock dataBlock)
+        private async Task<DateTime?> GetDataBlockCreatedDate(DataBlock dataBlock)
         {
-            DateTime createdDate;
-
             if (dataBlock.Created != null)
             {
-                createdDate = dataBlock.Created.Value;
+                return dataBlock.Created.Value;
             }
-            else
+            
+            var owningReleaseByReleaseContentBlocks = (await _contentDbContext
+                .ReleaseContentBlocks
+                .Include(rcb => rcb.Release)
+                .SingleOrDefaultAsync(rcb => rcb.ContentBlockId == dataBlock.Id))
+                ?.Release;
+
+            if (owningReleaseByReleaseContentBlocks != null)
             {
-                var owningRelease = (await _contentDbContext
-                    .ReleaseContentBlocks
-                    .Include(rcb => rcb.Release)
-                    .SingleAsync(rcb => rcb.ContentBlockId == dataBlock.Id))
-                    .Release;
+                return owningReleaseByReleaseContentBlocks.Created;
+            }
+            
+            var owningReleaseByContentSection = (await _contentDbContext
+                    .ReleaseContentSections
+                    .Include(rcs => rcs.Release)
+                    .Include(rcs => rcs.ContentSection)
+                    .ThenInclude(cs => cs.Content)
+                    .Where(rcs => rcs.ContentSection.Content.Contains(dataBlock))
+                    .FirstOrDefaultAsync())
+                ?.Release;
 
-                createdDate = owningRelease.Created;
+            if (owningReleaseByContentSection != null)
+            {
+                return owningReleaseByContentSection.Created;
             }
 
-            return createdDate;
+            return null;
         }
 
         private 
@@ -244,19 +257,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private BoundaryLevel GetLatestBoundaryLevelAtCreationTime(
-            DateTime dataBlockCreated,
+            DateTime? dataBlockCreatedDate,
             GeographicLevel geographicLevel, 
             List<BoundaryLevel> boundaryLevels)
         {
             var boundaryLevelsWithDateRanges = GetBoundaryLevelsWithDateRanges(boundaryLevels);
+
+            var dataBlockCreatedOrNow = dataBlockCreatedDate ?? DateTime.UtcNow;
+            
             return boundaryLevelsWithDateRanges
                 .Single(boundary =>
                 {
                     var (level, start, end, _) = boundary;
 
                     return level == geographicLevel &&
-                           dataBlockCreated.CompareTo(start) >= 0 &&
-                           dataBlockCreated.CompareTo(end) <= 0;
+                           dataBlockCreatedOrNow.CompareTo(start) >= 0 &&
+                           dataBlockCreatedOrNow.CompareTo(end) <= 0;
                 })
                 .boundaryLevel;
         }
