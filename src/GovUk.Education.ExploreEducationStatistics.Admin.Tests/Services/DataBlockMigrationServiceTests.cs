@@ -14,6 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.DataBlockMigrationService.DataBlockMapMigrationPlan.MigrationStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -957,7 +959,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
         
         [Fact]
-        public async Task MigrateAllMaps_ChooseCorrectBoundaryLevelIdToMatchReleaseCreationTime()
+        public async Task MigrateAllMaps_ChooseCorrectBoundaryLevelIdToMatchReleaseCreationTime_ViaReleaseContentBlock()
         {
             var singleGeographicLevelInDataSets = GeographicLevel.LocalAuthority;
             var matchingGeoLevelBoundaryLevelId = 2;
@@ -965,7 +967,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var dataBlock = new DataBlock
             {
                 // This Data Block has no Created Date.  It will be inferred from its owning Release's Creation date
-                // instead.
+                // instead, as found via ReleaseContentBlock -> ContentBlock.
                 Query = new ObservationQueryContext(),
                 Charts = new List<IChart> {
                     new MapChart
@@ -1013,6 +1015,251 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 // There are several Boundary Levels available for the given Geographic Level.  The matching one
                 // will be identified using the Created date on the Data Block's owning Release.
+                await statisticsDbContext.BoundaryLevel.AddRangeAsync(new List<BoundaryLevel>
+                {
+                    new()
+                    {
+                        Id = 1,
+                        Label = "Boundary Level 1",
+                        Level = singleGeographicLevelInDataSets,
+                        Created = DateTime.UtcNow.AddYears(-2)
+                    },
+                    new()
+                    {
+                        Id = matchingGeoLevelBoundaryLevelId,
+                        Label = "Boundary Level 2",
+                        Level = singleGeographicLevelInDataSets,
+                        Created = DateTime.UtcNow.AddYears(-1)
+                    },
+                    new()
+                    {
+                        Id = 3,
+                        Label = "Boundary Level 3",
+                        Level = singleGeographicLevelInDataSets,
+                        Created = DateTime.UtcNow.AddYears(1)
+                    },
+                    new()
+                    {
+                        Id = 4,
+                        Label = "Boundary Level 4",
+                        Level = GeographicLevel.Region,
+                        Created = DateTime.UtcNow.AddYears(-1)
+                    }
+                });
+                await statisticsDbContext.SaveChangesAsync();
+            }
+            
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+                {
+                    var service = SetupService(contentDbContext, statisticsDbContext);
+                    var result = await service.MigrateMaps(dryRun: false);
+                    var mapMigrationPlans = result.AssertRight();
+                    var mapMigrationPlan = Assert.Single(mapMigrationPlans);
+
+                    Assert.Equal(dataBlock.Id, mapMigrationPlan.DataBlockId);
+                    Assert.Equal(SetBoundaryLevelToMatchSingleDataSetGeoLevel, mapMigrationPlan.Strategy);
+                    Assert.Equal(matchingGeoLevelBoundaryLevelId, mapMigrationPlan.BoundaryLevelId);
+                    Assert.Equal(singleGeographicLevelInDataSets, mapMigrationPlan.GeographicLevel);
+                }
+            }
+            
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var updatedDataBlock = await contentDbContext
+                    .DataBlocks
+                    .SingleAsync(db => db.Id == dataBlock.Id);
+
+                var updatedMap = (updatedDataBlock.Charts[0] as MapChart)!;
+                
+                Assert.Equal(matchingGeoLevelBoundaryLevelId, updatedDataBlock.Query.BoundaryLevel);
+                Assert.Equal(matchingGeoLevelBoundaryLevelId, updatedMap.BoundaryLevel);
+            }
+        }
+        
+        [Fact]
+        public async Task MigrateAllMaps_ChooseCorrectBoundaryLevelIdToMatchReleaseCreationTime_ViaReleaseContentSection()
+        {
+            var singleGeographicLevelInDataSets = GeographicLevel.LocalAuthority;
+            var matchingGeoLevelBoundaryLevelId = 1;
+            
+            var dataBlock = new DataBlock
+            {
+                // This Data Block has no Created Date.  It will be inferred from its owning Release's Creation date
+                // instead, as found via ReleaseContentSection -> ContentSection -> ContentBlock.
+                Query = new ObservationQueryContext(),
+                Charts = new List<IChart> {
+                    new MapChart
+                    {
+                        Axes = new Dictionary<string, ChartAxisConfiguration>
+                        {
+                            {"Key1", new()
+                            {
+                                DataSets = new List<ChartDataSet>
+                                {
+                                    new()
+                                    {
+                                        Location = new ChartDataSetLocation
+                                        {
+                                            Level = singleGeographicLevelInDataSets.ToString()
+                                        }
+                                    }
+                                }
+                            }}
+                        }
+                    }
+                }
+            };
+
+            var releaseContentSection = new ReleaseContentSection
+            {
+                Release = new Release
+                {
+                    Created = DateTime.UtcNow.AddDays(-400)
+                },
+                ContentSection = new ContentSection
+                {
+                    Content = new List<ContentBlock>
+                    {
+                        new HtmlBlock
+                        {
+                            Id = Guid.NewGuid()
+                        },
+                        dataBlock,
+                        new HtmlBlock
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                }
+            };
+            
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.DataBlocks.AddAsync(dataBlock);
+                await contentDbContext.ReleaseContentSections.AddAsync(releaseContentSection);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                // There are several Boundary Levels available for the given Geographic Level.  The matching one
+                // will be identified using the Created date on the Data Block's owning Release.
+                await statisticsDbContext.BoundaryLevel.AddRangeAsync(new List<BoundaryLevel>
+                {
+                    new()
+                    {
+                        Id = matchingGeoLevelBoundaryLevelId,
+                        Label = "Boundary Level 1",
+                        Level = singleGeographicLevelInDataSets,
+                        Created = DateTime.UtcNow.AddYears(-2)
+                    },
+                    new()
+                    {
+                        Id = 2,
+                        Label = "Boundary Level 2",
+                        Level = singleGeographicLevelInDataSets,
+                        Created = DateTime.UtcNow.AddYears(-1)
+                    },
+                    new()
+                    {
+                        Id = 3,
+                        Label = "Boundary Level 3",
+                        Level = singleGeographicLevelInDataSets,
+                        Created = DateTime.UtcNow.AddYears(1)
+                    },
+                    new()
+                    {
+                        Id = 4,
+                        Label = "Boundary Level 4",
+                        Level = GeographicLevel.Region,
+                        Created = DateTime.UtcNow.AddYears(-1)
+                    }
+                });
+                await statisticsDbContext.SaveChangesAsync();
+            }
+            
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+                {
+                    var service = SetupService(contentDbContext, statisticsDbContext);
+                    var result = await service.MigrateMaps(dryRun: false);
+                    var mapMigrationPlans = result.AssertRight();
+                    var mapMigrationPlan = Assert.Single(mapMigrationPlans);
+
+                    Assert.Equal(dataBlock.Id, mapMigrationPlan.DataBlockId);
+                    Assert.Equal(SetBoundaryLevelToMatchSingleDataSetGeoLevel, mapMigrationPlan.Strategy);
+                    Assert.Equal(matchingGeoLevelBoundaryLevelId, mapMigrationPlan.BoundaryLevelId);
+                    Assert.Equal(singleGeographicLevelInDataSets, mapMigrationPlan.GeographicLevel);
+                }
+            }
+            
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var updatedDataBlock = await contentDbContext
+                    .DataBlocks
+                    .SingleAsync(db => db.Id == dataBlock.Id);
+
+                var updatedMap = (updatedDataBlock.Charts[0] as MapChart)!;
+                
+                Assert.Equal(matchingGeoLevelBoundaryLevelId, updatedDataBlock.Query.BoundaryLevel);
+                Assert.Equal(matchingGeoLevelBoundaryLevelId, updatedMap.BoundaryLevel);
+            }
+        }
+        
+        [Fact]
+        public async Task MigrateAllMaps_ChooseCorrectBoundaryLevelIdToMatchReleaseCreationTime_NoPathToRelease()
+        {
+            var singleGeographicLevelInDataSets = GeographicLevel.LocalAuthority;
+            var matchingGeoLevelBoundaryLevelId = 2;
+            
+            var dataBlock = new DataBlock
+            {
+                // This Data Block has no Created Date.  It also can't be inferred from an owning Release's created date
+                // as no path back to the owning Release is available.  Therefore it will default to using UtcNow as the
+                // created date.
+                Query = new ObservationQueryContext(),
+                Charts = new List<IChart> {
+                    new MapChart
+                    {
+                        Axes = new Dictionary<string, ChartAxisConfiguration>
+                        {
+                            {"Key1", new()
+                            {
+                                DataSets = new List<ChartDataSet>
+                                {
+                                    new()
+                                    {
+                                        Location = new ChartDataSetLocation
+                                        {
+                                            Level = singleGeographicLevelInDataSets.ToString()
+                                        }
+                                    }
+                                }
+                            }}
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.DataBlocks.AddAsync(dataBlock);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                // There are several Boundary Levels available for the given Geographic Level.  The matching one
+                // will be identified using UtcNow as the fallback Created date.
                 await statisticsDbContext.BoundaryLevel.AddRangeAsync(new List<BoundaryLevel>
                 {
                     new()
@@ -1551,7 +1798,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new DataBlockMigrationService(
                 contentDbContext,
                 statisticsDbContext,
-                userService ?? MockUtils.AlwaysTrueUserService().Object
+                userService ?? MockUtils.AlwaysTrueUserService().Object,
+                Mock.Of<ILogger<DataBlockMigrationService>>()
             );
         }
     }
