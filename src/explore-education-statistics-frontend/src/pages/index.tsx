@@ -102,8 +102,17 @@ function HomePage() {
       <div className="govuk-grid-row govuk-!-margin-bottom-3">
         <div className="govuk-grid-column-two-thirds">
           <p>
-            Use these services to find specific performance and other
-            information about schools and colleges in England:
+            Use these services to find related information and other statistical
+            services provided by the Department for Education (DfE):
+          </p>
+          <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
+            <a href="https://www.gov.uk/government/organisations/department-for-education/about/statistics">
+              Statistics at DfE
+            </a>
+          </h3>
+          <p className="govuk-caption-m govuk-!-margin-top-1">
+            Find out more about latest news, announcements, forthcoming releases
+            and ad hoc publications, as well as related education statistics.
           </p>
           <h3 className="govuk-heading-s govuk-!-margin-bottom-0">
             <a href="https://www.gov.uk/school-performance-tables">
