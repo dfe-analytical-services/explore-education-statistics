@@ -52,7 +52,7 @@ describe('generateTableTitle', () => {
     ],
   };
 
-  test('with multiple filters labelled "Total"', () => {
+  test('removes filters labelled "Total"', () => {
     const result = generateTableTitle({
       ...testFullTableMeta,
       filters: {
@@ -86,7 +86,7 @@ describe('generateTableTitle', () => {
     );
   });
 
-  test('with multiple filters', () => {
+  test('with less than 5 filters', () => {
     const result = generateTableTitle({
       ...testFullTableMeta,
       filters: {
@@ -131,6 +131,178 @@ describe('generateTableTitle', () => {
     );
   });
 
+  test('with 5 filters', () => {
+    const result = generateTableTitle({
+      ...testFullTableMeta,
+      filters: {
+        ...testFullTableMeta.filters,
+        Characteristic: {
+          ...testFullTableMeta.filters.Characteristic,
+          options: [
+            ...testFullTableMeta.filters.Characteristic.options,
+            new CategoryFilter({
+              value: 'gender_female',
+              label: 'Female',
+              group: 'Gender',
+              category: 'Characteristic',
+            }),
+            new CategoryFilter({
+              value: 'gender_male',
+              label: 'Male',
+              group: 'Gender',
+              category: 'Characteristic',
+            }),
+          ],
+        },
+        'School Type': {
+          name: 'school_type',
+          options: [
+            new CategoryFilter({
+              value: 'school_special',
+              label: 'Special',
+              category: 'School Type',
+            }),
+            new CategoryFilter({
+              value: 'school_primary',
+              label: 'State-funded primary',
+              category: 'School Type',
+            }),
+            new CategoryFilter({
+              value: 'school_secondary',
+              label: 'State-funded secondary',
+              category: 'School Type',
+            }),
+          ],
+        },
+      },
+    });
+
+    expect(result).toBe(
+      "Authorised absence rate for 'Absence by characteristic' for Female, Male, Special, State-funded primary and State-funded secondary in England for 2015/16",
+    );
+  });
+
+  test('with 6 filters', () => {
+    const result = generateTableTitle({
+      ...testFullTableMeta,
+      filters: {
+        ...testFullTableMeta.filters,
+        Characteristic: {
+          ...testFullTableMeta.filters.Characteristic,
+          options: [
+            ...testFullTableMeta.filters.Characteristic.options,
+            new CategoryFilter({
+              value: 'gender_female',
+              label: 'Female',
+              group: 'Gender',
+              category: 'Characteristic',
+            }),
+            new CategoryFilter({
+              value: 'gender_male',
+              label: 'Male',
+              group: 'Gender',
+              category: 'Characteristic',
+            }),
+            new CategoryFilter({
+              value: 'ethnicity_major_asian_total',
+              label: 'Ethnicity Major Asian Total',
+              group: 'Ethnic group major',
+              category: 'Characteristic',
+            }),
+            new CategoryFilter({
+              value: 'ethnicity_major_black_total',
+              label: 'Ethnicity Major Black Total',
+              group: 'Ethnic group major',
+              category: 'Characteristic',
+            }),
+          ],
+        },
+        'School Type': {
+          name: 'school_type',
+          options: [
+            new CategoryFilter({
+              value: 'school_special',
+              label: 'Special',
+              category: 'School Type',
+            }),
+            new CategoryFilter({
+              value: 'school_primary',
+              label: 'State-funded primary',
+              category: 'School Type',
+            }),
+          ],
+        },
+      },
+    });
+
+    expect(result).toBe(
+      "Authorised absence rate for 'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, Female, Male, Special and 1 other filter in England for 2015/16",
+    );
+  });
+
+  test('with 7 filters', () => {
+    const result = generateTableTitle({
+      ...testFullTableMeta,
+      filters: {
+        ...testFullTableMeta.filters,
+        Characteristic: {
+          ...testFullTableMeta.filters.Characteristic,
+          options: [
+            ...testFullTableMeta.filters.Characteristic.options,
+            new CategoryFilter({
+              value: 'gender_female',
+              label: 'Female',
+              group: 'Gender',
+              category: 'Characteristic',
+            }),
+            new CategoryFilter({
+              value: 'gender_male',
+              label: 'Male',
+              group: 'Gender',
+              category: 'Characteristic',
+            }),
+            new CategoryFilter({
+              value: 'ethnicity_major_asian_total',
+              label: 'Ethnicity Major Asian Total',
+              group: 'Ethnic group major',
+              category: 'Characteristic',
+            }),
+            new CategoryFilter({
+              value: 'ethnicity_major_black_total',
+              label: 'Ethnicity Major Black Total',
+              group: 'Ethnic group major',
+              category: 'Characteristic',
+            }),
+          ],
+        },
+        'School Type': {
+          name: 'school_type',
+          options: [
+            new CategoryFilter({
+              value: 'school_special',
+              label: 'Special',
+              category: 'School Type',
+            }),
+            new CategoryFilter({
+              value: 'school_primary',
+              label: 'State-funded primary',
+              category: 'School Type',
+            }),
+            new CategoryFilter({
+              value: 'school_secondary',
+              label: 'State-funded secondary',
+              category: 'School Type',
+            }),
+          ],
+        },
+      },
+    });
+
+    expect(result).toBe(
+      "Authorised absence rate for 'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, Female, Male, Special and 2 other filters in England for 2015/16",
+    );
+  });
+
   test('with more than one time period', () => {
     const result = generateTableTitle({
       ...testFullTableMeta,
@@ -162,7 +334,7 @@ describe('generateTableTitle', () => {
     );
   });
 
-  test('with less than 10 locations', () => {
+  test('with less than 5 locations', () => {
     const result = generateTableTitle({
       ...testFullTableMeta,
       locations: [
@@ -195,36 +367,86 @@ describe('generateTableTitle', () => {
     );
   });
 
-  test('with more than 10 locations', () => {
+  test('with 5 locations', () => {
+    const result = generateTableTitle({
+      ...testFullTableMeta,
+      locations: [
+        new LocationFilter({
+          value: 'one',
+          label: 'One',
+          level: 'localAuthorityDistrict',
+        }),
+        new LocationFilter({
+          value: 'two',
+          label: 'Two',
+          level: 'localAuthorityDistrict',
+        }),
+        new LocationFilter({
+          value: 'three',
+          label: 'Three',
+          level: 'localAuthorityDistrict',
+        }),
+        new LocationFilter({
+          value: 'four',
+          label: 'Four',
+          level: 'localAuthorityDistrict',
+        }),
+        new LocationFilter({
+          value: 'five',
+          label: 'Five',
+          level: 'localAuthorityDistrict',
+        }),
+      ],
+    });
+
+    expect(result).toBe(
+      "Authorised absence rate for 'Absence by characteristic' in Five, Four, One, Three and Two for 2015/16",
+    );
+  });
+
+  test('with 6 locations', () => {
     const result = generateTableTitle({
       ...testFullTableMeta,
       locations: [
         ...testFullTableMeta.locations,
         new LocationFilter({
-          value: 'eleven',
-          label: 'Eleven',
-          level: 'localAuthority',
-        }),
-        new LocationFilter({
-          value: 'ten',
-          label: 'Ten',
-          level: 'localAuthority',
-        }),
-        new LocationFilter({
-          value: 'nine',
-          label: 'Nine',
-          level: 'localAuthority',
-        }),
-        new LocationFilter({
-          value: 'eight',
-          label: 'Eight',
+          value: 'one',
+          label: 'One',
           level: 'localAuthorityDistrict',
         }),
         new LocationFilter({
-          value: 'seven',
-          label: 'Seven',
+          value: 'two',
+          label: 'Two',
           level: 'localAuthorityDistrict',
         }),
+        new LocationFilter({
+          value: 'three',
+          label: 'Three',
+          level: 'localAuthorityDistrict',
+        }),
+        new LocationFilter({
+          value: 'four',
+          label: 'Four',
+          level: 'localAuthorityDistrict',
+        }),
+        new LocationFilter({
+          value: 'five',
+          label: 'Five',
+          level: 'localAuthorityDistrict',
+        }),
+      ],
+    });
+
+    expect(result).toBe(
+      "Authorised absence rate for 'Absence by characteristic' in England, Five, Four, One, Three and 1 other location for 2015/16",
+    );
+  });
+
+  test('with 7 locations', () => {
+    const result = generateTableTitle({
+      ...testFullTableMeta,
+      locations: [
+        ...testFullTableMeta.locations,
         new LocationFilter({
           value: 'one',
           label: 'One',
@@ -259,7 +481,7 @@ describe('generateTableTitle', () => {
     });
 
     expect(result).toBe(
-      "Authorised absence rate for 'Absence by characteristic' in Eight, Eleven, England, Five, Four, Nine, One, Seven, Six, Ten and 2 other locations... for 2015/16",
+      "Authorised absence rate for 'Absence by characteristic' in England, Five, Four, One, Six and 2 other locations for 2015/16",
     );
   });
 

@@ -73,7 +73,7 @@ describe('DataTableCaption', () => {
       <strong
         data-testid="dataTableCaption"
       >
-        Authorised absence rate for 'Absence by characteristic' for Male and Female in Barnet and Barnsley for 2015/16
+        Authorised absence rate for 'Absence by characteristic' for Female and Male in Barnet and Barnsley for 2015/16
       </strong>
     `);
   });
@@ -87,7 +87,7 @@ describe('DataTableCaption', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('can show/hide full title when there are more than 10 locations', () => {
+  test('can show/hide full title when there are more than 5 locations', () => {
     render(
       <DataTableCaption
         {...testFullTableMeta}
@@ -122,65 +122,108 @@ describe('DataTableCaption', () => {
             label: 'Six',
             level: 'localAuthorityDistrict',
           }),
-          new LocationFilter({
-            value: 'seven',
-            label: 'Seven',
-            level: 'localAuthorityDistrict',
-          }),
-          new LocationFilter({
-            value: 'eight',
-            label: 'Eight',
-            level: 'localAuthorityDistrict',
-          }),
-          new LocationFilter({
-            value: 'nine',
-            label: 'Nine',
-            level: 'localAuthorityDistrict',
-          }),
-          new LocationFilter({
-            value: 'ten',
-            label: 'Ten',
-            level: 'localAuthorityDistrict',
-          }),
-          new LocationFilter({
-            value: 'eleven',
-            label: 'Eleven',
-            level: 'localAuthorityDistrict',
-          }),
         ]}
       />,
     );
 
-    expect(screen.getByTestId('dataTableCaption')).toMatchInlineSnapshot(`
-      <strong
-        data-testid="dataTableCaption"
-      >
-        Authorised absence rate for 'Absence by characteristic' for Male and Female in Eight, Eleven, Five, Four, Nine, One, Seven, Six, Ten, Three and 1 other location... for 2015/16
-      </strong>
-    `);
+    expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
+      "Authorised absence rate for 'Absence by characteristic' for Female and Male in Five, Four, One, Six, Three and 1 other location for 2015/16",
+    );
 
     userEvent.click(
       screen.getByRole('button', { name: 'View full table title' }),
     );
 
-    expect(screen.getByTestId('dataTableCaption')).toMatchInlineSnapshot(`
-      <strong
-        data-testid="dataTableCaption"
-      >
-        Authorised absence rate for 'Absence by characteristic' for Male and Female in Eight, Eleven, Five, Four, Nine, One, Seven, Six, Ten, Three and Two for 2015/16
-      </strong>
-    `);
+    expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
+      "Authorised absence rate for 'Absence by characteristic' for Female and Male in Five, Four, One, Six, Three and Two for 2015/16",
+    );
 
     userEvent.click(
       screen.getByRole('button', { name: 'Hide full table title' }),
     );
 
-    expect(screen.getByTestId('dataTableCaption')).toMatchInlineSnapshot(`
-      <strong
-        data-testid="dataTableCaption"
-      >
-        Authorised absence rate for 'Absence by characteristic' for Male and Female in Eight, Eleven, Five, Four, Nine, One, Seven, Six, Ten, Three and 1 other location... for 2015/16
-      </strong>
-    `);
+    expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
+      "Authorised absence rate for 'Absence by characteristic' for Female and Male in Five, Four, One, Six, Three and 1 other location for 2015/16",
+    );
+  });
+
+  test('can show/hide full title when there are more than 5 filters', () => {
+    render(
+      <DataTableCaption
+        {...testFullTableMeta}
+        filters={{
+          ...testFullTableMeta.filters,
+          Characteristic: {
+            ...testFullTableMeta.filters.Characteristic,
+            options: [
+              new CategoryFilter({
+                value: 'gender_female',
+                label: 'Female',
+                group: 'Gender',
+                category: 'Characteristic',
+              }),
+              new CategoryFilter({
+                value: 'gender_male',
+                label: 'Male',
+                group: 'Gender',
+                category: 'Characteristic',
+              }),
+              new CategoryFilter({
+                value: 'ethnicity_major_asian_total',
+                label: 'Ethnicity Major Asian Total',
+                group: 'Ethnic group major',
+                category: 'Characteristic',
+              }),
+              new CategoryFilter({
+                value: 'ethnicity_major_black_total',
+                label: 'Ethnicity Major Black Total',
+                group: 'Ethnic group major',
+                category: 'Characteristic',
+              }),
+            ],
+          },
+          'School Type': {
+            name: 'school_type',
+            options: [
+              new CategoryFilter({
+                value: 'school_special',
+                label: 'Special',
+                category: 'School Type',
+              }),
+              new CategoryFilter({
+                value: 'school_primary',
+                label: 'State-funded primary',
+                category: 'School Type',
+              }),
+              new CategoryFilter({
+                value: 'school_secondary',
+                label: 'State-funded secondary',
+                category: 'School Type',
+              }),
+            ],
+          },
+        }}
+      />,
+    );
+
+    expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
+      "Authorised absence rate for 'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, Female, Male, Special and 2 other filters in Barnet and Barnsley for 2015/16",
+    );
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'View full table title' }),
+    );
+
+    expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
+      "Authorised absence rate for 'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, Female, Male, Special, State-funded primary and State-funded secondary in Barnet and Barnsley for 2015/16",
+    );
+
+    userEvent.click(
+      screen.getByRole('button', { name: 'Hide full table title' }),
+    );
+
+    expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
+      "Authorised absence rate for 'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, Female, Male, Special and 2 other filters in Barnet and Barnsley for 2015/16",
+    );
   });
 });

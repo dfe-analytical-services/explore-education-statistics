@@ -10,7 +10,7 @@ interface Props extends FullTableMeta {
 }
 
 const DataTableCaption = ({ id, title, ...meta }: Props) => {
-  const { locations } = meta;
+  const { locations, filters } = meta;
 
   const [expanded, toggleExpanded] = useToggle(false);
 
@@ -24,7 +24,8 @@ const DataTableCaption = ({ id, title, ...meta }: Props) => {
       <strong id={id} data-testid="dataTableCaption">
         {title || caption}
       </strong>
-      {locations.length > 10 && (
+      {(locations.length > 5 ||
+        Object.values(filters).flatMap(group => group.options).length > 5) && (
         <ButtonText
           className="govuk-!-display-block govuk-!-margin-top-2"
           onClick={toggleExpanded}

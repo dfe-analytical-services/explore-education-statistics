@@ -30,26 +30,45 @@ export default function generateTableTitle({
 
   const locationLabels = locations.map(location => location.label).sort();
 
-  const locationsString = ` in ${commaList(
-    locations.length > 10 && !expanded
-      ? locationLabels
-          .slice(0, 10)
-          .concat(
-            `${locations.length - 10} other ${
-              locations.length - 10 === 1 ? 'location' : 'locations'
-            }...`,
-          )
-      : locationLabels,
-  )}`;
+  let locationString = '';
+
+  if (locationLabels.length > 0) {
+    const remaining = locations.length - 5;
+
+    locationString = ` in ${commaList(
+      locations.length > 5 && !expanded
+        ? locationLabels
+            .slice(0, 5)
+            .concat(
+              `${remaining} other ${
+                remaining === 1 ? 'location' : 'locations'
+              }`,
+            )
+        : locationLabels,
+    )}`;
+  }
 
   const filterLabels = Object.values(filters)
     .flatMap(filterGroup => filterGroup.options)
     .map(filter => filter.label)
-    .filter(label => label !== 'Total');
+    .filter(label => label !== 'Total')
+    .sort();
 
-  const filterString = filterLabels.length
-    ? ` for ${commaList(filterLabels)}`
-    : '';
+  let filterString = '';
 
-  return `${indicatorString}'${subjectName}'${filterString}${locationsString}${timePeriodString}`;
+  if (filterLabels.length > 0) {
+    const remaining = filterLabels.length - 5;
+
+    filterString = ` for ${commaList(
+      filterLabels.length > 5 && !expanded
+        ? filterLabels
+            .slice(0, 5)
+            .concat(
+              `${remaining} other ${remaining === 1 ? 'filter' : 'filters'}`,
+            )
+        : filterLabels,
+    )}`;
+  }
+
+  return `${indicatorString}'${subjectName}'${filterString}${locationString}${timePeriodString}`;
 }
