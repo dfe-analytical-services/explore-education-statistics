@@ -8,7 +8,7 @@ import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import generateTableTitle from '@common/modules/table-tool/utils/generateTableTitle';
 
 describe('generateTableTitle', () => {
-  const testFullTableMeta: FullTableMeta = {
+  const testMeta: FullTableMeta = {
     geoJsonAvailable: false,
     publicationName: 'Pupil absence in schools in England',
     subjectName: 'Absence by characteristic',
@@ -53,10 +53,10 @@ describe('generateTableTitle', () => {
   };
 
   test('removes filters labelled "Total"', () => {
-    const result = generateTableTitle({
-      ...testFullTableMeta,
+    const title = generateTableTitle({
+      ...testMeta,
       filters: {
-        ...testFullTableMeta.filters,
+        ...testMeta.filters,
         Characteristic: {
           name: 'characteristic',
           options: [
@@ -81,20 +81,30 @@ describe('generateTableTitle', () => {
       },
     });
 
-    expect(result).toBe(
+    expect(title).toBe(
+      "Authorised absence rate for 'Absence by characteristic' in England for 2015/16",
+    );
+  });
+
+  test('with no filters', () => {
+    const title = generateTableTitle({
+      ...testMeta,
+      filters: {},
+    });
+
+    expect(title).toBe(
       "Authorised absence rate for 'Absence by characteristic' in England for 2015/16",
     );
   });
 
   test('with less than 5 filters', () => {
-    const result = generateTableTitle({
-      ...testFullTableMeta,
+    const title = generateTableTitle({
+      ...testMeta,
       filters: {
-        ...testFullTableMeta.filters,
+        ...testMeta.filters,
         Characteristic: {
-          ...testFullTableMeta.filters.Characteristic,
+          ...testMeta.filters.Characteristic,
           options: [
-            ...testFullTableMeta.filters.Characteristic.options,
             new CategoryFilter({
               value: 'gender_female',
               label: 'Female',
@@ -126,20 +136,20 @@ describe('generateTableTitle', () => {
       },
     });
 
-    expect(result).toBe(
+    expect(title).toBe(
       "Authorised absence rate for 'Absence by characteristic' for Female, State-funded primary and State-funded secondary in England for 2015/16",
     );
   });
 
   test('with 5 filters', () => {
-    const result = generateTableTitle({
-      ...testFullTableMeta,
+    const title = generateTableTitle({
+      ...testMeta,
       filters: {
-        ...testFullTableMeta.filters,
+        ...testMeta.filters,
         Characteristic: {
-          ...testFullTableMeta.filters.Characteristic,
+          ...testMeta.filters.Characteristic,
           options: [
-            ...testFullTableMeta.filters.Characteristic.options,
+            ...testMeta.filters.Characteristic.options,
             new CategoryFilter({
               value: 'gender_female',
               label: 'Female',
@@ -177,20 +187,20 @@ describe('generateTableTitle', () => {
       },
     });
 
-    expect(result).toBe(
+    expect(title).toBe(
       "Authorised absence rate for 'Absence by characteristic' for Female, Male, Special, State-funded primary and State-funded secondary in England for 2015/16",
     );
   });
 
   test('with 6 filters', () => {
-    const result = generateTableTitle({
-      ...testFullTableMeta,
+    const title = generateTableTitle({
+      ...testMeta,
       filters: {
-        ...testFullTableMeta.filters,
+        ...testMeta.filters,
         Characteristic: {
-          ...testFullTableMeta.filters.Characteristic,
+          ...testMeta.filters.Characteristic,
           options: [
-            ...testFullTableMeta.filters.Characteristic.options,
+            ...testMeta.filters.Characteristic.options,
             new CategoryFilter({
               value: 'gender_female',
               label: 'Female',
@@ -235,20 +245,20 @@ describe('generateTableTitle', () => {
       },
     });
 
-    expect(result).toBe(
+    expect(title).toBe(
       "Authorised absence rate for 'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, Female, Male, Special and 1 other filter in England for 2015/16",
     );
   });
 
   test('with 7 filters', () => {
-    const result = generateTableTitle({
-      ...testFullTableMeta,
+    const title = generateTableTitle({
+      ...testMeta,
       filters: {
-        ...testFullTableMeta.filters,
+        ...testMeta.filters,
         Characteristic: {
-          ...testFullTableMeta.filters.Characteristic,
+          ...testMeta.filters.Characteristic,
           options: [
-            ...testFullTableMeta.filters.Characteristic.options,
+            ...testMeta.filters.Characteristic.options,
             new CategoryFilter({
               value: 'gender_female',
               label: 'Female',
@@ -298,16 +308,27 @@ describe('generateTableTitle', () => {
       },
     });
 
-    expect(result).toBe(
+    expect(title).toBe(
       "Authorised absence rate for 'Absence by characteristic' for Ethnicity Major Asian Total, Ethnicity Major Black Total, Female, Male, Special and 2 other filters in England for 2015/16",
     );
   });
 
+  test('with no time periods', () => {
+    const title = generateTableTitle({
+      ...testMeta,
+      timePeriodRange: [],
+    });
+
+    expect(title).toBe(
+      "Authorised absence rate for 'Absence by characteristic' in England",
+    );
+  });
+
   test('with more than one time period', () => {
-    const result = generateTableTitle({
-      ...testFullTableMeta,
+    const title = generateTableTitle({
+      ...testMeta,
       timePeriodRange: [
-        ...testFullTableMeta.timePeriodRange,
+        ...testMeta.timePeriodRange,
         new TimePeriodFilter({
           code: 'AY',
           year: 2016,
@@ -329,16 +350,27 @@ describe('generateTableTitle', () => {
       ],
     });
 
-    expect(result).toBe(
+    expect(title).toBe(
       "Authorised absence rate for 'Absence by characteristic' in England between 2015/16 and 2018/19",
     );
   });
 
+  test('with no locations', () => {
+    const title = generateTableTitle({
+      ...testMeta,
+      locations: [],
+    });
+
+    expect(title).toBe(
+      "Authorised absence rate for 'Absence by characteristic' for 2015/16",
+    );
+  });
+
   test('with less than 5 locations', () => {
-    const result = generateTableTitle({
-      ...testFullTableMeta,
+    const title = generateTableTitle({
+      ...testMeta,
       locations: [
-        ...testFullTableMeta.locations,
+        ...testMeta.locations,
         new LocationFilter({
           value: 'barking-and-dagenham',
           label: 'Barking and Dagenham',
@@ -362,14 +394,14 @@ describe('generateTableTitle', () => {
       ],
     });
 
-    expect(result).toBe(
+    expect(title).toBe(
       "Authorised absence rate for 'Absence by characteristic' in Adur, Allerdale, Barking and Dagenham, Barnet and England for 2015/16",
     );
   });
 
   test('with 5 locations', () => {
-    const result = generateTableTitle({
-      ...testFullTableMeta,
+    const title = generateTableTitle({
+      ...testMeta,
       locations: [
         new LocationFilter({
           value: 'one',
@@ -399,16 +431,16 @@ describe('generateTableTitle', () => {
       ],
     });
 
-    expect(result).toBe(
+    expect(title).toBe(
       "Authorised absence rate for 'Absence by characteristic' in Five, Four, One, Three and Two for 2015/16",
     );
   });
 
   test('with 6 locations', () => {
-    const result = generateTableTitle({
-      ...testFullTableMeta,
+    const title = generateTableTitle({
+      ...testMeta,
       locations: [
-        ...testFullTableMeta.locations,
+        ...testMeta.locations,
         new LocationFilter({
           value: 'one',
           label: 'One',
@@ -437,16 +469,16 @@ describe('generateTableTitle', () => {
       ],
     });
 
-    expect(result).toBe(
+    expect(title).toBe(
       "Authorised absence rate for 'Absence by characteristic' in England, Five, Four, One, Three and 1 other location for 2015/16",
     );
   });
 
   test('with 7 locations', () => {
-    const result = generateTableTitle({
-      ...testFullTableMeta,
+    const title = generateTableTitle({
+      ...testMeta,
       locations: [
-        ...testFullTableMeta.locations,
+        ...testMeta.locations,
         new LocationFilter({
           value: 'one',
           label: 'One',
@@ -480,16 +512,16 @@ describe('generateTableTitle', () => {
       ],
     });
 
-    expect(result).toBe(
+    expect(title).toBe(
       "Authorised absence rate for 'Absence by characteristic' in England, Five, Four, One, Six and 2 other locations for 2015/16",
     );
   });
 
   test('with multiple indicators', () => {
-    const result = generateTableTitle({
-      ...testFullTableMeta,
+    const title = generateTableTitle({
+      ...testMeta,
       indicators: [
-        ...testFullTableMeta.indicators,
+        ...testMeta.indicators,
         new Indicator({
           label: 'Number of authorised absence sessions',
           value: 'authAbsSess',
@@ -499,6 +531,6 @@ describe('generateTableTitle', () => {
       ],
     });
 
-    expect(result).toBe("'Absence by characteristic' in England for 2015/16");
+    expect(title).toBe("'Absence by characteristic' in England for 2015/16");
   });
 });

@@ -1,9 +1,8 @@
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import commaList from '@common/utils/string/commaList';
 
-interface GenerateTableTitleOptions extends FullTableMeta {
-  expanded?: boolean;
-}
+const MAX_LOCATIONS = 5;
+const MAX_FILTERS = 5;
 
 export default function generateTableTitle({
   indicators,
@@ -11,34 +10,45 @@ export default function generateTableTitle({
   locations,
   subjectName,
   filters,
-  expanded,
-}: GenerateTableTitleOptions) {
-  const indicatorString =
-    indicators.length === 1 ? `${indicators[0].label} for ` : '';
+}: FullTableMeta): string {
+  let title =
+    indicators.length === 1
+      ? `${indicators[0].label} for '${subjectName}'`
+      : `'${subjectName}'`;
 
-  let timePeriodString = '';
+  // Filters
 
-  if (timePeriodRange.length > 0) {
-    const startLabel = timePeriodRange[0].label;
-    const endLabel = timePeriodRange[timePeriodRange.length - 1].label;
+  const filterLabels = Object.values(filters)
+    .flatMap(filterGroup => filterGroup.options)
+    .map(filter => filter.label)
+    .filter(label => label !== 'Total')
+    .sort();
 
-    timePeriodString =
-      startLabel === endLabel
-        ? ` for ${startLabel}`
-        : ` between ${startLabel} and ${endLabel}`;
+  if (filterLabels.length > 0) {
+    const remaining = filterLabels.length - MAX_FILTERS;
+
+    title += ` for ${commaList(
+      remaining > 0
+        ? filterLabels
+            .slice(0, MAX_FILTERS)
+            .concat(
+              `${remaining} other ${remaining === 1 ? 'filter' : 'filters'}`,
+            )
+        : filterLabels,
+    )}`;
   }
+
+  // Locations
 
   const locationLabels = locations.map(location => location.label).sort();
 
-  let locationString = '';
-
   if (locationLabels.length > 0) {
-    const remaining = locations.length - 5;
+    const remaining = locationLabels.length - MAX_LOCATIONS;
 
-    locationString = ` in ${commaList(
-      locations.length > 5 && !expanded
+    title += ` in ${commaList(
+      remaining > 0
         ? locationLabels
-            .slice(0, 5)
+            .slice(0, MAX_LOCATIONS)
             .concat(
               `${remaining} other ${
                 remaining === 1 ? 'location' : 'locations'
@@ -48,27 +58,19 @@ export default function generateTableTitle({
     )}`;
   }
 
-  const filterLabels = Object.values(filters)
-    .flatMap(filterGroup => filterGroup.options)
-    .map(filter => filter.label)
-    .filter(label => label !== 'Total')
-    .sort();
+  // Time periods
 
-  let filterString = '';
+  if (timePeriodRange.length > 0) {
+    const startLabel = timePeriodRange[0].label;
+    const endLabel = timePeriodRange[timePeriodRange.length - 1].label;
 
-  if (filterLabels.length > 0) {
-    const remaining = filterLabels.length - 5;
+    const timePeriodString =
+      startLabel === endLabel
+        ? ` for ${startLabel}`
+        : ` between ${startLabel} and ${endLabel}`;
 
-    filterString = ` for ${commaList(
-      filterLabels.length > 5 && !expanded
-        ? filterLabels
-            .slice(0, 5)
-            .concat(
-              `${remaining} other ${remaining === 1 ? 'filter' : 'filters'}`,
-            )
-        : filterLabels,
-    )}`;
+    title += timePeriodString;
   }
 
-  return `${indicatorString}'${subjectName}'${filterString}${locationString}${timePeriodString}`;
+  return title;
 }
