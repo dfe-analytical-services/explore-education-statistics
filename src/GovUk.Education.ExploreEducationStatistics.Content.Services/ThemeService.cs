@@ -81,7 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 .Where(publication => publication
                                           .Releases
                                           .Any(r => r.IsLatestPublishedVersionOfRelease())
-                                      || !string.IsNullOrEmpty(publication.LegacyPublicationUrl?.ToString()))
+                                      || publication.LegacyPublicationUrl != null)
                 .SelectAwait(async publication =>
                     await BuildPublicationNode(publication))
                 .OrderBy(publication => publication.Title)
@@ -110,6 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     ? publication.LegacyPublicationUrl?.ToString()
                     : null,
                 IsSuperseded = IsSuperseded(publication),
+                HasLiveRelease = latestRelease != null,
                 LatestReleaseHasData = latestRelease != null && await HasAnyDataFiles(latestRelease),
                 AnyLiveReleaseHasData = await publication.Releases
                     .ToAsyncEnumerable()
@@ -164,8 +165,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             {
                 case PublicationTreeFilter.FindStatistics:
                     return !publicationTreeNode.IsSuperseded
-                           && (publicationTreeNode.LatestReleaseHasData ||
-                               !string.IsNullOrEmpty(publicationTreeNode.LegacyPublicationUrl));
+                           && (publicationTreeNode.HasLiveRelease
+                               || publicationTreeNode.Type == PublicationType.Legacy);
                 case PublicationTreeFilter.DataTables:
                     return publicationTreeNode.LatestReleaseHasData
                            && !publicationTreeNode.IsSuperseded;

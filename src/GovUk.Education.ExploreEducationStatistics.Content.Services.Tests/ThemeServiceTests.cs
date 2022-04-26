@@ -451,7 +451,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Type = ReleaseType.OfficialStatistics,
                     Published = new DateTime(2020, 1, 1),
                 },
-                File = new File { Type = FileType.Data },
             };
 
             var releaseD = new Release
@@ -850,7 +849,169 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
                 var publicationTree = result.AssertRight();
 
-                Assert.Empty(publicationTree);
+                Assert.Single(publicationTree);
+                Assert.Equal(theme.Id, publicationTree[0].Id);
+
+                var topic = Assert.Single(publicationTree[0].Topics);
+                Assert.Equal(theme.Topics[0].Id, topic.Id);
+
+                var publication = Assert.Single(topic.Publications);
+                Assert.Equal(publicationA.Id, publication.Id);
+                Assert.False(publication.IsSuperseded);
+                Assert.True(publication.HasLiveRelease);
+                Assert.False(publication.LatestReleaseHasData);
+                Assert.False(publication.AnyLiveReleaseHasData);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_FindStatistics_ReleaseHasData()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                Slug = "publication-a",
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Summary = "Theme A summary",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        Publications = ListOf(publicationA)
+                    },
+                },
+            };
+
+            var release = new Release
+            {
+                Publication = publicationA,
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = new DateTime(2020, 1, 1),
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddRangeAsync(
+                    theme,
+                    release,
+                    new ReleaseFile
+                    {
+                        Release = release,
+                        File = new File
+                        {
+                            Type = FileType.Data,
+                        }
+                    });
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
+
+                Assert.Single(publicationTree);
+                Assert.Equal(theme.Id, publicationTree[0].Id);
+
+                var topic = Assert.Single(publicationTree[0].Topics);
+                Assert.Equal(theme.Topics[0].Id, topic.Id);
+
+                var publication = Assert.Single(topic.Publications);
+                Assert.Equal(publicationA.Id, publication.Id);
+                Assert.False(publication.IsSuperseded);
+                Assert.True(publication.HasLiveRelease);
+                Assert.True(publication.LatestReleaseHasData);
+                Assert.True(publication.AnyLiveReleaseHasData);
+            }
+        }
+
+        [Fact]
+        public async Task GetPublicationTree_FindStatistics_PreviousReleaseHasData()
+        {
+            var publicationA = new Publication
+            {
+                Title = "Publication A",
+                Slug = "publication-a",
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme A",
+                Summary = "Theme A summary",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Topic A",
+                        Publications = ListOf(publicationA)
+                    },
+                },
+            };
+
+            var previousRelease = new Release
+            {
+                Publication = publicationA,
+                ReleaseName = "2020",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = new DateTime(2020, 1, 1),
+            };
+
+            var release = new Release
+            {
+                Publication = publicationA,
+                ReleaseName = "2021",
+                TimePeriodCoverage = TimeIdentifier.CalendarYear,
+                Type = ReleaseType.OfficialStatistics,
+                Published = new DateTime(2020, 1, 1),
+            };
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                await context.AddRangeAsync(
+                    theme,
+                    previousRelease,
+                    release,
+                    new ReleaseFile
+                    {
+                        Release = previousRelease,
+                        File = new File
+                        {
+                            Type = FileType.Data,
+                        }
+                    });
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryContentDbContext(contextId))
+            {
+                var service = BuildThemeService(context);
+
+                var result = await service.GetPublicationTree(PublicationTreeFilter.FindStatistics);
+                var publicationTree = result.AssertRight();
+
+                Assert.Single(publicationTree);
+                Assert.Equal(theme.Id, publicationTree[0].Id);
+
+                var topic = Assert.Single(publicationTree[0].Topics);
+                Assert.Equal(theme.Topics[0].Id, topic.Id);
+
+                var publication = Assert.Single(topic.Publications);
+                Assert.Equal(publicationA.Id, publication.Id);
+                Assert.False(publication.IsSuperseded);
+                Assert.True(publication.HasLiveRelease);
+                Assert.False(publication.LatestReleaseHasData);
+                Assert.True(publication.AnyLiveReleaseHasData);
             }
         }
 
@@ -1140,7 +1301,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublicationTree_DataTables_LatestDataNotSuperseded()
+        public async Task GetPublicationTree_DataTables_LatestReleaseHasDataAndIsNotSuperseded()
         {
             var publicationA = new Publication
             {
@@ -1240,11 +1401,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var publications = publicationTree[0].Topics[0].Publications;
 
-                Assert.Single(publications);
-                Assert.Equal("publication-a", publications[0].Slug);
-                Assert.Equal("Publication A", publications[0].Title);
-                Assert.Equal(PublicationType.NationalAndOfficial, publications[0].Type);
-                Assert.Null(publications[0].LegacyPublicationUrl);
+                var publication = Assert.Single(publications);
+                Assert.Equal(publicationA.Id, publication.Id);
+                Assert.Equal("publication-a", publication.Slug);
+                Assert.Equal("Publication A", publication.Title);
+                Assert.Equal(PublicationType.NationalAndOfficial, publication.Type);
+                Assert.Null(publication.LegacyPublicationUrl);
+                Assert.False(publication.IsSuperseded);
+                Assert.True(publication.HasLiveRelease);
+                Assert.True(publication.LatestReleaseHasData);
+                Assert.True(publication.AnyLiveReleaseHasData);
             }
         }
 
@@ -1818,7 +1984,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublicationTree_DataTables_DoesFilterPublicationWithoutDataOnLatestRelease()
+        public async Task GetPublicationTree_DataTables_PreviousReleaseHasData()
         {
             var publication = new Publication
             {
@@ -2515,7 +2681,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublicationTree_DataCatalogue_DoesNotFilterPublicationWithDataOnPreviousRelease()
+        public async Task GetPublicationTree_DataCatalogue_PreviousReleaseHasData()
         {
             var publication = new Publication
             {
@@ -2599,8 +2765,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
                 var publications = publicationTree[0].Topics[0].Publications;
 
-                Assert.Single(publications);
-                Assert.Equal("Publication A", publications[0].Title);
+                var resultPublication = Assert.Single(publications);
+                Assert.Equal(publication.Title, resultPublication.Title);
+                Assert.Equal(publication.Id, resultPublication.Id);
+                Assert.False(resultPublication.IsSuperseded);
+                Assert.True(resultPublication.HasLiveRelease);
+                Assert.False(resultPublication.LatestReleaseHasData);
+                Assert.True(resultPublication.AnyLiveReleaseHasData);
             }
         }
 
@@ -2686,7 +2857,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetPublicationTree_DataCatalogue_LatestData()
+        public async Task GetPublicationTree_DataCatalogue_LatestReleaseHasData()
         {
             var publicationA = new Publication
             {
@@ -2776,15 +2947,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var publications = publicationTree[0].Topics[0].Publications;
 
                 Assert.Equal(2, publications.Count);
+
+                Assert.Equal(publicationA.Id, publications[0].Id);
                 Assert.Equal("publication-a", publications[0].Slug);
                 Assert.Equal("Publication A", publications[0].Title);
                 Assert.Equal(PublicationType.NationalAndOfficial, publications[0].Type);
                 Assert.Null(publications[0].LegacyPublicationUrl);
+                Assert.False(publications[0].IsSuperseded);
+                Assert.True(publications[0].HasLiveRelease);
+                Assert.True(publications[0].LatestReleaseHasData);
+                Assert.True(publications[0].AnyLiveReleaseHasData);
 
+                Assert.Equal(publicationA.Id, publications[0].Id);
                 Assert.Equal("publication-b", publications[1].Slug);
                 Assert.Equal("Publication B", publications[1].Title);
                 Assert.Equal(PublicationType.NationalAndOfficial, publications[1].Type);
                 Assert.Null(publications[1].LegacyPublicationUrl);
+                Assert.False(publications[1].IsSuperseded);
+                Assert.True(publications[1].HasLiveRelease);
+                Assert.True(publications[1].LatestReleaseHasData);
+                Assert.True(publications[1].AnyLiveReleaseHasData);
             }
         }
 
