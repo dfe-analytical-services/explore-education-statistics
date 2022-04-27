@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -83,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 contentDbContext.Attach(methodology.Versions[0]);
 
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var result = (await service.GetLatestMethodologyBySlug(methodology.Slug)).AssertRight();
@@ -221,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 contentDbContext.Attach(methodology.Versions[0]);
 
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var result = (await service.GetLatestMethodologyBySlug(methodology.Slug)).AssertRight();
@@ -323,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 contentDbContext.Attach(methodology.Versions[0]);
 
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var result = (await service.GetLatestMethodologyBySlug(methodology.Slug)).AssertRight();
@@ -420,7 +422,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 contentDbContext.Attach(methodology.Versions[0]);
 
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var result = (await service.GetLatestMethodologyBySlug(methodology.Slug)).AssertRight();
@@ -468,7 +470,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var result = await service.GetLatestMethodologyBySlug(methodology.Slug);
@@ -503,7 +505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var result = await service.GetLatestMethodologyBySlug("methodology-slug");
@@ -515,88 +517,169 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetSummariesByPublication()
+        public async Task GetCachedSummariesByPublication()
         {
-            var publication = new Publication();
-
-            var methodology = new Methodology
+            var publication1 = new Publication
             {
-                Slug = "methodology-1",
-                OwningPublicationTitle = "Methodology 1 title"
+                Id = Guid.NewGuid(),
+                Title = "Publication title 1"
+            };
+            
+            var publication2 = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Title = "Publication title 2"
             };
 
-            var versions = AsList(
+            var topic = new Topic
+            {
+                Title = "Topic title",
+                Publications = ListOf(publication1, publication2)
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme title",
+                Topics = ListOf(topic)
+            };
+
+            var methodology1 = new Methodology
+            {
+                Slug = "methodology-1-slug",
+            };
+
+            var methodology2 = new Methodology
+            {
+                Slug = "methodology-2-slug",
+            };
+
+            var methodology3 = new Methodology
+            {
+                Slug = "methodology-2-slug",
+            };
+
+            var publication11LatestVersions = ListOf(
                 new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    Methodology = methodology
+                    Version = 0,
+                    Methodology = methodology1
                 },
                 new MethodologyVersion
                 {
                     Id = Guid.NewGuid(),
-                    Methodology = methodology,
-                    AlternativeTitle = "Methodology 2 title"
-                }
-            );
+                    Methodology = methodology2
+                });
+
+            var publication2LatestVersions = ListOf(
+                new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Methodology = methodology3
+                });
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Themes.AddAsync(theme);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersionByPublication(publication.Id))
-                .ReturnsAsync(versions);
+            methodologyVersionRepository
+                .Setup(mock => mock.GetLatestPublishedVersionByPublication(publication1.Id))
+                .ReturnsAsync(publication11LatestVersions);
+            
+            methodologyVersionRepository
+                .Setup(mock => mock.GetLatestPublishedVersionByPublication(publication2.Id))
+                .ReturnsAsync(publication2LatestVersions);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = (await service.GetCachedSummariesByPublication(publication.Id)).AssertRight();
+                var result = (await service.GetCachedSummariesByPublication(publication1.Id)).AssertRight();
 
                 Assert.Equal(2, result.Count);
 
-                Assert.Equal(versions[0].Id, result[0].Id);
-                Assert.Equal(methodology.Slug, result[0].Slug);
-                Assert.Equal(methodology.OwningPublicationTitle, result[0].Title);
+                Assert.Equal(publication11LatestVersions[0].Id, result[0].Id);
+                Assert.Equal(methodology1.Slug, result[0].Slug);
+                Assert.Equal(methodology1.OwningPublicationTitle, result[0].Title);
 
-                Assert.Equal(versions[1].Id, result[1].Id);
-                Assert.Equal(methodology.Slug, result[1].Slug);
-                Assert.Equal(versions[1].AlternativeTitle, result[1].Title);
+                Assert.Equal(publication11LatestVersions[1].Id, result[1].Id);
+                Assert.Equal(methodology2.Slug, result[1].Slug);
+                Assert.Equal(methodology2.OwningPublicationTitle, result[1].Title);
             }
 
             VerifyAllMocks(methodologyVersionRepository);
         }
 
         [Fact]
-        public async Task GetSummariesByPublication_PublicationHasNoMethodologies()
+        public async Task GetCachedSummariesByPublication_PublicationHasNoMethodologies()
         {
-            var publication = new Publication();
+            var publication1 = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Title = "Publication title 1"
+            };
+            
+            var publication2 = new Publication
+            {
+                Id = Guid.NewGuid(),
+                Title = "Publication title 2"
+            };
+
+            var topic = new Topic
+            {
+                Title = "Topic title",
+                Publications = ListOf(publication1, publication2)
+            };
+
+            var theme = new Theme
+            {
+                Title = "Theme title",
+                Topics = ListOf(topic)
+            };
+
+            var methodology = new Methodology
+            {
+                Slug = "methodology-2-slug",
+            };
+
+            var publication2LatestVersions = ListOf(
+                new MethodologyVersion
+                {
+                    Id = Guid.NewGuid(),
+                    Methodology = methodology
+                });
 
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.Themes.AddAsync(theme);
                 await contentDbContext.SaveChangesAsync();
             }
 
             var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-            methodologyVersionRepository.Setup(mock => mock.GetLatestPublishedVersionByPublication(publication.Id))
+            methodologyVersionRepository
+                .Setup(mock => mock.GetLatestPublishedVersionByPublication(publication1.Id))
                 .ReturnsAsync(new List<MethodologyVersion>());
+            
+            methodologyVersionRepository
+                .Setup(mock => mock.GetLatestPublishedVersionByPublication(publication2.Id))
+                .ReturnsAsync(publication2LatestVersions);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
-                var result = (await service.GetCachedSummariesByPublication(publication.Id)).AssertRight();
+                var result = (await service.GetCachedSummariesByPublication(publication1.Id)).AssertRight();
 
                 Assert.Empty(result);
             }
@@ -605,21 +688,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task GetSummariesByPublication_PublicationNotFound()
+        public async Task GetCachedSummariesByPublication_PublicationNotFound()
         {
-            var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
-
-            await using (var contentDbContext = InMemoryContentDbContext())
-            {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
-                    methodologyVersionRepository: methodologyVersionRepository.Object);
-
-                var result = await service.GetCachedSummariesByPublication(Guid.NewGuid());
-
-                result.AssertNotFound();
-            }
-
-            VerifyAllMocks(methodologyVersionRepository);
+            await using var contentDbContext = InMemoryContentDbContext();
+            var service = SetupMethodologyService(contentDbContext);
+            var result = await service.GetCachedSummariesByPublication(Guid.NewGuid());
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -633,19 +707,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var topic = new Topic
             {
                 Title = "Topic title",
-                Publications = AsList(publication)
+                Publications = ListOf(publication)
             };
 
             var theme = new Theme
             {
                 Title = "Theme title",
-                Topics = AsList(topic)
+                Topics = ListOf(topic)
             };
 
-            var latestVersions = AsList(
+            var latestVersions = ListOf(
                 new MethodologyVersion
                 {
-                    Id = Guid.Parse("7cba2701-b8d0-4d1a-ba9d-0cb71bf56574"),
+                    Id = Guid.NewGuid(),
                     Annexes = new List<ContentSection>(),
                     Content = new List<ContentSection>(),
                     PreviousVersionId = null,
@@ -655,12 +729,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Version = 0,
                     Methodology = new Methodology
                     {
+                        Id = Guid.NewGuid(),
                         Slug = "methodology-1-slug"
                     }
                 },
                 new MethodologyVersion
                 {
-                    Id = Guid.Parse("d49b519f-7b50-4bd3-bb87-8464cd434e16"),
+                    Id = Guid.NewGuid(),
                     Annexes = new List<ContentSection>(),
                     Content = new List<ContentSection>(),
                     PreviousVersionId = null,
@@ -670,6 +745,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Version = 0,
                     Methodology = new Methodology
                     {
+                        Id = Guid.NewGuid(),
                         Slug = "methodology-2-slug"
                     }
                 });
@@ -689,7 +765,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var themes = (await service.GetCachedSummariesTree()).AssertRight();
@@ -714,11 +790,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 var methodologies = publications[0].Methodologies;
                 Assert.Equal(2, methodologies.Count);
 
-                Assert.Equal(Guid.Parse("7cba2701-b8d0-4d1a-ba9d-0cb71bf56574"), methodologies[0].Id);
+                Assert.Equal(latestVersions[0].Id, methodologies[0].Id);
                 Assert.Equal("methodology-1-slug", methodologies[0].Slug);
                 Assert.Equal("Methodology 1 v0 title", methodologies[0].Title);
 
-                Assert.Equal(Guid.Parse("d49b519f-7b50-4bd3-bb87-8464cd434e16"), methodologies[1].Id);
+                Assert.Equal(latestVersions[1].Id, methodologies[1].Id);
                 Assert.Equal("methodology-2-slug", methodologies[1].Slug);
                 Assert.Equal("Methodology 2 v0 title", methodologies[1].Title);
             }
@@ -749,7 +825,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var result = (await service.GetCachedSummariesTree()).AssertRight();
@@ -768,7 +844,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Title = "Theme title",
                 Slug = "theme-slug",
                 Summary = "Theme summary",
-                Topics = AsList(
+                Topics = ListOf(
                     new Topic
                     {
                         Title = "Topic title",
@@ -790,7 +866,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var result = await service.GetCachedSummariesTree();
@@ -817,12 +893,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Title = "Theme title",
                 Slug = "theme-slug",
                 Summary = "Theme summary",
-                Topics = AsList(
+                Topics = ListOf(
                     new Topic
                     {
                         Title = "Topic title",
                         Slug = "topic-slug",
-                        Publications = AsList(publication)
+                        Publications = ListOf(publication)
                     }
                 )
             };
@@ -850,7 +926,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyService(contentDbContext: contentDbContext,
+                var service = SetupMethodologyService(contentDbContext,
                     methodologyVersionRepository: methodologyVersionRepository.Object);
 
                 var result = await service.GetCachedSummariesTree();
