@@ -3,6 +3,7 @@ import { FormTextInput } from '@common/components/form';
 import FormNumberInput from '@common/components/form/FormNumberInput';
 import {
   AxisConfiguration,
+  AxisType,
   ReferenceLine,
 } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
@@ -17,12 +18,14 @@ interface FormValues {
 }
 
 interface Props {
+  axisType: AxisType;
   configuration: AxisConfiguration;
   id: string;
   meta: FullTableMeta;
 }
 
 export default function ChartReferenceLinesConfiguration({
+  axisType,
   configuration,
   id,
   meta,
@@ -35,7 +38,7 @@ export default function ChartReferenceLinesConfiguration({
   });
 
   const options = useMemo<SelectOption[]>(() => {
-    if (!configuration.groupBy) {
+    if (axisType === 'minor') {
       return [];
     }
 
@@ -56,7 +59,39 @@ export default function ChartReferenceLinesConfiguration({
       default:
         return [];
     }
-  }, [configuration.groupBy, meta]);
+  }, [
+    axisType,
+    configuration.groupBy,
+    meta.indicators,
+    meta.locations,
+    meta.timePeriodRange,
+  ]);
+
+  const filteredOptions = useMemo<SelectOption[]>(() => {
+    return options.filter(option =>
+      form.values.referenceLines?.every(line => line.position !== option.value),
+    );
+  }, [form.values.referenceLines, options]);
+
+  const referenceLines = useMemo(() => {
+    if (axisType === 'major') {
+      return (
+        form.values.referenceLines?.filter(line =>
+          options.some(option => option.value === line.position),
+        ) ?? []
+      );
+    }
+
+    return form.values.referenceLines ?? [];
+  }, [axisType, form.values.referenceLines, options]);
+
+  const getPositionLabel = (position: string | number) => {
+    if (axisType === 'major') {
+      return options.find(option => option.value === position)?.label;
+    }
+
+    return position;
+  };
 
   return (
     <table className="govuk-table">
@@ -69,19 +104,20 @@ export default function ChartReferenceLinesConfiguration({
         </tr>
       </thead>
       <tbody>
-        {form.values.referenceLines?.map((refLine, index) => (
+        {referenceLines.map(refLine => (
           <tr key={`${refLine.label}_${refLine.position}`}>
-            <td>{refLine.position}</td>
+            <td>{getPositionLabel(refLine.position)}</td>
             <td>{refLine.label}</td>
             <td>
               <Button
                 className="govuk-!-margin-bottom-0 dfe-float--right"
                 variant="secondary"
                 onClick={() => {
-                  const newReferenceLines = [
-                    ...(form.values.referenceLines ?? []),
-                  ];
-                  newReferenceLines.splice(index, 1);
+                  const newReferenceLines = form.values.referenceLines?.filter(
+                    line =>
+                      line.position !== refLine.position &&
+                      line.label !== refLine.label,
+                  );
 
                   form.setFieldValue('referenceLines', newReferenceLines);
                 }}
@@ -91,73 +127,75 @@ export default function ChartReferenceLinesConfiguration({
             </td>
           </tr>
         ))}
-        <tr>
-          <td>
-            {configuration.groupBy ? (
-              <FormSelect
-                name={`referenceLines[${form.values.referenceLines?.length}].position`}
-                id={`${id}-referenceLines-position`}
-                label="Position"
+        {(filteredOptions.length > 0 || axisType === 'minor') && (
+          <tr>
+            <td>
+              {axisType === 'major' ? (
+                <FormSelect
+                  name={`referenceLines[${form.values.referenceLines?.length}].position`}
+                  id={`${id}-referenceLines-position`}
+                  label="Position"
+                  hideLabel
+                  value={referenceLine.position?.toString()}
+                  placeholder="Choose position"
+                  order={FormSelect.unordered}
+                  options={filteredOptions}
+                  onChange={e => {
+                    setReferenceLine({
+                      ...referenceLine,
+                      position: e.target.value,
+                    });
+                  }}
+                />
+              ) : (
+                <FormNumberInput
+                  name={`referenceLines[${form.values.referenceLines?.length}].position`}
+                  id={`${id}-referenceLines-position`}
+                  label="Position"
+                  hideLabel
+                  value={referenceLine.position as number}
+                  onChange={e => {
+                    setReferenceLine({
+                      ...referenceLine,
+                      position: e.target.value,
+                    });
+                  }}
+                />
+              )}
+            </td>
+            <td>
+              <FormTextInput
+                name={`referenceLines[${form.values.referenceLines?.length}].label`}
+                id={`${id}-referenceLines-label`}
+                label="Label"
                 hideLabel
-                value={referenceLine.position?.toString()}
-                placeholder="Select position"
-                order={FormSelect.unordered}
-                options={options}
+                value={referenceLine.label}
                 onChange={e => {
                   setReferenceLine({
                     ...referenceLine,
-                    position: e.target.value,
+                    label: e.target.value,
                   });
                 }}
               />
-            ) : (
-              <FormNumberInput
-                name={`referenceLines[${form.values.referenceLines?.length}].position`}
-                id={`${id}-referenceLines-position`}
-                label="Position"
-                hideLabel
-                value={referenceLine.position as number}
-                onChange={e => {
-                  setReferenceLine({
-                    ...referenceLine,
-                    position: e.target.value,
-                  });
-                }}
-              />
-            )}
-          </td>
-          <td>
-            <FormTextInput
-              name={`referenceLines[${form.values.referenceLines?.length}].label`}
-              id={`${id}-referenceLines-label`}
-              label="Label"
-              hideLabel
-              value={referenceLine.label}
-              onChange={e => {
-                setReferenceLine({
-                  ...referenceLine,
-                  label: e.target.value,
-                });
-              }}
-            />
-          </td>
-          <td>
-            <Button
-              className="govuk-!-margin-bottom-0 dfe-float--right"
-              disabled={!referenceLine.position || !referenceLine.label}
-              onClick={() => {
-                form.setFieldValue('referenceLines', [
-                  ...(form.values.referenceLines ?? []),
-                  referenceLine,
-                ]);
+            </td>
+            <td>
+              <Button
+                className="govuk-!-margin-bottom-0 dfe-float--right"
+                disabled={!referenceLine.position || !referenceLine.label}
+                onClick={() => {
+                  form.setFieldValue('referenceLines', [
+                    ...(form.values.referenceLines ?? []),
+                    referenceLine,
+                  ]);
 
-                setReferenceLine({ label: '', position: '' });
-              }}
-            >
-              Add line
-            </Button>
-          </td>
-        </tr>
+                  setReferenceLine({ label: '', position: '' });
+                }}
+              >
+                Add line
+              </Button>
+            </td>
+          </tr>
+        )}
       </tbody>
     </table>
   );

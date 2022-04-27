@@ -15,15 +15,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         public AxisType Type;
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public AxisGroupBy GroupBy;
+        public AxisGroupBy? GroupBy;
 
         public string? GroupByFilter;
 
         public string SortBy = null!;
         public bool SortAsc = true;
 
-        public List<ChartDataSet> DataSets = new List<ChartDataSet>();
-        public List<AxisReferenceLine> ReferenceLines = new List<AxisReferenceLine>();
+        public List<ChartDataSet> DataSets = new();
+        public List<AxisReferenceLine> ReferenceLines = new();
         public bool Visible = true;
         public string Title = null!;
         public string Unit = null!;

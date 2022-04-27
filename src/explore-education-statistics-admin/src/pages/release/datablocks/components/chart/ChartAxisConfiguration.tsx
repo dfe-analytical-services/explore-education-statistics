@@ -161,7 +161,7 @@ const ChartAxisConfiguration = ({
       // values from overwriting existing values
       const result = merge({}, configuration, values, {
         // `configuration.type` may be incorrectly set by
-        // seeded releases so we want to make sure this is
+        // seeded releases, so we want to make sure this is
         // set using the `type` prop (which uses the axis key)
         type,
         // Numeric values may be treated as strings by Formik
@@ -267,6 +267,34 @@ const ChartAxisConfiguration = ({
     [configuration, validationSchema.fields],
   );
 
+  const handleSubmit = useCallback(
+    (values: FormValues) => {
+      const nextConfiguration = normalizeValues(values);
+
+      if (nextConfiguration.groupBy) {
+        const groupByFilters = getGroupByFilters(
+          nextConfiguration.groupBy,
+          meta,
+        );
+
+        // Strip out any reference lines that don't match. For the user's
+        // convenience, we only do this when the chart is saved so that
+        // they don't lose reference lines when toggling the `groupBy`.
+        onSubmit({
+          ...nextConfiguration,
+          referenceLines: nextConfiguration.referenceLines.filter(line =>
+            groupByFilters.some(filter => filter.value === line.position),
+          ),
+        });
+      } else {
+        onSubmit(nextConfiguration);
+      }
+
+      submit();
+    },
+    [meta, normalizeValues, onSubmit, submit],
+  );
+
   return (
     <Formik<FormValues>
       enableReinitialize
@@ -278,10 +306,7 @@ const ChartAxisConfiguration = ({
       }
       validateOnMount
       validationSchema={validationSchema}
-      onSubmit={values => {
-        onSubmit(normalizeValues(values));
-        submit();
-      }}
+      onSubmit={handleSubmit}
     >
       {form => (
         <Form id={id}>
@@ -480,6 +505,7 @@ const ChartAxisConfiguration = ({
 
           {validationSchema.fields.referenceLines && (
             <ChartReferenceLinesConfiguration
+              axisType={type}
               configuration={configuration}
               id={id}
               meta={meta}
@@ -496,3 +522,23 @@ const ChartAxisConfiguration = ({
 };
 
 export default ChartAxisConfiguration;
+
+function getGroupByFilters(groupBy: AxisGroupBy, meta: FullTableMeta) {
+  switch (groupBy) {
+    case 'filters':
+      return Object.values(meta.filters).flatMap(
+        filterGroup => filterGroup.options,
+      );
+    case 'indicators':
+      return meta.indicators;
+    case 'locations':
+      return meta.locations;
+    case 'timePeriod':
+      return meta.timePeriodRange.map(timePeriod => ({
+        value: `${timePeriod.year}_${timePeriod.code}`,
+        label: timePeriod.label,
+      }));
+    default:
+      return [];
+  }
+}
