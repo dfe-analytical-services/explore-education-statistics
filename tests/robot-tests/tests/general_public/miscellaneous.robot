@@ -33,6 +33,7 @@ Validate homepage
     user checks page contains element    link:Methodology
     user checks page contains element    link:Glossary
     user waits until h2 is visible    Related services
+    user checks page contains element    link:Statistics at DfE
     user checks page contains element    link:Find and compare schools in England
     user checks page contains element    link:Get information about schools
     user checks page contains element    link:Schools financial benchmarking
