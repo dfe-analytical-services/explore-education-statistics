@@ -113,6 +113,7 @@ Check that having a Draft owned Methodology attached to this Release's Publicati
     user creates methodology for publication    ${PUBLICATION_NAME}
     user navigates to this release
     user edits release status
+    user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
     ...    2 things you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings contains link    A methodology for this publication is not yet approved
@@ -121,6 +122,7 @@ Approve the owned methodology and verify the warning disappears
     user approves methodology for publication    ${PUBLICATION_NAME}
     user navigates to this release
     user edits release status
+    user waits until element is visible    testid:releaseChecklist-warnings    %{WAIT_SMALL}
     user checks checklist warnings contains
     ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings does not contain link    A methodology for this publication is not yet approved
