@@ -9,12 +9,17 @@ Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
 *** Variables ***
-${PUBLICATION_NAME}     UI tests - legacy releases %{RUN_IDENTIFIER}
+${PUBLICATION_NAME}         UI tests - legacy releases %{RUN_IDENTIFIER}
+${DESCRIPTION}              legacy release description
+${UPDATED_DESCRIPTION}      updated legacy release description
 
 *** Test Cases ***
 Create new publication for topic
-    environment variable should be set    RUN_IDENTIFIER
-    user creates test publication via api    ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
+    Set Suite Variable    ${PUBLICATION_ID}
+
+Create new release
+    user create test release via api    ${PUBLICATION_ID}    AY    2020
 
 Verify new publication
     user selects theme and topic from admin dashboard    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
@@ -33,7 +38,7 @@ Create legacy release
     user clicks button    OK
     user waits until modal is not visible    Create legacy release
     user waits until h1 is visible    Create legacy release
-    user enters text into element    id:legacyReleaseForm-description    Test collection
+    user enters text into element    id:legacyReleaseForm-description    ${DESCRIPTION}
     user enters text into element    id:legacyReleaseForm-url    http://test.com
     user clicks button    Save legacy release
 
@@ -41,8 +46,42 @@ Validate created legacy release
     user waits until h1 is visible    Manage publication
     user checks element count is x    css:tbody tr    1
     user checks results table cell contains    1    1    1
-    user checks results table cell contains    1    2    Test collection
+    user checks results table cell contains    1    2    ${DESCRIPTION}
     user checks results table cell contains    1    3    http://test.com
+
+Navigate to admin dashboard to create new release
+    user navigates to admin dashboard    Bau1
+
+Navigate to release in admin
+    user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
+    ...    Academic Year 2020/21 (not Live)
+
+Approve release
+    user clicks link    Sign off
+    user approves original release for immediate publication
+    user waits until page contains element    testid:public-release-url
+    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
+    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
+Check legacy release appears on public frontend
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+    user opens details dropdown    See other releases (1)
+
+    ${other_releases}=    user gets details content element    See other releases (1)
+
+    user checks list has x items    css:ul    1    ${other_releases}
+
+    ${other_release_1}=    user gets list item element    css:ul    1    ${other_releases}
+    ${other_release_1_link}=    get child element    ${other_release_1}    link:${DESCRIPTION}
+    user checks element attribute value should be    ${other_release_1_link}    href    http://test.com/
+
+Navigate to publication to update legacy releases
+    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    user opens accordion section    ${PUBLICATION_NAME}
+    user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
+    user waits until page contains title caption    ${PUBLICATION_NAME}
+    user waits until h1 is visible    Manage publication    %{WAIT_SMALL}
 
 Update legacy release
     user clicks element    xpath://tr[1]//*[text()="Edit release"]
@@ -50,19 +89,41 @@ Update legacy release
     user clicks button    OK
     user waits until modal is not visible    Edit legacy release
     user waits until h1 is visible    Edit legacy release
-    user enters text into element    id:legacyReleaseForm-description    Test collection 2
-    user enters text into element    id:legacyReleaseForm-url    http://test-2.com
-    user enters text into element    id:legacyReleaseForm-order    2
+    user enters text into element    id:legacyReleaseForm-description    ${UPDATED_DESCRIPTION}
+    user enters text into element    id:legacyReleaseForm-url    http://test2.com
     user clicks button    Save legacy release
 
 Validate updated legacy release
     user waits until h1 is visible    Manage publication
     user checks element count is x    css:tbody tr    1
-    # Changing order to 2 should not actually change it to 2
-    # as there isn't another release to swap the order with.
     user checks results table cell contains    1    1    1
-    user checks results table cell contains    1    2    Test collection 2
-    user checks results table cell contains    1    3    http://test-2.com
+    user checks results table cell contains    1    2    ${UPDATED_DESCRIPTION}
+    user checks results table cell contains    1    3    http://test2.com
+
+Validate public frontend shows changes made to legacy release after saving publication
+    user clicks button    Save publication
+    user waits until modal is visible    Confirm publication changes
+    user clicks button    Confirm
+    user waits until modal is not visible    Confirm publication changes
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+
+    user opens details dropdown    See other releases (1)
+
+    ${other_releases}=    user gets details content element    See other releases (1)
+
+    user checks list has x items    css:ul    1    ${other_releases}
+
+    ${other_release_1}=    user gets list item element    css:ul    1    ${other_releases}
+
+    ${other_release_1_link}=    get child element    ${other_release_1}    link:${UPDATED_DESCRIPTION}
+    user checks element attribute value should be    ${other_release_1_link}    href    http://test2.com/
+
+Navigate to publication to update legacy releases again
+    user opens publication on the admin dashboard    ${PUBLICATION_NAME}
+    user opens accordion section    ${PUBLICATION_NAME}
+    user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
+    user waits until page contains title caption    ${PUBLICATION_NAME}
+    user waits until h1 is visible    Manage publication    %{WAIT_SMALL}
 
 Delete legacy release
     user clicks element    xpath://tr[1]//*[text()="Delete release"]
