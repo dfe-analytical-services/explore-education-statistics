@@ -2,24 +2,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class FilterRepository : AbstractRepository<Filter, Guid>, IFilterRepository
+    public class FilterRepository : IFilterRepository
     {
-        public FilterRepository(StatisticsDbContext context) : base(context)
+        private readonly StatisticsDbContext _context;
+
+        public FilterRepository(StatisticsDbContext context)
         {
+            _context = context;
         }
 
-        public List<Filter> GetFiltersIncludingItems(Guid subjectId)
+        public Task<List<Filter>> GetFiltersIncludingItems(Guid subjectId)
         {
-            return FindMany(filter => filter.SubjectId == subjectId)
+            return _context.Filter
                 .Include(filter => filter.FilterGroups)
                 .ThenInclude(group => group.FilterItems)
-                .ToList();
+                .Where(filter => filter.SubjectId == subjectId)
+                .ToListAsync();
         }
     }
 }

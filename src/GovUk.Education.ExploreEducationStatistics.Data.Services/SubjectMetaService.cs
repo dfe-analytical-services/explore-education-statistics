@@ -100,11 +100,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             Guid subjectId,
             List<FilterUpdateViewModel> request)
         {
-            return await CheckReleaseSubjectExists(releaseId, subjectId)
+            return await CheckReleaseSubjectExists(releaseId: releaseId, subjectId: subjectId)
+                .OnSuccessDo(() => ValidateFiltersForSubject(subjectId, request))
                 .OnSuccessVoid(async rs =>
                 {
-                    // TODO EES-3345 Validate all entries are present and only entries that relate to the subject
-
                     // Set the sequence based on the order of filters, filter groups and indicators observed
                     // in the request
                     rs.FilterSequence = request.Select(filter =>
@@ -127,11 +126,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             Guid subjectId,
             List<IndicatorGroupUpdateViewModel> request)
         {
-            return await CheckReleaseSubjectExists(releaseId, subjectId)
+            return await CheckReleaseSubjectExists(releaseId: releaseId, subjectId: subjectId)
+                .OnSuccessDo(() => ValidateIndicatorGroupsForSubject(subjectId, request))
                 .OnSuccessVoid(async releaseSubject =>
                 {
-                    // TODO EES-3345 Validate all entries are present and only entries that relate to the subject
-
                     // Set the sequence based on the order of indicator groups and indicators observed
                     // in the request
                     releaseSubject.IndicatorSequence = request.Select(indicatorGroup =>
@@ -148,8 +146,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return new SubjectMetaViewModel
             {
-                Filters = GetFilters(releaseSubject),
-                Indicators = GetIndicators(releaseSubject),
+                Filters = await GetFilters(releaseSubject),
+                Indicators = await GetIndicators(releaseSubject),
                 Locations = await GetLocations(releaseSubject.SubjectId),
                 TimePeriod = GetTimePeriods(releaseSubject.SubjectId)
             };
@@ -210,7 +208,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var indicators = GetIndicators(releaseSubject);
+                    var indicators = await GetIndicators(releaseSubject);
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
 
                     return new SubjectMetaViewModel
@@ -225,9 +223,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             }
         }
 
-        private Dictionary<string, FilterMetaViewModel> GetFilters(ReleaseSubject releaseSubject)
+        private async Task<Dictionary<string, FilterMetaViewModel>> GetFilters(ReleaseSubject releaseSubject)
         {
-            var filters = _filterRepository.GetFiltersIncludingItems(releaseSubject.SubjectId);
+            var filters = await _filterRepository.GetFiltersIncludingItems(releaseSubject.SubjectId);
             return FiltersViewModelBuilder.BuildFilters(filters, releaseSubject.FilterSequence);
         }
 
@@ -251,9 +249,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return BuildLocationAttributeViewModels(locationsHierarchical);
         }
 
-        private Dictionary<string, IndicatorGroupMetaViewModel> GetIndicators(ReleaseSubject releaseSubject)
+        private async Task<Dictionary<string, IndicatorGroupMetaViewModel>> GetIndicators(ReleaseSubject releaseSubject)
         {
-            var indicators = _indicatorGroupRepository.GetIndicatorGroups(releaseSubject.SubjectId);
+            var indicators = await _indicatorGroupRepository.GetIndicatorGroups(releaseSubject.SubjectId);
             return IndicatorsViewModelBuilder.BuildIndicatorGroups(indicators,
                 releaseSubject.IndicatorSequence);
         }
@@ -334,6 +332,115 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 )
                 : await _releaseSubjectRepository.GetReleaseSubjectForLatestPublishedVersion(subjectId) ??
                   new Either<ActionResult, ReleaseSubject>(new NotFoundResult());
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateFiltersForSubject(
+            Guid subjectId,
+            List<FilterUpdateViewModel> requestFilters)
+        {
+            var filters = await _filterRepository.GetFiltersIncludingItems(subjectId);
+            return AssertCollectionsAreSameIgnoringOrder(filters,
+                requestFilters,
+                filter => filter.Id,
+                requestFilter => requestFilter.Id,
+                "Requested filters do not match subject filters").OnSuccess(_ =>
+            {
+                var requestMap = requestFilters.ToDictionary(filter => filter.Id);
+                var results = filters.Select(filter =>
+                        ValidateFilterGroupsForSubject(filter, requestMap[filter.Id].FilterGroups))
+                    .ToList();
+
+                var failure = results.FirstOrDefault(result => result.IsLeft)?.Left;
+                return failure ?? new Either<ActionResult, Unit>(Unit.Instance);
+            });
+        }
+
+        private static Either<ActionResult, Unit> ValidateFilterGroupsForSubject(
+            Filter filter,
+            List<FilterGroupUpdateViewModel> requestFilterGroups)
+        {
+            return AssertCollectionsAreSameIgnoringOrder(filter.FilterGroups,
+                    requestFilterGroups,
+                    filterGroup => filterGroup.Id,
+                    requestFilterGroup => requestFilterGroup.Id,
+                    $"Requested filter groups do not match subject filter groups for filter: {filter.Id}")
+                .OnSuccess(_ =>
+                {
+                    var requestMap = requestFilterGroups.ToDictionary(filterGroup => filterGroup.Id);
+                    var results = filter.FilterGroups.Select(filterGroup =>
+                            AssertCollectionsAreSameIgnoringOrder(filterGroup.FilterItems,
+                                requestMap[filterGroup.Id].FilterItems,
+                                indicator => indicator.Id,
+                                $"Requested filter items do not match subject for filter group: {filterGroup.Id}"))
+                        .ToList();
+
+                    var failure = results.FirstOrDefault(result => result.IsLeft)?.Left;
+                    return failure ?? new Either<ActionResult, Unit>(Unit.Instance);
+                });
+        }
+
+        private async Task<Either<ActionResult, Unit>> ValidateIndicatorGroupsForSubject(
+            Guid subjectId,
+            List<IndicatorGroupUpdateViewModel> requestIndicatorGroups)
+        {
+            var indicatorGroups = await _indicatorGroupRepository.GetIndicatorGroups(subjectId);
+            return AssertCollectionsAreSameIgnoringOrder(indicatorGroups,
+                    requestIndicatorGroups,
+                    indicatorGroup => indicatorGroup.Id,
+                    requestIndicatorGroup => requestIndicatorGroup.Id,
+                    "Requested indicator groups do not match subject indicator groups")
+                .OnSuccess(_ =>
+                {
+                    var requestMap = requestIndicatorGroups.ToDictionary(indicatorGroup => indicatorGroup.Id);
+                    var results = indicatorGroups.Select(indicatorGroup =>
+                            AssertCollectionsAreSameIgnoringOrder(indicatorGroup.Indicators,
+                                requestMap[indicatorGroup.Id].Indicators,
+                                indicator => indicator.Id,
+                                $"Requested indicators do not match subject for indicator group: {indicatorGroup.Id}"))
+                        .ToList();
+
+                    var failure = results.FirstOrDefault(result => result.IsLeft)?.Left;
+                    return failure ?? new Either<ActionResult, Unit>(Unit.Instance);
+                });
+        }
+
+        private static Either<ActionResult, Unit> AssertCollectionsAreSameIgnoringOrder<TLeft, TRight, TId>(
+            IEnumerable<TLeft> left,
+            IEnumerable<TRight> right,
+            Func<TLeft, TId> leftIdSelector,
+            Func<TRight, TId> rightIdSelector,
+            string error)
+        {
+            var rightIdList = right.Select(rightIdSelector).ToList();
+            return AssertCollectionsAreSameIgnoringOrder(left, rightIdList, leftIdSelector, error);
+        }
+
+        private static Either<ActionResult, Unit> AssertCollectionsAreSameIgnoringOrder<TLeft, TId>(
+            IEnumerable<TLeft> left,
+            IEnumerable<TId> right,
+            Func<TLeft, TId> leftIdSelector,
+            string error)
+        {
+            if (CollectionsAreSameIgnoringOrder(left, right, leftIdSelector))
+            {
+                return Unit.Instance;
+            }
+
+            return new BadRequestObjectResult(error);
+        }
+
+        private static bool CollectionsAreSameIgnoringOrder<TLeft, TId>(
+            IEnumerable<TLeft> left,
+            IEnumerable<TId> right,
+            Func<TLeft, TId> leftIdSelector)
+        {
+            var leftIdList = left.Select(leftIdSelector).ToList();
+            var rightIdList = right.ToList();
+
+            var leftNotInRight = leftIdList.Except(rightIdList);
+            var rightNotInLeft = rightIdList.Except(leftIdList);
+
+            return !(leftNotInRight.Any() || rightNotInLeft.Any());
         }
     }
 }

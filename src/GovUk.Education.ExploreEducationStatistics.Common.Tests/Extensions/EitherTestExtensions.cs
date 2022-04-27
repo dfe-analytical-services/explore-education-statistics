@@ -68,6 +68,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             return either.Left;
         }
 
+        public static ActionResult AssertBadRequest<TRight>(this Either<ActionResult, TRight> either, string expectedError)
+        {
+            var badRequest = either.AssertActionResultOfType<BadRequestObjectResult, TRight>();
+            badRequest.AssertBadRequest(expectedError);
+            return either.Left;
+        }
+
         private static TActionResult AssertActionResultOfType<TActionResult, TRight>(this Either<ActionResult, TRight> result)
             where TActionResult : ActionResult
         {

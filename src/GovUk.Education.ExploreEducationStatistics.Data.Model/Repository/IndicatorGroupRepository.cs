@@ -2,23 +2,28 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Expressions;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class IndicatorGroupRepository : AbstractRepository<IndicatorGroup, Guid>, IIndicatorGroupRepository
+    public class IndicatorGroupRepository : IIndicatorGroupRepository
     {
-        public IndicatorGroupRepository(StatisticsDbContext context) : base(context)
+        private readonly StatisticsDbContext _context;
+
+        public IndicatorGroupRepository(StatisticsDbContext context)
         {
+            _context = context;
         }
 
-        public List<IndicatorGroup> GetIndicatorGroups(Guid subjectId)
+        public async Task<List<IndicatorGroup>> GetIndicatorGroups(Guid subjectId)
         {
-            return FindMany(group => group.SubjectId == subjectId,
-                    new List<Expression<Func<IndicatorGroup, object>>> {group => group.Indicators})
-                .ToList();
+            return await _context.IndicatorGroup
+                .Include(group => group.Indicators)
+                .Where(indicatorGroup => indicatorGroup.SubjectId == subjectId)
+                .ToListAsync();
         }
     }
 }

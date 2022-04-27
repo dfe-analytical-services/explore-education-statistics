@@ -19,7 +19,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class DataGuidanceSubjectService : IDataGuidanceSubjectService
     {
-        private readonly IFilterRepository _filterRepository;
         private readonly IIndicatorRepository _indicatorRepository;
         private readonly StatisticsDbContext _context;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
@@ -27,15 +26,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly ITimePeriodService _timePeriodService;
 
-        public DataGuidanceSubjectService(IFilterRepository filterRepository,
-            IIndicatorRepository indicatorRepository,
+        public DataGuidanceSubjectService(IIndicatorRepository indicatorRepository,
             StatisticsDbContext context,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
             IReleaseDataFileRepository releaseDataFileRepository,
             IFootnoteRepository footnoteRepository,
             ITimePeriodService timePeriodService)
         {
-            _filterRepository = filterRepository;
             _indicatorRepository = indicatorRepository;
             _context = context;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
@@ -109,7 +106,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private List<LabelValue> GetVariables(Guid subjectId)
         {
-            var filters = _filterRepository.FindMany(filter => filter.SubjectId == subjectId)
+            var filters = _context.Filter
+                .Where(filter => filter.SubjectId == subjectId)
                 .Select(filter =>
                     new LabelValue(
                         string.IsNullOrWhiteSpace(filter.Hint) ? filter.Label : $"{filter.Label} - {filter.Hint}",
