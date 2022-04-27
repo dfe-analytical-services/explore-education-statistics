@@ -183,19 +183,23 @@ describe('ChartAxisConfiguration', () => {
     userEvent.tab();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: 'Enter tick spacing' }),
-      ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('link', { name: 'Enter tick spacing' }),
+    ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
 
     await userEvent.type(screen.getByLabelText('Every nth value'), '-1');
     userEvent.tab();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: 'Tick spacing must be positive' }),
-      ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('link', { name: 'Tick spacing must be positive' }),
+    ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
   });
 
   test('shows validation error if invalid label width given', async () => {
@@ -218,10 +222,12 @@ describe('ChartAxisConfiguration', () => {
     userEvent.tab();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: 'Label width must be positive' }),
-      ).toHaveAttribute('href', '#chartBuilder-major-labelWidth');
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('link', { name: 'Label width must be positive' }),
+    ).toHaveAttribute('href', '#chartBuilder-major-labelWidth');
   });
 
   test('shows validation error if invalid axis width given', async () => {
@@ -244,10 +250,12 @@ describe('ChartAxisConfiguration', () => {
     userEvent.tab();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: 'Size of axis must be positive' }),
-      ).toHaveAttribute('href', '#chartBuilder-major-size');
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('link', { name: 'Size of axis must be positive' }),
+    ).toHaveAttribute('href', '#chartBuilder-major-size');
   });
 
   test('submitting fails with invalid values', async () => {
@@ -328,7 +336,7 @@ describe('ChartAxisConfiguration', () => {
     });
   });
 
-  describe('Group data by', () => {
+  describe('group data by', () => {
     test('submitting succeeds with the group data by option changed', async () => {
       const handleSubmit = jest.fn();
 
@@ -432,7 +440,7 @@ describe('ChartAxisConfiguration', () => {
     });
   });
 
-  describe('Reference lines', () => {
+  describe('reference lines', () => {
     test('adding reference lines', async () => {
       const handleSubmit = jest.fn();
 
@@ -451,29 +459,31 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      const referenceLinesSection = within(
+      const referenceLines = within(
         screen.getByRole('table', { name: 'Reference lines' }),
       );
-      expect(referenceLinesSection.getAllByRole('row')).toHaveLength(2);
+      expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-      fireEvent.change(referenceLinesSection.getByLabelText('Position'), {
+      fireEvent.change(referenceLines.getByLabelText('Position'), {
         target: { value: '2014_AY' },
       });
 
       await userEvent.type(
-        referenceLinesSection.getByLabelText('Label'),
+        referenceLines.getByLabelText('Label'),
         'I am label',
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
       await waitFor(() => {
-        const rows = referenceLinesSection.getAllByRole('row');
-        expect(rows).toHaveLength(3);
-        expect(rows[1]).toHaveTextContent('2014_AY');
-        expect(rows[1]).toHaveTextContent('I am label');
-        expect(within(rows[1]).getByRole('button', { name: 'Remove' }));
+        expect(referenceLines.getByText('I am label')).toBeInTheDocument();
       });
+
+      const rows = referenceLines.getAllByRole('row');
+      expect(rows).toHaveLength(3);
+      expect(rows[1]).toHaveTextContent('2014_AY');
+      expect(rows[1]).toHaveTextContent('I am label');
+      expect(within(rows[1]).getByRole('button', { name: 'Remove' }));
     });
 
     test('successfully submitting with reference lines', async () => {

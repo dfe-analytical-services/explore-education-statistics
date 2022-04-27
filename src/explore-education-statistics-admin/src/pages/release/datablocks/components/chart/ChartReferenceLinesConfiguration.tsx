@@ -86,7 +86,7 @@ export default function ChartReferenceLinesConfiguration({
                   form.setFieldValue('referenceLines', newReferenceLines);
                 }}
               >
-                Remove
+                Remove <span className="govuk-visually-hidden">line</span>
               </Button>
             </td>
           </tr>
