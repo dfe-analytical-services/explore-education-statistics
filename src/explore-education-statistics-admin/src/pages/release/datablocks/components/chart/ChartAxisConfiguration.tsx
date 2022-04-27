@@ -1,7 +1,7 @@
 import styles from '@admin/pages/release/datablocks/components/chart/ChartAxisConfiguration.module.scss';
 import ChartBuilderSaveActions from '@admin/pages/release/datablocks/components/chart/ChartBuilderSaveActions';
+import ChartReferenceLinesConfiguration from '@admin/pages/release/datablocks/components/chart/ChartReferenceLinesConfiguration';
 import { useChartBuilderFormsContext } from '@admin/pages/release/datablocks/components/chart/contexts/ChartBuilderFormsContext';
-import Button from '@common/components/Button';
 import Effect from '@common/components/Effect';
 import {
   Form,
@@ -9,20 +9,17 @@ import {
   FormFieldSelect,
   FormFieldset,
   FormFieldTextInput,
-  FormTextInput,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
-import FormNumberInput from '@common/components/form/FormNumberInput';
 import { RadioOption } from '@common/components/form/FormRadioGroup';
-import FormSelect, { SelectOption } from '@common/components/form/FormSelect';
+import { SelectOption } from '@common/components/form/FormSelect';
 import {
   AxisConfiguration,
   AxisGroupBy,
   AxisType,
   ChartDefinition,
   Label,
-  ReferenceLine,
   TickConfig,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
@@ -36,7 +33,7 @@ import { Formik } from 'formik';
 import mapValues from 'lodash/mapValues';
 import merge from 'lodash/merge';
 import pick from 'lodash/pick';
-import React, { ReactNode, useCallback, useMemo, useState } from 'react';
+import React, { ReactNode, useCallback, useMemo } from 'react';
 import { ObjectSchema } from 'yup';
 
 type FormValues = Partial<OmitStrict<AxisConfiguration, 'dataSets' | 'type'>>;
@@ -157,46 +154,6 @@ const ChartAxisConfiguration = ({
       value: index.toString(),
     }));
   }, [dataSetCategories, type]);
-
-  const [referenceLine, setReferenceLine] = useState<ReferenceLine>({
-    position: '',
-    label: '',
-  });
-
-  const referenceOptions = useMemo<SelectOption[]>(() => {
-    if (configuration.groupBy) {
-      const options: SelectOption[] = [];
-
-      switch (configuration.groupBy) {
-        case 'filters':
-          options.push(
-            ...Object.values(meta.filters).flatMap(
-              filterGroup => filterGroup.options,
-            ),
-          );
-          break;
-        case 'indicators':
-          options.push(...meta.indicators);
-          break;
-        case 'locations':
-          options.push(...meta.locations);
-          break;
-        case 'timePeriod':
-          options.push(
-            ...meta.timePeriodRange.map(timePeriod => ({
-              value: `${timePeriod.year}_${timePeriod.code}`,
-              label: timePeriod.label,
-            })),
-          );
-          break;
-        default:
-          break;
-      }
-
-      return options;
-    }
-    return [];
-  }, [configuration.groupBy, meta]);
 
   const normalizeValues = useCallback(
     (values: FormValues): AxisConfiguration => {
@@ -522,115 +479,11 @@ const ChartAxisConfiguration = ({
           </div>
 
           {validationSchema.fields.referenceLines && (
-            <table className="govuk-table">
-              <caption className="govuk-heading-s">Reference lines</caption>
-              <thead>
-                <tr>
-                  <th>Position</th>
-                  <th>Label</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {form.values.referenceLines &&
-                  form.values.referenceLines.map((refLine, idx) => (
-                    <tr key={`${refLine.label}_${refLine.position}`}>
-                      <td>{refLine.position}</td>
-                      <td>{refLine.label}</td>
-                      <td>
-                        <button
-                          className="govuk-button govuk-button--secondary govuk-!-margin-0"
-                          type="button"
-                          onClick={() => {
-                            const newReferenceLines = [
-                              ...(form.values.referenceLines ?? []),
-                            ];
-                            newReferenceLines.splice(idx, 1);
-
-                            form.setFieldValue(
-                              'referenceLines',
-                              newReferenceLines,
-                            );
-                          }}
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                <tr>
-                  <td>
-                    {type === 'minor' && (
-                      <FormNumberInput
-                        name={`referenceLines[${form.values.referenceLines?.length}].position`}
-                        id={`${id}-referenceLines-position`}
-                        label="Position"
-                        hideLabel
-                        value={referenceLine.position as number}
-                        onChange={e => {
-                          setReferenceLine({
-                            ...referenceLine,
-                            position: e.target.value,
-                          });
-                        }}
-                      />
-                    )}
-                    {type === 'major' && (
-                      <FormSelect
-                        name={`referenceLines[${form.values.referenceLines?.length}].position`}
-                        id={`${id}-referenceLines-position`}
-                        label="Position"
-                        hideLabel
-                        value={referenceLine.position?.toString()}
-                        placeholder="Select position"
-                        order={FormSelect.unordered}
-                        options={referenceOptions}
-                        onChange={e => {
-                          setReferenceLine({
-                            ...referenceLine,
-                            position: e.target.value,
-                          });
-                        }}
-                      />
-                    )}
-                  </td>
-                  <td>
-                    <FormTextInput
-                      name={`referenceLines[${form.values.referenceLines?.length}].label`}
-                      id={`${id}-referenceLines-label`}
-                      label="Label"
-                      hideLabel
-                      value={referenceLine.label}
-                      onChange={e => {
-                        setReferenceLine({
-                          ...referenceLine,
-                          label: e.target.value,
-                        });
-                      }}
-                    />
-                  </td>
-                  <td>
-                    <Button
-                      disabled={
-                        referenceLine.position === '' ||
-                        referenceLine.label === ''
-                      }
-                      className="govuk-!-margin-bottom-0 dfe-float--right"
-                      onClick={() => {
-                        form.setFieldValue('referenceLines', [
-                          ...(form.values.referenceLines ?? []),
-                          referenceLine,
-                        ]);
-
-                        setReferenceLine({ label: '', position: '' });
-                      }}
-                    >
-                      Add line
-                    </Button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <ChartReferenceLinesConfiguration
+              configuration={configuration}
+              id={id}
+              meta={meta}
+            />
           )}
 
           <ChartBuilderSaveActions formId={id} formKey={type}>
