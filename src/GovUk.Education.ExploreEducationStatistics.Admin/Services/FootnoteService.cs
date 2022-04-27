@@ -150,6 +150,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(id, HydrateFootnote)
                 .OnSuccess(async footnote =>
                 {
+                    // NOTE: At the time of writing, footnotes are now always exclusive to a particular release, but
+                    // in the past this wasn't always the case. It's unclear whether this is still necessary for
+                    // the sake of older footnotes.
                     if (await _footnoteRepository.IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
                     {
                         _context.Update(footnote);
