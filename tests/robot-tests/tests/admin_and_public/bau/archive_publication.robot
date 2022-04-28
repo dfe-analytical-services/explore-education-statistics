@@ -235,7 +235,14 @@ Check data catalogue page contains archive and superseding publication subjects
     user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
     user checks page does not contain    This is the latest data
 
-    user clicks button    Previous step
+    user clicks button    Next step
+    user waits until page contains    Choose files to download
+    user waits until page contains    ${SUBJECT_NAME_ARCHIVE}
+
+    user checks page does not contain    This is the latest data
+    user checks page contains    This is not the latest data
+
+    user clicks button    Change publication
     user waits until page contains    ${PUBLICATION_NAME_SUPERSEDE}
 
     user clicks radio    ${PUBLICATION_NAME_SUPERSEDE}
@@ -245,6 +252,13 @@ Check data catalogue page contains archive and superseding publication subjects
 
     user checks page contains radio    ${RELEASE_NAME_SUPERSEDE}
     user checks page contains    This is the latest data
+
+    user clicks button    Next step
+    user waits until page contains    Choose files to download
+    user waits until page contains    ${SUBJECT_NAME_SUPERSEDE}
+
+    user checks page contains    This is the latest data
+    user checks page does not contain    This is not the latest data
 
 Check archive-publication permalink has out-of-date warning
     user navigates to public frontend    ${PERMALINK_URL}
@@ -326,7 +340,14 @@ Check data catalogue page is correct after archive-publication has been unarchiv
     user checks page contains radio    ${RELEASE_NAME_ARCHIVE}
     user checks page contains    This is the latest data
 
-    user clicks button    Previous step
+    user clicks button    Next step
+    user waits until page contains    Choose files to download
+    user waits until page contains    ${SUBJECT_NAME_ARCHIVE}
+
+    user checks page contains    This is the latest data
+    user checks page does not contain    This is not the latest data
+
+    user clicks button    Change publication
     user waits until page contains    ${PUBLICATION_NAME_SUPERSEDE}
 
     user clicks radio    ${PUBLICATION_NAME_SUPERSEDE}
@@ -336,6 +357,13 @@ Check data catalogue page is correct after archive-publication has been unarchiv
 
     user checks page contains radio    ${RELEASE_NAME_SUPERSEDE}
     user checks page contains    This is the latest data
+
+    user clicks button    Next step
+    user waits until page contains    Choose files to download
+    user waits until page contains    ${SUBJECT_NAME_SUPERSEDE}
+
+    user checks page contains    This is the latest data
+    user checks page does not contain    This is not the latest data
 
 Check archive-publication permalink no longer has out-of-date warning after archive-publication has been unarchived
     user navigates to public frontend    ${PERMALINK_URL}
