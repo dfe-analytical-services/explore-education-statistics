@@ -3,21 +3,47 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
-    public class PublicationServiceTests
+    [Collection(BlobCacheServiceTests)]
+    public class PublicationServiceTests : BlobCacheServiceTestFixture
     {
+        // TODO - this constructor sets up default expectations for the caching service that are called by each test
+        // method within this test class.  In future it would be good to do targeted testing around caching within
+        // each method under test.  The reason this test class needs to be identified as part of the
+        // "BlobCacheServiceTests" collection is that otherwise these test methods will fail with unmatched CacheService
+        // setups if run in parallel with another test class that is of the "BlobCacheServiceTests" collection.
+        // This would happen because the other test class enables caching and sets a static CacheService mock at the
+        // same time as this class is running.
+        public PublicationServiceTests()
+        {
+            CacheService
+                .Setup(s => s.GetItem(
+                    It.IsAny<PublicationCacheKey>(), typeof(PublicationViewModel)))
+                .ReturnsAsync(null);
+
+            CacheService
+                .Setup(s => s.SetItem<object>(
+                    It.IsAny<PublicationCacheKey>(), It.IsAny<PublicationViewModel>()))
+                .Returns(Task.CompletedTask);
+        }
+        
         [Fact]
         public async Task Get()
         {

@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _mapper = mapper;
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> Get(string publicationSlug, string? releaseSlug = null)
+        public async Task<Either<ActionResult, ReleaseViewModel>> GetCachedViewModel(string publicationSlug, string? releaseSlug = null)
         {
             return await _publicationService.Get(publicationSlug)
                 .OnSuccessCombineWith(publication => _methodologyService.GetCachedSummariesByPublication(publication.Id))

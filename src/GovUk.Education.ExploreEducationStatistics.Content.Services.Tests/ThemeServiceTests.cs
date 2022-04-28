@@ -4,18 +4,42 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
-    public class ThemeServiceTests
+    [Collection(BlobCacheServiceTests)]
+    public class ThemeServiceTests : BlobCacheServiceTestFixture
     {
+        // TODO - this constructor sets up default expectations for the caching service that are called by each test
+        // method within this test class.  In future it would be good to do targeted testing around caching within
+        // each method under test.  The reason this test class needs to be identified as part of the
+        // "BlobCacheServiceTests" collection is that otherwise these test methods will fail with unmatched CacheService
+        // setups if run in parallel with another test class that is of the "BlobCacheServiceTests" collection.
+        // This would happen because the other test class enables caching and sets a static CacheService mock at the
+        // same time as this class is running.
+        public ThemeServiceTests()
+        {
+            CacheService
+                .Setup(s => s.GetItem(
+                    It.IsAny<PublicationTreeCacheKey>(), typeof(IList<ThemeTree<PublicationTreeNode>>)))
+                .ReturnsAsync(null);
+
+            CacheService
+                .Setup(s => s.SetItem<object>(
+                    It.IsAny<PublicationTreeCacheKey>(), It.IsAny<List<ThemeTree<PublicationTreeNode>>>()))
+                .Returns(Task.CompletedTask);
+        }
+
         [Fact]
         public async Task GetPublicationTree_Empty()
         {

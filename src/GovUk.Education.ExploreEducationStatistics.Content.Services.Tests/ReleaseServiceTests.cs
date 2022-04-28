@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
     public class ReleaseServiceTests
     {
         [Fact]
-        public async Task Get()
+        public async Task GetCachedViewModel()
         {
             var publicationId = Guid.NewGuid();
             var releaseId = Guid.NewGuid();
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     methodologyService: methodologyService.Object,
                     fileStorageService: fileStorageService.Object);
 
-                var result = await service.Get(publicationSlug, releaseSlug);
+                var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
 
                 VerifyAllMocks(methodologyService, publicationService, fileStorageService);
 
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task Get_PublicationNotFound()
+        public async Task GetCachedViewModel_PublicationNotFound()
         {
             const string publicationSlug = "publication-a";
             const string releaseSlug = "2016";
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             var service = SetupReleaseService(contentDbContext,
                 publicationService: publicationService.Object);
 
-            var result = await service.Get(publicationSlug, releaseSlug);
+            var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
 
             VerifyAllMocks(publicationService);
 
@@ -133,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
-        public async Task Get_ReleaseNotFound()
+        public async Task GetCachedViewModel_ReleaseNotFound()
         {
             var publicationId = Guid.NewGuid();
             var releaseId = Guid.NewGuid();
@@ -183,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     fileStorageService: fileStorageService.Object,
                     methodologyService: methodologyService.Object);
 
-                var result = await service.Get(publicationSlug, releaseSlug);
+                var result = await service.GetCachedViewModel(publicationSlug, releaseSlug);
 
                 VerifyAllMocks(publicationService, fileStorageService, methodologyService);
 

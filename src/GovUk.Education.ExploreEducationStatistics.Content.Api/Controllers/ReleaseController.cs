@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -16,14 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     public class ReleaseController : ControllerBase
     {
         private readonly IReleaseService _releaseService;
-        private readonly IMethodologyService _methodologyService;
 
-        public ReleaseController(
-            IReleaseService releaseService, 
-            IMethodologyService methodologyService)
+        public ReleaseController(IReleaseService releaseService)
         {
             _releaseService = releaseService;
-            _methodologyService = methodologyService;
         }
 
         [HttpGet("publications/{publicationSlug}/releases")]
@@ -36,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("publications/{publicationSlug}/releases/latest")]
         public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
         {
-            return await _releaseService.Get(publicationSlug)
+            return await _releaseService.GetCachedViewModel(publicationSlug)
                 .HandleFailuresOrOk();
         }
 
@@ -50,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}")]
         public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
         {
-            return await _releaseService.Get(
+            return await _releaseService.GetCachedViewModel(
                     publicationSlug,
                     releaseSlug)
                 .HandleFailuresOrOk();

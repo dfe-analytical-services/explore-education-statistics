@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            releaseService.Setup(mock => mock.Get("publication-a", null))
+            releaseService.Setup(mock => mock.GetCachedViewModel("publication-a", null))
                 .ReturnsAsync(BuildReleaseViewModel());
 
             var controller = BuildReleaseController(releaseService.Object);
@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            releaseService.Setup(mock => mock.Get(
+            releaseService.Setup(mock => mock.GetCachedViewModel(
                     "publication-a", null))
                 .ReturnsAsync(new NotFoundResult());
 
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            releaseService.Setup(mock => mock.Get(
+            releaseService.Setup(mock => mock.GetCachedViewModel(
                     "publication-a", "2000"))
                 .ReturnsAsync(BuildReleaseViewModel());
 
@@ -75,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var releaseService = new Mock<IReleaseService>(MockBehavior.Strict);
 
-            releaseService.Setup(mock => mock.Get(
+            releaseService.Setup(mock => mock.GetCachedViewModel(
                     "publication-a", "2000"))
                 .ReturnsAsync(new NotFoundResult());
 
