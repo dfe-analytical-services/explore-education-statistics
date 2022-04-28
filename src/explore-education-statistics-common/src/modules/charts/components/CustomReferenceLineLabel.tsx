@@ -1,44 +1,44 @@
-import { ReferenceLine } from '@common/modules/charts/types/chart';
 import { ChartData } from '@common/modules/charts/types/dataSet';
-import React from 'react';
-import { ReferenceLineProps } from 'recharts';
+import React, { memo } from 'react';
+import { ViewBox } from 'recharts';
 
-interface Props {
+interface Props extends ViewBox {
   chartData: ChartData[];
-  referenceLine: ReferenceLine;
-  referenceLineProps: ReferenceLineProps;
+  label: string;
+  position: string | number;
 }
 
 const CustomReferenceLineLabel = ({
   chartData,
-  referenceLine,
-  referenceLineProps,
+  label,
+  position,
+  height = 0,
+  width = 0,
+  x = 0,
+  y = 0,
 }: Props) => {
   const getTextAnchor = () => {
-    if (referenceLine.position === chartData[0].name) {
+    if (position === chartData[0].name) {
       return 'start';
     }
-    if (referenceLine.position === chartData[chartData.length - 1].name) {
+
+    if (position === chartData[chartData.length - 1].name) {
       return 'end';
     }
-    return 'middle';
-  };
 
-  const getY = () => {
-    const y = referenceLineProps.viewBox?.y ?? 0;
-    const height = referenceLineProps.viewBox?.height ?? 0;
-    return height / 2 + y;
+    return 'middle';
   };
 
   return (
     <text
-      x={referenceLineProps.viewBox?.x}
-      y={getY()}
+      className="govuk-!-font-size-16"
+      x={width / 2 + x}
+      y={height / 2 + y}
       textAnchor={getTextAnchor()}
     >
-      <tspan>{referenceLine.label}</tspan>
+      <tspan>{label}</tspan>
     </text>
   );
 };
 
-export default CustomReferenceLineLabel;
+export default memo(CustomReferenceLineLabel);
