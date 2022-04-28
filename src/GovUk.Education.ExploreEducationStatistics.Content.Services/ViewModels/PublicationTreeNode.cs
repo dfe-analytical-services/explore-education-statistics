@@ -13,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public bool IsSuperseded { get; set; }
 
+        public bool HasLiveRelease { get; set; }
+
         public bool LatestReleaseHasData { get; set; }
 
         public bool AnyLiveReleaseHasData { get; set; }
