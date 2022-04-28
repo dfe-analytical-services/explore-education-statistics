@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
     {
         SubjectRemoved,
         NotForLatestRelease,
-        SubjectReplaced,
+        SubjectReplacedOrRemoved,
         Current,
     }
 

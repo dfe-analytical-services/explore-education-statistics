@@ -224,19 +224,19 @@ describe('PermalinkPage', () => {
     expect(screen.getAllByRole('row')).toHaveLength(2);
   });
 
-  test('renders warning message with permalink status SubjectReplaced', () => {
+  test('renders warning message with permalink status SubjectReplacedOrRemoved', () => {
     render(
       <PermalinkPage
         data={{
           ...testPermalink,
-          status: 'SubjectReplaced',
+          status: 'SubjectReplacedOrRemoved',
         }}
       />,
     );
 
     expect(
       screen.getByText(
-        'WARNING - The data used in this table may be invalid as the subject file has been amended since its creation.',
+        'WARNING - The data used in this table may be invalid as the subject file has been amended or removed since its creation.',
       ),
     ).toBeInTheDocument();
 

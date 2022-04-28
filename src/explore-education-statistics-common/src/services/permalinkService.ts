@@ -6,7 +6,7 @@ import deduplicatePermalinkLocations from '@common/services/util/permalinkServic
 export type Permalink = ConfiguredTable & {
   status?:
     | 'SubjectRemoved'
-    | 'SubjectReplaced'
+    | 'SubjectReplacedOrRemoved'
     | 'NotForLatestRelease'
     | 'Current';
 };

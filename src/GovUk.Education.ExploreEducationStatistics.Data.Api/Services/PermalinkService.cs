@@ -113,12 +113,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private async Task<PermalinkStatus> GetPermalinkStatus(Guid subjectId)
         {
-            var subject = await _subjectRepository.Get(subjectId);
-            if (subject == null)
-            {
-                return PermalinkStatus.SubjectRemoved;
-            }
-
             var releasesWithSubject = _contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
                 .Include(rf => rf.Release)
@@ -132,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                 .ToList();
             if (releasesWithSubject.Count == 0)
             {
-                throw new Exception("The subject should be attached to at least one live release");
+                return PermalinkStatus.SubjectRemoved;
             }
 
             var publication = releasesWithSubject.First().Publication;
@@ -148,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             if (latestRelease != null
                 && releasesWithSubject.All(r => r.Id != latestRelease.Id))
             {
-                return PermalinkStatus.SubjectReplaced;
+                return PermalinkStatus.SubjectReplacedOrRemoved;
             }
 
             if (publication.SupersededById != null

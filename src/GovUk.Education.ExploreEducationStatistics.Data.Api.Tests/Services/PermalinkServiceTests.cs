@@ -132,10 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
 
             subjectRepository
-                .Setup(s => s.Get(subject.Id))
-                .ReturnsAsync(subject);
-
-            subjectRepository
                 .Setup(s => s.GetPublicationIdForSubject(subject.Id))
                 .ReturnsAsync(_publicationId);
 
@@ -188,16 +184,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         [Fact]
         public async Task Create_WithReleaseId()
         {
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            var subjectId = Guid.NewGuid();
 
             var request = new PermalinkCreateViewModel
             {
                 Query =
                 {
-                    SubjectId = subject.Id
+                    SubjectId = subjectId
                 }
             };
 
@@ -216,7 +209,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             };
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
             var tableBuilderService = new Mock<ITableBuilderService>(MockBehavior.Strict);
 
             // Permalink id is assigned on creation and used as the blob path
@@ -234,10 +226,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     It.IsAny<JsonSerializerSettings>()))
                 .Returns(Task.CompletedTask);
 
-            subjectRepository
-                .Setup(s => s.Get(subject.Id))
-                .ReturnsAsync(subject);
-
             tableBuilderService
                 .Setup(s => s.Query(release.Id, request.Query, CancellationToken.None))
                 .ReturnsAsync(tableResult);
@@ -252,7 +240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                         Release = release,
                         File = new File
                         {
-                            SubjectId = subject.Id,
+                            SubjectId = subjectId,
                             Type = FileType.Data,
                         },
                     });
@@ -265,14 +253,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 var service = BuildService(
                     contentDbContext: contentDbContext,
                     blobStorageService: blobStorageService.Object,
-                    subjectRepository: subjectRepository.Object,
                     tableBuilderService: tableBuilderService.Object);
 
                 var result = (await service.Create(release.Id, request)).AssertRight();
 
                 MockUtils.VerifyAllMocks(
                     blobStorageService,
-                    subjectRepository,
                     tableBuilderService);
 
                 Assert.Equal(Guid.Parse(blobPath), result.Id);
@@ -293,10 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Published = DateTime.UtcNow,
             };
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            var subjectId = Guid.NewGuid();
 
             var permalink = new Permalink(
                 new TableBuilderConfiguration(),
@@ -306,20 +289,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 },
                 new ObservationQueryContext
                 {
-                    SubjectId = subject.Id
+                    SubjectId = subjectId
                 });
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
                 blobText: JsonConvert.SerializeObject(permalink));
-
-            subjectRepository
-                .Setup(s => s.Get(subject.Id))
-                .ReturnsAsync(subject);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -331,7 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                         Release = release,
                         File = new File
                         {
-                            SubjectId = subject.Id,
+                            SubjectId = subjectId,
                             Type = FileType.Data,
                         },
                     });
@@ -343,14 +321,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
-                    subjectRepository: subjectRepository.Object);
+                    blobStorageService: blobStorageService.Object);
 
                 var result = (await service.Get(permalink.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(
-                    blobStorageService,
-                    subjectRepository);
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
@@ -367,10 +342,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             // test that legacy locations are transformed to 'LocationsHierarchical' and then mapped to 'Locations'
             // in the view model.
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            var subjectId = Guid.NewGuid();
 
             // Setup a list of legacy locations to be added to the Permalink table subject meta during serialization
             var legacyLocations = new List<LegacyLocationAttributeViewModel>
@@ -406,7 +378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 },
                 new ObservationQueryContext
                 {
-                    SubjectId = subject.Id
+                    SubjectId = subjectId
                 });
 
             // Set the legacy locations field on the Permalink table subject meta
@@ -416,16 +388,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             subjectMetaJsonObject!.Add("Locations", legacyLocationsJsonArray);
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
                 blobText: permalinkJsonObject.ToString(Formatting.None));
-
-            subjectRepository
-                .Setup(s => s.Get(subject.Id))
-                .ReturnsAsync(subject);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -444,7 +411,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                         ReleaseId = releaseId,
                         File = new File
                         {
-                            SubjectId = subject.Id,
+                            SubjectId = subjectId,
                             Type = FileType.Data,
                         }
                     });
@@ -456,14 +423,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
-                    subjectRepository: subjectRepository.Object);
+                    blobStorageService: blobStorageService.Object);
 
                 var result = (await service.Get(permalink.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(
-                    blobStorageService,
-                    subjectRepository);
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
 
@@ -525,28 +489,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 });
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
                 blobText: JsonConvert.SerializeObject(permalink));
 
-            subjectRepository
-                .Setup(s => s.Get(permalink.Query.SubjectId))
-                .ReturnsAsync((Subject?)null);
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
 
-            var service = BuildService(blobStorageService: blobStorageService.Object,
-                subjectRepository: subjectRepository.Object);
+                var result = (await service.Get(permalink.Id)).AssertRight();
 
-            var result = (await service.Get(permalink.Id)).AssertRight();
+                MockUtils.VerifyAllMocks(blobStorageService);
 
-            MockUtils.VerifyAllMocks(
-                blobStorageService,
-                subjectRepository);
-
-            Assert.Equal(permalink.Id, result.Id);
-            Assert.Equal(PermalinkStatus.SubjectRemoved, result.Status);
+                Assert.Equal(permalink.Id, result.Id);
+                Assert.Equal(PermalinkStatus.SubjectRemoved, result.Status);
+            }
         }
 
         [Fact]
@@ -571,10 +533,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 Published = DateTime.UtcNow,
             };
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            var subjectId = Guid.NewGuid();
 
             var permalink = new Permalink(
                 new TableBuilderConfiguration(),
@@ -584,20 +543,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 },
                 new ObservationQueryContext
                 {
-                    SubjectId = subject.Id
+                    SubjectId = subjectId
                 });
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
                 blobText: JsonConvert.SerializeObject(permalink));
-
-            subjectRepository
-                .Setup(s => s.Get(subject.Id))
-                .ReturnsAsync(subject);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -610,7 +564,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                         Release = release,
                         File = new File
                         {
-                            SubjectId = subject.Id,
+                            SubjectId = subjectId,
                             Type = FileType.Data,
                         }
                     });
@@ -622,14 +576,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
-                    subjectRepository: subjectRepository.Object);
+                    blobStorageService: blobStorageService.Object);
 
                 var result = (await service.Get(permalink.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(
-                    blobStorageService,
-                    subjectRepository);
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);
@@ -640,13 +591,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         public async Task Get_SubjectIsFromSupersededPublication()
         {
             var supersededPublicationId = Guid.NewGuid();
-
             var releaseId = Guid.NewGuid();
-
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid()
-            };
+            var subjectId = Guid.NewGuid();
 
             var permalink = new Permalink(
                 new TableBuilderConfiguration(),
@@ -656,20 +602,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 },
                 new ObservationQueryContext
                 {
-                    SubjectId = subject.Id
+                    SubjectId = subjectId
                 });
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
             blobStorageService.SetupDownloadBlobText(
                 container: Permalinks,
                 path: permalink.Id.ToString(),
                 blobText: JsonConvert.SerializeObject(permalink));
-
-            subjectRepository
-                .Setup(s => s.Get(subject.Id))
-                .ReturnsAsync(subject);
 
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -692,7 +633,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                         ReleaseId = releaseId,
                         File = new File
                         {
-                            SubjectId = subject.Id,
+                            SubjectId = subjectId,
                             Type = FileType.Data,
                         }
                     },
@@ -715,14 +656,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
-                    subjectRepository: subjectRepository.Object);
+                    blobStorageService: blobStorageService.Object);
 
                 var result = (await service.Get(permalink.Id)).AssertRight();
 
-                MockUtils.VerifyAllMocks(
-                    blobStorageService,
-                    subjectRepository);
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);

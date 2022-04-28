@@ -74,10 +74,10 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
           release has been published since its creation.
         </WarningMessage>
       )}
-      {data.status === 'SubjectReplaced' && (
+      {data.status === 'SubjectReplacedOrRemoved' && (
         <WarningMessage error>
           WARNING - The data used in this table may be invalid as the subject
-          file has been amended since its creation.
+          file has been amended or removed since its creation.
         </WarningMessage>
       )}
 
