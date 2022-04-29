@@ -228,8 +228,106 @@ There is a known bug with pyderman which is responsible for downloading chromedr
 
 To fix this, you can manually download the correct [chromedriver](https://chromedriver.chromium.org/downloads) and put it in the webdriver directory.
 
+# Visual testing - tables, charts and permalinks
+
+As well as the standard Robot UI tests, we also have a suite of tests to enable visual testing of tables, charts and permalinks.
+
+## Tables and Charts
+
+### Overview of the process
+We use a SQL query to generate a CSV of Data Blocks in a given environment. This then gives us the information we need to visit 
+each of these Data Blocks in the public site and view them in situ (e.g. as a Key Stat tile, as a Data Block embedded in Content, 
+as a Highlight Table, etc). We use this same CSV file to generate a Robot test suite based off a test suite template that visits
+each Release with Data Blocks as its own test case. 
+
+With the ability to view each of these tables and charts in situ, we're then able to generate snapshot images of them, as well as 
+their HTML.
+
+After a code change is deployed, a migration applied or other change is performed on an environment whereby we want to sanity check that 
+no changes to the existing tables and charts have occurred (or that only certain expected changes have occurred), we can then run the 
+tests again and capture snapshot images of the "after" state of each table and chart.
+
+Once we have a set of "before" and "after" snapshot images, we're able to visually compare them to ensure that only expected changes are 
+present.
+
+### Running the process
+
+#### Generate the CSV
+On the Content DB of the target environment, run the following SQL statement and save the results as a CSV:
+```sql
+SELECT ContentBlock.Id                                      AS ContentBlockId,
+  Releases.Id                                          AS ReleaseId,
+  Releases.Slug                                        AS ReleaseSlug,
+  Publications.Id                                      AS PublicationId,
+  Publications.Slug                                    AS PublicationSlug,
+  ContentSections.Id                                   AS ContentSectionId,
+  ContentSections.Heading                              AS ContentSectionHeading,
+  ContentSections.[Type]                               AS ContentSectionType,
+  ContentSections.[Order]                              AS ContentSectionOrder,
+  (
+    SELECT MIN(cs.[Order]) 
+    FROM ContentSections cs 
+    JOIN ReleaseContentSections rcs ON rcs.ContentSectionId = cs.Id 
+    AND rcs.ReleaseId = Releases.Id
+    AND cs.Type = ContentSections.Type
+  ) AS MinContentSectionOrder,
+  ContentBlock.[Order]                                 AS ContentBlockOrder,
+  (
+    SELECT MIN(cb.[Order]) 
+    FROM ContentBlock cb 
+    WHERE cb.ContentSectionId = ContentBlock.ContentSectionId
+  )                                                    AS MinContentBlockOrder,
+  DataBlock_HighlightName                              AS HighlightName,
+  JSON_VALUE([DataBlock_Query], '$.SubjectId')			AS SubjectId,
+  JSON_VALUE([DataBlock_Charts], '$[0].Title')         AS ChartTitle,
+  JSON_VALUE([DataBlock_Charts], '$[0].Type')          AS ChartType,
+  DataBlock_Table										AS TableConfig
+FROM ContentBlock
+JOIN ReleaseContentBlocks ON ContentBlock.Id = ReleaseContentBlocks.ContentBlockId
+JOIN Releases ON ReleaseContentBlocks.ReleaseId = Releases.Id
+JOIN Publications ON Publications.Id = Releases.PublicationId 
+LEFT JOIN ContentSections ON ContentSections.Id = ContentSectionId
+WHERE ContentBlock.Type = 'DataBlock'
+  AND Releases.Published IS NOT NULL
+  AND Releases.SoftDeleted = 0
+  AND (
+    -- Include DataBlocks that are linked to Content Sections
+    ContentSectionId IS NOT NULL
+    -- Include DataBlocks that are linked to Content Sections
+    OR (DataBlock_HighlightName IS NOT NULL
+        AND DataBlock_HighlightName <> ''))
+  -- Include only DataBlocks that are from the latest published Release
+  AND NOT EXISTS(
+    SELECT 1
+    FROM Releases PublicationReleases
+    WHERE PublicationReleases.PreviousVersionId = Releases.Id
+	  AND PublicationReleases.Published IS NOT NULL
+      AND PublicationReleases.SoftDeleted = 0
+  );
+```
+This produces a CSV that allow the UI tests to locate each published Data Block in its correct context.
+
+#### Generate the test script
+We now use the CSV to generate a Robot test suite whereby each unique Release with Data Blocks is 
+represented as its own test case within the suite.
+
+The reason why we generate it in this fashion is that it allows us to rerun the test suite with the 
+`--rerun-failed-tests` option to handle any intermittent failures we encounter, allowing us to get 
+the most complete results we can for a given environment.
+
+The test script template is the `visually_check_tables_and_charts.template.robot` file and test suites can 
+be generated via the `generate_tables_and_charts_test_cases.py` file.
+
+1. Save the CSV file captured by the first step into the `tests/robot-tests` folder e.g. `datablocks-dev.csv`.
+2. Run the following command:
+   ```bash
+   cd tests/robot-tests/tests/tables_and_charts
+   pipenv run python3 generate_tables_and_charts_test_cases.py --file /path/to/tests/robot-tests/datablocks-dev.csv --target visually_check_tables_and_charts.dev.robot 
+   ```
+   This will generate a test suite for the Data Blocks on the Dev environment
 
 # Who should I talk to?
 
 Luke Howsam  
 Mark Youngman
+Duncan Watson

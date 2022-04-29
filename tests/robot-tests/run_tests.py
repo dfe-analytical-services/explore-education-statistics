@@ -184,7 +184,8 @@ robotArgs = ["--outputdir", "test-results/",
              "--output", output_file,
              "--exclude", "Failing",
              "--exclude", "UnderConstruction",
-             "--exclude", "BootstrapData"]
+             "--exclude", "BootstrapData",
+             "--exclude", "VisualTesting"]
 
 robotArgs += ["-v", f"timeout:{os.getenv('TIMEOUT')}", "-v", f"implicit_wait:{os.getenv('IMPLICIT_WAIT')}"]
 
