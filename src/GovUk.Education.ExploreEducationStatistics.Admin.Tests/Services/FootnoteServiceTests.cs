@@ -549,19 +549,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-            };
+            var subject = new Subject();
 
-            var filterItem = new FilterItem
-            {
-                Id = Guid.NewGuid(),
-            };
+            var filterItem = new FilterItem();
 
             var filterGroup = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 FilterItems = new List<FilterItem>
                 {
                     filterItem,
@@ -570,18 +563,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var filter = new Filter
             {
-                Id = Guid.NewGuid(),
-                SubjectId = subject.Id,
+                Subject = subject,
                 FilterGroups = new List<FilterGroup>
                 {
                     filterGroup,
                 },
             };
 
-            var indicator = new Indicator
-            {
-                Id = Guid.NewGuid(),
-            };
+            var indicator = new Indicator();
 
             var indicatorGroup = new IndicatorGroup
             {
@@ -613,28 +602,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new FilterFootnote
                     {
-                        FilterId = filter.Id,
+                        Filter = filter,
                     }
                 },
                 FilterGroups = new List<FilterGroupFootnote>
                 {
                     new FilterGroupFootnote
                     {
-                        FilterGroupId =  filterGroup.Id,
+                        FilterGroup =  filterGroup,
                     }
                 },
                 FilterItems = new List<FilterItemFootnote>
                 {
                     new FilterItemFootnote
                     {
-                        FilterItemId = filterItem.Id,
+                        FilterItem = filterItem,
                     }
                 },
                 Indicators = new List<IndicatorFootnote>
                 {
                     new IndicatorFootnote
                     {
-                        IndicatorId = indicator.Id,
+                        Indicator = indicator,
                     }
                 },
             };
@@ -702,24 +691,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpdateFootnote_AddCriteria()
         {
-            var release = new Release
-            {
-                Id = Guid.NewGuid(),
-            };
+            var release = new Release();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-            };
+            var subject = new Subject();
 
-            var filterItem = new FilterItem
-            {
-                Id = Guid.NewGuid(),
-            };
+            var filterItem = new FilterItem();
 
             var filterGroup = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 FilterItems = new List<FilterItem>
                 {
                     filterItem,
@@ -728,18 +707,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var filter = new Filter
             {
-                Id = Guid.NewGuid(),
-                SubjectId = subject.Id,
+                Subject = subject,
                 FilterGroups = new List<FilterGroup>
                 {
                     filterGroup,
                 },
             };
 
-            var indicator = new Indicator
-            {
-                Id = Guid.NewGuid(),
-            };
+            var indicator = new Indicator();
 
             var indicatorGroup = new IndicatorGroup
             {
@@ -757,7 +732,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new ReleaseFootnote
                     {
-                        ReleaseId = release.Id,
+                        Release = release,
                     }
                 },
                 Subjects = new List<SubjectFootnote>(),
@@ -824,33 +799,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var dbFootnote = Assert.Single(statisticsDbContext.Footnote.ToList());
-                Assert.Equal(footnote.Id, dbFootnote.Id);
-                Assert.Equal("Updated footnote", dbFootnote.Content);
+                var savedFootnote = Assert.Single(statisticsDbContext.Footnote.ToList());
+                Assert.Equal(footnote.Id, savedFootnote.Id);
+                Assert.Equal("Updated footnote", savedFootnote.Content);
 
-                var dbReleaseFootnote = Assert.Single(statisticsDbContext.ReleaseFootnote.ToList());
-                Assert.Equal(release.Id, dbReleaseFootnote.ReleaseId);
-                Assert.Equal(footnote.Id, dbReleaseFootnote.FootnoteId);
+                var savedReleaseFootnote = Assert.Single(statisticsDbContext.ReleaseFootnote.ToList());
+                Assert.Equal(release.Id, savedReleaseFootnote.ReleaseId);
+                Assert.Equal(footnote.Id, savedReleaseFootnote.FootnoteId);
 
-                var dbSubjectFootnote = Assert.Single(statisticsDbContext.SubjectFootnote.ToList());
-                Assert.Equal(subject.Id, dbSubjectFootnote.SubjectId);
-                Assert.Equal(footnote.Id, dbSubjectFootnote.FootnoteId);
+                var savedSubjectFootnote = Assert.Single(statisticsDbContext.SubjectFootnote.ToList());
+                Assert.Equal(subject.Id, savedSubjectFootnote.SubjectId);
+                Assert.Equal(footnote.Id, savedSubjectFootnote.FootnoteId);
 
-                var dbFilterFootnote = Assert.Single(statisticsDbContext.FilterFootnote.ToList());
-                Assert.Equal(filter.Id, dbFilterFootnote.FilterId);
-                Assert.Equal(footnote.Id, dbFilterFootnote.FootnoteId);
+                var savedFilterFootnote = Assert.Single(statisticsDbContext.FilterFootnote.ToList());
+                Assert.Equal(filter.Id, savedFilterFootnote.FilterId);
+                Assert.Equal(footnote.Id, savedFilterFootnote.FootnoteId);
 
-                var dbFilterGroupFootnote = Assert.Single(statisticsDbContext.FilterGroupFootnote.ToList());
-                Assert.Equal(filterGroup.Id, dbFilterGroupFootnote.FilterGroupId);
-                Assert.Equal(footnote.Id, dbFilterGroupFootnote.FootnoteId);
+                var savedFilterGroupFootnote = Assert.Single(statisticsDbContext.FilterGroupFootnote.ToList());
+                Assert.Equal(filterGroup.Id, savedFilterGroupFootnote.FilterGroupId);
+                Assert.Equal(footnote.Id, savedFilterGroupFootnote.FootnoteId);
 
-                var dbFilterItemFootnote = Assert.Single(statisticsDbContext.FilterItemFootnote.ToList());
-                Assert.Equal(filterItem.Id, dbFilterItemFootnote.FilterItemId);
-                Assert.Equal(footnote.Id, dbFilterItemFootnote.FootnoteId);
+                var savedFilterItemFootnote = Assert.Single(statisticsDbContext.FilterItemFootnote.ToList());
+                Assert.Equal(filterItem.Id, savedFilterItemFootnote.FilterItemId);
+                Assert.Equal(footnote.Id, savedFilterItemFootnote.FootnoteId);
 
-                var dbIndicatorFootnote = Assert.Single(statisticsDbContext.IndicatorFootnote.ToList());
-                Assert.Equal(indicator.Id, dbIndicatorFootnote.IndicatorId);
-                Assert.Equal(footnote.Id, dbIndicatorFootnote.FootnoteId);
+                var savedIndicatorFootnote = Assert.Single(statisticsDbContext.IndicatorFootnote.ToList());
+                Assert.Equal(indicator.Id, savedIndicatorFootnote.IndicatorId);
+                Assert.Equal(footnote.Id, savedIndicatorFootnote.FootnoteId);
             }
         }
 
@@ -859,19 +834,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var release = new Release();
 
-            var subject = new Subject
-            {
-                Id = Guid.NewGuid(),
-            };
+            var subject = new Subject();
 
-            var filterItem = new FilterItem
-            {
-                Id = Guid.NewGuid(),
-            };
+            var filterItem = new FilterItem();
 
             var filterGroup = new FilterGroup
             {
-                Id = Guid.NewGuid(),
                 FilterItems = new List<FilterItem>
                 {
                     filterItem,
@@ -880,18 +848,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var filter = new Filter
             {
-                Id = Guid.NewGuid(),
-                SubjectId = subject.Id,
+                Subject = subject,
                 FilterGroups = new List<FilterGroup>
                 {
                     filterGroup,
                 },
             };
 
-            var indicator = new Indicator
-            {
-                Id = Guid.NewGuid(),
-            };
+            var indicator = new Indicator();
 
             var indicatorGroup = new IndicatorGroup
             {
@@ -923,28 +887,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     new FilterFootnote
                     {
-                        FilterId = filter.Id,
+                        Filter = filter,
                     }
                 },
                 FilterGroups = new List<FilterGroupFootnote>
                 {
                     new FilterGroupFootnote
                     {
-                        FilterGroupId =  filterGroup.Id,
+                        FilterGroup =  filterGroup,
                     }
                 },
                 FilterItems = new List<FilterItemFootnote>
                 {
                     new FilterItemFootnote
                     {
-                        FilterItemId = filterItem.Id,
+                        FilterItem = filterItem,
                     }
                 },
                 Indicators = new List<IndicatorFootnote>
                 {
                     new IndicatorFootnote
                     {
-                        IndicatorId = indicator.Id,
+                        Indicator = indicator,
                     }
                 },
             };
@@ -1006,13 +970,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
             {
-                var dbFootnote = Assert.Single(statisticsDbContext.Footnote.ToList());
-                Assert.Equal(footnote.Id, dbFootnote.Id);
-                Assert.Equal("Updated footnote", dbFootnote.Content);
+                var savedFootnote = Assert.Single(statisticsDbContext.Footnote.ToList());
+                Assert.Equal(footnote.Id, savedFootnote.Id);
+                Assert.Equal("Updated footnote", savedFootnote.Content);
 
-                var dbReleaseFootnote = Assert.Single(statisticsDbContext.ReleaseFootnote.ToList());
-                Assert.Equal(release.Id, dbReleaseFootnote.ReleaseId);
-                Assert.Equal(footnote.Id, dbReleaseFootnote.FootnoteId);
+                var savedReleaseFootnote = Assert.Single(statisticsDbContext.ReleaseFootnote.ToList());
+                Assert.Equal(release.Id, savedReleaseFootnote.ReleaseId);
+                Assert.Equal(footnote.Id, savedReleaseFootnote.FootnoteId);
 
                 Assert.Empty(statisticsDbContext.SubjectFootnote.ToList());
                 Assert.Empty(statisticsDbContext.FilterFootnote.ToList());

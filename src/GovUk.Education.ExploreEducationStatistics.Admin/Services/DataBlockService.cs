@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _context.DataBlocks.Update(dataBlock);
                             await _context.SaveChangesAsync();
                         })
-                        .OnSuccessDo(() => InvalidateDataBlockCache(rcb.ReleaseId, rcb.ContentBlockId)))
+                        .OnSuccessDo(() => InvalidateCachedDataBlock(rcb.ReleaseId, rcb.ContentBlockId)))
                     .OnSuccess(() => Get(id));
         }
 
@@ -327,7 +327,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return deletePlan
                 .DependentDataBlocks
-                .ForEachAsync(dataBlock => InvalidateDataBlockCache(deletePlan.ReleaseId, dataBlock.Id))
+                .ForEachAsync(dataBlock => InvalidateCachedDataBlock(deletePlan.ReleaseId, dataBlock.Id))
                 .OnSuccessVoid();
         }
 
@@ -336,11 +336,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var dataBlocks = GetDataBlocks(releaseId);
             foreach (var dataBlock in dataBlocks)
             {
-                 await InvalidateDataBlockCache(releaseId, dataBlock.Id);
+                 await InvalidateCachedDataBlock(releaseId, dataBlock.Id);
             }
         }
 
-        private Task<Either<ActionResult, Unit>> InvalidateDataBlockCache(Guid releaseId, Guid dataBlockId)
+        private Task<Either<ActionResult, Unit>> InvalidateCachedDataBlock(Guid releaseId, Guid dataBlockId)
         {
             return _cacheKeyService
                 .CreateCacheKeyForDataBlock(releaseId, dataBlockId)
