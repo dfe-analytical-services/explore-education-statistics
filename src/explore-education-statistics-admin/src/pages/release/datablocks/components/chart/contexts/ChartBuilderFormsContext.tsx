@@ -1,3 +1,4 @@
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import { AxisType, ChartDefinition } from '@common/modules/charts/types/chart';
 import { Dictionary } from '@common/types';
 import mapValues from 'lodash/mapValues';
@@ -40,7 +41,7 @@ export interface ChartBuilderFormsContextValue {
   hasSubmitted: boolean;
   isSubmitting: boolean;
   isValid: boolean;
-  submit: () => void;
+  submitForms: () => void;
   updateForm: (nextState: UpdateFormState) => void;
 }
 
@@ -157,17 +158,23 @@ export const ChartBuilderFormsContextProvider = ({
     [],
   );
 
-  const submit = useCallback(async () => {
-    if (!onSubmit) {
-      return;
-    }
+  // Use debounced callback so that chart builder state (and hence the
+  // current chart props) can update before submit actually happens.
+  // This prevents stale state potentially being saved to the server.
+  // We ideally want chart builder and `onSubmit` callbacks to always
+  // use the same chart props.
+  // TODO: EES-3355 Unify chart builder configuration/form state
+  const [handleSubmit] = useDebouncedCallback(async () => {
+    await onSubmit?.();
+  }, 300);
 
+  const submitForms = useCallback(async () => {
     if (Object.values(forms).every(form => form.isValid)) {
       setSubmitting(true);
-      await onSubmit();
+      await handleSubmit();
       setSubmitting(false);
     }
-  }, [forms, onSubmit]);
+  }, [forms, handleSubmit]);
 
   const value = useMemo<ChartBuilderFormsContextValue>(() => {
     const formValues = Object.values(forms);
@@ -175,12 +182,12 @@ export const ChartBuilderFormsContextProvider = ({
     return {
       forms,
       updateForm,
-      submit,
+      submitForms,
       isSubmitting,
       isValid: formValues.every(form => form.isValid),
       hasSubmitted: formValues.some(form => form.submitCount > 0),
     };
-  }, [forms, isSubmitting, submit, updateForm]);
+  }, [forms, isSubmitting, submitForms, updateForm]);
 
   return (
     <ChartBuilderFormsContext.Provider value={value}>

@@ -848,7 +848,7 @@ describe('useChartBuilderFormsContext', () => {
     expect(result.current.isValid).toBe(false);
     expect(result.current.isSubmitting).toBe(false);
 
-    result.current.submit();
+    result.current.submitForms();
 
     expect(result.current.isValid).toBe(false);
     expect(result.current.isSubmitting).toBe(false);
@@ -875,7 +875,7 @@ describe('useChartBuilderFormsContext', () => {
 
     expect(result.current.isSubmitting).toBe(false);
 
-    result.current.submit();
+    result.current.submitForms();
 
     expect(result.current.isSubmitting).toBe(true);
 

@@ -65,7 +65,11 @@ const ChartAxisConfiguration = ({
 }: Props) => {
   const { capabilities } = definition;
 
-  const { hasSubmitted, updateForm, submit } = useChartBuilderFormsContext();
+  const {
+    hasSubmitted,
+    updateForm,
+    submitForms,
+  } = useChartBuilderFormsContext();
 
   const dataSetCategories = useMemo<DataSetCategory[]>(() => {
     if (type === 'minor') {
@@ -268,7 +272,7 @@ const ChartAxisConfiguration = ({
   );
 
   const handleSubmit = useCallback(
-    (values: FormValues) => {
+    async (values: FormValues) => {
       const nextConfiguration = normalizeValues(values);
 
       if (nextConfiguration.groupBy) {
@@ -290,9 +294,9 @@ const ChartAxisConfiguration = ({
         onSubmit(nextConfiguration);
       }
 
-      submit();
+      await submitForms();
     },
-    [meta, normalizeValues, onSubmit, submit],
+    [meta, normalizeValues, onSubmit, submitForms],
   );
 
   return (
@@ -512,7 +516,11 @@ const ChartAxisConfiguration = ({
             />
           )}
 
-          <ChartBuilderSaveActions formId={id} formKey={type}>
+          <ChartBuilderSaveActions
+            formId={id}
+            formKey={type}
+            disabled={form.isSubmitting}
+          >
             {buttons}
           </ChartBuilderSaveActions>
         </Form>
