@@ -42,19 +42,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         List<TChildSequenceEntry> ChildSequence { get; init; }
     }
 
-    public class FilterSequenceEntry : ISequenceEntry<FilterGroupSequenceEntry>
+    public record FilterSequenceEntry : ISequenceEntry<FilterGroupSequenceEntry>
     {
         public Guid Id { get; init; }
         public List<FilterGroupSequenceEntry> ChildSequence { get; init; } = new();
     }
 
-    public class FilterGroupSequenceEntry : ISequenceEntry<Guid>
+    public record FilterGroupSequenceEntry : ISequenceEntry<Guid>
     {
         public Guid Id { get; init; }
         public List<Guid> ChildSequence { get; init; } = new();
     }
 
-    public class IndicatorGroupSequenceEntry : ISequenceEntry<Guid>
+    public record IndicatorGroupSequenceEntry : ISequenceEntry<Guid>
     {
         public Guid Id { get; init; }
         public List<Guid> ChildSequence { get; init; } = new();
