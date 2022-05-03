@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var (controller, subjectMetaService) = BuildControllerAndMocks();
 
             subjectMetaService
-                .Setup(s => s.GetSubjectMeta(SubjectId))
+                .Setup(s => s.GetCachedSubjectMeta(SubjectId))
                 .ReturnsAsync(subjectMetaViewModel);
 
             var result = await controller.GetSubjectMeta(SubjectId);
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var (controller, subjectMetaService) = BuildControllerAndMocks();
 
             subjectMetaService
-                .Setup(s => s.GetSubjectMeta(SubjectId))
+                .Setup(s => s.GetCachedSubjectMeta(SubjectId))
                 .ReturnsAsync(new NotFoundResult());
 
             var result = await controller.GetSubjectMeta(SubjectId);

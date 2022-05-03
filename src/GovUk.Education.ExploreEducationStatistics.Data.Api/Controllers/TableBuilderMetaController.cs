@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         [HttpGet("meta/subject/{subjectId:guid}")]
         public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
-            return _subjectMetaService.GetSubjectMeta(subjectId)
+            return _subjectMetaService.GetCachedSubjectMeta(subjectId)
                 .HandleFailuresOrOk();
         }
 
