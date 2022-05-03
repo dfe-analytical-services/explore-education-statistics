@@ -59,10 +59,6 @@ Check release
         END
     END
 
-#    Log to console    \n=====================================================================\n
-
-    # TODO permalinks
-
 Check Fast Track Table
     [Arguments]    ${content_block}
     user navigates to public frontend    %{PUBLIC_URL}${content_block.content_url}
@@ -72,7 +68,6 @@ Check Fast Track Table
     user takes html snapshot of element    id:tableToolWizard
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${FAST_TRACKS_FOLDER}/${content_block.content_block_id}-table.html
     log content block details    ${content_block}    Fast Track    ${filepath}
-    # TODO charts
 
 Check Content Block Table
     [Arguments]    ${content_block}
@@ -93,7 +88,6 @@ Check Content Block Table
     ${data_block_table_tab}=    get child element    ${data_block}
     ...    id:dataBlock-${content_block.content_block_id}-tables-tab
     user clicks element    ${data_block_table_tab}
-#    highlight element    ${data_block}
     ${table_filepath}=    user takes screenshot of element    ${data_block}
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${CONTENT_SECTIONS_FOLDER}/${content_block.content_block_id}-table.png
     user takes html snapshot of element    ${data_block}
@@ -105,7 +99,6 @@ Check Content Block Table
         user clicks element    ${data_block_chart_tab}
         user waits for chart to appear    ${content_block.chart_type}    ${data_block}
         ${data_block}=    get child element    ${accordion}    id:dataBlock-${content_block.content_block_id}
-#    highlight element    ${data_block}
         ${chart_filepath}=    user takes screenshot of element    ${data_block}
         ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${CONTENT_SECTIONS_FOLDER}/${content_block.content_block_id}-${content_block.chart_type}-chart.png
         user takes html snapshot of element    ${data_block}
@@ -126,7 +119,6 @@ Check Secondary Stats Table
     user takes html snapshot of element    id:releaseHeadlines-tables
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${SECONDARY_STATS_FOLDER}/${content_block.content_block_id}-table.html
     log content block details    ${content_block}    Secondary Stats Table    ${filepath}
-    # TODO charts
 
 Check Key Stats Table
     [Arguments]    ${content_block}
@@ -140,7 +132,6 @@ Check Key Stats Table
     user takes html snapshot of element    xpath://div[@data-testid="keyStat"][${content_block.content_block_position}]
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${KEY_STATS_FOLDER}/${content_block.content_block_id}-table.html
     log content block details    ${content_block}    Key Stats Table    ${filepath}
-    # TODO charts
 
 Log Content Block Details
     [Arguments]
@@ -148,17 +139,10 @@ Log Content Block Details
     ...    ${type_description}
     ...    ${table_snapshot_filepath}
     ...    ${chart_snapshot_filepath}=
-#    Log to console    \n\n\n\t=====================================================================\n
-#    Log to console    \tId:\t\t\t ${content_block.content_block_id}
-#    Log to console    \tType:\t\t\t ${type_description}
-#    Log to console    \tURL:\t\t\t ${content_block.content_url}
-#    Log to console    \t\tTable snapshot:\t\t ${table_snapshot_filepath}
     Log to console    \t\tTable snapshot taken for block ${content_block.content_block_id}
     IF    "${chart_snapshot_filepath}" != ""
         Log to console    \t\tChart snapshot taken for block ${content_block.content_block_id}
-#    Log to console    \t\tChart snapshot:\t\t ${chart_snapshot_filepath}
     END
-#    Log to console    \n\t=====================================================================\n\n\n
 
 user waits for chart to appear
     [Arguments]    ${chart_type}    ${data_block}

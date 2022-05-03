@@ -331,10 +331,6 @@ def setup_authentication(clear_existing=False):
         )
 
 
-runIdentifier = datetime.datetime.utcnow().strftime('%Y%m%d-%H%M%S')
-os.environ['RUN_IDENTIFIER'] = runIdentifier
-print(f'Starting tests with RUN_IDENTIFIER: {runIdentifier}')
-
 # Auth not required with general_public tests
 if args.tests and "general_public" not in args.tests:
     setup_authentication()

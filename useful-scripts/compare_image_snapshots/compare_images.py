@@ -123,26 +123,6 @@ def compare_images(
                     cv2.imshow("Diff", diff_image)
                     cv2.imshow("Thresh", thresh)
                     cv2.waitKey(0)
-        # else:
-        #     print(f"No visual difference detected in snapshot {os.path.basename(first_filepath)}")
 
     except BaseException:
         warning(f'Could not compare image {first_filepath}')
-
-# construct the argument parse and parse the arguments
-# ap = argparse.ArgumentParser()
-# ap.add_argument("-f", "--first", required=True,
-#                 help="first input image")
-# ap.add_argument("-s", "--second", required=True,
-#                 help="second input image")
-# ap.add_argument("-d", "--diff", required=False,
-#                 help="output diff image path")
-# ap.add_argument("-v", "--visual", required=False,
-#                 help="show diffs in visual windows")
-# args = vars(ap.parse_args())
-#
-# compare_images(
-#     args['first'],
-#     args['second'],
-#     args['diff'],
-#     args['visual'])
