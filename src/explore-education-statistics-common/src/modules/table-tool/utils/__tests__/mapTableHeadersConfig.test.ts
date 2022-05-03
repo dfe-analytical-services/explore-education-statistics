@@ -93,6 +93,7 @@ describe('mapTableHeadersConfig', () => {
               order: 0,
             },
           },
+          order: 0,
         },
         SchoolType: {
           totalValue: '',
@@ -116,6 +117,7 @@ describe('mapTableHeadersConfig', () => {
               order: 0,
             },
           },
+          order: 1,
         },
       },
       footnotes: [],

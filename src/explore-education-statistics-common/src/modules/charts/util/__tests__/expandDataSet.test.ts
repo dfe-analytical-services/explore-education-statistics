@@ -38,6 +38,7 @@ describe('expandDataSet', () => {
               order: 0,
             },
           },
+          order: 0,
           name: 'characteristic',
         },
         SchoolType: {
@@ -61,6 +62,7 @@ describe('expandDataSet', () => {
               order: 0,
             },
           },
+          order: 1,
           name: 'school_type',
         },
       },

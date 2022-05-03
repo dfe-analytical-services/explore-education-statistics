@@ -57,6 +57,7 @@ describe('TableToolPage', () => {
                 order: 0,
               },
             },
+            order: 0,
             name: 'subject_name',
           },
         },

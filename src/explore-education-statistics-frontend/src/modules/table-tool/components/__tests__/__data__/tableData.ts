@@ -53,6 +53,7 @@ export const testTable: FullTable = {
             category: 'Date',
           }),
         ],
+        order: 0,
       },
     },
     footnotes: [],

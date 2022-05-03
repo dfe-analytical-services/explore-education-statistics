@@ -7,6 +7,7 @@ import { Subject, SubjectMeta } from '@common/services/tableBuilderService';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import produce from 'immer';
 import noop from 'lodash/noop';
 import React from 'react';
 
@@ -732,5 +733,68 @@ describe('FiltersForm', () => {
     expect(
       screen.getByText(/available when the release is published/),
     ).toBeInTheDocument();
+  });
+
+  test('orders filters and filter groups by the order property', () => {
+    const orderedTestSubjectMeta = produce(testSubjectMeta, draft => {
+      draft.filters.SchoolType.order = 1;
+      draft.filters.Characteristic.order = 0;
+      draft.filters.Characteristic.options.EthnicGroupMajor.order = 2;
+      draft.filters.Characteristic.options.Total.order = 0;
+    });
+
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subject={testSubject}
+        subjectMeta={orderedTestSubjectMeta}
+        onSubmit={noop}
+      />,
+    );
+
+    const filters = within(
+      screen.getByRole('group', { name: 'Categories' }),
+    ).getAllByRole('group');
+    expect(within(filters[0]).getByRole('button', { name: 'Characteristic' }));
+    expect(within(filters[1]).getByRole('button', { name: 'School type' }));
+
+    const characteristicGroups = within(filters[0]).getAllByRole('group', {
+      hidden: true,
+    });
+    expect(characteristicGroups[1]).toEqual(
+      screen.getByRole('group', { name: 'Total', hidden: true }),
+    );
+    expect(characteristicGroups[2]).toEqual(
+      screen.getByRole('group', { name: 'Gender', hidden: true }),
+    );
+    expect(characteristicGroups[3]).toEqual(
+      screen.getByRole('group', { name: 'Ethnic group major', hidden: true }),
+    );
+  });
+
+  test('orders indicator groups by the order property', () => {
+    const orderedTestSubjectMeta = produce(testSubjectMeta, draft => {
+      draft.indicators.AbsenceByReason.order = 1;
+      draft.indicators.AbsenceFields.order = 0;
+    });
+
+    render(
+      <FiltersForm
+        {...testWizardStepProps}
+        subject={testSubject}
+        subjectMeta={orderedTestSubjectMeta}
+        onSubmit={noop}
+      />,
+    );
+
+    const indicators = within(
+      screen.getByRole('group', { name: 'Indicators' }),
+    ).getAllByRole('group');
+    expect(indicators[0]).toEqual(
+      screen.getByRole('group', { name: 'Absence fields', hidden: true }),
+    );
+    expect(indicators[1]).toEqual(
+      screen.getByRole('group', { name: 'Absence by reason', hidden: true }),
+    );
   });
 });

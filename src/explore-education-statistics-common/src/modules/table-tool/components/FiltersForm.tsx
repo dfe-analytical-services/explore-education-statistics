@@ -31,6 +31,7 @@ import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import isEqual from 'lodash/isEqual';
 import mapValues from 'lodash/mapValues';
+import orderBy from 'lodash/orderBy';
 import React, { useMemo, useState } from 'react';
 
 export interface FormValues {
@@ -153,6 +154,16 @@ const FiltersForm = ({
     }
   };
 
+  const orderedFilters = orderBy(
+    Object.entries(subjectMeta.filters),
+    ([_, value]) => value.order,
+  );
+
+  const orderedIndicators = orderBy(
+    Object.values(subjectMeta.indicators),
+    'order',
+  );
+
   return (
     <Formik<FormValues>
       enableReinitialize
@@ -210,15 +221,13 @@ const FiltersForm = ({
                       hint="Select at least one indicator below"
                       disabled={form.isSubmitting}
                       order={[]}
-                      options={Object.values(subjectMeta.indicators).map(
-                        group => ({
-                          legend: group.label,
-                          options: group.options,
-                        }),
-                      )}
+                      options={orderedIndicators.map(group => ({
+                        legend: group.label,
+                        options: group.options,
+                      }))}
                     />
 
-                    {Object.entries(subjectMeta.filters).length > 0 && (
+                    {orderedFilters.length > 0 && (
                       <FormFieldset
                         id="filters"
                         legend="Categories"
@@ -226,30 +235,29 @@ const FiltersForm = ({
                         hint="Select at least one option from all categories"
                         error={getError('filters')}
                       >
-                        {Object.entries(subjectMeta.filters).map(
-                          ([filterKey, filterGroup]) => {
-                            const filterName = `filters.${filterKey}`;
-                            const filterGroupOptions = Object.values(
-                              filterGroup.options,
-                            );
+                        {orderedFilters.map(([filterKey, filterGroup]) => {
+                          const filterName = `filters.${filterKey}`;
+                          const orderedFilterGroupOptions = orderBy(
+                            Object.values(filterGroup.options),
+                            'order',
+                          );
 
-                            return (
-                              <FormFieldCheckboxGroupsMenu
-                                key={filterKey}
-                                name={filterName}
-                                legend={filterGroup.legend}
-                                hint={filterGroup.hint}
-                                disabled={form.isSubmitting}
-                                order={[]}
-                                options={filterGroupOptions.map(group => ({
-                                  legend: group.label,
-                                  options: group.options,
-                                }))}
-                                open={filterGroupOptions.length === 1}
-                              />
-                            );
-                          },
-                        )}
+                          return (
+                            <FormFieldCheckboxGroupsMenu
+                              key={filterKey}
+                              name={filterName}
+                              legend={filterGroup.legend}
+                              hint={filterGroup.hint}
+                              disabled={form.isSubmitting}
+                              order={[]}
+                              options={orderedFilterGroupOptions.map(group => ({
+                                legend: group.label,
+                                options: group.options,
+                              }))}
+                              open={orderedFilterGroupOptions.length === 1}
+                            />
+                          );
+                        })}
                       </FormFieldset>
                     )}
                   </div>
@@ -285,7 +293,7 @@ const FiltersForm = ({
             <SummaryList noBorder>
               <SummaryListItem term="Indicators">
                 <CollapsibleList>
-                  {Object.values(subjectMeta.indicators)
+                  {orderedIndicators
                     .flatMap(group => group.options)
                     .filter(indicator =>
                       form.values.indicators.includes(indicator.value),
@@ -296,7 +304,7 @@ const FiltersForm = ({
                 </CollapsibleList>
               </SummaryListItem>
 
-              {Object.entries(subjectMeta.filters)
+              {orderedFilters
                 .filter(([groupKey]) => !!form.values.filters[groupKey])
                 .map(([filterGroupKey, filterGroup]) => (
                   <SummaryListItem
@@ -304,7 +312,7 @@ const FiltersForm = ({
                     term={filterGroup.legend}
                   >
                     <CollapsibleList>
-                      {Object.values(filterGroup.options)
+                      {orderBy(Object.values(filterGroup.options), 'order')
                         .flatMap(group => group.options)
                         .filter(option =>
                           form.values.filters[filterGroupKey].includes(

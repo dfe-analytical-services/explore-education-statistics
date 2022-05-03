@@ -95,6 +95,7 @@ export const testMapTableData: TableDataResponse = {
             order: 0,
           },
         },
+        order: 0,
         name: 'school_type',
       },
       Characteristic: {
@@ -114,6 +115,7 @@ export const testMapTableData: TableDataResponse = {
             order: 0,
           },
         },
+        order: 1,
         name: 'characteristic',
       },
     },
@@ -656,6 +658,7 @@ export const testsMixedLocationsFullTableMeta: FullTableMeta = {
           category: 'Characteristic',
         }),
       ],
+      order: 0,
     },
   },
   indicators: [

@@ -25,6 +25,7 @@ export const testTableData: TableDataResponse = {
             order: 0,
           },
         },
+        order: 0,
         name: 'characteristic',
       },
       SchoolType: {
@@ -48,6 +49,7 @@ export const testTableData: TableDataResponse = {
             order: 0,
           },
         },
+        order: 1,
         name: 'school_type',
       },
     },

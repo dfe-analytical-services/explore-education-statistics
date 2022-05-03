@@ -33,6 +33,7 @@ describe('DataTableCaption', () => {
             category: 'Characteristic',
           }),
         ],
+        order: 0,
       },
     },
     indicators: [

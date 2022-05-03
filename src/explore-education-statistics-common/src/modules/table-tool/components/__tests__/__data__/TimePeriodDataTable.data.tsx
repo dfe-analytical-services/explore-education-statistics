@@ -26,6 +26,7 @@ export const testData1Table: TableDataResponse = {
             order: 0,
           },
         },
+        order: 0,
       },
       SchoolType: {
         totalValue: '',
@@ -49,6 +50,7 @@ export const testData1Table: TableDataResponse = {
             order: 0,
           },
         },
+        order: 1,
       },
     },
     footnotes: [],
@@ -381,6 +383,7 @@ export const testData2Table: TableDataResponse = {
             order: 0,
           },
         },
+        order: 0,
       },
       SchoolType: {
         totalValue: '',
@@ -404,6 +407,7 @@ export const testData2Table: TableDataResponse = {
             order: 0,
           },
         },
+        order: 1,
       },
     },
     footnotes: [],
@@ -677,6 +681,7 @@ export const testData3Table: TableDataResponse = {
             order: 0,
           },
         },
+        order: 0,
       },
       SchoolType: {
         totalValue: '',
@@ -700,6 +705,7 @@ export const testData3Table: TableDataResponse = {
             order: 0,
           },
         },
+        order: 1,
       },
     },
     footnotes: [],
@@ -1004,6 +1010,7 @@ export const testDataFiltersWithNoResults: TableDataResponse = {
             order: 0,
           },
         },
+        order: 0,
       },
       SchoolType: {
         totalValue: '',
@@ -1023,6 +1030,7 @@ export const testDataFiltersWithNoResults: TableDataResponse = {
             order: 0,
           },
         },
+        order: 1,
       },
     },
     footnotes: [],

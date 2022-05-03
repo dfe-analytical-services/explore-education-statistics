@@ -150,7 +150,10 @@ const ChartDataSetsConfiguration = ({
         {() => (
           <Form id={formId} showSubmitError>
             <div className={styles.formSelectRow}>
-              {Object.entries(meta.filters)
+              {orderBy(
+                Object.entries(meta.filters),
+                ([_, value]) => value.order,
+              )
                 .filter(([, filters]) => filters.options.length > 1)
                 .map(([categoryName, filters]) => (
                   <FormFieldSelect
@@ -163,6 +166,7 @@ const ChartDataSetsConfiguration = ({
                       filters.options.length > 1 ? 'All options' : undefined
                     }
                     options={filters.options}
+                    order={FormSelect.unordered}
                   />
                 ))}
 
@@ -174,6 +178,7 @@ const ChartDataSetsConfiguration = ({
                   className="govuk-!-width-full"
                   placeholder="All indicators"
                   options={indicatorOptions}
+                  order={FormSelect.unordered}
                 />
               )}
 

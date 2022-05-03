@@ -75,6 +75,7 @@ describe('ChartDataSetsConfiguration', () => {
             order: 0,
           },
         },
+        order: 0,
       },
     },
   };
@@ -111,6 +112,7 @@ describe('ChartDataSetsConfiguration', () => {
             order: 0,
           },
         },
+        order: 0,
       },
     },
   };
