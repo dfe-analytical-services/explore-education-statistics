@@ -1845,7 +1845,7 @@
         ],
         "cors": {
           "allowedOrigins": [
-            "[parameters('adminUri')]",
+            "[concat('https://', parameters('adminUri')]",
             "https://localhost:3000",
             "http://localhost:3000"
           ]
