@@ -36,27 +36,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public DateTime? Updated { get; set; }
     }
 
-    public interface ISequenceEntry<TChildSequenceEntry>
-    {
-        Guid Id { get; init; }
-        List<TChildSequenceEntry> ChildSequence { get; init; }
-    }
+    public abstract record SequenceEntry<TEntry, TChild>(TEntry Id, List<TChild> ChildSequence);
 
-    public record FilterSequenceEntry : ISequenceEntry<FilterGroupSequenceEntry>
-    {
-        public Guid Id { get; init; }
-        public List<FilterGroupSequenceEntry> ChildSequence { get; init; } = new();
-    }
+    public record FilterSequenceEntry(Guid Id, List<FilterGroupSequenceEntry> ChildSequence) :
+        SequenceEntry<Guid, FilterGroupSequenceEntry>(Id, ChildSequence);
 
-    public record FilterGroupSequenceEntry : ISequenceEntry<Guid>
-    {
-        public Guid Id { get; init; }
-        public List<Guid> ChildSequence { get; init; } = new();
-    }
+    public record FilterGroupSequenceEntry(Guid Id, List<Guid> ChildSequence) :
+        SequenceEntry<Guid, Guid>(Id, ChildSequence);
 
-    public record IndicatorGroupSequenceEntry : ISequenceEntry<Guid>
-    {
-        public Guid Id { get; init; }
-        public List<Guid> ChildSequence { get; init; } = new();
-    }
+    public record IndicatorGroupSequenceEntry(Guid Id, List<Guid> ChildSequence) :
+        SequenceEntry<Guid, Guid>(Id, ChildSequence);
 }

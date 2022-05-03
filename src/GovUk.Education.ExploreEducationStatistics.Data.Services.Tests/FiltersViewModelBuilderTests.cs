@@ -669,81 +669,71 @@ public class FiltersBuilderTests
         var ordering = new List<FilterSequenceEntry>
         {
             // A filter that does not exist in the input list
-            new()
-            {
-                Id = Guid.NewGuid(),
-                ChildSequence = new List<FilterGroupSequenceEntry>
+            new(
+                Guid.NewGuid(),
+                new List<FilterGroupSequenceEntry>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        ChildSequence = new List<Guid>
+                    new(
+                        Guid.NewGuid(),
+                        new List<Guid>
                         {
                             Guid.NewGuid()
                         }
-                    }
+                    )
                 }
-            },
+            ),
             // Filter c
-            new()
-            {
-                Id = filters[2].Id,
-                ChildSequence = new List<FilterGroupSequenceEntry>()
-            },
+            new(
+                filters[2].Id,
+                new List<FilterGroupSequenceEntry>()
+            ),
             // Filter a
-            new()
-            {
-                Id = filters[0].Id,
-                ChildSequence = new List<FilterGroupSequenceEntry>
+            new(
+                filters[0].Id,
+                new List<FilterGroupSequenceEntry>
                 {
                     // Group c
-                    new()
-                    {
-                        Id = filters[0].FilterGroups[2].Id,
-                        ChildSequence = new List<Guid>()
-                    },
+                    new(
+                        filters[0].FilterGroups[2].Id,
+                        new List<Guid>()
+                    ),
                     // Group a
-                    new()
-                    {
-                        Id = filters[0].FilterGroups[0].Id,
-                        ChildSequence = new List<Guid>
+                    new(
+                        filters[0].FilterGroups[0].Id,
+                        new List<Guid>
                         {
                             // Item c, Item a, Item b
                             filters[0].FilterGroups[0].FilterItems[2].Id,
                             filters[0].FilterGroups[0].FilterItems[0].Id,
                             filters[0].FilterGroups[0].FilterItems[1].Id
                         }
-                    },
+                    ),
                     // Group b
-                    new()
-                    {
-                        Id = filters[0].FilterGroups[1].Id,
-                        ChildSequence = new List<Guid>()
-                    }
+                    new(
+                        filters[0].FilterGroups[1].Id,
+                        new List<Guid>()
+                    )
                 }
-            },
+            ),
             // Filter b
-            new()
-            {
-                Id = filters[1].Id,
-                ChildSequence = new List<FilterGroupSequenceEntry>()
-            },
+            new(
+                filters[1].Id,
+                new List<FilterGroupSequenceEntry>()
+            ),
             // Another filter that does not exist in the input list
-            new()
-            {
-                Id = Guid.NewGuid(),
-                ChildSequence = new List<FilterGroupSequenceEntry>
+            new(
+                Guid.NewGuid(),
+                new List<FilterGroupSequenceEntry>
                 {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        ChildSequence = new List<Guid>
+                    new(
+                        Guid.NewGuid(),
+                        new List<Guid>
                         {
                             Guid.NewGuid()
                         }
-                    }
+                    )
                 }
-            }
+            )
         };
 
         var result = (IDictionary<string, FilterMetaViewModel>) BuildFilters(filters, ordering);

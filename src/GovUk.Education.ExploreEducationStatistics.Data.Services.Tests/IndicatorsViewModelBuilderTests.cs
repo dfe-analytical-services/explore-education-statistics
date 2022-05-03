@@ -320,59 +320,54 @@ public class IndicatorsBuilderTests
         var ordering = new List<IndicatorGroupSequenceEntry>
         {
             // A group that does not exist in the input list
-            new()
-            {
-                Id = Guid.NewGuid(),
-                ChildSequence = new List<Guid>
+            new(
+                Guid.NewGuid(),
+                new List<Guid>
                 {
                     Guid.NewGuid()
                 }
-            },
+            ),
             // Group c
-            new()
-            {
-                Id = indicatorGroups[2].Id,
-                ChildSequence = new List<Guid>
+            new(
+                indicatorGroups[2].Id,
+                new List<Guid>
                 {
                     // Indicator c, Indicator a, Indicator b
                     indicatorGroups[2].Indicators[2].Id,
                     indicatorGroups[2].Indicators[0].Id,
                     indicatorGroups[2].Indicators[1].Id
                 }
-            },
+            ),
             // Group a
-            new()
-            {
-                Id = indicatorGroups[0].Id,
-                ChildSequence = new List<Guid>
+            new(
+                indicatorGroups[0].Id,
+                new List<Guid>
                 {
                     //Indicator f, Indicator d, Indicator e
                     indicatorGroups[0].Indicators[2].Id,
                     indicatorGroups[0].Indicators[0].Id,
                     indicatorGroups[0].Indicators[1].Id
                 }
-            },
+            ),
             // Group b
-            new()
-            {
-                Id = indicatorGroups[1].Id,
-                ChildSequence = new List<Guid>
+            new(
+                indicatorGroups[1].Id,
+                new List<Guid>
                 {
                     // Indicator i, Indicator g, Indicator h
                     indicatorGroups[1].Indicators[2].Id,
                     indicatorGroups[1].Indicators[0].Id,
                     indicatorGroups[1].Indicators[1].Id
                 }
-            },
+            ),
             // Another group that does not exist in the input list
-            new()
-            {
-                Id = Guid.NewGuid(),
-                ChildSequence = new List<Guid>
+            new(
+                Guid.NewGuid(),
+                new List<Guid>
                 {
                     Guid.NewGuid()
                 }
-            }
+            )
         };
 
         var result =

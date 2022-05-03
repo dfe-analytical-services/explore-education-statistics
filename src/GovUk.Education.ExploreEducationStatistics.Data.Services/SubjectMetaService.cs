@@ -138,17 +138,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     // Set the sequence based on the order of filters, filter groups and indicators observed
                     // in the request
                     rs.FilterSequence = request.Select(filter =>
-                            new FilterSequenceEntry
-                            {
-                                Id = filter.Id,
-                                ChildSequence = filter.FilterGroups.Select(filterGroup =>
-                                        new FilterGroupSequenceEntry
-                                        {
-                                            Id = filterGroup.Id,
-                                            ChildSequence = filterGroup.FilterItems
-                                        })
+                            new FilterSequenceEntry(
+                                filter.Id,
+                                filter.FilterGroups.Select(filterGroup =>
+                                        new FilterGroupSequenceEntry(
+                                            filterGroup.Id,
+                                            filterGroup.FilterItems
+                                        ))
                                     .ToList()
-                            })
+                            ))
                         .ToList();
                     await _statisticsDbContext.SaveChangesAsync();
                 });
@@ -167,11 +165,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     // Set the sequence based on the order of indicator groups and indicators observed
                     // in the request
                     releaseSubject.IndicatorSequence = request.Select(indicatorGroup =>
-                            new IndicatorGroupSequenceEntry
-                            {
-                                Id = indicatorGroup.Id,
-                                ChildSequence = indicatorGroup.Indicators
-                            })
+                            new IndicatorGroupSequenceEntry(
+                                indicatorGroup.Id,
+                                indicatorGroup.Indicators
+                            ))
                         .ToList();
                     await _statisticsDbContext.SaveChangesAsync();
                 });
