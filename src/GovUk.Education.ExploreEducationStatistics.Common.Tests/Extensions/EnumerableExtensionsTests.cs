@@ -11,6 +11,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
     public class EnumerableExtensionsTests
     {
         [Fact]
+        public void ToDictionaryIndexed()
+        {
+            var source = new List<string>
+            {
+                "a",
+                "b",
+                "c"
+            };
+
+            var result = source.ToDictionaryIndexed(value => value, (value, index) => (Value: value, Index: index));
+
+            var expected = new Dictionary<string, ( string S, int Index )>
+            {
+                {"a", ("a", 0)},
+                {"b", ("b", 1)},
+                {"c", ("c", 2)}
+            };
+
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
         public void DistinctByProperty()
         {
             var list = new List<TestClass>

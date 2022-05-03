@@ -7,8 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 {
     public class ReleaseSubject : ICreatedUpdatedTimestamps<DateTime?, DateTime?>
     {
-        public DateTime? Created { get; set; }
-
         public Subject Subject { get; set; } = null!;
 
         public Guid SubjectId { get; set; }
@@ -23,6 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         public List<IndicatorGroupSequenceEntry>? IndicatorSequence { get; set; }
 
+        public DateTime? Created { get; set; }
+
+        public DateTime? Updated { get; set; }
+
         public ReleaseSubject CopyForRelease(Release release)
         {
             var releaseSubject = MemberwiseClone() as ReleaseSubject;
@@ -32,8 +34,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
             return releaseSubject;
         }
-
-        public DateTime? Updated { get; set; }
     }
 
     public abstract record SequenceEntry<TEntry, TChild>(TEntry Id, List<TChild> ChildSequence);

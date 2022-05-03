@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -34,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IGeoJsonRepository _geoJsonRepository;
         private readonly IIndicatorRepository _indicatorRepository;
         private readonly ITimePeriodService _timePeriodService;
+        private readonly IUserService _userService;
         private readonly ISubjectRepository _subjectRepository;
         private readonly IReleaseDataFileRepository _releaseDataFileRepository;
         private readonly LocationsOptions _locationOptions;
@@ -52,9 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ISubjectRepository subjectRepository,
             IReleaseDataFileRepository releaseDataFileRepository,
             IOptions<LocationsOptions> locationOptions,
-            ILogger<ResultSubjectMetaService> logger) : base(
-            persistenceHelper,
-            userService)
+            ILogger<ResultSubjectMetaService> logger) : base(persistenceHelper)
         {
             _contentDbContext = contentDbContext;
             _boundaryLevelRepository = boundaryLevelRepository;
@@ -63,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _geoJsonRepository = geoJsonRepository;
             _indicatorRepository = indicatorRepository;
             _timePeriodService = timePeriodService;
+            _userService = userService;
             _subjectRepository = subjectRepository;
             _releaseDataFileRepository = releaseDataFileRepository;
             _locationOptions = locationOptions.Value;
@@ -75,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IList<Observation> observations)
         {
             return await CheckReleaseSubjectExists(releaseId, query.SubjectId)
-                .OnSuccess(CheckCanViewSubjectData)
+                .OnSuccess(_userService.CheckCanViewSubjectData)
                 .OnSuccess(async releaseSubject =>
                 {
                     var stopwatch = Stopwatch.StartNew();

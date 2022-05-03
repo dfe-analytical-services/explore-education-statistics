@@ -137,6 +137,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
             return rightResults;
         }
 
+        public static Dictionary<TKey, TElement> ToDictionaryIndexed<TSource, TKey, TElement>(
+            this IEnumerable<TSource> source,
+            Func<TSource, TKey> keySelector,
+            Func<TSource, int, TElement> elementSelector) where TKey : notnull
+        {
+            var sourceList = source.ToList();
+
+            var result = new Dictionary<TKey, TElement>(sourceList.Count);
+            sourceList.ForEach((value, index) => { result.Add(keySelector(value), elementSelector(value, index)); });
+            return result;
+        }
+
         public static bool IsNullOrEmpty<T>(this IEnumerable<T>? list)
         {
             if (list == null)

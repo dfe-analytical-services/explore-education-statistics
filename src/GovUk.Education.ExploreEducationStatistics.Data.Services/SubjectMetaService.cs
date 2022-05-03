@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IObservationService _observationService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly ITimePeriodService _timePeriodService;
+        private readonly IUserService _userService;
         private readonly LocationsOptions _locationOptions;
 
         public SubjectMetaService(
@@ -61,9 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
-            IOptions<LocationsOptions> locationOptions) : base(
-            persistenceHelper,
-            userService)
+            IOptions<LocationsOptions> locationOptions) : base(persistenceHelper)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
@@ -75,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _observationService = observationService;
             _releaseSubjectRepository = releaseSubjectRepository;
             _timePeriodService = timePeriodService;
+            _userService = userService;
             _locationOptions = locationOptions.Value;
         }
 
@@ -101,7 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             Guid subjectId)
         {
             return await CheckReleaseSubjectExists(releaseId, subjectId)
-                .OnSuccess(CheckCanViewSubjectData)
+                .OnSuccess(_userService.CheckCanViewSubjectData)
                 .OnSuccess(GetSubjectMetaViewModel);
         }
 
@@ -120,7 +121,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             CancellationToken cancellationToken)
         {
             return CheckReleaseSubjectExists(releaseId, query.SubjectId)
-                .OnSuccess(CheckCanViewSubjectData)
+                .OnSuccess(_userService.CheckCanViewSubjectData)
                 .OnSuccess(releaseSubject =>
                     GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
         }

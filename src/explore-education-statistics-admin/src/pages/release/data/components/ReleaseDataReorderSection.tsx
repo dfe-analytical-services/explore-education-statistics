@@ -34,27 +34,28 @@ const ReleaseDataReorderSection = ({ releaseId, canUpdateRelease }: Props) => {
   const [reorderingFilters, setReorderingFilters] = useState<Subject>();
   const [reorderingIndicators, setReorderingIndicators] = useState<Subject>();
 
-  const handleSaveFilters = (
+  const handleSaveFilters = async (
     subjectId: string,
     updatedFilters: UpdateFiltersRequest,
   ) => {
-    setReorderingFilters(undefined);
-    adminTableBuilderService.updateFilters(
+    await adminTableBuilderService.updateFilters(
       releaseId,
       subjectId,
       updatedFilters,
     );
+    setReorderingFilters(undefined);
   };
-  const handleSaveIndicators = (
+
+  const handleSaveIndicators = async (
     subjectId: string,
     updatedIndicators: UpdateIndicatorsRequest,
   ) => {
-    setReorderingIndicators(undefined);
-    adminTableBuilderService.updateIndicators(
+    await adminTableBuilderService.updateIndicators(
       releaseId,
       subjectId,
       updatedIndicators,
     );
+    setReorderingIndicators(undefined);
   };
 
   return (

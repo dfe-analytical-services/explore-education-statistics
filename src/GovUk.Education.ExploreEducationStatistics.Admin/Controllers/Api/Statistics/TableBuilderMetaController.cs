@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
+    [Route("api")]
     [ApiController]
     [Authorize]
     public class TableBuilderMetaController : ControllerBase
@@ -24,14 +25,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _subjectMetaService = subjectMetaService;
         }
 
-        [HttpGet("api/data/release/{releaseId:guid}/meta/subject/{subjectId:guid}")]
+        [HttpGet("data/release/{releaseId:guid}/meta/subject/{subjectId:guid}")]
         public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, Guid subjectId)
         {
             return _subjectMetaService.GetSubjectMetaRestricted(releaseId, subjectId)
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("api/data/release/{releaseId:guid}/meta/subject")]
+        [HttpPost("data/release/{releaseId:guid}/meta/subject")]
         public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(
             Guid releaseId,
             [FromBody] ObservationQueryContext query,
@@ -41,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrOk();
         }
 
-        [HttpPatch("api/data/release/{releaseId:guid}/meta/subject/{subjectId:guid}/filters")]
+        [HttpPatch("data/release/{releaseId:guid}/meta/subject/{subjectId:guid}/filters")]
         public Task<ActionResult<Unit>> UpdateFilters(
             Guid releaseId,
             Guid subjectId,
@@ -51,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrOk();
         }
 
-        [HttpPatch("api/data/release/{releaseId:guid}/meta/subject/{subjectId:guid}/indicators")]
+        [HttpPatch("data/release/{releaseId:guid}/meta/subject/{subjectId:guid}/indicators")]
         public Task<ActionResult<Unit>> UpdateIndicators(
             Guid releaseId,
             Guid subjectId,

@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -18,13 +16,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public abstract class AbstractSubjectMetaService
     {
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
-        private readonly IUserService _userService;
 
-        protected AbstractSubjectMetaService(IPersistenceHelper<StatisticsDbContext> persistenceHelper,
-            IUserService userService)
+        protected AbstractSubjectMetaService(IPersistenceHelper<StatisticsDbContext> persistenceHelper)
         {
             _persistenceHelper = persistenceHelper;
-            _userService = userService;
         }
 
         protected static IEnumerable<LocationAttributeViewModel> DeduplicateLocationViewModels(
@@ -87,17 +82,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .Where(rs => rs.ReleaseId == releaseId
                                  && rs.SubjectId == subjectId)
             );
-        }
-
-        protected async Task<Either<ActionResult, ReleaseSubject>> CheckCanViewSubjectData(
-            ReleaseSubject releaseSubject)
-        {
-            if (await _userService.MatchesPolicy(releaseSubject.Subject, DataSecurityPolicies.CanViewSubjectData))
-            {
-                return releaseSubject;
-            }
-
-            return new ForbidResult();
         }
     }
 }

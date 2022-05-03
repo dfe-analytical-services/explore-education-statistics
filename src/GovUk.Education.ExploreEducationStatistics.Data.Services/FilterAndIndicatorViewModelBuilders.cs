@@ -23,21 +23,19 @@ public class FilterAndIndicatorViewModelBuilders
         public static Dictionary<string, FilterMetaViewModel> BuildFilters(IEnumerable<Filter> values,
             IEnumerable<FilterSequenceEntry>? sequence = null)
         {
-            FilterMetaViewModel BuildViewModel(Ordered<Filter, FilterSequenceEntry> input, int index)
-            {
-                var totalFilterItemId = GetTotal(input)?.Id;
-                return new FilterMetaViewModel(input, totalFilterItemId, index)
-                {
-                    Options = BuildFilterGroups(input.Value.FilterGroups, input.Sequence?.ChildSequence)
-                };
-            }
-
             return OrderAsDictionary(values,
                 idSelector: value => value.Id,
                 labelSelector: value => value.Label,
-                sequenceIdSelector: s => s.Id,
-                resultSelector: BuildViewModel,
-                sequence
+                sequenceIdSelector: sequenceEntry => sequenceEntry.Id,
+                resultSelector: (input, index) =>
+                {
+                    var totalFilterItemId = GetTotal(input)?.Id;
+                    return new FilterMetaViewModel(input, totalFilterItemId, index)
+                    {
+                        Options = BuildFilterGroups(input.Value.FilterGroups, input.Sequence?.ChildSequence)
+                    };
+                },
+                sequence: sequence
             );
         }
 
@@ -45,20 +43,15 @@ public class FilterAndIndicatorViewModelBuilders
             IEnumerable<FilterGroup> values,
             IEnumerable<FilterGroupSequenceEntry>? sequence = null)
         {
-            FilterGroupMetaViewModel BuildViewModel(Ordered<FilterGroup, FilterGroupSequenceEntry> input, int index)
-            {
-                return new FilterGroupMetaViewModel(input, index)
-                {
-                    Options = BuildFilterItems(input.Value.FilterItems, input.Sequence?.ChildSequence)
-                };
-            }
-
             return OrderAsDictionaryWithTotalFirst(values,
                 idSelector: value => value.Id,
                 labelSelector: value => value.Label,
                 sequenceIdSelector: sequenceEntry => sequenceEntry.Id,
-                resultSelector: BuildViewModel,
-                sequence
+                resultSelector: (input, index) => new FilterGroupMetaViewModel(input, index)
+                {
+                    Options = BuildFilterItems(input.Value.FilterItems, input.Sequence?.ChildSequence)
+                },
+                sequence: sequence
             );
         }
 
@@ -130,20 +123,15 @@ public class FilterAndIndicatorViewModelBuilders
             IEnumerable<IndicatorGroup> values,
             IEnumerable<IndicatorGroupSequenceEntry>? sequence = null)
         {
-            IndicatorGroupMetaViewModel BuildViewModel(Ordered<IndicatorGroup, IndicatorGroupSequenceEntry> input, int index)
-            {
-                return new IndicatorGroupMetaViewModel(input, index)
-                {
-                    Options = BuildIndicators(input.Value.Indicators, input.Sequence?.ChildSequence)
-                };
-            }
-
             return OrderAsDictionary(values,
                 idSelector: filter => filter.Id,
                 labelSelector: filter => filter.Label,
                 sequenceIdSelector: filterOrdering => filterOrdering.Id,
-                resultSelector: BuildViewModel,
-                sequence
+                resultSelector: (input, index) => new IndicatorGroupMetaViewModel(input, index)
+                {
+                    Options = BuildIndicators(input.Value.Indicators, input.Sequence?.ChildSequence)
+                },
+                sequence: sequence
             );
         }
 
@@ -211,18 +199,11 @@ public class FilterAndIndicatorViewModelBuilders
         Func<Ordered<TValue, TSequence>, int, TResult> resultSelector,
         IEnumerable<TSequence>? sequence) where TId : notnull
     {
-        var ordered = (sequence == null
-            ? OrderByLabel<TValue, TSequence>(values, labelSelector)
-            : OrderBySequence(values, idSelector, sequenceIdSelector, sequence)).ToList();
-
-        var result = new Dictionary<string, TResult>(ordered.Count);
-        ordered.ForEach((ordered1, index) =>
-        {
-            var key = labelSelector(ordered1).PascalCase();
-            var value = resultSelector(ordered1, index);
-            result.Add(key, value);
-        });
-        return result;
+        return (sequence == null
+                ? OrderByLabel<TValue, TSequence>(values, labelSelector)
+                : OrderBySequence(values, idSelector, sequenceIdSelector, sequence))
+            .ToDictionaryIndexed(value => labelSelector(value).PascalCase(),
+                resultSelector);
     }
 
     private static Dictionary<string, TResult> OrderAsDictionaryWithTotalFirst<TValue, TId, TSequence, TResult>(
@@ -233,16 +214,11 @@ public class FilterAndIndicatorViewModelBuilders
         Func<Ordered<TValue, TSequence>, int, TResult> resultSelector,
         IEnumerable<TSequence>? sequence) where TId : notnull
     {
-        var ordered = (sequence == null
-            ? OrderByLabelWithTotalFirst<TValue, TSequence>(values, labelSelector)
-            : OrderBySequence(values, idSelector, sequenceIdSelector, sequence)).ToList();
-
-        var result = new Dictionary<string, TResult>(ordered.Count);
-        ordered.ForEach((value, index) =>
-        {
-            result.Add(labelSelector(value).PascalCase(), resultSelector(value, index));
-        });
-        return result;
+        return (sequence == null
+                ? OrderByLabelWithTotalFirst<TValue, TSequence>(values, labelSelector)
+                : OrderBySequence(values, idSelector, sequenceIdSelector, sequence))
+            .ToDictionaryIndexed(value => labelSelector(value).PascalCase(),
+                resultSelector);
     }
 
     private static List<TResult> OrderAsList<TValue, TId, TSequence, TResult>(
