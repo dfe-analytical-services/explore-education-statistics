@@ -14,6 +14,7 @@ import {
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
+import { PublicationSummary } from '@common/services/publicationService';
 
 export interface PublicationContactDetails {
   id: string;
@@ -50,9 +51,12 @@ export interface MyPublication {
     canCreateReleases: boolean;
     canUpdatePublication: boolean;
     canUpdatePublicationTitle: boolean;
+    canUpdatePublicationSupersededBy: boolean;
     canCreateMethodologies: boolean;
     canManageExternalMethodology: boolean;
   };
+  supersededById?: string;
+  isSuperseded?: boolean;
 }
 
 export interface MyPublicationMethodology {
@@ -86,6 +90,7 @@ export interface SavePublicationRequest {
   contact: SavePublicationContact;
   selectedMethodologyId?: string;
   externalMethodology?: ExternalMethodology;
+  supersededById?: string;
   topicId: string;
 }
 
@@ -98,10 +103,15 @@ export type UpdatePublicationLegacyRelease = Partial<
 
 const publicationService = {
   getMyPublicationsByTopic(topicId: string): Promise<MyPublication[]> {
-    return client.get<MyPublication[]>('/me/publications', {
+    return client.get('/me/publications', {
       params: { topicId },
     });
   },
+
+  getPublicationSummaries(): Promise<PublicationSummary[]> {
+    return client.get('/publication-summaries');
+  },
+
   createPublication(
     publication: CreatePublicationRequest,
   ): Promise<BasicPublicationDetails> {

@@ -14,7 +14,6 @@ interface Props {
 
 const TableTabSection = ({ dataBlock, table, tableHeaders, onSave }: Props) => {
   const dataTableRef = useRef<HTMLElement>(null);
-
   return (
     <>
       {onSave && (

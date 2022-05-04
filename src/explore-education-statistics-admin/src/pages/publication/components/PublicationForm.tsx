@@ -1,10 +1,12 @@
 import FormFieldThemeTopicSelect from '@admin/components/form/FormFieldThemeTopicSelect';
+import publicationService from '@admin/services/publicationService';
 import themeService from '@admin/services/themeService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
-import { FormFieldset } from '@common/components/form';
+import { FormFieldSelect, FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import FormSelect from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';
@@ -21,6 +23,7 @@ export interface FormValues {
   teamEmail: string;
   contactName: string;
   contactTelNo: string;
+  supersededById?: string;
 }
 
 const errorMappings = [
@@ -33,25 +36,45 @@ const errorMappings = [
 ];
 interface Props {
   cancelButton?: ReactNode;
+  confirmOnSubmit?: boolean;
   id?: string;
   initialValues?: FormValues;
-  onSubmit: (values: FormValues) => void;
-  confirmOnSubmit?: boolean;
+  publicationId?: string;
+  showSupersededBy?: boolean;
   showTitleInput?: boolean;
+  onSubmit: (values: FormValues) => void;
 }
 
 const PublicationForm = ({
   cancelButton,
+  confirmOnSubmit = false,
   id = 'publicationForm',
   initialValues,
-  confirmOnSubmit = false,
-  showTitleInput = true,
+  publicationId,
+  showSupersededBy = false,
+  showTitleInput = false,
   onSubmit,
 }: Props) => {
-  const {
-    value: themes = [],
-    isLoading: isThemesLoading,
-  } = useAsyncHandledRetry(themeService.getThemes);
+  const { value, isLoading: isThemesLoading } = useAsyncHandledRetry(
+    async () => {
+      const themes = await themeService.getThemes();
+      if (!showSupersededBy) {
+        return { themes };
+      }
+
+      const allPublications = await publicationService.getPublicationSummaries();
+      const publications = allPublications.filter(
+        publication => publication.id !== publicationId,
+      );
+
+      return {
+        themes,
+        publications,
+      };
+    },
+  );
+
+  const { themes, publications } = value ?? {};
 
   const [showConfirmSubmitModal, setShowConfirmSubmitModal] = useState<boolean>(
     false,
@@ -66,6 +89,7 @@ const PublicationForm = ({
         .email('Enter a valid team email address'),
       contactName: Yup.string().required('Enter a contact name'),
       contactTelNo: Yup.string().required('Enter a contact telephone number'),
+      supersededById: Yup.string(),
     });
 
     if (initialValues?.topicId) {
@@ -73,7 +97,6 @@ const PublicationForm = ({
         topicId: Yup.string().required('Choose a topic'),
       });
     }
-
     return schema;
   }, [initialValues?.topicId]);
 
@@ -111,7 +134,7 @@ const PublicationForm = ({
               />
             )}
 
-            {initialValues?.topicId && (
+            {themes && initialValues?.topicId && (
               <FormFieldThemeTopicSelect<FormValues>
                 name="topicId"
                 legend="Choose a topic for this publication"
@@ -151,6 +174,25 @@ const PublicationForm = ({
                 width={10}
               />
             </FormFieldset>
+
+            {publications && showSupersededBy && (
+              <FormFieldset
+                id="supersede"
+                legend="Archive this publication"
+                legendSize="m"
+              >
+                <FormFieldSelect<FormValues>
+                  label="Superseding publication"
+                  hint="If superseded by a publication with a live release, this will archive the current publication immediately"
+                  name="supersededById"
+                  options={publications.map(publication => ({
+                    label: publication.title,
+                    value: publication.id,
+                  }))}
+                  placeholder="None selected"
+                />
+              </FormFieldset>
+            )}
 
             <ButtonGroup>
               <Button

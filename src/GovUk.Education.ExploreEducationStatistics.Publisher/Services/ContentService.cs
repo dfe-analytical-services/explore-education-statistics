@@ -146,8 +146,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         {
             await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
             await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
-            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
-            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
         }
 
         private async Task DeleteAllContent()

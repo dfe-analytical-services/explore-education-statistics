@@ -30,6 +30,7 @@ describe('PreReleaseMethodologiesPage', () => {
       canManageExternalMethodology: false,
       canUpdatePublication: false,
       canUpdatePublicationTitle: false,
+      canUpdatePublicationSupersededBy: false,
     },
   };
 

@@ -194,6 +194,20 @@ describe('DownloadStep', () => {
     expect(screen.getByText('This is not the latest data')).toBeInTheDocument();
   });
 
+  test('shows not latest data tag when hideLatestDataTag is true', () => {
+    render(
+      <DownloadStep
+        {...wizardProps}
+        subjects={testSubjects}
+        release={testLatestRelease}
+        onSubmit={noop}
+        hideLatestDataTag
+      />,
+    );
+
+    expect(screen.getByText('This is not the latest data')).toBeInTheDocument();
+  });
+
   test('renders a message when there are no downloads', () => {
     const handleSubmit = jest.fn();
     render(

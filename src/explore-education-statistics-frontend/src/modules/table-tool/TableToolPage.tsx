@@ -45,6 +45,7 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
   themeMeta,
 }) => {
   const [loadingFastTrack, setLoadingFastTrack] = useState(false);
+
   useEffect(() => {
     if (fastTrack && subjectMeta) {
       setLoadingFastTrack(false);
@@ -159,28 +160,36 @@ const TableToolPage: NextPage<TableToolPageProps> = ({
         }}
         finalStep={({
           query,
-          response,
           selectedPublication: selectedPublicationDetails,
-        }) => (
-          <WizardStep size="l">
-            {wizardStepProps => (
-              <>
-                <WizardStepHeading {...wizardStepProps} isActive>
-                  Explore data
-                </WizardStepHeading>
+          table,
+          tableHeaders,
+          onReorder,
+        }) => {
+          return (
+            <WizardStep size="l">
+              {wizardStepProps => (
+                <>
+                  <WizardStepHeading {...wizardStepProps} isActive>
+                    Explore data
+                  </WizardStepHeading>
 
-                {response && query && selectedPublicationDetails && (
-                  <TableToolFinalStep
-                    query={query}
-                    table={response.table}
-                    tableHeaders={response.tableHeaders}
-                    selectedPublication={selectedPublicationDetails}
-                  />
-                )}
-              </>
-            )}
-          </WizardStep>
-        )}
+                  {table &&
+                    tableHeaders &&
+                    query &&
+                    selectedPublicationDetails && (
+                      <TableToolFinalStep
+                        query={query}
+                        selectedPublication={selectedPublicationDetails}
+                        table={table}
+                        tableHeaders={tableHeaders}
+                        onReorderTableHeaders={onReorder}
+                      />
+                    )}
+                </>
+              )}
+            </WizardStep>
+          );
+        }}
         onSubmit={table => {
           logEvent({
             category: 'Table tool',
@@ -206,7 +215,7 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
   >;
 
   const themeMeta = await themeService.listThemes({
-    publicationFilter: 'LatestData',
+    publicationFilter: 'DataTables',
   });
 
   const selectedPublication = themeMeta

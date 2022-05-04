@@ -27,21 +27,18 @@ const testSubjectMeta: SubjectMeta = {
       label: 'Category 1',
       options: [
         {
-          id: 'category-1-item-1-id',
           value: 'category-1-item-1',
           label: 'Category 1 Item 1',
           unit: '',
           name: 'category_1_item_1',
         },
         {
-          id: 'category-1-item-2-id',
           value: 'category-1-item-2',
           label: 'Category 1 Item 2',
           unit: '',
           name: 'category_1_item_2',
         },
         {
-          id: 'category-1-item-3-id',
           value: 'category-1-item-3',
           label: 'Category 1 Item 3',
           unit: '',
@@ -55,7 +52,6 @@ const testSubjectMeta: SubjectMeta = {
       label: 'Category 2',
       options: [
         {
-          id: 'category-2-item-1-id',
           value: 'category-2-item-1',
           label: 'Category 2 Item 1',
           unit: '',
@@ -237,14 +233,14 @@ describe('ReorderIndicatorsList', () => {
     const expectedRequest = [
       {
         id: 'category-2-id',
-        indicatorItems: ['category-2-item-1-id'],
+        indicatorItems: ['category-2-item-1'],
       },
       {
         id: 'category-1-id',
         indicatorItems: [
-          'category-1-item-1-id',
-          'category-1-item-2-id',
-          'category-1-item-3-id',
+          'category-1-item-1',
+          'category-1-item-2',
+          'category-1-item-3',
         ],
       },
     ];

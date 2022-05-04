@@ -13,10 +13,6 @@ import createDataSetCategories from '@common/modules/charts/util/createDataSetCa
 import getDataSetCategoryConfigs, {
   DataSetCategoryConfig,
 } from '@common/modules/charts/util/getDataSetCategoryConfigs';
-import {
-  KeyStatColumn,
-  KeyStatContainer,
-} from '@common/modules/find-statistics/components/KeyStat';
 import KeyStatTile from '@common/modules/find-statistics/components/KeyStatTile';
 import {
   GeoJsonFeature,
@@ -47,6 +43,7 @@ import React, {
   useState,
 } from 'react';
 import { GeoJSON, LatLngBounds, Map } from 'react-leaflet';
+import { uniq } from 'lodash';
 
 interface MapFeatureProperties extends GeoJsonFeatureProperties {
   colour: string;
@@ -286,13 +283,14 @@ function generateGeometryAndLegend(
 }
 
 export interface MapBlockProps extends ChartProps {
-  id: string;
-  position?: { lat: number; lng: number };
-  maxBounds?: LatLngBounds;
-  legend: LegendConfiguration;
   axes: {
     major: AxisConfiguration;
   };
+  boundaryLevel?: number;
+  id: string;
+  legend: LegendConfiguration;
+  maxBounds?: LatLngBounds;
+  position?: { lat: number; lng: number };
 }
 
 export const MapBlockInternal = ({
@@ -397,7 +395,9 @@ export const MapBlockInternal = ({
   }, [dataSetCategories, shouldGroupLocationOptions]);
 
   const locationType = useMemo(() => {
-    const levels = dataSetCategories.map(category => category.filter.level);
+    const levels = uniq(
+      dataSetCategories.map(category => category.filter.level),
+    );
     return !levels.every(level => level === levels[0]) ||
       !locationLevelsMap[levels[0]]
       ? { label: 'location', prefix: 'a' }

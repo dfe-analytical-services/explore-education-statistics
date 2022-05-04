@@ -138,6 +138,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.S
             return userService.CheckPolicy(SecurityPolicies.CanUpdatePublicationTitles);
         }
 
+        public static Task<Either<ActionResult, Unit>> CheckCanUpdatePublicationSupersededBy(
+            this IUserService userService)
+        {
+            return userService.CheckPolicy(SecurityPolicies.CanUpdatePublicationSupersededBy);
+        }
+
         public static Task<Either<ActionResult, Tuple<Publication, ReleaseRole>>> CheckCanUpdateReleaseRole(
             this IUserService userService, Publication publication, ReleaseRole role)
         {

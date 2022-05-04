@@ -57,10 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             if (block.ContentBlock is DataBlock dataBlock)
             {
-                var query = dataBlock.Query.Clone();
-                query.IncludeGeoJson = dataBlock.Charts.Any(chart => chart.Type == ChartType.Map);
-
-                return await _tableBuilderService.Query(block.ReleaseId, query);
+                return await _tableBuilderService.Query(block.ReleaseId, dataBlock.Query);
             }
 
             return new NotFoundResult();

@@ -22,13 +22,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         public async Task Get()
         {
             var release2000Version0Id = Guid.NewGuid();
+            var supersedingPublication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    new ()
+                    {
+                        Published = null,
+                    },
+                }
+            };
             var publication = new Publication
             {
                 Title = "Publication Title",
                 Slug = "publication-slug",
+                SupersededBy = supersedingPublication,
                 Releases = new List<Release>
                 {
-                    new Release // latest published release
+                    new () // latest published release
                     {
                         ReleaseName = "2000",
                         Slug = "2000",
@@ -37,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Version = 1,
                         PreviousVersionId = release2000Version0Id,
                     },
-                    new Release
+                    new ()
                     {
                         Id = release2000Version0Id,
                         ReleaseName = "2000",
@@ -46,7 +57,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Published = DateTime.UtcNow,
                         Version = 0,
                     },
-                    new Release // not published
+                    new () // not published
                     {
                         ReleaseName = "2001",
                         Slug = "2001",
@@ -54,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         Published = null,
                         Version = 0,
                     },
-                    new Release // published so appears in ListReleases result
+                    new () // published so appears in ListReleases result
                     {
                         ReleaseName = "1999",
                         Slug = "1999",
@@ -65,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 },
                 LegacyReleases = new List<LegacyRelease>
                 {
-                    new LegacyRelease
+                    new ()
                     {
                         Description = "Legacy release description",
                         Url = "http://legacy.release.com",
@@ -114,6 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(publication.Id, publicationViewModel.Id);
                 Assert.Equal(publication.Title, publicationViewModel.Title);
                 Assert.Equal(publication.Slug, publicationViewModel.Slug);
+                Assert.False(publicationViewModel.IsSuperseded); // because superseding publication has no Live releases
 
                 Assert.Equal(2, publicationViewModel.Releases.Count);
                 Assert.Equal(publication.Releases[0].Id, publicationViewModel.LatestReleaseId);
@@ -145,6 +157,72 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         }
 
         [Fact]
+        public async Task Get_IsSuperseded()
+        {
+            var release2000Version0Id = Guid.NewGuid();
+            var supersedingPublication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    new ()
+                    {
+                        Published = DateTime.UtcNow,
+                    },
+                }
+            };
+            var publication = new Publication
+            {
+                Title = "Publication Title",
+                Slug = "publication-slug",
+                SupersededBy = supersedingPublication,
+                Releases = new List<Release>
+                {
+                    new ()
+                    {
+                        ReleaseName = "2000",
+                        Slug = "2000",
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        Published = DateTime.UtcNow,
+                        Version = 1,
+                        PreviousVersionId = release2000Version0Id,
+                    },
+                },
+                Topic = new Topic
+                {
+                    Title = "Test topic",
+                    Slug = "test-topic",
+                    Theme = new Theme
+                    {
+                        Title = "Test theme",
+                        Slug = "test-theme",
+                    }
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupPublicationService(contentDbContext);
+
+                var result = await service.Get(publication.Slug);
+
+                var publicationViewModel = result.AssertRight();
+
+                Assert.Equal(publication.Id, publicationViewModel.Id);
+                Assert.True(publicationViewModel.IsSuperseded);
+
+                Assert.Single(publicationViewModel.Releases);
+                Assert.Equal(publication.Releases[0].Id, publicationViewModel.LatestReleaseId);
+            }
+        }
+
+        [Fact]
         public async Task Get_NoPublication()
         {
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -153,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             {
                 var service = SetupPublicationService(contentDbContext);
 
-                var result = await service.Get("nonexistant-publication");
+                var result = await service.Get("nonexistent-publication");
 
                 result.AssertNotFound();
             }
@@ -172,7 +250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     Slug = publicationSlug,
                     Releases = new List<Release>
                     {
-                        new Release // not published
+                        new () // not published
                         {
                             ReleaseName = "2000",
                             Slug = "2000",
@@ -199,6 +277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             IMapper? mapper = null)
         {
             return new(
+                contentDbContext ?? Mock.Of<ContentDbContext>(),
                 contentDbContext is null
                     ? Mock.Of<IPersistenceHelper<ContentDbContext>>()
                     : new PersistenceHelper<ContentDbContext>(contentDbContext),

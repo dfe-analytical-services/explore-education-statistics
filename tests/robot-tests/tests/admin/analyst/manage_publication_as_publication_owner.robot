@@ -35,6 +35,7 @@ Update publication
     user enters text into element    id:publicationForm-contactTelNo    4321 4321
 
     user checks page does not contain element    id:publicationForm-title    # Only BAU users should see this
+    user checks page does not contain element    id:publicationForm-supersede    # Only BAU users should see this
 
     user clicks button    Save publication
     user clicks button    Confirm

@@ -5,9 +5,8 @@ import Effect from '@common/components/Effect';
 import {
   Form,
   FormFieldRadioGroup,
+  FormFieldSelect,
   FormFieldTextInput,
-  FormGroup,
-  FormSelect,
 } from '@common/components/form';
 import FormFieldCheckbox from '@common/components/form/FormFieldCheckbox';
 import FormFieldFileInput from '@common/components/form/FormFieldFileInput';
@@ -28,6 +27,7 @@ import merge from 'lodash/merge';
 import pick from 'lodash/pick';
 import React, { ChangeEvent, ReactNode, useCallback, useMemo } from 'react';
 import { ObjectSchema } from 'yup';
+import FormGroup from '@common/components/form/FormGroup';
 
 type FormValues = Partial<ChartOptions>;
 
@@ -50,7 +50,6 @@ const replaceNewLines = (event: ChangeEvent<HTMLTextAreaElement>) => {
 };
 
 interface Props {
-  boundaryLevel?: number;
   buttons?: ReactNode;
   chartOptions: ChartOptions;
   definition: ChartDefinition;
@@ -64,7 +63,6 @@ interface Props {
 const formId = 'chartConfigurationForm';
 
 const ChartConfiguration = ({
-  boundaryLevel,
   buttons,
   chartOptions,
   definition,
@@ -137,8 +135,16 @@ const ChartConfiguration = ({
       });
     }
 
+    if (definition.type === 'map' && meta.boundaryLevels?.length) {
+      schema = schema.shape({
+        boundaryLevel: Yup.number()
+          .oneOf(meta.boundaryLevels.map(level => level.id))
+          .required('Choose a boundary level'),
+      });
+    }
+
     return schema;
-  }, [definition.capabilities.stackable, definition.type]);
+  }, [definition.capabilities.stackable, definition.type, meta.boundaryLevels]);
 
   const initialValues = useMemo<FormValues>(() => {
     return pick(chartOptions, Object.keys(validationSchema.fields));
@@ -150,6 +156,9 @@ const ChartConfiguration = ({
       // values from overwriting existing values
       return merge({}, chartOptions, values, {
         width: parseNumber(values.width),
+        boundaryLevel: values.boundaryLevel
+          ? parseNumber(values.boundaryLevel)
+          : undefined,
       });
     },
     [chartOptions],
@@ -276,28 +285,28 @@ const ChartConfiguration = ({
               />
             )}
 
-            {definition.type === 'map' && meta.boundaryLevels && (
-              <FormGroup>
-                <FormSelect
-                  id={`${formId}-boundaryLevel`}
-                  label="Select a version of geographical data to use"
-                  name="boundaryLevel"
-                  order={[]}
-                  value={boundaryLevel?.toString()}
-                  options={[
-                    { label: 'Latest', value: '' },
-                    ...meta.boundaryLevels.map(({ id, label }) => ({
-                      value: id,
-                      label,
-                    })),
-                  ]}
-                  onChange={e => {
-                    if (onBoundaryLevelChange) {
-                      onBoundaryLevelChange(e.target.value);
-                    }
-                  }}
-                />
-              </FormGroup>
+            {definition.type === 'map' && meta.boundaryLevels?.length && (
+              <FormFieldSelect
+                id={`${formId}-boundaryLevel`}
+                label="Select a version of geographical data to use"
+                name="boundaryLevel"
+                order={[]}
+                options={[
+                  {
+                    label: 'Please select',
+                    value: '',
+                  },
+                  ...meta.boundaryLevels.map(({ id, label }) => ({
+                    value: id,
+                    label,
+                  })),
+                ]}
+                onChange={e => {
+                  if (onBoundaryLevelChange) {
+                    onBoundaryLevelChange(e.target.value);
+                  }
+                }}
+              />
             )}
 
             {definition.type !== 'map' && (

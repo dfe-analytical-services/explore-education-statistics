@@ -16,6 +16,7 @@ import {
   FullTableMeta,
 } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import { Dictionary, PartialBy } from '@common/types';
 import cartesian from '@common/utils/cartesian';
 import formatPretty from '@common/utils/number/formatPretty';
@@ -37,16 +38,9 @@ class FilterGroup extends Filter {
 }
 
 function getExcludedFilters(
-  tableHeadersConfig: TableHeadersConfig,
+  tableHeaderFilters: string[],
   subjectMeta: FullTableMeta,
-): string[] {
-  const tableHeaderFilters = [
-    ...tableHeadersConfig.columnGroups.flatMap(filterGroup => filterGroup),
-    ...tableHeadersConfig.rowGroups.flatMap(filterGroup => filterGroup),
-    ...tableHeadersConfig.columns,
-    ...tableHeadersConfig.rows,
-  ].map(filter => filter.id);
-
+): Set<string> {
   const subjectMetaFilters = [
     ...Object.values(subjectMeta.filters).flatMap(
       filterGroup => filterGroup.options,
@@ -56,10 +50,53 @@ function getExcludedFilters(
     ...subjectMeta.indicators,
   ].map(filter => filter.id);
 
-  return subjectMetaFilters.filter(
-    subjectMetaFilter => !tableHeaderFilters.includes(subjectMetaFilter),
+  return new Set(
+    subjectMetaFilters.filter(
+      subjectMetaFilter => !tableHeaderFilters.includes(subjectMetaFilter),
+    ),
   );
 }
+
+/**
+ * Determines whether any rows or columns are excluded from the table because they have no data.
+ * For filters, indicators and locations:
+ *  - when there's no data, these aren't included in subjectMeta.
+ *  - compare subjectMeta with the query to find the excluded ones.
+ *  For timePeriod:
+ *  - when there's no data, these are in subjectMeta but aren't in tableHeadersConfig.
+ *  - compare subjectMeta with tableHeadersConfig to find the excluded ones.
+ *  - the query isn't useful here as just has the start and end timePeriods.
+ */
+const hasMissingRowsOrColumns = (
+  query: ReleaseTableDataQuery,
+  subjectMeta: FullTableMeta,
+  tableHeaderFilters: string[],
+): boolean => {
+  if (
+    query.locationIds.length !== subjectMeta.locations.length ||
+    query.indicators.length !== subjectMeta.indicators.length
+  ) {
+    return true;
+  }
+
+  const subjectMetaFilters = Object.values(subjectMeta.filters)
+    .flatMap(filterGroup => filterGroup.options)
+    .map(filter => filter.id);
+
+  if (query.filters.length !== subjectMetaFilters.length) {
+    return true;
+  }
+
+  if (
+    !subjectMeta.timePeriodRange.every(timePeriod =>
+      tableHeaderFilters.includes(timePeriod.value),
+    )
+  ) {
+    return true;
+  }
+
+  return false;
+};
 
 function getCellText(
   measuresByDataSet: Dictionary<unknown>,
@@ -183,19 +220,21 @@ interface Props {
   captionTitle?: string;
   dataBlockId?: string;
   fullTable: FullTable;
-  tableHeadersConfig: TableHeadersConfig;
+  query?: ReleaseTableDataQuery;
   source?: string;
+  tableHeadersConfig: TableHeadersConfig;
   onError?: (message: string) => void;
 }
 
 const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
   function TimePeriodDataTable(
     {
-      fullTable,
-      tableHeadersConfig,
       captionTitle,
       dataBlockId,
+      fullTable,
+      query,
       source,
+      tableHeadersConfig,
       onError,
     }: Props,
     dataTableRef,
@@ -226,8 +265,15 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       // as we want to remove empty ones later.
       const columnsWithText = columnHeadersCartesian.map(() => false);
 
+      const tableHeaderFilters = [
+        ...tableHeadersConfig.columnGroups.flatMap(filterGroup => filterGroup),
+        ...tableHeadersConfig.rowGroups.flatMap(filterGroup => filterGroup),
+        ...tableHeadersConfig.columns,
+        ...tableHeadersConfig.rows,
+      ].map(filter => filter.id);
+
       const excludedFilters = getExcludedFilters(
-        tableHeadersConfig,
+        tableHeaderFilters,
         subjectMeta,
       );
 
@@ -237,6 +283,10 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         results,
         excludedFilters,
       );
+
+      const showMissingRowsOrColumnsWarning =
+        query &&
+        hasMissingRowsOrColumns(query, subjectMeta, tableHeaderFilters);
 
       const tableCartesian: TableCell[][] = rowHeadersCartesian.map(
         rowFilterCombination => {
@@ -335,22 +385,30 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
       const rows = filteredCartesian.map(row => row.map(cell => cell.text));
 
       return (
-        <FixedMultiHeaderDataTable
-          caption={
-            <DataTableCaption
-              {...subjectMeta}
-              title={captionTitle}
-              id={captionId}
-            />
-          }
-          captionId={captionId}
-          columnHeaders={columnHeaders}
-          rowHeaders={rowHeaders}
-          rows={rows}
-          ref={dataTableRef}
-          footnotes={subjectMeta.footnotes}
-          source={source}
-        />
+        <>
+          {showMissingRowsOrColumnsWarning && (
+            <WarningMessage>
+              Some rows and columns are not shown in this table as the data does
+              not exist in the underlying file.
+            </WarningMessage>
+          )}
+          <FixedMultiHeaderDataTable
+            caption={
+              <DataTableCaption
+                {...subjectMeta}
+                title={captionTitle}
+                id={captionId}
+              />
+            }
+            captionId={captionId}
+            columnHeaders={columnHeaders}
+            rowHeaders={rowHeaders}
+            rows={rows}
+            ref={dataTableRef}
+            footnotes={subjectMeta.footnotes}
+            source={source}
+          />
+        </>
       );
     } catch (error) {
       onError?.(isErrorLike(error) ? error.message : 'Unknown error');

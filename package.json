@@ -70,10 +70,10 @@
       "prettier --write"
     ],
     "*.robot": [
-      "python3 -m pipenv run robotidy --config tests/robot-tests/robotidy.toml"
+      "pipenv run robotidy --config tests/robot-tests/robotidy.toml"
     ],
     "*.py": [
-      "python3 -m pipenv run autopep8"
+      "pipenv run autopep8"
     ]
   }
 }

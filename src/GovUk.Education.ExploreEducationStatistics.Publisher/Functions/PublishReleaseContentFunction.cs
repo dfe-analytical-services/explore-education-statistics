@@ -5,8 +5,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -83,17 +81,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                 // Invalidate the cached trees in case any methodologies/publications
                 // are now accessible for the first time after publishing these releases
-                await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
-                await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
-                await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.AnyData));
-                await _blobCacheService.DeleteItem(new PublicationTreeCacheKey(PublicationTreeFilter.LatestData));
+                await _contentService.DeleteCachedTaxonomyBlobs();
 
+                // Invalidate publication cache for release
                 var release = await _contentDbContext.Releases
                     .Include(r => r.Publication)
                     .Where(r => r.Id == message.ReleaseId)
                     .SingleAsync();
                 await _blobCacheService.DeleteItem(new PublicationCacheKey(release.Publication.Slug));
-                // TODO: @MarkFix EES-3149 Delete superseded publication's cache here too?
+
+                // Invalidate publication cache for superseded publications, as potentially affected. If newly
+                // published release is first Live release for the publication, the superseding is now enforced
+                await _contentDbContext.Publications
+                    .Where(p => p.SupersededById == release.Publication.Id)
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(publication =>
+                        _blobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug)));
 
                 await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
                 await _contentService.DeletePreviousVersionsContent(message.ReleaseId);

@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -71,6 +72,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     releaseViewModel.DownloadFiles = files.ToList();
                     releaseViewModel.Publication.Methodologies =
                         _mapper.Map<List<TitleAndIdViewModel>>(methodologies);
+                    
+                    // TODO EES-3319 - remove backwards-compatibility for Map Configuration without its
+                    // own Boundary Level selection
+                    releaseViewModel.Content.ForEach(c => c.Content.ForEach(contentBlock =>
+                    {
+                        if (contentBlock is DataBlockViewModel dataBlock)
+                        {
+                            dataBlock.Charts.ForEach(chart =>
+                            {
+                                if (chart is MapChart { BoundaryLevel: null } mapChart)
+                                {
+                                    mapChart.BoundaryLevel = dataBlock.Query.BoundaryLevel;       
+                                }
+                            });
+                        }
+                    }));
 
                     return new ManageContentPageViewModel
                     {

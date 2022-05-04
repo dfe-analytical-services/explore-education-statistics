@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
@@ -84,8 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         {
             private static readonly HashSet<string> AllowedPaths = new HashSet<string>
             {
-                PublicationTreeCacheKey.GetKey(PublicationTreeFilter.AnyData),
-                PublicationTreeCacheKey.GetKey(PublicationTreeFilter.LatestData),
                 PublicationTreeCacheKey.GetKey(),
                 AllMethodologiesCacheKey.GetKey()
             };

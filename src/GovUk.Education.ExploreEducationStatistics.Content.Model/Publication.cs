@@ -34,6 +34,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Contact Contact { get; set; } = null!;
 
+        public Guid? SupersededById { get; set; }
+
+        public Publication? SupersededBy { get; set; }
+
         public DateTime? Updated { get; set; }
 
         public bool Live => Published.HasValue && DateTime.Compare(DateTime.UtcNow, Published.Value) > 0;

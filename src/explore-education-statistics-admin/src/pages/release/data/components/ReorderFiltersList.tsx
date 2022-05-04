@@ -29,7 +29,6 @@ const testSubjectMeta: SubjectMeta = {
             {
               label: 'Category 1 Group 1 Item 1',
               value: 'category-1-group-1-item-1',
-              id: 'category-1-group-1-item-1-id',
             },
           ],
           order: 1,
@@ -41,17 +40,14 @@ const testSubjectMeta: SubjectMeta = {
             {
               label: 'Category 1 Group 2 Item 1',
               value: 'category-1-group-2-item-1',
-              id: 'category-1-group-2-item-1-id',
             },
             {
               label: 'Category 1 Group 2 Item 2',
               value: 'category-1-group-2-item-2',
-              id: 'category-1-group-2-item-2-id',
             },
             {
               label: 'Category 1 Group 2 Item 3',
               value: 'category-1-group-2-item-3',
-              id: 'category-1-group-2-item-3-id',
             },
           ],
           order: 0,
@@ -63,12 +59,10 @@ const testSubjectMeta: SubjectMeta = {
             {
               label: 'Category 1 Group 3 Item 1',
               value: 'category-1-group-3-item-1',
-              id: 'category-1-group-3-item-1-id',
             },
             {
               label: 'Category 1 Group 3 Item 2',
               value: 'category-1-group-3-item-2',
-              id: 'category-1-group-3-item-2-id',
             },
           ],
           order: 2,
@@ -88,12 +82,10 @@ const testSubjectMeta: SubjectMeta = {
             {
               label: 'Category 2 Group 1 Item 1',
               value: 'category-2-group-1-item-1',
-              id: 'category-2-group-1-item-1-id',
             },
             {
               label: 'Category 2 Group 1 Item 2',
               value: 'category-2-group-1-item-2',
-              id: 'category-2-group-1-item-2-id',
             },
           ],
           order: 0,
@@ -113,7 +105,7 @@ const testSubjectMeta: SubjectMeta = {
 
 interface UpdatedFilter {
   id?: string;
-  filterGroups: { id?: string; filterItems: (string | undefined)[] }[]; // EES-1243 - won't need the undefined when ids exist
+  filterGroups: { id?: string; filterItems: string[] }[];
 }
 export type UpdateFiltersRequest = UpdatedFilter[];
 
@@ -153,7 +145,10 @@ const ReorderFiltersList = ({ subject, onCancel, onSave }: Props) => {
                 id: item.id,
                 label: item.label,
                 order: item.order,
-                items: item.options,
+                items: item.options.map(option => ({
+                  id: option.value,
+                  label: option.label,
+                })),
               };
             }),
             'order',
@@ -181,7 +176,7 @@ const ReorderFiltersList = ({ subject, onCancel, onSave }: Props) => {
         return filter;
       }
       // Reordering groups
-      if (!parentGroupId || parentGroupId === parentCategoryId) {
+      if (!parentGroupId) {
         return { ...filter, groups: reordered };
       }
       // Reordering items

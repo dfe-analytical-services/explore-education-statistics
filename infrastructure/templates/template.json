@@ -82,6 +82,30 @@
         "S3 Standard"
       ]
     },
+    "skuAdminSignalR": {
+      "type": "string",
+      "defaultValue": "Free_F1",
+      "allowedValues": [
+        "Free_F1",
+        "Standard_S1"
+      ]
+    },
+    "adminSignalRCapacity": {
+      "type": "int",
+      "metadata": {
+        "description": "The number of SignalR units."
+      },
+      "defaultValue": 1,
+      "allowedValues": [
+        1,
+        2,
+        5,
+        10,
+        20,
+        50,
+        100
+      ]
+    },
     "adminFirewallRules": {
       "type": "array",
       "metadata": {
@@ -590,6 +614,8 @@
     "contentAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-content')]",
     "adminAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-admin')]",
     "adminPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-admin')]",
+    "adminSignalRName": "[concat(parameters('subscription'), '-sr-', parameters('environment'), '-admin')]",
+    "adminSignalRPrivateEndpointName": "[concat(parameters('subscription'), '-srpe-', parameters('environment'), '-admin')]",
     "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-admin')]",
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public')]",
     "publicAppUrl": "[concat('https://', parameters('domain'))]",
@@ -1780,6 +1806,77 @@
         "reserved": false,
         "numberOfWorkers": "1",
         "hostingEnvironment": ""
+      }
+    },
+    {
+      "type": "Microsoft.SignalRService/signalR",
+      "apiVersion": "2021-10-01",
+      "name": "[variables('adminSignalRName')]",
+      "location": "[resourceGroup().location]",
+      "condition": "[equals(parameters('environmentName'), 'Development')]",
+      "sku": {
+        "capacity": "[parameters('adminSignalRCapacity')]",
+        "name": "[parameters('skuAdminSignalR')]"
+      },
+      "kind": "SignalR",
+      "identity": {
+        "type": "SystemAssigned"
+      },
+      "properties": {
+        "tls": {
+          "clientCertEnabled": false
+        },
+        "features": [
+          {
+            "flag": "ServiceMode",
+            "value": "Default"
+          },
+          {
+            "flag": "EnableConnectivityLogs",
+            "value": "true"
+          },
+          {
+            "flag": "EnableMessagingLogs",
+            "value": "true"
+          },
+          {
+            "flag": "EnableLiveTrace",
+            "value": "true"
+          }
+        ],
+        "cors": {
+          "allowedOrigins": [
+            "[concat('https://', parameters('adminUri'))]",
+            "https://localhost:3000",
+            "http://localhost:3000"
+          ]
+        },
+        "networkACLs": {
+          "defaultAction": "deny",
+          "publicNetwork": {
+            "allow": [
+              "ClientConnection"
+            ]
+          },
+          "privateEndpoints": [
+            {
+              "name": "[variables('adminSignalRPrivateEndpointName')]",
+              "allow": [
+                "ServerConnection"
+              ]
+            }
+          ]
+        },
+        "upstream": {
+          "templates": [
+            {
+              "categoryPattern": "*",
+              "eventPattern": "*",
+              "hubPattern": "*",
+              "urlTemplate": "[concat('https://', parameters('adminUri'), '/hubs/{hub}/{event}')]"
+            }
+          ]
+        }
       }
     },
     {

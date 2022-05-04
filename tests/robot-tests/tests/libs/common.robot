@@ -492,6 +492,10 @@ user waits until h2 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is visible    xpath://h2[text()="${text}"]    ${wait}
 
+user waits until h2 is not visible
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until element is not visible    xpath://h2[text()="${text}"]    ${wait}
+
 user waits until h3 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is visible    xpath://h3[text()="${text}"]    ${wait}
@@ -564,6 +568,12 @@ user chooses select option
     user waits until page contains element    ${locator}
     user waits until parent contains element    ${locator}    xpath:.//option
     select from list by label    ${locator}    ${label}
+
+user chooses select option at index
+    [Arguments]    ${locator}    ${index}
+    user waits until page contains element    ${locator}
+    user waits until parent contains element    ${locator}    xpath:.//option
+    select from list by index    ${locator}    ${index}
 
 user chooses file
     [Arguments]    ${locator}    ${file_path}
@@ -779,6 +789,13 @@ user navigates to data tables page on public frontend
     environment variable should be set    PUBLIC_URL
     user navigates to public frontend    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
+
+user navigates to data catalogue page on public frontend
+    environment variable should be set    PUBLIC_URL
+    user navigates to public frontend    %{PUBLIC_URL}/data-catalogue
+    user waits until page contains title caption    Data catalogue
+    user waits until h1 is visible    Browse our open data
+    user waits until page contains    View all of the open data available and choose files to download.
 
 check that variable is not empty
     [Arguments]    ${variable_name}    ${variable_value}

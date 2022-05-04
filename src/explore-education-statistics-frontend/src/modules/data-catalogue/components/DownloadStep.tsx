@@ -31,6 +31,7 @@ interface Props {
   subjects: Subject[];
   initialValues?: { files: string[] };
   onSubmit: DownloadFormSubmitHandler;
+  hideLatestDataTag?: boolean;
 }
 
 const DownloadStep = ({
@@ -38,6 +39,7 @@ const DownloadStep = ({
   subjects,
   initialValues = { files: [] },
   onSubmit,
+  hideLatestDataTag,
   ...stepProps
 }: Props & InjectedWizardProps) => {
   const { isActive, currentStep, stepNumber } = stepProps;
@@ -50,7 +52,7 @@ const DownloadStep = ({
         data-testid="choose-files"
       >
         Choose files to download{' '}
-        {release && release.latestRelease ? (
+        {release && release.latestRelease && !hideLatestDataTag ? (
           <Tag
             strong
             className="govuk-!-margin-left-4"

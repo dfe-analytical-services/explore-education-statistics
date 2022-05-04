@@ -14,12 +14,14 @@ interface Props extends InjectedWizardProps {
   releases: ReleaseSummary[];
   selectedRelease?: ReleaseSummary;
   onSubmit: ReleaseFormSubmitHandler;
+  hideLatestDataTag?: boolean;
 }
 
 const ReleaseStep = ({
   releases,
   selectedRelease,
   onSubmit,
+  hideLatestDataTag,
   ...stepProps
 }: Props) => {
   const { isActive } = stepProps;
@@ -44,6 +46,7 @@ const ReleaseStep = ({
         onSubmit={onSubmit}
         legendSize="l"
         legend={stepHeading}
+        hideLatestDataTag={hideLatestDataTag}
       />
     );
   }

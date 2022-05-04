@@ -743,7 +743,7 @@ user waits until modal is visible
 user waits until modal is not visible
     [Arguments]    ${modal_title}    ${wait}=${timeout}
     user waits until page does not contain element    css:.ReactModal__Content    ${wait}
-    user waits until h1 is not visible    ${modal_title}
+    user waits until h2 is not visible    ${modal_title}
 
 user gets comment
     [Arguments]    ${comment_text}

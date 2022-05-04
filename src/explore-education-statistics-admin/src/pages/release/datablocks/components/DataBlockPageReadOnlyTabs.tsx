@@ -67,20 +67,6 @@ const DataBlockPageReadOnlyTabs = ({ releaseId, dataBlock }: Props) => {
 
                   const axes = { ...chart.axes } as Required<AxesConfiguration>;
 
-                  if (chart.type === 'infographic') {
-                    return (
-                      <ChartRenderer
-                        {...chart}
-                        key={key}
-                        id={`dataBlockTabs-chart-${index}`}
-                        axes={axes}
-                        data={model.table.results}
-                        meta={model.table.subjectMeta}
-                        source={dataBlock.source}
-                      />
-                    );
-                  }
-
                   return (
                     <ChartRenderer
                       {...chart}

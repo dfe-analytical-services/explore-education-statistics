@@ -17,13 +17,14 @@ import {
   TableDataQuery,
 } from '@common/services/tableBuilderService';
 import { logEvent } from '@frontend/services/googleAnalyticsService';
-import React, { memo, ReactNode, useEffect, useRef, useState } from 'react';
+import React, { memo, ReactNode, useRef } from 'react';
 
 interface TableToolFinalStepProps {
   query: TableDataQuery;
   table: FullTable;
   tableHeaders: TableHeadersConfig;
   selectedPublication: SelectedPublication;
+  onReorderTableHeaders: (reorderedTableHeaders: TableHeadersConfig) => void;
 }
 
 const TableToolFinalStep = ({
@@ -31,16 +32,10 @@ const TableToolFinalStep = ({
   tableHeaders,
   query,
   selectedPublication,
+  onReorderTableHeaders,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [hasTableError, toggleHasTableError] = useToggle(false);
-  const [currentTableHeaders, setCurrentTableHeaders] = useState<
-    TableHeadersConfig
-  >();
-
-  useEffect(() => {
-    setCurrentTableHeaders(tableHeaders);
-  }, [tableHeaders]);
 
   const { value: fullPublication } = useAsyncRetry(
     async () =>
@@ -76,9 +71,9 @@ const TableToolFinalStep = ({
       data-testid="Table tool final step container"
     >
       <TableHeadersForm
-        initialValues={currentTableHeaders}
-        onSubmit={tableHeaderConfig => {
-          setCurrentTableHeaders(tableHeaderConfig);
+        initialValues={tableHeaders}
+        onSubmit={nextTableHeaders => {
+          onReorderTableHeaders(nextTableHeaders);
           if (dataTableRef.current) {
             dataTableRef.current.scrollIntoView({
               behavior: 'smooth',
@@ -87,7 +82,7 @@ const TableToolFinalStep = ({
           }
         }}
       />
-      {table && currentTableHeaders && (
+      {table && tableHeaders && (
         <>
           <div className="govuk-!-margin-bottom-3">
             {selectedPublication.selectedRelease.latestData && (
@@ -120,7 +115,8 @@ const TableToolFinalStep = ({
           <TimePeriodDataTable
             ref={dataTableRef}
             fullTable={table}
-            tableHeadersConfig={currentTableHeaders}
+            query={query}
+            tableHeadersConfig={tableHeaders}
             onError={message => {
               toggleHasTableError.on();
               logEvent({
@@ -136,7 +132,7 @@ const TableToolFinalStep = ({
         <>
           <div className="govuk-!-margin-bottom-7">
             <TableToolShare
-              tableHeaders={currentTableHeaders}
+              tableHeaders={tableHeaders}
               query={query}
               selectedPublication={selectedPublication}
             />

@@ -1,15 +1,22 @@
 import PublicationForm, {
   FormValues,
 } from '@admin/pages/publication/components/PublicationForm';
+import { MyRelease } from '@admin/services/releaseService';
 import _themeService, { Theme } from '@admin/services/themeService';
+import _publicationService, {
+  MyPublication,
+} from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
 
 jest.mock('@admin/services/themeService');
-
 const themeService = _themeService as jest.Mocked<typeof _themeService>;
+jest.mock('@admin/services/publicationService');
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
+>;
 
 describe('PublicationForm', () => {
   const testThemes: Theme[] = [
@@ -56,7 +63,7 @@ describe('PublicationForm', () => {
   ];
 
   test('does not render any theme/topic fields when no `initialValues`', async () => {
-    render(<PublicationForm onSubmit={noop} />);
+    render(<PublicationForm onSubmit={noop} showTitleInput />);
 
     await waitFor(() => {
       expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
@@ -67,7 +74,7 @@ describe('PublicationForm', () => {
   });
 
   test('shows validation error when there is no title', async () => {
-    render(<PublicationForm onSubmit={noop} />);
+    render(<PublicationForm onSubmit={noop} showTitleInput />);
 
     await waitFor(() => {
       expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
@@ -176,7 +183,7 @@ describe('PublicationForm', () => {
   test('can submit with valid values', async () => {
     const handleSubmit = jest.fn();
 
-    render(<PublicationForm onSubmit={handleSubmit} />);
+    render(<PublicationForm onSubmit={handleSubmit} showTitleInput />);
 
     await waitFor(() => {
       expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
@@ -391,6 +398,213 @@ describe('PublicationForm', () => {
           topicId: 'topic-3',
         });
       });
+    });
+  });
+
+  describe('archive publication', () => {
+    const testSingleTheme: Theme = {
+      id: 'theme-1',
+      slug: 'theme-1',
+      title: 'Theme 1',
+      summary: '',
+      topics: [
+        {
+          id: 'topic-1',
+          slug: 'topic-1',
+          title: 'Topic 1',
+          themeId: 'theme-1',
+        },
+      ],
+    };
+
+    const testRelease1: MyRelease = {
+      amendment: false,
+      approvalStatus: 'Approved',
+      contact: {
+        contactName: 'Test contact name',
+        contactTelNo: 'Test contact tel',
+        id: 'test-contact-id',
+        teamEmail: 'test-contact@hiveit.co.uk',
+        teamName: 'Test team name',
+      },
+      id: 'release-id-1',
+      latestInternalReleaseNote: 'Test internal release note',
+      latestRelease: true,
+      live: true,
+      permissions: {
+        canAddPrereleaseUsers: false,
+        canUpdateRelease: false,
+        canDeleteRelease: false,
+        canMakeAmendmentOfRelease: false,
+      },
+      preReleaseAccessList: '',
+      previousVersionId: 'prev-version-id-1',
+      publicationId: 'publication-id-1',
+      publicationSlug: 'publication-slug-1',
+      publicationTitle: 'Publication 1',
+      published: '2021-01-01T11:21:17',
+      releaseName: 'Test release name',
+      slug: 'release-slug-1',
+      timePeriodCoverage: {
+        label: 'Academic year',
+        value: 'AY',
+      },
+      title: 'Release 1',
+      type: 'AdHocStatistics',
+    };
+
+    const testPublication1: MyPublication = {
+      id: 'publication-id-1',
+      title: 'Publication 1',
+      contact: {
+        id: 'contact-1',
+        contactName: 'John Smith',
+        contactTelNo: '0777777777',
+        teamEmail: 'john.smith@test.com',
+        teamName: 'Team Smith',
+      },
+      releases: [testRelease1],
+      legacyReleases: [],
+      methodologies: [],
+      themeId: 'theme-1',
+      topicId: 'topic-1',
+      permissions: {
+        canAdoptMethodologies: true,
+        canCreateReleases: true,
+        canUpdatePublication: true,
+        canUpdatePublicationTitle: true,
+        canUpdatePublicationSupersededBy: true,
+        canCreateMethodologies: true,
+        canManageExternalMethodology: true,
+      },
+    };
+
+    const testPublication2: MyPublication = {
+      ...testPublication1,
+      id: 'publication-id-2',
+      title: 'Publication 2',
+      releases: [],
+    };
+
+    test('does not render the `Archive publication` field when showSupersededBy is false', async () => {
+      themeService.getThemes.mockResolvedValue(testThemes);
+      publicationService.getPublicationSummaries.mockResolvedValue([
+        {
+          id: testPublication1.id,
+          title: testPublication1.title,
+          slug: 'slug-1',
+        },
+      ]);
+
+      render(
+        <PublicationForm
+          initialValues={{
+            title: 'Test title',
+            topicId: 'topic-4',
+            teamName: 'Test team',
+            teamEmail: 'team@test.com',
+            contactTelNo: '0123456789',
+            contactName: 'John Smith',
+          }}
+          showTitleInput
+          showSupersededBy={false}
+          onSubmit={noop}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+      });
+
+      expect(
+        screen.queryByLabelText('Superseding publication'),
+      ).not.toBeInTheDocument();
+    });
+
+    test('renders the `Archive publication` field when showSupersededBy is true', async () => {
+      themeService.getThemes.mockResolvedValue([testSingleTheme]);
+      publicationService.getPublicationSummaries.mockResolvedValue([
+        {
+          id: testPublication1.id,
+          title: testPublication1.title,
+          slug: 'slug-1',
+        },
+      ]);
+
+      render(
+        <PublicationForm
+          initialValues={{
+            title: 'Test title',
+            topicId: 'topic-4',
+            teamName: 'Test team',
+            teamEmail: 'team@test.com',
+            contactTelNo: '0123456789',
+            contactName: 'John Smith',
+          }}
+          showSupersededBy
+          onSubmit={noop}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Superseding publication'),
+        ).toBeInTheDocument();
+      });
+
+      const publicationSelect = screen.getByLabelText(
+        'Superseding publication',
+      );
+
+      const publications = within(publicationSelect).getAllByRole(
+        'option',
+      ) as HTMLOptionElement[];
+
+      expect(publications).toHaveLength(2);
+      expect(publications[0]).toHaveTextContent('None selected');
+      expect(publications[1]).toHaveTextContent('Publication 1');
+    });
+
+    test('shows correct publications in the superseded by select', async () => {
+      themeService.getThemes.mockResolvedValue(testThemes);
+      publicationService.getPublicationSummaries.mockResolvedValueOnce([
+        { ...testPublication1, slug: 'slug-1' },
+        { ...testPublication2, slug: 'slug-2' },
+      ]);
+
+      render(
+        <PublicationForm
+          initialValues={{
+            title: 'Test title',
+            topicId: 'topic-4',
+            teamName: 'Test team',
+            teamEmail: 'team@test.com',
+            contactTelNo: '0123456789',
+            contactName: 'John Smith',
+          }}
+          showSupersededBy
+          onSubmit={noop}
+        />,
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Superseding publication'),
+        ).toBeInTheDocument();
+      });
+
+      const publicationSelect = screen.getByLabelText(
+        'Superseding publication',
+      );
+
+      const publications = within(publicationSelect).getAllByRole(
+        'option',
+      ) as HTMLOptionElement[];
+
+      expect(publications).toHaveLength(3);
+      expect(publications[0]).toHaveTextContent('None selected');
+      expect(publications[1]).toHaveTextContent('Publication 1');
+      expect(publications[2]).toHaveTextContent('Publication 2');
     });
   });
 });

@@ -320,10 +320,15 @@
                 "publication_heading": "Apprenticeships and traineeships"
               },
               {
-                "publication_heading": "Apprenticeships in England by industry characteristics "
-              },
-              {
                 "publication_heading": "Further education and skills"
+              }
+            ]
+          },
+          {
+            "publication_type_heading": "Experimental statistics",
+            "publications": [
+              {
+                "publication_heading": "Apprenticeships in England by industry characteristics "
               }
             ]
           },
@@ -711,6 +716,9 @@
               },
               {
                 "publication_heading": "Initial teacher training performance profiles"
+              },
+              {
+                "publication_heading": "Postgraduate initial teacher training targets"
               }
             ]
           },

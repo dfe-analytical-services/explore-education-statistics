@@ -111,7 +111,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     stopwatch.Restart();
 
                     var publicationId = await _subjectRepository.GetPublicationIdForSubject(subject.Id);
-                    var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId)).Title;
+                    var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId))!.Title;
 
                     var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id);
                     var subjectName = releaseFile.Name!;
@@ -206,17 +206,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             public List<BoundaryLevelViewModel> GetBoundaryLevelViewModels()
             {
-                var boundaryLevels = _query.BoundaryLevel.HasValue
-                    ? _boundaryLevelRepository.FindRelatedByBoundaryLevel(_query.BoundaryLevel.Value)
-                    : _boundaryLevelRepository.FindByGeographicLevels(_geographicLevels);
-                return boundaryLevels
+                return _boundaryLevelRepository
+                    .FindByGeographicLevels(_geographicLevels)
                     .Select(level => new BoundaryLevelViewModel(level.Id, level.Label))
                     .ToList();
             }
 
             public Dictionary<string, List<LocationAttributeViewModel>> GetLocationViewModels()
             {
-                var allGeoJson = GetGeoJson(_locationAttributes);
+                var allGeoJson = _query.BoundaryLevel != null 
+                    ? GetGeoJson(_query.BoundaryLevel.Value, _locationAttributes)
+                    : new Dictionary<GeographicLevel, Dictionary<string, GeoJson>>();
 
                 return _locationAttributes.ToDictionary(
                     pair => pair.Key.ToString().CamelCase(),
@@ -249,7 +249,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     return new LocationAttributeViewModel
                     {
-                        Id = locationAttributeNode.LocationId.Value,
+                        Id = locationAttributeNode.LocationId!.Value,
                         GeoJson = geoJson,
                         Label = locationAttribute.Name ?? string.Empty,
                         Value = code
@@ -281,58 +281,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 };
             }
 
-            private long? GetLatestBoundaryLevelByGeographicLevel(GeographicLevel geographicLevel)
-            {
-                return _boundaryLevelRepository.FindLatestByGeographicLevel(geographicLevel)?.Id;
-            }
-
             private Dictionary<GeographicLevel, Dictionary<string, GeoJson>> GetGeoJson(
+                long boundaryLevelId,
                 Dictionary<GeographicLevel, List<LocationAttributeNode>> locations)
             {
-                if (!GeoJsonRequested)
+                var selectedBoundaryLevel = _boundaryLevelRepository
+                    .FindOrNotFound(boundaryLevelId)
+                    .OrElse(() => null!)
+                    .Right;
+
+                if (selectedBoundaryLevel == null || !locations.ContainsKey(selectedBoundaryLevel.Level))
                 {
                     return new Dictionary<GeographicLevel, Dictionary<string, GeoJson>>();
                 }
-
+                
                 return locations.ToDictionary(
                     pair => pair.Key,
                     pair =>
                     {
                         var (geographicLevel, locationAttributes) = pair;
-                        return GetGeoJson(
-                            geographicLevel,
-                            locationAttributes
-                                .SelectMany(node => node.GetLeafAttributes())
-                                .ToList());
+
+                        if (geographicLevel != selectedBoundaryLevel.Level)
+                        {
+                            return new Dictionary<string, GeoJson>();
+                        }
+                        
+                        var locationAttributeCodes = locationAttributes
+                            .SelectMany(locationAttribute => locationAttribute.GetLeafAttributes())
+                            .Select(locationAttribute => locationAttribute.GetCodeOrFallback())
+                            .WhereNotNull();
+
+                        return _geoJsonRepository.FindByBoundaryLevelAndCodes(boundaryLevelId, locationAttributeCodes);
                     });
             }
-
-            private Dictionary<string, GeoJson> GetGeoJson(
-                GeographicLevel geographicLevel,
-                IReadOnlyList<ILocationAttribute> locationAttributes)
-            {
-                if (!GeoJsonRequested)
-                {
-                    return new Dictionary<string, GeoJson>();
-                }
-
-                // If no boundary level is requested, get the latest boundary level id for the geographic level
-                var boundaryLevelId = _query.BoundaryLevel ?? GetLatestBoundaryLevelByGeographicLevel(geographicLevel);
-
-                // Not all geographic levels have boundary level data configured so expect to return an empty result
-                if (boundaryLevelId == null)
-                {
-                    return new Dictionary<string, GeoJson>();
-                }
-
-                var locationAttributeCodes = locationAttributes
-                    .Select(locationAttribute => locationAttribute.GetCodeOrFallback())
-                    .WhereNotNull();
-
-                return _geoJsonRepository.FindByBoundaryLevelAndCodes(boundaryLevelId.Value, locationAttributeCodes);
-            }
-
-            private bool GeoJsonRequested => _query.IncludeGeoJson != null && _query.IncludeGeoJson.Value;
         }
     }
 }

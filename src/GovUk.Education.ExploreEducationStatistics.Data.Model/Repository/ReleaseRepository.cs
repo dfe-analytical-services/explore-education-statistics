@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .LastOrDefault();
         }
 
-        private bool IsLatestVersionOfRelease(Guid publicationId, Guid releaseId)
+        public bool IsLatestVersionOfRelease(Guid publicationId, Guid releaseId)
         {
             var releases = _context.Release
                 .Where(r => r.PublicationId == publicationId)

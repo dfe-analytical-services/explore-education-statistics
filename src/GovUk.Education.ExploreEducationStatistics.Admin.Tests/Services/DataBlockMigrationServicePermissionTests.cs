@@ -4,11 +4,14 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.PermissionTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -22,25 +25,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertForbidden(
                     async userService =>
                     {
-                        await using var contentDbContext = ContentDbUtils.InMemoryContentDbContext();
+                        await using var contentDbContext = InMemoryContentDbContext();
+                        await using var statisticsDbContext = InMemoryStatisticsDbContext();
 
                         var service = SetupService(
-                            contentDbContext: contentDbContext,
-                            userService: userService.Object
+                            contentDbContext,
+                            statisticsDbContext,
+                            userService.Object
                         );
 
-                        return await service.Migrate();
+                        return await service.MigrateMaps();
                     }
                 );
         }
 
         private static DataBlockMigrationService SetupService(
             ContentDbContext contentDbContext,
+            StatisticsDbContext statisticsDbContext,
             IUserService? userService = null)
         {
             return new DataBlockMigrationService(
                 contentDbContext,
-                userService ?? Mock.Of<IUserService>(MockBehavior.Strict),
+                statisticsDbContext,
+                userService ?? Mock.Of<IUserService>(Strict),
                 Mock.Of<ILogger<DataBlockMigrationService>>()
             );
         }
