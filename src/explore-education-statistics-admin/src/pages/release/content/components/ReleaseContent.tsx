@@ -165,6 +165,7 @@ const ReleaseContent = () => {
                     <ReleaseEditableBlock
                       allowComments
                       block={block}
+                      publicationId={release.publication.id}
                       releaseId={release.id}
                       sectionId={release.summarySection.id}
                       onSave={updateBlock}

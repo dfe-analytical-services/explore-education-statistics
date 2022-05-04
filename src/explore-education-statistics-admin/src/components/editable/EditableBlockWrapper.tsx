@@ -1,3 +1,4 @@
+import ButtonLink from '@admin/components/ButtonLink';
 import styles from '@admin/components/editable/EditableBlockWrapper.module.scss';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
@@ -6,12 +7,14 @@ import useToggle from '@common/hooks/useToggle';
 import React, { ReactNode } from 'react';
 
 export interface EditableBlockProps {
+  dataBlockEditLink?: string;
   onEdit?: () => void;
   onDelete?: () => void;
 }
 
 const EditableBlockWrapper = ({
   children,
+  dataBlockEditLink,
   onEdit,
   onDelete,
 }: EditableBlockProps & { children: ReactNode }) => {
@@ -26,6 +29,12 @@ const EditableBlockWrapper = ({
           <Button variant="secondary" onClick={() => onEdit()}>
             Edit block
           </Button>
+        )}
+
+        {dataBlockEditLink && (
+          <ButtonLink to={dataBlockEditLink} variant="secondary">
+            Edit data block
+          </ButtonLink>
         )}
 
         {onDelete && (
