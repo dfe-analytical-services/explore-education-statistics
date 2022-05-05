@@ -48,7 +48,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         private readonly LocalAuthority _sunderland = new("E08000024", "", "Sunderland");
 
         [Fact]
-        public async Task GetCachedSubjectMeta_SubjectNotFound()
+        public async Task GetSubjectMeta_SubjectNotFound()
         {
             var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
 
@@ -62,7 +62,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 statisticsDbContext,
                 releaseSubjectRepository: releaseSubjectRepository.Object);
 
-            var result = await service.GetCachedSubjectMeta(Guid.NewGuid());
+            var result = await service.GetSubjectMeta(Guid.NewGuid());
 
             VerifyAllMocks(releaseSubjectRepository);
 
@@ -110,7 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetCachedSubjectMeta_EmptyModelReturnedForSubject()
+        public async Task GetSubjectMeta_EmptyModelReturnedForSubject()
         {
             var statisticsRelease = new Release();
             var subject = new Subject();
@@ -195,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = (await service.GetCachedSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
@@ -214,7 +214,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetCachedSubjectMeta_LocationsForSubject()
+        public async Task GetSubjectMeta_LocationsForSubject()
         {
             var statisticsRelease = new Release();
             var subject = new Subject();
@@ -361,7 +361,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     options: options
                 );
 
-                var result = (await service.GetCachedSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
@@ -457,7 +457,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetCachedSubjectMeta_LocationsForSubject_LocationAttributeOfHierarchyIsMissing()
+        public async Task GetSubjectMeta_LocationsForSubject_LocationAttributeOfHierarchyIsMissing()
         {
             var statisticsRelease = new Release();
             var subject = new Subject();
@@ -576,7 +576,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     options: options
                 );
 
-                var result = (await service.GetCachedSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
@@ -632,7 +632,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetCachedSubjectMeta_LocationsForSpecialCases()
+        public async Task GetSubjectMeta_LocationsForSpecialCases()
         {
             var statisticsRelease = new Release();
             var subject = new Subject();
@@ -732,7 +732,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     options: options
                 );
 
-                var result = (await service.GetCachedSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
@@ -761,7 +761,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetCachedSubjectMeta_LocationsAreDeduplicated_Flat()
+        public async Task GetSubjectMeta_LocationsAreDeduplicated_Flat()
         {
             var statisticsRelease = new Release();
             var subject = new Subject();
@@ -869,7 +869,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     options: options
                 );
 
-                var result = (await service.GetCachedSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
@@ -916,7 +916,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetCachedSubjectMeta_LocationsAreDeduplicated_Hierarchy()
+        public async Task GetSubjectMeta_LocationsAreDeduplicated_Hierarchy()
         {
             var statisticsRelease = new Release();
             var subject = new Subject();
@@ -1041,7 +1041,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     options: options
                 );
 
-                var result = (await service.GetCachedSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
@@ -1095,7 +1095,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetCachedSubjectMeta_LocationRegionsOrderedByCode()
+        public async Task GetSubjectMeta_LocationRegionsOrderedByCode()
         {
             var statisticsRelease = new Release();
             var subject = new Subject();
@@ -1240,7 +1240,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     options: options
                 );
 
-                var result = (await service.GetCachedSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,

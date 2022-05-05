@@ -79,19 +79,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _locationOptions = locationOptions.Value;
         }
 
-        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetCachedSubjectMeta(Guid subjectId)
+        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
             return await CheckSubjectExistsOnLatestPublishedVersion(subjectId)
                 .OnSuccessCombineWith(CreateCacheKeyForSubjectMeta)
                 .OnSuccess(releaseSubjectAndCacheKey =>
                 {
                     var (releaseSubject, cacheKey) = releaseSubjectAndCacheKey;
-                    return GetCachedSubjectMeta(releaseSubject, cacheKey);
+                    return GetSubjectMeta(releaseSubject, cacheKey);
                 });
         }
 
         [BlobCache(typeof(SubjectMetaCacheKey))]
-        private Task<SubjectMetaViewModel> GetCachedSubjectMeta(ReleaseSubject releaseSubject,
+        private Task<SubjectMetaViewModel> GetSubjectMeta(ReleaseSubject releaseSubject,
             SubjectMetaCacheKey cacheKey)
         {
             return GetSubjectMetaViewModel(releaseSubject);
