@@ -5,7 +5,11 @@ import Details from '@common/components/Details';
 import sortBy from 'lodash/sortBy';
 import React from 'react';
 
-const CommentsList = () => {
+interface Props {
+  className?: string;
+}
+
+const CommentsList = ({ className }: Props) => {
   const { comments, markersOrder } = useCommentsContext();
 
   const resolvedComments = comments.filter(comment => comment.resolved);
@@ -15,7 +19,7 @@ const CommentsList = () => {
   );
 
   return (
-    <>
+    <div className={className}>
       {unresolvedComments.length > 0 && (
         <ol className={styles.list} data-testid="unresolvedComments">
           {unresolvedComments.map(comment => (
@@ -33,7 +37,7 @@ const CommentsList = () => {
           </ol>
         </Details>
       )}
-    </>
+    </div>
   );
 };
 

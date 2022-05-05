@@ -116,23 +116,25 @@ const EditableContentForm = ({
 
   return (
     <div className={styles.container} ref={containerRef}>
-      <div data-testid="comments-sidebar">
-        {showCommentAddForm && (
-          <CommentAddForm
-            baseId={id}
-            containerRef={containerRef}
-            onCancel={toggleCommentAddForm.off}
-            onSave={toggleCommentAddForm.off}
-          />
-        )}
-        <div
-          className={classNames(styles.commentsSidebar, {
-            [styles.showCommentAddForm]: showCommentAddForm,
-          })}
-        >
-          {allowComments && comments.length > 0 && <CommentsList />}
+      {allowComments && (
+        <div data-testid="comments-sidebar">
+          {showCommentAddForm && (
+            <CommentAddForm
+              baseId={id}
+              containerRef={containerRef}
+              onCancel={toggleCommentAddForm.off}
+              onSave={toggleCommentAddForm.off}
+            />
+          )}
+          {comments.length > 0 && (
+            <CommentsList
+              className={classNames(styles.commentsList, {
+                [styles.padTop]: showCommentAddForm,
+              })}
+            />
+          )}
         </div>
-      </div>
+      )}
 
       <div className={styles.form}>
         <Formik<FormValues>
@@ -192,5 +194,4 @@ const EditableContentForm = ({
     </div>
   );
 };
-
 export default EditableContentForm;

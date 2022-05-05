@@ -7,7 +7,7 @@
   position: relative;
 }
 
-.commentsSidebar {
+.commentsList {
   bottom: 0;
   margin-right: $dfe-comments-gutter;
   max-height: 100%;
@@ -17,8 +17,8 @@
   top: 0;
   width: $dfe-comments-width - $dfe-comments-gutter;
 
-  &.showCommentAddForm {
-    top: 200px;
+  &.padTop {
+    margin-top: 200px;
   }
 }
 
