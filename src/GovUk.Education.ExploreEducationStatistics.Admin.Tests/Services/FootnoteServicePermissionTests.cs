@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -107,6 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 _,
                 releaseHelper,
                 userService,
+                dataBlockService,
                 footnoteService,
                 footnoteHelper,
                 guidGenerator
@@ -117,6 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context,
                 releaseHelper.Object,
                 userService.Object,
+                dataBlockService.Object,
                 footnoteService.Object,
                 footnoteHelper.Object,
                 guidGenerator.Object
@@ -129,6 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Mock<ILogger<FootnoteService>>,
             Mock<IPersistenceHelper<ContentDbContext>>,
             Mock<IUserService>,
+            Mock<IDataBlockService>,
             Mock<IFootnoteRepository>,
             Mock<IPersistenceHelper<StatisticsDbContext>>,
             Mock<IGuidGenerator>) Mocks()
@@ -140,6 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 new Mock<ILogger<FootnoteService>>(),
                 contentPersistenceHelper,
                 new Mock<IUserService>(),
+                new Mock<IDataBlockService>(),
                 new Mock<IFootnoteRepository>(),
                 MockUtils.MockPersistenceHelper<StatisticsDbContext, Footnote>(Footnote.Id, Footnote),
                 new Mock<IGuidGenerator>());

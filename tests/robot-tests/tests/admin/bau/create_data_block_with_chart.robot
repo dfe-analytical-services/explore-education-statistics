@@ -220,12 +220,11 @@ Navigate to content tab
 
 Check updated footnote is displayed in content Tab
     [Documentation]    EES-3136
-    [Tags]    Failing
     user clicks button    Test data block section
     ${section}=    user gets accordion section content element    Test data block section
     ...    //*[@data-testid="editableAccordionSection"]
 
-    user scrolls to element    //*[@data-testid="editableAccordionSection"]//*[@data-testid="footnotes"]
+    user scrolls to element    ${section}
 
     user checks list has x items    testid:footnotes    1
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_UPDATED}

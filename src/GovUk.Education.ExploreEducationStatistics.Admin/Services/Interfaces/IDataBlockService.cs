@@ -32,5 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<DeleteDataBlockPlan> GetDeletePlan(Guid releaseId, Subject? subject);
 
         Task<Either<ActionResult, Unit>> RemoveChartFile(Guid releaseId, Guid id);
+
+        Task InvalidateCachedDataBlocks(Guid releaseId);
     }
 }
