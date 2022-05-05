@@ -109,7 +109,7 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem1.getByLabelText('Label')).toHaveValue(
       'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, Barnet)',
     );
-    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#1d70b8');
+    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#12436d');
     expect(legendItem1.getByLabelText('Symbol')).toHaveValue('none');
     expect(legendItem1.getByLabelText('Style')).toHaveValue('solid');
   });
@@ -153,7 +153,7 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem1.getByLabelText('Label')).toHaveValue(
       'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, Barnet)',
     );
-    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#1d70b8');
+    expect(legendItem1.getByLabelText('Colour')).toHaveValue('#12436d');
     expect(legendItem1.getByLabelText('Symbol')).toHaveValue('none');
     expect(legendItem1.getByLabelText('Style')).toHaveValue('solid');
 
@@ -162,7 +162,7 @@ describe('ChartLegendConfiguration', () => {
     expect(legendItem2.getByLabelText('Label')).toHaveValue(
       'Number of authorised absence sessions (Ethnicity Major Chinese, State-funded primary, Barnsley)',
     );
-    expect(legendItem2.getByLabelText('Colour')).toHaveValue('#912b88');
+    expect(legendItem2.getByLabelText('Colour')).toHaveValue('#f46a25');
     expect(legendItem2.getByLabelText('Symbol')).toHaveValue('none');
     expect(legendItem2.getByLabelText('Style')).toHaveValue('solid');
   });
