@@ -20,13 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
     [Collection(BlobCacheServiceTests)]
     public class ThemeServiceTests : BlobCacheServiceTestFixture
     {
-        // TODO - this constructor sets up default expectations for the caching service that are called by each test
-        // method within this test class.  In future it would be good to do targeted testing around caching within
-        // each method under test.  The reason this test class needs to be identified as part of the
-        // "BlobCacheServiceTests" collection is that otherwise these test methods will fail with unmatched CacheService
-        // setups if run in parallel with another test class that is of the "BlobCacheServiceTests" collection.
-        // This would happen because the other test class enables caching and sets a static CacheService mock at the
-        // same time as this class is running.
         public ThemeServiceTests()
         {
             CacheService

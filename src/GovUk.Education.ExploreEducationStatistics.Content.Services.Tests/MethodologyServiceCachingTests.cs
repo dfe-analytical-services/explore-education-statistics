@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
 public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
 {
     [Fact]
-    public async Task GetCachedSummariesByPublication_NoCachedMethodologyThemeTreeExists()
+    public async Task GetCachedSummariesByPublication_NoCachedTreeExists()
     {
         var publication = new Publication
         {
@@ -79,10 +79,6 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
             .Setup(mock => mock.GetLatestPublishedVersionByPublication(publication.Id))
             .ReturnsAsync(publicationLatestVersions);
         
-        methodologyVersionRepository
-            .Setup(mock => mock.GetLatestPublishedVersionByPublication(publication.Id))
-            .ReturnsAsync(publicationLatestVersions);
-
         CacheService
             .Setup(s => s.SetItem<object>(
                 It.IsAny<AllMethodologiesCacheKey>(), It.IsAny<List<AllMethodologiesThemeViewModel>>()))
@@ -106,7 +102,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
     }
     
     [Fact]
-    public async Task GetCachedSummariesByPublication_CachedMethodologyThemeTreeExists()
+    public async Task GetCachedSummariesByPublication_CachedTreeExists()
     {
         var publicationId = Guid.NewGuid();
         
@@ -227,7 +223,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
     }
     
     [Fact]
-    public async Task GetCachedSummariesByPublication_CachedMethodologyThemeTreeExistsButNoMatchingPublicationRecord()
+    public async Task GetCachedSummariesByPublication_CachedTreeExistsButNoMatchingPublicationRecord()
     {
         var publicationId = Guid.NewGuid();
         
@@ -299,7 +295,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
     }
 
     [Fact]
-    public async Task GetCachedSummariesTree_NoCachedMethodologyThemeTreeExists()
+    public async Task GetCachedSummariesTree_NoCachedTreeExists()
     {
         var publication = new Publication
         {
@@ -421,7 +417,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
     }
     
     [Fact]
-    public async Task GetCachedSummariesTree_CachedMethodologyThemeTreeExists()
+    public async Task GetCachedSummariesTree_CachedTreeExists()
     {
         var cachedResult = ListOf(
             new AllMethodologiesThemeViewModel
@@ -465,7 +461,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
     }
 
     [Fact]
-    public async Task GetCachedSummariesTree_NoCachedMethodologyThemeTreeExists_ThemeWithoutTopicsIsNotIncluded()
+    public async Task GetCachedSummariesTree_NoCachedTreeExists_ThemeWithoutTopicsIsNotIncluded()
     {
         var theme = new Theme
         {
@@ -508,7 +504,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
     }
 
     [Fact]
-    public async Task GetCachedSummariesTree_NoCachedMethodologyThemeTreeExists_ThemeWithoutPublicationsIsNotIncluded()
+    public async Task GetCachedSummariesTree_NoCachedTreeExists_ThemeWithoutPublicationsIsNotIncluded()
     {
         var theme = new Theme
         {
@@ -561,7 +557,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
     }
 
     [Fact]
-    public async Task GetCachedSummariesTree_NoCachedMethodologyThemeTreeExists_ThemeWithoutPublishedMethodologiesIsNotIncluded()
+    public async Task GetCachedSummariesTree_NoCachedTreeExists_ThemeWithoutPublishedMethodologiesIsNotIncluded()
     {
         var publication = new Publication
         {
