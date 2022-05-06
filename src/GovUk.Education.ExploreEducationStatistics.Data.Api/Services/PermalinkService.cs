@@ -116,23 +116,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             // TODO EES-3339 This doesn't currently include a status to warn if the footnotes have been amended on a Release,
             // and will return 'Current' unless one of the other cases also applies.
 
-            var releasesWithSubject = _contentDbContext.ReleaseFiles
+            var releasesWithSubject = await _contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
                 .Include(rf => rf.Release)
-                .ThenInclude(r => r.Publication)
-                .ThenInclude(p => p.Releases)
                 .Where(rf =>
                     rf.File.SubjectId == subjectId
                     && rf.File.Type == FileType.Data
                     && rf.Release.Published.HasValue && DateTime.UtcNow >= rf.Release.Published.Value)
                 .Select(rf => rf.Release)
-                .ToList();
+                .ToListAsync();
+
             if (releasesWithSubject.Count == 0)
             {
                 return PermalinkStatus.SubjectRemoved;
             }
 
-            var publication = releasesWithSubject.First().Publication;
+            var publication = await _contentDbContext.Publications
+                .Include(p => p.Releases)
+                .SingleAsync(p => p.Id == releasesWithSubject.First().PublicationId);
+
             var latestRelease = publication.LatestPublishedRelease();
 
             if (latestRelease != null && releasesWithSubject.All(r =>
@@ -149,10 +151,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             }
 
             if (publication.SupersededById != null
-                && _contentDbContext.Releases
+                && (await _contentDbContext.Releases
                     .Include(p => p.Publication)
                     .Where(r => r.PublicationId == publication.SupersededById)
-                    .ToList()
+                    .ToListAsync())
                     .Any(r => r.IsLatestPublishedVersionOfRelease()))
             {
                 return PermalinkStatus.PublicationSuperseded;
