@@ -12,7 +12,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Api.Converters;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Models;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 {
     public class PermalinkService : IPermalinkService
     {
-        private readonly StatisticsDbContext _statisticsDbContext;
         private readonly ContentDbContext _contentDbContext;
         private readonly ITableBuilderService _tableBuilderService;
         private readonly IBlobStorageService _blobStorageService;
@@ -35,7 +33,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         private readonly IMapper _mapper;
 
         public PermalinkService(
-            StatisticsDbContext statisticsDbContext,
             ContentDbContext contentDbContext,
             ITableBuilderService tableBuilderService,
             IBlobStorageService blobStorageService,
@@ -43,7 +40,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
             IReleaseRepository releaseRepository,
             IMapper mapper)
         {
-            _statisticsDbContext = statisticsDbContext;
             _contentDbContext = contentDbContext;
             _tableBuilderService = tableBuilderService;
             _blobStorageService = blobStorageService;
@@ -110,44 +106,61 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
         {
             var viewModel = _mapper.Map<PermalinkViewModel>(permalink);
 
-            viewModel.Invalidated = !await IsValid(permalink.Query.SubjectId);
+            viewModel.Status = await GetPermalinkStatus(permalink.Query.SubjectId);
 
             return viewModel;
         }
 
-        private async Task<bool> IsValid(Guid subjectId)
+        private async Task<PermalinkStatus> GetPermalinkStatus(Guid subjectId)
         {
-            var subject = await _subjectRepository.Get(subjectId);
-            if (subject == null)
+            // TODO EES-3339 This doesn't currently include a status to warn if the footnotes have been amended on a Release,
+            // and will return 'Current' unless one of the other cases also applies.
+
+            var releasesWithSubject = await _contentDbContext.ReleaseFiles
+                .Include(rf => rf.File)
+                .Include(rf => rf.Release)
+                .Where(rf =>
+                    rf.File.SubjectId == subjectId
+                    && rf.File.Type == FileType.Data
+                    && rf.Release.Published.HasValue && DateTime.UtcNow >= rf.Release.Published.Value)
+                .Select(rf => rf.Release)
+                .ToListAsync();
+
+            if (releasesWithSubject.Count == 0)
             {
-                return false;
+                return PermalinkStatus.SubjectRemoved;
             }
 
-            var releaseSubject = _statisticsDbContext.ReleaseSubject
-                .Include(rs => rs.Release)
-                .Where(rs => rs.SubjectId == subjectId)
-                .ToList()
-                .SingleOrDefault(rs =>
-                    _releaseRepository.IsLatestVersionOfRelease(rs.Release.PublicationId, rs.Release.Id));
-            if (releaseSubject == null)
+            var publication = await _contentDbContext.Publications
+                .Include(p => p.Releases)
+                .SingleAsync(p => p.Id == releasesWithSubject.First().PublicationId);
+
+            var latestRelease = publication.LatestPublishedRelease();
+
+            if (latestRelease != null && releasesWithSubject.All(r =>
+                    r.Year != latestRelease.Year
+                    || r.TimePeriodCoverage != latestRelease.TimePeriodCoverage))
             {
-                return false;
+                return PermalinkStatus.NotForLatestRelease;
             }
 
-            var publication = await _contentDbContext.Releases
-                .Include(r => r.Publication)
-                .ThenInclude(p => p.SupersededBy)
-                .Where(r => r.Id == releaseSubject.ReleaseId)
-                .Select(r => r.Publication)
-                .Distinct()
-                .SingleAsync();
+            if (latestRelease != null
+                && releasesWithSubject.All(r => r.Id != latestRelease.Id))
+            {
+                return PermalinkStatus.SubjectReplacedOrRemoved;
+            }
 
-            return publication.SupersededById == null
-                   || !_contentDbContext.Releases
-                       .Include(p => p.Publication)
-                       .Where(r => r.PublicationId == publication.SupersededById)
-                       .ToList()
-                       .Any(r => r.IsLatestPublishedVersionOfRelease());
+            if (publication.SupersededById != null
+                && (await _contentDbContext.Releases
+                    .Include(p => p.Publication)
+                    .Where(r => r.PublicationId == publication.SupersededById)
+                    .ToListAsync())
+                    .Any(r => r.IsLatestPublishedVersionOfRelease()))
+            {
+                return PermalinkStatus.PublicationSuperseded;
+            }
+
+            return PermalinkStatus.Current;
         }
     }
 
