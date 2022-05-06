@@ -68,7 +68,8 @@ const PermalinkPage: NextPage<Props> = ({ data }) => {
           WARNING - The data used in this table is no longer valid.
         </WarningMessage>
       )}
-      {data.status === 'NotForLatestRelease' && (
+      {(data.status === 'NotForLatestRelease' ||
+        data.status === 'PublicationSuperseded') && (
         <WarningMessage error>
           WARNING - The data used in this table may now be out-of-date as a new
           release has been published since its creation.

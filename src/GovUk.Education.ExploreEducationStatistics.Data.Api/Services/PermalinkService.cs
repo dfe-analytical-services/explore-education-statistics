@@ -113,6 +113,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
 
         private async Task<PermalinkStatus> GetPermalinkStatus(Guid subjectId)
         {
+            // TODO EES-3339 This doesn't currently include a status to warn if the footnotes have been amended on a Release,
+            // and will return 'Current' unless one of the other cases also applies.
+
             var releasesWithSubject = _contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
                 .Include(rf => rf.Release)
@@ -152,7 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
                     .ToList()
                     .Any(r => r.IsLatestPublishedVersionOfRelease()))
             {
-                return PermalinkStatus.NotForLatestRelease;
+                return PermalinkStatus.PublicationSuperseded;
             }
 
             return PermalinkStatus.Current;

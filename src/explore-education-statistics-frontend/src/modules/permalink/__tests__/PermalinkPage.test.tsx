@@ -244,12 +244,34 @@ describe('PermalinkPage', () => {
     expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getAllByRole('row')).toHaveLength(2);
   });
+
   test('renders warning message with permalink status NotForLatestRelease', () => {
     render(
       <PermalinkPage
         data={{
           ...testPermalink,
           status: 'NotForLatestRelease',
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        'WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.',
+      ),
+    ).toBeInTheDocument();
+
+    // Table still renders
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')).toHaveLength(2);
+  });
+
+  test('renders warning message with permalink status PublicationSuperseded', () => {
+    render(
+      <PermalinkPage
+        data={{
+          ...testPermalink,
+          status: 'PublicationSuperseded',
         }}
       />,
     );

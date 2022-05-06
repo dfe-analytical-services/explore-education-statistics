@@ -5,10 +5,11 @@ import deduplicatePermalinkLocations from '@common/services/util/permalinkServic
 
 export type Permalink = ConfiguredTable & {
   status?:
+    | 'Current'
     | 'SubjectRemoved'
     | 'SubjectReplacedOrRemoved'
     | 'NotForLatestRelease'
-    | 'Current';
+    | 'PublicationSuperseded';
 };
 
 export type TableHeader =

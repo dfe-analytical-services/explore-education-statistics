@@ -9,10 +9,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels
 {
     public enum PermalinkStatus
     {
-        SubjectRemoved,
-        NotForLatestRelease,
-        SubjectReplacedOrRemoved,
         Current,
+        SubjectRemoved,
+        SubjectReplacedOrRemoved,
+        NotForLatestRelease,
+        PublicationSuperseded
     }
 
     public class PermalinkViewModel

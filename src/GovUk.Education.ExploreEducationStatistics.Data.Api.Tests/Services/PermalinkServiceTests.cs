@@ -52,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             releaseRepository
                 .Setup(s => s.GetLatestPublishedRelease(_publicationId))
-                .Returns((Release?)null);
+                .Returns((Release?) null);
 
             subjectRepository
                 .Setup(s => s.GetPublicationIdForSubject(request.Query.SubjectId))
@@ -89,7 +89,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentRelease = new Content.Model.Release
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication { Id = _publicationId },
+                Publication = new Publication
+                {
+                    Id = _publicationId
+                },
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 ReleaseName = "2000",
                 Published = DateTime.UtcNow,
@@ -130,8 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                    Year = 2000,
                });
 
-
-            subjectRepository
+           subjectRepository
                 .Setup(s => s.GetPublicationIdForSubject(subject.Id))
                 .ReturnsAsync(_publicationId);
 
@@ -166,8 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     subjectRepository: subjectRepository.Object,
                     tableBuilderService: tableBuilderService.Object);
 
-                var result = await service.Create(request);
-                var permalinkViewModel = result.AssertRight();
+                var result = (await service.Create(request)).AssertRight();
 
                 MockUtils.VerifyAllMocks(
                     blobStorageService,
@@ -175,9 +176,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     subjectRepository,
                     tableBuilderService);
 
-                Assert.Equal(Guid.Parse(blobPath), permalinkViewModel.Id);
-                Assert.InRange(DateTime.UtcNow.Subtract(permalinkViewModel.Created).Milliseconds, 0, 1500);
-                Assert.Equal(PermalinkStatus.Current, permalinkViewModel.Status);
+                Assert.Equal(Guid.Parse(blobPath), result.Id);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
+                Assert.Equal(PermalinkStatus.Current, result.Status);
             }
         }
 
@@ -202,7 +203,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var release = new Content.Model.Release
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication { Id = _publicationId },
+                Publication = new Publication
+                {
+                    Id = _publicationId
+                },
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Published = DateTime.UtcNow,
@@ -273,7 +277,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var release = new Content.Model.Release
             {
                 Id = Guid.NewGuid(),
-                Publication = new Publication { Id = _publicationId },
+                Publication = new Publication
+                {
+                    Id = _publicationId
+                },
                 ReleaseName = "2000",
                 TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 Published = DateTime.UtcNow,
@@ -401,7 +408,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                     new Content.Model.Release
                     {
                         Id = releaseId,
-                        Publication = new Publication { Id = _publicationId },
+                        Publication = new Publication
+                        {
+                            Id = _publicationId
+                        },
                         ReleaseName = "2000",
                         TimePeriodCoverage = TimeIdentifier.AcademicYear,
                         Published = DateTime.UtcNow,
@@ -512,9 +522,102 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         }
 
         [Fact]
-        public async Task Get_SubjectIsNotFromLatestPublishedRelease()
+        public async Task Get_SubjectIsForMultipleVersions()
         {
-            var publication = new Publication { Id = _publicationId };
+            var publication = new Publication
+            {
+                Id = _publicationId
+            };
+
+            var previousVersion = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Published = DateTime.UtcNow,
+                PreviousVersionId = null
+            };
+
+            var latestVersion = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Published = DateTime.UtcNow,
+                PreviousVersionId = previousVersion.Id
+            };
+
+            var subjectId = Guid.NewGuid();
+
+            var permalink = new Permalink(
+                new TableBuilderConfiguration(),
+                new PermalinkTableBuilderResult
+                {
+                    SubjectMeta = new PermalinkResultSubjectMeta()
+                },
+                new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                });
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.SetupDownloadBlobText(
+                container: Permalinks,
+                path: permalink.Id.ToString(),
+                blobText: JsonConvert.SerializeObject(permalink));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(previousVersion, latestVersion);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
+                    new ReleaseFile
+                    {
+                        Release = previousVersion,
+                        File = new File
+                        {
+                            SubjectId = subjectId,
+                            Type = FileType.Data,
+                        }
+                    },
+                    new ReleaseFile
+                    {
+                        Release = latestVersion,
+                        File = new File
+                        {
+                            SubjectId = subjectId,
+                            Type = FileType.Data,
+                        }
+                    });
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = (await service.Get(permalink.Id)).AssertRight();
+
+                MockUtils.VerifyAllMocks(blobStorageService);
+
+                Assert.Equal(permalink.Id, result.Id);
+                Assert.Equal(PermalinkStatus.Current, result.Status);
+            }
+        }
+
+        [Fact]
+        public async Task Get_SubjectIsNotForNextYearInSeries()
+        {
+            var publication = new Publication
+            {
+                Id = _publicationId
+            };
             var release = new Content.Model.Release
             {
                 Id = Guid.NewGuid(),
@@ -556,9 +659,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                await contentDbContext.AddRangeAsync(
-                    release,
-                    latestRelease,
+                await contentDbContext.Releases.AddRangeAsync(release, latestRelease);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
                     new ReleaseFile
                     {
                         Release = release,
@@ -584,6 +686,167 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
                 Assert.Equal(permalink.Id, result.Id);
                 Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);
+            }
+        }
+
+        [Fact]
+        public async Task Get_SubjectIsNotForNextTimePeriodInSeries()
+        {
+            var publication = new Publication
+            {
+                Id = _publicationId
+            };
+            var release = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.January,
+                Published = DateTime.UtcNow,
+            };
+
+            var latestRelease = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.February,
+                Published = DateTime.UtcNow,
+            };
+
+            var subjectId = Guid.NewGuid();
+
+            var permalink = new Permalink(
+                new TableBuilderConfiguration(),
+                new PermalinkTableBuilderResult
+                {
+                    SubjectMeta = new PermalinkResultSubjectMeta()
+                },
+                new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                });
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.SetupDownloadBlobText(
+                container: Permalinks,
+                path: permalink.Id.ToString(),
+                blobText: JsonConvert.SerializeObject(permalink));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(release, latestRelease);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
+                    new ReleaseFile
+                    {
+                        Release = release,
+                        File = new File
+                        {
+                            SubjectId = subjectId,
+                            Type = FileType.Data,
+                        }
+                    });
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = (await service.Get(permalink.Id)).AssertRight();
+
+                MockUtils.VerifyAllMocks(blobStorageService);
+
+                Assert.Equal(permalink.Id, result.Id);
+                Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);
+            }
+        }
+
+        [Fact]
+        public async Task Get_SubjectIsNotForLatestVersion()
+        {
+            var publication = new Publication
+            {
+                Id = _publicationId
+            };
+
+            var previousVersion = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Published = DateTime.UtcNow,
+                PreviousVersionId = null
+            };
+
+            var latestVersion = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication,
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                Published = DateTime.UtcNow,
+                PreviousVersionId = previousVersion.Id
+            };
+
+            var subjectId = Guid.NewGuid();
+
+            var permalink = new Permalink(
+                new TableBuilderConfiguration(),
+                new PermalinkTableBuilderResult
+                {
+                    SubjectMeta = new PermalinkResultSubjectMeta()
+                },
+                new ObservationQueryContext
+                {
+                    SubjectId = subjectId
+                });
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.SetupDownloadBlobText(
+                container: Permalinks,
+                path: permalink.Id.ToString(),
+                blobText: JsonConvert.SerializeObject(permalink));
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(previousVersion, latestVersion);
+                await contentDbContext.AddRangeAsync(
+                    previousVersion,
+                    latestVersion,
+                    new ReleaseFile
+                    {
+                        Release = previousVersion,
+                        File = new File
+                        {
+                            SubjectId = subjectId,
+                            Type = FileType.Data,
+                        }
+                    });
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildService(
+                    contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = (await service.Get(permalink.Id)).AssertRight();
+
+                MockUtils.VerifyAllMocks(blobStorageService);
+
+                Assert.Equal(permalink.Id, result.Id);
+                Assert.Equal(PermalinkStatus.SubjectReplacedOrRemoved, result.Status);
             }
         }
 
@@ -663,7 +926,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 MockUtils.VerifyAllMocks(blobStorageService);
 
                 Assert.Equal(permalink.Id, result.Id);
-                Assert.Equal(PermalinkStatus.NotForLatestRelease, result.Status);
+                Assert.Equal(PermalinkStatus.PublicationSuperseded, result.Status);
             }
         }
 
@@ -675,11 +938,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
             ISubjectRepository? subjectRepository = null)
         {
             return new(
-                contentDbContext ?? new Mock<ContentDbContext>(MockBehavior.Strict).Object,
-                tableBuilderService ?? new Mock<ITableBuilderService>(MockBehavior.Strict).Object,
-                blobStorageService ?? new Mock<IBlobStorageService>(MockBehavior.Strict).Object,
-                subjectRepository ?? new Mock<ISubjectRepository>(MockBehavior.Strict).Object,
-                releaseRepository ?? new Mock<IReleaseRepository>(MockBehavior.Strict).Object,
+                contentDbContext ?? Mock.Of<ContentDbContext>(MockBehavior.Strict),
+                tableBuilderService ?? Mock.Of<ITableBuilderService>(MockBehavior.Strict),
+                blobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),
+                subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
+                releaseRepository ?? Mock.Of<IReleaseRepository>(MockBehavior.Strict),
                 MapperUtils.MapperForProfile<MappingProfiles>()
             );
         }
