@@ -6,7 +6,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
     public interface IReleaseRepository : IRepository<Release, Guid>
     {
         Release? GetLatestPublishedRelease(Guid publicationId);
-
-        bool IsLatestVersionOfRelease(Guid publicationId, Guid releaseId);
     }
 }

@@ -2,7 +2,7 @@ import { Permalink } from '@common/services/permalinkService';
 
 export const testPermalink: Permalink = {
   id: 'permalink-1',
-  invalidated: false,
+  status: 'Current',
   created: '2020-10-07T12:00:00.00Z',
   configuration: {
     tableHeaders: {
@@ -78,7 +78,7 @@ export const testPermalink: Permalink = {
 
 export const testPermalinkWithHierarchicalLocations: Permalink = {
   id: 'permalink-1',
-  invalidated: false,
+  status: 'Current',
   created: '2020-10-07T12:00:00.00Z',
   configuration: {
     tableHeaders: {
@@ -195,7 +195,7 @@ export const testPermalinkWithHierarchicalLocations: Permalink = {
 // EES-2955 which switched over to using location id's.
 export const testPermalinkWithLocationCodes: Permalink = {
   id: 'permalink-1',
-  invalidated: false,
+  status: 'Current',
   created: '2020-10-07T12:00:00.00Z',
   configuration: {
     tableHeaders: {
@@ -278,7 +278,7 @@ export const testPermalinkWithLocationCodes: Permalink = {
 // but before EES-2955 switched over to using location id's.
 export const testPermalinkWithResultLocationIds: Permalink = {
   id: 'permalink-1',
-  invalidated: false,
+  status: 'Current',
   created: '2020-10-07T12:00:00.00Z',
   configuration: {
     tableHeaders: {
