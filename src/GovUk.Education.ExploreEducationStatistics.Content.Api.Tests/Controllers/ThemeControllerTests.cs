@@ -2,10 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
@@ -19,8 +16,7 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
-    [Collection(BlobCacheServiceTests)]
-    public class ThemeControllerTests : BlobCacheServiceTestFixture
+    public class ThemeControllerTests
     {
         private static readonly List<ThemeTree<PublicationTreeNode>> Themes = new()
         {
@@ -82,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
             var publicationTree = result.Value;
             VerifyAllMocks(mocks);
 
-            var theme = Assert.Single(publicationTree);
+            var theme = Assert.Single(publicationTree!);
 
             Assert.IsType<ThemeTree<PublicationTreeNode>>(theme);
 
@@ -96,21 +92,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            mocks.cacheService
-                .Setup(s => s.GetItem(
-                    It.IsAny<AllMethodologiesCacheKey>(),
-                    typeof(List<AllMethodologiesThemeViewModel>)))
-                .ReturnsAsync(null);
-            
             mocks.methodologyService
-                .Setup(mock => mock.GetTree())
+                .Setup(mock => mock.GetCachedSummariesTree())
                 .ReturnsAsync(MethodologyThemes);
-
-            mocks.cacheService
-                .Setup(s => s.SetItem<object>(
-                    It.IsAny<AllMethodologiesCacheKey>(), 
-                    MethodologyThemes))
-                .Returns(Task.CompletedTask);
 
             var result = await controller.GetMethodologyThemes();
 
@@ -135,14 +119,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 
         private static (ThemeController controller, (
                 Mock<IThemeService> themeService, 
-                Mock<IMethodologyService> methodologyService,
-                Mock<IBlobCacheService> cacheService) mocks) 
+                Mock<IMethodologyService> methodologyService) mocks) 
                 BuildControllerAndDependencies()
         {
             var themeService = new Mock<IThemeService>(Strict);
             var methodologyService = new Mock<IMethodologyService>(Strict);
             var controller = new ThemeController(themeService.Object, methodologyService.Object);
-            return (controller, (themeService, methodologyService, CacheService));
+            return (controller, (themeService, methodologyService));
         }
     }
 }
