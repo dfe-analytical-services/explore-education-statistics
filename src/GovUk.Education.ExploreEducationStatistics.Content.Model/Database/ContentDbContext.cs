@@ -24,15 +24,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             // are what get used in real application scenarios.
         }
 
-        public ContentDbContext(DbContextOptions<ContentDbContext> options) : base(options)
+        public ContentDbContext(DbContextOptions<ContentDbContext> options, bool updateTimestamps = true) : base(options)
         {
-            Configure();
+            Configure(updateTimestamps);
         }
 
-        private void Configure()
+        private void Configure(bool updateTimestamps = true)
         {
-            ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
-            ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
+            if (updateTimestamps)
+            {
+                ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
+                ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
+            }
         }
 
         public DbSet<Methodology> Methodologies { get; set; }
