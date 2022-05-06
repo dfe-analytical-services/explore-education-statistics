@@ -9,14 +9,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -26,15 +22,13 @@ using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
-using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
-    [Collection(BlobCacheServiceTests)]
-    public class SubjectMetaServiceTests : BlobCacheServiceTestFixture
+    public class SubjectMetaServiceTests
     {
         private readonly Country _england = new("E92000001", "England");
         private readonly Region _northEast = new("E12000001", "North East");
@@ -48,37 +42,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         private readonly LocalAuthority _sunderland = new("E08000024", "", "Sunderland");
 
         [Fact]
-        public async Task GetSubjectMeta_SubjectNotFound()
+        public async Task GetSubjectMeta_NoAccess()
         {
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
-
-            releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(It.IsAny<Guid>()))
-                .ReturnsAsync((ReleaseSubject?) null);
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId);
-            var service = BuildSubjectMetaService(
-                statisticsDbContext,
-                releaseSubjectRepository: releaseSubjectRepository.Object);
-
-            var result = await service.GetSubjectMeta(Guid.NewGuid());
-
-            VerifyAllMocks(releaseSubjectRepository);
-
-            result.AssertNotFound();
-        }
-
-        [Fact]
-        public async Task GetSubjectMetaRestricted_SubjectNoAccess()
-        {
-            var statisticsRelease = new Release();
-            var subject = new Subject();
-
             var releaseSubject = new ReleaseSubject
             {
-                Release = statisticsRelease,
-                Subject = subject
+                Release = new Release(),
+                Subject = new Subject()
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -92,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var userService = new Mock<IUserService>(MockBehavior.Strict);
 
             userService.Setup(s => s.MatchesPolicy(
-                    It.Is<Subject>(resource => resource.Id == subject.Id),
+                    releaseSubject,
                     DataSecurityPolicies.CanViewSubjectData))
                 .ReturnsAsync(false);
 
@@ -102,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     statisticsDbContext,
                     userService: userService.Object);
 
-                var result = await service.GetSubjectMetaRestricted(statisticsRelease.Id, subject.Id);
+                var result = await service.GetSubjectMeta(releaseSubject);
                 VerifyAllMocks(userService);
 
                 result.AssertForbidden();
@@ -110,15 +79,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetSubjectMeta_EmptyModelReturnedForSubject()
+        public async Task GetSubjectMeta_EmptyModelReturned()
         {
-            var statisticsRelease = new Release();
-            var subject = new Subject();
-
             var releaseSubject = new ReleaseSubject
             {
-                Release = statisticsRelease,
-                Subject = subject
+                Release = new Release(),
+                Subject = new Subject()
             };
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -129,79 +95,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Content.Model.Release
-            {
-                Id = statisticsRelease.Id,
-                Slug = "release-slug",
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                }
-            };
-
-            var cacheKey = GetCacheKey(contentRelease, releaseSubject);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(contentRelease);
-                await contentDbContext.SaveChangesAsync();
-            }
-
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
-            CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
-                .ReturnsAsync(null);
-
-            CacheService
-                .Setup(s => s.SetItem<object>(cacheKey, It.IsAny<SubjectMetaViewModel>()))
-                .Returns(Task.CompletedTask);
-
             filterRepository
-                .Setup(s => s.GetFiltersIncludingItems(subject.Id))
+                .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
                 .Returns(new List<Filter>());
 
             indicatorGroupRepository
-                .Setup(s => s.GetIndicatorGroups(subject.Id))
+                .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
                 .Returns(new List<IndicatorGroup>());
 
-            releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(subject.Id))
-                .ReturnsAsync(releaseSubject);
-
             timePeriodService
-                .Setup(s => s.GetTimePeriods(subject.Id))
+                .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             locationRepository
-                .Setup(s => s.GetDistinctForSubject(subject.Id))
+                .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
                 .ReturnsAsync(new List<Location>());
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
-                    contentDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     timePeriodService: timePeriodService.Object
                 );
 
-                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(releaseSubject)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
-                    releaseSubjectRepository,
                     timePeriodService);
 
                 var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
@@ -216,13 +146,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_LocationsForSubject()
         {
-            var statisticsRelease = new Release();
-            var subject = new Subject();
-
             var releaseSubject = new ReleaseSubject
             {
-                Release = statisticsRelease,
-                Subject = subject
+                Release = new Release(),
+                Subject = new Subject()
             };
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
@@ -294,80 +221,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Content.Model.Release
-            {
-                Id = statisticsRelease.Id,
-                Slug = "release-slug",
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                }
-            };
-
-            var cacheKey = GetCacheKey(contentRelease, releaseSubject);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(contentRelease);
-                await contentDbContext.SaveChangesAsync();
-            }
-
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
-            CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
-                .ReturnsAsync(null);
-
-            CacheService
-                .Setup(s => s.SetItem<object>(cacheKey, It.IsAny<SubjectMetaViewModel>()))
-                .Returns(Task.CompletedTask);
-
             filterRepository
-                .Setup(s => s.GetFiltersIncludingItems(subject.Id))
+                .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
                 .Returns(new List<Filter>());
 
             indicatorGroupRepository
-                .Setup(s => s.GetIndicatorGroups(subject.Id))
+                .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
                 .Returns(new List<IndicatorGroup>());
 
-            releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(subject.Id))
-                .ReturnsAsync(releaseSubject);
-
             timePeriodService
-                .Setup(s => s.GetTimePeriods(subject.Id))
+                .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             locationRepository
-                .Setup(s => s.GetDistinctForSubject(subject.Id))
+                .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
                 .ReturnsAsync(locations);
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
-                    contentDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     options: options
                 );
 
-                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(releaseSubject)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
-                    releaseSubjectRepository,
                     timePeriodService);
 
                 var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
@@ -459,13 +350,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_LocationsForSubject_LocationAttributeOfHierarchyIsMissing()
         {
-            var statisticsRelease = new Release();
-            var subject = new Subject();
-
             var releaseSubject = new ReleaseSubject
             {
-                Release = statisticsRelease,
-                Subject = subject
+                Release = new Release(),
+                Subject = new Subject()
             };
 
             // Setup a hierarchy of Country-Region-LA data within the Local Authority level where one of the attributes
@@ -509,80 +397,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Content.Model.Release
-            {
-                Id = statisticsRelease.Id,
-                Slug = "release-slug",
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                }
-            };
-
-            var cacheKey = GetCacheKey(contentRelease, releaseSubject);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(contentRelease);
-                await contentDbContext.SaveChangesAsync();
-            }
-
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
-            CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
-                .ReturnsAsync(null);
-
-            CacheService
-                .Setup(s => s.SetItem<object>(cacheKey, It.IsAny<SubjectMetaViewModel>()))
-                .Returns(Task.CompletedTask);
-
             filterRepository
-                .Setup(s => s.GetFiltersIncludingItems(subject.Id))
+                .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
                 .Returns(new List<Filter>());
 
             indicatorGroupRepository
-                .Setup(s => s.GetIndicatorGroups(subject.Id))
+                .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
                 .Returns(new List<IndicatorGroup>());
 
-            releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(subject.Id))
-                .ReturnsAsync(releaseSubject);
-
             timePeriodService
-                .Setup(s => s.GetTimePeriods(subject.Id))
+                .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             locationRepository
-                .Setup(s => s.GetDistinctForSubject(subject.Id))
+                .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
                 .ReturnsAsync(locations);
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
-                    contentDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     options: options
                 );
 
-                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(releaseSubject)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
-                    releaseSubjectRepository,
                     timePeriodService);
 
                 var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
@@ -606,7 +458,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var laOption1SubOption1 = Assert.Single(laOption1.Options!);
                 Assert.NotNull(laOption1SubOption1);
                 Assert.Null(laOption1SubOption1.Id);
-                Assert.Equal(string.Empty, laOption1SubOption1!.Label);
+                Assert.Equal(string.Empty, laOption1SubOption1.Label);
                 Assert.Equal(string.Empty, laOption1SubOption1.Value);
                 Assert.Equal("region", laOption1SubOption1.Level);
                 Assert.Equal(2, laOption1SubOption1.Options!.Count);
@@ -634,13 +486,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         [Fact]
         public async Task GetSubjectMeta_LocationsForSpecialCases()
         {
-            var statisticsRelease = new Release();
-            var subject = new Subject();
-
             var releaseSubject = new ReleaseSubject
             {
-                Release = statisticsRelease,
-                Subject = subject
+                Release = new Release(),
+                Subject = new Subject()
             };
 
             // Setup multiple geographic levels of data where some but not all of the levels have a hierarchy applied.
@@ -665,80 +514,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Content.Model.Release
-            {
-                Id = statisticsRelease.Id,
-                Slug = "release-slug",
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                }
-            };
-
-            var cacheKey = GetCacheKey(contentRelease, releaseSubject);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(contentRelease);
-                await contentDbContext.SaveChangesAsync();
-            }
-
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
-            CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
-                .ReturnsAsync(null);
-
-            CacheService
-                .Setup(s => s.SetItem<object>(cacheKey, It.IsAny<SubjectMetaViewModel>()))
-                .Returns(Task.CompletedTask);
-
             filterRepository
-                .Setup(s => s.GetFiltersIncludingItems(subject.Id))
+                .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
                 .Returns(new List<Filter>());
 
             indicatorGroupRepository
-                .Setup(s => s.GetIndicatorGroups(subject.Id))
+                .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
                 .Returns(new List<IndicatorGroup>());
 
-            releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(subject.Id))
-                .ReturnsAsync(releaseSubject);
-
             timePeriodService
-                .Setup(s => s.GetTimePeriods(subject.Id))
+                .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
 
             locationRepository
-                .Setup(s => s.GetDistinctForSubject(subject.Id))
+                .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
                 .ReturnsAsync(locations);
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
-                    contentDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     options: options
                 );
 
-                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(releaseSubject)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
-                    releaseSubjectRepository,
                     timePeriodService);
 
                 var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
@@ -802,39 +615,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Content.Model.Release
-            {
-                Id = statisticsRelease.Id,
-                Slug = "release-slug",
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                }
-            };
-
-            var cacheKey = GetCacheKey(contentRelease, releaseSubject);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(contentRelease);
-                await contentDbContext.SaveChangesAsync();
-            }
-
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
-                .ReturnsAsync(null);
-
-            CacheService
-                .Setup(s => s.SetItem<object>(cacheKey, It.IsAny<SubjectMetaViewModel>()))
-                .Returns(Task.CompletedTask);
 
             filterRepository
                 .Setup(s => s.GetFiltersIncludingItems(subject.Id))
@@ -844,9 +628,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(new List<IndicatorGroup>());
 
-            releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(subject.Id))
-                .ReturnsAsync(releaseSubject);
-
             timePeriodService
                 .Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -855,27 +636,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetDistinctForSubject(subject.Id))
                 .ReturnsAsync(locations);
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
-                    contentDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     options: options
                 );
 
-                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(releaseSubject)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
-                    releaseSubjectRepository,
                     timePeriodService);
 
                 var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
@@ -974,39 +751,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Content.Model.Release
-            {
-                Id = statisticsRelease.Id,
-                Slug = "release-slug",
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                }
-            };
-
-            var cacheKey = GetCacheKey(contentRelease, releaseSubject);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(contentRelease);
-                await contentDbContext.SaveChangesAsync();
-            }
-
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
-                .ReturnsAsync(null);
-
-            CacheService
-                .Setup(s => s.SetItem<object>(cacheKey, It.IsAny<SubjectMetaViewModel>()))
-                .Returns(Task.CompletedTask);
 
             filterRepository
                 .Setup(s => s.GetFiltersIncludingItems(subject.Id))
@@ -1016,9 +764,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(new List<IndicatorGroup>());
 
-            releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(subject.Id))
-                .ReturnsAsync(releaseSubject);
-
             timePeriodService
                 .Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -1027,27 +772,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetDistinctForSubject(subject.Id))
                 .ReturnsAsync(locations);
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
-                    contentDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     options: options
                 );
 
-                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(releaseSubject)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
-                    releaseSubjectRepository,
                     timePeriodService);
 
                 var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
@@ -1173,39 +914,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var contentRelease = new Content.Model.Release
-            {
-                Id = statisticsRelease.Id,
-                Slug = "release-slug",
-                Publication = new Publication
-                {
-                    Slug = "publication-slug"
-                }
-            };
-
-            var cacheKey = GetCacheKey(contentRelease, releaseSubject);
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.Releases.AddRangeAsync(contentRelease);
-                await contentDbContext.SaveChangesAsync();
-            }
-
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
             var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            CacheService
-                .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
-                .ReturnsAsync(null);
-
-            CacheService
-                .Setup(s => s.SetItem<object>(cacheKey, It.IsAny<SubjectMetaViewModel>()))
-                .Returns(Task.CompletedTask);
 
             filterRepository
                 .Setup(s => s.GetFiltersIncludingItems(subject.Id))
@@ -1215,9 +927,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
                 .Returns(new List<IndicatorGroup>());
 
-            releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(subject.Id))
-                .ReturnsAsync(releaseSubject);
-
             timePeriodService
                 .Setup(s => s.GetTimePeriods(subject.Id))
                 .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
@@ -1226,27 +935,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .Setup(s => s.GetDistinctForSubject(subject.Id))
                 .ReturnsAsync(locations);
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
-                    contentDbContext,
                     filterRepository: filterRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object,
                     locationRepository: locationRepository.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     timePeriodService: timePeriodService.Object,
                     options: options
                 );
 
-                var result = (await service.GetSubjectMeta(subject.Id)).AssertRight();
+                var result = (await service.GetSubjectMeta(releaseSubject)).AssertRight();
 
                 VerifyAllMocks(
                     filterRepository,
                     indicatorGroupRepository,
                     locationRepository,
-                    releaseSubjectRepository,
                     timePeriodService);
 
                 var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
@@ -1310,9 +1015,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetSubjectMetaForQuery_TimePeriods()
+        public async Task FilterSubjectMeta_TimePeriods()
         {
-            var statisticsRelease = new Release();
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
@@ -1320,7 +1024,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                Release = new Release(),
                 Subject = subject
             };
 
@@ -1423,11 +1127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             {
                 var cancellationToken = new CancellationTokenSource().Token;
 
-                var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
-
-                releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(subject.Id))
-                    .ReturnsAsync(releaseSubject);
-
                 var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
                 timePeriodService
@@ -1445,14 +1144,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     timePeriodService: timePeriodService.Object);
 
-                var result = await service.GetSubjectMeta(query, cancellationToken);
+                var result = await service.FilterSubjectMeta(releaseSubject, query, cancellationToken);
 
-                VerifyAllMocks(
-                    releaseSubjectRepository,
-                    timePeriodService);
+                VerifyAllMocks(timePeriodService);
 
                 var meta = result.AssertRight();
                 Assert.Empty(meta.Locations);
@@ -1471,9 +1167,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetSubjectMetaForQuery_FiltersAndIndicators()
+        public async Task FilterSubjectMeta_FiltersAndIndicators()
         {
-            var statisticsRelease = new Release();
             var subject = new Subject
             {
                 Id = Guid.NewGuid()
@@ -1481,7 +1176,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             var releaseSubject = new ReleaseSubject
             {
-                Release = statisticsRelease,
+                Release = new Release(),
                 Subject = subject
             };
 
@@ -1515,10 +1210,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var cancellationToken = new CancellationTokenSource().Token;
 
                 var observationService = new Mock<IObservationService>(MockBehavior.Strict);
-                var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
-
-                releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(subject.Id))
-                    .ReturnsAsync(releaseSubject);
 
                 observationService
                     .Setup(s => s.GetMatchedObservations(query, cancellationToken))
@@ -1594,17 +1285,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
                     observationService: observationService.Object,
-                    releaseSubjectRepository: releaseSubjectRepository.Object,
                     filterItemRepository: filterItemRepository.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
-                var result = await service.GetSubjectMeta(query, cancellationToken);
+                var result = await service.FilterSubjectMeta(releaseSubject, query, cancellationToken);
 
                 VerifyAllMocks(
                     filterItemRepository,
                     indicatorGroupRepository,
-                    observationService,
-                    releaseSubjectRepository);
+                    observationService);
 
                 var meta = result.AssertRight();
                 meta.TimePeriod.AssertDeepEqualTo(new TimePeriodsMetaViewModel());
@@ -1711,7 +1400,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetSubjectMetaForQuery_InvalidCombination_NoTimePeriodsOrLocations()
+        public async Task FilterSubjectMeta_InvalidCombination_NoTimePeriodsOrLocations()
         {
             var statisticsRelease = new Release();
             var subject = new Subject
@@ -1732,11 +1421,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 TimePeriod = null
             };
 
-            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(MockBehavior.Strict);
-
-            releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(subject.Id))
-                .ReturnsAsync(releaseSubject);
-
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1747,13 +1431,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
-                var service = BuildSubjectMetaService(statisticsDbContext,
-                    releaseSubjectRepository: releaseSubjectRepository.Object);
+                var service = BuildSubjectMetaService(statisticsDbContext);
 
                 var exception = await Assert.ThrowsAsync<ArgumentOutOfRangeException>(
-                    () => service.GetSubjectMeta(query, default));
-
-                VerifyAllMocks(releaseSubjectRepository);
+                    () => service.FilterSubjectMeta(releaseSubject, query, default));
 
                 Assert.Equal("Unable to determine which SubjectMeta information has requested " +
                              "(Parameter 'subjectMetaStep')", exception.Message);
@@ -1794,27 +1475,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 .ToList();
         }
 
-        private static SubjectMetaCacheKey GetCacheKey(Content.Model.Release release, ReleaseSubject releaseSubject)
-        {
-            return new SubjectMetaCacheKey(release.Publication.Slug, release.Slug, releaseSubject.SubjectId);
-        }
-
         private static SubjectMetaService BuildSubjectMetaService(
             StatisticsDbContext statisticsDbContext,
-            ContentDbContext? contentDbContext = null,
             IFilterRepository? filterRepository = null,
             IFilterItemRepository? filterItemRepository = null,
             IIndicatorGroupRepository? indicatorGroupRepository = null,
             ILocationRepository? locationRepository = null,
             IObservationService? observationService = null,
-            IReleaseSubjectRepository? releaseSubjectRepository = null,
             IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
             ITimePeriodService? timePeriodService = null,
             IUserService? userService = null,
             IOptions<LocationsOptions>? options = null)
         {
             return new(
-                contentDbContext ?? Mock.Of<ContentDbContext>(MockBehavior.Strict),
+                statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 statisticsDbContext,
                 filterRepository ?? Mock.Of<IFilterRepository>(MockBehavior.Strict),
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
@@ -1822,8 +1496,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 locationRepository ?? Mock.Of<ILocationRepository>(MockBehavior.Strict),
                 Mock.Of<ILogger<SubjectMetaService>>(),
                 observationService ?? Mock.Of<IObservationService>(MockBehavior.Strict),
-                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(MockBehavior.Strict),
-                statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 timePeriodService ?? Mock.Of<ITimePeriodService>(MockBehavior.Strict),
                 userService ?? AlwaysTrueUserService().Object,
                 options ?? DefaultLocationOptions()

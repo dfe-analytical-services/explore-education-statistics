@@ -9,10 +9,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Exte
 
 public static class UserServiceExtensions
 {
-    public static async Task<Either<ActionResult, ReleaseSubject>> CheckCanViewSubjectData(this IUserService userService,
+    public static async Task<Either<ActionResult, ReleaseSubject>> CheckCanViewSubjectData(
+        this IUserService userService,
         ReleaseSubject releaseSubject)
     {
-        if (await userService.MatchesPolicy(releaseSubject.Subject, DataSecurityPolicies.CanViewSubjectData))
+        if (await userService.MatchesPolicy(releaseSubject, DataSecurityPolicies.CanViewSubjectData))
         {
             return releaseSubject;
         }

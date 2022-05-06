@@ -178,10 +178,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
                     .ReturnsAsync(publicationId);
 
-                subjectRepository
-                    .Setup(s => s.IsSubjectForLatestPublishedRelease(query.SubjectId))
-                    .ReturnsAsync(true);
-
                 var releaseRepository = new Mock<IReleaseRepository>(Strict);
 
                 releaseRepository
@@ -376,10 +372,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(s => s.GetPublicationIdForSubject(query.SubjectId))
                     .ReturnsAsync(publicationId);
 
-                subjectRepository
-                    .Setup(s => s.IsSubjectForLatestPublishedRelease(query.SubjectId))
-                    .ReturnsAsync(true);
-
                 var releaseRepository = new Mock<IReleaseRepository>(Strict);
 
                 releaseRepository
@@ -549,21 +541,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     )
                     .ReturnsAsync(subjectMeta);
 
-                var subjectRepository = new Mock<ISubjectRepository>(Strict);
-                subjectRepository.Setup(s =>
-                        s.IsSubjectForLatestPublishedRelease(releaseSubject.Subject.Id))
-                    .ReturnsAsync(false);
-
                 var service = BuildTableBuilderService(
                     context,
                     observationService: observationService.Object,
-                    resultSubjectMetaService: resultSubjectMetaService.Object,
-                    subjectRepository: subjectRepository.Object
+                    resultSubjectMetaService: resultSubjectMetaService.Object
                 );
 
                 var result = await service.Query(releaseSubject.ReleaseId, query);
 
-                VerifyAllMocks(observationService, resultSubjectMetaService, subjectRepository);
+                VerifyAllMocks(observationService, resultSubjectMetaService);
 
                 var observationResults = result.AssertRight().Results.ToList();
 
@@ -705,11 +691,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                         }
                     });
 
-                var subjectRepository = new Mock<ISubjectRepository>(Strict);
-                subjectRepository.Setup(s =>
-                        s.IsSubjectForLatestPublishedRelease(releaseSubject.Subject.Id))
-                    .ReturnsAsync(false);
-
                 var options = Options.Create(new TableBuilderOptions
                 {
                     // 2 Filter items (from 1 Filter), 1 Location, and 2 Time periods provide 4 different combinations,
@@ -721,13 +702,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 var service = BuildTableBuilderService(
                     statisticsDbContext,
                     filterItemRepository: filterItemRepository.Object,
-                    subjectRepository: subjectRepository.Object,
                     options: options
                 );
 
                 var result = await service.Query(releaseSubject.ReleaseId, query);
 
-                VerifyAllMocks(filterItemRepository, subjectRepository);
+                VerifyAllMocks(filterItemRepository);
 
                 result.AssertBadRequest(ValidationErrorMessages.QueryExceedsMaxAllowableTableSize);
             }

@@ -13,12 +13,12 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
@@ -44,8 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IResultSubjectMetaService resultSubjectMetaService,
             ISubjectRepository subjectRepository,
             IUserService userService,
-            IResultBuilder<Observation,
-            ObservationViewModel> resultBuilder,
+            IResultBuilder<Observation, ObservationViewModel> resultBuilder,
             IReleaseRepository releaseRepository,
             IOptions<TableBuilderOptions> options)
         {
@@ -73,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 return new NotFoundResult();
             }
 
-            return await Query(release, queryContext, cancellationToken);
+            return await Query(release.Id, queryContext, cancellationToken);
         }
 
         public async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
@@ -81,22 +80,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ObservationQueryContext queryContext,
             CancellationToken cancellationToken = default)
         {
-            return await _statisticsPersistenceHelper.CheckEntityExists<ReleaseSubject>(
-                    query => query
-                        .Include(rs => rs.Release)
-                        .Where(rs => rs.ReleaseId == releaseId
-                                     && rs.SubjectId == queryContext.SubjectId)
-                )
-                .OnSuccess(rs => Query(rs.Release, queryContext, cancellationToken));
-        }
-
-        private async Task<Either<ActionResult, TableBuilderResultViewModel>> Query(
-            Release release,
-            ObservationQueryContext queryContext,
-            CancellationToken cancellationToken)
-        {
-            return await _statisticsPersistenceHelper.CheckEntityExists<Subject>(queryContext.SubjectId)
-                .OnSuccessDo(CheckCanViewSubjectData)
+            return await CheckReleaseSubjectExists(queryContext.SubjectId, releaseId)
+                .OnSuccess(_userService.CheckCanViewSubjectData)
                 .OnSuccess(async () =>
                 {
                     if (await GetMaximumTableCellCount(queryContext) > _options.MaxTableCellsAllowed)
@@ -123,7 +108,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     return await _resultSubjectMetaService
                         .GetSubjectMeta(
-                            release.Id,
+                            releaseId,
                             queryContext,
                             observations)
                         .OnSuccess(subjectMetaViewModel =>
@@ -162,15 +147,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             );
         }
 
-        private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
+        private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId, Guid releaseId)
         {
-            if (await _subjectRepository.IsSubjectForLatestPublishedRelease(subject.Id) ||
-                await _userService.MatchesPolicy(subject, CanViewSubjectData))
-            {
-                return subject;
-            }
-
-            return new ForbidResult();
+            return _statisticsPersistenceHelper.CheckEntityExists<ReleaseSubject>(
+                query => query
+                    .Where(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId)
+            );
         }
     }
 

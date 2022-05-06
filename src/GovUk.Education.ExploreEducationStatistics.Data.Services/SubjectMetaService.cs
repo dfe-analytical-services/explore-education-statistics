@@ -5,18 +5,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -37,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             GetFilterItems
         }
 
-        private readonly ContentDbContext _contentDbContext;
+        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IFilterRepository _filterRepository;
         private readonly IFilterItemRepository _filterItemRepository;
@@ -45,13 +42,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly ILocationRepository _locationRepository;
         private readonly ILogger _logger;
         private readonly IObservationService _observationService;
-        private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
         private readonly LocationsOptions _locationOptions;
 
-        public SubjectMetaService(
-            ContentDbContext contentDbContext,
+        public SubjectMetaService(IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             StatisticsDbContext statisticsDbContext,
             IFilterRepository filterRepository,
             IFilterItemRepository filterItemRepository,
@@ -59,13 +54,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ILocationRepository locationRepository,
             ILogger<SubjectMetaService> logger,
             IObservationService observationService,
-            IReleaseSubjectRepository releaseSubjectRepository,
-            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
-            IOptions<LocationsOptions> locationOptions) : base(persistenceHelper)
+            IOptions<LocationsOptions> locationOptions)
         {
-            _contentDbContext = contentDbContext;
+            _persistenceHelper = persistenceHelper;
             _statisticsDbContext = statisticsDbContext;
             _filterRepository = filterRepository;
             _filterItemRepository = filterItemRepository;
@@ -73,57 +66,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _locationRepository = locationRepository;
             _logger = logger;
             _observationService = observationService;
-            _releaseSubjectRepository = releaseSubjectRepository;
             _timePeriodService = timePeriodService;
             _userService = userService;
             _locationOptions = locationOptions.Value;
         }
 
-        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
+        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ReleaseSubject releaseSubject)
         {
-            return await CheckSubjectExistsOnLatestPublishedVersion(subjectId)
-                .OnSuccessCombineWith(CreateCacheKeyForSubjectMeta)
-                .OnSuccess(releaseSubjectAndCacheKey =>
-                {
-                    var (releaseSubject, cacheKey) = releaseSubjectAndCacheKey;
-                    return GetSubjectMeta(releaseSubject, cacheKey);
-                });
-        }
-
-        [BlobCache(typeof(SubjectMetaCacheKey))]
-        private Task<SubjectMetaViewModel> GetSubjectMeta(ReleaseSubject releaseSubject,
-            SubjectMetaCacheKey cacheKey)
-        {
-            return GetSubjectMetaViewModel(releaseSubject);
-        }
-
-        public async Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(
-            Guid releaseId,
-            Guid subjectId)
-        {
-            return await CheckReleaseSubjectExists(releaseId, subjectId)
-                .OnSuccess(_userService.CheckCanViewSubjectData)
+            return await _userService.CheckCanViewSubjectData(releaseSubject)
                 .OnSuccess(GetSubjectMetaViewModel);
         }
 
-        public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(
+        public async Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(ReleaseSubject releaseSubject,
             ObservationQueryContext query,
             CancellationToken cancellationToken)
         {
-            return CheckSubjectExistsOnLatestPublishedVersion(query.SubjectId)
-                .OnSuccess(releaseSubject =>
-                    GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
-        }
-
-        public Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMetaRestricted(
-            Guid releaseId,
-            ObservationQueryContext query,
-            CancellationToken cancellationToken)
-        {
-            return CheckReleaseSubjectExists(releaseId, query.SubjectId)
-                .OnSuccess(_userService.CheckCanViewSubjectData)
-                .OnSuccess(releaseSubject =>
-                    GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
+            return await _userService.CheckCanViewSubjectData(releaseSubject)
+                .OnSuccess(() => GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
         }
 
         public async Task<Either<ActionResult, Unit>> UpdateSubjectFilters(
@@ -355,22 +314,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             };
         }
 
-        private async Task<Either<ActionResult, ReleaseSubject>> CheckSubjectExistsOnLatestPublishedVersion(
-            Guid subjectId)
+        private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId,
+            Guid releaseId)
         {
-            return await _releaseSubjectRepository.GetReleaseSubjectForLatestPublishedVersion(subjectId) ??
-                   new Either<ActionResult, ReleaseSubject>(new NotFoundResult());
-        }
-
-        private async Task<Either<ActionResult, SubjectMetaCacheKey>> CreateCacheKeyForSubjectMeta(
-            ReleaseSubject releaseSubject)
-        {
-            var release = await _contentDbContext
-                .Releases
-                .Include(release => release.Publication)
-                .SingleAsync(release => release.Id == releaseSubject.ReleaseId);
-
-            return new SubjectMetaCacheKey(release.Publication.Slug, release.Slug, releaseSubject.SubjectId);
+            return _persistenceHelper.CheckEntityExists<ReleaseSubject>(
+                query => query
+                    .Where(rs => rs.ReleaseId == releaseId
+                                 && rs.SubjectId == subjectId)
+            );
         }
     }
 }

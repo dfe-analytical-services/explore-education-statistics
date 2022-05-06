@@ -20,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensio
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.FilterAndIndicatorViewModelBuilders;
@@ -29,6 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
     public class ResultSubjectMetaService : AbstractSubjectMetaService, IResultSubjectMetaService
     {
         private readonly ContentDbContext _contentDbContext;
+        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly IBoundaryLevelRepository _boundaryLevelRepository;
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly IFootnoteRepository _footnoteRepository;
@@ -43,20 +45,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public ResultSubjectMetaService(
             ContentDbContext contentDbContext,
+            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             IBoundaryLevelRepository boundaryLevelRepository,
             IFilterItemRepository filterItemRepository,
             IFootnoteRepository footnoteRepository,
             IGeoJsonRepository geoJsonRepository,
             IIndicatorRepository indicatorRepository,
-            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
             ISubjectRepository subjectRepository,
             IReleaseDataFileRepository releaseDataFileRepository,
             IOptions<LocationsOptions> locationOptions,
-            ILogger<ResultSubjectMetaService> logger) : base(persistenceHelper)
+            ILogger<ResultSubjectMetaService> logger)
         {
             _contentDbContext = contentDbContext;
+            _persistenceHelper = persistenceHelper;
             _boundaryLevelRepository = boundaryLevelRepository;
             _filterItemRepository = filterItemRepository;
             _footnoteRepository = footnoteRepository;
@@ -142,6 +145,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         TimePeriodRange = timePeriodViewModels
                     };
                 });
+        }
+
+        private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid releaseId, Guid subjectId)
+        {
+            return _persistenceHelper.CheckEntityExists<ReleaseSubject>(
+                query => query
+                    .Include(rs => rs.Subject)
+                    .Where(rs => rs.ReleaseId == releaseId
+                                 && rs.SubjectId == subjectId)
+            );
         }
 
         private List<IndicatorMetaViewModel> GetIndicatorViewModels(ObservationQueryContext query,

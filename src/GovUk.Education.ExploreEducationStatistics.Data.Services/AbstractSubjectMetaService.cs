@@ -1,27 +1,12 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Utils;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public abstract class AbstractSubjectMetaService
     {
-        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
-
-        protected AbstractSubjectMetaService(IPersistenceHelper<StatisticsDbContext> persistenceHelper)
-        {
-            _persistenceHelper = persistenceHelper;
-        }
-
         protected static IEnumerable<LocationAttributeViewModel> DeduplicateLocationViewModels(
             IEnumerable<LocationAttributeViewModel> viewModels)
         {
@@ -72,16 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                 return value;
             });
-        }
-
-        protected Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid releaseId, Guid subjectId)
-        {
-            return _persistenceHelper.CheckEntityExists<ReleaseSubject>(
-                query => query
-                    .Include(rs => rs.Subject)
-                    .Where(rs => rs.ReleaseId == releaseId
-                                 && rs.SubjectId == subjectId)
-            );
         }
     }
 }

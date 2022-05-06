@@ -1720,12 +1720,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         private static ResultSubjectMetaService BuildResultSubjectMetaService(
             StatisticsDbContext statisticsDbContext,
             ContentDbContext? contentDbContext = null,
+            IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
             IFilterItemRepository? filterItemRepository = null,
             IBoundaryLevelRepository? boundaryLevelRepository = null,
             IFootnoteRepository? footnoteRepository = null,
             IGeoJsonRepository? geoJsonRepository = null,
             IIndicatorRepository? indicatorRepository = null,
-            IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
             ITimePeriodService? timePeriodService = null,
             IUserService? userService = null,
             ISubjectRepository? subjectRepository = null,
@@ -1734,12 +1734,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         {
             return new(
                 contentDbContext ?? InMemoryContentDbContext(),
+                statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 boundaryLevelRepository ?? Mock.Of<IBoundaryLevelRepository>(MockBehavior.Strict),
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
                 footnoteRepository ?? Mock.Of<IFootnoteRepository>(MockBehavior.Strict),
                 geoJsonRepository ?? Mock.Of<IGeoJsonRepository>(MockBehavior.Strict),
                 indicatorRepository ?? Mock.Of<IIndicatorRepository>(MockBehavior.Strict),
-                statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 timePeriodService ?? Mock.Of<ITimePeriodService>(MockBehavior.Strict),
                 userService ?? AlwaysTrueUserService().Object,
                 subjectRepository ?? Mock.Of<ISubjectRepository>(MockBehavior.Strict),
