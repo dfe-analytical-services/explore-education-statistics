@@ -48,11 +48,9 @@ describe('TableToolFinalStep', () => {
     ).toBeInTheDocument();
 
     // test that the preview table is rendered correctly
-    expect(
-      screen.queryByText(
-        "'dates' for 02/06/2020 and 02/04/2021 in England between 2020 Week 23 and 2020 Week 26",
-      ),
-    ).toBeInTheDocument();
+    expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
+      "'dates' for 02/04/2021 and 02/06/2020 in England between 2020 Week 23 and 2020 Week 26",
+    );
 
     const table = screen.queryByTestId('dataTableCaption-table');
     expect(table).toBeInTheDocument();

@@ -97,7 +97,7 @@ Create table
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    css:[data-testid="dataTableCaption"]
-    ...    Admission Numbers for 'UI test subject' in Bolton 001, Bolton 002, Bolton 003, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2020
+    ...    Admission Numbers for 'UI test subject' in Bolton 001, Bolton 002, Bolton 003, Bolton 004, Nailsea Youngwood and 1 other location between 2005 and 2020
 
 Validate table rows
     user checks table column heading contains    1    1    Admission Numbers

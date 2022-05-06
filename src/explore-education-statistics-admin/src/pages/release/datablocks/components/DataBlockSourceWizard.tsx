@@ -2,7 +2,6 @@ import DataBlockDetailsForm, {
   DataBlockDetailsFormValues,
 } from '@admin/pages/release/datablocks/components/DataBlockDetailsForm';
 import { ReleaseDataBlock } from '@admin/services/dataBlockService';
-import { generateTableTitle } from '@common/modules/table-tool/components/DataTableCaption';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TableToolWizard, {
   InitialTableToolState,
@@ -12,6 +11,7 @@ import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
+import generateTableTitle from '@common/modules/table-tool/utils/generateTableTitle';
 import { ReleaseTableDataQuery } from '@common/services/tableBuilderService';
 import WarningMessage from '@common/components/WarningMessage';
 import React, { createRef, memo, useCallback, useState } from 'react';
