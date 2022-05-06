@@ -99,7 +99,6 @@ const EditableKeyStat = ({
               <h3 className="govuk-heading-s">{name}</h3>
 
               <KeyStatTile
-                dataBlockId={dataBlockId}
                 title={keyStat.title}
                 titleTag="h4"
                 testId={testId}
@@ -145,7 +144,6 @@ const EditableKeyStat = ({
     return (
       <>
         <KeyStatTile
-          dataBlockId={dataBlockId}
           title={keyStat.title}
           value={keyStat.value}
           testId={testId}

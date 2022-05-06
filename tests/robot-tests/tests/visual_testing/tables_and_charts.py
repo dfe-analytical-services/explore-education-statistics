@@ -156,6 +156,7 @@ def generate_releases(data_blocks_csv_filepath):
 
     for release in releases:
         releases_by_url[release.url] = release
+        warning(release.url)
 
 
 def get_release_by_url(url: str):
