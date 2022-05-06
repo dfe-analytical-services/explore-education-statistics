@@ -6,7 +6,8 @@
       "default": "Warning",
       "Microsoft": "Warning",
       "Function": "Information",
-      "GovUk.Education.ExploreEducationStatistics": "Information"
+      "GovUk.Education.ExploreEducationStatistics": "Information",
+      "Azure": "Error"
     }
   },
   "extensions": {

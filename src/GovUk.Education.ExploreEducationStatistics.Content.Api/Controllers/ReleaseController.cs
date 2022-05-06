@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("publications/{publicationSlug}/releases/latest")]
         public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
         {
-            return await _releaseService.Get(publicationSlug)
+            return await _releaseService.GetCachedViewModel(publicationSlug)
                 .HandleFailuresOrOk();
         }
 
@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}")]
         public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
         {
-            return await _releaseService.Get(
+            return await _releaseService.GetCachedViewModel(
                     publicationSlug,
                     releaseSlug)
                 .HandleFailuresOrOk();

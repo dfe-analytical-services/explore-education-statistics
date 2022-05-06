@@ -1813,6 +1813,7 @@
       "apiVersion": "2021-10-01",
       "name": "[variables('adminSignalRName')]",
       "location": "[resourceGroup().location]",
+      "condition": "[equals(parameters('environmentName'), 'Development')]",
       "sku": {
         "capacity": "[parameters('adminSignalRCapacity')]",
         "name": "[parameters('skuAdminSignalR')]"
@@ -1845,7 +1846,7 @@
         ],
         "cors": {
           "allowedOrigins": [
-            "[parameters('adminUri')]",
+            "[concat('https://', parameters('adminUri'))]",
             "https://localhost:3000",
             "http://localhost:3000"
           ]

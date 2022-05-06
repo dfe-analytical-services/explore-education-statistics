@@ -39,10 +39,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         }
 
         [HttpGet("methodology-themes")]
-        [BlobCache(typeof(AllMethodologiesCacheKey))]
         public async Task<ActionResult<List<AllMethodologiesThemeViewModel>>> GetMethodologyThemes()
         {
-            return await _methodologyService.GetTree()
+            return await _methodologyService
+                .GetCachedSummariesTree()
                 .HandleFailuresOrOk();
         }
     }

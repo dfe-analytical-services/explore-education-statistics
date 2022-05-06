@@ -12,8 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
     {
         public Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug);
 
-        public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetSummariesByPublication(Guid publicationId);
+        public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetCachedSummariesByPublication(Guid publicationId);
 
-        public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetTree();
+        public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetCachedSummariesTree();
     }
 }

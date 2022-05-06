@@ -395,8 +395,8 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
           <FixedMultiHeaderDataTable
             caption={
               <DataTableCaption
-                {...subjectMeta}
                 title={captionTitle}
+                meta={subjectMeta}
                 id={captionId}
               />
             }
