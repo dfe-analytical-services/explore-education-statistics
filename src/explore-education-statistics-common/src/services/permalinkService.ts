@@ -4,7 +4,12 @@ import { ConfiguredTable } from '@common/services/types/table';
 import deduplicatePermalinkLocations from '@common/services/util/permalinkServiceUtils';
 
 export type Permalink = ConfiguredTable & {
-  invalidated: boolean;
+  status?:
+    | 'Current'
+    | 'SubjectRemoved'
+    | 'SubjectReplacedOrRemoved'
+    | 'NotForLatestRelease'
+    | 'PublicationSuperseded';
 };
 
 export type TableHeader =

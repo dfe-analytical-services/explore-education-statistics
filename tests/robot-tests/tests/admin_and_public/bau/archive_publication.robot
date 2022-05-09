@@ -180,6 +180,7 @@ Go to "Sign off" page and approve superseding-publication release
     user approves original release for immediate publication
 
 Check archive-publication is now archived and superseding-publication now appears on Find stats page
+    sleep    1    # Prevent intermittent failure where Find Stats page loads before cache is cleared
     user navigates to find statistics page on public frontend
 
     user waits until page contains accordion section    %{TEST_THEME_NAME}
@@ -266,7 +267,8 @@ Check archive-publication permalink has out-of-date warning
     user waits until h1 is visible
     ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
 
-    user waits until page contains    WARNING - The data used in this permalink may be out-of-date.
+    user waits until page contains
+    ...    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.
 
 Set archive-publication to be no longer be superseded
     user navigates to admin dashboard
@@ -371,4 +373,4 @@ Check archive-publication permalink no longer has out-of-date warning after arch
     user waits until h1 is visible
     ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
 
-    user checks page does not contain    WARNING
+    user checks page does not contain    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.

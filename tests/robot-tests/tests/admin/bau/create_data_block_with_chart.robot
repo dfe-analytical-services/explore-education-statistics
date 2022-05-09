@@ -97,7 +97,7 @@ Create table
     user clicks element    id:filtersForm-submit
     user waits until results table appears    %{WAIT_LONG}
     user waits until element contains    css:[data-testid="dataTableCaption"]
-    ...    Admission Numbers for 'UI test subject' in Bolton 001, Bolton 002, Bolton 003, Bolton 004, Nailsea Youngwood and Syon between 2005 and 2020
+    ...    Admission Numbers for 'UI test subject' in Bolton 001, Bolton 002, Bolton 003, Bolton 004, Nailsea Youngwood and 1 other location between 2005 and 2020
 
 Validate table rows
     user checks table column heading contains    1    1    Admission Numbers
@@ -220,12 +220,11 @@ Navigate to content tab
 
 Check updated footnote is displayed in content Tab
     [Documentation]    EES-3136
-    [Tags]    Failing
     user clicks button    Test data block section
     ${section}=    user gets accordion section content element    Test data block section
     ...    //*[@data-testid="editableAccordionSection"]
 
-    user scrolls to element    //*[@data-testid="editableAccordionSection"]//*[@data-testid="footnotes"]
+    user scrolls to element    ${section}
 
     user checks list has x items    testid:footnotes    1
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_UPDATED}

@@ -26,6 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
         private readonly IUserService _userService;
+        private readonly IDataBlockService _dataBlockService;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IGuidGenerator _guidGenerator;
 
@@ -33,6 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             StatisticsDbContext context,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IUserService userService,
+            IDataBlockService dataBlockService,
             IFootnoteRepository footnoteRepository,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper, 
             IGuidGenerator guidGenerator)
@@ -40,6 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _context = context;
             _contentPersistenceHelper = contentPersistenceHelper;
             _userService = userService;
+            _dataBlockService = dataBlockService;
             _footnoteRepository = footnoteRepository;
             _statisticsPersistenceHelper = statisticsPersistenceHelper;
             _guidGenerator = guidGenerator;
@@ -75,14 +78,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _context.Footnote.AddAsync(footnote);
 
                     await _context.ReleaseFootnote.AddAsync(new ReleaseFootnote
-                        {
-                            ReleaseId = releaseId,
-                            Footnote = footnote
-                        });
+                    {
+                        ReleaseId = releaseId,
+                        Footnote = footnote
+                    });
 
                     await _context.SaveChangesAsync();
-                    return await GetFootnote(releaseId, footnote.Id);
-                });
+                    return footnote;
+                })
+                .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId))
+                .OnSuccess(async footnote => await GetFootnote(releaseId, footnote.Id)
+                );
         }
 
         public async Task<Either<ActionResult, List<Footnote>>> CopyFootnotes(Guid sourceReleaseId, Guid destinationReleaseId)
@@ -122,6 +128,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     await _footnoteRepository.DeleteFootnote(releaseId, footnote.Id);
                     await _context.SaveChangesAsync();
+
+                    await _dataBlockService.InvalidateCachedDataBlocks(releaseId);
                     return Unit.Instance;
                 }));
         }
@@ -142,6 +150,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => _statisticsPersistenceHelper.CheckEntityExists<Footnote>(id, HydrateFootnote)
                 .OnSuccess(async footnote =>
                 {
+                    // NOTE: At the time of writing, footnotes are now always exclusive to a particular release, but
+                    // in the past this wasn't always the case. It's unclear whether this is still necessary for
+                    // the sake of older footnotes.
                     if (await _footnoteRepository.IsFootnoteExclusiveToReleaseAsync(releaseId, footnote.Id))
                     {
                         _context.Update(footnote);
@@ -170,7 +181,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         filterItemIds,
                         indicatorIds,
                         subjectIds);
-                }));
+                })
+                .OnSuccessDo(async _ => await _dataBlockService.InvalidateCachedDataBlocks(releaseId)));
         }
 
         public Task<Either<ActionResult, Footnote>> GetFootnote(Guid releaseId, Guid id)

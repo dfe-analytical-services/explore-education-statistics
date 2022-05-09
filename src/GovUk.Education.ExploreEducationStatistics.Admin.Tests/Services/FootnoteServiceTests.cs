@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -382,13 +383,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.SaveChangesAsync();
 
                 await contentDbContext.AddRangeAsync(new Content.Model.Release
-                {
-                    Id = release.Id
-                },
-                new Content.Model.Release
-                {
-                    Id = amendment.Id
-                });
+                    {
+                        Id = release.Id
+                    },
+                    new Content.Model.Release
+                    {
+                        Id = amendment.Id
+                    });
 
                 await contentDbContext.SaveChangesAsync();
             }
@@ -445,9 +446,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Returns(newFootnote1.Id)
                     .Returns(newFootnote2.Id);
 
+                var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+                dataBlockService.Setup(mock => mock.InvalidateCachedDataBlocks(amendment.Id))
+                    .Returns(Task.CompletedTask);
+
                 var service = SetupFootnoteService(
                     statisticsDbContext,
                     contentDbContext,
+                    dataBlockService: dataBlockService.Object,
                     footnoteRepository: footnoteRepository.Object,
                     guidGenerator: guidGenerator.Object);
 
@@ -472,8 +479,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Include(f => f.Releases)
                     .Include(f => f.Subjects)
                     .Include(f => f.Indicators)
-                    .Where(f => f.Releases.
-                        FirstOrDefault(r => r.ReleaseId == amendment.Id) != null)
+                    .Where(f => f.Releases.FirstOrDefault(r => r.ReleaseId == amendment.Id) != null)
                     .OrderBy(f => f.Content)
                     .ToList();
 
@@ -538,11 +544,454 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task DeleteFootnote()
+        {
+            var release = new Release();
+
+            var subject = new Subject();
+
+            var filterItem = new FilterItem();
+
+            var filterGroup = new FilterGroup
+            {
+                FilterItems = new List<FilterItem>
+                {
+                    filterItem,
+                },
+            };
+
+            var filter = new Filter
+            {
+                Subject = subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    filterGroup,
+                },
+            };
+
+            var indicator = new Indicator();
+
+            var indicatorGroup = new IndicatorGroup
+            {
+                Subject = subject,
+                Indicators = new List<Indicator>
+                {
+                    indicator,
+                }
+            };
+
+            var footnote = new Footnote
+            {
+                Content = "Test footnote 1",
+                Releases = new List<ReleaseFootnote>
+                {
+                    new ReleaseFootnote
+                    {
+                        Release = release,
+                    },
+                },
+                Subjects = new List<SubjectFootnote>
+                {
+                    new SubjectFootnote
+                    {
+                        Subject = subject,
+                    }
+                },
+                Filters = new List<FilterFootnote>
+                {
+                    new FilterFootnote
+                    {
+                        Filter = filter,
+                    }
+                },
+                FilterGroups = new List<FilterGroupFootnote>
+                {
+                    new FilterGroupFootnote
+                    {
+                        FilterGroup =  filterGroup,
+                    }
+                },
+                FilterItems = new List<FilterItemFootnote>
+                {
+                    new FilterItemFootnote
+                    {
+                        FilterItem = filterItem,
+                    }
+                },
+                Indicators = new List<IndicatorFootnote>
+                {
+                    new IndicatorFootnote
+                    {
+                        Indicator = indicator,
+                    }
+                },
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.AddRangeAsync(
+                    release,
+                    footnote,
+                    filter,
+                    indicatorGroup,
+                    releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddAsync(new Content.Model.Release
+                {
+                    Id = release.Id,
+                });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+            dataBlockService.Setup(mock => mock.InvalidateCachedDataBlocks(release.Id))
+                .Returns(Task.CompletedTask);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupFootnoteService(
+                    statisticsDbContext,
+                    contentDbContext,
+                    dataBlockService: dataBlockService.Object);
+
+                var result = await service.DeleteFootnote(release.Id, footnote.Id);
+                await statisticsDbContext.SaveChangesAsync();
+
+                result.AssertRight();
+            }
+
+            MockUtils.VerifyAllMocks(dataBlockService);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                Assert.Empty(statisticsDbContext.Footnote.ToList());
+                Assert.Empty(statisticsDbContext.ReleaseFootnote.ToList());
+                Assert.Empty(statisticsDbContext.SubjectFootnote.ToList());
+                Assert.Empty(statisticsDbContext.FilterFootnote.ToList());
+                Assert.Empty(statisticsDbContext.FilterGroupFootnote.ToList());
+                Assert.Empty(statisticsDbContext.FilterItemFootnote.ToList());
+                Assert.Empty(statisticsDbContext.IndicatorFootnote.ToList());
+            }
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_AddCriteria()
+        {
+            var release = new Release();
+
+            var subject = new Subject();
+
+            var filterItem = new FilterItem();
+
+            var filterGroup = new FilterGroup
+            {
+                FilterItems = new List<FilterItem>
+                {
+                    filterItem,
+                },
+            };
+
+            var filter = new Filter
+            {
+                Subject = subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    filterGroup,
+                },
+            };
+
+            var indicator = new Indicator();
+
+            var indicatorGroup = new IndicatorGroup
+            {
+                Subject = subject,
+                Indicators = new List<Indicator>
+                {
+                    indicator,
+                }
+            };
+
+            var footnote = new Footnote
+            {
+                Content = "Original footnote",
+                Releases = new List<ReleaseFootnote>
+                {
+                    new ReleaseFootnote
+                    {
+                        Release = release,
+                    }
+                },
+                Subjects = new List<SubjectFootnote>(),
+                Filters = new List<FilterFootnote>(),
+                FilterGroups = new List<FilterGroupFootnote>(),
+                FilterItems = new List<FilterItemFootnote>(),
+                Indicators = new List<IndicatorFootnote>(),
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.AddRangeAsync(
+                    release,
+                    footnote,
+                    filter,
+                    indicatorGroup,
+                    releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddAsync(new Content.Model.Release
+                {
+                    Id = release.Id,
+                });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+            dataBlockService.Setup(mock => mock.InvalidateCachedDataBlocks(release.Id))
+                .Returns(Task.CompletedTask);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupFootnoteService(
+                    statisticsDbContext,
+                    contentDbContext,
+                    dataBlockService: dataBlockService.Object);
+
+                var result = await service.UpdateFootnote(
+                    release.Id,
+                    footnote.Id,
+                    "Updated footnote",
+                    new List<Guid>{ filter.Id },
+                    new List<Guid>{ filterGroup.Id },
+                    new List<Guid>{ filterItem.Id },
+                    new List<Guid>{ indicator.Id },
+                    new List<Guid>{ subject.Id });
+
+                result.AssertRight();
+            }
+
+            MockUtils.VerifyAllMocks(dataBlockService);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var savedFootnote = Assert.Single(statisticsDbContext.Footnote.ToList());
+                Assert.Equal(footnote.Id, savedFootnote.Id);
+                Assert.Equal("Updated footnote", savedFootnote.Content);
+
+                var savedReleaseFootnote = Assert.Single(statisticsDbContext.ReleaseFootnote.ToList());
+                Assert.Equal(release.Id, savedReleaseFootnote.ReleaseId);
+                Assert.Equal(footnote.Id, savedReleaseFootnote.FootnoteId);
+
+                var savedSubjectFootnote = Assert.Single(statisticsDbContext.SubjectFootnote.ToList());
+                Assert.Equal(subject.Id, savedSubjectFootnote.SubjectId);
+                Assert.Equal(footnote.Id, savedSubjectFootnote.FootnoteId);
+
+                var savedFilterFootnote = Assert.Single(statisticsDbContext.FilterFootnote.ToList());
+                Assert.Equal(filter.Id, savedFilterFootnote.FilterId);
+                Assert.Equal(footnote.Id, savedFilterFootnote.FootnoteId);
+
+                var savedFilterGroupFootnote = Assert.Single(statisticsDbContext.FilterGroupFootnote.ToList());
+                Assert.Equal(filterGroup.Id, savedFilterGroupFootnote.FilterGroupId);
+                Assert.Equal(footnote.Id, savedFilterGroupFootnote.FootnoteId);
+
+                var savedFilterItemFootnote = Assert.Single(statisticsDbContext.FilterItemFootnote.ToList());
+                Assert.Equal(filterItem.Id, savedFilterItemFootnote.FilterItemId);
+                Assert.Equal(footnote.Id, savedFilterItemFootnote.FootnoteId);
+
+                var savedIndicatorFootnote = Assert.Single(statisticsDbContext.IndicatorFootnote.ToList());
+                Assert.Equal(indicator.Id, savedIndicatorFootnote.IndicatorId);
+                Assert.Equal(footnote.Id, savedIndicatorFootnote.FootnoteId);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateFootnote_RemoveCriteria()
+        {
+            var release = new Release();
+
+            var subject = new Subject();
+
+            var filterItem = new FilterItem();
+
+            var filterGroup = new FilterGroup
+            {
+                FilterItems = new List<FilterItem>
+                {
+                    filterItem,
+                },
+            };
+
+            var filter = new Filter
+            {
+                Subject = subject,
+                FilterGroups = new List<FilterGroup>
+                {
+                    filterGroup,
+                },
+            };
+
+            var indicator = new Indicator();
+
+            var indicatorGroup = new IndicatorGroup
+            {
+                Subject = subject,
+                Indicators = new List<Indicator>
+                {
+                    indicator,
+                }
+            };
+
+            var footnote = new Footnote
+            {
+                Content = "Original footnote",
+                Releases = new List<ReleaseFootnote>
+                {
+                    new ReleaseFootnote
+                    {
+                        Release = release,
+                    },
+                },
+                Subjects = new List<SubjectFootnote>
+                {
+                    new SubjectFootnote
+                    {
+                        Subject = subject,
+                    }
+                },
+                Filters = new List<FilterFootnote>
+                {
+                    new FilterFootnote
+                    {
+                        Filter = filter,
+                    }
+                },
+                FilterGroups = new List<FilterGroupFootnote>
+                {
+                    new FilterGroupFootnote
+                    {
+                        FilterGroup =  filterGroup,
+                    }
+                },
+                FilterItems = new List<FilterItemFootnote>
+                {
+                    new FilterItemFootnote
+                    {
+                        FilterItem = filterItem,
+                    }
+                },
+                Indicators = new List<IndicatorFootnote>
+                {
+                    new IndicatorFootnote
+                    {
+                        Indicator = indicator,
+                    }
+                },
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = release,
+                Subject = subject,
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                await statisticsDbContext.AddRangeAsync(
+                    release,
+                    footnote,
+                    filter,
+                    indicatorGroup,
+                    releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                await contentDbContext.AddAsync(new Content.Model.Release
+                {
+                    Id = release.Id,
+                });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+
+            dataBlockService.Setup(mock => mock.InvalidateCachedDataBlocks(release.Id))
+                .Returns(Task.CompletedTask);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
+            {
+                var service = SetupFootnoteService(
+                    statisticsDbContext,
+                    contentDbContext,
+                    dataBlockService: dataBlockService.Object);
+
+                var result = await service.UpdateFootnote(
+                    release.Id,
+                    footnote.Id,
+                    "Updated footnote",
+                    new List<Guid>(),
+                    new List<Guid>(),
+                    new List<Guid>(),
+                    new List<Guid>(),
+                    new List<Guid>());
+
+                result.AssertRight();
+            }
+
+            MockUtils.VerifyAllMocks(dataBlockService);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(contextId))
+            {
+                var savedFootnote = Assert.Single(statisticsDbContext.Footnote.ToList());
+                Assert.Equal(footnote.Id, savedFootnote.Id);
+                Assert.Equal("Updated footnote", savedFootnote.Content);
+
+                var savedReleaseFootnote = Assert.Single(statisticsDbContext.ReleaseFootnote.ToList());
+                Assert.Equal(release.Id, savedReleaseFootnote.ReleaseId);
+                Assert.Equal(footnote.Id, savedReleaseFootnote.FootnoteId);
+
+                Assert.Empty(statisticsDbContext.SubjectFootnote.ToList());
+                Assert.Empty(statisticsDbContext.FilterFootnote.ToList());
+                Assert.Empty(statisticsDbContext.FilterGroupFootnote.ToList());
+                Assert.Empty(statisticsDbContext.FilterItemFootnote.ToList());
+                Assert.Empty(statisticsDbContext.IndicatorFootnote.ToList());
+            }
+        }
+
         private FootnoteService SetupFootnoteService(
             StatisticsDbContext statisticsDbContext,
             ContentDbContext contentDbContext = null,
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
             IUserService userService = null,
+            IDataBlockService dataBlockService = null,
             IFootnoteRepository footnoteRepository = null,
             IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper = null,
             IGuidGenerator guidGenerator = null)
@@ -553,6 +1002,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 statisticsDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentContext),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
+                dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
                 footnoteRepository ?? new FootnoteRepository(statisticsDbContext),
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 guidGenerator ?? new SequentialGuidGenerator()

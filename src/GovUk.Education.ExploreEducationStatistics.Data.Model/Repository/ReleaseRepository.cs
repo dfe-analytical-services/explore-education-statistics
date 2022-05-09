@@ -14,8 +14,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 
         public Release? GetLatestPublishedRelease(Guid publicationId)
         {
+            // NOTE: This method won't get the latest release if it has no subject attached, as no
+            // Statistics DB Release table entry will be created
             return DbSet()
-                .Where(release => release.PublicationId.Equals(publicationId))
+                .Where(release => release.PublicationId == publicationId)
                 .ToList()
                 .Where(release => release.Live && IsLatestVersionOfRelease(release.PublicationId, release.Id))
                 .OrderBy(release => release.Year)
@@ -23,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .LastOrDefault();
         }
 
-        public bool IsLatestVersionOfRelease(Guid publicationId, Guid releaseId)
+        private bool IsLatestVersionOfRelease(Guid publicationId, Guid releaseId)
         {
             var releases = _context.Release
                 .Where(r => r.PublicationId == publicationId)
