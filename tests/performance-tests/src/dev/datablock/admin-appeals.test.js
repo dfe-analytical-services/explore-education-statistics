@@ -4,13 +4,7 @@ import http from 'k6/http';
 import { htmlReport } from 'https://raw.githubusercontent.com/luke-h1/k6-reporter/main/dist/bundle.js';
 import { Rate } from 'k6/metrics';
 
-const username = '';
-const password = '';
-
-const BASE_SCHEME = `https://${
-  username && password ? `${username}:${password}@` : ''
-}`;
-const BASE_URL = `${BASE_SCHEME}data.dev.explore-education-statistics.service.gov.uk`;
+const BASE_URL = `https://data.dev.explore-education-statistics.service.gov.uk`;
 
 export const options = {
   vus: 60,

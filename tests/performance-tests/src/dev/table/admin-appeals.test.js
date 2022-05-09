@@ -7,10 +7,7 @@ import { Rate } from 'k6/metrics';
 const username = '';
 const password = '';
 
-const BASE_SCHEME = `https://${
-  username && password ? `${username}:${password}@` : ''
-}`;
-const BASE_URL = `${BASE_SCHEME}data.dev.explore-education-statistics.service.gov.uk`;
+const BASE_URL = `https://data.dev.explore-education-statistics.service.gov.uk`;
 
 export const options = {
   noConnectionReuse: true,
