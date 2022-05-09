@@ -29,6 +29,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseContentProvider value={testValue}>
         <ReleaseEditableBlock
+          publicationId="publication-1"
           releaseId="release-1"
           sectionId="section-1"
           block={testHtmlBlock}
@@ -61,6 +62,7 @@ describe('ReleaseEditableBlock', () => {
     render(
       <ReleaseContentProvider value={testValue}>
         <ReleaseEditableBlock
+          publicationId="publication-1"
           releaseId="release-1"
           sectionId="section-1"
           block={{

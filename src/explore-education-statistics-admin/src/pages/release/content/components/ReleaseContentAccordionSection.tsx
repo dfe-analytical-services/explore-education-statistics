@@ -183,6 +183,7 @@ const ReleaseContentAccordionSection = ({
                 block={block}
                 sectionId={sectionId}
                 editable={!isReordering}
+                publicationId={release.publication.id}
                 releaseId={release.id}
                 visible={open}
                 onSave={updateBlock}
