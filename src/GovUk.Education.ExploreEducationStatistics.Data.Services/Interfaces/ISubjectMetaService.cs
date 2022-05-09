@@ -14,9 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces
 {
     public interface ISubjectMetaService
     {
+        Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, Guid subjectId);
+
         Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(ReleaseSubject releaseSubject);
 
-        Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(ReleaseSubject releaseSubject,
+        Task<Either<ActionResult, SubjectMetaViewModel>> FilterSubjectMeta(Guid? releaseId,
             ObservationQueryContext query,
             CancellationToken cancellationToken);
 

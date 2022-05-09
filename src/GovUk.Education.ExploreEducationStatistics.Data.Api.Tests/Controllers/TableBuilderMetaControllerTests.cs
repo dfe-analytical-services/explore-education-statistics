@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetSubjectMeta_ReleaseSubjectNotFoundForLatestRelease()
+        public async Task GetSubjectMeta_LatestRelease_ReleaseSubjectNotFound()
         {
             var (controller, mocks) = BuildControllerAndMocks();
 
@@ -147,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetSubjectMeta_ReleaseSubjectNotFoundForSpecificRelease()
+        public async Task GetSubjectMeta_SpecificRelease_ReleaseSubjectNotFound()
         {
             var (controller, mocks) = BuildControllerAndMocks();
 
@@ -167,23 +167,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task FilterSubjectMeta_LatestRelease()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                ReleaseId = ReleaseId,
-                SubjectId = SubjectId
-            };
-
             var subjectMetaViewModel = new SubjectMetaViewModel();
             var cancellationToken = new CancellationTokenSource().Token;
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            mocks.releaseSubjectRepository
-                .Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(SubjectId))
-                .ReturnsAsync(releaseSubject);
-
             mocks.subjectMetaService
-                .Setup(s => s.FilterSubjectMeta(releaseSubject, QueryContext, cancellationToken))
+                .Setup(s => s.FilterSubjectMeta(null, QueryContext, cancellationToken))
                 .ReturnsAsync(subjectMetaViewModel);
 
             var result = await controller.FilterSubjectMeta(QueryContext, cancellationToken);
@@ -195,64 +185,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task FilterSubjectMeta_SpecificRelease()
         {
-            var releaseSubject = new ReleaseSubject
-            {
-                ReleaseId = ReleaseId,
-                SubjectId = SubjectId
-            };
-
             var subjectMetaViewModel = new SubjectMetaViewModel();
             var cancellationToken = new CancellationTokenSource().Token;
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            SetupCall(mocks.statisticsPersistenceHelper, releaseSubject);
-
             mocks.subjectMetaService
-                .Setup(s => s.FilterSubjectMeta(releaseSubject, QueryContext, cancellationToken))
+                .Setup(s => s.FilterSubjectMeta(ReleaseId, QueryContext, cancellationToken))
                 .ReturnsAsync(subjectMetaViewModel);
 
             var result = await controller.FilterSubjectMeta(ReleaseId, QueryContext, cancellationToken);
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(subjectMetaViewModel);
-        }
-
-        [Fact]
-        public async Task FilterSubjectMeta_ReleaseSubjectNotFoundForLatestRelease()
-        {
-            var cancellationToken = new CancellationTokenSource().Token;
-
-            var (controller, mocks) = BuildControllerAndMocks();
-
-            mocks.releaseSubjectRepository
-                .Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(SubjectId))
-                .ReturnsAsync((ReleaseSubject?) null);
-
-            var result = await controller.FilterSubjectMeta(QueryContext, cancellationToken);
-            VerifyAllMocks(mocks);
-
-            result.AssertNotFoundResult();
-        }
-
-        [Fact]
-        public async Task FilterSubjectMeta_ReleaseSubjectNotFoundForSpecificRelease()
-        {
-            var cancellationToken = new CancellationTokenSource().Token;
-
-            var (controller, mocks) = BuildControllerAndMocks();
-
-            mocks.statisticsPersistenceHelper
-                .Setup(mock => mock.CheckEntityExists(
-                        It.IsAny<Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>>()
-                    )
-                )
-                .ReturnsAsync(new NotFoundResult());
-
-            var result = await controller.FilterSubjectMeta(ReleaseId, QueryContext, cancellationToken);
-            VerifyAllMocks(mocks);
-
-            result.AssertNotFoundResult();
         }
 
         private static SubjectMetaCacheKey GetCacheKey(Content.Model.Release release, ReleaseSubject releaseSubject)

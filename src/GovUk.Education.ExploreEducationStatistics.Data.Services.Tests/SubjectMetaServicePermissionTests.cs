@@ -22,17 +22,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
 public class SubjectMetaServicePermissionTests
 {
-    private readonly ReleaseSubject _releaseSubject = new()
+    private static readonly Guid ReleaseId = Guid.NewGuid();
+    private static readonly Guid SubjectId = Guid.NewGuid();
+
+    private static readonly ReleaseSubject ReleaseSubject = new()
     {
-        ReleaseId = Guid.NewGuid(),
-        SubjectId = Guid.NewGuid()
+        ReleaseId = ReleaseId,
+        SubjectId = SubjectId
     };
 
     [Fact]
     public async Task GetSubjectMeta()
     {
         await PolicyCheckBuilder<DataSecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseSubject, DataSecurityPolicies.CanViewSubjectData)
+            .SetupResourceCheckToFail(ReleaseSubject, DataSecurityPolicies.CanViewSubjectData)
             .AssertForbidden(
                 async userService =>
                 {
@@ -40,7 +43,24 @@ public class SubjectMetaServicePermissionTests
                         userService: userService.Object
                     );
 
-                    return await service.GetSubjectMeta(_releaseSubject);
+                    return await service.GetSubjectMeta(releaseId: ReleaseId, subjectId: SubjectId);
+                }
+            );
+    }
+
+    [Fact]
+    public async Task GetSubjectMeta_WithReleaseSubject()
+    {
+        await PolicyCheckBuilder<DataSecurityPolicies>()
+            .SetupResourceCheckToFail(ReleaseSubject, DataSecurityPolicies.CanViewSubjectData)
+            .AssertForbidden(
+                async userService =>
+                {
+                    var service = SetupSubjectMetaService(
+                        userService: userService.Object
+                    );
+
+                    return await service.GetSubjectMeta(ReleaseSubject);
                 }
             );
     }
@@ -49,13 +69,13 @@ public class SubjectMetaServicePermissionTests
     public async Task FilterSubjectMeta()
     {
         await PolicyCheckBuilder<DataSecurityPolicies>()
-            .SetupResourceCheckToFail(_releaseSubject, DataSecurityPolicies.CanViewSubjectData)
+            .SetupResourceCheckToFail(ReleaseSubject, DataSecurityPolicies.CanViewSubjectData)
             .AssertForbidden(
                 async userService =>
                 {
                     var query = new ObservationQueryContext
                     {
-                        SubjectId = _releaseSubject.SubjectId
+                        SubjectId = SubjectId
                     };
 
                     var cancellationToken = new CancellationTokenSource().Token;
@@ -64,12 +84,42 @@ public class SubjectMetaServicePermissionTests
                         userService: userService.Object
                     );
 
-                    return await service.FilterSubjectMeta(_releaseSubject, query, cancellationToken);
+                    return await service.FilterSubjectMeta(ReleaseId, query, cancellationToken);
                 }
             );
     }
 
-    private SubjectMetaService SetupSubjectMetaService(
+    [Fact]
+    public async Task FilterSubjectMeta_LatestRelease()
+    {
+        await PolicyCheckBuilder<DataSecurityPolicies>()
+            .SetupResourceCheckToFail(ReleaseSubject, DataSecurityPolicies.CanViewSubjectData)
+            .AssertForbidden(
+                async userService =>
+                {
+                    var query = new ObservationQueryContext
+                    {
+                        SubjectId = SubjectId
+                    };
+
+                    var cancellationToken = new CancellationTokenSource().Token;
+
+                    var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
+
+                    releaseSubjectRepository.Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(SubjectId))
+                        .ReturnsAsync(ReleaseSubject);
+
+                    var service = SetupSubjectMetaService(
+                        releaseSubjectRepository: releaseSubjectRepository.Object,
+                        userService: userService.Object
+                    );
+
+                    return await service.FilterSubjectMeta(null, query, cancellationToken);
+                }
+            );
+    }
+
+    private static SubjectMetaService SetupSubjectMetaService(
         StatisticsDbContext? statisticsDbContext = null,
         IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
         IFilterRepository? filterRepository = null,
@@ -77,6 +127,7 @@ public class SubjectMetaServicePermissionTests
         IIndicatorGroupRepository? indicatorGroupRepository = null,
         ILocationRepository? locationRepository = null,
         IObservationService? observationService = null,
+        IReleaseSubjectRepository? releaseSubjectRepository = null,
         ITimePeriodService? timePeriodService = null,
         IUserService? userService = null,
         IOptions<LocationsOptions>? options = null)
@@ -90,6 +141,7 @@ public class SubjectMetaServicePermissionTests
             locationRepository ?? Mock.Of<ILocationRepository>(Strict),
             Mock.Of<ILogger<SubjectMetaService>>(),
             observationService ?? Mock.Of<IObservationService>(Strict),
+            releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
             timePeriodService ?? Mock.Of<ITimePeriodService>(Strict),
             userService ?? Mock.Of<IUserService>(),
             options ?? DefaultLocationOptions()
@@ -101,8 +153,8 @@ public class SubjectMetaServicePermissionTests
         return Options.Create(new LocationsOptions());
     }
 
-    private Mock<IPersistenceHelper<StatisticsDbContext>> DefaultPersistenceHelperMock()
+    private static Mock<IPersistenceHelper<StatisticsDbContext>> DefaultPersistenceHelperMock()
     {
-        return MockUtils.MockPersistenceHelper<StatisticsDbContext, ReleaseSubject>(_releaseSubject);
+        return MockUtils.MockPersistenceHelper<StatisticsDbContext, ReleaseSubject>(ReleaseSubject);
     }
 }

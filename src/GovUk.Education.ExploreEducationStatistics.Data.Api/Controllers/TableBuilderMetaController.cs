@@ -81,9 +81,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken)
         {
-            return CheckReleaseSubjectExists(query.SubjectId)
-                .OnSuccess(releaseSubject =>
-                    _subjectMetaService.FilterSubjectMeta(releaseSubject, query, cancellationToken))
+            return _subjectMetaService.FilterSubjectMeta(null, query, cancellationToken)
                 .HandleFailuresOrOk();
         }
 
@@ -93,9 +91,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken)
         {
-            return CheckReleaseSubjectExists(query.SubjectId, releaseId)
-                .OnSuccess(releaseSubject =>
-                    _subjectMetaService.FilterSubjectMeta(releaseSubject, query, cancellationToken))
+            return _subjectMetaService.FilterSubjectMeta(releaseId, query, cancellationToken)
                 .HandleFailuresOrOk();
         }
 
