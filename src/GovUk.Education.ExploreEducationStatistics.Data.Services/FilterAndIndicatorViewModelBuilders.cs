@@ -152,7 +152,7 @@ public class FilterAndIndicatorViewModelBuilders
 
     private static bool IsLabelTotal<T>(T input, Func<T, string> labelSelector)
     {
-        return labelSelector(input).Equals("Total", StringComparison.InvariantCultureIgnoreCase);
+        return labelSelector(input).Equals("Total", StringComparison.OrdinalIgnoreCase);
     }
 
     private static IEnumerable<Ordered<TValue, TSequence>> OrderByLabel<TValue, TSequence>(

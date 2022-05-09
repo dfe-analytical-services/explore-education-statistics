@@ -9,7 +9,7 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Services.FilterAndI
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
-public class FiltersBuilderTests
+public class FiltersViewModelBuilderTests
 {
     [Fact]
     public void GetFiltersFromFilterItems_NoFilterItems()
@@ -660,10 +660,10 @@ public class FiltersBuilderTests
         // - Filter c
         // - Filter a
         //   - Group c
+        //   - Group a
         //     - Item c
         //     - Item a
         //     - Item b
-        //   - Group a
         //   - Group b
         // - Filter b
         var ordering = new List<FilterSequenceEntry>

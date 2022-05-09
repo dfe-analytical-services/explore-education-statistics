@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
@@ -37,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IFilterRepository _filterRepository;
         private readonly IIndicatorRepository _indicatorRepository;
+        private readonly IIndicatorGroupRepository _indicatorGroupRepository;
         private readonly ILocationRepository _locationRepository;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IReleaseService _releaseService;
@@ -52,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             StatisticsDbContext statisticsDbContext,
             IFilterRepository filterRepository,
             IIndicatorRepository indicatorRepository,
+            IIndicatorGroupRepository indicatorGroupRepository,
             ILocationRepository locationRepository,
             IFootnoteRepository footnoteRepository,
             IReleaseService releaseService,
@@ -65,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _statisticsDbContext = statisticsDbContext;
             _filterRepository = filterRepository;
             _indicatorRepository = indicatorRepository;
+            _indicatorGroupRepository = indicatorGroupRepository;
             _locationRepository = locationRepository;
             _footnoteRepository = footnoteRepository;
             _releaseService = releaseService;
@@ -113,28 +117,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid replacementFileId)
         {
             return await GetReplacementPlan(releaseId, originalFileId, replacementFileId)
-                .OnSuccess(async replacementPlan =>
+                .OnSuccess(async plan =>
                 {
-                    if (!replacementPlan.Valid)
+                    if (!plan.Valid)
                     {
                         return ValidationActionResult(ReplacementMustBeValid);
                     }
 
-                    await replacementPlan.DataBlocks
+                    var originalSubjectId = plan.OriginalSubjectId;
+                    var replacementSubjectId = plan.ReplacementSubjectId;
+
+                    await plan.DataBlocks
                         .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(plan =>
-                            InvalidateDataBlockCachedResults(plan, releaseId));
-                    await replacementPlan.DataBlocks
+                        .ForEachAwaitAsync(async dataBlockPlan =>
+                        {
+                            await InvalidateDataBlockCachedResults(dataBlockPlan, releaseId);
+                            await ReplaceLinksForDataBlock(dataBlockPlan, replacementSubjectId);
+                        });
+
+                    await plan.Footnotes
                         .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(plan =>
-                            ReplaceLinksForDataBlock(plan, replacementPlan.ReplacementSubjectId));
-                    await replacementPlan.Footnotes
-                        .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(plan =>
-                            ReplaceLinksForFootnote(plan, replacementPlan.OriginalSubjectId,
-                                replacementPlan.ReplacementSubjectId));
-                    await ReplaceDataGuidance(releaseId, replacementPlan.OriginalSubjectId,
-                        replacementPlan.ReplacementSubjectId);
+                        .ForEachAwaitAsync(footnotePlan =>
+                            ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId));
+
+                    await ReplaceReleaseSubject(releaseId, originalSubjectId, replacementSubjectId);
 
                     await _contentDbContext.SaveChangesAsync();
                     await _statisticsDbContext.SaveChangesAsync();
@@ -169,7 +175,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToDictionary(filter => filter.Name, filter => filter);
 
             var indicators = _indicatorRepository.GetIndicators(subjectId)
-                .ToDictionary(filterItem => filterItem.Name, filterItem => filterItem);
+                .ToDictionary(indicator => indicator.Name, indicator => indicator);
 
             var locations = await _locationRepository.GetDistinctForSubject(subjectId);
 
@@ -1002,25 +1008,261 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
         }
 
-        private async Task ReplaceDataGuidance(
-            Guid releaseId,
-            Guid originalSubject,
-            Guid replacementSubject)
+        private async Task ReplaceReleaseSubject(Guid releaseId,
+            Guid originalSubjectId,
+            Guid replacementSubjectId)
         {
             var originalReleaseSubject = await _statisticsDbContext.ReleaseSubject
-                .AsQueryable()
-                .Where(rs => rs.ReleaseId == releaseId &&
-                             rs.SubjectId == originalSubject)
-                .FirstAsync();
+                .SingleAsync(rs => rs.ReleaseId == releaseId &&
+                                   rs.SubjectId == originalSubjectId);
 
             var replacementReleaseSubject = await _statisticsDbContext.ReleaseSubject
-                .AsQueryable()
-                .Where(rs => rs.ReleaseId == releaseId &&
-                             rs.SubjectId == replacementSubject)
-                .FirstAsync();
+                .SingleAsync(rs => rs.ReleaseId == releaseId &&
+                                   rs.SubjectId == replacementSubjectId);
 
             _statisticsDbContext.Update(replacementReleaseSubject);
+
             replacementReleaseSubject.DataGuidance = originalReleaseSubject.DataGuidance;
+
+            replacementReleaseSubject.FilterSequence =
+                await ReplaceFilterSequence(originalReleaseSubject, replacementReleaseSubject);
+            replacementReleaseSubject.IndicatorSequence =
+                await ReplaceIndicatorSequence(originalReleaseSubject, replacementReleaseSubject);
+        }
+
+        private async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(ReleaseSubject originalReleaseSubject,
+            ReleaseSubject replacementReleaseSubject)
+        {
+            // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
+            if (originalReleaseSubject.FilterSequence == null)
+            {
+                return null;
+            }
+
+            var originalFilters = (await _filterRepository.GetFiltersIncludingItems(originalReleaseSubject.SubjectId))
+                .ToDictionary(filter => filter.Name, filter => filter);
+            var replacementFilters =
+                await _filterRepository.GetFiltersIncludingItems(replacementReleaseSubject.SubjectId);
+
+            // Step 1: Create id to replacement-id maps and work out newly added filters, filter groups and filter items
+
+            var filtersMap = new Dictionary<Guid, Guid>();
+            var filterGroupsMap = new Dictionary<Guid, Guid>();
+            var filterItemsMap = new Dictionary<Guid, Guid>();
+            var newlyAddedFilters = new List<Filter>();
+            var newlyAddedFilterGroups = new Dictionary<Guid, List<FilterGroup>>();
+            var newlyAddedFilterItems = new Dictionary<Guid, List<FilterItem>>();
+
+            replacementFilters.ForEach(replacementFilter =>
+            {
+                if (originalFilters.TryGetValue(replacementFilter.Name, out var originalFilter))
+                {
+                    filtersMap.Add(originalFilter.Id, replacementFilter.Id);
+                    var originalFilterGroups = originalFilter.FilterGroups.ToDictionary(fg => fg.Label);
+                    replacementFilter.FilterGroups.ForEach(replacementFilterGroup =>
+                    {
+                        if (originalFilterGroups.TryGetValue(replacementFilterGroup.Label, out var originalFilterGroup))
+                        {
+                            filterGroupsMap.Add(originalFilterGroup.Id, replacementFilterGroup.Id);
+                            var originalFilterItems = originalFilterGroup.FilterItems.ToDictionary(fi => fi.Label);
+                            replacementFilterGroup.FilterItems.ForEach(replacementFilterItem =>
+                            {
+                                if (originalFilterItems.TryGetValue(replacementFilterItem.Label,
+                                        out var originalFilterItem))
+                                {
+                                    filterItemsMap.Add(originalFilterItem.Id, replacementFilterItem.Id);
+                                }
+                                else
+                                {
+                                    if (newlyAddedFilterItems.TryGetValue(originalFilterGroup.Id,
+                                            out var newlyAddedFilterItemList))
+                                    {
+                                        newlyAddedFilterItemList.Add(replacementFilterItem);
+                                    }
+                                    else
+                                    {
+                                        newlyAddedFilterItems.Add(originalFilterGroup.Id,
+                                            ListOf(replacementFilterItem));
+                                    }
+                                }
+                            });
+                        }
+                        else
+                        {
+                            if (newlyAddedFilterGroups.TryGetValue(originalFilter.Id,
+                                    out var newlyAddedFilterGroupList))
+                            {
+                                newlyAddedFilterGroupList.Add(replacementFilterGroup);
+                            }
+                            else
+                            {
+                                newlyAddedFilterGroups.Add(originalFilter.Id, ListOf(replacementFilterGroup));
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    newlyAddedFilters.Add(replacementFilter);
+                }
+            });
+
+            // Step 2: Create a new sequence based on the original:
+            // - Remove any entries that don't exist in the replacement
+            // - Swap the remaining id's with their replacements
+            // - Append new entries that were added in the replacement
+
+            var filterSequence = originalReleaseSubject.FilterSequence
+                .Where(filter => filtersMap.ContainsKey(filter.Id))
+                .Select(filter =>
+                {
+                    var newFilterSequenceEntry = new FilterSequenceEntry(
+                        filtersMap[filter.Id],
+                        filter.ChildSequence
+                            .Where(filterGroup => filterGroupsMap.ContainsKey(filterGroup.Id))
+                            .Select(filterGroup =>
+                            {
+                                var newFilterGroupSequenceEntry = new FilterGroupSequenceEntry(
+                                    filterGroupsMap[filterGroup.Id],
+                                    filterGroup.ChildSequence
+                                        .Where(filterItem => filterItemsMap.ContainsKey(filterItem))
+                                        .Select(filterItem => filterItemsMap[filterItem])
+                                        .ToList());
+
+                                if (newlyAddedFilterItems.TryGetValue(filterGroup.Id, out var newlyAddedFilterItemList))
+                                {
+                                    newFilterGroupSequenceEntry.ChildSequence.AddRange(
+                                        newlyAddedFilterItemList
+                                            .OrderBy(fi => !IsTotal(fi.Label))
+                                            .ThenBy(fi => fi.Label, LabelComparer)
+                                            .Select(fi => fi.Id));
+                                }
+
+                                return newFilterGroupSequenceEntry;
+                            }).ToList());
+
+                    if (newlyAddedFilterGroups.TryGetValue(filter.Id, out var newlyAddedFilterGroupList))
+                    {
+                        newFilterSequenceEntry.ChildSequence.AddRange(newlyAddedFilterGroupList
+                            .OrderBy(fg => !IsTotal(fg.Label))
+                            .ThenBy(fg => fg.Label, LabelComparer)
+                            .Select(fg => new FilterGroupSequenceEntry(fg.Id,
+                                fg.FilterItems
+                                    .OrderBy(fi => !IsTotal(fi.Label))
+                                    .ThenBy(fi => fi.Label, LabelComparer)
+                                    .Select(fi => fi.Id).ToList()))
+                        );
+                    }
+
+                    return newFilterSequenceEntry;
+                }).ToList();
+
+            filterSequence.AddRange(newlyAddedFilters
+                .OrderBy(f => f.Label, LabelComparer)
+                .Select(f => new FilterSequenceEntry(f.Id,
+                    f.FilterGroups
+                        .OrderBy(fg => !IsTotal(fg.Label))
+                        .ThenBy(fg => fg.Label, LabelComparer)
+                        .Select(fg =>
+                            new FilterGroupSequenceEntry(fg.Id, fg.FilterItems
+                                .OrderBy(fi => !IsTotal(fi.Label))
+                                .ThenBy(fi => fi.Label, LabelComparer)
+                                .Select(fi => fi.Id).ToList())).ToList())));
+
+            return filterSequence;
+        }
+
+        private async Task<List<IndicatorGroupSequenceEntry>?> ReplaceIndicatorSequence(
+            ReleaseSubject originalReleaseSubject,
+            ReleaseSubject replacementReleaseSubject)
+        {
+            // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
+            if (originalReleaseSubject.IndicatorSequence == null)
+            {
+                return null;
+            }
+
+            var originalIndicatorGroups =
+                (await _indicatorGroupRepository.GetIndicatorGroups(originalReleaseSubject.SubjectId))
+                .ToDictionary(indicatorGroup => indicatorGroup.Label, indicatorGroup => indicatorGroup);
+            var replacementIndicatorGroups =
+                await _indicatorGroupRepository.GetIndicatorGroups(replacementReleaseSubject.SubjectId);
+
+            // Step 1: Create id to replacement-id maps and work out newly added indicator groups and indicators
+
+            var indicatorGroupsMap = new Dictionary<Guid, Guid>();
+            var indicatorsMap = new Dictionary<Guid, Guid>();
+            var newlyAddedIndicatorGroups = new List<IndicatorGroup>();
+            var newlyAddedIndicators = new Dictionary<Guid, List<Indicator>>();
+
+            replacementIndicatorGroups.ForEach(replacementIndicatorGroup =>
+            {
+                if (originalIndicatorGroups.TryGetValue(replacementIndicatorGroup.Label,
+                        out var originalIndicatorGroup))
+                {
+                    indicatorGroupsMap.Add(originalIndicatorGroup.Id, replacementIndicatorGroup.Id);
+                    var originalIndicators = originalIndicatorGroup.Indicators.ToDictionary(i => i.Name);
+                    replacementIndicatorGroup.Indicators.ForEach(replacementIndicator =>
+                    {
+                        if (originalIndicators.TryGetValue(replacementIndicator.Name, out var originalIndicator))
+                        {
+                            indicatorsMap.Add(originalIndicator.Id, replacementIndicator.Id);
+                        }
+                        else
+                        {
+                            if (newlyAddedIndicators.TryGetValue(originalIndicatorGroup.Id,
+                                    out var newlyAddedIndicatorList))
+                            {
+                                newlyAddedIndicatorList.Add(replacementIndicator);
+                            }
+                            else
+                            {
+                                newlyAddedIndicators.Add(originalIndicatorGroup.Id, ListOf(replacementIndicator));
+                            }
+                        }
+                    });
+                }
+                else
+                {
+                    newlyAddedIndicatorGroups.Add(replacementIndicatorGroup);
+                }
+            });
+
+            // Step 2: Create a new sequence based on the original:
+            // - Remove any entries that don't exist in the replacement
+            // - Swap the remaining id's with their replacements
+            // - Append new entries that were added in the replacement
+
+            var indicatorSequence = originalReleaseSubject.IndicatorSequence
+                .Where(indicatorGroup => indicatorGroupsMap.ContainsKey(indicatorGroup.Id))
+                .Select(indicatorGroup =>
+                {
+                    var newIndicatorGroupSequenceEntry = new IndicatorGroupSequenceEntry(
+                        indicatorGroupsMap[indicatorGroup.Id],
+                        indicatorGroup.ChildSequence
+                            .Where(indicator => indicatorsMap.ContainsKey(indicator))
+                            .Select(indicator => indicatorsMap[indicator])
+                            .ToList());
+
+                    if (newlyAddedIndicators.TryGetValue(indicatorGroup.Id, out var newlyAddedIndicatorList))
+                    {
+                        newIndicatorGroupSequenceEntry.ChildSequence.AddRange(
+                            newlyAddedIndicatorList
+                                .OrderBy(i => i.Label, LabelComparer)
+                                .Select(i => i.Id));
+                    }
+
+                    return newIndicatorGroupSequenceEntry;
+                }).ToList();
+
+            indicatorSequence.AddRange(newlyAddedIndicatorGroups
+                .OrderBy(ig => ig.Label, LabelComparer)
+                .Select(ig => new IndicatorGroupSequenceEntry(ig.Id,
+                    ig.Indicators
+                        .OrderBy(i => i.Label, LabelComparer)
+                        .Select(i => i.Id).ToList())));
+
+            return indicatorSequence;
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(
@@ -1061,6 +1303,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return _cacheKeyService
                 .CreateCacheKeyForDataBlock(releaseId, plan.Id)
                 .OnSuccessVoid(_cacheService.DeleteItem);
+        }
+
+        private static bool IsTotal(string input)
+        {
+            return input.Equals("Total", StringComparison.OrdinalIgnoreCase);
         }
 
         private static Guid ReplacementPlanOriginalId(TargetableReplacementViewModel plan)
