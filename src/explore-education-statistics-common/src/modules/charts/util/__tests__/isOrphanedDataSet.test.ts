@@ -13,6 +13,7 @@ describe('isOrphanedDataSet', () => {
           legend: 'Characteristic',
           options: {
             EthnicGroupMajor: {
+              id: 'ethnic-group-major',
               label: 'Ethnic group major',
               options: [
                 {
@@ -28,6 +29,7 @@ describe('isOrphanedDataSet', () => {
                   value: 'ethnicity-major-black-total',
                 },
               ],
+              order: 0,
             },
           },
           name: 'characteristic',
@@ -38,6 +40,7 @@ describe('isOrphanedDataSet', () => {
           legend: 'School type',
           options: {
             Default: {
+              id: 'default',
               label: 'Default',
               options: [
                 {
@@ -49,6 +52,7 @@ describe('isOrphanedDataSet', () => {
                   value: 'state-funded-primary',
                 },
               ],
+              order: 1,
             },
           },
           name: 'school_type',

@@ -47,7 +47,10 @@ export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async 
   const [subjects, featuredTables, subjectMeta] = await Promise.all([
     tableBuilderService.listReleaseSubjects(fastTrack.releaseId),
     tableBuilderService.listReleaseFeaturedTables(fastTrack.releaseId),
-    tableBuilderService.getSubjectMeta(fastTrack.query.subjectId),
+    tableBuilderService.getSubjectMeta(
+      fastTrack.query.subjectId,
+      fastTrack.releaseId,
+    ),
   ]);
 
   return {

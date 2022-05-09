@@ -1,77 +1,12 @@
 #nullable enable
 using System.Collections.Generic;
 using System.Linq;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public abstract class AbstractSubjectMetaService
     {
-        protected readonly IFilterItemRepository _filterItemRepository;
-        protected static IComparer<string> LabelComparer { get; } = new LabelRelationalComparer();
-
-        protected AbstractSubjectMetaService(IFilterItemRepository filterItemRepository)
-        {
-            _filterItemRepository = filterItemRepository;
-        }
-
-        protected Dictionary<string, FilterMetaViewModel> BuildFilterHierarchy(IEnumerable<FilterItem> filterItems)
-        {
-            return filterItems
-                .GroupBy(item => item.FilterGroup.Filter, item => item, Filter.IdComparer)
-                .ToDictionary(
-                    itemsGroupedByFilter => itemsGroupedByFilter.Key.Label.PascalCase(),
-                    itemsGroupedByFilter => new FilterMetaViewModel
-                    {
-                        Hint = itemsGroupedByFilter.Key.Hint,
-                        Legend = itemsGroupedByFilter.Key.Label,
-                        Name = itemsGroupedByFilter.Key.Name,
-                        Options = itemsGroupedByFilter
-                            .GroupBy(item => item.FilterGroup, item => item, FilterGroup.IdComparer)
-                            .OrderBy(items => items.Key.Label.ToLower() != "total")
-                            .ThenBy(items => items.Key.Label, LabelComparer)
-                            .ToDictionary(
-                                itemsGroupedByFilterGroup => itemsGroupedByFilterGroup.Key.Label.PascalCase(),
-                                itemsGroupedByFilterGroup => 
-                                    BuildFilterItemsViewModel(itemsGroupedByFilterGroup.Key, itemsGroupedByFilterGroup)
-                            ),
-                        TotalValue = GetTotalValue(itemsGroupedByFilter)
-                    });
-        }
-
-        protected static List<IndicatorMetaViewModel> BuildIndicatorViewModels(IEnumerable<Indicator> indicators)
-        {
-            return indicators
-                .OrderBy(indicator => indicator.Label, LabelComparer)
-                .Select(indicator => new IndicatorMetaViewModel
-                {
-                    Label = indicator.Label,
-                    Name = indicator.Name,
-                    Unit = indicator.Unit.GetEnumValue(),
-                    Value = indicator.Id.ToString(),
-                    DecimalPlaces = indicator.DecimalPlaces
-                })
-                .ToList();
-        }
-
-        protected static FilterItemsMetaViewModel BuildFilterItemsViewModel(FilterGroup filterGroup,
-            IEnumerable<FilterItem> filterItems)
-        {
-            return new()
-            {
-                Label = filterGroup.Label,
-                Options = filterItems
-                    .OrderBy(item => item.Label.ToLower() != "total")
-                    .ThenBy(item => item.Label, LabelComparer)
-                    .Select(item => new LabelValue(item.Label, item.Id.ToString()))
-                    .ToList()
-            };
-        }
-
         protected static IEnumerable<LocationAttributeViewModel> DeduplicateLocationViewModels(
             IEnumerable<LocationAttributeViewModel> viewModels)
         {
@@ -122,11 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                 return value;
             });
-        }
-
-        private string GetTotalValue(IEnumerable<FilterItem> filterItems)
-        {
-            return _filterItemRepository.GetTotal(filterItems)?.Id.ToString() ?? string.Empty;
         }
     }
 }

@@ -1,9 +1,13 @@
 import {
-  testData1,
-  testData2,
-  testData3,
+  testData1Table,
+  testData1TableHeadersConfig,
+  testData2Table,
+  testData2TableHeadersConfig,
+  testData3Table,
+  testData3TableHeadersConfig,
   testDataFiltersWithNoResults,
-  testDataNoFilters,
+  testDataNoFiltersTable,
+  testDataNoFiltersTableHeadersConfig,
 } from '@common/modules/table-tool/components/__tests__/__data__/TimePeriodDataTable.data';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { UnmappedTableHeadersConfig } from '@common/services/permalinkService';
@@ -27,13 +31,13 @@ import { TableHeadersConfig } from '../../types/tableHeaders';
 
 describe('TimePeriodDataTable', () => {
   test('renders table with two of every option', () => {
-    const fullTable = mapFullTable(testData1.fullTable);
+    const fullTable = mapFullTable(testData1Table);
 
     render(
       <TimePeriodDataTable
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
-          testData1.tableHeadersConfig,
+          testData1TableHeadersConfig,
           fullTable,
         )}
       />,
@@ -61,13 +65,13 @@ describe('TimePeriodDataTable', () => {
   });
 
   test('renders title without indicator when there is more than one', () => {
-    const fullTable = mapFullTable(testData1.fullTable);
+    const fullTable = mapFullTable(testData1Table);
 
     render(
       <TimePeriodDataTable
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
-          testData1.tableHeadersConfig,
+          testData1TableHeadersConfig,
           fullTable,
         )}
       />,
@@ -81,13 +85,13 @@ describe('TimePeriodDataTable', () => {
   });
 
   test('renders table without indicators when there is only one', () => {
-    const fullTable = mapFullTable(testData2.fullTable);
+    const fullTable = mapFullTable(testData2Table);
 
     render(
       <TimePeriodDataTable
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
-          testData2.tableHeadersConfig,
+          testData2TableHeadersConfig,
           fullTable,
         )}
       />,
@@ -115,13 +119,13 @@ describe('TimePeriodDataTable', () => {
   });
 
   test('renders title with indicator when there is only one', () => {
-    const fullTable = mapFullTable(testData2.fullTable);
+    const fullTable = mapFullTable(testData2Table);
 
     render(
       <TimePeriodDataTable
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
-          testData2.tableHeadersConfig,
+          testData2TableHeadersConfig,
           fullTable,
         )}
       />,
@@ -135,13 +139,13 @@ describe('TimePeriodDataTable', () => {
   });
 
   test('renders table without time period when there is only one', () => {
-    const fullTable = mapFullTable(testData3.fullTable);
+    const fullTable = mapFullTable(testData3Table);
 
     render(
       <TimePeriodDataTable
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
-          testData3.tableHeadersConfig,
+          testData3TableHeadersConfig,
           fullTable,
         )}
       />,
@@ -169,13 +173,13 @@ describe('TimePeriodDataTable', () => {
   });
 
   test('renders title with time period when there is only one', () => {
-    const fullTable = mapFullTable(testData3.fullTable);
+    const fullTable = mapFullTable(testData3Table);
 
     render(
       <TimePeriodDataTable
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
-          testData3.tableHeadersConfig,
+          testData3TableHeadersConfig,
           fullTable,
         )}
       />,
@@ -189,13 +193,13 @@ describe('TimePeriodDataTable', () => {
   });
 
   test('renders table with no filters', () => {
-    const fullTable = mapFullTable(testDataNoFilters.fullTable);
+    const fullTable = mapFullTable(testDataNoFiltersTable);
 
     render(
       <TimePeriodDataTable
         fullTable={fullTable}
         tableHeadersConfig={mapTableHeadersConfig(
-          testDataNoFilters.tableHeadersConfig,
+          testDataNoFiltersTableHeadersConfig,
           fullTable,
         )}
       />,
@@ -233,6 +237,7 @@ describe('TimePeriodDataTable', () => {
             name: 'characteristic',
             options: {
               EthnicGroupMajor: {
+                id: 'ethnic-group-major',
                 label: 'Ethnic group major',
                 options: [
                   {
@@ -240,6 +245,7 @@ describe('TimePeriodDataTable', () => {
                     value: '598ed9fd-b37e-4e08-baec-08d78f6f2c4d',
                   },
                 ],
+                order: 0,
               },
             },
           },
@@ -909,7 +915,7 @@ describe('TimePeriodDataTable', () => {
   });
 
   test('renders table with completely empty rows removed', () => {
-    const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
+    const fullTable = mapFullTable(testDataFiltersWithNoResults);
 
     const tableHeadersConfig: UnmappedTableHeadersConfig = {
       columnGroups: [
@@ -993,7 +999,7 @@ describe('TimePeriodDataTable', () => {
   });
 
   test('renders table with completely empty columns removed', () => {
-    const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
+    const fullTable = mapFullTable(testDataFiltersWithNoResults);
 
     const tableHeadersConfig: UnmappedTableHeadersConfig = {
       columnGroups: [
@@ -1077,7 +1083,7 @@ describe('TimePeriodDataTable', () => {
   });
 
   test('renders table correctly with no `dataBlockId` ', () => {
-    const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
+    const fullTable = mapFullTable(testDataFiltersWithNoResults);
 
     const tableHeadersConfig: UnmappedTableHeadersConfig = {
       columnGroups: [
@@ -1149,7 +1155,7 @@ describe('TimePeriodDataTable', () => {
   });
 
   test('renders table & caption correctly with `dataBlockId`', () => {
-    const fullTable = mapFullTable(testDataFiltersWithNoResults.fullTable);
+    const fullTable = mapFullTable(testDataFiltersWithNoResults);
 
     const tableHeadersConfig: UnmappedTableHeadersConfig = {
       columnGroups: [

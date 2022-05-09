@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 
             return NotFound();
         }
-        
+
         [BlobCache(typeof(FastTrackResultsCacheKey))]
         private Task<Either<ActionResult, FastTrackViewModel>> GetAndCacheFastTrackAndResults(FastTrackResultsCacheKey cacheKey)
         {

@@ -58,9 +58,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Label")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<Guid>("SubjectId")
@@ -100,6 +102,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Label")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -134,6 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Label")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -202,9 +206,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Label")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Unit")
@@ -242,6 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Label")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid>("SubjectId")
@@ -527,8 +534,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Migrations
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime?>("Created")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("DataGuidance")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FilterSequence")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IndicatorSequence")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("Updated")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("ReleaseId", "SubjectId");
 

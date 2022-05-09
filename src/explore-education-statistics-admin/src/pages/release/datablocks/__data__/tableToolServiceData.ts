@@ -6,12 +6,14 @@ import {
 export const testSubjectMeta: SubjectMeta = {
   filters: {
     Characteristic: {
+      id: 'characteristic',
       totalValue: '',
       hint: 'Filter by pupil characteristic',
       legend: 'Characteristic',
       name: 'characteristic',
       options: {
         Gender: {
+          id: 'gender',
           label: 'Gender',
           options: [
             {
@@ -19,12 +21,15 @@ export const testSubjectMeta: SubjectMeta = {
               value: 'gender-female',
             },
           ],
+          order: 0,
         },
       },
+      order: 0,
     },
   },
   indicators: {
     AbsenceFields: {
+      id: 'absence',
       label: 'Absence fields',
       options: [
         {
@@ -35,6 +40,7 @@ export const testSubjectMeta: SubjectMeta = {
           decimalPlaces: 2,
         },
       ],
+      order: 0,
     },
   },
   locations: {
@@ -87,6 +93,7 @@ export const testTableData: TableDataResponse = {
         name: 'characteristic',
         options: {
           Gender: {
+            id: 'gender',
             label: 'Gender',
             options: [
               {
@@ -94,6 +101,7 @@ export const testTableData: TableDataResponse = {
                 value: 'gender-female',
               },
             ],
+            order: 0,
           },
         },
       },

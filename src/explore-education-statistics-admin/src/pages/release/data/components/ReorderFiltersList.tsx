@@ -9,116 +9,32 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import tableBuilderService, {
   Subject,
-  SubjectMeta,
 } from '@common/services/tableBuilderService';
 import orderBy from 'lodash/orderBy';
 import React, { useEffect, useState } from 'react';
 
-// EES-1243 - remove this when the backend is done
-const testSubjectMeta: SubjectMeta = {
-  filters: {
-    Category1: {
-      id: 'category-1-id',
-      legend: 'Category 1',
-      name: 'category-1',
-      options: {
-        Category1Group1: {
-          id: 'category-1-group-1-id',
-          label: 'Category 1 Group 1',
-          options: [
-            {
-              label: 'Category 1 Group 1 Item 1',
-              value: 'category-1-group-1-item-1',
-            },
-          ],
-          order: 1,
-        },
-        Category1Group2: {
-          id: 'category-1-group-2-id',
-          label: 'Category 1 Group 2',
-          options: [
-            {
-              label: 'Category 1 Group 2 Item 1',
-              value: 'category-1-group-2-item-1',
-            },
-            {
-              label: 'Category 1 Group 2 Item 2',
-              value: 'category-1-group-2-item-2',
-            },
-            {
-              label: 'Category 1 Group 2 Item 3',
-              value: 'category-1-group-2-item-3',
-            },
-          ],
-          order: 0,
-        },
-        Category1Group3: {
-          id: 'category-1-group-3-id',
-          label: 'Category 1 Group 3',
-          options: [
-            {
-              label: 'Category 1 Group 3 Item 1',
-              value: 'category-1-group-3-item-1',
-            },
-            {
-              label: 'Category 1 Group 3 Item 2',
-              value: 'category-1-group-3-item-2',
-            },
-          ],
-          order: 2,
-        },
-      },
-      order: 1,
-    },
-    Category2: {
-      id: 'category-2-id',
-      legend: 'Category 2',
-      name: 'category-2',
-      options: {
-        Category2Group1: {
-          id: 'category-2-group-1-id',
-          label: 'Category 2 Group 1',
-          options: [
-            {
-              label: 'Category 2 Group 1 Item 1',
-              value: 'category-2-group-1-item-1',
-            },
-            {
-              label: 'Category 2 Group 1 Item 2',
-              value: 'category-2-group-1-item-2',
-            },
-          ],
-          order: 0,
-        },
-      },
-      order: 0,
-    },
-  },
-  indicators: {},
-  locations: {},
-  timePeriod: {
-    hint: '',
-    legend: '',
-    options: [],
-  },
-};
-
 interface UpdatedFilter {
-  id?: string;
-  filterGroups: { id?: string; filterItems: string[] }[];
+  id: string;
+  filterGroups: { id: string; filterItems: string[] }[];
 }
 export type UpdateFiltersRequest = UpdatedFilter[];
 
 interface Props {
   subject: Subject;
+  releaseId: string;
   onCancel: () => void;
-  onSave: (requestFilters: UpdateFiltersRequest) => void;
+  onSave: (subjectId: string, requestFilters: UpdateFiltersRequest) => void;
 }
 
-const ReorderFiltersList = ({ subject, onCancel, onSave }: Props) => {
+const ReorderFiltersList = ({
+  releaseId,
+  subject,
+  onCancel,
+  onSave,
+}: Props) => {
   const { value: subjectMeta, isLoading } = useAsyncHandledRetry(
-    () => tableBuilderService.getSubjectMeta(subject.id),
-    [subject.id],
+    () => tableBuilderService.getSubjectMeta(subject.id, releaseId),
+    [subject.id, releaseId],
   );
 
   const [filters, setFilters] = useState<FormattedFilters[]>([]);
@@ -127,9 +43,7 @@ const ReorderFiltersList = ({ subject, onCancel, onSave }: Props) => {
     if (isLoading) {
       return;
     }
-    // EES-1243 - restore this line to use the real filters.
-    // const filtersMeta = subjectMeta?.filters || {};
-    const filtersMeta = testSubjectMeta.filters;
+    const filtersMeta = subjectMeta?.filters || {};
 
     // Transforming the filters to be nested arrays rather than keyed objects.
     // Order by the order fields.
@@ -210,7 +124,7 @@ const ReorderFiltersList = ({ subject, onCancel, onSave }: Props) => {
         }),
       };
     });
-    onSave(updateFiltersRequest);
+    onSave(subject.id, updateFiltersRequest);
   };
 
   return (

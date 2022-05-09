@@ -25,6 +25,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 using static Newtonsoft.Json.JsonConvert;
+using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
 {
@@ -64,20 +65,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             Hint = "A hint",
                             Legend = "A legend",
                             Name = "A name",
-                            Options = new Dictionary<string, FilterItemsMetaViewModel>
+                            Options = new Dictionary<string, FilterGroupMetaViewModel>
                             {
                                 {
-                                    "option1", new FilterItemsMetaViewModel
+                                    "option1", new FilterGroupMetaViewModel
                                     {
                                         Label = "filter",
-                                        Options = new List<LabelValue>
+                                        Options = new List<FilterItemMetaViewModel>
                                         {
-                                            new("label", "value")
+                                            new("label", Guid.NewGuid())
                                         }
                                     }
                                 }
                             },
-                            TotalValue = "1234"
+                            TotalValue = Guid.NewGuid()
                         }
                     }
                 },
@@ -95,8 +96,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     {
                         Label = "A label",
                         Name = "A name",
-                        Unit = "cm",
-                        Value = "1234",
+                        Unit = Unit.Percent,
+                        Value = Guid.NewGuid(),
                         DecimalPlaces = 2
                     }
                 },
@@ -268,13 +269,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public void TableBuilderResultViewModel_SerialiseAndDeserialise()
+        public void TableBuilderResultViewModel_SerializeAndDeserialize()
         {
             var converted = DeserializeObject<TableBuilderResultViewModel>(SerializeObject(_tableBuilderResults));
             converted.AssertDeepEqualTo(_tableBuilderResults);
         }
 
-        private (TableBuilderController controller,
+        private static (TableBuilderController controller,
             (
             Mock<ITableBuilderService> tableBuilderService,
             Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,

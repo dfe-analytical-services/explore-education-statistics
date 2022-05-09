@@ -22,6 +22,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static Moq.MockBehavior;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
@@ -224,7 +225,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                     Body = "Text",
                                     Comments = new List<Comment>
                                     {
-                                        new Comment
+                                        new()
                                         {
                                             Id = Guid.NewGuid(),
                                             Content = "Inset Comment 1 Text"
@@ -333,7 +334,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid()
             };
 
-            using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 contentDbContext.Add(new Publication
                 {
@@ -355,7 +359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext.SaveChanges();
             }
 
-            using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
+            using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 statisticsDbContext.Release.Add(new Data.Model.Release
                 {
@@ -387,14 +391,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             Guid newReleaseId;
 
-            var footnoteService = new Mock<IFootnoteService>();
+            var footnoteService = new Mock<IFootnoteService>(Strict);
 
             footnoteService
                 .Setup(service => service.CopyFootnotes(releaseId, It.IsAny<Guid>()))
                 .ReturnsAsync(new Either<ActionResult, List<Footnote>>(new List<Footnote>()));
 
-            using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
-            using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
+            using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var releaseService = BuildReleaseService(
                     contentDbContext,
@@ -405,17 +409,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Method under test
                 var amendmentViewModel = releaseService.CreateReleaseAmendment(releaseId).Result.Right;
 
-                footnoteService.Verify(
-                    mock => mock.CopyFootnotes(releaseId, amendmentViewModel.Id), Times.Once);
-
-                footnoteService.VerifyNoOtherCalls();
+                MockUtils.VerifyAllMocks(footnoteService);
 
                 Assert.NotEqual(release.Id, amendmentViewModel.Id);
                 Assert.NotEqual(Guid.Empty, amendmentViewModel.Id);
                 newReleaseId = amendmentViewModel.Id;
             }
 
-            using (var contentDbContext = InMemoryApplicationDbContext("CreateReleaseAmendment"))
+            using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var amendment = contentDbContext
                     .Releases
@@ -531,7 +532,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(amendment.Amendment);
             }
 
-            using (var statisticsDbContext = InMemoryStatisticsDbContext("CreateReleaseAmendment"))
+            using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var releaseSubjectLinks = statisticsDbContext
                     .ReleaseSubject
@@ -656,23 +657,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IReleaseSubjectRepository? releaseSubjectRepository = null,
             IGuidGenerator? guidGenerator = null)
         {
-            return new(
+            return new ReleaseService(
                 contentDbContext,
                 AdminMapper(),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userService ?? UserServiceMock().Object,
-                repository ?? Mock.Of<IReleaseRepository>(),
-                releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(),
-                subjectRepository ?? Mock.Of<ISubjectRepository>(),
-                releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(),
-                releaseFileService ?? Mock.Of<IReleaseFileService>(),
-                dataImportService ?? Mock.Of<IDataImportService>(),
-                footnoteService ?? Mock.Of<IFootnoteService>(),
+                repository ?? Mock.Of<IReleaseRepository>(Strict),
+                releaseFileRepository ?? Mock.Of<IReleaseFileRepository>(Strict),
+                subjectRepository ?? Mock.Of<ISubjectRepository>(Strict),
+                releaseDataFileService ?? Mock.Of<IReleaseDataFileService>(Strict),
+                releaseFileService ?? Mock.Of<IReleaseFileService>(Strict),
+                dataImportService ?? Mock.Of<IDataImportService>(Strict),
+                footnoteService ?? Mock.Of<IFootnoteService>(Strict),
                 statisticsDbContext,
-                dataBlockService ?? Mock.Of<IDataBlockService>(),
-                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(),
+                dataBlockService ?? Mock.Of<IDataBlockService>(Strict),
+                releaseSubjectRepository ?? Mock.Of<IReleaseSubjectRepository>(Strict),
                 guidGenerator ?? new SequentialGuidGenerator(),
-                Mock.Of<IBlobCacheService>()
+                Mock.Of<IBlobCacheService>(Strict)
             );
         }
     }

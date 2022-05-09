@@ -60,6 +60,7 @@ describe('ChartDataSetsConfiguration', () => {
         name: 'characteristic',
         options: {
           gender: {
+            id: 'gender',
             label: 'Gender',
             options: [
               {
@@ -71,6 +72,7 @@ describe('ChartDataSetsConfiguration', () => {
                 label: 'Female',
               },
             ],
+            order: 0,
           },
         },
       },
@@ -87,21 +89,26 @@ describe('ChartDataSetsConfiguration', () => {
         name: 'School Type',
         options: {
           CategoryFilter: {
+            id: 'category-filter',
             label: 'Category filter',
             options: [
               {
+                id: 'secondary',
                 value: 'secondary',
                 label: 'Secondary',
               },
               {
+                id: 'primary',
                 value: 'primary',
                 label: 'Primary',
               },
               {
+                id: 'special',
                 value: 'special',
                 label: 'Special',
               },
             ],
+            order: 0,
           },
         },
       },

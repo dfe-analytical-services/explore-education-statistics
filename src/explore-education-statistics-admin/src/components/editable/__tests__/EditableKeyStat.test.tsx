@@ -27,6 +27,7 @@ describe('EditableKeyStat', () => {
           name: 'filter1',
           options: {
             FilterGroup1: {
+              id: 'filter-group-1',
               label: 'Filter group 1',
               options: [
                 {
@@ -34,6 +35,7 @@ describe('EditableKeyStat', () => {
                   value: 'filter-1',
                 },
               ],
+              order: 1,
             },
           },
         },

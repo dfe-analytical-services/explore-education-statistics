@@ -23,6 +23,7 @@ describe('KeyStat', () => {
           name: 'filter1',
           options: {
             FilterGroup1: {
+              id: 'filter-group-1',
               label: 'Filter group 1',
               options: [
                 {
@@ -30,6 +31,7 @@ describe('KeyStat', () => {
                   value: 'filter-1',
                 },
               ],
+              order: 0,
             },
           },
         },

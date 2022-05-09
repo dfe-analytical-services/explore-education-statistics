@@ -129,6 +129,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var (service, _) = BuildServiceAndDependencies(contentDbContext);
 
+            // Assert the ArgumentException that should be thrown constructing DataBlockTableResultCacheKey
             var exception = await Assert.ThrowsAsync<TargetInvocationException>(() => 
                 service.GetDataBlockTableResult(releaseContentBlock));
 

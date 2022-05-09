@@ -21,10 +21,10 @@ export interface TimePeriodOption {
 }
 
 export interface FilterOptionGroup {
-  id?: string; // EES-1243 - not optional when backend done?
+  id: string;
   label: string;
   options: FilterOption[];
-  order?: number; // EES-1243 - not optional when backend done?
+  order: number;
 }
 
 export interface GroupedFilterOptions {
@@ -94,17 +94,17 @@ export interface SubjectMeta {
   filters: Dictionary<{
     legend: string;
     hint?: string;
-    id?: string; // EES-1243 - not optional when backend done?
+    id: string;
     options: GroupedFilterOptions;
-    order?: number; // EES-1243 - not optional when backend done?
+    order: number;
     totalValue?: string;
     name: string;
   }>;
   indicators: Dictionary<{
-    id?: string; // EES-1243 - not optional when backend done?
+    id: string;
     label: string;
     options: IndicatorOption[];
-    order?: number; // EES-1243 - not optional when backend done?
+    order: number;
   }>;
   locations: Dictionary<{
     legend: string;
@@ -139,6 +139,13 @@ export interface ReleaseTableDataQuery extends TableDataQuery {
   releaseId?: string;
 }
 
+export interface ReleaseSubjectMetaQuery {
+  releaseId?: string;
+  subjectId: string;
+  timePeriod?: TimePeriodQuery;
+  locationIds?: string[];
+}
+
 export interface TableDataSubjectMeta {
   publicationName: string;
   subjectName: string;
@@ -146,6 +153,7 @@ export interface TableDataSubjectMeta {
   boundaryLevels: BoundaryLevel[];
   timePeriodRange: TimePeriodOption[];
   filters: Dictionary<{
+    // TODO EES-1238 why isn't id and order fields here?
     name: string;
     legend: string;
     hint?: string;
@@ -207,15 +215,21 @@ const tableBuilderService = {
   listReleaseFeaturedTables(releaseId: string): Promise<FeaturedTable[]> {
     return dataApi.get(`/releases/${releaseId}/featured-tables`);
   },
-  async getSubjectMeta(subjectId: string): Promise<SubjectMeta> {
-    return dataApi.get(`/meta/subject/${subjectId}`);
+  async getSubjectMeta(
+    subjectId: string,
+    releaseId?: string,
+  ): Promise<SubjectMeta> {
+    return releaseId
+      ? dataApi.get(`/release/${releaseId}/meta/subject/${subjectId}`)
+      : dataApi.get(`/meta/subject/${subjectId}`);
   },
-  async filterSubjectMeta(query: {
-    subjectId: string;
-    timePeriod?: TimePeriodQuery;
-    locationIds?: string[];
-  }): Promise<SubjectMeta> {
-    return dataApi.post('/meta/subject', query);
+  async filterSubjectMeta({
+    releaseId,
+    ...query
+  }: ReleaseSubjectMetaQuery): Promise<SubjectMeta> {
+    return releaseId
+      ? dataApi.post(`/release/${releaseId}/meta/subject`, query)
+      : dataApi.post('/meta/subject', query);
   },
   async getTableData({
     releaseId,

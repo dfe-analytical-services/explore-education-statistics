@@ -1,16 +1,23 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
@@ -18,38 +25,86 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
     [ApiController]
     public class TableBuilderMetaController : ControllerBase
     {
+        private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
+        private readonly IPersistenceHelper<StatisticsDbContext> _statisticsPersistenceHelper;
+        private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly ISubjectMetaService _subjectMetaService;
-        private readonly ICacheKeyService _cacheKeyService;
 
-        public TableBuilderMetaController(
-            ISubjectMetaService subjectMetaService,
-            ICacheKeyService cacheKeyService)
+        public TableBuilderMetaController(IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
+            IPersistenceHelper<StatisticsDbContext> statisticsPersistenceHelper,
+            IReleaseSubjectRepository releaseSubjectRepository,
+            ISubjectMetaService subjectMetaService)
         {
+            _contentPersistenceHelper = contentPersistenceHelper;
+            _statisticsPersistenceHelper = statisticsPersistenceHelper;
+            _releaseSubjectRepository = releaseSubjectRepository;
             _subjectMetaService = subjectMetaService;
-            _cacheKeyService = cacheKeyService;
         }
 
         [HttpGet("meta/subject/{subjectId:guid}")]
         public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid subjectId)
         {
-            return _cacheKeyService
-                .CreateCacheKeyForSubjectMeta(subjectId)
+            return CheckReleaseSubjectExists(subjectId)
+                .OnSuccess(GetCacheableReleaseSubject)
                 .OnSuccess(GetSubjectMeta)
                 .HandleFailuresOrOk();
         }
 
-        [BlobCache(typeof(SubjectMetaCacheKey))]
-        private Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(SubjectMetaCacheKey cacheKey)
+        [HttpGet("release/{releaseId:guid}/meta/subject/{subjectId:guid}")]
+        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(Guid releaseId, Guid subjectId)
         {
-            return _subjectMetaService.GetSubjectMeta(cacheKey.SubjectId);
+            return CheckReleaseSubjectExists(subjectId, releaseId)
+                .OnSuccess(GetCacheableReleaseSubject)
+                .OnSuccess(GetSubjectMeta)
+                .HandleFailuresOrOk();
+        }
+
+        private async Task<Either<ActionResult, CacheableReleaseSubject>> GetCacheableReleaseSubject(
+            ReleaseSubject releaseSubject)
+        {
+            // TODO EES-3363 CacheableReleaseSubject exists to provide the Publication slug not available from the ReleaseSubject
+            // In future we should change the storage path for cached items to use Publication and Release id's in the
+            // directory structure rather than slugs so that we don't need to lookup the Publication from the Content Release.
+            return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseSubject.ReleaseId,
+                    q => q.Include(release => release.Publication))
+                .OnSuccess(release => new CacheableReleaseSubject(releaseSubject, release));
+        }
+
+        [BlobCache(typeof(SubjectMetaCacheKey))]
+        private Task<Either<ActionResult, SubjectMetaViewModel>> GetSubjectMeta(CacheableReleaseSubject cacheable)
+        {
+            return _subjectMetaService.GetSubjectMeta(cacheable.ReleaseSubject);
         }
 
         [HttpPost("meta/subject")]
-        public Task<ActionResult<SubjectMetaViewModel>> GetSubjectMeta(
+        public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
             [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken)
         {
-            return _subjectMetaService.GetSubjectMeta(query, cancellationToken).HandleFailuresOrOk();
+            return _subjectMetaService.FilterSubjectMeta(null, query, cancellationToken)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpPost("release/{releaseId:guid}/meta/subject")]
+        public Task<ActionResult<SubjectMetaViewModel>> FilterSubjectMeta(
+            Guid releaseId,
+            [FromBody] ObservationQueryContext query,
+            CancellationToken cancellationToken)
+        {
+            return _subjectMetaService.FilterSubjectMeta(releaseId, query, cancellationToken)
+                .HandleFailuresOrOk();
+        }
+
+        private async Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid subjectId,
+            Guid? releaseId = null)
+        {
+            return releaseId.HasValue
+                ? await _statisticsPersistenceHelper.CheckEntityExists<ReleaseSubject>(
+                    query => query
+                        .Where(rs => rs.ReleaseId == releaseId && rs.SubjectId == subjectId)
+                )
+                : await _releaseSubjectRepository.GetReleaseSubjectForLatestPublishedVersion(subjectId) ??
+                  new Either<ActionResult, ReleaseSubject>(new NotFoundResult());
         }
     }
 }

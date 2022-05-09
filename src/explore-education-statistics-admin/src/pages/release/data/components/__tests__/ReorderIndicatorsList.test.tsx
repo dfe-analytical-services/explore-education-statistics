@@ -74,6 +74,7 @@ describe('ReorderIndicatorsList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderIndicatorsList
+        releaseId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -114,6 +115,7 @@ describe('ReorderIndicatorsList', () => {
     );
     render(
       <ReorderIndicatorsList
+        releaseId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -130,6 +132,7 @@ describe('ReorderIndicatorsList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderIndicatorsList
+        releaseId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -161,6 +164,7 @@ describe('ReorderIndicatorsList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderIndicatorsList
+        releaseId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -190,6 +194,7 @@ describe('ReorderIndicatorsList', () => {
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderIndicatorsList
+        releaseId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={noop}
@@ -215,11 +220,12 @@ describe('ReorderIndicatorsList', () => {
     expect(within(indicatorsList).queryByRole('list')).not.toBeInTheDocument();
   });
 
-  test('clicking the `save` button calls handleSave with the redoreded list formatted for the update request', async () => {
+  test('clicking the `save` button calls handleSave with the reordered list formatted for the update request', async () => {
     const handleSave = jest.fn();
     tableBuilderService.getSubjectMeta.mockResolvedValue(testSubjectMeta);
     render(
       <ReorderIndicatorsList
+        releaseId="release-1"
         subject={testSubject}
         onCancel={noop}
         onSave={handleSave}
@@ -233,11 +239,11 @@ describe('ReorderIndicatorsList', () => {
     const expectedRequest = [
       {
         id: 'category-2-id',
-        indicatorItems: ['category-2-item-1'],
+        indicators: ['category-2-item-1'],
       },
       {
         id: 'category-1-id',
-        indicatorItems: [
+        indicators: [
           'category-1-item-1',
           'category-1-item-2',
           'category-1-item-3',
@@ -245,6 +251,6 @@ describe('ReorderIndicatorsList', () => {
       },
     ];
 
-    expect(handleSave).toHaveBeenCalledWith(expectedRequest);
+    expect(handleSave).toHaveBeenCalledWith(testSubject.id, expectedRequest);
   });
 });

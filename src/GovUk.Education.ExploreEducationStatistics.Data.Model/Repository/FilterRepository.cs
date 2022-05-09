@@ -1,5 +1,7 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -12,11 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         {
         }
 
-        public IEnumerable<Filter> GetFiltersIncludingItems(Guid subjectId)
+        public List<Filter> GetFiltersIncludingItems(Guid subjectId)
         {
             return FindMany(filter => filter.SubjectId == subjectId)
                 .Include(filter => filter.FilterGroups)
-                .ThenInclude(group => group.FilterItems);
+                .ThenInclude(group => group.FilterItems)
+                .ToList();
         }
     }
 }

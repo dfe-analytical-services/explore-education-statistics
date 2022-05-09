@@ -1,14 +1,20 @@
 #nullable enable
 using System;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
@@ -22,6 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
     [Collection(BlobCacheServiceTests)]
     public class TableBuilderMetaControllerTests : BlobCacheServiceTestFixture
     {
+        private static readonly Guid ReleaseId = Guid.NewGuid();
         private static readonly Guid SubjectId = Guid.NewGuid();
 
         private static readonly ObservationQueryContext QueryContext = new()
@@ -30,32 +37,48 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         };
 
         [Fact]
-        public async Task GetSubjectMeta()
+        public async Task GetSubjectMeta_LatestRelease()
         {
+            var contentRelease = new Content.Model.Release
+            {
+                Id = ReleaseId,
+                Slug = "release-slug",
+                Publication = new Publication
+                {
+                    Slug = "publication-slug"
+                }
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                ReleaseId = ReleaseId,
+                SubjectId = SubjectId
+            };
+
             var subjectMetaViewModel = new SubjectMetaViewModel();
 
-            var cacheKey = new SubjectMetaCacheKey("publication", "release", SubjectId);
+            var cacheKey = GetCacheKey(contentRelease, releaseSubject);
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            mocks
-                .cacheKeyService
-                .Setup(s => s.CreateCacheKeyForSubjectMeta(SubjectId))
-                .ReturnsAsync(cacheKey);
-            
+            SetupCall(mocks.contentPersistenceHelper, ReleaseId, contentRelease);
+
             mocks.cacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
                 .ReturnsAsync(null);
-
-            mocks
-                .subjectMetaService
-                .Setup(s => s.GetSubjectMeta(SubjectId))
-                .ReturnsAsync(subjectMetaViewModel);
 
             mocks.cacheService
                 .Setup(s => s.SetItem<object>(cacheKey, subjectMetaViewModel))
                 .Returns(Task.CompletedTask);
 
+            mocks.releaseSubjectRepository
+                .Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(SubjectId))
+                .ReturnsAsync(releaseSubject);
+
+            mocks.subjectMetaService
+                .Setup(s => s.GetSubjectMeta(releaseSubject))
+                .ReturnsAsync(subjectMetaViewModel);
+
             var result = await controller.GetSubjectMeta(SubjectId);
             VerifyAllMocks(mocks);
 
@@ -63,25 +86,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task GetSubjectMeta_NotFound()
+        public async Task GetSubjectMeta_SpecificRelease()
         {
+            var contentRelease = new Content.Model.Release
+            {
+                Id = ReleaseId,
+                Slug = "release-slug",
+                Publication = new Publication
+                {
+                    Slug = "publication-slug"
+                }
+            };
+
+            var releaseSubject = new ReleaseSubject
+            {
+                ReleaseId = ReleaseId,
+                SubjectId = SubjectId
+            };
+
+            var subjectMetaViewModel = new SubjectMetaViewModel();
+
+            var cacheKey = GetCacheKey(contentRelease, releaseSubject);
+
             var (controller, mocks) = BuildControllerAndMocks();
 
-            var cacheKey = new SubjectMetaCacheKey("publication", "release", SubjectId);
-            
-            mocks
-                .cacheKeyService
-                .Setup(s => s.CreateCacheKeyForSubjectMeta(SubjectId))
-                .ReturnsAsync(cacheKey);
-            
+            SetupCall(mocks.contentPersistenceHelper, ReleaseId, contentRelease);
+            SetupCall(mocks.statisticsPersistenceHelper, releaseSubject);
+
             mocks.cacheService
                 .Setup(s => s.GetItem(cacheKey, typeof(SubjectMetaViewModel)))
                 .ReturnsAsync(null);
-            
-            mocks
-                .subjectMetaService
-                .Setup(s => s.GetSubjectMeta(SubjectId))
-                .ReturnsAsync(new NotFoundResult());
+
+            mocks.cacheService
+                .Setup(s => s.SetItem<object>(cacheKey, subjectMetaViewModel))
+                .Returns(Task.CompletedTask);
+
+            mocks.subjectMetaService
+                .Setup(s => s.GetSubjectMeta(releaseSubject))
+                .ReturnsAsync(subjectMetaViewModel);
+
+            var result = await controller.GetSubjectMeta(ReleaseId, SubjectId);
+            VerifyAllMocks(mocks);
+
+            result.AssertOkResult(subjectMetaViewModel);
+        }
+
+        [Fact]
+        public async Task GetSubjectMeta_LatestRelease_ReleaseSubjectNotFound()
+        {
+            var (controller, mocks) = BuildControllerAndMocks();
+
+            mocks.releaseSubjectRepository
+                .Setup(mock => mock.GetReleaseSubjectForLatestPublishedVersion(SubjectId))
+                .ReturnsAsync((ReleaseSubject?) null);
 
             var result = await controller.GetSubjectMeta(SubjectId);
             VerifyAllMocks(mocks);
@@ -90,55 +147,89 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         }
 
         [Fact]
-        public async Task Post_GetSubjectMeta()
+        public async Task GetSubjectMeta_SpecificRelease_ReleaseSubjectNotFound()
+        {
+            var (controller, mocks) = BuildControllerAndMocks();
+
+            mocks.statisticsPersistenceHelper
+                .Setup(mock => mock.CheckEntityExists(
+                        It.IsAny<Func<IQueryable<ReleaseSubject>, IQueryable<ReleaseSubject>>>()
+                    )
+                )
+                .ReturnsAsync(new NotFoundResult());
+
+            var result = await controller.GetSubjectMeta(ReleaseId, SubjectId);
+            VerifyAllMocks(mocks);
+
+            result.AssertNotFoundResult();
+        }
+
+        [Fact]
+        public async Task FilterSubjectMeta_LatestRelease()
         {
             var subjectMetaViewModel = new SubjectMetaViewModel();
             var cancellationToken = new CancellationTokenSource().Token;
 
             var (controller, mocks) = BuildControllerAndMocks();
 
-            mocks
-                .subjectMetaService
-                .Setup(s => s.GetSubjectMeta(QueryContext, cancellationToken))
+            mocks.subjectMetaService
+                .Setup(s => s.FilterSubjectMeta(null, QueryContext, cancellationToken))
                 .ReturnsAsync(subjectMetaViewModel);
 
-            var result = await controller.GetSubjectMeta(QueryContext, cancellationToken);
+            var result = await controller.FilterSubjectMeta(QueryContext, cancellationToken);
             VerifyAllMocks(mocks);
 
             result.AssertOkResult(subjectMetaViewModel);
         }
 
         [Fact]
-        public async Task Post_GetSubjectMeta_NotFound()
+        public async Task FilterSubjectMeta_SpecificRelease()
         {
+            var subjectMetaViewModel = new SubjectMetaViewModel();
             var cancellationToken = new CancellationTokenSource().Token;
-            
+
             var (controller, mocks) = BuildControllerAndMocks();
 
-            mocks
-                .subjectMetaService
-                .Setup(s => s.GetSubjectMeta(QueryContext, cancellationToken))
-                .ReturnsAsync(new NotFoundResult());
+            mocks.subjectMetaService
+                .Setup(s => s.FilterSubjectMeta(ReleaseId, QueryContext, cancellationToken))
+                .ReturnsAsync(subjectMetaViewModel);
 
-            var result = await controller.GetSubjectMeta(QueryContext, cancellationToken);
+            var result = await controller.FilterSubjectMeta(ReleaseId, QueryContext, cancellationToken);
             VerifyAllMocks(mocks);
 
-            result.AssertNotFoundResult();
+            result.AssertOkResult(subjectMetaViewModel);
         }
 
-        private static (
-            TableBuilderMetaController controller,
+        private static SubjectMetaCacheKey GetCacheKey(Content.Model.Release release, ReleaseSubject releaseSubject)
+        {
+            return new SubjectMetaCacheKey(release.Publication.Slug, release.Slug, releaseSubject.SubjectId);
+        }
+
+        private static (TableBuilderMetaController controller,
             (
-                Mock<ISubjectMetaService> subjectMetaService, 
-                Mock<ICacheKeyService> cacheKeyService,
-                Mock<IBlobCacheService> cacheService) mocks)
+            Mock<IPersistenceHelper<ContentDbContext>> contentPersistenceHelper,
+            Mock<IPersistenceHelper<StatisticsDbContext>> statisticsPersistenceHelper,
+            Mock<IReleaseSubjectRepository> releaseSubjectRepository,
+            Mock<ISubjectMetaService> subjectMetaService,
+            Mock<IBlobCacheService> cacheService) mocks)
             BuildControllerAndMocks()
         {
+            var contentPersistenceHelper = MockPersistenceHelper<ContentDbContext>();
+            var statisticsPersistenceHelper = MockPersistenceHelper<StatisticsDbContext>();
+            var releaseSubjectRepository = new Mock<IReleaseSubjectRepository>(Strict);
             var subjectMetaService = new Mock<ISubjectMetaService>(Strict);
-            var cacheKeyService = new Mock<ICacheKeyService>(Strict);
-            var controller = new TableBuilderMetaController(subjectMetaService.Object, cacheKeyService.Object);
-            
-            return (controller, (subjectMetaService, cacheKeyService, CacheService));
+
+            var controller = new TableBuilderMetaController(contentPersistenceHelper.Object,
+                statisticsPersistenceHelper.Object,
+                releaseSubjectRepository.Object,
+                subjectMetaService.Object);
+
+            return (controller, (
+                contentPersistenceHelper,
+                statisticsPersistenceHelper,
+                releaseSubjectRepository,
+                subjectMetaService,
+                CacheService));
         }
     }
 }
