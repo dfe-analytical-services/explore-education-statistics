@@ -16,8 +16,10 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.RoleNames;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -31,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _identityUserManager;
 
         public UserRoleService(UsersAndRolesDbContext usersAndRolesDbContext,
             ContentDbContext contentDbContext,
@@ -41,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserService userService,
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> identityUserManager)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -51,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _userPublicationRoleRepository = userPublicationRoleRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
-            _userManager = userManager;
+            _identityUserManager = identityUserManager;
         }
 
         public async Task<Either<ActionResult, Unit>> AddGlobalRole(string userId, string roleId)
@@ -62,12 +64,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await _usersAndRolesPersistenceHelper
                         .CheckEntityExists<ApplicationUser, string>(userId)
-                        .OnSuccessCombineWith(user =>_usersAndRolesPersistenceHelper
+                        .OnSuccessCombineWith(_ =>_usersAndRolesPersistenceHelper
                             .CheckEntityExists<IdentityRole, string>(roleId))
                         .OnSuccessVoid(async tuple =>
                         {
                             var (user, role) = tuple;
-                            await _userManager.AddToRoleAsync(user, role.Name);
+                            await _identityUserManager.AddToRoleAsync(user, role.Name);
                         });
                 });
         }
@@ -80,8 +82,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await _usersAndRolesPersistenceHelper
                         .CheckEntityExists<ApplicationUser, string>(userId.ToString())
-                        .OnSuccessCombineWith(user => _contentPersistenceHelper.CheckEntityExists<Publication>(publicationId))
-                        .OnSuccessDo(release => ValidatePublicationRoleCanBeAdded(userId, publicationId, role))
+                        .OnSuccessCombineWith(_ => _contentPersistenceHelper.CheckEntityExists<Publication>(publicationId))
+                        .OnSuccessDo(_ => ValidatePublicationRoleCanBeAdded(userId, publicationId, role))
                         .OnSuccess(async tuple =>
                         {
                             var (user, publication) = tuple;
@@ -114,10 +116,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     releaseId: release.Id,
                                     role: role,
                                     createdById: _userService.GetUserId());
+
+                                var globalRoleName = GetGlobalRoleNameForReleaseRole(role);
+
+                                var existingRoleNames = await _identityUserManager.GetRolesAsync(user);
+
+                                if (!existingRoleNames.Contains(globalRoleName))
+                                {
+                                    await _identityUserManager.AddToRoleAsync(user, globalRoleName);
+                                }
+
                                 return _emailTemplateService.SendReleaseRoleEmail(user.Email, release, role);
                             });
                     })
                 );
+        }
+
+        private string GetGlobalRoleNameForReleaseRole(ReleaseRole role)
+        {
+            if (role == PrereleaseViewer)
+            {
+                return PrereleaseUser;
+            }
+            
+            return Analyst;
         }
 
         public async Task<Either<ActionResult, List<RoleViewModel>>> GetAllGlobalRoles()
@@ -251,12 +273,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     return await _usersAndRolesPersistenceHelper
                         .CheckEntityExists<ApplicationUser, string>(userId)
-                        .OnSuccessCombineWith(user =>_usersAndRolesPersistenceHelper
+                        .OnSuccessCombineWith(_ =>_usersAndRolesPersistenceHelper
                             .CheckEntityExists<IdentityRole, string>(roleId))
                         .OnSuccessVoid(async tuple =>
                         {
                             var (user, role) = tuple;
-                            await _userManager.RemoveFromRoleAsync(user, role.Name);
+                            await _identityUserManager.RemoveFromRoleAsync(user, role.Name);
                         });
                 });
         }
