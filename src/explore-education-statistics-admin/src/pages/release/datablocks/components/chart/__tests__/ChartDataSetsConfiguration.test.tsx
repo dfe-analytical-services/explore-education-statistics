@@ -344,8 +344,8 @@ describe('ChartDataSetsConfiguration', () => {
       );
       expect(characteristicOptions).toHaveLength(3);
       expect(characteristicOptions[0]).toHaveTextContent('All options');
-      expect(characteristicOptions[1]).toHaveTextContent('Female');
-      expect(characteristicOptions[2]).toHaveTextContent('Male');
+      expect(characteristicOptions[1]).toHaveTextContent('Male');
+      expect(characteristicOptions[2]).toHaveTextContent('Female');
 
       const indicator = screen.getByLabelText('Indicator');
       expect(indicator).toBeInTheDocument();
