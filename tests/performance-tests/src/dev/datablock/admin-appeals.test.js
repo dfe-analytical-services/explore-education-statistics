@@ -2,9 +2,15 @@
 import { check } from 'k6';
 import http from 'k6/http';
 import { htmlReport } from 'https://raw.githubusercontent.com/luke-h1/k6-reporter/main/dist/bundle.js';
-import { Rate } from "k6/metrics";
+import { Rate } from 'k6/metrics';
 
-const BASE_URL = 'https://data.dev.explore-education-statistics.service.gov.uk';
+const username = '';
+const password = '';
+
+const BASE_SCHEME = `https://${
+  username && password ? `${username}:${password}@` : ''
+}`;
+const BASE_URL = `${BASE_SCHEME}data.dev.explore-education-statistics.service.gov.uk`;
 
 export const options = {
   vus: 60,
@@ -13,8 +19,7 @@ export const options = {
   noConnectionReuse: true,
 };
 
-export let errorRate = new Rate("errors");
-
+export const errorRate = new Rate('errors');
 
 export default function () {
   const res = http.get(
@@ -24,12 +29,12 @@ export default function () {
   console.log(`Response time was ${String(res.timings.duration)} ms`);
 
   check(res, {
-    'response code was 200': res => res.status == 200,
+    'response code was 200': res => res.status === 200,
   });
 }
 
 export function handleSummary(data) {
   return {
-    'test-results/admin-appeals.html': htmlReport(data),
+    '/tmp/admin-appeals.html': htmlReport(data),
   };
 }

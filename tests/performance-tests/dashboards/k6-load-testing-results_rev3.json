@@ -50,6 +50,7 @@
   "graphTooltip": 2,
   "hideControls": false,
   "id": null,
+  "uid": "k6",
   "links": [],
   "refresh": "5s",
   "rows": [
@@ -62,7 +63,7 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "fill": 1,
           "id": 1,
           "interval": ">1s",
@@ -170,7 +171,7 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "fill": 1,
           "id": 17,
           "interval": "1s",
@@ -279,7 +280,7 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "fill": 1,
           "id": 7,
           "interval": "1s",
@@ -392,7 +393,7 @@
           "bars": true,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "fill": 1,
           "id": 10,
           "interval": ">1s",
@@ -527,7 +528,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "decimals": 2,
           "format": "ms",
           "gauge": {
@@ -636,7 +637,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "decimals": 2,
           "format": "ms",
           "gauge": {
@@ -745,7 +746,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "decimals": 2,
           "format": "ms",
           "gauge": {
@@ -854,7 +855,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "decimals": 2,
           "format": "ms",
           "gauge": {
@@ -963,7 +964,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "decimals": 2,
           "format": "ms",
           "gauge": {
@@ -1072,7 +1073,7 @@
             "rgba(237, 129, 40, 0.89)",
             "rgba(50, 172, 45, 0.97)"
           ],
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "decimals": 2,
           "format": "ms",
           "gauge": {
@@ -1177,7 +1178,7 @@
           "bars": false,
           "dashLength": 10,
           "dashes": false,
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "description": "Grouped by 1 sec intervals",
           "fill": 1,
           "height": "250px",
@@ -1421,7 +1422,7 @@
             "mode": "spectrum"
           },
           "dataFormat": "timeseries",
-          "datasource": "${DS_K6}",
+          "datasource": "k6influxdb",
           "heatmap": {},
           "height": "250px",
           "highlightCards": true,
@@ -1583,7 +1584,7 @@
     ]
   },
   "time": {
-    "from": "now-1h",
+    "from": "now-5m",
     "to": "now"
   },
   "timepicker": {
