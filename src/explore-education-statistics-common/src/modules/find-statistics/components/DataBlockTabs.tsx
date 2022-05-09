@@ -67,16 +67,6 @@ const DataBlockTabs = ({
 
             {fullTable && (
               <ErrorBoundary fallback={errorMessage}>
-                <a
-                  className="govuk-visually-hidden"
-                  href={`#${id}-tables`}
-                  aria-live="assertive"
-                >
-                  If you are using a keyboard or a screen reader you may wish to
-                  view the accessible table instead. Press enter to switch to
-                  the data tables tab.
-                </a>
-
                 {dataBlock.charts.map((chart, index) => {
                   const key = index;
 
