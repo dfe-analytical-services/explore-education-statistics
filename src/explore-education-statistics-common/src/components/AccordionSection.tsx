@@ -65,7 +65,6 @@ const AccordionSection = ({
       })}
       data-testid="accordionSection"
       id={id}
-      role="presentation"
     >
       <div className="govuk-accordion__section-header">
         {header ??
@@ -76,6 +75,7 @@ const AccordionSection = ({
             },
             isMounted ? (
               <button
+                aria-controls={contentId}
                 aria-expanded={open}
                 className={classes.sectionButton}
                 id={headingId}
