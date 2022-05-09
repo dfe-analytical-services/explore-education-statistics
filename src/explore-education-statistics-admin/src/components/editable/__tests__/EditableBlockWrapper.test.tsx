@@ -23,9 +23,7 @@ describe('EditableBlockWrapper', () => {
       </EditableBlockWrapper>,
     );
 
-    expect(
-      screen.getByRole('button', { name: 'Edit block' }),
-    ).toBeInTheDocument();
+    expect(handleEdit).not.toHaveBeenCalled();
     userEvent.click(screen.getByRole('button', { name: 'Edit block' }));
     expect(handleEdit).toHaveBeenCalled();
   });
@@ -96,6 +94,7 @@ describe('EditableBlockWrapper', () => {
       expect(modal.getByText('Remove block')).toBeInTheDocument();
     });
 
+    expect(handleDelete).not.toHaveBeenCalled();
     userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
     expect(handleDelete).toHaveBeenCalled();
   });
