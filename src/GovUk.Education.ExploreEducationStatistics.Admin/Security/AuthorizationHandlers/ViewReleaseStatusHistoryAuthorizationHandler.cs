@@ -37,9 +37,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             var publicationRoles = await _publicationRoleRepository
-                .GetAllRolesByUser(authContext.User.GetUserId(), release.PublicationId);
+                .GetAllRolesByUserAndPublicationId(authContext.User.GetUserId(), release.PublicationId);
             var releaseRoles = await _releaseRoleRepository
-                .GetAllRolesByUser(authContext.User.GetUserId(), release.Id);
+                .GetAllRolesByUserAndRelease(authContext.User.GetUserId(), release.Id);
             if (ContainPublicationOwnerRole(publicationRoles) || ContainsUnrestrictedViewerRole(releaseRoles))
             {
                 authContext.Succeed(requirement);

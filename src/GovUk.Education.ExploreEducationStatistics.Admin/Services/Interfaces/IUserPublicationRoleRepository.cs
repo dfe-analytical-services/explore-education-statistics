@@ -13,7 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             PublicationRole role,
             Guid createdById);
 
-        Task<List<PublicationRole>> GetAllRolesByUser(Guid userId,
+        Task<List<PublicationRole>> GetAllRolesByUser(Guid userId);
+        
+        Task<List<PublicationRole>> GetAllRolesByUserAndPublicationId(Guid userId,
             Guid publicationId);
 
         Task<bool> IsUserPublicationOwner(Guid userId, Guid publicationId);

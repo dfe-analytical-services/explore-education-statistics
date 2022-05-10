@@ -149,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await RemoveMany(userReleaseRoles, deletedById);
         }
 
-        public async Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId, Guid releaseId)
+        public async Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId, Guid releaseId)
         {
             return await _contentDbContext.UserReleaseRoles
                 .AsQueryable()

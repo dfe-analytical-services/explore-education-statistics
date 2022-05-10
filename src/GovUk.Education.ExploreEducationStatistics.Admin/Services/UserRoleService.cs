@@ -87,11 +87,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async tuple =>
                         {
                             var (user, publication) = tuple;
+                            
                             await _userPublicationRoleRepository.Create(
                                 userId: userId,
                                 publicationId: publication.Id,
                                 role: role,
                                 createdById: _userService.GetUserId());
+                            
+                            var globalRole = GetAssociatedGlobalRoleNameForReleaseRole
+                            await AddGlobalRoleIfRequired(Analyst, user);
+                            
                             return _emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
                         });
                 });
@@ -117,14 +122,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     role: role,
                                     createdById: _userService.GetUserId());
 
-                                var globalRoleName = GetGlobalRoleNameForReleaseRole(role);
-
-                                var existingRoleNames = await _identityUserManager.GetRolesAsync(user);
-
-                                if (!existingRoleNames.Contains(globalRoleName))
-                                {
-                                    await _identityUserManager.AddToRoleAsync(user, globalRoleName);
-                                }
+                                var globalRole = GetAssociatedGlobalRoleNameForReleaseRole(role);
+                                await AddGlobalRoleIfRequired(globalRole, user);
 
                                 return _emailTemplateService.SendReleaseRoleEmail(user.Email, release, role);
                             });
@@ -132,13 +131,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        private string GetGlobalRoleNameForReleaseRole(ReleaseRole role)
+        private async Task AddGlobalRoleIfRequired(string globalRoleName, ApplicationUser user)
         {
-            if (role == PrereleaseViewer)
+            var existingRoleNames = await _identityUserManager.GetRolesAsync(user);
+
+            if (!existingRoleNames.Contains(globalRoleName))
             {
-                return PrereleaseUser;
+                await _identityUserManager.AddToRoleAsync(user, globalRoleName);
             }
-            
+        }
+
+        private async Task RemoveGlobalRoleIfRequired(string globalRoleName, ApplicationUser user)
+        {
+            var userId = Guid.Parse(user.Id);
+            var allReleaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(userId);
+            var allPublicationRoles = await _userPublicationRoleRepository.GetAllRolesByUser(userId);
+
+            var requiredGlobalRoles = allReleaseRoles
+                .Select(GetAssociatedGlobalRoleNameForReleaseRole)
+                .Concat(allPublicationRoles
+                    .Select(GetAssociatedGlobalRoleNameForPublicationRole))
+                .Distinct();
+
+            if (!requiredGlobalRoles.Contains(globalRoleName))
+            {
+                await _identityUserManager.RemoveFromRoleAsync(user, globalRoleName);
+            }
+        }
+
+        private string GetAssociatedGlobalRoleNameForReleaseRole(ReleaseRole role)
+        {
+            return role == PrereleaseViewer ? PrereleaseUser : Analyst;
+        }
+
+        private string GetAssociatedGlobalRoleNameForPublicationRole(PublicationRole role)
+        {
             return Analyst;
         }
 

@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             TRequirement requirement,
             Release release)
         {
-            var releaseRoles = await _releaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
+            var releaseRoles = await _releaseRoleRepository.GetAllRolesByUserAndRelease(context.User.GetUserId(), release.Id);
 
             if (releaseRoles.Any())
             {

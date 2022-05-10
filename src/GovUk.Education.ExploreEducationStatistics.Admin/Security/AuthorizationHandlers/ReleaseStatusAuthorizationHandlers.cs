@@ -71,7 +71,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var roles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
+            var roles = await _userReleaseRoleRepository.GetAllRolesByUserAndRelease(context.User.GetUserId(), release.Id);
 
             if (ContainsApproverRole(roles))
             {
@@ -91,8 +91,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             var publicationRoles =
-                await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
-            var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
+                await _userPublicationRoleRepository.GetAllRolesByUserAndPublicationId(context.User.GetUserId(), release.PublicationId);
+            var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUserAndRelease(context.User.GetUserId(), release.Id);
 
             if (release.ApprovalStatus == ReleaseApprovalStatus.Approved
                 ? ContainsApproverRole(releaseRoles)
@@ -114,8 +114,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             var publicationRoles =
-                await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
-            var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
+                await _userPublicationRoleRepository.GetAllRolesByUserAndPublicationId(context.User.GetUserId(), release.PublicationId);
+            var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUserAndRelease(context.User.GetUserId(), release.Id);
 
             if (release.ApprovalStatus == ReleaseApprovalStatus.Approved
                 ? ContainsApproverRole(releaseRoles)

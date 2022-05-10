@@ -38,7 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
+            var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUserAndRelease(context.User.GetUserId(), release.Id);
 
             if (ContainsApproverRole(releaseRoles))
             {

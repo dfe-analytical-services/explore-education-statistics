@@ -36,7 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid userId, Publication publication,
             ReleaseRole role, Guid deletedById);
 
-        Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId,
+        Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId);
+        
+        Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId,
             Guid releaseId);
 
         Task<bool> IsUserApproverOnLatestRelease(Guid userId, Guid publicationId);

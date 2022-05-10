@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return created;
         }
 
-        public async Task<List<PublicationRole>> GetAllRolesByUser(Guid userId, Guid publicationId)
+        public async Task<List<PublicationRole>> GetAllRolesByUserAndPublicationId(Guid userId, Guid publicationId)
         {
             return await _contentDbContext.UserPublicationRoles
                 .AsQueryable()
