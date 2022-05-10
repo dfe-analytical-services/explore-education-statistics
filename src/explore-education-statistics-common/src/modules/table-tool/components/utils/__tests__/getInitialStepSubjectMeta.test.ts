@@ -307,6 +307,7 @@ describe('getInitialStepSubjectMeta', () => {
                 order: 0,
               },
             },
+            order: 0,
           },
         },
       },

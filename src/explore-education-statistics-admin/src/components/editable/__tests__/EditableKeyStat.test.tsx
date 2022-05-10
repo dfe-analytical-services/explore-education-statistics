@@ -38,6 +38,7 @@ describe('EditableKeyStat', () => {
               order: 1,
             },
           },
+          order: 0,
         },
       },
       locations: {

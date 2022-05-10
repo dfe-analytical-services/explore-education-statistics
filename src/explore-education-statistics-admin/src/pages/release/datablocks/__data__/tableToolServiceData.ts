@@ -104,6 +104,7 @@ export const testTableData: TableDataResponse = {
             order: 0,
           },
         },
+        order: 0,
       },
     },
   },

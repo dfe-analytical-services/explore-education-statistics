@@ -32,6 +32,7 @@ describe('isOrphanedDataSet', () => {
               order: 0,
             },
           },
+          order: 0,
           name: 'characteristic',
         },
         SchoolType: {
@@ -55,6 +56,7 @@ describe('isOrphanedDataSet', () => {
               order: 1,
             },
           },
+          order: 1,
           name: 'school_type',
         },
       },

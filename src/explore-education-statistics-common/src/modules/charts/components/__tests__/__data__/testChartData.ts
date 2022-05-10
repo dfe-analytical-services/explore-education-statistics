@@ -114,6 +114,7 @@ export const testChartTableData: TableDataResponse = {
             order: 0,
           },
         },
+        order: 0,
         name: 'school_type',
       },
       Characteristic: {
@@ -133,6 +134,7 @@ export const testChartTableData: TableDataResponse = {
             order: 0,
           },
         },
+        order: 1,
         name: 'characteristic',
       },
     },

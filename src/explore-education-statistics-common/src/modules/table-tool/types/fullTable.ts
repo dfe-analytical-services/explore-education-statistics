@@ -18,6 +18,7 @@ export interface FullTableMeta {
   filters: Dictionary<{
     name: string;
     options: CategoryFilter[];
+    order: number;
   }>;
   indicators: Indicator[];
   boundaryLevels: BoundaryLevel[];

@@ -118,6 +118,7 @@ describe('PreReleaseTableToolPage', () => {
               order: 0,
             },
           },
+          order: 0,
           name: 'school_type',
         },
       },

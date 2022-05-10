@@ -37,6 +37,7 @@ describe('DownloadTable', () => {
             category: 'Characteristic',
           }),
         ],
+        order: 0,
       },
     },
     indicators: [

@@ -28,6 +28,7 @@ describe('getDefaultTableHeadersConfig', () => {
               order: 0,
             },
           },
+          order: 0,
         },
         SchoolType: {
           totalValue: '',
@@ -55,6 +56,7 @@ describe('getDefaultTableHeadersConfig', () => {
               order: 0,
             },
           },
+          order: 1,
         },
       },
       footnotes: [],

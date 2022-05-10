@@ -25,6 +25,7 @@ describe('generateTableTitle', () => {
             category: 'Characteristic',
           }),
         ],
+        order: 0,
       },
     },
     indicators: [
@@ -67,6 +68,7 @@ describe('generateTableTitle', () => {
               category: 'Characteristic',
             }),
           ],
+          order: 0,
         },
         'School Type': {
           name: 'school_type',
@@ -77,6 +79,7 @@ describe('generateTableTitle', () => {
               category: 'School Type',
             }),
           ],
+          order: 1,
         },
       },
     });
@@ -112,6 +115,7 @@ describe('generateTableTitle', () => {
               category: 'Characteristic',
             }),
           ],
+          order: 0,
         },
         'School Type': {
           name: 'school_type',
@@ -132,6 +136,7 @@ describe('generateTableTitle', () => {
               category: 'School Type',
             }),
           ],
+          order: 1,
         },
       },
     });
@@ -163,6 +168,7 @@ describe('generateTableTitle', () => {
               category: 'Characteristic',
             }),
           ],
+          order: 0,
         },
         'School Type': {
           name: 'school_type',
@@ -183,6 +189,7 @@ describe('generateTableTitle', () => {
               category: 'School Type',
             }),
           ],
+          order: 1,
         },
       },
     });
@@ -226,6 +233,7 @@ describe('generateTableTitle', () => {
               category: 'Characteristic',
             }),
           ],
+          order: 0,
         },
         'School Type': {
           name: 'school_type',
@@ -241,6 +249,7 @@ describe('generateTableTitle', () => {
               category: 'School Type',
             }),
           ],
+          order: 1,
         },
       },
     });
@@ -284,6 +293,7 @@ describe('generateTableTitle', () => {
               category: 'Characteristic',
             }),
           ],
+          order: 0,
         },
         'School Type': {
           name: 'school_type',
@@ -304,6 +314,7 @@ describe('generateTableTitle', () => {
               category: 'School Type',
             }),
           ],
+          order: 1,
         },
       },
     });

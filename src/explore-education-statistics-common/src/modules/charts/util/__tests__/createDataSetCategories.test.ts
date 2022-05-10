@@ -30,6 +30,7 @@ describe('createDataSetCategories', () => {
               order: 0,
             },
           },
+          order: 0,
           name: 'characteristic',
         },
         SchoolType: {
@@ -53,6 +54,7 @@ describe('createDataSetCategories', () => {
               order: 0,
             },
           },
+          order: 1,
           name: 'school_type',
         },
       },
@@ -1160,6 +1162,7 @@ describe('createDataSetCategories', () => {
                 order: 0,
               },
             },
+            order: 0,
             name: 'school_type',
           },
         },

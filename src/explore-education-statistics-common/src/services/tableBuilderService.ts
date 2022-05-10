@@ -153,11 +153,11 @@ export interface TableDataSubjectMeta {
   boundaryLevels: BoundaryLevel[];
   timePeriodRange: TimePeriodOption[];
   filters: Dictionary<{
-    // TODO EES-1238 why isn't id and order fields here?
     name: string;
     legend: string;
     hint?: string;
     options: GroupedFilterOptions;
+    order: number;
     totalValue?: string;
   }>;
   geoJsonAvailable: boolean;

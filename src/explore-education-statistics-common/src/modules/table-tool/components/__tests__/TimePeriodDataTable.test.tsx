@@ -248,6 +248,7 @@ describe('TimePeriodDataTable', () => {
                 order: 0,
               },
             },
+            order: 0,
           },
         },
         footnotes: [],
@@ -1240,6 +1241,7 @@ describe('TimePeriodDataTable', () => {
               category: 'Category 1',
             }),
           ],
+          order: 0,
         },
         Category2: {
           name: 'category_2',
@@ -1250,6 +1252,7 @@ describe('TimePeriodDataTable', () => {
               category: 'Category 2',
             }),
           ],
+          order: 1,
         },
       },
       footnotes: [],

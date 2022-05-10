@@ -34,6 +34,7 @@ describe('KeyStat', () => {
               order: 0,
             },
           },
+          order: 0,
         },
       },
       locations: {
