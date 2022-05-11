@@ -93,9 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 publicationId: publication.Id,
                                 role: role,
                                 createdById: _userService.GetUserId());
-                            
-                            var globalRole = GetAssociatedGlobalRoleNameForReleaseRole
-                            await AddGlobalRoleIfRequired(Analyst, user);
+
+                            await AddGlobalRoleIfRequired(GetAssociatedGlobalRoleNameForPublicationRole(role), user);
                             
                             return _emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
                         });
@@ -315,10 +314,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _userService
                 .CheckCanManageAllUsers()
                 .OnSuccess(() => _contentPersistenceHelper.CheckEntityExists<UserPublicationRole>(userPublicationRoleId))
-                .OnSuccessVoid(async userPublicationRole =>
+                .OnSuccessVoid(async role =>
                 {
-                    _contentDbContext.Remove(userPublicationRole);
+                    _contentDbContext.Remove(role);
                     await _contentDbContext.SaveChangesAsync();
+
+                    await _usersAndRolesPersistenceHelper
+                        .CheckEntityExists<ApplicationUser, string>(role.UserId.ToString())
+                        .OnSuccessDo(identityUser => RemoveGlobalRoleIfRequired(
+                            GetAssociatedGlobalRoleNameForPublicationRole(role.Role), identityUser));
                 });
         }
 
@@ -326,21 +330,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _contentPersistenceHelper
                 .CheckEntityExists<UserReleaseRole>(userReleaseRoleId)
-                .OnSuccess(async userReleaseRole =>
+                .OnSuccess(async role =>
                 {
                     return await _contentPersistenceHelper
                         .CheckEntityExists<Release>(query => query
                             .Include(r => r.Publication)
-                            .Where(r => r.Id == userReleaseRole.ReleaseId)
+                            .Where(r => r.Id == role.ReleaseId)
                         )
                         .OnSuccess(async release =>
                         {
                             return await _userService
-                                .CheckCanUpdateReleaseRole(release.Publication, userReleaseRole.Role)
+                                .CheckCanUpdateReleaseRole(release.Publication, role.Role)
                                 .OnSuccessVoid(async () =>
                                 {
-                                    await _userReleaseRoleRepository.Remove(userReleaseRole,
+                                    await _userReleaseRoleRepository.Remove(role,
                                         deletedById: _userService.GetUserId());
+                                    
+                                    await _usersAndRolesPersistenceHelper
+                                        .CheckEntityExists<ApplicationUser, string>(role.UserId.ToString())
+                                        .OnSuccessDo(identityUser => RemoveGlobalRoleIfRequired(
+                                            GetAssociatedGlobalRoleNameForReleaseRole(role.Role), identityUser));
+
                                 });
                         });
                 });
