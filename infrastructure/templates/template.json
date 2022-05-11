@@ -1108,6 +1108,8 @@
     "ees-publisher-clientid": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientid')]",
     "ees-publisher-clientsecret": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-publisher-clientsecret')]",
 
+    "ees-signalr-admin-connectionstring": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-signalr-admin-connectionstring')]",
+
     "ees-sql-admin-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-admin-password')]",
     "ees-sql-public-password": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-sql-public-password')]",
 
@@ -1699,6 +1701,7 @@
         "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
         "NotifyContributorTemplateId": "[parameters('notifyContributorTemplateId')]",
         "AdminUri": "[parameters('adminUri')]",
+        "Azure:SignalR:ConnectionString": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-signalr-admin-connectionstring'), '2018-02-14').secretUriWithVersion, ')')]",
         "PublicAppUrl": "[variables('publicAppUrl')]",
         "IdentityServer:IssuerUri": "[concat('urn=', parameters('adminUri'))]",
         "IdentityServer:Key:Name": "[concat('CN=', parameters('adminUri'))]",
