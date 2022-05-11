@@ -142,16 +142,17 @@ pipenv run python run_tests.py -f tests/visual_testing/visually_check_tables_and
 Now that we have a set of "before" and "after" snapshot images in the two `snapshots-<yyyy-MM-dd hh:mm:ss>` folders, we're able to visually compare them to 
 ensure that only expected changes are present.
 
-From the `<project root>/useful-scripts/compare_image_snapshots` folder, run:
+From the `tests/robot-tests/scripts/visual-testing` folder, run:
 
 ```bash
 cd tests/robot-tests/scripts/visual-testing
+pipenv install # (only need to run this the first time)
 pipenv run python compare_image_folder_trees.py --first </path/to/before/snapshots> --second </path/to/after/snapshots> --diff </path/to/diffs/folder>
 ```
 
 This will compare the images in the `</path/to/before/snapshots>` folder with the images in the `</path/to/after/snapshots>` folder.
 
-Any differences will be output to the provided `</path/to/diffs/snapshots>` folder. This folder will be created if it does not already exist. If 
+Any differences will be output to the provided `</path/to/diffs/folder>` folder. This folder will be created if it does not already exist. If 
 differences are found, the original, the new, and the diff images are all output to allow manual visual comparisons.
 
 ## Permalinks
