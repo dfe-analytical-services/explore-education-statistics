@@ -104,8 +104,8 @@ const EditableContentForm = ({
   const handleSubmit = useCallback(
     async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
       try {
-        await onSubmit(values.content);
         await clearPendingDeletions?.();
+        await onSubmit(values.content);
       } catch (err) {
         logger.error(err);
         helpers.setFieldError('content', 'Could not save content');
