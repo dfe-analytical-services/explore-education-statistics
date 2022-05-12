@@ -16,8 +16,10 @@ import { Dictionary } from '@common/types';
 import sanitizeHtml, {
   defaultSanitizeOptions,
   SanitizeHtmlOptions,
+  TagFilter,
 } from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
+import mapValues from 'lodash/mapValues';
 import React, { useMemo } from 'react';
 
 interface EditableContentBlockProps {
@@ -83,27 +85,27 @@ const EditableContentBlock = ({
   ]);
 
   const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
-    const commentTags = [
-      'comment-start',
-      'comment-end',
-      'resolvedcomment-start',
-      'resolvedcomment-end',
-    ];
-    const commentAttributes = {
+    const commentTagAttributes: SanitizeHtmlOptions['allowedAttributes'] = {
       'comment-start': ['name'],
       'comment-end': ['name'],
       'resolvedcomment-start': ['name'],
       'resolvedcomment-end': ['name'],
     };
 
+    const commentTagFilter: TagFilter = frame =>
+      comments.every(comment => comment.id !== frame.attribs.name);
+
     return {
       ...defaultSanitizeOptions,
-      allowedTags: defaultSanitizeOptions.allowedTags
-        ? [...defaultSanitizeOptions.allowedTags, ...commentTags]
-        : [],
-      allowedAttributes: defaultSanitizeOptions.allowedAttributes
-        ? { ...defaultSanitizeOptions.allowedAttributes, ...commentAttributes }
-        : {},
+      allowedTags: [
+        ...(defaultSanitizeOptions.allowedTags ?? []),
+        ...Object.keys(commentTagAttributes),
+      ],
+      allowedAttributes: {
+        ...(defaultSanitizeOptions.allowedAttributes ?? {}),
+        ...commentTagAttributes,
+      },
+      filterTags: mapValues(commentTagAttributes, () => commentTagFilter),
       transformTags: {
         img: (tagName, attribs) => {
           return {
@@ -115,14 +117,14 @@ const EditableContentBlock = ({
         },
       },
     };
-  }, [transformImageAttributes]);
+  }, [comments, transformImageAttributes]);
 
   if (isEditing && !lockedBy) {
     return (
       <EditableContentForm
         actionThrottle={actionThrottle}
         allowComments={allowComments}
-        content={content ? sanitizeHtml(content, sanitizeOptions) : ''} // NOTE: Sanitize to transform img src attribs
+        content={content ? sanitizeHtml(content, sanitizeOptions) : ''}
         label={label}
         hideLabel={hideLabel}
         id={id}

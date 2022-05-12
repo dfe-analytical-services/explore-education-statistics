@@ -14,6 +14,12 @@ describe('EditableContentBlock', () => {
 Test paragraph
 `;
 
+  const testOrphanedCommentHtml = `
+<p>
+  Test <comment-start name="comment-1"></comment-start>unresolved<comment-end name="comment-1"></comment-end> and 
+  <resolvedcomment-start name="comment-2"></resolvedcomment-start>resolved<resolvedcomment-end name="comment-2"></resolvedcomment-end>
+</p>`;
+
   test('renders editable version correctly', () => {
     render(
       <EditableContentBlock
@@ -37,6 +43,32 @@ Test paragraph
     expect(
       screen.getByRole('button', { name: 'Remove block' }),
     ).toBeInTheDocument();
+  });
+
+  test('renders editable version without orphaned comments', () => {
+    render(
+      <EditableContentBlock
+        id="test-id"
+        label="Block content"
+        value={testOrphanedCommentHtml}
+        onEditing={noop}
+        onCancel={noop}
+        onSubmit={noop}
+        onDelete={noop}
+      />,
+    );
+
+    const paragraph = screen.getByText('Test unresolved and resolved', {
+      selector: 'p',
+    });
+
+    // Markup should not contain comment elements
+    expect(paragraph.innerHTML).toMatchInlineSnapshot(`
+      "
+        Test unresolved and 
+        resolved
+      "
+    `);
   });
 
   test('renders editable version with markdown content correctly', () => {
@@ -86,6 +118,34 @@ Test paragraph
     expect(
       screen.queryByRole('button', { name: 'Remove block' }),
     ).not.toBeInTheDocument();
+  });
+
+  test('renders non-editable version without orphaned comments', () => {
+    render(
+      <EditableContentBlock
+        id="test-id"
+        label="Block content"
+        value={testOrphanedCommentHtml}
+        editable={false}
+        useMarkdown
+        onEditing={noop}
+        onCancel={noop}
+        onSubmit={noop}
+        onDelete={noop}
+      />,
+    );
+
+    const paragraph = screen.getByText('Test unresolved and resolved', {
+      selector: 'p',
+    });
+
+    // Markup should not contain comment elements
+    expect(paragraph.innerHTML).toMatchInlineSnapshot(`
+      "
+        Test unresolved and 
+        resolved
+      "
+    `);
   });
 
   test('renders locked version correctly', () => {
