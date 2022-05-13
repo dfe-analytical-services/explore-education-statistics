@@ -347,12 +347,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 "Requested filters do not match subject filters").OnSuccess(_ =>
             {
                 var requestMap = requestFilters.ToDictionary(filter => filter.Id);
-                var results = filters.Select(filter =>
+                return filters.Select(filter =>
                         ValidateFilterGroupsForSubject(filter, requestMap[filter.Id].FilterGroups))
-                    .ToList();
-
-                var failure = results.FirstOrDefault(result => result.IsLeft)?.Left;
-                return failure ?? new Either<ActionResult, Unit>(Unit.Instance);
+                    .OnSuccessAll()
+                    .OnSuccessVoid();
             });
         }
 
@@ -368,15 +366,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .OnSuccess(_ =>
                 {
                     var requestMap = requestFilterGroups.ToDictionary(filterGroup => filterGroup.Id);
-                    var results = filter.FilterGroups.Select(filterGroup =>
+                    return filter.FilterGroups.Select(filterGroup =>
                             AssertCollectionsAreSameIgnoringOrder(
                                 filterGroup.FilterItems.Select(filterItem => filterItem.Id),
                                 requestMap[filterGroup.Id].FilterItems,
                                 $"Requested filter items do not match subject for filter group: {filterGroup.Id}"))
-                        .ToList();
-
-                    var failure = results.FirstOrDefault(result => result.IsLeft)?.Left;
-                    return failure ?? new Either<ActionResult, Unit>(Unit.Instance);
+                        .OnSuccessAll()
+                        .OnSuccessVoid();
                 });
         }
 
@@ -393,15 +389,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .OnSuccess(_ =>
                 {
                     var requestMap = requestIndicatorGroups.ToDictionary(indicatorGroup => indicatorGroup.Id);
-                    var results = indicatorGroups.Select(indicatorGroup =>
+                    return indicatorGroups.Select(indicatorGroup =>
                             AssertCollectionsAreSameIgnoringOrder(
                                 indicatorGroup.Indicators.Select(indicator => indicator.Id),
                                 requestMap[indicatorGroup.Id].Indicators,
                                 $"Requested indicators do not match subject for indicator group: {indicatorGroup.Id}"))
-                        .ToList();
-
-                    var failure = results.FirstOrDefault(result => result.IsLeft)?.Left;
-                    return failure ?? new Either<ActionResult, Unit>(Unit.Instance);
+                        .OnSuccessAll()
+                        .OnSuccessVoid();
                 });
         }
 
