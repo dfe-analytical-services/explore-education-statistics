@@ -72,7 +72,7 @@ const PageFooter = ({ wide }: Props) => {
                 aria-hidden
                 className="govuk-!-margin-top-3 govuk-!-font-size-14"
               >
-                Build: ${process.env.REACT_APP_BUILD_NUMBER}
+                Build: {process.env.REACT_APP_BUILD_NUMBER}
               </p>
             )}
           </div>
