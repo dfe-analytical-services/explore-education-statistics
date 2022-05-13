@@ -26,14 +26,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
     public class UserRoleServicePermissionTests
     {
         [Fact]
-        public async Task AddGlobalRole()
+        public async Task SetGlobalRole()
         {
             await PolicyCheckBuilder<SecurityPolicies>()
                 .ExpectCheckToFail(CanManageUsersOnSystem)
                 .AssertForbidden(async userService =>
                 {
                     var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.AddGlobalRole(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
+                    return await service.SetGlobalRole(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
                 });
         }
 
@@ -142,18 +142,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     var service = SetupUserRoleService(userService: userService.Object);
                     return await service.GetReleaseRoles(Guid.NewGuid());
-                });
-        }
-
-        [Fact]
-        public async Task RemoveGlobalRole()
-        {
-            await PolicyCheckBuilder<SecurityPolicies>()
-                .ExpectCheckToFail(CanManageUsersOnSystem)
-                .AssertForbidden(async userService =>
-                {
-                    var service = SetupUserRoleService(userService: userService.Object);
-                    return await service.RemoveGlobalRole(Guid.NewGuid().ToString(), Guid.NewGuid().ToString());
                 });
         }
 

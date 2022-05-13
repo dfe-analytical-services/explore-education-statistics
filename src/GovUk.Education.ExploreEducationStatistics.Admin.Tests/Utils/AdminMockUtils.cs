@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils
             var store = new Mock<IUserStore<ApplicationUser>>();
             var mock = new Mock<UserManager<ApplicationUser>>(
                 store.Object, null, null, null, null, null, null, null, null);
+            mock.SetupSet(s => s.Logger = null);
             return mock;
         }
 

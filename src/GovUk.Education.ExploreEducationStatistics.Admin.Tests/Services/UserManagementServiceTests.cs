@@ -157,75 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task UpdateUser_UserHasExistingRole()
-        {
-            var user = new ApplicationUser
-            {
-                Id = Guid.NewGuid().ToString()
-            };
-
-            var role1 = new IdentityRole
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Role 1",
-                NormalizedName = "ROLE 1"
-            };
-
-            var role2 = new IdentityRole
-            {
-                Id = Guid.NewGuid().ToString(),
-                Name = "Role 2",
-                NormalizedName = "ROLE 2"
-            };
-
-            var userRole = new IdentityUserRole<string>
-            {
-                UserId = user.Id,
-                RoleId = role1.Id
-            };
-
-            var userAndRolesDbContextId = Guid.NewGuid().ToString();
-
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                await userAndRolesDbContext.AddAsync(user);
-                await userAndRolesDbContext.AddRangeAsync(role1, role2);
-                await userAndRolesDbContext.AddRangeAsync(userRole);
-                await userAndRolesDbContext.SaveChangesAsync();
-            }
-
-            var userRoleService = new Mock<IUserRoleService>(Strict);
-
-            userRoleService.Setup(mock =>
-                mock.RemoveGlobalRole(user.Id, role1.Id)).ReturnsAsync(Unit.Instance);
-
-            userRoleService.Setup(mock =>
-                mock.AddGlobalRole(user.Id, role2.Id)).ReturnsAsync(Unit.Instance);
-
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                var service = SetupUserManagementService(
-                    usersAndRolesDbContext: userAndRolesDbContext,
-                    userRoleService: userRoleService.Object);
-
-                var result = await service.UpdateUser(user.Id, role2.Id);
-
-                Assert.True(result.IsRight);
-
-                userRoleService.Verify(mock => mock.RemoveGlobalRole(
-                        user.Id, role1.Id),
-                    Times.Once);
-
-                userRoleService.Verify(mock => mock.AddGlobalRole(
-                        user.Id, role2.Id),
-                    Times.Once);
-            }
-
-            VerifyAllMocks(userRoleService);
-        }
-
-        [Fact]
-        public async Task UpdateUser_UserHasNoExistingRole()
+        public async Task UpdateUser()
         {
             var user = new ApplicationUser
             {
@@ -251,7 +183,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var userRoleService = new Mock<IUserRoleService>(Strict);
 
             userRoleService.Setup(mock =>
-                mock.AddGlobalRole(user.Id, role.Id)).ReturnsAsync(Unit.Instance);
+                mock.SetGlobalRole(user.Id, role.Id)).ReturnsAsync(Unit.Instance);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
@@ -263,7 +195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.True(result.IsRight);
 
-                userRoleService.Verify(mock => mock.AddGlobalRole(
+                userRoleService.Verify(mock => mock.SetGlobalRole(
                         user.Id, role.Id),
                     Times.Once);
             }

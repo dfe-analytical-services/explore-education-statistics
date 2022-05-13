@@ -165,8 +165,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async user =>
                         {
                             return await _userRoleService.GetGlobalRoles(user.Id)
-                                .OnSuccessCombineWith(globalRoles => _userRoleService.GetPublicationRoles(id))
-                                .OnSuccessCombineWith(globalAndPublicationRoles => _userRoleService.GetReleaseRoles(id))
+                                .OnSuccessCombineWith(_ => _userRoleService.GetPublicationRoles(id))
+                                .OnSuccessCombineWith(_ => _userRoleService.GetReleaseRoles(id))
                                 .OnSuccess(tuple =>
                                 {
                                     var (globalRoles, publicationRoles, releaseRoles) = tuple;
@@ -261,22 +261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccess(async () =>
-                {
-                    // Currently we only allow a user to have a maximum of one global role
-                    var existingRole =
-                        await _usersAndRolesDbContext.UserRoles
-                            .AsQueryable()
-                            .FirstOrDefaultAsync(userRole => userRole.UserId == userId);
-
-                    if (existingRole == null)
-                    {
-                        return await _userRoleService.AddGlobalRole(userId, roleId);
-                    }
-
-                    return await _userRoleService.RemoveGlobalRole(userId, existingRole.RoleId)
-                        .OnSuccess(() => _userRoleService.AddGlobalRole(userId, roleId));
-                });
+                .OnSuccess(() => _userRoleService.SetGlobalRole(userId, roleId));
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateUserDoesNotExist(string email)

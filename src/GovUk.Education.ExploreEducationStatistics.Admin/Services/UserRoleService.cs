@@ -58,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _identityUserManager = identityUserManager;
         }
 
-        public async Task<Either<ActionResult, Unit>> AddGlobalRole(string userId, string roleId)
+        public async Task<Either<ActionResult, Unit>> SetGlobalRole(string userId, string roleId)
         {
             return await _userService
                 .CheckCanManageAllUsers()
@@ -96,7 +96,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 role: role,
                                 createdById: _userService.GetUserId());
 
-                            await ExclusivelySetGlobalRoleIfRequired(GetAssociatedGlobalRoleNameForPublicationRole(role), user);
+                            await ExclusivelyUpgradeToGlobalRoleIfRequired(GetAssociatedGlobalRoleNameForPublicationRole(role), user);
                             
                             return _emailTemplateService.SendPublicationRoleEmail(user.Email, publication, role);
                         });
@@ -124,7 +124,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                     createdById: _userService.GetUserId());
 
                                 var globalRole = GetAssociatedGlobalRoleNameForReleaseRole(role);
-                                await ExclusivelySetGlobalRoleIfRequired(globalRole, user);
+                                await ExclusivelyUpgradeToGlobalRoleIfRequired(globalRole, user);
 
                                 return _emailTemplateService.SendReleaseRoleEmail(user.Email, release, role);
                             });
@@ -135,29 +135,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task SetExclusiveGlobalRole(string globalRoleName, ApplicationUser user)
         {
             var existingRoleNames = await _identityUserManager
-                .GetRolesAsync(user);
+                .GetRolesAsync(user) ?? new List<string>();
 
             if (!existingRoleNames.Contains(globalRoleName))
             {
                 await _identityUserManager.AddToRoleAsync(user, globalRoleName);
             }
 
-            var mutexRolesToRemove = EnumUtil.GetEnumValues<Role>()
+            var rolesToRemove = EnumUtil.GetEnumValues<Role>()
                 .Select(role => role.GetEnumLabel())
                 .Intersect(existingRoleNames)
                 .Where(roleName => roleName == globalRoleName)
                 .ToList();
 
-            if (mutexRolesToRemove.Count > 0)
+            if (rolesToRemove.Count > 0)
             {
-                await _identityUserManager.RemoveFromRolesAsync(user, mutexRolesToRemove);
+                await _identityUserManager.RemoveFromRolesAsync(user, rolesToRemove);
             }
         }
 
-        private async Task ExclusivelySetGlobalRoleIfRequired(string globalRoleNameToSet, ApplicationUser user)
+        private async Task ExclusivelyUpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, ApplicationUser user)
         {
             var existingRoleNames = await _identityUserManager
-                .GetRolesAsync(user);
+                .GetRolesAsync(user) ?? new List<string>();
 
             var userAlreadyAssignedToRole = existingRoleNames.Contains(globalRoleNameToSet);
             
@@ -313,24 +313,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, Unit>> RemoveGlobalRole(string userId, string roleId)
-        {
-            return await _userService
-                .CheckCanManageAllUsers()
-                .OnSuccess(async () =>
-                {
-                    return await _usersAndRolesPersistenceHelper
-                        .CheckEntityExists<ApplicationUser, string>(userId)
-                        .OnSuccessCombineWith(_ =>_usersAndRolesPersistenceHelper
-                            .CheckEntityExists<IdentityRole, string>(roleId))
-                        .OnSuccessVoid(async tuple =>
-                        {
-                            var (user, role) = tuple;
-                            await _identityUserManager.RemoveFromRoleAsync(user, role.Name);
-                        });
-                });
-        }
-
         public async Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId)
         {
             return await _userService
@@ -340,11 +322,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     _contentDbContext.Remove(role);
                     await _contentDbContext.SaveChangesAsync();
-
-                    await _usersAndRolesPersistenceHelper
-                        .CheckEntityExists<ApplicationUser, string>(role.UserId.ToString())
-                        .OnSuccessDo(identityUser => SetOrDowngradeGlobalRole(
-                            GetAssociatedGlobalRoleNameForPublicationRole(role.Role), identityUser));
                 });
         }
 
@@ -367,12 +344,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 {
                                     await _userReleaseRoleRepository.Remove(role,
                                         deletedById: _userService.GetUserId());
-                                    
-                                    await _usersAndRolesPersistenceHelper
-                                        .CheckEntityExists<ApplicationUser, string>(role.UserId.ToString())
-                                        .OnSuccessDo(identityUser => SetOrDowngradeGlobalRole(
-                                            GetAssociatedGlobalRoleNameForReleaseRole(role.Role), identityUser));
-
                                 });
                         });
                 });
