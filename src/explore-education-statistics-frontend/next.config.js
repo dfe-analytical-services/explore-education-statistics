@@ -4,6 +4,9 @@ const withTranspileModules = require('next-transpile-modules');
 const path = require('path');
 
 const nextConfig = {
+  env: {
+    BUILD_NUMBER: process.env.BUILD_BUILDNUMBER,
+  },
   publicRuntimeConfig: {
     APP_ENV: process.env.APP_ENV,
     CONTENT_API_BASE_URL: process.env.CONTENT_API_BASE_URL,
