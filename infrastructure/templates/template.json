@@ -1850,8 +1850,8 @@
         "cors": {
           "allowedOrigins": [
             "[concat('https://', parameters('adminUri'))]",
-            "https://localhost:3000",
-            "http://localhost:3000"
+            "https://localhost:5021",
+            "http://localhost:5021"
           ]
         },
         "networkACLs": {
