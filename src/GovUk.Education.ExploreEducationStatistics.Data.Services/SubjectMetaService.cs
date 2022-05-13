@@ -92,7 +92,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             return await CheckReleaseSubjectExists(releaseId, query.SubjectId)
                 .OnSuccess(_userService.CheckCanViewSubjectData)
-                .OnSuccess(releaseSubject => GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
+                .OnSuccess(releaseSubject =>
+                    GetSubjectMetaViewModelFromQuery(query, releaseSubject, cancellationToken));
         }
 
         public async Task<Either<ActionResult, Unit>> UpdateSubjectFilters(
@@ -368,9 +369,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     var requestMap = requestFilterGroups.ToDictionary(filterGroup => filterGroup.Id);
                     var results = filter.FilterGroups.Select(filterGroup =>
-                            AssertCollectionsAreSameIgnoringOrder(filterGroup.FilterItems,
+                            AssertCollectionsAreSameIgnoringOrder(
+                                filterGroup.FilterItems.Select(filterItem => filterItem.Id),
                                 requestMap[filterGroup.Id].FilterItems,
-                                indicator => indicator.Id,
                                 $"Requested filter items do not match subject for filter group: {filterGroup.Id}"))
                         .ToList();
 
@@ -393,9 +394,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     var requestMap = requestIndicatorGroups.ToDictionary(indicatorGroup => indicatorGroup.Id);
                     var results = indicatorGroups.Select(indicatorGroup =>
-                            AssertCollectionsAreSameIgnoringOrder(indicatorGroup.Indicators,
+                            AssertCollectionsAreSameIgnoringOrder(
+                                indicatorGroup.Indicators.Select(indicator => indicator.Id),
                                 requestMap[indicatorGroup.Id].Indicators,
-                                indicator => indicator.Id,
                                 $"Requested indicators do not match subject for indicator group: {indicatorGroup.Id}"))
                         .ToList();
 
@@ -404,24 +405,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 });
         }
 
-        private static Either<ActionResult, Unit> AssertCollectionsAreSameIgnoringOrder<TLeft, TRight, TId>(
-            IEnumerable<TLeft> left,
-            IEnumerable<TRight> right,
-            Func<TLeft, TId> leftIdSelector,
-            Func<TRight, TId> rightIdSelector,
+        private static Either<ActionResult, Unit> AssertCollectionsAreSameIgnoringOrder<TFirst, TSecond, TId>(
+            IEnumerable<TFirst> first,
+            IEnumerable<TSecond> second,
+            Func<TFirst, TId> firstIdSelector,
+            Func<TSecond, TId> secondIdSelector,
             string error)
         {
-            var rightIdList = right.Select(rightIdSelector).ToList();
-            return AssertCollectionsAreSameIgnoringOrder(left, rightIdList, leftIdSelector, error);
+            var firstIdList = first.Select(firstIdSelector);
+            var secondIdList = second.Select(secondIdSelector);
+            return AssertCollectionsAreSameIgnoringOrder(firstIdList, secondIdList, error);
         }
 
-        private static Either<ActionResult, Unit> AssertCollectionsAreSameIgnoringOrder<TLeft, TId>(
-            IEnumerable<TLeft> left,
-            IEnumerable<TId> right,
-            Func<TLeft, TId> leftIdSelector,
+        private static Either<ActionResult, Unit> AssertCollectionsAreSameIgnoringOrder<T>(IEnumerable<T> first,
+            IEnumerable<T> second,
             string error)
         {
-            if (CollectionsAreSameIgnoringOrder(left, right, leftIdSelector))
+            if (CollectionsAreSameIgnoringOrder(first, second))
             {
                 return Unit.Instance;
             }
@@ -429,18 +429,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             return new BadRequestObjectResult(error);
         }
 
-        private static bool CollectionsAreSameIgnoringOrder<TLeft, TId>(
-            IEnumerable<TLeft> left,
-            IEnumerable<TId> right,
-            Func<TLeft, TId> leftIdSelector)
+        private static bool CollectionsAreSameIgnoringOrder<T>(IEnumerable<T> first, IEnumerable<T> second)
         {
-            var leftIdList = left.Select(leftIdSelector).ToList();
-            var rightIdList = right.ToList();
+            var firstList = first.ToList();
+            var secondList = second.ToList();
 
-            var leftNotInRight = leftIdList.Except(rightIdList);
-            var rightNotInLeft = rightIdList.Except(leftIdList);
+            var firstNotInSecond = firstList.Except(secondList);
+            var secondNotInFirst = secondList.Except(firstList);
 
-            return !(leftNotInRight.Any() || rightNotInLeft.Any());
+            return !(firstNotInSecond.Any() || secondNotInFirst.Any());
         }
     }
 }
