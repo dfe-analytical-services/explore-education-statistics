@@ -128,7 +128,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         _boundaryLevelRepository,
                         _geoJsonRepository);
 
-                    var locationViewModels = locationsHelper.GetLocationViewModels();
+                    var locationViewModels = await locationsHelper.GetLocationViewModels();
                     _logger.LogTrace("Got Location view models in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Stop();
 
@@ -226,10 +226,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     .ToList();
             }
 
-            public Dictionary<string, List<LocationAttributeViewModel>> GetLocationViewModels()
+            public async Task<Dictionary<string, List<LocationAttributeViewModel>>> GetLocationViewModels()
             {
                 var allGeoJson = _query.BoundaryLevel != null
-                    ? GetGeoJson(_query.BoundaryLevel.Value, _locationAttributes)
+                    ? await GetGeoJson(_query.BoundaryLevel.Value, _locationAttributes)
                     : new Dictionary<GeographicLevel, Dictionary<string, GeoJson>>();
 
                 return _locationAttributes.ToDictionary(
@@ -295,14 +295,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 };
             }
 
-            private Dictionary<GeographicLevel, Dictionary<string, GeoJson>> GetGeoJson(
+            private async Task<Dictionary<GeographicLevel, Dictionary<string, GeoJson>>> GetGeoJson(
                 long boundaryLevelId,
                 Dictionary<GeographicLevel, List<LocationAttributeNode>> locations)
             {
-                var selectedBoundaryLevel = _boundaryLevelRepository
-                    .FindOrNotFound(boundaryLevelId)
-                    .OrElse(() => null!)
-                    .Right;
+                var selectedBoundaryLevel = await _boundaryLevelRepository.Get(boundaryLevelId);
 
                 if (selectedBoundaryLevel == null || !locations.ContainsKey(selectedBoundaryLevel.Level))
                 {

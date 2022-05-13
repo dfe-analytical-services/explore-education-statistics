@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
 
         public async Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity, TEntityId>(
             TEntityId id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null)
             where TEntity : class
         {
             var queryableEntities = _context.Set<TEntity>()
@@ -41,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
 
         public Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
             Guid id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null)
             where TEntity : class
         {
             return CheckEntityExists<TEntity, Guid>(id, hydrateEntityFn);
@@ -61,8 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
                 : new Either<ActionResult, TEntity>(entity);
         }
 
-        public async Task<Either<ActionResult, TEntity>> CheckOptionalEntityExists<TEntity>(Guid? id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null) where TEntity : class
+        public async Task<Either<ActionResult, TEntity?>> CheckOptionalEntityExists<TEntity>(Guid? id,
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null) where TEntity : class
         {
             return id.HasValue
                 ? await CheckEntityExists(id.Value, hydrateEntityFn)

@@ -779,8 +779,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(GeographicLevel.Region))
                 .Returns(_regionsBoundaryLevel);
 
-            boundaryLevelRepository.Setup(s => s.FindOrNotFound(query.BoundaryLevel.Value))
-                .Returns(_regionsBoundaryLevel);
+            boundaryLevelRepository.Setup(s => s.Get(query.BoundaryLevel.Value))
+                .ReturnsAsync(_regionsBoundaryLevel);
 
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(ItIs.ListSequenceEqualTo(ListOf(GeographicLevel.Region))))
                 .Returns(ListOf(_regionsBoundaryLevel));
