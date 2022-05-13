@@ -48,6 +48,7 @@ export const testPermalink: Permalink = {
           name: 'characteristic',
           options: {
             Gender: {
+              id: 'gender',
               label: 'Gender',
               options: [
                 {
@@ -55,8 +56,10 @@ export const testPermalink: Permalink = {
                   value: 'gender-female',
                 },
               ],
+              order: 0,
             },
           },
+          order: 0,
         },
       },
     },
@@ -152,6 +155,7 @@ export const testPermalinkWithHierarchicalLocations: Permalink = {
           name: 'characteristic',
           options: {
             Gender: {
+              id: 'gender',
               label: 'Gender',
               options: [
                 {
@@ -159,8 +163,10 @@ export const testPermalinkWithHierarchicalLocations: Permalink = {
                   value: 'gender-female',
                 },
               ],
+              order: 0,
             },
           },
+          order: 0,
         },
       },
     },
@@ -236,6 +242,7 @@ export const testPermalinkWithLocationCodes: Permalink = {
           name: 'characteristic',
           options: {
             Gender: {
+              id: 'gender',
               label: 'Gender',
               options: [
                 {
@@ -243,8 +250,10 @@ export const testPermalinkWithLocationCodes: Permalink = {
                   value: 'gender-female',
                 },
               ],
+              order: 0,
             },
           },
+          order: 0,
         },
       },
     },
@@ -317,6 +326,7 @@ export const testPermalinkWithResultLocationIds: Permalink = {
           name: 'characteristic',
           options: {
             Gender: {
+              id: 'gender',
               label: 'Gender',
               options: [
                 {
@@ -324,8 +334,10 @@ export const testPermalinkWithResultLocationIds: Permalink = {
                   value: 'gender-female',
                 },
               ],
+              order: 0,
             },
           },
+          order: 0,
         },
       },
     },

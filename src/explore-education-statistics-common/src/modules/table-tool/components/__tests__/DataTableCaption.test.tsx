@@ -33,23 +33,26 @@ describe('DataTableCaption', () => {
             category: 'Characteristic',
           }),
         ],
+        order: 0,
       },
     },
     indicators: [
       new Indicator({
         label: 'Authorised absence rate',
-        value: 'authAbsRate',
+        value: 'authorised-absence-rate',
         unit: '%',
         name: 'sess_authorised_percent',
       }),
     ],
     locations: [
       new LocationFilter({
+        id: 'barnsley-id',
         value: 'barnsley',
         label: 'Barnsley',
         level: 'localAuthority',
       }),
       new LocationFilter({
+        id: 'barnet-id',
         value: 'barnet',
         label: 'Barnet',
         level: 'localAuthority',

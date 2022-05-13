@@ -14,6 +14,9 @@
     "skuAdmin": {
       "value": "S2 Standard"
     },
+    "skuAdminSignalR": {
+      "value": "Standard_S1"
+    },
     "skuImporter": {
       "value": "S3 Standard"
     },

@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
-using GovUk.Education.ExploreEducationStatistics.Data.Services.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -26,50 +25,50 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private readonly Subject _subject = new()
         {
-            Id = SubjectId,
+            Id = Guid.NewGuid(),
         };
 
         private readonly Release _release = new()
         {
-            Id = ReleaseId,
+            Id = Guid.NewGuid(),
+            PublicationId = Guid.NewGuid()
+        };
+
+        private readonly ReleaseSubject _releaseSubject = new()
+        {
+            ReleaseId = ReleaseId,
+            SubjectId = SubjectId,
         };
 
         [Fact]
         public async Task Query_LatestRelease_CanViewSubjectData()
         {
             await PolicyCheckBuilder<DataSecurityPolicies>()
-                .SetupResourceCheckToFail(_subject, DataSecurityPolicies.CanViewSubjectData)
+                .SetupResourceCheckToFail(_releaseSubject, DataSecurityPolicies.CanViewSubjectData)
                 .AssertForbidden(
                     async userService =>
                     {
-                        var publicationId = Guid.NewGuid();
+                        var statisticsPersistenceHelper = StatisticsPersistenceHelperMock(_subject);
 
-                        var release = new Release
-                        {
-                            Id = Guid.NewGuid(),
-                            PublicationId = publicationId,
-                        };
+                        MockUtils.SetupCall(statisticsPersistenceHelper, _releaseSubject);
 
-                        var subjectRepository = new Mock<ISubjectRepository>();
-
-                        subjectRepository
-                            .Setup(s => s.IsSubjectForLatestPublishedRelease(_subject.Id))
-                            .ReturnsAsync(false);
+                        var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
 
                         subjectRepository
                             .Setup(s => s.GetPublicationIdForSubject(_subject.Id))
-                            .ReturnsAsync(publicationId);
+                            .ReturnsAsync(_release.PublicationId);
 
-                        var releaseRepository = new Mock<IReleaseRepository>();
+                        var releaseRepository = new Mock<IReleaseRepository>(MockBehavior.Strict);
 
                         releaseRepository
-                            .Setup(s => s.GetLatestPublishedRelease(publicationId))
-                            .Returns(release);
+                            .Setup(s => s.GetLatestPublishedRelease(_release.PublicationId))
+                            .Returns(_release);
 
                         var service = BuildTableBuilderService(
                             userService: userService.Object,
                             subjectRepository: subjectRepository.Object,
-                            releaseRepository: releaseRepository.Object
+                            releaseRepository: releaseRepository.Object,
+                            statisticsPersistenceHelper: statisticsPersistenceHelper.Object
                         );
 
                         return await service.Query(
@@ -86,35 +85,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         public async Task Query_ReleaseId_CanViewSubjectData()
         {
             await PolicyCheckBuilder<DataSecurityPolicies>()
-                .SetupResourceCheckToFail(_subject, DataSecurityPolicies.CanViewSubjectData)
+                .SetupResourceCheckToFail(_releaseSubject, DataSecurityPolicies.CanViewSubjectData)
                 .AssertForbidden(
                     async userService =>
                     {
-                        var releaseSubject = new ReleaseSubject
-                        {
-                            ReleaseId = _release.Id,
-                            Release = _release,
-                            SubjectId = _subject.Id,
-                            Subject = _subject,
-                        };
-
                         var statisticsPersistenceHelper = StatisticsPersistenceHelperMock(_subject);
 
-                        MockUtils.SetupCall(statisticsPersistenceHelper, releaseSubject);
-
-                        var subjectRepository = new Mock<ISubjectRepository>();
-
-                        subjectRepository
-                            .Setup(s => s.IsSubjectForLatestPublishedRelease(_subject.Id))
-                            .ReturnsAsync(false);
+                        MockUtils.SetupCall(statisticsPersistenceHelper, _releaseSubject);
 
                         var service = BuildTableBuilderService(
                             userService: userService.Object,
-                            subjectRepository: subjectRepository.Object,
                             statisticsPersistenceHelper: statisticsPersistenceHelper.Object
                         );
                         return await service.Query(
-                            releaseSubject.ReleaseId,
+                            _release.Id,
                             new ObservationQueryContext
                             {
                                 SubjectId = _subject.Id

@@ -1,5 +1,7 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -12,10 +14,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
         {
         }
 
-        public IEnumerable<IndicatorGroup> GetIndicatorGroups(Guid subjectId)
+        public List<IndicatorGroup> GetIndicatorGroups(Guid subjectId)
         {
             return FindMany(group => group.SubjectId == subjectId,
-                new List<Expression<Func<IndicatorGroup, object>>> {group => group.Indicators});
+                    new List<Expression<Func<IndicatorGroup, object>>> {group => group.Indicators})
+                .ToList();
         }
     }
 }

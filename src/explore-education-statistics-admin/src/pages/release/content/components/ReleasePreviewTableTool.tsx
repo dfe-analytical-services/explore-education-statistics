@@ -40,7 +40,7 @@ const ReleasePreviewTableTool = ({ releaseId, publication }: Props) => {
       );
 
       const [subjectMeta, tableData] = await Promise.all([
-        tableBuilderService.getSubjectMeta(query.subjectId),
+        tableBuilderService.getSubjectMeta(query.subjectId, releaseId),
         tableBuilderService.getTableData({
           releaseId,
           ...query,

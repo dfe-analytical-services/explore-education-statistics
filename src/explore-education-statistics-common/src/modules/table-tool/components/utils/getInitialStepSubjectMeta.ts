@@ -34,7 +34,10 @@ export default async function getInitialStepSubjectMeta(
     };
   }
 
-  const subjectMeta = await tableBuilderService.getSubjectMeta(query.subjectId);
+  const subjectMeta = await tableBuilderService.getSubjectMeta(
+    query.subjectId,
+    query.releaseId,
+  );
 
   // Just do really basic checks to see if table can be rendered
   // and don't bother checking the query itself.

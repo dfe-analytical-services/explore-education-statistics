@@ -4,6 +4,10 @@ import EditableContentBlock from '@admin/components/editable/EditableContentBloc
 import { useEditingContext } from '@admin/contexts/EditingContext';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
+import {
+  releaseDataBlockEditRoute,
+  ReleaseDataBlockRouteParams,
+} from '@admin/routes/releaseRoutes';
 import { Comment, EditableBlock } from '@admin/services/types/content';
 import releaseContentCommentService, {
   AddComment,
@@ -12,15 +16,17 @@ import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockT
 import Gate from '@common/components/Gate';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
 import isBrowser from '@common/utils/isBrowser';
-import React, { useCallback } from 'react';
 import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
 import useToggle from '@common/hooks/useToggle';
+import React, { useCallback } from 'react';
+import { generatePath } from 'react-router';
 
 interface Props {
   allowComments?: boolean;
   allowImages?: boolean;
   block: EditableBlock;
   editable?: boolean;
+  publicationId: string;
   releaseId: string;
   sectionId: string;
   visible?: boolean;
@@ -32,8 +38,9 @@ const ReleaseEditableBlock = ({
   allowComments = false,
   allowImages = false,
   block,
-  releaseId,
   editable = true,
+  publicationId,
+  releaseId,
   sectionId,
   visible,
   onDelete,
@@ -113,7 +120,17 @@ const ReleaseEditableBlock = ({
     case 'DataBlock':
       return (
         <div className="dfe-content-overflow">
-          <EditableBlockWrapper onDelete={editable ? handleDelete : undefined}>
+          <EditableBlockWrapper
+            dataBlockEditLink={generatePath<ReleaseDataBlockRouteParams>(
+              releaseDataBlockEditRoute.path,
+              {
+                publicationId,
+                releaseId,
+                dataBlockId: block.id,
+              },
+            )}
+            onDelete={editable ? handleDelete : undefined}
+          >
             <Gate condition={!!visible}>
               <DataBlockTabs
                 releaseId={releaseId}

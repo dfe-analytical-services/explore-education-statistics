@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 
@@ -10,5 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
         Task SoftDeleteReleaseSubject(Guid releaseId, Guid subjectId);
 
         Task DeleteAllReleaseSubjects(Guid releaseId, bool softDeleteOrphanedSubjects = false);
+
+        Task<ReleaseSubject?> GetReleaseSubjectForLatestPublishedVersion(Guid subjectId);
     }
 }

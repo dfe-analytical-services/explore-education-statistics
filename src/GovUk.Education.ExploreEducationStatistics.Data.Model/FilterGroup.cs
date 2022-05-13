@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 
@@ -6,11 +7,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
     public class FilterGroup
     {
         public Guid Id { get; set; }
-        public Filter Filter { get; set; }
+        public Filter Filter { get; set; } = null!;
         public Guid FilterId { get; set; }
-        public string Label { get; set; }
-        public ICollection<FilterItem> FilterItems { get; set; }
-        public ICollection<FilterGroupFootnote> Footnotes { get; set; }
+        public string Label { get; set; } = string.Empty;
+        public List<FilterItem> FilterItems { get; set; } = new();
+        public List<FilterGroupFootnote> Footnotes { get; set; } = new();
 
         public static IEqualityComparer<FilterGroup> IdComparer { get; } = new IdEqualityComparer();
 
@@ -24,6 +25,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             Filter = filter;
             Label = label;
             FilterItems = new List<FilterItem>();
+        }
+
+        public FilterGroup Clone()
+        {
+            return (FilterGroup) MemberwiseClone();
         }
 
         private sealed class IdEqualityComparer : IEqualityComparer<FilterGroup>

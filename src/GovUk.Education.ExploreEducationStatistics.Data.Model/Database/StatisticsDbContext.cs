@@ -300,14 +300,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                 .HasKey(item => new { item.ReleaseId, item.SubjectId });
 
             modelBuilder.Entity<ReleaseSubject>()
-                .HasOne(r => r.Release)
+                .HasOne(rs => rs.Release)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<ReleaseSubject>()
-                .HasOne(r => r.Subject)
+                .HasOne(rs => rs.Subject)
                 .WithMany()
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<ReleaseSubject>()
+                .Property(rs => rs.FilterSequence)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<FilterSequenceEntry>>(v));
+
+            modelBuilder.Entity<ReleaseSubject>()
+                .Property(rs => rs.IndicatorSequence)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<IndicatorGroupSequenceEntry>>(v));
         }
 
         private static void ConfigureReleaseFootnote(ModelBuilder modelBuilder)

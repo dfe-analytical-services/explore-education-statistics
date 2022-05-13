@@ -1,44 +1,36 @@
-using System.Linq;
+#nullable enable
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers
 {
-    public class ViewSubjectDataRequirement : IAuthorizationRequirement
-    {
-    }
-
     public class ViewSubjectDataForPublishedReleasesAuthorizationHandler : AuthorizationHandler<
-        ViewSubjectDataRequirement, Subject>
+        ViewSubjectDataRequirement, ReleaseSubject>
     {
-        private readonly StatisticsDbContext _context;
+        private readonly ContentDbContext _context;
 
-        public ViewSubjectDataForPublishedReleasesAuthorizationHandler(StatisticsDbContext context)
+        public ViewSubjectDataForPublishedReleasesAuthorizationHandler(ContentDbContext context)
         {
             _context = context;
         }
 
-        protected override Task HandleRequirementAsync(AuthorizationHandlerContext authContext, 
+        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext authContext,
             ViewSubjectDataRequirement requirement,
-            Subject subject)
+            ReleaseSubject releaseSubject)
         {
-            var attachedToPublishedRelease = _context
-                .ReleaseSubject
-                .Include(r => r.Release)
-                .Where(r => r.SubjectId == subject.Id)
-                .ToList()
-                .Any(r => r.Release.Live);
+            var release = await _context.Releases
+                .Include(r => r.Publication)
+                .ThenInclude(p => p.Releases)
+                .SingleAsync(r => r.Id == releaseSubject.ReleaseId);
 
-            if (attachedToPublishedRelease)
+            if (release.IsLatestPublishedVersionOfRelease())
             {
                 authContext.Succeed(requirement);
             }
-
-            return Task.CompletedTask;
-
         }
     }
 }

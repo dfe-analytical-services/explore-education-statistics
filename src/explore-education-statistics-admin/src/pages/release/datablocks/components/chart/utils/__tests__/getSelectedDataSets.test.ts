@@ -24,6 +24,7 @@ describe('getSelectedDataSets', () => {
           label: 'Special',
         } as CategoryFilter,
       ],
+      order: 0,
     },
   };
 
@@ -41,6 +42,7 @@ describe('getSelectedDataSets', () => {
           label: 'another-category1-option2',
         } as CategoryFilter,
       ],
+      order: 1,
     },
   };
 
@@ -58,6 +60,7 @@ describe('getSelectedDataSets', () => {
           label: 'another-category2-option2',
         } as CategoryFilter,
       ],
+      order: 2,
     },
   };
 

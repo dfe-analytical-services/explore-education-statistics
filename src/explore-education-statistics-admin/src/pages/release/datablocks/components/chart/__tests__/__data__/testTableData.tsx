@@ -10,6 +10,7 @@ export const testTableData: TableDataResponse = {
         legend: 'Characteristic',
         options: {
           EthnicGroupMajor: {
+            id: 'ethnic-group-major',
             label: 'Ethnic group major',
             options: [
               {
@@ -21,8 +22,10 @@ export const testTableData: TableDataResponse = {
                 value: 'ethnicity-major-black-total',
               },
             ],
+            order: 0,
           },
         },
+        order: 0,
         name: 'characteristic',
       },
       SchoolType: {
@@ -31,6 +34,7 @@ export const testTableData: TableDataResponse = {
         legend: 'School type',
         options: {
           Default: {
+            id: 'default',
             label: 'Default',
             options: [
               {
@@ -42,8 +46,10 @@ export const testTableData: TableDataResponse = {
                 value: 'state-funded-secondary',
               },
             ],
+            order: 0,
           },
         },
+        order: 1,
         name: 'school_type',
       },
     },

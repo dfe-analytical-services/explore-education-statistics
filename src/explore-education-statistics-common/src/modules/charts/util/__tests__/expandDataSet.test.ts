@@ -19,6 +19,7 @@ describe('expandDataSet', () => {
           legend: 'Characteristic',
           options: {
             EthnicGroupMajor: {
+              id: 'ethnic-group-major',
               label: 'Ethnic group major',
               options: [
                 {
@@ -34,8 +35,10 @@ describe('expandDataSet', () => {
                   value: 'ethnicity-major-black-total',
                 },
               ],
+              order: 0,
             },
           },
+          order: 0,
           name: 'characteristic',
         },
         SchoolType: {
@@ -44,6 +47,7 @@ describe('expandDataSet', () => {
           legend: 'School type',
           options: {
             Default: {
+              id: 'default',
               label: 'Default',
               options: [
                 {
@@ -55,8 +59,10 @@ describe('expandDataSet', () => {
                   value: 'state-funded-primary',
                 },
               ],
+              order: 0,
             },
           },
+          order: 1,
           name: 'school_type',
         },
       },

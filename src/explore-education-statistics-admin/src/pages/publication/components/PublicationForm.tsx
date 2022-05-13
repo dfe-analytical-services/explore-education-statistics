@@ -6,7 +6,6 @@ import ButtonGroup from '@common/components/ButtonGroup';
 import { FormFieldSelect, FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
-import FormSelect from '@common/components/form/FormSelect';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useFormSubmit from '@common/hooks/useFormSubmit';

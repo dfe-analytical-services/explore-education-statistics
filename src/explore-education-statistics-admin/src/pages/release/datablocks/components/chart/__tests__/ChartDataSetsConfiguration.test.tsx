@@ -60,6 +60,7 @@ describe('ChartDataSetsConfiguration', () => {
         name: 'characteristic',
         options: {
           gender: {
+            id: 'gender',
             label: 'Gender',
             options: [
               {
@@ -71,8 +72,10 @@ describe('ChartDataSetsConfiguration', () => {
                 label: 'Female',
               },
             ],
+            order: 0,
           },
         },
+        order: 0,
       },
     },
   };
@@ -87,23 +90,29 @@ describe('ChartDataSetsConfiguration', () => {
         name: 'School Type',
         options: {
           CategoryFilter: {
+            id: 'category-filter',
             label: 'Category filter',
             options: [
               {
+                id: 'secondary',
                 value: 'secondary',
                 label: 'Secondary',
               },
               {
+                id: 'primary',
                 value: 'primary',
                 label: 'Primary',
               },
               {
+                id: 'special',
                 value: 'special',
                 label: 'Special',
               },
             ],
+            order: 0,
           },
         },
+        order: 0,
       },
     },
   };
@@ -335,8 +344,8 @@ describe('ChartDataSetsConfiguration', () => {
       );
       expect(characteristicOptions).toHaveLength(3);
       expect(characteristicOptions[0]).toHaveTextContent('All options');
-      expect(characteristicOptions[1]).toHaveTextContent('Female');
-      expect(characteristicOptions[2]).toHaveTextContent('Male');
+      expect(characteristicOptions[1]).toHaveTextContent('Male');
+      expect(characteristicOptions[2]).toHaveTextContent('Female');
 
       const indicator = screen.getByLabelText('Indicator');
       expect(indicator).toBeInTheDocument();

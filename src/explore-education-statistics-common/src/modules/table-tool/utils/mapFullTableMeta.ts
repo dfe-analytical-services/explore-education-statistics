@@ -26,6 +26,7 @@ export default function mapFullTableMeta(
             }),
         ),
       ),
+      order: category.order,
     };
 
     return acc;

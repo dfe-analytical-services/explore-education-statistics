@@ -78,6 +78,7 @@ describe('mapTableHeadersConfig', () => {
           name: 'characteristic',
           options: {
             EthnicGroupMajor: {
+              id: '872e2ee8-1972-4db8-9e4b-ba279c544f22',
               label: 'Ethnic group major',
               options: [
                 {
@@ -89,8 +90,10 @@ describe('mapTableHeadersConfig', () => {
                   value: '067de12b-014b-4bbd-baf1-08d78f6f2c4d',
                 },
               ],
+              order: 0,
             },
           },
+          order: 0,
         },
         SchoolType: {
           totalValue: '',
@@ -99,6 +102,7 @@ describe('mapTableHeadersConfig', () => {
           name: 'school_type',
           options: {
             Default: {
+              id: '02efb195-51e8-4a4b-bba0-f772c1b460ab',
               label: 'Default',
               options: [
                 {
@@ -110,8 +114,10 @@ describe('mapTableHeadersConfig', () => {
                   value: 'a9fe9fa6-e91f-460b-a0b1-66877b97c581',
                 },
               ],
+              order: 0,
             },
           },
+          order: 1,
         },
       },
       footnotes: [],

@@ -13,6 +13,7 @@ describe('getDefaultTableHeadersConfig', () => {
           name: 'characteristic',
           options: {
             EthnicGroupMajor: {
+              id: 'ethnic-group-major',
               label: 'Ethnic group major',
               options: [
                 {
@@ -24,8 +25,10 @@ describe('getDefaultTableHeadersConfig', () => {
                   value: 'ethnicity-major-black-total',
                 },
               ],
+              order: 0,
             },
           },
+          order: 0,
         },
         SchoolType: {
           totalValue: '',
@@ -34,6 +37,7 @@ describe('getDefaultTableHeadersConfig', () => {
           name: 'school_type',
           options: {
             Default: {
+              id: 'default',
               label: 'Default',
               options: [
                 {
@@ -49,8 +53,10 @@ describe('getDefaultTableHeadersConfig', () => {
                   value: 'state-funded-secondary',
                 },
               ],
+              order: 0,
             },
           },
+          order: 1,
         },
       },
       footnotes: [],
@@ -276,6 +282,7 @@ describe('getDefaultTableHeadersConfig', () => {
             ...testTableData.subjectMeta.filters.SchoolType,
             options: {
               Default: {
+                id: 'default',
                 label: 'Default',
                 options: [
                   {
@@ -287,6 +294,7 @@ describe('getDefaultTableHeadersConfig', () => {
                     value: 'state-funded-secondary',
                   },
                 ],
+                order: 0,
               },
             },
           },
@@ -353,6 +361,7 @@ describe('getDefaultTableHeadersConfig', () => {
             ...testTableData.subjectMeta.filters.Characteristic,
             options: {
               EthnicGroupMajor: {
+                id: 'ethnic-group-major',
                 label: 'Ethnic group major',
                 options: [
                   {
@@ -360,6 +369,7 @@ describe('getDefaultTableHeadersConfig', () => {
                     value: 'ethnicity-major-black-total',
                   },
                 ],
+                order: 0,
               },
             },
           },
@@ -367,6 +377,7 @@ describe('getDefaultTableHeadersConfig', () => {
             ...testTableData.subjectMeta.filters.SchoolType,
             options: {
               Default: {
+                id: 'default',
                 label: 'Default',
                 options: [
                   {
@@ -374,6 +385,7 @@ describe('getDefaultTableHeadersConfig', () => {
                     value: 'state-funded-secondary',
                   },
                 ],
+                order: 0,
               },
             },
           },

@@ -103,10 +103,18 @@ export const testChartTableData: TableDataResponse = {
         legend: 'School type',
         options: {
           Default: {
+            id: 'default',
             label: 'Default',
-            options: [{ label: 'Total', value: 'school-type-total' }],
+            options: [
+              {
+                label: 'Total',
+                value: 'school-type-total',
+              },
+            ],
+            order: 0,
           },
         },
+        order: 0,
         name: 'school_type',
       },
       Characteristic: {
@@ -115,10 +123,18 @@ export const testChartTableData: TableDataResponse = {
         legend: 'Characteristic',
         options: {
           Total: {
+            id: 'total',
             label: 'Total',
-            options: [{ label: 'Total', value: 'characteristic-total' }],
+            options: [
+              {
+                label: 'Total',
+                value: 'characteristic-total',
+              },
+            ],
+            order: 0,
           },
         },
+        order: 1,
         name: 'characteristic',
       },
     },

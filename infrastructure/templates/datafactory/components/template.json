@@ -2002,6 +2002,46 @@
                                             "name": "DataGuidance",
                                             "type": "String"
                                         }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Created",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "Created",
+                                            "type": "DateTime"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "FilterSequence",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "FilterSequence",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "IndicatorSequence",
+                                            "type": "String"
+                                        },
+                                        "sink": {
+                                            "name": "IndicatorSequence",
+                                            "type": "String"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Updated",
+                                            "type": "DateTime"
+                                        },
+                                        "sink": {
+                                            "name": "Updated",
+                                            "type": "DateTime"
+                                        }
                                     }
                                 ]
                             }

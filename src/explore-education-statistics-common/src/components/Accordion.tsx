@@ -156,7 +156,6 @@ const Accordion = ({
       className={classNames('govuk-accordion', styles.accordion)}
       id={id}
       ref={ref}
-      role="none"
       data-testid="accordion"
     >
       {isMounted && showOpenAll && (

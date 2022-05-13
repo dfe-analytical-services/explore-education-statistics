@@ -16,23 +16,26 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using static GovUk.Education.ExploreEducationStatistics.Data.Services.Security.DataSecurityPolicies;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.FilterAndIndicatorViewModelBuilders;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public class ResultSubjectMetaService : AbstractSubjectMetaService, IResultSubjectMetaService
     {
         private readonly ContentDbContext _contentDbContext;
+        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly IBoundaryLevelRepository _boundaryLevelRepository;
+        private readonly IFilterItemRepository _filterItemRepository;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IGeoJsonRepository _geoJsonRepository;
         private readonly IIndicatorRepository _indicatorRepository;
-        private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly ITimePeriodService _timePeriodService;
         private readonly IUserService _userService;
         private readonly ISubjectRepository _subjectRepository;
@@ -42,25 +45,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public ResultSubjectMetaService(
             ContentDbContext contentDbContext,
-            IFilterItemRepository filterItemRepository,
+            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             IBoundaryLevelRepository boundaryLevelRepository,
+            IFilterItemRepository filterItemRepository,
             IFootnoteRepository footnoteRepository,
             IGeoJsonRepository geoJsonRepository,
             IIndicatorRepository indicatorRepository,
-            IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             ITimePeriodService timePeriodService,
             IUserService userService,
             ISubjectRepository subjectRepository,
             IReleaseDataFileRepository releaseDataFileRepository,
             IOptions<LocationsOptions> locationOptions,
-            ILogger<ResultSubjectMetaService> logger) : base(filterItemRepository)
+            ILogger<ResultSubjectMetaService> logger)
         {
             _contentDbContext = contentDbContext;
+            _persistenceHelper = persistenceHelper;
             _boundaryLevelRepository = boundaryLevelRepository;
+            _filterItemRepository = filterItemRepository;
             _footnoteRepository = footnoteRepository;
             _geoJsonRepository = geoJsonRepository;
             _indicatorRepository = indicatorRepository;
-            _persistenceHelper = persistenceHelper;
             _timePeriodService = timePeriodService;
             _userService = userService;
             _subjectRepository = subjectRepository;
@@ -74,18 +78,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             ObservationQueryContext query,
             IList<Observation> observations)
         {
-            return await _persistenceHelper.CheckEntityExists<Subject>(query.SubjectId)
-                .OnSuccess(CheckCanViewSubjectData)
-                .OnSuccess(async subject =>
+            return await CheckReleaseSubjectExists(releaseId, query.SubjectId)
+                .OnSuccess(_userService.CheckCanViewSubjectData)
+                .OnSuccess(async releaseSubject =>
                 {
                     var stopwatch = Stopwatch.StartNew();
                     stopwatch.Start();
-                    
+
                     var locations = observations
                         .Select(o => o.Location)
                         .Distinct()
                         .ToList();
-                    
+
                     var locationAttributes =
                         locations.GetLocationAttributesHierarchical(_locationOptions.Hierarchies);
                     _logger.LogTrace("Got Location attributes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
@@ -93,16 +97,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     var filterItems =
                         _filterItemRepository.GetFilterItemsFromObservationList(observations);
-                    var filterViewModels = BuildFilterHierarchy(filterItems);
+                    var filterViewModels = FiltersViewModelBuilder.BuildFiltersFromFilterItems(filterItems,
+                        releaseSubject.FilterSequence);
                     _logger.LogTrace("Got Filters in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var footnoteViewModels = 
+                    var footnoteViewModels =
                         GetFilteredFootnoteViewModels(releaseId, filterItems.Select(fi => fi.Id).ToList(), query);
                     _logger.LogTrace("Got Footnotes in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var indicatorViewModels = GetIndicatorViewModels(query);
+                    var indicatorViewModels = GetIndicatorViewModels(query, releaseSubject);
                     _logger.LogTrace("Got Indicators in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
@@ -110,10 +115,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     _logger.LogTrace("Got Time Periods in {Time} ms", stopwatch.Elapsed.TotalMilliseconds);
                     stopwatch.Restart();
 
-                    var publicationId = await _subjectRepository.GetPublicationIdForSubject(subject.Id);
+                    var publicationId = await _subjectRepository.GetPublicationIdForSubject(releaseSubject.SubjectId);
                     var publicationTitle = (await _contentDbContext.Publications.FindAsync(publicationId))!.Title;
 
-                    var releaseFile = await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id);
+                    var releaseFile =
+                        await _releaseDataFileRepository.GetBySubject(releaseId, releaseSubject.SubjectId);
                     var subjectName = releaseFile.Name!;
 
                     var locationsHelper = new LocationsQueryHelper(
@@ -141,20 +147,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 });
         }
 
-        private async Task<Either<ActionResult, Subject>> CheckCanViewSubjectData(Subject subject)
+        private Task<Either<ActionResult, ReleaseSubject>> CheckReleaseSubjectExists(Guid releaseId, Guid subjectId)
         {
-            if (await _userService.MatchesPolicy(subject, CanViewSubjectData))
-            {
-                return subject;
-            }
-
-            return new ForbidResult();
+            return _persistenceHelper.CheckEntityExists<ReleaseSubject>(
+                query => query
+                    .Include(rs => rs.Subject)
+                    .Where(rs => rs.ReleaseId == releaseId
+                                 && rs.SubjectId == subjectId)
+            );
         }
 
-        private List<IndicatorMetaViewModel> GetIndicatorViewModels(ObservationQueryContext query)
+        private List<IndicatorMetaViewModel> GetIndicatorViewModels(ObservationQueryContext query,
+            ReleaseSubject subject)
         {
             var indicators = _indicatorRepository.GetIndicators(query.SubjectId, query.Indicators);
-            return BuildIndicatorViewModels(indicators);
+
+            // Flatten the indicator sequence so that it can be used to sequence all the indicators since they have
+            // been fetched without groups
+            var indicatorsOrdering = subject.IndicatorSequence?
+                .SelectMany(groupOrdering => groupOrdering.ChildSequence)
+                .ToList();
+
+            return IndicatorsViewModelBuilder.BuildIndicators(indicators, indicatorsOrdering);
         }
 
         private List<FootnoteViewModel> GetFilteredFootnoteViewModels(
@@ -171,7 +185,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 })
                 .ToList();
         }
-        
+
         private List<TimePeriodMetaViewModel> GetTimePeriodViewModels(IList<Observation> observations)
         {
             return _timePeriodService
@@ -214,7 +228,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
             public Dictionary<string, List<LocationAttributeViewModel>> GetLocationViewModels()
             {
-                var allGeoJson = _query.BoundaryLevel != null 
+                var allGeoJson = _query.BoundaryLevel != null
                     ? GetGeoJson(_query.BoundaryLevel.Value, _locationAttributes)
                     : new Dictionary<GeographicLevel, Dictionary<string, GeoJson>>();
 
@@ -294,7 +308,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 {
                     return new Dictionary<GeographicLevel, Dictionary<string, GeoJson>>();
                 }
-                
+
                 return locations.ToDictionary(
                     pair => pair.Key,
                     pair =>
@@ -305,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         {
                             return new Dictionary<string, GeoJson>();
                         }
-                        
+
                         var locationAttributeCodes = locationAttributes
                             .SelectMany(locationAttribute => locationAttribute.GetLeafAttributes())
                             .Select(locationAttribute => locationAttribute.GetCodeOrFallback())

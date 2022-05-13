@@ -87,6 +87,7 @@ describe('getInitialStepSubjectMeta', () => {
 
     expect(tableBuilderService.getSubjectMeta).toHaveBeenCalledWith(
       'subject-1',
+      'release-1',
     );
   });
 
@@ -121,6 +122,7 @@ describe('getInitialStepSubjectMeta', () => {
 
     expect(tableBuilderService.getSubjectMeta).toHaveBeenCalledWith(
       'subject-1',
+      'release-1',
     );
   });
 
@@ -181,6 +183,7 @@ describe('getInitialStepSubjectMeta', () => {
 
     expect(tableBuilderService.getSubjectMeta).toHaveBeenCalledWith(
       'subject-1',
+      'release-1',
     );
   });
 
@@ -203,6 +206,7 @@ describe('getInitialStepSubjectMeta', () => {
       },
       indicators: {
         indicatorGroup1: {
+          id: 'indicator-group-1',
           label: 'Indicator group 1',
           options: [
             {
@@ -212,19 +216,29 @@ describe('getInitialStepSubjectMeta', () => {
               name: 'indicator_1',
             },
           ],
+          order: 0,
         },
       },
       filters: {
         filter1: {
+          id: 'filter-1',
           legend: 'Filter 1',
           hint: '',
           name: 'filter_1',
           options: {
             filterGroup1: {
+              id: 'filter-group-1',
               label: 'Filter Group 1',
-              options: [{ value: 'filter-item-1', label: 'Filter item 1' }],
+              options: [
+                {
+                  value: 'filter-item-1',
+                  label: 'Filter item 1',
+                },
+              ],
+              order: 0,
             },
           },
+          order: 0,
         },
       },
     };
@@ -282,10 +296,18 @@ describe('getInitialStepSubjectMeta', () => {
             name: 'filter_1',
             options: {
               filterGroup1: {
+                id: 'filter-group-1',
                 label: 'Filter Group 1',
-                options: [{ value: 'filter-item-1', label: 'Filter item 1' }],
+                options: [
+                  {
+                    value: 'filter-item-1',
+                    label: 'Filter item 1',
+                  },
+                ],
+                order: 0,
               },
             },
+            order: 0,
           },
         },
       },

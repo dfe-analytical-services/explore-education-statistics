@@ -42,6 +42,7 @@ describe('TableToolPage', () => {
             legend: 'Subject studied',
             options: {
               Default: {
+                id: 'default',
                 label: 'Default',
                 options: [
                   {
@@ -53,8 +54,10 @@ describe('TableToolPage', () => {
                     value: '0164a10e-c041-49f8-b44d-daa6f0c1fbfd',
                   },
                 ],
+                order: 0,
               },
             },
+            order: 0,
             name: 'subject_name',
           },
         },
@@ -162,12 +165,14 @@ describe('TableToolPage', () => {
   const testSubjectMeta: SubjectMeta = {
     filters: {
       SubjectStudied: {
+        id: 'subject-studied',
         totalValue: '',
         name: 'Subject studied',
         hint: 'Filter by Subject studied',
         legend: 'Subject studied',
         options: {
           Default: {
+            id: 'default',
             label: 'Default',
             options: [
               {
@@ -183,12 +188,15 @@ describe('TableToolPage', () => {
                 value: '89cf21bd-2d1c-479b-9bde-550fc1ade623',
               },
             ],
+            order: 0,
           },
         },
+        order: 0,
       },
     },
     indicators: {
       Earnings: {
+        id: 'earnings',
         label: 'Earnings',
         options: [
           {
@@ -213,8 +221,10 @@ describe('TableToolPage', () => {
             decimalPlaces: 0,
           },
         ],
+        order: 0,
       },
       Outcomes: {
+        id: 'outcomes',
         label: 'Outcomes',
         options: [
           {
@@ -239,8 +249,10 @@ describe('TableToolPage', () => {
             decimalPlaces: 1,
           },
         ],
+        order: 1,
       },
       Populations: {
+        id: 'populations',
         label: 'Populations',
         options: [
           {
@@ -265,6 +277,7 @@ describe('TableToolPage', () => {
             decimalPlaces: 0,
           },
         ],
+        order: 2,
       },
     },
     locations: {

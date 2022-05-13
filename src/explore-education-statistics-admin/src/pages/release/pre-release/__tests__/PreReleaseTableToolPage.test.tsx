@@ -38,12 +38,14 @@ describe('PreReleaseTableToolPage', () => {
   const testSubjectMeta: SubjectMeta = {
     filters: {
       SchoolType: {
+        id: 'school-type',
         totalValue: '',
         hint: 'Filter by school type',
         legend: 'School type',
         name: 'school_type',
         options: {
           Default: {
+            id: 'default',
             label: 'Default',
             options: [
               {
@@ -55,12 +57,15 @@ describe('PreReleaseTableToolPage', () => {
                 value: 'state-funded-secondary',
               },
             ],
+            order: 0,
           },
         },
+        order: 0,
       },
     },
     indicators: {
       AbsenceFields: {
+        id: 'absence-fields',
         label: 'Absence fields',
         options: [
           {
@@ -71,6 +76,7 @@ describe('PreReleaseTableToolPage', () => {
             decimalPlaces: 2,
           },
         ],
+        order: 0,
       },
     },
     locations: {
@@ -97,6 +103,7 @@ describe('PreReleaseTableToolPage', () => {
           legend: 'School type',
           options: {
             Default: {
+              id: 'default',
               label: 'Default',
               options: [
                 {
@@ -108,8 +115,10 @@ describe('PreReleaseTableToolPage', () => {
                   value: 'state-funded-secondary',
                 },
               ],
+              order: 0,
             },
           },
+          order: 0,
           name: 'school_type',
         },
       },

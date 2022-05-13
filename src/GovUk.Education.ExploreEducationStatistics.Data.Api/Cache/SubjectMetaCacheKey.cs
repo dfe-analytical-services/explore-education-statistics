@@ -2,16 +2,22 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache
+namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache
 {
     public record SubjectMetaCacheKey : IBlobCacheKey
     {
         private string PublicationSlug { get; }
         private string ReleaseSlug { get; }
-        public Guid SubjectId { get; }
+        private Guid SubjectId { get; }
+
+        public SubjectMetaCacheKey(CacheableReleaseSubject cacheable)
+        {
+            PublicationSlug = cacheable.PublicationSlug;
+            ReleaseSlug = cacheable.ReleaseSlug;
+            SubjectId = cacheable.SubjectId;
+        }
 
         public SubjectMetaCacheKey(string publicationSlug, string releaseSlug, Guid subjectId)
         {
@@ -20,13 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Cache
             SubjectId = subjectId;
         }
 
-        public SubjectMetaCacheKey(SubjectMetaCacheKey cacheKey)
-        {
-            PublicationSlug = cacheKey.PublicationSlug;
-            ReleaseSlug = cacheKey.ReleaseSlug;
-            SubjectId = cacheKey.SubjectId;
-        }
-        
         public IBlobContainer Container => BlobContainers.PublicContent;
 
         public string Key => PublicContentSubjectMetaPath(PublicationSlug, ReleaseSlug, SubjectId);

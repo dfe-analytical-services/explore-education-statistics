@@ -67,7 +67,7 @@ const ReleaseDataPage = () => {
             canUpdateRelease={canUpdateRelease}
           />
         </TabsSection>
-        {/* EES-1243 
+        {/* TODO Depends on EES-2793 Data replacement support for reordering
         <TabsSection
           id={releaseDataPageTabIds.reordering}
           title="Reorder filters and indicators"
