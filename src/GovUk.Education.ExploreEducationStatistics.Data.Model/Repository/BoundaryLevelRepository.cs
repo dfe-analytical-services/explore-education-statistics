@@ -1,44 +1,41 @@
 #nullable enable
-using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
 {
-    public class BoundaryLevelRepository : AbstractRepository<BoundaryLevel, long>, IBoundaryLevelRepository
+    public class BoundaryLevelRepository : IBoundaryLevelRepository
     {
-        private readonly DataServiceMemoryCache<BoundaryLevel> _cache;
+        private readonly StatisticsDbContext _context;
 
-        public BoundaryLevelRepository(
-            StatisticsDbContext context,
-            DataServiceMemoryCache<BoundaryLevel> cache)
-            : base(context)
+        public BoundaryLevelRepository(StatisticsDbContext context)
         {
-            _cache = cache;
+            _context = context;
         }
 
-        private IEnumerable<BoundaryLevel> FindByGeographicLevel(GeographicLevel geographicLevel)
+        public Task<BoundaryLevel?> Get(long id)
         {
-            return FindMany(level => level.Level == geographicLevel)
-                .OrderByDescending(level => level.Published);
+            return _context.BoundaryLevel.SingleOrDefaultAsync(level => level.Id == id);
         }
 
         public IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels)
         {
-            return FindMany(level => geographicLevels.Contains(level.Level))
+            return _context.BoundaryLevel
+                .Where(level => geographicLevels.Contains(level.Level))
                 .OrderByDescending(level => level.Published);
         }
 
         public BoundaryLevel? FindLatestByGeographicLevel(GeographicLevel geographicLevel)
         {
-            var boundaryLevel = FindMany(level => level.Level == geographicLevel)
+            return _context.BoundaryLevel
+                .Where(level => level.Level == geographicLevel)
                 .OrderByDescending(level => level.Published)
                 .FirstOrDefault();
-
-            return boundaryLevel;
         }
     }
 }

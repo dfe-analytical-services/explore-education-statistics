@@ -1010,7 +1010,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private static DataGuidanceSubjectService SetupService(
             StatisticsDbContext statisticsDbContext,
-            IFilterRepository? filterRepository = null,
             IIndicatorRepository? indicatorRepository = null,
             IPersistenceHelper<StatisticsDbContext>? persistenceHelper = null,
             ContentDbContext? contentDbContext = null,
@@ -1018,7 +1017,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             ITimePeriodService? timePeriodService = null)
         {
             return new (
-                filterRepository ?? new FilterRepository(statisticsDbContext),
                 indicatorRepository ?? new IndicatorRepository(statisticsDbContext),
                 statisticsDbContext,
                 persistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),

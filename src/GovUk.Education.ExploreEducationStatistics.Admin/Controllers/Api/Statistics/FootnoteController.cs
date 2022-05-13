@@ -113,8 +113,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                         .SelectAsync(async subject =>
                             new FootnotesSubjectMetaViewModel
                             {
-                                Filters = GetFilters(subject.Id),
-                                Indicators = GetIndicators(subject.Id),
+                                Filters = await GetFilters(subject.Id),
+                                Indicators = await GetIndicators(subject.Id),
                                 SubjectId = subject.Id,
                                 SubjectName = (await _releaseDataFileRepository.GetBySubject(releaseId, subject.Id)).Name,
                             }
@@ -131,9 +131,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrOk();
         }
 
-        private Dictionary<Guid, FootnotesIndicatorsMetaViewModel> GetIndicators(Guid subjectId)
+        private async Task<Dictionary<Guid, FootnotesIndicatorsMetaViewModel>> GetIndicators(Guid subjectId)
         {
-            return _indicatorGroupRepository.GetIndicatorGroups(subjectId)
+            return (await _indicatorGroupRepository.GetIndicatorGroups(subjectId))
                 .OrderBy(group => group.Label, LabelComparer)
                 .ToDictionary(
                     group => group.Id,
@@ -148,9 +148,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 );
         }
 
-        private Dictionary<Guid, FootnotesFilterMetaViewModel> GetFilters(Guid subjectId)
+        private async Task<Dictionary<Guid, FootnotesFilterMetaViewModel>> GetFilters(Guid subjectId)
         {
-            return _filterRepository.GetFiltersIncludingItems(subjectId)
+            return (await _filterRepository.GetFiltersIncludingItems(subjectId))
                 .ToDictionary(
                     filter => filter.Id,
                     filter => new FootnotesFilterMetaViewModel

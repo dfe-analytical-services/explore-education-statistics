@@ -23,6 +23,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
@@ -78,11 +79,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterRepository
                 .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
-                .Returns(new List<Filter>());
+                .ReturnsAsync(new List<Filter>());
 
             indicatorGroupRepository
                 .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
-                .Returns(new List<IndicatorGroup>());
+                .ReturnsAsync(new List<IndicatorGroup>());
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
@@ -206,11 +207,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterRepository
                 .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
-                .Returns(new List<Filter>());
+                .ReturnsAsync(new List<Filter>());
 
             indicatorGroupRepository
                 .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
-                .Returns(new List<IndicatorGroup>());
+                .ReturnsAsync(new List<IndicatorGroup>());
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
@@ -384,11 +385,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterRepository
                 .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
-                .Returns(new List<Filter>());
+                .ReturnsAsync(new List<Filter>());
 
             indicatorGroupRepository
                 .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
-                .Returns(new List<IndicatorGroup>());
+                .ReturnsAsync(new List<IndicatorGroup>());
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
@@ -503,11 +504,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterRepository
                 .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
-                .Returns(new List<Filter>());
+                .ReturnsAsync(new List<Filter>());
 
             indicatorGroupRepository
                 .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
-                .Returns(new List<IndicatorGroup>());
+                .ReturnsAsync(new List<IndicatorGroup>());
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
@@ -604,11 +605,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterRepository
                 .Setup(s => s.GetFiltersIncludingItems(subject.Id))
-                .Returns(new List<Filter>());
+                .ReturnsAsync(new List<Filter>());
 
             indicatorGroupRepository
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
-                .Returns(new List<IndicatorGroup>());
+                .ReturnsAsync(new List<IndicatorGroup>());
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(subject.Id))
@@ -742,11 +743,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterRepository
                 .Setup(s => s.GetFiltersIncludingItems(subject.Id))
-                .Returns(new List<Filter>());
+                .ReturnsAsync(new List<Filter>());
 
             indicatorGroupRepository
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
-                .Returns(new List<IndicatorGroup>());
+                .ReturnsAsync(new List<IndicatorGroup>());
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(subject.Id))
@@ -907,11 +908,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
             filterRepository
                 .Setup(s => s.GetFiltersIncludingItems(subject.Id))
-                .Returns(new List<Filter>());
+                .ReturnsAsync(new List<Filter>());
 
             indicatorGroupRepository
                 .Setup(s => s.GetIndicatorGroups(subject.Id))
-                .Returns(new List<IndicatorGroup>());
+                .ReturnsAsync(new List<IndicatorGroup>());
 
             timePeriodService
                 .Setup(s => s.GetTimePeriods(subject.Id))
@@ -1380,7 +1381,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 indicatorGroupRepository
                     .Setup(s => s.GetIndicatorGroups(subject.Id))
-                    .Returns(indicatorGroups);
+                    .ReturnsAsync(indicatorGroups);
 
                 var service = BuildSubjectMetaService(
                     statisticsDbContext,
@@ -1538,6 +1539,1390 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 Assert.Equal("Unable to determine which SubjectMeta information has requested " +
                              "(Parameter 'subjectMetaStep')", exception.Message);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectFilters()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var filters = new List<Filter>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FilterGroups = new List<FilterGroup>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                },
+                            }
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                }
+                            }
+                        }
+                    }
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FilterGroups = new List<FilterGroup>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Create a request with identical filters, filter groups and filter items
+            var request = filters.Select(filter =>
+                new FilterUpdateViewModel
+                {
+                    Id = filter.Id,
+                    FilterGroups = filter.FilterGroups.Select(filterGroup => new FilterGroupUpdateViewModel
+                    {
+                        Id = filterGroup.Id,
+                        FilterItems = filterGroup.FilterItems.Select(filterItem => filterItem.Id).ToList()
+                    }).ToList()
+                }).ToList();
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+
+            filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
+                .ReturnsAsync(filters);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    filterRepository: filterRepository.Object);
+
+                var result = await service.UpdateSubjectFilters(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(filterRepository);
+
+                result.AssertRight();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                var savedSequence = savedReleaseSubject.FilterSequence;
+
+                Assert.NotNull(savedSequence);
+                Assert.Equal(2, savedSequence!.Count);
+
+                // Filter 1
+                var savedFilter1 = savedSequence[0];
+                Assert.Equal(request[0].Id, savedFilter1.Id);
+
+                Assert.Equal(2, savedFilter1.ChildSequence.Count);
+                var savedFilter1Group1 = savedFilter1.ChildSequence[0];
+                var savedFilter1Group2 = savedFilter1.ChildSequence[1];
+
+                Assert.Equal(request[0].FilterGroups[0].Id, savedFilter1Group1.Id);
+                Assert.Equal(request[0].FilterGroups[1].Id, savedFilter1Group2.Id);
+
+                Assert.Equal(2, savedFilter1Group1.ChildSequence.Count);
+                Assert.Equal(request[0].FilterGroups[0].FilterItems[0], savedFilter1Group1.ChildSequence[0]);
+                Assert.Equal(request[0].FilterGroups[0].FilterItems[1], savedFilter1Group1.ChildSequence[1]);
+
+                Assert.Equal(2, savedFilter1Group2.ChildSequence.Count);
+                Assert.Equal(request[0].FilterGroups[1].FilterItems[0], savedFilter1Group2.ChildSequence[0]);
+                Assert.Equal(request[0].FilterGroups[1].FilterItems[1], savedFilter1Group2.ChildSequence[1]);
+
+                // Filter 2
+                var savedFilter2 = savedSequence[1];
+                Assert.Equal(request[1].Id, savedFilter2.Id);
+
+                Assert.Single(savedFilter2.ChildSequence);
+                var savedFilter2Group1 = savedFilter2.ChildSequence[0];
+
+                Assert.Equal(request[1].FilterGroups[0].Id, savedFilter2Group1.Id);
+
+                Assert.Single(savedFilter2Group1.ChildSequence);
+                Assert.Equal(request[1].FilterGroups[0].FilterItems[0], savedFilter2Group1.ChildSequence[0]);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectFilters_FilterMissing()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var filters = new List<Filter>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FilterGroups = new List<FilterGroup>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                }
+                            }
+                        }
+                    }
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FilterGroups = new List<FilterGroup>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Request has the second filter missing
+            var request = new List<FilterUpdateViewModel>
+            {
+                new()
+                {
+                    Id = filters[0].Id,
+                    FilterGroups = new List<FilterGroupUpdateViewModel>
+                    {
+                        new()
+                        {
+                            Id = filters[0].FilterGroups[0].Id,
+                            FilterItems = new List<Guid>
+                            {
+                                filters[0].FilterGroups[0].FilterItems[0].Id
+                            }
+                        }
+                    }
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+
+            filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
+                .ReturnsAsync(filters);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    filterRepository: filterRepository.Object);
+
+                var result = await service.UpdateSubjectFilters(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(filterRepository);
+
+                result.AssertBadRequest(FiltersDifferFromSubject);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.FilterSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectFilters_FilterGroupMissing()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var filters = new List<Filter>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FilterGroups = new List<FilterGroup>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                }
+                            }
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Request has the second filter group missing
+            var request = new List<FilterUpdateViewModel>
+            {
+                new()
+                {
+                    Id = filters[0].Id,
+                    FilterGroups = new List<FilterGroupUpdateViewModel>
+                    {
+                        new()
+                        {
+                            Id = filters[0].FilterGroups[0].Id,
+                            FilterItems = new List<Guid>
+                            {
+                                filters[0].FilterGroups[0].FilterItems[0].Id
+                            }
+                        }
+                    }
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+
+            filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
+                .ReturnsAsync(filters);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    filterRepository: filterRepository.Object);
+
+                var result = await service.UpdateSubjectFilters(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(filterRepository);
+
+                result.AssertBadRequest(FilterGroupsDifferFromSubject);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.FilterSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectFilters_FilterItemMissing()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var filters = new List<Filter>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FilterGroups = new List<FilterGroup>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Request has the second filter item missing
+            var request = new List<FilterUpdateViewModel>
+            {
+                new()
+                {
+                    Id = filters[0].Id,
+                    FilterGroups = new List<FilterGroupUpdateViewModel>
+                    {
+                        new()
+                        {
+                            Id = filters[0].FilterGroups[0].Id,
+                            FilterItems = new List<Guid>
+                            {
+                                filters[0].FilterGroups[0].FilterItems[0].Id
+                            }
+                        }
+                    }
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+
+            filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
+                .ReturnsAsync(filters);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    filterRepository: filterRepository.Object);
+
+                var result = await service.UpdateSubjectFilters(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(filterRepository);
+
+                result.AssertBadRequest(FilterItemsDifferFromSubject);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.FilterSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectFilters_FilterNotForSubject()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var filters = new List<Filter>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FilterGroups = new List<FilterGroup>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Request has a filter not for this subject
+            var request = new List<FilterUpdateViewModel>
+            {
+                new()
+                {
+                    Id = filters[0].Id,
+                    FilterGroups = new List<FilterGroupUpdateViewModel>
+                    {
+                        new()
+                        {
+                            Id = filters[0].FilterGroups[0].Id,
+                            FilterItems = new List<Guid>
+                            {
+                                filters[0].FilterGroups[0].FilterItems[0].Id
+                            }
+                        }
+                    }
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FilterGroups = new List<FilterGroupUpdateViewModel>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<Guid>
+                            {
+                                Guid.NewGuid()
+                            }
+                        }
+                    }
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+
+            filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
+                .ReturnsAsync(filters);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    filterRepository: filterRepository.Object);
+
+                var result = await service.UpdateSubjectFilters(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(filterRepository);
+
+                result.AssertBadRequest(FiltersDifferFromSubject);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.FilterSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectFilters_FilterGroupNotForSubject()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var filters = new List<Filter>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FilterGroups = new List<FilterGroup>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Request has a filter group not for this subject
+            var request = new List<FilterUpdateViewModel>
+            {
+                new()
+                {
+                    Id = filters[0].Id,
+                    FilterGroups = new List<FilterGroupUpdateViewModel>
+                    {
+                        new()
+                        {
+                            Id = filters[0].FilterGroups[0].Id,
+                            FilterItems = new List<Guid>
+                            {
+                                filters[0].FilterGroups[0].FilterItems[0].Id
+                            }
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<Guid>
+                            {
+                                Guid.NewGuid()
+                            }
+                        }
+                    }
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+
+            filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
+                .ReturnsAsync(filters);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    filterRepository: filterRepository.Object);
+
+                var result = await service.UpdateSubjectFilters(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(filterRepository);
+
+                result.AssertBadRequest(FilterGroupsDifferFromSubject);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.FilterSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectFilters_FilterItemNotForSubject()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var filters = new List<Filter>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    FilterGroups = new List<FilterGroup>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid()
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Request has a filter item not for this subject
+            var request = new List<FilterUpdateViewModel>
+            {
+                new()
+                {
+                    Id = filters[0].Id,
+                    FilterGroups = new List<FilterGroupUpdateViewModel>
+                    {
+                        new()
+                        {
+                            Id = filters[0].FilterGroups[0].Id,
+                            FilterItems = new List<Guid>
+                            {
+                                filters[0].FilterGroups[0].FilterItems[0].Id,
+                                Guid.NewGuid()
+                            }
+                        }
+                    }
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+
+            filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
+                .ReturnsAsync(filters);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    filterRepository: filterRepository.Object);
+
+                var result = await service.UpdateSubjectFilters(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(filterRepository);
+
+                result.AssertBadRequest(FilterItemsDifferFromSubject);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.FilterSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectFilters_ReleaseNotFound()
+        {
+            // Create a ReleaseSubject but for a different release than the one which will be used in the update
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext);
+
+                var result = await service.UpdateSubjectFilters(
+                    releaseId: Guid.NewGuid(),
+                    subjectId: releaseSubject.SubjectId,
+                    new List<FilterUpdateViewModel>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                );
+
+                result.AssertNotFound();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.FilterSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectFilters_SubjectNotFound()
+        {
+            // Create a ReleaseSubject but for a different release than the one which will be used in the update
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext);
+
+                var result = await service.UpdateSubjectFilters(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: Guid.NewGuid(),
+                    new List<FilterUpdateViewModel>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                );
+
+                result.AssertNotFound();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.FilterSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectIndicators()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var indicatorGroups = new List<IndicatorGroup>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Indicators = new List<Indicator>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Indicators = new List<Indicator>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                }
+            };
+
+            // Create a request with identical indicator groups and indicators
+            var request = indicatorGroups.Select(indicatorGroup =>
+                new IndicatorGroupUpdateViewModel
+                {
+                    Id = indicatorGroup.Id,
+                    Indicators = indicatorGroup.Indicators.Select(indicator => indicator.Id).ToList()
+                }).ToList();
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+
+            indicatorGroupRepository.Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
+                .ReturnsAsync(indicatorGroups);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    indicatorGroupRepository: indicatorGroupRepository.Object);
+
+                var result = await service.UpdateSubjectIndicators(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(indicatorGroupRepository);
+
+                result.AssertRight();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                var savedSequence = savedReleaseSubject.IndicatorSequence;
+
+                Assert.NotNull(savedSequence);
+                Assert.Equal(2, savedSequence!.Count);
+
+                // Indicator Group 1
+                var savedIndicatorGroup1 = savedSequence[0];
+                Assert.Equal(request[0].Id, savedIndicatorGroup1.Id);
+
+                Assert.Equal(2, savedIndicatorGroup1.ChildSequence.Count);
+                Assert.Equal(request[0].Indicators[0], savedIndicatorGroup1.ChildSequence[0]);
+                Assert.Equal(request[0].Indicators[1], savedIndicatorGroup1.ChildSequence[1]);
+
+                // Indicator Group 2
+                var savedIndicatorGroup2 = savedSequence[1];
+                Assert.Equal(request[1].Id, savedIndicatorGroup2.Id);
+
+                Assert.Single(savedIndicatorGroup2.ChildSequence);
+                Assert.Equal(request[1].Indicators[0], savedIndicatorGroup2.ChildSequence[0]);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectIndicators_IndicatorGroupMissing()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var indicatorGroups = new List<IndicatorGroup>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Indicators = new List<Indicator>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Indicators = new List<Indicator>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                }
+            };
+
+            // Request has the second indicator group missing
+            var request = new List<IndicatorGroupUpdateViewModel>
+            {
+                new()
+                {
+                    Id = indicatorGroups[0].Id,
+                    Indicators = new List<Guid>
+                    {
+                        indicatorGroups[0].Indicators[0].Id
+                    }
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+
+            indicatorGroupRepository.Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
+                .ReturnsAsync(indicatorGroups);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    indicatorGroupRepository: indicatorGroupRepository.Object);
+
+                var result = await service.UpdateSubjectIndicators(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(indicatorGroupRepository);
+
+                result.AssertBadRequest(IndicatorGroupsDifferFromSubject);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.IndicatorSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectIndicators_IndicatorMissing()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var indicatorGroups = new List<IndicatorGroup>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Indicators = new List<Indicator>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                }
+            };
+
+            // Request has the second indicator missing
+            var request = new List<IndicatorGroupUpdateViewModel>
+            {
+                new()
+                {
+                    Id = indicatorGroups[0].Id,
+                    Indicators = new List<Guid>
+                    {
+                        indicatorGroups[0].Indicators[0].Id
+                    }
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+
+            indicatorGroupRepository.Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
+                .ReturnsAsync(indicatorGroups);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    indicatorGroupRepository: indicatorGroupRepository.Object);
+
+                var result = await service.UpdateSubjectIndicators(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(indicatorGroupRepository);
+
+                result.AssertBadRequest(IndicatorsDifferFromSubject);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.IndicatorSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectIndicators_IndicatorGroupNotForSubject()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var indicatorGroups = new List<IndicatorGroup>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Indicators = new List<Indicator>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                }
+            };
+
+            // Request has an indicator group not for this subject
+            var request = new List<IndicatorGroupUpdateViewModel>
+            {
+                new()
+                {
+                    Id = indicatorGroups[0].Id,
+                    Indicators = new List<Guid>
+                    {
+                        indicatorGroups[0].Indicators[0].Id
+                    }
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Indicators = new List<Guid>
+                    {
+                        Guid.NewGuid()
+                    }
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+
+            indicatorGroupRepository.Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
+                .ReturnsAsync(indicatorGroups);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    indicatorGroupRepository: indicatorGroupRepository.Object);
+
+                var result = await service.UpdateSubjectIndicators(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(indicatorGroupRepository);
+
+                result.AssertBadRequest(IndicatorGroupsDifferFromSubject);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.IndicatorSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectIndicators_IndicatorNotForSubject()
+        {
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var indicatorGroups = new List<IndicatorGroup>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Indicators = new List<Indicator>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                }
+            };
+
+            // Request has an indicator not for this subject
+            var request = new List<IndicatorGroupUpdateViewModel>
+            {
+                new()
+                {
+                    Id = indicatorGroups[0].Id,
+                    Indicators = new List<Guid>
+                    {
+                        indicatorGroups[0].Indicators[0].Id,
+                        Guid.NewGuid()
+                    }
+                }
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+
+            indicatorGroupRepository.Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
+                .ReturnsAsync(indicatorGroups);
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext,
+                    indicatorGroupRepository: indicatorGroupRepository.Object);
+
+                var result = await service.UpdateSubjectIndicators(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: releaseSubject.SubjectId,
+                    request
+                );
+
+                VerifyAllMocks(indicatorGroupRepository);
+
+                result.AssertBadRequest(IndicatorsDifferFromSubject);
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.IndicatorSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectIndicators_ReleaseNotFound()
+        {
+            // Create a ReleaseSubject but for a different release than the one which will be used in the update
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext);
+
+                var result = await service.UpdateSubjectIndicators(
+                    releaseId: Guid.NewGuid(),
+                    subjectId: releaseSubject.SubjectId,
+                    new List<IndicatorGroupUpdateViewModel>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                );
+
+                result.AssertNotFound();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.IndicatorSequence);
+            }
+        }
+
+        [Fact]
+        public async Task UpdateSubjectIndicators_SubjectNotFound()
+        {
+            // Create a ReleaseSubject but for a different release than the one which will be used in the update
+            var releaseSubject = new ReleaseSubject
+            {
+                Release = new Release(),
+                Subject = new Subject()
+            };
+
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var service = BuildSubjectMetaService(statisticsDbContext);
+
+                var result = await service.UpdateSubjectIndicators(
+                    releaseId: releaseSubject.ReleaseId,
+                    subjectId: Guid.NewGuid(),
+                    new List<IndicatorGroupUpdateViewModel>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
+                    }
+                );
+
+                result.AssertNotFound();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var savedReleaseSubject = statisticsDbContext.ReleaseSubject.Single(rs =>
+                    rs.ReleaseId == releaseSubject.ReleaseId
+                    && rs.SubjectId == releaseSubject.SubjectId);
+
+                // Verify that the ReleaseSubject remains untouched
+                Assert.Null(savedReleaseSubject.IndicatorSequence);
             }
         }
 

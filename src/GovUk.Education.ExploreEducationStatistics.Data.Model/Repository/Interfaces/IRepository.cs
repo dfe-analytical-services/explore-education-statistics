@@ -1,7 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
+#nullable enable
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +7,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
 {
     public interface IRepository<TEntity, in TKey> where TEntity : class
     {
-        Either<ActionResult, TEntity> FindOrNotFound(TKey id);
-        
         Task<Either<ActionResult, TEntity>> FindOrNotFoundAsync(TKey id);
-        
-        IQueryable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,
-            List<Expression<Func<TEntity, object>>> include = null);
     }
 }

@@ -57,6 +57,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
             AssertBadRequestWithValidationErrors(result, expectedValidationErrors);
         }
 
+        public static void AssertBadRequest(this ActionResult result, string expectedError)
+        {
+            var badRequest = Assert.IsAssignableFrom<BadRequestObjectResult>(result);
+            var error = Assert.IsAssignableFrom<string>(badRequest.Value);
+            Assert.Equal(expectedError, error);
+        }
+
         public static void AssertNotModified<T>(this ActionResult<T> result)
         {
             var statusCodeResult = Assert.IsType<StatusCodeResult>(result.Result);
