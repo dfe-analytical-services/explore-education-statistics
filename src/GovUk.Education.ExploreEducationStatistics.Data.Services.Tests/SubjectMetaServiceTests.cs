@@ -23,6 +23,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
 using static GovUk.Education.ExploreEducationStatistics.Data.Model.Tests.Utils.StatisticsDbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
@@ -1789,7 +1790,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 VerifyAllMocks(filterRepository);
 
-                result.AssertBadRequest("Requested filters do not match subject filters");
+                result.AssertBadRequest(FiltersDifferFromSubject);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1891,8 +1892,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 VerifyAllMocks(filterRepository);
 
-                result.AssertBadRequest(
-                    $"Requested filter groups do not match subject filter groups for filter: {filters[0].Id}");
+                result.AssertBadRequest(FilterGroupsDifferFromSubject);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1987,8 +1987,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 VerifyAllMocks(filterRepository);
 
-                result.AssertBadRequest(
-                    $"Requested filter items do not match subject for filter group: {filters[0].FilterGroups[0].Id}");
+                result.AssertBadRequest(FilterItemsDifferFromSubject);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2094,7 +2093,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 VerifyAllMocks(filterRepository);
 
-                result.AssertBadRequest("Requested filters do not match subject filters");
+                result.AssertBadRequest(FiltersDifferFromSubject);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2193,8 +2192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 VerifyAllMocks(filterRepository);
 
-                result.AssertBadRequest(
-                    $"Requested filter groups do not match subject filter groups for filter: {filters[0].Id}");
+                result.AssertBadRequest(FilterGroupsDifferFromSubject);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2286,8 +2284,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 VerifyAllMocks(filterRepository);
 
-                result.AssertBadRequest(
-                    $"Requested filter items do not match subject for filter group: {filters[0].FilterGroups[0].Id}");
+                result.AssertBadRequest(FilterItemsDifferFromSubject);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2575,7 +2572,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 VerifyAllMocks(indicatorGroupRepository);
 
-                result.AssertBadRequest("Requested indicator groups do not match subject indicator groups");
+                result.AssertBadRequest(IndicatorGroupsDifferFromSubject);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2656,8 +2653,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 VerifyAllMocks(indicatorGroupRepository);
 
-                result.AssertBadRequest(
-                    $"Requested indicators do not match subject for indicator group: {indicatorGroups[0].Id}");
+                result.AssertBadRequest(IndicatorsDifferFromSubject);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2742,7 +2738,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 VerifyAllMocks(indicatorGroupRepository);
 
-                result.AssertBadRequest("Requested indicator groups do not match subject indicator groups");
+                result.AssertBadRequest(IndicatorGroupsDifferFromSubject);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -2820,8 +2816,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 VerifyAllMocks(indicatorGroupRepository);
 
-                result.AssertBadRequest(
-                    $"Requested indicators do not match subject for indicator group: {indicatorGroups[0].Id}");
+                result.AssertBadRequest(IndicatorsDifferFromSubject);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))

@@ -21,7 +21,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.FilterAndIndicatorViewModelBuilders;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
@@ -344,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 requestFilters,
                 filter => filter.Id,
                 requestFilter => requestFilter.Id,
-                "Requested filters do not match subject filters").OnSuccess(_ =>
+                FiltersDifferFromSubject).OnSuccess(_ =>
             {
                 var requestMap = requestFilters.ToDictionary(filter => filter.Id);
                 return filters.Select(filter =>
@@ -362,7 +364,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     requestFilterGroups,
                     filterGroup => filterGroup.Id,
                     requestFilterGroup => requestFilterGroup.Id,
-                    $"Requested filter groups do not match subject filter groups for filter: {filter.Id}")
+                    FilterGroupsDifferFromSubject)
                 .OnSuccess(_ =>
                 {
                     var requestMap = requestFilterGroups.ToDictionary(filterGroup => filterGroup.Id);
@@ -370,7 +372,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             AssertCollectionsAreSameIgnoringOrder(
                                 filterGroup.FilterItems.Select(filterItem => filterItem.Id),
                                 requestMap[filterGroup.Id].FilterItems,
-                                $"Requested filter items do not match subject for filter group: {filterGroup.Id}"))
+                                FilterItemsDifferFromSubject))
                         .OnSuccessAll()
                         .OnSuccessVoid();
                 });
@@ -385,7 +387,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                     requestIndicatorGroups,
                     indicatorGroup => indicatorGroup.Id,
                     requestIndicatorGroup => requestIndicatorGroup.Id,
-                    "Requested indicator groups do not match subject indicator groups")
+                    IndicatorGroupsDifferFromSubject)
                 .OnSuccess(_ =>
                 {
                     var requestMap = requestIndicatorGroups.ToDictionary(indicatorGroup => indicatorGroup.Id);
@@ -393,7 +395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             AssertCollectionsAreSameIgnoringOrder(
                                 indicatorGroup.Indicators.Select(indicator => indicator.Id),
                                 requestMap[indicatorGroup.Id].Indicators,
-                                $"Requested indicators do not match subject for indicator group: {indicatorGroup.Id}"))
+                                IndicatorsDifferFromSubject))
                         .OnSuccessAll()
                         .OnSuccessVoid();
                 });
@@ -404,7 +406,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IEnumerable<TSecond> second,
             Func<TFirst, TId> firstIdSelector,
             Func<TSecond, TId> secondIdSelector,
-            string error)
+            ValidationErrorMessages error)
         {
             var firstIdList = first.Select(firstIdSelector);
             var secondIdList = second.Select(secondIdSelector);
@@ -413,14 +415,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private static Either<ActionResult, Unit> AssertCollectionsAreSameIgnoringOrder<T>(IEnumerable<T> first,
             IEnumerable<T> second,
-            string error)
+            ValidationErrorMessages error)
         {
             if (CollectionsAreSameIgnoringOrder(first, second))
             {
                 return Unit.Instance;
             }
 
-            return new BadRequestObjectResult(error);
+            return ValidationResult(error);
         }
 
         private static bool CollectionsAreSameIgnoringOrder<T>(IEnumerable<T> first, IEnumerable<T> second)

@@ -3,7 +3,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
     public enum ValidationErrorMessages
     {
+        // Table builder queries
         QueryExceedsMaxAllowableTableSize,
-        RequestCancelled
+
+        // Updating Filters
+        FiltersDifferFromSubject,
+        FilterGroupsDifferFromSubject,
+        FilterItemsDifferFromSubject,
+
+        // Updating Indicators
+        IndicatorGroupsDifferFromSubject,
+        IndicatorsDifferFromSubject
     }
 }
