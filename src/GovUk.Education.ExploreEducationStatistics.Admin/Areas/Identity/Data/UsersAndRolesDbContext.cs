@@ -19,15 +19,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 
         public UsersAndRolesDbContext(
             DbContextOptions<UsersAndRolesDbContext> options,
-            IOptions<OperationalStoreOptions> operationalStoreOptions) : base(options, operationalStoreOptions)
+            IOptions<OperationalStoreOptions> operationalStoreOptions,
+            bool updateTimestamps = true) : base(options, operationalStoreOptions)
         {
-            Configure();
+            Configure(updateTimestamps);
         }
 
-        private void Configure()
+        private void Configure(bool updateTimestamps = true)
         {
-            ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
-            ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
+            if (updateTimestamps)
+            {
+                ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
+                ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;   
+            }
         }
 
         private static IdentityRole<string> CreateRole(Role role)

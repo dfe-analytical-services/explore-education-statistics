@@ -1,6 +1,6 @@
 import useAsyncCallback, {
   AsyncCallbackState,
-  AsyncStateSetterParam,
+  UseAsyncCallbackOptions,
 } from '@common/hooks/useAsyncCallback';
 import usePrevious from '@common/hooks/usePrevious';
 import isEqual from 'lodash/isEqual';
@@ -10,6 +10,8 @@ export interface AsyncRetryState<T> extends AsyncCallbackState<T> {
   retry: () => void;
 }
 
+export type UseAsyncRetryOptions<T> = UseAsyncCallbackOptions<T>;
+
 /**
  * Runs an asynchronous task on component render
  * and provides a `retry` method if you want
@@ -18,13 +20,17 @@ export interface AsyncRetryState<T> extends AsyncCallbackState<T> {
 export default function useAsyncRetry<T>(
   task: () => Promise<T>,
   deps: DependencyList = [],
-  initialState: AsyncStateSetterParam<T> = {
-    isLoading: true,
-  },
+  options: UseAsyncRetryOptions<T> = {},
 ): AsyncRetryState<T> {
   const prevDeps = usePrevious<DependencyList>(deps);
 
-  const [state, run] = useAsyncCallback<T, []>(task, deps, initialState);
+  const [state, run] = useAsyncCallback<T, []>(task, deps, {
+    ...options,
+    initialState: options.initialState ?? {
+      isLoading: true,
+    },
+  });
+
   const { isLoading } = state;
 
   useEffect(() => {

@@ -3,7 +3,7 @@ import {
   CommentsContextProviderProps,
   useCommentsContext,
 } from '@admin/contexts/CommentsContext';
-import { AddComment } from '@admin/services/releaseContentCommentService';
+import { CommentCreate } from '@admin/services/releaseContentCommentService';
 import { OmitStrict } from '@common/types';
 import {
   testComments,
@@ -22,9 +22,7 @@ describe('CommentsContext', () => {
     </CommentsContextProvider>
   );
 
-  const blockId = 'block-id';
-
-  const commentToAdd: AddComment = {
+  const commentToAdd: CommentCreate = {
     content: 'Added Comment content',
   };
   const addedComment: Comment = {
@@ -32,14 +30,6 @@ describe('CommentsContext', () => {
     content: 'Added Comment content',
     createdBy: testCommentUser1,
     created: '2021-11-30T10:00',
-  };
-  const commentToUpdate: Comment = {
-    ...testComments[2],
-    content: 'Updated content',
-  };
-  const updatedComment: Comment = {
-    ...testComments[2],
-    content: 'Updated content',
   };
   const resolvedComment: Comment = {
     ...testComments[1],
@@ -52,27 +42,59 @@ describe('CommentsContext', () => {
     resolvedBy: undefined,
   };
 
-  const handleSaveComment = jest.fn();
-  const handleDeletePendingComment = jest.fn();
-  const handleSaveUpdatedComment = jest.fn();
-  const handleUpdateUnresolvedComments = jest.fn();
-  const handleUnsavedCommentDeletion = jest.fn();
+  const handleCreate = jest.fn();
+  const handleDelete = jest.fn();
+  const handleUpdate = jest.fn();
+  const handlePendingDelete = jest.fn();
+  const handlePendingDeleteUndo = jest.fn();
 
   const initialProps: Props = {
     comments: testComments,
-    onSaveComment: handleSaveComment,
-    onDeleteComment: handleDeletePendingComment,
-    onSaveUpdatedComment: handleSaveUpdatedComment,
-    onUpdateUnresolvedComments: {
-      current: handleUpdateUnresolvedComments,
-    },
-    onUpdateUnsavedCommentDeletions: {
-      current: handleUnsavedCommentDeletion,
-    },
+    onCreate: handleCreate,
+    onDelete: handleDelete,
+    onUpdate: handleUpdate,
+    onPendingDelete: handlePendingDelete,
+    onPendingDeleteUndo: handlePendingDeleteUndo,
   };
 
-  test('addComment calls the save method and adds the new comment to the comments array', async () => {
-    handleSaveComment.mockResolvedValue(addedComment);
+  test('updating `comments` prop updates the returned comments', () => {
+    const { result, rerender } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        ...initialProps,
+        comments: [],
+      },
+    });
+
+    expect(result.current.comments).toEqual([]);
+
+    rerender({
+      ...initialProps,
+      comments: testComments,
+    });
+
+    expect(result.current.comments).toEqual(testComments);
+  });
+
+  test('filters out returned `comments` that are pending deletion', () => {
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        ...initialProps,
+        pendingDeletions: [testComments[1], testComments[2]],
+      },
+    });
+
+    expect(result.current.comments).toEqual([
+      testComments[0],
+      testComments[3],
+      testComments[4],
+    ]);
+  });
+
+  test('calling `addComment` updates state correctly', async () => {
+    handleCreate.mockResolvedValue(addedComment);
+
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
       initialProps: {
@@ -80,53 +102,74 @@ describe('CommentsContext', () => {
         comments: [],
       },
     });
-    expect(result.current.comments).toEqual([]);
+
+    expect(result.current.currentInteraction).toBeUndefined();
 
     await act(async () => {
-      await result.current.addComment(blockId, commentToAdd);
+      await result.current.addComment(commentToAdd);
     });
-    expect(handleSaveComment).toHaveBeenCalledWith(commentToAdd);
-    expect(handleUpdateUnresolvedComments).toHaveBeenCalledWith(
-      blockId,
-      addedComment.id,
-    );
-    expect(result.current.comments).toEqual([addedComment]);
+
     expect(result.current.currentInteraction).toEqual({
       type: 'adding',
       id: addedComment.id,
     });
   });
 
-  test('removeComment removes comment from the comments array and adds it to pendingDeletions', async () => {
+  test('calling `addComment` calls `onSaveComment` handler', async () => {
+    handleCreate.mockResolvedValue(addedComment);
+
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        ...initialProps,
+        comments: [],
+      },
+    });
+
+    expect(handleCreate).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.addComment(commentToAdd);
+    });
+
+    expect(handleCreate).toHaveBeenCalledWith(commentToAdd);
+  });
+
+  test('calling `removeComment` updates state correctly', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
       initialProps,
     });
-    expect(result.current.comments).toEqual(testComments);
+
     expect(result.current.pendingDeletions).toEqual([]);
 
     await act(async () => {
-      await result.current.removeComment.current(blockId, testComments[1].id);
+      await result.current.removeComment.current(testComments[1].id);
     });
 
-    expect(result.current.comments).toEqual([
-      testComments[0],
-      testComments[2],
-      testComments[3],
-      testComments[4],
-    ]);
     expect(result.current.pendingDeletions).toEqual([testComments[1]]);
     expect(result.current.currentInteraction).toEqual({
       type: 'removing',
       id: testComments[1].id,
     });
-    expect(handleUnsavedCommentDeletion).toHaveBeenCalledWith(
-      blockId,
-      testComments[1].id,
-    );
   });
 
-  test('clearPendingDeletions calls the delete comment method for each pending and removes them from the pending array', async () => {
+  test('calling `removeComment` calls the `onPendingDelete` handler', async () => {
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps,
+    });
+
+    expect(handlePendingDelete).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.removeComment.current(testComments[1].id);
+    });
+
+    expect(handlePendingDelete).toHaveBeenCalledWith(testComments[1].id);
+  });
+
+  test('calling `clearPendingDeletions` updates state correctly', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
       initialProps: {
@@ -135,96 +178,139 @@ describe('CommentsContext', () => {
         pendingDeletions: [testComments[2], testComments[3], testComments[4]],
       },
     });
-    expect(result.current.comments).toEqual([testComments[0], testComments[1]]);
+
     expect(result.current.pendingDeletions).toEqual([
       testComments[2],
       testComments[3],
       testComments[4],
     ]);
+
     await act(async () => {
       await result.current.clearPendingDeletions();
     });
 
-    expect(handleDeletePendingComment).toHaveBeenCalledTimes(3);
-    expect(handleDeletePendingComment).toHaveBeenCalledWith(testComments[2].id);
-    expect(handleDeletePendingComment).toHaveBeenCalledWith(testComments[3].id);
-    expect(handleDeletePendingComment).toHaveBeenCalledWith(testComments[4].id);
-
-    expect(result.current.comments).toEqual([testComments[0], testComments[1]]);
     expect(result.current.pendingDeletions).toEqual([]);
   });
 
-  test('resolveComment calls the update method and updates the comment in the array', async () => {
-    handleSaveUpdatedComment.mockResolvedValue(resolvedComment);
+  test('calling `clearPendingDeletions` calls the `onDelete` handler for each pending deletion', async () => {
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        ...initialProps,
+        comments: [testComments[0], testComments[1]],
+        pendingDeletions: [testComments[2], testComments[3], testComments[4]],
+      },
+    });
+
+    expect(handleDelete).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.clearPendingDeletions();
+    });
+
+    expect(handleDelete).toHaveBeenCalledTimes(3);
+    expect(handleDelete).toHaveBeenCalledWith(testComments[2].id);
+    expect(handleDelete).toHaveBeenCalledWith(testComments[3].id);
+    expect(handleDelete).toHaveBeenCalledWith(testComments[4].id);
+  });
+
+  test('calling `resolveComment` updates state correctly', async () => {
+    handleUpdate.mockResolvedValue(resolvedComment);
+
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
       initialProps,
     });
-    expect(result.current.comments[1].resolved).toBeUndefined();
+
+    expect(result.current.currentInteraction).toBeUndefined();
 
     await act(async () => {
-      await result.current.resolveComment.current(
-        blockId,
-        testComments[1].id,
-        true,
-      );
+      await result.current.resolveComment.current(testComments[1].id, true);
     });
 
-    expect(result.current.comments[1]).toEqual(resolvedComment);
-    expect(handleUpdateUnresolvedComments).toHaveBeenCalledWith(
-      blockId,
-      resolvedComment.id,
-    );
     expect(result.current.currentInteraction).toEqual({
       type: 'resolving',
       id: resolvedComment.id,
     });
   });
 
-  test('unresolveComment calls the update method and updates the comment in the array', async () => {
-    handleSaveUpdatedComment.mockResolvedValue(unresolvedComment);
+  test('calling `resolveComment` calls the `onUpdate` handler', async () => {
+    handleUpdate.mockResolvedValue(resolvedComment);
+
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
       initialProps,
     });
-    expect(result.current.comments[0].resolved).toEqual('2021-11-30T13:55');
+
+    expect(handleUpdate).not.toHaveBeenCalled();
 
     await act(async () => {
-      await result.current.unresolveComment.current(
-        blockId,
-        testComments[0].id,
-        true,
-      );
+      await result.current.resolveComment.current(testComments[1].id, true);
     });
 
-    expect(result.current.comments[0]).toEqual(unresolvedComment);
-    expect(handleUpdateUnresolvedComments).toHaveBeenCalledWith(
-      blockId,
-      unresolvedComment.id,
-    );
+    expect(handleUpdate).toHaveBeenCalledWith({
+      ...testComments[1],
+      setResolved: true,
+    });
+  });
+
+  test('calling `unresolveComment` updates state correctly', async () => {
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps,
+    });
+
+    expect(result.current.currentInteraction).toBeUndefined();
+
+    await act(async () => {
+      await result.current.unresolveComment.current(testComments[0].id, true);
+    });
+
     expect(result.current.currentInteraction).toEqual({
       type: 'unresolving',
       id: unresolvedComment.id,
     });
   });
 
-  test('updateComment calls the update method and updates the comment in the array', async () => {
-    handleSaveUpdatedComment.mockResolvedValue(updatedComment);
+  test('calling `unresolveComment` calls the `onUpdate` handler', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
       initialProps,
     });
-    expect(result.current.comments[2].content).toEqual(testComments[2].content);
+
+    expect(handleUpdate).not.toHaveBeenCalled();
 
     await act(async () => {
-      await result.current.updateComment(commentToUpdate);
+      await result.current.unresolveComment.current(testComments[0].id, true);
     });
 
-    expect(handleSaveUpdatedComment).toHaveBeenCalledWith(commentToUpdate);
-    expect(result.current.comments[2].content).toEqual(updatedComment.content);
+    expect(handleUpdate).toHaveBeenCalledWith({
+      ...testComments[0],
+      setResolved: false,
+    });
   });
 
-  test('reAddComment removes comment from the pendingDeletions array and adds it to comments', async () => {
+  test('calling `updateComment` calls `onUpdate` handler', async () => {
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps,
+    });
+
+    const updatedComment: Comment = {
+      ...testComments[2],
+      content: 'Updated content',
+    };
+
+    expect(handleUpdate).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.updateComment(updatedComment);
+    });
+
+    expect(handleUpdate).toHaveBeenCalledWith(updatedComment);
+  });
+
+  test('calling `reAddComment` updates state correctly', async () => {
     const { result } = renderHook(() => useCommentsContext(), {
       wrapper,
       initialProps: {
@@ -235,21 +321,32 @@ describe('CommentsContext', () => {
     });
 
     await act(async () => {
-      await result.current.reAddComment.current(blockId, testComments[3].id);
+      await result.current.reAddComment.current(testComments[3].id);
     });
 
     expect(result.current.pendingDeletions).toEqual([
       testComments[2],
       testComments[4],
     ]);
-    expect(result.current.comments).toEqual([
-      testComments[0],
-      testComments[1],
-      testComments[3],
-    ]);
+  });
 
-    expect(handleUnsavedCommentDeletion).toHaveBeenLastCalledWith(
-      blockId,
+  test('calling `reAddComment` calls `onPendingDeleteUndo` handler', async () => {
+    const { result } = renderHook(() => useCommentsContext(), {
+      wrapper,
+      initialProps: {
+        ...initialProps,
+        comments: [testComments[0], testComments[1]],
+        pendingDeletions: [testComments[2], testComments[3], testComments[4]],
+      },
+    });
+
+    expect(handlePendingDeleteUndo).not.toHaveBeenCalled();
+
+    await act(async () => {
+      await result.current.reAddComment.current(testComments[3].id);
+    });
+
+    expect(handlePendingDeleteUndo).toHaveBeenLastCalledWith(
       testComments[3].id,
     );
   });

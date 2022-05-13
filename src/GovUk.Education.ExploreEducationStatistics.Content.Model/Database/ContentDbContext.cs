@@ -24,15 +24,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             // are what get used in real application scenarios.
         }
 
-        public ContentDbContext(DbContextOptions<ContentDbContext> options) : base(options)
+        public ContentDbContext(DbContextOptions<ContentDbContext> options, bool updateTimestamps = true) : base(options)
         {
-            Configure();
+            Configure(updateTimestamps);
         }
 
-        private void Configure()
+        private void Configure(bool updateTimestamps = true)
         {
-            ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
-            ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
+            if (updateTimestamps)
+            {
+                ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
+                ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
+            }
         }
 
         public DbSet<Methodology> Methodologies { get; set; }
@@ -79,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(comment => comment.Updated)
                 .HasConversion(
                     v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<DataImport>()
                 .HasOne(import => import.File)
@@ -136,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(m => m.Created)
                 .HasConversion(
                     v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<MethodologyVersion>()
                 .HasOne(m => m.CreatedBy)
@@ -174,7 +177,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(n => n.Updated)
                 .HasConversion(
                     v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<MethodologyNote>()
                 .HasOne(m => m.UpdatedBy)
@@ -196,13 +199,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(n => n.Published)
                 .HasConversion(
                     v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<Publication>()
                 .Property(n => n.Updated)
                 .HasConversion(
                     v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<PublicationMethodology>()
                 .HasKey(pm => new {pm.PublicationId, pm.MethodologyId});
@@ -254,7 +257,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v,
                     v => v.HasValue
                         ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
-                        : (DateTime?) null);
+                        : null);
 
             modelBuilder.Entity<ReleaseStatus>()
                 .HasOne(rs => rs.CreatedBy)
@@ -267,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v,
                     v => v.HasValue
                         ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc)
-                        : (DateTime?) null);
+                        : null);
 
             modelBuilder.Entity<ReleaseStatus>()
                 .Property(rs => rs.ApprovalStatus)
@@ -303,7 +306,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(comment => comment.Created)
                 .HasConversion(
                     v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<Release>()
                 .HasOne(r => r.PreviousVersion)
@@ -318,7 +321,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(block => block.Created)
                 .HasConversion(
                     v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
+            modelBuilder.Entity<ContentBlock>()
+                .Property(comment => comment.Locked)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<ContentSection>()
                 .Property(b => b.Type)
@@ -334,7 +343,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(release => release.PublishScheduled)
                 .HasConversion(
                     v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<Release>()
                 .Property(release => release.ApprovalStatus)
@@ -415,7 +424,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(userReleaseRole => userReleaseRole.Created)
                 .HasConversion(
                     v => v,
-                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : (DateTime?) null);
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<UserReleaseRole>()
                 .Property(r => r.Role)

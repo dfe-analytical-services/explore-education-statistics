@@ -1,10 +1,13 @@
 import { KeyStatsFormValues } from '@admin/components/editable/EditableKeyStat';
 import { useReleaseContentDispatch } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ContentSectionKeys } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
+import releaseContentCommentService, {
+  CommentCreate,
+} from '@admin/services/releaseContentCommentService';
 import releaseContentService, {
   ContentBlockAttachRequest,
 } from '@admin/services/releaseContentService';
-import { ContentBlockPostModel } from '@admin/services/types/content';
+import { Comment, ContentBlockPostModel } from '@admin/services/types/content';
 import { Dictionary } from '@admin/types';
 import { useCallback, useMemo } from 'react';
 
@@ -43,12 +46,11 @@ export default function useReleaseContentActions() {
         blockId,
       );
       dispatch({
-        type: 'REMOVE_BLOCK_FROM_SECTION',
+        type: 'REMOVE_SECTION_BLOCK',
         payload: { meta: { sectionId, blockId, sectionKey } },
       });
-      // becuase we don't know if a datablock was removed,
-      // and so it is now available again
-      updateAvailableDataBlocks({ releaseId });
+
+      await updateAvailableDataBlocks({ releaseId });
     },
     [dispatch, updateAvailableDataBlocks],
   );
@@ -74,7 +76,7 @@ export default function useReleaseContentActions() {
         values,
       );
       dispatch({
-        type: 'UPDATE_BLOCK_FROM_SECTION',
+        type: 'UPDATE_SECTION_BLOCK',
         payload: {
           meta: { sectionId, blockId, sectionKey },
           block: updateBlock,
@@ -106,10 +108,98 @@ export default function useReleaseContentActions() {
       );
 
       dispatch({
-        type: 'UPDATE_BLOCK_FROM_SECTION',
+        type: 'UPDATE_SECTION_BLOCK',
         payload: {
           meta: { sectionId, blockId, sectionKey },
           block: updateBlock,
+        },
+      });
+    },
+    [dispatch],
+  );
+
+  const addBlockComment = useCallback(
+    async ({
+      releaseId,
+      sectionId,
+      sectionKey,
+      blockId,
+      comment,
+    }: {
+      releaseId: string;
+      sectionId: string;
+      sectionKey: ContentSectionKeys;
+      blockId: string;
+      comment: CommentCreate;
+    }): Promise<Comment> => {
+      const newComment = await releaseContentCommentService.addContentSectionComment(
+        releaseId,
+        sectionId,
+        blockId,
+        comment,
+      );
+
+      dispatch({
+        type: 'ADD_BLOCK_COMMENT',
+        payload: {
+          comment: newComment,
+          meta: { sectionId, blockId, sectionKey },
+        },
+      });
+
+      return newComment;
+    },
+    [dispatch],
+  );
+
+  const deleteBlockComment = useCallback(
+    async ({
+      sectionId,
+      sectionKey,
+      blockId,
+      commentId,
+    }: {
+      releaseId: string;
+      sectionId: string;
+      sectionKey: ContentSectionKeys;
+      blockId: string;
+      commentId: string;
+    }) => {
+      await releaseContentCommentService.deleteContentSectionComment(commentId);
+
+      dispatch({
+        type: 'REMOVE_BLOCK_COMMENT',
+        payload: {
+          commentId,
+          meta: { sectionId, blockId, sectionKey },
+        },
+      });
+    },
+    [dispatch],
+  );
+
+  const updateBlockComment = useCallback(
+    async ({
+      sectionId,
+      sectionKey,
+      blockId,
+      comment,
+    }: {
+      releaseId: string;
+      sectionId: string;
+      sectionKey: ContentSectionKeys;
+      blockId: string;
+      comment: Comment;
+    }) => {
+      const updatedComment = await releaseContentCommentService.updateContentSectionComment(
+        comment,
+      );
+
+      dispatch({
+        type: 'UPDATE_BLOCK_COMMENT',
+        payload: {
+          comment: updatedComment,
+          meta: { sectionId, blockId, sectionKey },
         },
       });
     },
@@ -133,13 +223,13 @@ export default function useReleaseContentActions() {
         sectionId,
         block,
       );
+
       dispatch({
-        type: 'ADD_BLOCK_TO_SECTION',
+        type: 'ADD_SECTION_BLOCK',
         payload: { meta: { sectionId, sectionKey }, block: newBlock },
       });
-      // becuase we don't know if a datablock was used,
-      // and so it is unavailable
-      updateAvailableDataBlocks({ releaseId });
+
+      await updateAvailableDataBlocks({ releaseId });
     },
     [dispatch, updateAvailableDataBlocks],
   );
@@ -161,11 +251,13 @@ export default function useReleaseContentActions() {
         sectionId,
         block,
       );
+
       dispatch({
-        type: 'ADD_BLOCK_TO_SECTION',
+        type: 'ADD_SECTION_BLOCK',
         payload: { meta: { sectionId, sectionKey }, block: newBlock },
       });
-      updateAvailableDataBlocks({ releaseId });
+
+      await updateAvailableDataBlocks({ releaseId });
     },
     [dispatch, updateAvailableDataBlocks],
   );
@@ -187,6 +279,7 @@ export default function useReleaseContentActions() {
         sectionId,
         order,
       );
+
       dispatch({
         type: 'UPDATE_SECTION_CONTENT',
         payload: {
@@ -226,6 +319,7 @@ export default function useReleaseContentActions() {
         releaseId,
         order,
       );
+
       dispatch({
         type: 'SET_CONTENT',
         payload: {
@@ -248,6 +342,7 @@ export default function useReleaseContentActions() {
         releaseId,
         sectionId,
       );
+
       dispatch({
         type: 'SET_CONTENT',
         payload: {
@@ -273,6 +368,7 @@ export default function useReleaseContentActions() {
         sectionId,
         title,
       );
+
       dispatch({
         type: 'UPDATE_CONTENT_SECTION',
         payload: {
@@ -286,25 +382,31 @@ export default function useReleaseContentActions() {
 
   return useMemo(
     () => ({
-      updateAvailableDataBlocks,
-      deleteContentSectionBlock,
-      updateContentSectionDataBlock,
-      updateContentSectionBlock,
+      addBlockComment,
+      addContentSection,
       addContentSectionBlock,
       attachContentSectionBlock,
-      updateSectionBlockOrder,
-      addContentSection,
-      updateContentSectionsOrder,
+      deleteBlockComment,
+      deleteContentSectionBlock,
       removeContentSection,
+      updateAvailableDataBlocks,
+      updateBlockComment,
+      updateContentSectionBlock,
+      updateContentSectionDataBlock,
       updateContentSectionHeading,
+      updateContentSectionsOrder,
+      updateSectionBlockOrder,
     }),
     [
+      addBlockComment,
       addContentSection,
       addContentSectionBlock,
       attachContentSectionBlock,
+      deleteBlockComment,
       deleteContentSectionBlock,
       removeContentSection,
       updateAvailableDataBlocks,
+      updateBlockComment,
       updateContentSectionBlock,
       updateContentSectionDataBlock,
       updateContentSectionHeading,

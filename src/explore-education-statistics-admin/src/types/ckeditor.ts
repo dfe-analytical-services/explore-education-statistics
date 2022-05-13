@@ -12,7 +12,9 @@ export interface Editor {
   plugins: PluginCollection;
   editing: {
     view: {
+      document: Document;
       focus(): void;
+      change(callback: (writer: DowncastWriter) => void): void;
     };
   };
   model: Model;
@@ -156,9 +158,16 @@ export interface Model {
   readonly document: Document;
 }
 
+// https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_view_downcastwriter-DowncastWriter.html
+export interface DowncastWriter {
+  readonly document: Document;
+  setAttribute(key: string, value: string, element: Element): void;
+  removeAttribute(key: string, element: Element): void;
+}
+
 // https://ckeditor.com/docs/ckeditor5/latest/api/module_engine_model_document-Document.html
 export interface Document {
-  getRoot(name: string): RootElement;
+  getRoot(name?: string): RootElement;
 }
 
 export interface Node {

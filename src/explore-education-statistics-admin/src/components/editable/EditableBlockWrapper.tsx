@@ -1,13 +1,18 @@
 import ButtonLink from '@admin/components/ButtonLink';
 import styles from '@admin/components/editable/EditableBlockWrapper.module.scss';
+import { UserDetails } from '@admin/services/types/user';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import ModalConfirm from '@common/components/ModalConfirm';
+import Tooltip from '@common/components/Tooltip';
 import useToggle from '@common/hooks/useToggle';
 import React, { ReactNode } from 'react';
 
 export interface EditableBlockProps {
   dataBlockEditLink?: string;
+  isLoading?: boolean;
+  lockedBy?: UserDetails;
   onEdit?: () => void;
   onDelete?: () => void;
 }
@@ -15,20 +20,43 @@ export interface EditableBlockProps {
 const EditableBlockWrapper = ({
   children,
   dataBlockEditLink,
+  isLoading = false,
+  lockedBy,
   onEdit,
   onDelete,
 }: EditableBlockProps & { children: ReactNode }) => {
   const [showConfirmDelete, toggleConfirmDelete] = useToggle(false);
 
+  const lockedTooltip = lockedBy
+    ? `This block is being edited by ${lockedBy?.displayName}`
+    : undefined;
+
   return (
-    <article>
-      <div className={styles.block}>{children}</div>
+    <>
+      <div>{children}</div>
 
       <ButtonGroup className={styles.buttons}>
+        <LoadingSpinner
+          loading={isLoading}
+          inline
+          hideText
+          size="md"
+          text="Loading block editor"
+        />
         {onEdit && (
-          <Button variant="secondary" onClick={() => onEdit()}>
-            Edit block
-          </Button>
+          <Tooltip text={lockedTooltip} enabled={!!lockedTooltip}>
+            {({ ref }) => (
+              <Button
+                ariaDisabled={!!lockedTooltip}
+                disabled={isLoading}
+                ref={ref}
+                variant="secondary"
+                onClick={() => onEdit()}
+              >
+                Edit block
+              </Button>
+            )}
+          </Tooltip>
         )}
 
         {dataBlockEditLink && (
@@ -39,9 +67,19 @@ const EditableBlockWrapper = ({
 
         {onDelete && (
           <>
-            <Button variant="warning" onClick={toggleConfirmDelete.on}>
-              Remove block
-            </Button>
+            <Tooltip text={lockedTooltip} enabled={!!lockedTooltip}>
+              {({ ref }) => (
+                <Button
+                  ariaDisabled={!!lockedTooltip}
+                  disabled={isLoading}
+                  ref={ref}
+                  variant="warning"
+                  onClick={toggleConfirmDelete.on}
+                >
+                  Remove block
+                </Button>
+              )}
+            </Tooltip>
 
             <ModalConfirm
               title="Remove block"
@@ -61,7 +99,7 @@ const EditableBlockWrapper = ({
           </>
         )}
       </ButtonGroup>
-    </article>
+    </>
   );
 };
 

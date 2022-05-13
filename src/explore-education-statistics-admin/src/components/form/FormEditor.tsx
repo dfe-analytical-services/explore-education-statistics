@@ -2,6 +2,7 @@ import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import styles from '@admin/components/form/FormEditor.module.scss';
 import {
   CommentsPlugin,
+  DowncastWriter,
   Editor as EditorType,
   Element,
 } from '@admin/types/ckeditor';
@@ -20,7 +21,13 @@ import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
 import classNames from 'classnames';
 import Editor from 'explore-education-statistics-ckeditor';
-import React, { MutableRefObject, useCallback, useEffect, useRef } from 'react';
+import React, {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from 'react';
 
 export type EditorChangeHandler = (value: string) => void;
 export type EditorElementsHandler = (elements: Element[]) => void;
@@ -28,7 +35,6 @@ export type EditorElementsHandler = (elements: Element[]) => void;
 export interface FormEditorProps {
   allowComments?: boolean;
   allowedHeadings?: string[];
-  blockId?: string;
   error?: string;
   focusOnInit?: boolean;
   hideLabel?: boolean;
@@ -52,7 +58,6 @@ export interface FormEditorProps {
 const FormEditor = ({
   allowComments = false,
   allowedHeadings = defaultAllowedHeadings,
-  blockId,
   error,
   focusOnInit,
   hideLabel,
@@ -83,7 +88,6 @@ const FormEditor = ({
   const config = useCKEditorConfig({
     allowComments,
     allowedHeadings,
-    blockId,
     editorInstance,
     toolbarConfig,
     onAutoSave,
@@ -94,6 +98,15 @@ const FormEditor = ({
   });
 
   const [isFocused, toggleFocused] = useToggle(false);
+
+  const describedBy = useMemo(
+    () =>
+      classNames({
+        [`${id}-error`]: !!error,
+        [`${id}-hint`]: !!hint,
+      }),
+    [error, hint, id],
+  );
 
   useEffect(() => {
     if (process.env.NODE_ENV === 'test') {
@@ -147,23 +160,61 @@ const FormEditor = ({
 
   const handleBlur = useCallback<CKEditorProps['onBlur']>(() => {
     toggleFocused.off();
-    onBlur?.();
+
+    // Add a tiny timeout to prevent form submit events being lost during
+    // the blur (but only when there is a large DOM change e.g. element renders).
+    // By 'deferring' the blur event slightly, the higher priority submit
+    // event can take place without interruption.
+    //
+    // I'm fairly sure this is due to CKEditor's event system not being
+    // handled by React. This means React is not aware the CKEditor
+    // blur should not take precedence over the submit event.
+    // This may be fixable in React 18 with the new `useTransition` hook.
+    setTimeout(() => {
+      onBlur?.();
+    }, 100);
   }, [onBlur, toggleFocused]);
+
+  // Change editor to add attributes like `aria-describedby`
+  // linking the editor textbox to error messages.
+  const changeEditingView = useCallback(
+    (writer: DowncastWriter) => {
+      const root = writer.document.getRoot();
+
+      writer.setAttribute('id', id, root);
+
+      if (describedBy) {
+        writer.setAttribute('aria-describedby', describedBy, root);
+      } else {
+        writer.removeAttribute('aria-describedby', root);
+      }
+    },
+    [describedBy, id],
+  );
 
   const handleReady = useCallback<CKEditorProps['onReady']>(
     editor => {
       if (focusOnInit) {
         editor.editing.view.focus();
       }
+
+      editor.editing.view.change(changeEditingView);
+
       onElementsReady?.(
         Array.from(editor.model.document.getRoot('main').getChildren()),
       );
+
       editorInstance.current = editor;
       commentsPlugin.current = editor.plugins.get<CommentsPlugin>('Comments');
+
       setMarkersOrder(getMarkersOrder([...editor.model.markers]));
     },
-    [focusOnInit, onElementsReady, setMarkersOrder],
+    [changeEditingView, focusOnInit, onElementsReady, setMarkersOrder],
   );
+
+  useEffect(() => {
+    editorInstance.current?.editing.view.change(changeEditingView);
+  }, [changeEditingView]);
 
   useEffect(() => {
     if (!selectedComment?.fromEditor && selectedComment?.id) {
@@ -176,6 +227,7 @@ const FormEditor = ({
       if (!commentsPlugin.current || !currentInteraction) {
         return;
       }
+
       switch (currentInteraction.type) {
         case 'adding':
           commentsPlugin.current.addCommentMarker(currentInteraction.id);
@@ -206,11 +258,7 @@ const FormEditor = ({
     }
 
     updateMarker();
-    if (editorInstance.current) {
-      onAutoSave?.(editorInstance.current.getData());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentInteraction]);
+  }, [currentInteraction, setMarkersOrder]);
 
   const isReadOnly = isBrowser('IE');
 
@@ -246,14 +294,13 @@ const FormEditor = ({
           className={classNames(styles.editor, {
             [styles.focused]: isFocused,
           })}
-          data-testid={isFocused ? `${testId}-focused` : testId}
+          data-testid={testId && isFocused ? `${testId}-focused` : testId}
           ref={thisRef => {
             const editorElement = thisRef?.querySelector<HTMLDivElement>(
               '[role="textbox"]',
             );
 
             if (editorElement) {
-              editorElement.id = id;
               editorRef.current = editorElement;
             }
           }}
@@ -270,6 +317,7 @@ const FormEditor = ({
             />
           ) : (
             <textarea
+              aria-describedby={describedBy}
               id={id}
               value={value}
               onBlur={() => {

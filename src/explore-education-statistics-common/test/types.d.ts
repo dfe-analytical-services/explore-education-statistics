@@ -10,6 +10,7 @@ declare module '@testing-library/jest-dom/dist/utils' {
 
 declare namespace jest {
   interface Matchers<R> {
+    toBeAriaDisabled(): R;
     toHaveScrolledIntoView(): R;
   }
 }

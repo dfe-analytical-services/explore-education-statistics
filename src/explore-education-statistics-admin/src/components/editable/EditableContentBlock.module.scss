@@ -1,9 +1,13 @@
 @import '~govuk-frontend/govuk/base';
 @import '@admin/styles/variables';
 
+$border-width: 2px;
+$locked-border-width: 4px;
+
 .preview {
   margin-bottom: govuk-spacing(2);
   padding: govuk-spacing(2);
+  position: relative;
 
   pre {
     white-space: normal;
@@ -12,16 +16,27 @@
 
 .readOnly {
   background: govuk-colour('light-grey');
-  border: 2px solid $govuk-border-colour;
+  border: $border-width solid $govuk-border-colour;
   min-height: 2.2rem;
 }
 
-.editButton {
+.editable {
   cursor: pointer;
+}
 
-  &:focus {
-    @include govuk-focused-text;
-  }
+.locked {
+  border: $locked-border-width solid govuk-colour('orange');
+  cursor: not-allowed;
+}
+
+.lockedMessage {
+  background: govuk-colour('orange');
+  bottom: -#{$locked-border-width};
+  color: govuk-colour('white');
+  font-weight: $govuk-font-weight-bold;
+  padding: govuk-spacing(1) govuk-spacing(2);
+  position: absolute;
+  right: -#{$locked-border-width};
 }
 
 .commentsButtonContainer {

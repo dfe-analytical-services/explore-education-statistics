@@ -40,7 +40,7 @@ const ReorderFiltersList = ({
   const [filters, setFilters] = useState<FormattedFilters[]>([]);
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || !subjectMeta) {
       return;
     }
     const filtersMeta = subjectMeta?.filters || {};

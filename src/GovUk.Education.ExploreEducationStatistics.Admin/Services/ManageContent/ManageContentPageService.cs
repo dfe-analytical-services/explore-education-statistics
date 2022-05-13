@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Manag
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageContent;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -25,7 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
 {
     public class ManageContentPageService : IManageContentPageService
     {
-        private readonly ContentDbContext _contentDbContext;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IMapper _mapper;
         private readonly IContentService _contentService;
@@ -33,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly IReleaseFileService _releaseFileService;
         private readonly IUserService _userService;
 
-        public ManageContentPageService(ContentDbContext contentDbContext,
+        public ManageContentPageService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IMapper mapper,
             IContentService contentService,
@@ -41,7 +39,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             IReleaseFileService releaseFileService,
             IUserService userService)
         {
-            _contentDbContext = contentDbContext;
             _persistenceHelper = persistenceHelper;
             _mapper = mapper;
             _contentService = contentService;
@@ -54,8 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
             Guid releaseId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(HydrateReleaseForReleaseViewModel)
+                .CheckEntityExists<Release>(releaseId, HydrateReleaseQuery)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccessCombineWith(release => _contentService.GetUnattachedContentBlocks<DataBlock>(releaseId))
                 .OnSuccessCombineWith(releaseAndBlocks => _releaseFileService.ListAll(
@@ -97,53 +93,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 });
         }
 
-        private async Task<Release> HydrateReleaseForReleaseViewModel(Release release)
+        private IQueryable<Release> HydrateReleaseQuery(IQueryable<Release> queryable)
         {
-            release.Updates = await _contentDbContext.Update
-                .AsQueryable()
-                .Where(u => u.ReleaseId == release.Id)
-                .ToListAsync();
-
-            var publication = await _contentDbContext.Publications
-                .Include(p => p.Releases)
-                .Include(p => p.Topic.Theme)
-                .Include(p => p.Contact)
-                .SingleAsync(p => p.Releases.Contains(release));
-            release.Publication = publication;
-
-            await _contentDbContext.Entry(release.Publication)
-                .Collection(p => p.LegacyReleases)
-                .LoadAsync();
-
-            await _contentDbContext.Entry(release.Publication)
-                .Collection(p => p.Releases)
-                .LoadAsync();
-
-            var content = await _contentDbContext.ReleaseContentSections
-                .AsQueryable()
-                .Where(rcs => rcs.ReleaseId == release.Id)
-                .Include(rcs => rcs.ContentSection)
-                .ThenInclude(cs => cs.Content)
-                .ToListAsync();
-            release.Content = content;
-
-            await release.Content
-                .ToAsyncEnumerable()
-                .ForEachAwaitAsync(async rcs =>
-                {
-                    await rcs.ContentSection.Content
-                        .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(async cb =>
-                        {
-                            cb.Comments = await _contentDbContext.Comment
-                                .AsQueryable()
-                                .Where(c => c.ContentBlockId == cb.Id)
-                                .Include(c => c.CreatedBy)
-                                .Include(c => c.ResolvedBy)
-                                .ToListAsync();
-                        });
-                });
-            return release;
+            // Using `AsSplitQuery` as the generated SQL without it is incredibly
+            // inefficient. Previously, we had dealt with this by splitting out
+            // individual queries and hydrating the release manually.
+            // We should keep an eye on this in case `AsSplitQuery` is not as
+            // performant as running individual queries, and revert this if required.
+            return queryable
+                .AsSplitQuery()
+                .Include(r => r.Publication)
+                .ThenInclude(publication => publication.Contact)
+                .Include(r => r.Publication)
+                .ThenInclude(publication => publication.Releases)
+                .Include(r => r.Publication)
+                .ThenInclude(publication => publication.LegacyReleases)
+                .Include(r => r.Publication)
+                .ThenInclude(publication => publication.Topic.Theme)
+                .Include(r => r.Content)
+                .ThenInclude(join => join.ContentSection)
+                .ThenInclude(section => section.Content)
+                .ThenInclude(content => content.Comments)
+                .ThenInclude(comment => comment.CreatedBy)
+                .Include(r => r.Content)
+                .ThenInclude(join => join.ContentSection)
+                .ThenInclude(section => section.Content)
+                .ThenInclude(content => content.LockedBy)
+                .Include(r => r.Updates);
         }
     }
 }

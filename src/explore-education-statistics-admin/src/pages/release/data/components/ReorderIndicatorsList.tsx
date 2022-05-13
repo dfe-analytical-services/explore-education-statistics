@@ -42,7 +42,7 @@ const ReorderIndicatorsList = ({
   const [indicators, setIndicators] = useState<FormattedIndicators[]>([]);
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || !subjectMeta) {
       return;
     }
     const indicatorsMeta = subjectMeta?.indicators || {};

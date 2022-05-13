@@ -17,13 +17,13 @@ interface FormValues {
 }
 
 interface Props {
-  blockId: string;
+  baseId: string;
   containerRef: RefObject<HTMLDivElement>;
   onCancel: () => void;
   onSave: () => void;
 }
 
-const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
+const CommentAddForm = ({ baseId, containerRef, onCancel, onSave }: Props) => {
   const { addComment, setCurrentInteraction } = useCommentsContext();
 
   const ref = useRef<HTMLDivElement>(null);
@@ -38,7 +38,7 @@ const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
   }, [focus]);
 
   const handleSubmit = useFormSubmit(async (values: FormValues) => {
-    const newComment = await addComment(blockId, {
+    const newComment = await addComment({
       content: values.content,
     });
     if (newComment) {
@@ -58,7 +58,7 @@ const CommentAddForm = ({ blockId, containerRef, onCancel, onSave }: Props) => {
         onSubmit={handleSubmit}
       >
         {form => (
-          <Form id={`${blockId}-addCommentForm`} showErrorSummary={false}>
+          <Form id={`${baseId}-commentAddForm`} showErrorSummary={false}>
             <FormFieldTextArea<FormValues>
               label="Comment"
               hideLabel

@@ -2,11 +2,15 @@
 Resource    ./common.robot
 Library     admin-utilities.py
 
+*** Variables ***
+${BAU1_BROWSER}         bau1
+${ANALYST1_BROWSER}     analyst1
+
 *** Keywords ***
 user signs in as bau1
-    [Arguments]    ${open_browser}=True
+    [Arguments]    ${open_browser}=True    ${alias}=${BAU1_BROWSER}
     IF    ${open_browser}
-        user opens the browser
+        user opens the browser    ${alias}
     END
     user navigates to admin frontend
     user waits until h1 is visible    Sign in    %{WAIT_MEDIUM}
@@ -17,9 +21,9 @@ user signs in as bau1
     user checks nth breadcrumb contains    2    Administrator dashboard
 
 user signs in as analyst1
-    [Arguments]    ${open_browser}=True
+    [Arguments]    ${open_browser}=True    ${alias}=${ANALYST1_BROWSER}
     IF    ${open_browser}
-        user opens the browser
+        user opens the browser    ${alias}
     END
     user navigates to admin frontend
     user waits until h1 is visible    Sign in
@@ -28,6 +32,12 @@ user signs in as analyst1
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Administrator dashboard
+
+user switches to bau1 browser
+    user switches browser    ${BAU1_BROWSER}
+
+user switches to analyst1 browser
+    user switches browser    ${ANALYST1_BROWSER}
 
 user changes to bau1
     user signs out
@@ -409,33 +419,6 @@ user removes an external methodology from publication
     user clicks button    Confirm
     user waits until modal is not visible    Remove external methodology
 
-user adds basic release content
-    [Arguments]    ${publication}
-    user clicks button    Add a summary text block
-    user waits until element contains    id:releaseSummary    This section is empty    %{WAIT_SMALL}
-    user clicks button    Edit block    id:releaseSummary
-    user presses keys    Test summary text for ${publication}
-    # To ensure Save button gets clicked
-    user sets focus to element    xpath://button[.="Save & close"]    id:releaseSummary
-    user clicks button    Save & close    id:releaseSummary
-    user waits until element contains    id:releaseSummary    Test summary text for ${publication}    %{WAIT_SMALL}
-
-    user clicks button    Add a headlines text block    id:releaseHeadlines
-    user waits until element contains    id:releaseHeadlines    This section is empty    %{WAIT_SMALL}
-    user clicks button    Edit block    id:releaseHeadlines
-    user presses keys    Test headlines summary text for ${publication}
-    user clicks button    Save & close    id:releaseHeadlines
-    user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${publication}
-    ...    %{WAIT_SMALL}
-
-    user waits until button is enabled    Add new section
-    user clicks button    Add new section
-
-    user changes accordion section title    1    Test section one    css:#releaseMainContent
-    user adds text block to editable accordion section    Test section one    css:#releaseMainContent
-    user adds content to autosaving accordion section text block    Test section one    1
-    ...    Test content block for ${publication}    css:#releaseMainContent
-
 user creates public prerelease access list
     [Arguments]    ${content}
     user clicks link    Public access list
@@ -730,24 +713,49 @@ user goes to manage user
 
 user waits until modal is visible
     [Arguments]
-    ...    ${MODAL_TITLE}
-    ...    ${MODAL_TEXT}=${EMPTY}
+    ...    ${modal_title}
+    ...    ${modal_text}=${EMPTY}
 
-    user waits until parent contains element    css:.ReactModal__Content    xpath://h2[.="${MODAL_TITLE}"]
-    IF    "${MODAL_TEXT}" != "${EMPTY}"
-        user waits until parent contains element    css:.ReactModal__Content    xpath://*[.="${MODAL_TEXT}"]
+    user waits until parent contains element    css:[role="dialog"]    xpath://h2[.="${modal_title}"]
+    IF    "${modal_text}" != "${EMPTY}"
+        user waits until parent contains element    css:[role="dialog"]    xpath://*[.="${modal_text}"]
     END
-    ${modal_element}=    get webelement    css:.ReactModal__Content
+    ${modal_element}=    get webelement    css:[role="dialog"]
     [Return]    ${modal_element}
 
 user waits until modal is not visible
     [Arguments]    ${modal_title}    ${wait}=${timeout}
-    user waits until page does not contain element    css:.ReactModal__Content    ${wait}
+    user waits until page does not contain element    css:[role="dialog"]    ${wait}
     user waits until h2 is not visible    ${modal_title}
 
-user gets comment
-    [Arguments]    ${comment_text}
-    ${result}=    get webelement    xpath://*[li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]]
+user gets resolved comments
+    [Arguments]    ${parent}=css:body
+    user waits until parent contains element    ${parent}    testid:resolvedComments
+    ${comments}=    get child element    ${parent}    testid:resolvedComments
+    [Return]    ${comments}
+
+user gets unresolved comments
+    [Arguments]    ${parent}=css:body
+    user waits until parent contains element    ${parent}    testid:unresolvedComments
+    ${comments}=    get child element    ${parent}    testid:unresolvedComments
+    [Return]    ${comments}
+
+user gets unresolved comment
+    [Arguments]    ${comment_text}    ${parent}=css:body
+    ${comments}=    user gets unresolved comments    ${parent}
+    user waits until parent contains element    ${comments}
+    ...    xpath:./li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]
+    ${result}=    get child element    ${comments}
+    ...    xpath:./li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]
+    [Return]    ${result}
+
+user gets resolved comment
+    [Arguments]    ${comment_text}    ${parent}=css:body
+    ${comments}=    user gets resolved comments    ${parent}
+    user waits until parent contains element    ${comments}
+    ...    xpath:./li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]
+    ${result}=    get child element    ${comments}
+    ...    xpath:./li[.//*[@data-testid="comment-content" and text()="${comment_text}"]]
     [Return]    ${result}
 
 user closes Set Page View box

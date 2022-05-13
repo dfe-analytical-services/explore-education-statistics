@@ -1,7 +1,9 @@
+import EditableBlockLockedMessage from '@admin/components/editable/EditableBlockLockedMessage';
 import { useCommentsContext } from '@admin/contexts/CommentsContext';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentForm from '@admin/components/editable/EditableContentForm';
 import styles from '@admin/components/editable/EditableContentBlock.module.scss';
+import { UserDetails } from '@admin/services/types/user';
 import {
   ImageUploadCancelHandler,
   ImageUploadHandler,
@@ -9,53 +11,71 @@ import {
 import toHtml from '@admin/utils/markdown/toHtml';
 import Button from '@common/components/Button';
 import ContentHtml from '@common/components/ContentHtml';
-import useToggle from '@common/hooks/useToggle';
+import Tooltip from '@common/components/Tooltip';
 import { Dictionary } from '@common/types';
 import sanitizeHtml, {
   defaultSanitizeOptions,
   SanitizeHtmlOptions,
+  TagFilter,
 } from '@common/utils/sanitizeHtml';
 import classNames from 'classnames';
-import React, { useCallback, useMemo } from 'react';
+import mapValues from 'lodash/mapValues';
+import React, { useMemo } from 'react';
 
 interface EditableContentBlockProps {
+  actionThrottle?: number;
   allowComments?: boolean;
-  autoSave?: boolean;
   editable?: boolean;
   id: string;
-  isSaving?: boolean;
+  idleTimeout?: number;
+  isEditing?: boolean;
+  isLoading?: boolean;
   label: string;
-  handleBlur?: (isDirty: boolean) => void;
+  locked?: string;
+  lockedBy?: UserDetails;
   hideLabel?: boolean;
   transformImageAttributes?: (
     attributes: Dictionary<string>,
   ) => Dictionary<string>;
   useMarkdown?: boolean;
   value: string;
+  onActive?: () => void;
+  onAutoSave?: (value: string) => void;
+  onBlur?: (isDirty: boolean) => void;
   onCancel?: () => void;
   onDelete: () => void;
+  onEditing: () => void;
+  onIdle?: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
-  onSave: (value: string, isAutoSave?: boolean) => void;
+  onSubmit: (value: string) => void;
 }
 
 const EditableContentBlock = ({
+  actionThrottle,
   allowComments = false,
-  autoSave = false,
   editable = true,
   id,
-  isSaving,
+  idleTimeout,
+  isLoading,
+  isEditing,
   label,
-  handleBlur,
+  locked,
+  lockedBy,
   hideLabel = false,
   transformImageAttributes,
   useMarkdown,
   value,
+  onActive,
+  onAutoSave,
+  onBlur,
   onCancel,
   onDelete,
+  onEditing,
+  onIdle,
   onImageUpload,
   onImageUploadCancel,
-  onSave,
+  onSubmit,
 }: EditableContentBlockProps) => {
   const { comments } = useCommentsContext();
 
@@ -64,30 +84,28 @@ const EditableContentBlock = ({
     value,
   ]);
 
-  const [isEditing, toggleEditing] = useToggle(false);
-
   const sanitizeOptions: SanitizeHtmlOptions = useMemo(() => {
-    const commentTags = [
-      'comment-start',
-      'comment-end',
-      'resolvedcomment-start',
-      'resolvedcomment-end',
-    ];
-    const commentAttributes = {
+    const commentTagAttributes: SanitizeHtmlOptions['allowedAttributes'] = {
       'comment-start': ['name'],
       'comment-end': ['name'],
       'resolvedcomment-start': ['name'],
       'resolvedcomment-end': ['name'],
     };
 
+    const commentTagFilter: TagFilter = frame =>
+      comments.every(comment => comment.id !== frame.attribs.name);
+
     return {
       ...defaultSanitizeOptions,
-      allowedTags: defaultSanitizeOptions.allowedTags
-        ? [...defaultSanitizeOptions.allowedTags, ...commentTags]
-        : [],
-      allowedAttributes: defaultSanitizeOptions.allowedAttributes
-        ? { ...defaultSanitizeOptions.allowedAttributes, ...commentAttributes }
-        : {},
+      allowedTags: [
+        ...(defaultSanitizeOptions.allowedTags ?? []),
+        ...Object.keys(commentTagAttributes),
+      ],
+      allowedAttributes: {
+        ...(defaultSanitizeOptions.allowedAttributes ?? {}),
+        ...commentTagAttributes,
+      },
+      filterTags: mapValues(commentTagAttributes, () => commentTagFilter),
       transformTags: {
         img: (tagName, attribs) => {
           return {
@@ -99,87 +117,96 @@ const EditableContentBlock = ({
         },
       },
     };
-  }, [transformImageAttributes]);
+  }, [comments, transformImageAttributes]);
 
-  const handleSave = useCallback(
-    (nextValue: string, isAutoSave?: boolean) => {
-      if (!isAutoSave) {
-        toggleEditing.off();
-      }
-      // No need to handle useMarkdown case
-      // as Admin API now converts MarkDownBlocks
-      // to HtmlBlocks
-
-      onSave(nextValue, isAutoSave);
-    },
-    [toggleEditing, onSave],
-  );
-
-  if (isEditing) {
+  if (isEditing && !lockedBy) {
     return (
       <EditableContentForm
+        actionThrottle={actionThrottle}
         allowComments={allowComments}
-        autoSave={autoSave}
-        content={content ? sanitizeHtml(content, sanitizeOptions) : ''} // NOTE: Sanitize to transform img src attribs
+        content={content ? sanitizeHtml(content, sanitizeOptions) : ''}
         label={label}
-        handleBlur={handleBlur}
         hideLabel={hideLabel}
         id={id}
-        isSaving={isSaving}
+        idleTimeout={idleTimeout}
+        onAction={onActive}
+        onAutoSave={onAutoSave}
+        onBlur={onBlur}
+        onIdle={onIdle}
         onImageUpload={onImageUpload}
         onImageUploadCancel={onImageUploadCancel}
-        onCancel={() => {
-          toggleEditing.off();
-          onCancel?.();
-        }}
-        onSubmit={handleSave}
+        onCancel={onCancel}
+        onSubmit={onSubmit}
       />
     );
   }
+
+  const isEditable = editable && !isLoading && !lockedBy;
+
+  const disabledTooltip = lockedBy
+    ? `This block is being edited by ${lockedBy?.displayName}`
+    : undefined;
 
   return (
     <>
       {allowComments && comments.length > 0 && (
         <div className={styles.commentsButtonContainer}>
-          <Button
-            variant="secondary"
-            onClick={toggleEditing.on}
-            testId="view-comments"
-          >
-            View comments
-            <br />
-            <span className="govuk-!-margin-top-1 govuk-body-s">
-              {`(${
-                comments.filter(comment => !comment.resolved).length
-              } unresolved)`}
-            </span>
-          </Button>
+          <Tooltip text={disabledTooltip} enabled={!!disabledTooltip}>
+            {({ ref }) => (
+              <Button
+                ariaDisabled={!!disabledTooltip}
+                ref={ref}
+                testId="view-comments"
+                variant="secondary"
+                onClick={onEditing}
+              >
+                View comments
+                <br />
+                <span className="govuk-!-margin-top-1 govuk-body-s">
+                  {`(${
+                    comments.filter(comment => !comment.resolved).length
+                  } unresolved)`}
+                </span>
+              </Button>
+            )}
+          </Tooltip>
         </div>
       )}
+
+      {locked && lockedBy && (
+        <EditableBlockLockedMessage locked={locked} lockedBy={lockedBy} />
+      )}
+
       <EditableBlockWrapper
-        onEdit={editable ? toggleEditing.on : undefined}
+        isLoading={isLoading}
+        lockedBy={lockedBy}
+        onEdit={editable ? onEditing : undefined}
         onDelete={editable ? onDelete : undefined}
       >
-        <div
-          className={classNames(styles.preview, {
-            [styles.readOnly]: !isEditing,
-          })}
-        >
-          {editable ? (
-            // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions
-            <div className={styles.editButton} onClick={toggleEditing.on}>
+        <Tooltip enabled={!!lockedBy} followMouse text={disabledTooltip}>
+          {({ ref }) => (
+            // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions
+            <div
+              className={classNames(styles.preview, {
+                [styles.readOnly]: !isEditing,
+                [styles.editable]: isEditable,
+                [styles.locked]: !!lockedBy,
+              })}
+              ref={ref}
+              onClick={isEditable ? onEditing : undefined}
+            >
               <ContentHtml
                 html={content || '<p>This section is empty</p>'}
                 sanitizeOptions={sanitizeOptions}
               />
+              {lockedBy && (
+                <span className={styles.lockedMessage}>
+                  {`${lockedBy.displayName} is editing`}
+                </span>
+              )}
             </div>
-          ) : (
-            <ContentHtml
-              html={content || '<p>This section is empty</p>'}
-              sanitizeOptions={sanitizeOptions}
-            />
           )}
-        </div>
+        </Tooltip>
       </EditableBlockWrapper>
     </>
   );

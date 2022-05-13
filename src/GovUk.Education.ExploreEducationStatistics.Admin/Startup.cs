@@ -7,6 +7,7 @@ using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
+using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
@@ -23,6 +24,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.ModelBinding;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -108,8 +110,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
         {
             services.AddHealthChecks();
 
+            /*
+             * Logging
+             */
+
             services.AddApplicationInsightsTelemetry()
                 .AddApplicationInsightsTelemetryProcessor<SensitiveDataTelemetryProcessor>();
+
+            /*
+             * Web configuration
+             */
 
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -124,6 +134,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options => { options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(",")); }
                 )
                 .AddControllersAsServices();
+
+            services.AddMvc(options =>
+                {
+                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
+                    options.Filters.Add(new OperationCancelledExceptionFilter());
+                    options.EnableEndpointRouting = false;
+                    options.AllowEmptyInputInBodyModelBinding = true;
+                })
+                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+                .AddNewtonsoftJson(options =>
+                {
+                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+                });
+
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
+            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+
+            /*
+             * Database contexts
+             */
 
             services.AddDbContext<UsersAndRolesDbContext>(options =>
                 options
@@ -149,6 +180,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         })
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
+
+            /*
+             * Auth / IdentityServer
+             */
 
             // remove default Microsoft remapping of the name of the OpenID "roles" claim mapping
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Remove("roles");
@@ -206,6 +241,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
                 .AddIdentityServerJwt();
 
+            services.Configure<JwtBearerOptions>(
+                IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
+                options =>
+                {
+                    var originalOnMessageReceived = options.Events.OnMessageReceived;
+
+                    options.Events.OnMessageReceived = async context =>
+                    {
+                        await originalOnMessageReceived(context);
+
+                        if (!context.Token.IsNullOrEmpty())
+                        {
+                            return;
+                        }
+
+                        // Allows requests with `access_token` query parameter to authenticate.
+                        // Only really needed for websockets as we unfortunately can't set any
+                        // headers in the browser for the initial handshake.
+                        if (context.Request.Query.ContainsKey("access_token"))
+                        {
+                            context.Token = context.Request.Query["access_token"];
+                        }
+                    };
+                });
+
             // This configuration has to occur after the AddAuthentication() block as it is otherwise overridden.
             services.Configure<IdentityOptions>(options =>
             {
@@ -224,16 +284,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+'";
             });
 
+            /*
+             * SignalR
+             */
+
+            var signalRBuilder = services
+                .AddSignalR()
+                .AddNewtonsoftJsonProtocol();
+
+            var azureSignalRConnectionString = Configuration.GetValue<string>("Azure:SignalR:ConnectionString");
+
+            if (!azureSignalRConnectionString.IsNullOrEmpty())
+            {
+                signalRBuilder.AddAzureSignalR(azureSignalRConnectionString);
+            }
+
+            /*
+             * Configuration options
+             */
+
             services.Configure<PreReleaseOptions>(Configuration);
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
-
-            // here we configure our security policies
-            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
-
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
+            StartupSecurityConfiguration.ConfigureAuthorizationPolicies(services);
+
+            /*
+             * Services
+             */
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
             services.AddTransient<IMyReleasePermissionsResolver,
                 MyReleasePermissionsResolver>();
             services.AddTransient<IMyPublicationPermissionsResolver,
@@ -242,22 +324,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 MyPublicationMethodologyVersionPermissionsResolver>();
             services.AddTransient<IMyMethodologyVersionPermissionsResolver,
                 MyMethodologyVersionPermissionsResolver>();
-
-            services.AddMvc(options =>
-                {
-                    options.Filters.Add(new AuthorizeFilter(SecurityPolicies.CanAccessSystem.ToString()));
-                    options.Filters.Add(new OperationCancelledExceptionFilter());
-                    options.EnableEndpointRouting = false;
-                    options.AllowEmptyInputInBodyModelBinding = true;
-                })
-                .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-                .AddNewtonsoftJson(options =>
-                {
-                    options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
-                });
-
-            // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
 
             services.AddTransient<IFileRepository, FileRepository>();
             services.AddTransient<IDataImportRepository, DataImportRepository>();
@@ -352,6 +418,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddTransient<IManageContentPageService, ManageContentPageService>();
             services.AddTransient<IContentService, ContentService>();
+            services.AddTransient<IReleaseContentBlockService, ReleaseContentBlockService>();
             services.AddTransient<ICommentService, CommentService>();
             services.AddTransient<IRelatedInformationService, RelatedInformationService>();
             services.AddTransient<IReplacementService, ReplacementService>();
@@ -457,6 +524,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 )
             );
 
+            /*
+             * Swagger
+             */
+
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1",
@@ -547,18 +618,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             app.UseStaticFiles();
             app.UseSpaStaticFiles();
             app.UseCookiePolicy();
+            app.UseRouting();
+            app.UseHealthChecks("/api/health");
 
             app.UseAuthentication();
             app.UseIdentityServer();
             app.UseAuthorization();
-            app.UseRouting();
-            app.UseHealthChecks("/api/health");
 
             // deny access to all Identity routes other than /Identity/Account/Login and
             // /Identity/Account/ExternalLogin
             var options = new RewriteOptions()
                 .AddRewrite(@"^(?i)identity/(?!account/(?:external)*login$)", "/", skipRemainingRules: true);
             app.UseRewriter(options);
+
+            app.UseEndpoints(endpoints =>
+                {
+                    endpoints.MapHub<ReleaseContentHub>("/hubs/release-content");
+                }
+            );
 
             app.UseMvc(routes =>
             {

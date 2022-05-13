@@ -26,7 +26,6 @@ import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
-import useToggle from '@common/hooks/useToggle';
 import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
@@ -46,96 +45,62 @@ const ReleaseContent = () => {
     unsavedCommentDeletions,
   } = useEditingContext();
   const { release } = useReleaseContentState();
-  const actions = useReleaseContentActions();
-  const [blockRouteChange, toggleBlockRouteChange] = useToggle(false);
+  const { addContentSectionBlock } = useReleaseContentActions();
 
-  useMemo(() => {
+  const blockRouteChange = useMemo(() => {
+    if (unsavedBlocks.length > 0) {
+      return true;
+    }
+
     const blocksWithCommentDeletions = Object.entries(unsavedCommentDeletions)
       .filter(blockWithDeletions => blockWithDeletions[1].length)
       .map(blockWithDeletions => blockWithDeletions[0]);
-    toggleBlockRouteChange(
-      unsavedBlocks.length > 0 || blocksWithCommentDeletions.length > 0,
-    );
-  }, [toggleBlockRouteChange, unsavedBlocks, unsavedCommentDeletions]);
 
-  const releaseCount = useMemo(() => {
-    if (release) {
-      return (
-        release.publication.releases.length +
-        release.publication.legacyReleases.length
-      );
-    }
-    return 0;
-  }, [release]);
+    return blocksWithCommentDeletions.length > 0;
+  }, [unsavedBlocks, unsavedCommentDeletions]);
 
   const addBlock = useCallback(async () => {
-    if (release)
-      await actions.addContentSectionBlock({
-        releaseId: release.id,
-        sectionId: release.summarySection.id,
-        sectionKey: 'summarySection',
-        block: {
-          type: 'HtmlBlock',
-          order: 0,
-          body: '',
-        },
-      });
-  }, [release, actions]);
-
-  const updateBlock = useCallback(
-    async (blockId, bodyContent) => {
-      if (release)
-        await actions.updateContentSectionBlock({
-          releaseId: release.id,
-          sectionId: release.summarySection.id,
-          blockId,
-          sectionKey: 'summarySection',
-          bodyContent,
-        });
-    },
-    [release, actions],
-  );
-
-  const removeBlock = useCallback(
-    async (blockId: string) => {
-      if (release)
-        await actions.deleteContentSectionBlock({
-          releaseId: release.id,
-          sectionId: release.summarySection.id,
-          blockId,
-          sectionKey: 'summarySection',
-        });
-    },
-    [release, actions],
-  );
-
-  if (!release) {
-    return null;
-  }
+    await addContentSectionBlock({
+      releaseId: release.id,
+      sectionId: release.summarySection.id,
+      sectionKey: 'summarySection',
+      block: {
+        type: 'HtmlBlock',
+        order: 0,
+        body: '',
+      },
+    });
+  }, [addContentSectionBlock, release.id, release.summarySection.id]);
 
   const { publication } = release;
 
-  const allMethodologies: MethodologyLink[] = publication.methodologies.map(
-    methodology => ({
+  const allMethodologies = useMemo<MethodologyLink[]>(() => {
+    const methodologies = publication.methodologies.map(methodology => ({
       key: methodology.id,
       title: methodology.title,
       url: `/methodology/${methodology.id}/summary`,
-    }),
-  );
+    }));
 
-  if (publication.externalMethodology) {
-    allMethodologies.push({
-      key: publication.externalMethodology.url,
-      title: publication.externalMethodology.title,
-      url: publication.externalMethodology.url,
-    });
-  }
+    if (publication.externalMethodology) {
+      methodologies.push({
+        key: publication.externalMethodology.url,
+        title: publication.externalMethodology.title,
+        url: publication.externalMethodology.url,
+      });
+    }
+
+    return methodologies;
+  }, [publication.externalMethodology, publication.methodologies]);
 
   const hasAllFilesButton = release.downloadFiles.some(
     file =>
       file.type === 'Data' ||
       (file.type === 'Ancillary' && file.name !== 'All files'),
   );
+
+  const releaseCount =
+    release.publication.releases.length +
+    release.publication.legacyReleases.length;
 
   return (
     <>
@@ -168,8 +133,7 @@ const ReleaseContent = () => {
                       publicationId={release.publication.id}
                       releaseId={release.id}
                       sectionId={release.summarySection.id}
-                      onSave={updateBlock}
-                      onDelete={removeBlock}
+                      sectionKey="summarySection"
                     />
                   )}
                 />

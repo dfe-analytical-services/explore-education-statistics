@@ -7,13 +7,13 @@ import noop from 'lodash/noop';
 import React, { createRef } from 'react';
 
 describe('CommentAddForm', () => {
-  const blockId = 'block-id';
+  const baseId = 'test';
   const containerRef = createRef<HTMLDivElement>();
 
   test('renders the add comment form correctly', () => {
     render(
       <CommentAddForm
-        blockId={blockId}
+        baseId={baseId}
         containerRef={containerRef}
         onCancel={noop}
         onSave={noop}
@@ -39,7 +39,7 @@ describe('CommentAddForm', () => {
     ).toBeInTheDocument();
   });
 
-  test('adds the comment and calls the onSave handler when the form is submitted', async () => {
+  test('adds the comment and calls the `onSave` handler when the form is submitted', async () => {
     const handleSave = jest.fn();
     const handleSaveComment = jest.fn();
     handleSaveComment.mockResolvedValue(testComments[1]);
@@ -47,14 +47,14 @@ describe('CommentAddForm', () => {
     render(
       <CommentsContextProvider
         comments={[]}
-        onDeleteComment={jest.fn()}
-        onSaveComment={handleSaveComment}
-        onSaveUpdatedComment={jest.fn()}
-        onUpdateUnresolvedComments={{ current: jest.fn() }}
-        onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
+        onDelete={noop}
+        onCreate={handleSaveComment}
+        onUpdate={noop}
+        onPendingDelete={noop}
+        onPendingDeleteUndo={noop}
       >
         <CommentAddForm
-          blockId={blockId}
+          baseId={baseId}
           containerRef={containerRef}
           onCancel={noop}
           onSave={handleSave}
@@ -89,7 +89,7 @@ describe('CommentAddForm', () => {
 
     render(
       <CommentAddForm
-        blockId={blockId}
+        baseId={baseId}
         containerRef={containerRef}
         onCancel={noop}
         onSave={handleSave}
@@ -105,7 +105,7 @@ describe('CommentAddForm', () => {
     await waitFor(() => {
       expect(
         screen.getByText('Enter a comment', {
-          selector: '#block-id-addCommentForm-content-error',
+          selector: '#test-commentAddForm-content-error',
         }),
       ).toBeInTheDocument();
 
@@ -118,7 +118,7 @@ describe('CommentAddForm', () => {
 
     render(
       <CommentAddForm
-        blockId={blockId}
+        baseId={baseId}
         containerRef={containerRef}
         onCancel={handleCancel}
         onSave={noop}

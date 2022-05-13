@@ -1,9 +1,12 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.Serialization;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -17,8 +20,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     [KnownType(typeof(MarkDownBlock))]
     [KnownType(typeof(DataBlock))]
     [KnownType(typeof(HtmlBlock))]
-    public abstract class ContentBlock
+    public abstract class ContentBlock : ICreatedUpdatedTimestamps<DateTime?, DateTime?>
     {
+        /// <summary>
+        /// The maximum time a block can be locked (in minutes).
+        /// </summary>
+        public const int MaxLockTime = 10;
+
         public Guid Id { get; set; }
 
         [JsonIgnore] public ContentSection? ContentSection { get; set; }
@@ -29,7 +37,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? Created { get; set; }
 
+        public DateTime? Updated { get; set; }
+
         public List<Comment> Comments { get; set; } = new();
+
+        public DateTime? Locked { get; set; }
+
+        [JsonIgnore]
+        public DateTime? LockedUntil => Locked?.AddMinutes(MaxLockTime);
+
+        public User? LockedBy { get; set; }
+
+        [ConcurrencyCheck]
+        public Guid? LockedById { get; set; }
 
         public ContentBlock Clone(Release.CloneContext context, ContentSection? newContentSection = null)
         {
@@ -124,7 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         [NotMapped]
         private List<IChart> ChartsInternal { get; set; } = new();
 
-        public DataBlockSummary Summary { get; set; }
+        public DataBlockSummary? Summary { get; set; }
 
         public TableBuilderConfiguration Table { get; set; }
     }
@@ -132,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     [AttributeUsage(AttributeTargets.Field)]
     public class ContentBlockClassType : Attribute
     {
-        public Type Type { get; set; }
+        public Type Type { get; set; } = null!;
     }
 
     public enum ContentBlockType

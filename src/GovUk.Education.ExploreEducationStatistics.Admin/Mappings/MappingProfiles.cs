@@ -22,6 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
     {
         public MappingProfiles()
         {
+            CreateMap<User, UserDetailsViewModel>();
+
             CreateMap<Release, ReleaseViewModel>()
                 .ForMember(
                     dest => dest.LatestRelease,
@@ -85,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m =>
                         m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order).ToList())
                 )
-                .ForMember(dest => dest.Methodologies, m => m.MapFrom(p => 
+                .ForMember(dest => dest.Methodologies, m => m.MapFrom(p =>
                     p.Methodologies
                         .Select(methodologyLink => methodologyLink.Methodology.LatestVersion())
                         .OrderBy(methodology => methodology.Title)))

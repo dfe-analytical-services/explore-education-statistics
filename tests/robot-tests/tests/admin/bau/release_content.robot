@@ -56,14 +56,8 @@ Navigate to 'Content' page
 
 Add summary content to release
     user closes Set Page View box
-    user clicks button    Add a summary text block
-    user waits until element contains    id:releaseSummary    This section is empty
-    user clicks button    Edit block    id:releaseSummary
-    user presses keys    Test intro text for ${PUBLICATION_NAME}
-    user sets focus to element    xpath://button[text()="Save & close"]    id:releaseSummary
-    user clicks button    Save & close    id:releaseSummary
-    user waits until parent does not contain element    id:releaseSummary    xpath://button[text()="Save & close"]
-    user waits until element contains    id:releaseSummary    Test intro text for ${PUBLICATION_NAME}
+    user adds summary text block
+    user adds content to summary text block    Test intro text for ${PUBLICATION_NAME}
 
 # TODO: Add comment to summary content
 
@@ -174,13 +168,8 @@ Remove a key statistics tile
     user checks page contains    Proportion of settings open
 
 Add key statistics summary content to release
-    user clicks button    Add a headlines text block    id:releaseHeadlines
-    user waits until element contains    id:releaseHeadlines    This section is empty
-    user clicks button    Edit block    id:releaseHeadlines
-    user presses keys    Test key statistics summary text for ${PUBLICATION_NAME}
-    user clicks button    Save & close    id:releaseHeadlines
-
-    user waits until page contains    Test key statistics summary text for ${PUBLICATION_NAME}
+    user adds headlines text block
+    user adds content to headlines text block    Test key statistics summary text for ${PUBLICATION_NAME}
 
 Add accordion sections to release
     user creates new content section    1    Test section one

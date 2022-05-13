@@ -4,33 +4,36 @@ import { useEditingContext } from '@admin/contexts/EditingContext';
 import DataBlockSelectForm from '@admin/pages/release/content/components/DataBlockSelectForm';
 import ReleaseBlock from '@admin/pages/release/content/components/ReleaseBlock';
 import ReleaseEditableBlock from '@admin/pages/release/content/components/ReleaseEditableBlock';
+import { useReleaseContentState } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
-import { EditableRelease } from '@admin/services/releaseContentService';
 import { EditableBlock } from '@admin/services/types/content';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
+import Tooltip from '@common/components/Tooltip';
 import useToggle from '@common/hooks/useToggle';
 import { ContentSection } from '@common/services/publicationService';
 import { Dictionary } from '@common/types';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import { isFuture } from 'date-fns';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 export interface ReleaseContentAccordionSectionProps {
   id: string;
   section: ContentSection<EditableBlock>;
-  release: EditableRelease;
 }
 
 const ReleaseContentAccordionSection = ({
-  release,
-  section: { id: sectionId, caption, heading, content: sectionContent = [] },
+  section,
   ...props
 }: ReleaseContentAccordionSectionProps) => {
+  const { id: sectionId, caption, content: sectionContent = [] } = section;
+
   const {
     editingMode,
     unsavedCommentDeletions,
     unsavedBlocks,
   } = useEditingContext();
 
+  const { release } = useReleaseContentState();
   const actions = useReleaseContentActions();
 
   const [isReordering, setIsReordering] = useState(false);
@@ -38,21 +41,22 @@ const ReleaseContentAccordionSection = ({
 
   const [blocks, setBlocks] = useState<EditableBlock[]>(sectionContent);
 
-  const updatedHeading = () => {
-    if (
-      blocks.find(block => unsavedBlocks.includes(block.id)) ||
-      blocks.find(block =>
-        Object.keys(unsavedCommentDeletions).includes(block.id),
-      )
-    ) {
-      return `${heading} (unsaved changes)`;
-    }
-    return heading;
-  };
-
   useEffect(() => {
     setBlocks(sectionContent);
   }, [sectionContent]);
+
+  const heading = useMemo(() => {
+    if (
+      blocks.some(block => unsavedBlocks.includes(block.id)) ||
+      blocks.some(block =>
+        Object.keys(unsavedCommentDeletions).includes(block.id),
+      )
+    ) {
+      return `${section.heading} (unsaved changes)`;
+    }
+
+    return section.heading;
+  }, [blocks, section, unsavedBlocks, unsavedCommentDeletions]);
 
   const addBlock = useCallback(async () => {
     await actions.addContentSectionBlock({
@@ -80,31 +84,6 @@ const ReleaseContentAccordionSection = ({
       });
     },
     [actions, release.id, sectionId, sectionContent.length],
-  );
-
-  const updateBlock = useCallback(
-    async (blockId: string, bodyContent: string) => {
-      await actions.updateContentSectionBlock({
-        releaseId: release.id,
-        sectionId,
-        blockId,
-        sectionKey: 'content',
-        bodyContent,
-      });
-    },
-    [actions, release.id, sectionId],
-  );
-
-  const removeBlock = useCallback(
-    async (blockId: string) => {
-      await actions.deleteContentSectionBlock({
-        releaseId: release.id,
-        sectionId,
-        blockId,
-        sectionKey: 'content',
-      });
-    },
-    [actions, release.id, sectionId],
   );
 
   const reorderBlocks = useCallback(async () => {
@@ -139,27 +118,45 @@ const ReleaseContentAccordionSection = ({
     });
   }, [actions, sectionId, release.id]);
 
+  const hasLockedBlocks = blocks.some(
+    block => block.lockedUntil && isFuture(new Date(block.lockedUntil)),
+  );
+
   return (
     <EditableAccordionSection
       {...props}
-      heading={updatedHeading()}
+      heading={heading}
+      disabledRemoveSectionTooltip={
+        hasLockedBlocks
+          ? 'This section is being edited and cannot be removed'
+          : undefined
+      }
       caption={caption}
       onHeadingChange={handleHeadingChange}
       onRemoveSection={handleRemoveSection}
       headerButtons={
-        <Button
-          variant={!isReordering ? 'secondary' : undefined}
-          onClick={async () => {
-            if (isReordering) {
-              await reorderBlocks();
-              setIsReordering(false);
-            } else {
-              setIsReordering(true);
-            }
-          }}
+        <Tooltip
+          text="This section is being edited and cannot be reordered"
+          enabled={hasLockedBlocks}
         >
-          {isReordering ? 'Save section order' : 'Reorder this section'}
-        </Button>
+          {({ ref }) => (
+            <Button
+              ariaDisabled={hasLockedBlocks}
+              ref={ref}
+              variant={!isReordering ? 'secondary' : undefined}
+              onClick={async () => {
+                if (isReordering) {
+                  await reorderBlocks();
+                  setIsReordering(false);
+                } else {
+                  setIsReordering(true);
+                }
+              }}
+            >
+              {isReordering ? 'Save section order' : 'Reorder this section'}
+            </Button>
+          )}
+        </Tooltip>
       }
     >
       {({ open }) => (
@@ -182,12 +179,11 @@ const ReleaseContentAccordionSection = ({
                 allowImages
                 block={block}
                 sectionId={sectionId}
+                sectionKey="content"
                 editable={!isReordering}
                 publicationId={release.publication.id}
                 releaseId={release.id}
                 visible={open}
-                onSave={updateBlock}
-                onDelete={removeBlock}
               />
             )}
           />

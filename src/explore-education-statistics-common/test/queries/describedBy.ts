@@ -14,8 +14,8 @@ function getDescribedByIds(element: HTMLElement) {
 }
 
 export function queryAllDescribedBy(
-  container: HTMLElement,
   element: HTMLElement,
+  container: HTMLElement = document.body,
 ): (HTMLElement | null)[] {
   return getDescribedByIds(element).map(id => {
     const els = queryHelpers.queryAllByAttribute('id', container, id);
@@ -32,8 +32,8 @@ export function queryAllDescribedBy(
 }
 
 export function getAllDescribedBy(
-  container: HTMLElement,
   element: HTMLElement,
+  container: HTMLElement = document.body,
 ): HTMLElement[] {
   const ids = getDescribedByIds(element);
 
@@ -70,8 +70,8 @@ export function getAllDescribedBy(
 }
 
 export function getDescribedBy(
-  container: HTMLElement,
   element: HTMLElement,
+  container: HTMLElement = document.body,
 ): HTMLElement {
   const ids = getDescribedByIds(element);
 
@@ -82,11 +82,11 @@ export function getDescribedBy(
     );
   }
 
-  return getAllDescribedBy(container, element)[0];
+  return getAllDescribedBy(element, container)[0];
 }
 
 export function queryDescribedBy(
-  container: HTMLElement,
+  container: HTMLElement = document.body,
   element: HTMLElement,
 ): HTMLElement | null {
   const ids = getDescribedByIds(element);
@@ -98,5 +98,5 @@ export function queryDescribedBy(
     );
   }
 
-  return queryAllDescribedBy(container, element)[0];
+  return queryAllDescribedBy(element, container)[0];
 }

@@ -1,24 +1,26 @@
-import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import EditableBlockWrapper from '@admin/components/editable/EditableBlockWrapper';
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
+import { CommentsContextProvider } from '@admin/contexts/CommentsContext';
 import { useEditingContext } from '@admin/contexts/EditingContext';
+import { useReleaseContentHubContext } from '@admin/contexts/ReleaseContentHubContext';
+import useBlockLock from '@admin/hooks/useBlockLock';
 import useGetChartFile from '@admin/hooks/useGetChartFile';
+import { ContentSectionKeys } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
+import useReleaseContentActions from '@admin/pages/release/content/contexts/useReleaseContentActions';
+import { useReleaseContentDispatch } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import useReleaseImageUpload from '@admin/pages/release/hooks/useReleaseImageUpload';
 import {
   releaseDataBlockEditRoute,
   ReleaseDataBlockRouteParams,
 } from '@admin/routes/releaseRoutes';
+import { CommentCreate } from '@admin/services/releaseContentCommentService';
 import { Comment, EditableBlock } from '@admin/services/types/content';
-import releaseContentCommentService, {
-  AddComment,
-} from '@admin/services/releaseContentCommentService';
-import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import Gate from '@common/components/Gate';
+import DataBlockTabs from '@common/modules/find-statistics/components/DataBlockTabs';
 import useReleaseImageAttributeTransformer from '@common/modules/release/hooks/useReleaseImageAttributeTransformer';
-import isBrowser from '@common/utils/isBrowser';
 import { insertReleaseIdPlaceholders } from '@common/modules/release/utils/releaseImageUrls';
-import useToggle from '@common/hooks/useToggle';
-import React, { useCallback } from 'react';
+import isBrowser from '@common/utils/isBrowser';
+import React, { useCallback, useEffect } from 'react';
 import { generatePath } from 'react-router';
 
 interface Props {
@@ -29,9 +31,8 @@ interface Props {
   publicationId: string;
   releaseId: string;
   sectionId: string;
+  sectionKey: ContentSectionKeys;
   visible?: boolean;
-  onDelete: (blockId: string) => void;
-  onSave: (blockId: string, content: string) => void;
 }
 
 const ReleaseEditableBlock = ({
@@ -42,9 +43,8 @@ const ReleaseEditableBlock = ({
   publicationId,
   releaseId,
   sectionId,
+  sectionKey,
   visible,
-  onDelete,
-  onSave,
 }: Props) => {
   const {
     addUnsavedBlock,
@@ -53,8 +53,17 @@ const ReleaseEditableBlock = ({
     updateUnresolvedComments,
     updateUnsavedCommentDeletions,
   } = useEditingContext();
-  const blockId = `block-${block.id}`;
-  const [isSaving, toggleIsSaving] = useToggle(false);
+
+  const {
+    addBlockComment,
+    deleteBlockComment,
+    updateBlockComment,
+    deleteContentSectionBlock,
+    updateContentSectionBlock,
+  } = useReleaseContentActions();
+  const dispatch = useReleaseContentDispatch();
+
+  const { hub } = useReleaseContentHubContext();
 
   const getChartFile = useGetChartFile(releaseId);
 
@@ -66,55 +75,203 @@ const ReleaseEditableBlock = ({
     releaseId,
   });
 
-  const handleSave = useCallback(
-    async (content: string, isAutoSave?: boolean) => {
-      toggleIsSaving.on();
-      const contentWithPlaceholders = insertReleaseIdPlaceholders(content);
-      await onSave(block.id, contentWithPlaceholders);
+  const updateBlock = useCallback(
+    (nextBlock: EditableBlock) => {
+      dispatch({
+        type: 'UPDATE_SECTION_BLOCK',
+        payload: {
+          block: nextBlock,
+          meta: {
+            blockId: block.id,
+            sectionId,
+            sectionKey,
+          },
+        },
+      });
+    },
+    [block.id, dispatch, sectionId, sectionKey],
+  );
 
-      if (!isAutoSave) {
-        clearUnsavedCommentDeletions(block.id);
+  const {
+    isLocking,
+    isLockedByOtherUser,
+    isLockedByUser,
+    locked,
+    lockedBy,
+    lockThrottle,
+    endLock,
+    setLock,
+    startLock,
+    refreshLock,
+  } = useBlockLock({
+    getLock: () => hub.lockContentBlock(block.id),
+    unlock: () => hub.unlockContentBlock(block.id),
+    initialLock: {
+      locked: block.locked,
+      lockedUntil: block.lockedUntil,
+      lockedBy: block.lockedBy,
+    },
+  });
+
+  useEffect(() => {
+    const onContentBlockLocked = hub.onContentBlockLocked(event => {
+      if (event.id === block.id) {
+        setLock({
+          locked: event.locked,
+          lockedUntil: event.lockedUntil,
+          lockedBy: event.lockedBy,
+        });
+
+        updateBlock({
+          ...block,
+          ...event,
+        });
       }
+    });
 
-      toggleIsSaving.off();
+    const onContentBlockUnlocked = hub.onContentBlockUnlocked(event => {
+      if (event.id === block.id) {
+        setLock(undefined);
+
+        updateBlock({
+          ...block,
+          locked: undefined,
+          lockedBy: undefined,
+          lockedUntil: undefined,
+        });
+      }
+    });
+
+    const onContentBlockUpdated = hub.onContentBlockUpdated(updatedBlock => {
+      if (updatedBlock.id === block.id) {
+        updateBlock(updatedBlock);
+      }
+    });
+
+    return () => {
+      onContentBlockLocked.unsubscribe();
+      onContentBlockUnlocked.unsubscribe();
+      onContentBlockUpdated.unsubscribe();
+    };
+  }, [block, hub, setLock, updateBlock]);
+
+  const handleSave = useCallback(
+    async (content: string) => {
+      await updateContentSectionBlock({
+        releaseId,
+        sectionId,
+        sectionKey,
+        blockId: block.id,
+        bodyContent: insertReleaseIdPlaceholders(content),
+      });
+
       removeUnsavedBlock(block.id);
     },
     [
       block.id,
-      clearUnsavedCommentDeletions,
+      updateContentSectionBlock,
       removeUnsavedBlock,
-      onSave,
-      toggleIsSaving,
+      releaseId,
+      sectionId,
+      sectionKey,
     ],
   );
 
-  const handleDelete = useCallback(() => {
-    onDelete(block.id);
-  }, [block.id, onDelete]);
+  const handleSubmit = useCallback(
+    async (content: string) => {
+      await handleSave(content);
 
-  const handleBlur = (isDirty: boolean) => {
-    if (isDirty) {
-      addUnsavedBlock(block.id);
-    }
-  };
+      clearUnsavedCommentDeletions(block.id);
+      await endLock();
+    },
+    [handleSave, clearUnsavedCommentDeletions, block.id, endLock],
+  );
 
-  const handleCancel = () => {
-    removeUnsavedBlock(block.id);
-  };
-
-  const handleSaveComment = async (comment: AddComment) =>
-    releaseContentCommentService.addContentSectionComment(
+  const handleDelete = useCallback(async () => {
+    await deleteContentSectionBlock({
       releaseId,
       sectionId,
-      blockId.replace('block-', ''),
-      comment,
-    );
+      sectionKey,
+      blockId: block.id,
+    });
+  }, [block.id, deleteContentSectionBlock, releaseId, sectionId, sectionKey]);
 
-  const handleDeletePendingComment = async (commentId: string) =>
-    releaseContentCommentService.deleteContentSectionComment(commentId);
+  const handleBlur = useCallback(
+    (isDirty: boolean) => {
+      if (isDirty) {
+        addUnsavedBlock(block.id);
+      }
+    },
+    [addUnsavedBlock, block.id],
+  );
 
-  const handleSaveUpdatedComment = async (comment: Comment) =>
-    releaseContentCommentService.updateContentSectionComment(comment);
+  const handleSaveComment = useCallback(
+    async (comment: CommentCreate) => {
+      const newComment = await addBlockComment({
+        releaseId,
+        sectionId,
+        sectionKey,
+        blockId: block.id,
+        comment,
+      });
+
+      updateUnresolvedComments.current(block.id, newComment.id);
+
+      return newComment;
+    },
+    [
+      addBlockComment,
+      block.id,
+      releaseId,
+      sectionId,
+      sectionKey,
+      updateUnresolvedComments,
+    ],
+  );
+
+  const handlePendingDeleteComment = useCallback(
+    (commentId: string) => {
+      updateUnsavedCommentDeletions.current(block.id, commentId);
+    },
+    [block.id, updateUnsavedCommentDeletions],
+  );
+
+  const handleDeleteComment = useCallback(
+    async (commentId: string) => {
+      await deleteBlockComment({
+        releaseId,
+        sectionId,
+        sectionKey,
+        blockId: block.id,
+        commentId,
+      });
+    },
+    [block.id, deleteBlockComment, releaseId, sectionId, sectionKey],
+  );
+
+  const handleSaveUpdatedComment = useCallback(
+    async (comment: Comment) => {
+      await updateBlockComment({
+        releaseId,
+        sectionId,
+        sectionKey,
+        blockId: block.id,
+        comment,
+      });
+
+      updateUnresolvedComments.current(block.id, comment.id);
+    },
+    [
+      block.id,
+      releaseId,
+      sectionId,
+      sectionKey,
+      updateBlockComment,
+      updateUnresolvedComments,
+    ],
+  );
+
+  const blockId = `block-${block.id}`;
 
   switch (block.type) {
     case 'DataBlock':
@@ -143,31 +300,37 @@ const ReleaseEditableBlock = ({
         </div>
       );
     case 'HtmlBlock':
-    case 'MarkDownBlock':
+    case 'MarkDownBlock': {
       return (
         <CommentsContextProvider
           comments={block.comments}
-          onDeleteComment={handleDeletePendingComment}
-          onSaveComment={handleSaveComment}
-          onSaveUpdatedComment={handleSaveUpdatedComment}
-          onUpdateUnresolvedComments={updateUnresolvedComments}
-          onUpdateUnsavedCommentDeletions={updateUnsavedCommentDeletions}
+          onDelete={handleDeleteComment}
+          onPendingDelete={handlePendingDeleteComment}
+          onPendingDeleteUndo={handlePendingDeleteComment}
+          onCreate={handleSaveComment}
+          onUpdate={handleSaveUpdatedComment}
         >
           <EditableContentBlock
+            actionThrottle={lockThrottle}
             allowComments={allowComments}
-            autoSave
             editable={editable && !isBrowser('IE')}
-            handleBlur={handleBlur}
             hideLabel
             id={blockId}
-            isSaving={isSaving}
+            isEditing={isLockedByUser}
+            isLoading={isLocking}
             label="Content block"
+            locked={locked}
+            lockedBy={isLockedByOtherUser ? lockedBy : undefined}
             transformImageAttributes={transformImageAttributes}
             useMarkdown={block.type === 'MarkDownBlock'}
             value={block.body}
-            onCancel={handleCancel}
-            onSave={handleSave}
+            onActive={refreshLock}
+            onAutoSave={handleSave}
+            onBlur={handleBlur}
+            onIdle={endLock}
+            onSubmit={handleSubmit}
             onDelete={handleDelete}
+            onEditing={startLock}
             onImageUpload={allowImages ? handleImageUpload : undefined}
             onImageUploadCancel={
               allowImages ? handleImageUploadCancel : undefined
@@ -175,6 +338,7 @@ const ReleaseEditableBlock = ({
           />
         </CommentsContextProvider>
       );
+    }
     default:
       return <div>Unable to edit content</div>;
   }

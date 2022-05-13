@@ -1,32 +1,36 @@
+import { UserDetails } from '@admin/services/types/user';
 import { ContentBlock, DataBlock } from '@common/services/types/blocks';
+
+export interface CommentUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+}
 
 export interface Comment {
   id: string;
   content: string;
-  createdBy: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
+  createdBy: CommentUser;
   created: string;
   updated?: string;
   resolved?: string;
-  resolvedBy?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-  };
+  resolvedBy?: CommentUser;
   setResolved?: boolean;
 }
 
 export type EditableContentBlock = ContentBlock & {
   comments: Comment[];
+  locked?: string;
+  lockedUntil?: string;
+  lockedBy?: UserDetails;
 };
 
 export type EditableDataBlock = DataBlock & {
   comments: Comment[];
+  locked?: string;
+  lockedUntil?: string;
+  lockedBy?: UserDetails;
 };
 
 export type EditableBlock = EditableContentBlock | EditableDataBlock;

@@ -1,5 +1,6 @@
 import EditableContentBlock from '@admin/components/editable/EditableContentBlock';
 import { EditableContentBlock as EditableContentBlockType } from '@admin/services/types/content';
+import useToggle from '@common/hooks/useToggle';
 import isBrowser from '@common/utils/isBrowser';
 import React, { useCallback } from 'react';
 import useMethodologyImageUpload from '@admin/pages/methodology/hooks/useMethodologyImageUpload';
@@ -25,6 +26,8 @@ const MethodologyEditableBlock = ({
 }: Props) => {
   const blockId = `block-${block.id}`;
 
+  const [isEditing, toggleEditing] = useToggle(false);
+
   const {
     handleImageUpload,
     handleImageUploadCancel,
@@ -38,8 +41,9 @@ const MethodologyEditableBlock = ({
     (content: string) => {
       const contentWithPlaceholders = insertMethodologyIdPlaceholders(content);
       onSave(block.id, contentWithPlaceholders);
+      toggleEditing.off();
     },
-    [block.id, onSave],
+    [block.id, onSave, toggleEditing],
   );
 
   const handleDelete = useCallback(() => {
@@ -53,12 +57,15 @@ const MethodologyEditableBlock = ({
         <EditableContentBlock
           editable={editable && !isBrowser('IE')}
           id={blockId}
+          isEditing={isEditing}
           label="Content block"
           hideLabel
           value={block.body}
           useMarkdown={block.type === 'MarkDownBlock'}
           transformImageAttributes={transformImageAttributes}
-          onSave={handleSave}
+          onCancel={toggleEditing.off}
+          onEditing={toggleEditing.on}
+          onSubmit={handleSave}
           onDelete={handleDelete}
           onImageUpload={allowImages ? handleImageUpload : undefined}
           onImageUploadCancel={

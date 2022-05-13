@@ -1,4 +1,5 @@
 import createLocalStorageMock from '@common-test/createLocalStorageMock';
+import mockDate from '@common-test/mockDate';
 
 // This is just a little hack to silence a warning that we'll get until React
 // fixes this: https://github.com/facebook/react/pull/14853
@@ -35,4 +36,5 @@ beforeEach(() => {
 
 afterEach(() => {
   window.location.hash = '';
+  mockDate.reset();
 });

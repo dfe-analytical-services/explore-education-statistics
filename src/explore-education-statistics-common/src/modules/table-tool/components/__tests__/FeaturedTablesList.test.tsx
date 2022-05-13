@@ -53,7 +53,7 @@ describe('FeaturedTablesList', () => {
     });
 
     expect(link1).toBeInTheDocument();
-    expect(getDescribedBy(listItems[0], link1)).toHaveTextContent(
+    expect(getDescribedBy(link1, listItems[0])).toHaveTextContent(
       '1 - Same description',
     );
 
@@ -61,7 +61,7 @@ describe('FeaturedTablesList', () => {
       name: '2 - Similar name',
     });
     expect(link2).toBeInTheDocument();
-    expect(getDescribedBy(listItems[1], link2)).toHaveTextContent(
+    expect(getDescribedBy(link2, listItems[1])).toHaveTextContent(
       '2 - Same description',
     );
 
@@ -70,7 +70,7 @@ describe('FeaturedTablesList', () => {
     });
 
     expect(link3).toBeInTheDocument();
-    expect(getDescribedBy(listItems[2], link3)).toHaveTextContent(
+    expect(getDescribedBy(link3, listItems[2])).toHaveTextContent(
       '10 - Unique description',
     );
   });
