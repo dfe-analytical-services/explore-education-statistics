@@ -24,6 +24,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             // are what get used in real application scenarios.
         }
 
+        public ContentDbContext(DbContextOptions<ContentDbContext> options) : this(options, true)
+        {
+        }
+        
         public ContentDbContext(DbContextOptions<ContentDbContext> options, bool updateTimestamps = true) : base(options)
         {
             Configure(updateTimestamps);
