@@ -241,8 +241,10 @@ Switch back to analyst1 to resolve second text block
     ${comment}=    user gets unresolved comment    Test comment 3    ${block}
     ${author}=    get child element    ${comment}    testid:comment-author
     user waits until element contains    ${author}    Bau1 User1
+
     # resolve the comment left by bau1
-    user clicks button    Resolve    ${comment}
+    user sets focus to element    xpath://button[text()="Resolve"]    ${block}
+    user clicks button    Resolve
 
     user waits until parent contains element
     ...    ${block}
