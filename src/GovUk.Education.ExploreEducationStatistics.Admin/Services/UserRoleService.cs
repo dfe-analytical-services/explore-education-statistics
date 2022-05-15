@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Secur
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -132,18 +131,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 );
         }
 
-        private async Task SetExclusiveGlobalRole(string globalRoleName, ApplicationUser user)
+        private async Task SetExclusiveGlobalRole(string? globalRoleNameToSet, ApplicationUser user)
         {
             var existingRoleNames = await _identityUserManager
                 .GetRolesAsync(user) ?? new List<string>();
 
-            if (!existingRoleNames.Contains(globalRoleName))
+            if (globalRoleNameToSet == null)
             {
-                await _identityUserManager.AddToRoleAsync(user, globalRoleName);
+                await _identityUserManager.RemoveFromRolesAsync(user, existingRoleNames);
+                return;
+            }
+
+            if (!existingRoleNames.Contains(globalRoleNameToSet))
+            {
+                await _identityUserManager.AddToRoleAsync(user, globalRoleNameToSet);
             }
 
             var rolesToRemove = existingRoleNames
-                .Where(roleName => roleName != globalRoleName)
+                .Where(roleName => roleName != globalRoleNameToSet)
                 .ToList();
 
             if (rolesToRemove.Count > 0)
@@ -178,39 +183,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
         
-        private async Task DowngradeFromGlobalRoleIfRequired(ApplicationUser user, string globalRoleNameToRemove)
+        private async Task DowngradeFromGlobalRoleIfRequired(ApplicationUser user, string globalRoleNameToDowngradeFrom)
         {
-            var existingRoleNames = await _identityUserManager
+            var existingGlobalRoleNames = await _identityUserManager
                 .GetRolesAsync(user) ?? new List<string>();
 
-            var userAssignedToRole = existingRoleNames.Contains(globalRoleNameToRemove);
+            var higherPrecedenceExistingGlobalRoleNames = existingGlobalRoleNames
+                .Where(role => GlobalRolePrecedenceOrder.IndexOf(role) >
+                    GlobalRolePrecedenceOrder.IndexOf(globalRoleNameToDowngradeFrom));
+            
+            var requiredGlobalRoleNames = 
+                await GetRequiredGlobalRoleNamesForResourceRoles(user);
 
-            if (!userAssignedToRole)
-            {
-                return;
-            }
+            var highestPrecedenceRoleNameToRetain = higherPrecedenceExistingGlobalRoleNames
+                .Concat(requiredGlobalRoleNames)
+                .OrderBy(GlobalRolePrecedenceOrder.IndexOf)
+                .LastOrDefault();
 
+            await SetExclusiveGlobalRole(highestPrecedenceRoleNameToRetain, user);
+        }
+
+        private async Task<List<string>> GetRequiredGlobalRoleNamesForResourceRoles(ApplicationUser user)
+        {
             var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(Guid.Parse(user.Id));
             var publicationRoles = await _userPublicationRoleRepository.GetAllRolesByUser(Guid.Parse(user.Id));
-            var requiredGlobalRoles =
+            var requiredGlobalRoleNames =
                 releaseRoles.Select(GetAssociatedGlobalRoleNameForReleaseRole)
                     .Concat(publicationRoles.Select(GetAssociatedGlobalRoleNameForPublicationRole))
                     .Distinct()
                     .ToList();
-
-            if (!requiredGlobalRoles.Contains(globalRoleNameToRemove))
-            {
-                await _identityUserManager.RemoveFromRoleAsync(user, globalRoleNameToRemove);
-            }
-
-            var highestPoweredRoleRequired = requiredGlobalRoles
-                .OrderBy(GlobalRolePrecedenceOrder.IndexOf)
-                .LastOrDefault();
-
-            if (highestPoweredRoleRequired != null && !existingRoleNames.Contains(highestPoweredRoleRequired))
-            {
-                await _identityUserManager.AddToRoleAsync(user, highestPoweredRoleRequired);
-            }
+            return requiredGlobalRoleNames;
         }
 
         private string GetAssociatedGlobalRoleNameForReleaseRole(ReleaseRole role)

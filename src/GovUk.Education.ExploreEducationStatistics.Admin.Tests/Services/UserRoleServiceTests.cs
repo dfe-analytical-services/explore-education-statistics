@@ -48,7 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var role = new IdentityRole
             {
-                Id = Guid.NewGuid().ToString()
+                Id = Guid.NewGuid().ToString(),
+                Name = "Role"
             };
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -100,7 +101,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var role = new IdentityRole
             {
-                Id = Guid.NewGuid().ToString()
+                Id = Guid.NewGuid().ToString(),
+                Name = "Role"
             };
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -1553,7 +1555,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // TODO DW - should we be handling this?
             userManager
-                .Setup(s => s.RemoveFromRoleAsync(ItIsUser(identityUser), RoleNames.Analyst))
+                .Setup(s => s.RemoveFromRolesAsync(
+                    ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
                 .ReturnsAsync(new IdentityResult());
             
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -1860,7 +1863,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(ListOf(RoleNames.Analyst));
 
             userManager
-                .Setup(s => s.RemoveFromRoleAsync(ItIsUser(identityUser), RoleNames.Analyst))
+                .Setup(s => s.RemoveFromRolesAsync(
+                    ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
                 .ReturnsAsync(new IdentityResult());
 
             userManager
@@ -1942,7 +1946,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             // TODO DW - should we be handling this?
             userManager
-                .Setup(s => s.RemoveFromRoleAsync(ItIsUser(identityUser), RoleNames.Analyst))
+                .Setup(s => s.RemoveFromRolesAsync(
+                    ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
                 .ReturnsAsync(new IdentityResult());
             
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -2289,7 +2294,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .ReturnsAsync(ListOf(RoleNames.Analyst));
 
             userManager
-                .Setup(s => s.RemoveFromRoleAsync(ItIsUser(identityUser), RoleNames.Analyst))
+                .Setup(s => s.RemoveFromRolesAsync(
+                    ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
                 .ReturnsAsync(new IdentityResult());
 
             userManager
