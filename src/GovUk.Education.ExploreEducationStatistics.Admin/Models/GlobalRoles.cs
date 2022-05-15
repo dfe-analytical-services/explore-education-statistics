@@ -25,7 +25,7 @@ public static class GlobalRoles
         public const string PrereleaseUser = "Prerelease User";
     }
     
-    public static List<string> RolePrecedence = new List<string>
+    public static List<string> GlobalRolePrecedenceOrder = new()
     {
         RoleNames.PrereleaseUser,
         RoleNames.Analyst,
@@ -34,11 +34,11 @@ public static class GlobalRoles
 
     public static List<string> GetHigherRoles(string roleName)
     {
-        return RolePrecedence.Skip(RolePrecedence.IndexOf(roleName) + 1).ToList();
+        return GlobalRolePrecedenceOrder.Skip(GlobalRolePrecedenceOrder.IndexOf(roleName) + 1).ToList();
     }
 
     public static List<string> GetLowerRoles(string role)
     {
-        return RolePrecedence.GetRange(0, RolePrecedence.IndexOf(role));
+        return GlobalRolePrecedenceOrder.GetRange(0, GlobalRolePrecedenceOrder.IndexOf(role));
     }
 }
