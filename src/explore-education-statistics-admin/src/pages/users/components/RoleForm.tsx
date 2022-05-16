@@ -60,6 +60,7 @@ const RoleForm = ({ roles, user, onSubmit }: Props) => {
                       label: role.name,
                       value: role.id,
                     }))}
+                    placeholder="Choose a role"
                   />
                 </div>
                 <div className="govuk-grid-column-one-quarter">

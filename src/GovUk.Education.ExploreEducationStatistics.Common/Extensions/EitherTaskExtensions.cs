@@ -33,11 +33,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         }
 
         public static async Task<ActionResult> HandleFailuresOrNoContent<T>(
-            this Task<Either<ActionResult, T>> task)
+            this Task<Either<ActionResult, T>> validationErrorsRaisingAction,
+            bool convertNotFoundToNoContent = true)
         {
-            var result = await task;
+            var result = await validationErrorsRaisingAction;
 
-            return result.IsRight ? new NoContentResult() : result.Left;
+            if (result.IsRight)
+            {
+                return new NoContentResult();
+            }
+
+            if (convertNotFoundToNoContent && result.Left is NotFoundResult)
+            {
+                return new NoContentResult();
+            }
+
+            return result.Left;
         }
 
         public static async Task<HubResult<T>> HandleFailuresOrHubResult<T>(

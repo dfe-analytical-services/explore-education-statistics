@@ -59,3 +59,21 @@ user checks headed table body row cell contains
     [Arguments]    ${row_heading}    ${cell}    ${content}    ${parent}=css:table    ${wait}=${timeout}
     user waits until parent contains element    ${parent}
     ...    xpath:.//tbody/tr/th[text()="${row_heading}"]/../td[${cell}][contains(., "${content}")]    timeout=${wait}
+
+user clicks link in table cell
+    [Arguments]    ${row}    ${column}    ${link_text}    ${parent}=css:table
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//tbody/tr[${row}]/td[${column}]/a[contains(., "${link_text}")]
+    ${link}=    get child element
+    ...    ${parent}
+    ...    xpath:.//tbody/tr[${row}]/td[${column}]/a[contains(., "${link_text}")]
+    user clicks element    ${link}
+
+user clicks button in table cell
+    [Arguments]    ${row}    ${column}    ${button_text}    ${parent}=css:table
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//tbody/tr[${row}]/td[${column}]/button[contains(., "${button_text}")]
+    ${link}=    get child element
+    ...    ${parent}
+    ...    xpath:.//tbody/tr[${row}]/td[${column}]/button[contains(., "${button_text}")]
+    user clicks element    ${link}

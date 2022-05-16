@@ -35,7 +35,7 @@ const BauUsersPage = () => {
                 <tr key={user.id}>
                   <th scope="row">{user.name}</th>
                   <td>{user.email}</td>
-                  <td>{user.role}</td>
+                  <td>{user.role ?? 'No role'}</td>
                   <td>
                     <Link to={`/administration/users/${user.id}`}>Manage</Link>
                   </td>
