@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.Account;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau;
 using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
+using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Filters;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
@@ -55,6 +56,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -134,6 +136,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options => { options.ModelBinderProviders.Insert(0, new SeparatedQueryModelBinderProvider(",")); }
                 )
                 .AddControllersAsServices();
+
+            services.AddHttpContextAccessor();
 
             services.AddMvc(options =>
                 {
@@ -255,7 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         {
                             return;
                         }
-
+                        
                         // Allows requests with `access_token` query parameter to authenticate.
                         // Only really needed for websockets as we unfortunately can't set any
                         // headers in the browser for the initial handshake.
@@ -289,7 +293,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              */
 
             var signalRBuilder = services
-                .AddSignalR()
+                .AddSignalR(
+                    options =>
+                    {
+                        options.AddFilter<HttpContextHubFilter>();
+                    }
+                )
                 .AddNewtonsoftJsonProtocol();
 
             var azureSignalRConnectionString = Configuration.GetValue<string>("Azure:SignalR:ConnectionString");
@@ -315,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              */
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
+            
             services.AddTransient<IMyReleasePermissionsResolver,
                 MyReleasePermissionsResolver>();
             services.AddTransient<IMyPublicationPermissionsResolver,
