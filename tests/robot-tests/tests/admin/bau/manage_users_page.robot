@@ -70,11 +70,11 @@ Select a user to manage
 
 Check the initial manage user page
     user checks select contains x options    name:selectedRoleId    4
-    user checks select contains option    name:selectedRoleId    Choose a role
+    user checks select contains option    name:selectedRoleId    Choose role
     user checks select contains option    name:selectedRoleId    Analyst
     user checks select contains option    name:selectedRoleId    BAU User
     user checks select contains option    name:selectedRoleId    Prerelease User
-    user checks selected option label    name:selectedRoleId    Choose a role
+    user checks selected option label    name:selectedRoleId    Choose role
 
     user checks select contains option    name:selectedReleaseId    ${PUBLICATION_NAME} - ${RELEASE_NAME}
     user checks select contains option    name:selectedReleaseId    ${PUBLICATION_2_NAME} - ${RELEASE_2_NAME}
@@ -134,7 +134,7 @@ Remove approver access for release from user
 Remove prerelease access for release from user
     user clicks button in table cell    1    4    Remove    testid:releaseAccessTable
     user checks table body has x rows    0    testid:releaseAccessTable
-    user checks selected option label    name:selectedRoleId    Choose a role
+    user checks selected option label    name:selectedRoleId    Choose role
 
 Give the user owner access to some publications
     user chooses select option    name:selectedPublicationId    ${PUBLICATION_NAME}
@@ -161,6 +161,7 @@ Give the user owner access to some publications
 Give the user the BAU User role
     user chooses select option    name:selectedRoleId    BAU User
     user clicks button    Update role
+    user waits for page to finish loading
     user checks selected option label    name:selectedRoleId    BAU User
 
 Remove publication owner access for one of the publications from user while they are BAU
@@ -205,9 +206,10 @@ Give the user approver access to a release while they are BAU and manually set t
 
     user chooses select option    name:selectedRoleId    Analyst
     user clicks button    Update role
+    user waits for page to finish loading
     user checks selected option label    name:selectedRoleId    Analyst
 
 Remove approver access for release from user after they have manually been set to Analyst
     user clicks button in table cell    1    4    Remove    testid:releaseAccessTable
     user checks table body has x rows    0    testid:releaseAccessTable
-    user checks selected option label    name:selectedRoleId    Choose a role
+    user checks selected option label    name:selectedRoleId    Choose role
