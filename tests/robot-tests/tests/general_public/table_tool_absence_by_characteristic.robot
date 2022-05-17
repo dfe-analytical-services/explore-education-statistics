@@ -7,7 +7,6 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev    Preprod
 
-
 *** Test Cases ***
 Go to Table Tool page
     user navigates to data tables page on public frontend
@@ -129,22 +128,29 @@ Reorder Gender to be column group
     user opens details dropdown    Re-order table headers
     # Column group needs to be inside the viewport
     user scrolls to element    xpath://button[text()="Re-order table"]
-    user sets focus to element    xpath://legend[text()="Row group 1"]/../../..
+    user clicks button    Re-order row groups
+    user clicks button    Move Characteristic group to columns
+
+Reorder Gender to be first of the column groups
+    user clicks button    Re-order column groups
+    user sets focus to element    xpath://legend[text()="Characteristic"]/../../..
     user presses keys    ${SPACE}
-    user presses keys    ARROW_DOWN
     user presses keys    ARROW_LEFT
     user presses keys    ${SPACE}
 
 Reorder Gender male to be second
+    ${columnGroups}=    user gets testid element    columnGroups
+    user clicks button    Re-order items    columnGroups
     # The /../.. to get to a focusable element
-    user sets focus to element    xpath://strong[text()="Gender male"]/../..
+    user sets focus to element    xpath://span[text()="Gender male"]/../..
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
 
 Reorder Authorised absence rate to be last
+    user clicks button    Re-order items
     # The /../.. to get to a focusable element
-    user sets focus to element    xpath://strong[text()="Authorised absence rate"]/../..
+    user sets focus to element    xpath://span[text()="Authorised absence rate"]/../..
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
@@ -153,7 +159,7 @@ Reorder Authorised absence rate to be last
 
 Reorder Overall absence rate to be first
     # The /../.. to get to a focusable element
-    user sets focus to element    xpath://strong[text()="Overall absence rate"]/../..
+    user sets focus to element    xpath://span[text()="Overall absence rate"]/../..
     user presses keys    ${SPACE}
     user presses keys    ${SPACE}
     user presses keys    ARROW_UP
@@ -161,7 +167,7 @@ Reorder Overall absence rate to be first
     user presses keys    ${SPACE}
 
 Reorder 2012/13 to be last
-    user sets focus to element    xpath://strong[text()="2012/13"]/../..    # The /../.. to get to a focusable element
+    user sets focus to element    xpath://span[text()="2012/13"]/../..    # The /../.. to get to a focusable element
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN

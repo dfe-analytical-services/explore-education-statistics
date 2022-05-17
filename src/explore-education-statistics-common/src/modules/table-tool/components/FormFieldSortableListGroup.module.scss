@@ -1,59 +1,118 @@
 @import '~govuk-frontend/govuk/base';
 
-.groupsFieldset {
-  border: 4px solid govuk-colour('light-grey');
-  padding: govuk-spacing(2);
-  width: 100%;
-}
-
-.isDraggingOver {
+.container {
   background-color: govuk-colour('mid-grey');
-  border-color: $govuk-focus-colour;
+  border: 4px solid govuk-colour('light-grey');
+  overflow-x: auto;
+  padding: govuk-spacing(2);
+  position: relative;
+  width: 100%;
+
+  &.isDragDisabled {
+    background: none;
+  }
+
+  &.isDraggingOver {
+    border-color: $govuk-focus-colour;
+  }
 }
 
-.listsContainer {
+.toggleReorderGroups {
+  @include govuk-media-query($from: desktop) {
+    position: absolute;
+    right: govuk-spacing(2);
+    top: govuk-spacing(2);
+
+    &:active {
+      top: govuk-spacing(2);
+    }
+  }
+}
+
+.groupsContainer {
   display: flex;
   flex-direction: column;
-  padding: govuk-spacing(2);
   width: 100%;
 
   @include govuk-media-query($from: desktop) {
     flex-direction: row;
   }
+
+  &.isActive {
+    position: relative;
+  }
 }
 
-.list {
+.groupContainer {
+  padding: 0 govuk-spacing(1);
+}
+
+.group {
   background: govuk-colour('light-grey');
+  box-sizing: border-box;
   display: block;
-  flex-basis: 100%;
   margin-bottom: govuk-spacing(2);
-  margin-right: govuk-spacing(2);
   padding: govuk-spacing(2);
+  position: relative;
 
   @include govuk-media-query($from: desktop) {
-    flex-basis: 33%;
+    width: 320px;
   }
 
-  &:focus {
-    border: $govuk-focus-width solid #000;
+  legend {
+    padding-right: govuk-spacing(4);
+  }
+}
+
+.dragIcon {
+  display: none;
+}
+
+.groupIsActive {
+  background: govuk-colour('white');
+
+  &:focus-visible {
     outline: $govuk-focus-colour solid $govuk-focus-width;
   }
 
   &:hover {
-    background: govuk-colour('mid-grey');
-
+    background: govuk-colour('light-grey');
     // Fallback if grab is unsupported
     cursor: move;
     cursor: grab;
   }
+
+  &.isDragging {
+    background: govuk-colour('blue');
+    outline: $govuk-focus-width solid $govuk-focus-colour;
+  }
+
+  .dragIcon {
+    display: block;
+    fill: currentColor;
+    height: 18px;
+    position: absolute;
+    right: 16px;
+    top: 12px;
+    width: 18px;
+  }
 }
 
 .isDragging {
-  outline: $govuk-focus-width solid $govuk-focus-colour;
-  outline-offset: 0;
+  legend {
+    color: govuk-colour('white');
+  }
 }
 
-.optionDraggedOutside {
+.isDraggedOutside {
   opacity: 0.4;
   outline: none;
+}
+
+.moveButton {
+  max-width: 100%;
+
+  @include govuk-media-query($from: desktop) {
+    width: 320px;
+  }
 }

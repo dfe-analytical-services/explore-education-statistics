@@ -1,5 +1,6 @@
 import { FormFieldset } from '@common/components/form';
 import { FormFieldsetProps } from '@common/components/form/FormFieldset';
+import DragIcon from '@common/modules/table-tool/components/DragIcon';
 import { Filter } from '@common/modules/table-tool/types/filters';
 import reorderMultiple from '@common/utils/reorderMultiple';
 import classNames from 'classnames';
@@ -23,6 +24,7 @@ const primaryButton = 0; // https://developer.mozilla.org/en-US/docs/Web/API/Mou
 type SortableOptionChangeEventHandler = (value: Filter[]) => void;
 
 export type FormSortableListProps = {
+  isGroupDragDisabled: boolean;
   onBlur?: FocusEventHandler<HTMLDivElement>;
   onChange?: SortableOptionChangeEventHandler;
   onFocus?: FocusEventHandler<HTMLDivElement>;
@@ -33,6 +35,7 @@ export type FormSortableListProps = {
 
 const FormSortableList = ({
   id,
+  isGroupDragDisabled,
   onBlur,
   onChange,
   onFocus,
@@ -92,24 +95,28 @@ const FormSortableList = ({
   }, []);
 
   const toggleSelection = (index: number) => {
-    setSelectedIndices(prevIndices =>
-      prevIndices.includes(index) ? [] : [index],
-    );
+    if (isGroupDragDisabled) {
+      setSelectedIndices(prevIndices =>
+        prevIndices.includes(index) ? [] : [index],
+      );
+    }
   };
 
   const toggleSelectionInGroup = (index: number) => {
-    setSelectedIndices(prevIndices => {
-      const indexPosition = prevIndices.indexOf(index);
+    if (isGroupDragDisabled) {
+      setSelectedIndices(prevIndices => {
+        const indexPosition = prevIndices.indexOf(index);
 
-      if (indexPosition === -1) {
-        return [...prevIndices, index];
-      }
+        if (indexPosition === -1) {
+          return [...prevIndices, index];
+        }
 
-      const nextIndices = [...prevIndices];
-      nextIndices.splice(indexPosition, 1);
+        const nextIndices = [...prevIndices];
+        nextIndices.splice(indexPosition, 1);
 
-      return nextIndices;
-    });
+        return nextIndices;
+      });
+    }
   };
 
   const performAction = (
@@ -258,16 +265,19 @@ const FormSortableList = ({
               // eslint-disable-next-line react/jsx-props-no-spreading
               {...droppableProvided.droppableProps}
               className={classNames(styles.list, {
-                [styles.listDraggingOver]: droppableSnapshot.isDraggingOver,
+                [styles.isDraggingOver]: droppableSnapshot.isDraggingOver,
+                [styles.listIsDisabled]: !isGroupDragDisabled,
               })}
               ref={droppableProvided.innerRef}
               onBlur={handleContainerBlur}
               onFocus={handleContainerFocus}
               onMouseEnter={onMouseEnter}
               onMouseLeave={onMouseLeave}
+              aria-hidden={!isGroupDragDisabled}
             >
               {value.map((option, index) => (
                 <Draggable
+                  isDragDisabled={!isGroupDragDisabled}
                   draggableId={option.value}
                   key={option.value}
                   index={index}
@@ -278,23 +288,21 @@ const FormSortableList = ({
                       {...draggableProvided.draggableProps}
                       // eslint-disable-next-line react/jsx-props-no-spreading
                       {...draggableProvided.dragHandleProps}
-                      className={classNames(styles.optionRow, {
-                        [styles.optionDragging]: draggableSnapshot.isDragging,
-                        [styles.optionSelected]: selectedIndices.includes(
-                          index,
-                        ),
-                        [styles.optionGhosted]:
+                      className={classNames(styles.option, {
+                        [styles.isDragging]: draggableSnapshot.isDragging,
+                        [styles.isSelected]: selectedIndices.includes(index),
+                        [styles.isGhosted]:
                           selectedIndices.includes(index) &&
                           typeof draggingIndex === 'number' &&
                           draggingIndex !== index,
-                        [styles.optionDraggedOutside]:
+                        [styles.isDraggedOutside]:
                           draggableSnapshot.isDragging &&
                           !draggableSnapshot.draggingOver,
                       })}
                       ref={draggableProvided.innerRef}
-                      role="button"
+                      role={isGroupDragDisabled ? 'button' : ''}
                       style={draggableProvided.draggableProps.style}
-                      tabIndex={0}
+                      tabIndex={isGroupDragDisabled ? 0 : -1}
                       onClick={event => {
                         handleClick(event, index);
                       }}
@@ -305,9 +313,9 @@ const FormSortableList = ({
                         handleTouchEnd(event, index);
                       }}
                     >
-                      <div className={styles.optionText}>
-                        <strong>{option.label}</strong>
-                        <span aria-hidden>⇅</span>
+                      <div className={styles.optionLabel}>
+                        <span>{option.label}</span>
+                        <DragIcon className={styles.dragIcon} />
                       </div>
 
                       {selectedIndices.length > 1 &&

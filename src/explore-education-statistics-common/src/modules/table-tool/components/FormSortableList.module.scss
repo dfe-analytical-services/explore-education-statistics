@@ -5,14 +5,23 @@
   overflow: auto;
 }
 
-.listDraggingOver {
+.listIsDisabled {
+  opacity: 0.5;
+  overflow: hidden;
+
+  .option:hover {
+    background: govuk-colour('white');
+  }
+}
+
+.isDraggingOver {
   background: govuk-colour('light-grey');
   outline: $govuk-focus-width solid $govuk-focus-colour;
   outline-offset: 0;
 }
 
-.optionRow {
-  background: #fff;
+.option {
+  background: govuk-colour('white');
   border-bottom: 1px solid govuk-colour('mid-grey');
   padding: govuk-spacing(2);
   position: relative;
@@ -26,29 +35,12 @@
   }
 
   &:focus {
-    border: $govuk-focus-width solid govuk-colour('black');
     outline: $govuk-focus-colour solid $govuk-focus-width;
+    outline-offset: $govuk-focus-width * -1;
   }
 }
 
-.optionText {
-  display: flex;
-  justify-content: space-between;
-}
-
-.optionActions {
-  display: flex;
-  flex-direction: column;
-}
-
-.optionDragging {
-  background: govuk-colour('blue');
-  border: $govuk-focus-width solid govuk-colour('black');
-  color: govuk-colour('white');
-  outline: $govuk-focus-colour solid $govuk-focus-width;
-}
-
-.optionSelected {
+.isSelected {
   background: govuk-colour('blue');
   color: govuk-colour('white');
 
@@ -57,14 +49,44 @@
   }
 }
 
-.optionGhosted {
+.isDragging {
+  background: govuk-colour('blue');
+  border: $govuk-focus-width solid govuk-colour('black');
+  color: govuk-colour('white');
+  outline: $govuk-focus-colour solid $govuk-focus-width;
+}
+
+.isGhosted {
   opacity: 0.5;
 }
 
-.optionDraggedOutside {
+.isDraggedOutside {
   border: 0;
   opacity: 0.2;
   outline: none;
+}
+
+.dragIcon {
+  display: block;
+  fill: currentColor;
+  height: 18px;
+  position: absolute;
+  right: 0;
+  top: 2px;
+  width: 18px;
+}
+
+.optionLabel {
+  font-weight: $govuk-font-weight-bold;
+  padding-right: govuk-spacing(6);
+  position: relative;
+  word-break: break-word;
+}
+
+.listIsDisabled {
+  .dragIcon {
+    display: none;
+  }
 }
 
 .selectedCount {
