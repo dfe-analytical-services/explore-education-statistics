@@ -8,6 +8,7 @@
   max-width: 250px;
   padding: govuk-spacing(1) govuk-spacing(2);
   text-align: center;
+  white-space: pre-wrap;
   z-index: 1000;
 
   &.warning {

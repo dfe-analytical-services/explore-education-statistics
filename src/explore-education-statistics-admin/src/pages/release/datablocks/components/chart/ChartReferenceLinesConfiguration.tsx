@@ -1,20 +1,27 @@
 import Button from '@common/components/Button';
-import { FormTextInput } from '@common/components/form';
-import FormNumberInput from '@common/components/form/FormNumberInput';
+import FormFieldNumberInput from '@common/components/form/FormFieldNumberInput';
+import FormFieldSelect from '@common/components/form/FormFieldSelect';
+import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
+import Tooltip from '@common/components/Tooltip';
 import {
   AxisConfiguration,
   AxisType,
-  ReferenceLine,
 } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import Yup from '@common/validation/yup';
 import FormSelect, {
   SelectOption,
 } from 'explore-education-statistics-common/src/components/form/FormSelect';
-import { useFormikContext } from 'formik';
-import React, { useMemo, useState } from 'react';
+import { Formik, useFormikContext } from 'formik';
+import React, { useMemo } from 'react';
 
 interface FormValues {
   referenceLines?: AxisConfiguration['referenceLines'];
+}
+
+interface AddFormValues {
+  label: string;
+  position: string;
 }
 
 interface Props {
@@ -31,11 +38,6 @@ export default function ChartReferenceLinesConfiguration({
   meta,
 }: Props) {
   const form = useFormikContext<FormValues>();
-
-  const [referenceLine, setReferenceLine] = useState<ReferenceLine>({
-    position: '',
-    label: '',
-  });
 
   const options = useMemo<SelectOption[]>(() => {
     if (axisType === 'minor') {
@@ -128,73 +130,83 @@ export default function ChartReferenceLinesConfiguration({
           </tr>
         ))}
         {(filteredOptions.length > 0 || axisType === 'minor') && (
-          <tr>
-            <td>
-              {axisType === 'major' ? (
-                <FormSelect
-                  name={`referenceLines[${form.values.referenceLines?.length}].position`}
-                  id={`${id}-referenceLines-position`}
-                  label="Position"
-                  hideLabel
-                  value={referenceLine.position?.toString()}
-                  placeholder="Choose position"
-                  order={FormSelect.unordered}
-                  options={filteredOptions}
-                  onChange={e => {
-                    setReferenceLine({
-                      ...referenceLine,
-                      position: e.target.value,
-                    });
-                  }}
-                />
-              ) : (
-                <FormNumberInput
-                  name={`referenceLines[${form.values.referenceLines?.length}].position`}
-                  id={`${id}-referenceLines-position`}
-                  label="Position"
-                  hideLabel
-                  value={referenceLine.position as number}
-                  onChange={e => {
-                    setReferenceLine({
-                      ...referenceLine,
-                      position: e.target.value,
-                    });
-                  }}
-                />
-              )}
-            </td>
-            <td>
-              <FormTextInput
-                name={`referenceLines[${form.values.referenceLines?.length}].label`}
-                id={`${id}-referenceLines-label`}
-                label="Label"
-                hideLabel
-                value={referenceLine.label}
-                onChange={e => {
-                  setReferenceLine({
-                    ...referenceLine,
-                    label: e.target.value,
-                  });
-                }}
-              />
-            </td>
-            <td>
-              <Button
-                className="govuk-!-margin-bottom-0 dfe-float--right"
-                disabled={!referenceLine.position || !referenceLine.label}
-                onClick={() => {
-                  form.setFieldValue('referenceLines', [
-                    ...(form.values.referenceLines ?? []),
-                    referenceLine,
-                  ]);
+          <Formik<AddFormValues>
+            initialValues={{
+              label: '',
+              position: '',
+            }}
+            validationSchema={Yup.object<AddFormValues>({
+              label: Yup.string().required('Enter label'),
+              position: Yup.string().required('Enter position'),
+            })}
+            onSubmit={(values, helpers) => {
+              form.setFieldValue('referenceLines', [
+                ...(form.values.referenceLines ?? []),
+                values,
+              ]);
 
-                  setReferenceLine({ label: '', position: '' });
-                }}
-              >
-                Add line
-              </Button>
-            </td>
-          </tr>
+              helpers.resetForm();
+            }}
+          >
+            {addForm => (
+              <tr>
+                <td className="dfe-vertical-align--bottom">
+                  {axisType === 'major' ? (
+                    <FormFieldSelect
+                      name="position"
+                      id={`${id}-referenceLines-position`}
+                      label="Position"
+                      formGroup={false}
+                      hideLabel
+                      placeholder="Choose position"
+                      order={FormSelect.unordered}
+                      options={filteredOptions}
+                    />
+                  ) : (
+                    <FormFieldNumberInput
+                      name="position"
+                      id={`${id}-referenceLines-position`}
+                      label="Position"
+                      formGroup={false}
+                      hideLabel
+                    />
+                  )}
+                </td>
+                <td className="dfe-vertical-align--bottom">
+                  <FormFieldTextInput
+                    name="label"
+                    id={`${id}-referenceLines-label`}
+                    label="Label"
+                    formGroup={false}
+                    hideLabel
+                  />
+                </td>
+                <td className="dfe-vertical-align--bottom">
+                  <Tooltip
+                    text={
+                      !addForm.isValid
+                        ? 'Cannot add invalid reference line'
+                        : ''
+                    }
+                    enabled={!addForm.isValid}
+                  >
+                    {({ ref }) => (
+                      <Button
+                        ariaDisabled={!addForm.isValid}
+                        className="govuk-!-margin-bottom-0 dfe-float--right"
+                        ref={ref}
+                        onClick={async () => {
+                          await addForm.submitForm();
+                        }}
+                      >
+                        Add line
+                      </Button>
+                    )}
+                  </Tooltip>
+                </td>
+              </tr>
+            )}
+          </Formik>
         )}
       </tbody>
     </table>
