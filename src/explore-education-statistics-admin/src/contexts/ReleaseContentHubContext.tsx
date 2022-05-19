@@ -45,13 +45,17 @@ export function ReleaseContentHubContextProvider({
           joinStateRef.current = '';
         });
     }
+  }, [hub, hubState, isMountedRef, releaseId, status]);
 
+  useEffect(() => {
     return () => {
-      if (status === 'Connected') {
+      if (hub.status() === 'Connected' && joinStateRef.current === 'joined') {
         hub.leaveReleaseGroup(releaseId);
       }
     };
-  }, [hub, hubState, isMountedRef, releaseId, status]);
+    // We only want this to run when the component unmounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [releaseId]);
 
   if (!hubState) {
     return <LoadingSpinner />;
