@@ -125,10 +125,14 @@ pipenv run python run_tests.py -f tests/visual_testing/visually_check_tables_and
 ```
 
 This will iterate through Releases on the environment, capturing images of all of the tables and charts per Release, saving them into a
-`snapshots-<yyyy-MM-dd hh:mm:ss>` folder. These will be the "before" snapshots. HTML of the tables and charts will also be captured.
+`test-results/snapshots/%{RUN_IDENTIFIER}` folder. These will be the "before" snapshots. HTML of the tables and charts will also be captured.
+
+Copy the `test-results/snapshots/%{RUN_IDENTIFIER}` folder to a safe location as a subsequent run will cause the folder to be deleted.
 
 When the change under test is applied to the environment, then we can capture the "after" snapshots in the same way as above. These will again be captures
-within another `snapshots-<yyyy-MM-dd hh:mm:ss>` folder.
+within another `test-results/snapshots/%{RUN_IDENTIFIER}` folder.
+
+Again, copy the `test-results/snapshots/%{RUN_IDENTIFIER}` folder to a safe location as a subsequent run will cause the folder to be deleted.
 
 If any intermittent failures occur whilst running the test suite, it can be rerun using the `--rerun-failed-tests` flag to try the failing Releases again, e.g:
 
@@ -139,7 +143,7 @@ pipenv run python run_tests.py -f tests/visual_testing/visually_check_tables_and
 
 #### Visually compare images
 
-Now that we have a set of "before" and "after" snapshot images in the two `snapshots-<yyyy-MM-dd hh:mm:ss>` folders, we're able to visually compare them to 
+Now that we have a set of "before" and "after" snapshot images in the two snapshot folders, we're able to visually compare them to 
 ensure that only expected changes are present.
 
 From the `tests/robot-tests/scripts/visual-testing` folder, run:

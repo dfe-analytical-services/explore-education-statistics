@@ -5,7 +5,7 @@ Library     ../libs/visual.py
 Library     tables_and_charts.py
 
 *** Variables ***
-${SNAPSHOT_FOLDER}=             snapshots/%{RUN_IDENTIFIER}
+${SNAPSHOT_FOLDER}=             test-results/snapshots/%{RUN_IDENTIFIER}
 ${KEY_STATS_FOLDER}=            key-stats
 ${SECONDARY_STATS_FOLDER}=      secondary-stats
 ${CONTENT_SECTIONS_FOLDER}=     content-sections
