@@ -7,6 +7,7 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev
 
+
 *** Test Cases ***
 Navigate to Pupil absence in schools in England methodology page
     user navigates to public methodologies page

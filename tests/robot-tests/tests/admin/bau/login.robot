@@ -6,6 +6,7 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Test Cases ***
 Check that bau users can login & authenticate succesfully
     [Documentation]    EES-3303

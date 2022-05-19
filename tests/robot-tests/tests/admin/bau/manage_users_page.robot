@@ -10,6 +10,7 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Test Cases ***
 Navigate to manage users page as bau1
     user navigates to admin frontend    %{ADMIN_URL}/administration/users

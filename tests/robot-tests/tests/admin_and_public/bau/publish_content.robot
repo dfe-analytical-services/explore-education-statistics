@@ -9,9 +9,11 @@ Suite Teardown      user closes the browser
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - publish content %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Calendar Year 2001
+
 
 *** Test Cases ***
 Create new publication and release via API

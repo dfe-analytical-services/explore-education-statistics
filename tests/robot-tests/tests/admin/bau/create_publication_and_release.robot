@@ -8,12 +8,14 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}         UI tests - create publication %{RUN_IDENTIFIER}
 
 ${CREATED_THEME_ID}         ${EMPTY}
 ${CREATED_THEME_NAME}       UI test theme - create publication %{RUN_IDENTIFIER}
 ${CREATED_TOPIC_NAME}       UI test topic - create publication %{RUN_IDENTIFIER}
+
 
 *** Test Cases ***
 Go to Create publication page for "UI tests topic" topic
@@ -131,6 +133,7 @@ Verify updated release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user verifies release summary    ${PUBLICATION_NAME}    Summer Term    2026/27    UI Tests Contact Name
     ...    Official statistics
+
 
 *** Keywords ***
 teardown suite

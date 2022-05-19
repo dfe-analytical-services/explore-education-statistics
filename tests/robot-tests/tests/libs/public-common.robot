@@ -2,6 +2,7 @@
 Resource    ./common.robot
 Library     public-utilities.py
 
+
 *** Keywords ***
 user checks headline summary contains
     [Arguments]    ${text}

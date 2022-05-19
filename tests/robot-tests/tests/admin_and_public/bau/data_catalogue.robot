@@ -10,6 +10,7 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Variables ***
 ${TOPIC_NAME}=          %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=    UI tests - data catalogue %{RUN_IDENTIFIER}
@@ -18,6 +19,7 @@ ${SUBJECT_NAME_1}=      UI test subject 1
 ${SUBJECT_NAME_2}=      UI test subject 2
 ${SUBJECT_NAME_3}=      UI test subject 3
 ${SUBJECT_NAME_4}=      UI test subject 4
+
 
 *** Test Cases ***
 Create publication

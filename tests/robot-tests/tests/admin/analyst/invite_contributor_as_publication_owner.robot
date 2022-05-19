@@ -9,8 +9,10 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - invite contributor %{RUN_IDENTIFIER}
+
 
 *** Test Cases ***
 Create Publication as bau1
@@ -157,6 +159,7 @@ Validate contributors for 2000/01 release again
     user checks page does not contain    Analyst3 User3 (ees-analyst3@education.gov.uk)
     user waits until page contains    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk    %{WAIT_SMALL}
     user checks page contains tag    Pending Invite
+
 
 *** Keywords ***
 user clicks remove user button for row

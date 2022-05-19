@@ -10,10 +10,12 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${TOPIC_NAME}                       %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}                 UI tests - release content %{RUN_IDENTIFIER}
 ${SECONDARY_STATS_TABLE_TAB_ID}     releaseHeadlines-dataBlock-tables-tab
+
 
 *** Test Cases ***
 Create test publication and release via API
@@ -201,6 +203,7 @@ Validate two remaining content blocks
     ...    id:releaseMainContent
     user checks accordion section text block contains    Test section one    2    block three test text
     ...    id:releaseMainContent
+
 
 *** Keywords ***
 user clicks the nth key stats tile button

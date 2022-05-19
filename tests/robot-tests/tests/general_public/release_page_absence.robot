@@ -8,6 +8,7 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev    Preprod
 
+
 *** Test Cases ***
 Navigate to Absence publication
     user navigates to public frontend
