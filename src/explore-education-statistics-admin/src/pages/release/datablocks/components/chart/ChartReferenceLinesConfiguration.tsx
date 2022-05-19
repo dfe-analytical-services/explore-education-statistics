@@ -6,29 +6,29 @@ import Tooltip from '@common/components/Tooltip';
 import {
   AxisConfiguration,
   AxisType,
+  ReferenceLine,
 } from '@common/modules/charts/types/chart';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import Yup from '@common/validation/yup';
 import FormSelect, {
   SelectOption,
 } from 'explore-education-statistics-common/src/components/form/FormSelect';
-import { Formik, useFormikContext } from 'formik';
+import { Formik } from 'formik';
 import React, { useMemo } from 'react';
-
-interface FormValues {
-  referenceLines?: AxisConfiguration['referenceLines'];
-}
 
 interface AddFormValues {
   label: string;
   position: string;
 }
 
-interface Props {
+export interface ChartReferenceLinesConfigurationProps {
   axisType: AxisType;
   configuration: AxisConfiguration;
   id: string;
   meta: FullTableMeta;
+  lines: ReferenceLine[];
+  onAddLine: (line: ReferenceLine) => void;
+  onRemoveLine: (line: ReferenceLine) => void;
 }
 
 export default function ChartReferenceLinesConfiguration({
@@ -36,9 +36,10 @@ export default function ChartReferenceLinesConfiguration({
   configuration,
   id,
   meta,
-}: Props) {
-  const form = useFormikContext<FormValues>();
-
+  lines,
+  onAddLine,
+  onRemoveLine,
+}: ChartReferenceLinesConfigurationProps) {
   const options = useMemo<SelectOption[]>(() => {
     if (axisType === 'minor') {
       return [];
@@ -64,6 +65,7 @@ export default function ChartReferenceLinesConfiguration({
   }, [
     axisType,
     configuration.groupBy,
+    meta.filters,
     meta.indicators,
     meta.locations,
     meta.timePeriodRange,
@@ -71,21 +73,21 @@ export default function ChartReferenceLinesConfiguration({
 
   const filteredOptions = useMemo<SelectOption[]>(() => {
     return options.filter(option =>
-      form.values.referenceLines?.every(line => line.position !== option.value),
+      lines?.every(line => line.position !== option.value),
     );
-  }, [form.values.referenceLines, options]);
+  }, [lines, options]);
 
   const referenceLines = useMemo(() => {
     if (axisType === 'major') {
       return (
-        form.values.referenceLines?.filter(line =>
+        lines?.filter(line =>
           options.some(option => option.value === line.position),
         ) ?? []
       );
     }
 
-    return form.values.referenceLines ?? [];
-  }, [axisType, form.values.referenceLines, options]);
+    return lines ?? [];
+  }, [axisType, lines, options]);
 
   const getPositionLabel = (position: string | number) => {
     if (axisType === 'major') {
@@ -106,22 +108,16 @@ export default function ChartReferenceLinesConfiguration({
         </tr>
       </thead>
       <tbody>
-        {referenceLines.map(refLine => (
-          <tr key={`${refLine.label}_${refLine.position}`}>
-            <td>{getPositionLabel(refLine.position)}</td>
-            <td>{refLine.label}</td>
+        {referenceLines.map(line => (
+          <tr key={`${line.label}_${line.position}`}>
+            <td>{getPositionLabel(line.position)}</td>
+            <td>{line.label}</td>
             <td>
               <Button
                 className="govuk-!-margin-bottom-0 dfe-float--right"
                 variant="secondary"
                 onClick={() => {
-                  const newReferenceLines = form.values.referenceLines?.filter(
-                    line =>
-                      line.position !== refLine.position &&
-                      line.label !== refLine.label,
-                  );
-
-                  form.setFieldValue('referenceLines', newReferenceLines);
+                  onRemoveLine(line);
                 }}
               >
                 Remove <span className="govuk-visually-hidden">line</span>
@@ -140,11 +136,7 @@ export default function ChartReferenceLinesConfiguration({
               position: Yup.string().required('Enter position'),
             })}
             onSubmit={(values, helpers) => {
-              form.setFieldValue('referenceLines', [
-                ...(form.values.referenceLines ?? []),
-                values,
-              ]);
-
+              onAddLine(values);
               helpers.resetForm();
             }}
           >

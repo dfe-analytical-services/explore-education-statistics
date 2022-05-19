@@ -513,6 +513,23 @@ const ChartAxisConfiguration = ({
               configuration={configuration}
               id={id}
               meta={meta}
+              lines={form.values.referenceLines ?? []}
+              onAddLine={line => {
+                form.setFieldValue('referenceLines', [
+                  ...(form.values.referenceLines ?? []),
+                  line,
+                ]);
+              }}
+              onRemoveLine={line => {
+                form.setFieldValue(
+                  'referenceLines',
+                  form.values.referenceLines?.filter(
+                    refLine =>
+                      refLine.position !== line.position &&
+                      refLine.label !== line.label,
+                  ),
+                );
+              }}
             />
           )}
 
