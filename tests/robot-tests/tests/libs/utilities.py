@@ -13,6 +13,7 @@ import utilities_init
 import os
 import re
 from urllib.parse import urlparse
+import visual
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 element_finder = sl._element_finder
@@ -237,28 +238,13 @@ def prompt_to_continue():
 
 
 def capture_large_screenshot_and_prompt_to_continue():
-    capture_large_screenshot()
+    visual.capture_large_screenshot()
     prompt_to_continue()
 
 
 def capture_large_screenshot_and_html():
-    capture_large_screenshot()
+    visual.capture_large_screenshot()
     capture_html()
-
-
-def capture_large_screenshot():
-    currentWindow = sl.get_window_size()
-    page_height = sl.driver.execute_script(
-        "return document.documentElement.scrollHeight;")
-
-    page_width = currentWindow[0]
-    original_height = currentWindow[1]
-
-    sl.set_window_size(page_width, page_height)
-    screenshot_location = sl.capture_page_screenshot()
-    sl.set_window_size(page_width, original_height)
-
-    warning(f"Captured a screenshot at URL {sl.get_location()}     Screenshot saved to file://{screenshot_location}")
 
 
 def capture_html():
