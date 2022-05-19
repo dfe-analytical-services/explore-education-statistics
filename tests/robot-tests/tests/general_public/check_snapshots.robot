@@ -4,6 +4,7 @@ Library         ../libs/snapshots.py
 
 Force Tags      GeneralPublic    Snapshots    Prod
 
+
 *** Test Cases ***
 Compare current Find Statistics page with snapshot
     validate find stats snapshot

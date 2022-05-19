@@ -10,6 +10,7 @@ Library     visual.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
 
+
 *** Variables ***
 ${browser}=                             chrome
 ${headless}=                            1
@@ -21,6 +22,7 @@ ${RELEASE_COMPLETE_WAIT}=               %{RELEASE_COMPLETE_WAIT}
 ${prompt_to_continue_on_failure}=       0
 ${FAIL_TEST_SUITES_FAST}=               %{FAIL_TEST_SUITES_FAST}
 
+
 *** Keywords ***
 do this on failure
     # See if the currently executing Test Suite is failing fast and if not, take a screenshot and HTML grab of the
@@ -28,7 +30,6 @@ do this on failure
     ${currently_failing_fast}=    current test suite failing fast
 
     IF    "${currently_failing_fast}" == "${FALSE}"
-
         capture large screenshot and html
 
         # Additionally, mark the current Test Suite as failing if the "FAIL_TEST_SUITES_FAST" option is enabled, and

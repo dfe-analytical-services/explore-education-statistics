@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ./common.robot
 
+
 *** Keywords ***
 user waits until results table appears
     [Arguments]    ${wait_time}

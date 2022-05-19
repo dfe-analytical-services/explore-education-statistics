@@ -2,6 +2,7 @@
 Resource    ../../common.robot
 Resource    ../../admin-common.robot
 
+
 *** Keywords ***
 user navigates to publication on admin dashboard
     [Arguments]    ${publication}    ${theme}    ${topic}

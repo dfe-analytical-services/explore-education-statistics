@@ -11,12 +11,14 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${TOPIC_NAME}=                              %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=                        UI tests - prerelease %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}=                          UI test table
 ${DATABLOCK_FEATURED_NAME}=                 UI test featured table name
 ${DATABLOCK_FEATURED_TABLE_DESCRIPTION}=    UI test featured table description
+
 
 *** Test Cases ***
 Create test publication and release via API
@@ -500,6 +502,7 @@ Unschedule release
     user clicks button    Update status
 
     user checks summary list contains    Current status    In Draft
+
 
 *** Keywords ***
 user chooses location, time period and filters

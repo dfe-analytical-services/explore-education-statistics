@@ -9,9 +9,11 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Variables ***
 ${OWNING_PUBLICATION_NAME}=         UI tests - methodology owning publication %{RUN_IDENTIFIER}
 ${ADOPTING_PUBLICATION_NAME}=       UI tests - adopting methodology publication %{RUN_IDENTIFIER}
+
 
 *** Test Cases ***
 Create Publications and a Methodology to adopt

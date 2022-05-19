@@ -9,6 +9,7 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME_ARCHIVE}=        UI tests - archived publication %{RUN_IDENTIFIER}
 ${RELEASE_NAME_ARCHIVE}=            Financial Year 3000-01
@@ -17,6 +18,7 @@ ${SUBJECT_NAME_ARCHIVE}=            Subject for archived publication
 ${PUBLICATION_NAME_SUPERSEDE}=      UI tests - superseding publication %{RUN_IDENTIFIER}
 ${RELEASE_NAME_SUPERSEDE}=          Financial Year 2000-01
 ${SUBJECT_NAME_SUPERSEDE}=          Subject for superseding publication
+
 
 *** Test Cases ***
 Create new publication to be archived and release via API
@@ -373,4 +375,5 @@ Check archive-publication permalink no longer has out-of-date warning after arch
     user waits until h1 is visible
     ...    '${SUBJECT_NAME_ARCHIVE}' from '${PUBLICATION_NAME_ARCHIVE}'
 
-    user checks page does not contain    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.
+    user checks page does not contain
+    ...    WARNING - The data used in this table may now be out-of-date as a new release has been published since its creation.

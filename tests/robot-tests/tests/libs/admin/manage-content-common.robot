@@ -3,6 +3,7 @@ Resource    ../common.robot
 Resource    ../admin-common.robot
 Library     ../admin-utilities.py
 
+
 *** Variables ***
 # The more complex "EDITABLE_ACCORDION" selectors below are necessary to target controls that lie outside of the
 # accordion section itself e.g. the "Add new section" button.    These are necessary to use to differentiate
@@ -12,6 +13,7 @@ ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}=      xpath://div[div[div[@id="methodo
 ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}=      xpath://div[div[div[@id="methodologyAccordion-annexes"]]]
 ${METHODOLOGY_CONTENT_READONLY_ACCORDION}=      id:methodologyAccordion-content
 ${METHODOLOGY_ANNEXES_READONLY_ACCORDION}=      id:methodologyAccordion-annexes
+
 
 *** Keywords ***
 user adds basic release content

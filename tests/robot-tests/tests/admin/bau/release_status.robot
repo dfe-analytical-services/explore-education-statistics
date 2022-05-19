@@ -9,9 +9,11 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}             UI tests - release status %{RUN_IDENTIFIER}
 ${ADOPTED_PUBLICATION_NAME}     UI tests - release status publication with adoptable methodology %{RUN_IDENTIFIER}
+
 
 *** Test Cases ***
 Create new publication and release via API
@@ -151,6 +153,7 @@ Approve the adopted methodology and verify the warning disappears
     user checks checklist warnings contains
     ...    1 thing you may have forgotten, but do not need to resolve to publish this release.
     user checks checklist warnings does not contain link    A methodology for this publication is not yet approved
+
 
 *** Keywords ***
 user navigates to this release

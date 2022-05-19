@@ -7,6 +7,7 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Prod
 
+
 *** Test Cases ***
 Navigate to Find Statistics page
     [Tags]    Local    Dev

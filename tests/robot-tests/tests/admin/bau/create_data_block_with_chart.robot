@@ -11,6 +11,7 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${TOPIC_NAME}=              %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=        UI tests - create data block with chart %{RUN_IDENTIFIER}
@@ -18,6 +19,7 @@ ${DATABLOCK_NAME}=          UI test data block
 ${CONTENT_SECTION_NAME}=    Test data block section
 ${FOOTNOTE_1}=              Test footnote from bau
 ${FOOTNOTE_UPDATED}=        Updated test footnote from bau
+
 
 *** Test Cases ***
 Create test publication and release via API
@@ -740,6 +742,7 @@ Delete data block
 
     user waits until h2 is visible    Data blocks
     user waits until page contains    No data blocks have been created.
+
 
 *** Keywords ***
 user counts legend form item rows

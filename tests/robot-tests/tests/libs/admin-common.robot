@@ -2,9 +2,11 @@
 Resource    ./common.robot
 Library     admin-utilities.py
 
+
 *** Variables ***
 ${BAU1_BROWSER}         bau1
 ${ANALYST1_BROWSER}     analyst1
+
 
 *** Keywords ***
 user signs in as bau1

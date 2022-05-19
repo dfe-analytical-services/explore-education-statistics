@@ -8,9 +8,11 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Variables ***
 ${RELEASE_NAME}=        Calendar Year 2000
 ${PUBLICATION_NAME}=    UI tests - public release visibility %{RUN_IDENTIFIER}
+
 
 *** Test Cases ***
 Create test publication and release via API
