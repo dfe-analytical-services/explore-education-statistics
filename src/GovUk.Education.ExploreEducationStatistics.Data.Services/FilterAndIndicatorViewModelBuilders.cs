@@ -69,7 +69,8 @@ public class FilterAndIndicatorViewModelBuilders
 
         private static FilterItem? GetTotal(Filter filter)
         {
-            return GetTotalGroup(filter)?.FilterItems.FirstOrDefault(IsFilterItemTotal);
+            return GetTotalGroup(filter)?.FilterItems.FirstOrDefault(filterItem =>
+                IsLabelTotal(filterItem, item => item.Label));
         }
 
         private static FilterGroup? GetTotalGroup(Filter filter)
@@ -79,17 +80,7 @@ public class FilterAndIndicatorViewModelBuilders
             // Return the group if there is only one, otherwise the 'Total' group if it exists
             return filterGroups.Count == 1
                 ? filterGroups.First()
-                : filterGroups.FirstOrDefault(IsFilterGroupTotal);
-        }
-
-        private static bool IsFilterItemTotal(FilterItem filterItem)
-        {
-            return IsLabelTotal(filterItem, item => item.Label);
-        }
-
-        private static bool IsFilterGroupTotal(FilterGroup filterGroup)
-        {
-            return IsLabelTotal(filterGroup, group => group.Label);
+                : filterGroups.FirstOrDefault(filterGroup => IsLabelTotal(filterGroup, group => group.Label));
         }
 
         private static List<Filter> GroupFilterItemsByFilter(IEnumerable<FilterItem> filterItems)
