@@ -302,9 +302,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
-            boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(GeographicLevel.Country))
-                .Returns(_countriesBoundaryLevel);
-
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(
                     new List<GeographicLevel>
                     {
@@ -529,9 +526,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(It.IsAny<GeographicLevel>()))
-                .Returns((BoundaryLevel?) null);
 
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(
                     new List<GeographicLevel>
@@ -776,9 +770,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
-            boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(GeographicLevel.Region))
-                .Returns(_regionsBoundaryLevel);
-
             boundaryLevelRepository.Setup(s => s.Get(query.BoundaryLevel.Value))
                 .ReturnsAsync(_regionsBoundaryLevel);
 
@@ -994,10 +985,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
             boundaryLevelRepository
-                .Setup(s => s.FindLatestByGeographicLevel(It.IsAny<GeographicLevel>()))
-                .Returns((BoundaryLevel?)null);
-
-            boundaryLevelRepository
                 .Setup(s => s.FindByGeographicLevels(
                     new List<GeographicLevel>
                     {
@@ -1191,10 +1178,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
 
             boundaryLevelRepository
-                .Setup(s => s.FindLatestByGeographicLevel(It.IsAny<GeographicLevel>()))
-                .Returns((BoundaryLevel?)null);
-
-            boundaryLevelRepository
                 .Setup(s => s.FindByGeographicLevels(
                     new List<GeographicLevel>
                     {
@@ -1373,9 +1356,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            boundaryLevelRepository.Setup(s => s.FindLatestByGeographicLevel(It.IsAny<GeographicLevel>()))
-                .Returns((BoundaryLevel?) null);
 
             boundaryLevelRepository.Setup(s => s.FindByGeographicLevels(
                     new List<GeographicLevel>
@@ -1583,10 +1563,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             var releaseDataFileRepository = new Mock<IReleaseDataFileRepository>(MockBehavior.Strict);
             var subjectRepository = new Mock<ISubjectRepository>(MockBehavior.Strict);
             var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            boundaryLevelRepository
-                .Setup(s => s.FindLatestByGeographicLevel(It.IsAny<GeographicLevel>()))
-                .Returns((BoundaryLevel?) null);
 
             boundaryLevelRepository
                 .Setup(s => s.FindByGeographicLevels(

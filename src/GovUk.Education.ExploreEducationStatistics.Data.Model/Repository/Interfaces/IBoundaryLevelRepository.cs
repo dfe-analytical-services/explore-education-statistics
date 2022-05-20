@@ -10,7 +10,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Inter
         Task<BoundaryLevel?> Get(long id);
 
         IEnumerable<BoundaryLevel> FindByGeographicLevels(IEnumerable<GeographicLevel> geographicLevels);
-
-        BoundaryLevel? FindLatestByGeographicLevel(GeographicLevel geographicLevel);
     }
 }
