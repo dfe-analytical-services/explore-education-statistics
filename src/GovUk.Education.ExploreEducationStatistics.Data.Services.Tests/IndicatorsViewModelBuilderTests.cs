@@ -8,7 +8,7 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Services.FilterAndI
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests;
 
-public class IndicatorsBuilderTests
+public class IndicatorsViewModelBuilderTests
 {
     [Fact]
     public void GetIndicatorGroups_NoIndicatorGroups()
@@ -306,17 +306,17 @@ public class IndicatorsBuilderTests
         // Include some random elements not in the input list since an ordering configuration contains all
         // groups / indicators belonging to the Subject, whereas the input list is usually filtered:
         // - Group c
-        //   - Indicator c
-        //   - Indicator a
-        //   - Indicator b
-        // - Group a
-        //   - Indicator f
-        //   - Indicator d
-        //   - Indicator e
-        // - Group b
         //   - Indicator i
         //   - Indicator g
         //   - Indicator h
+        // - Group a
+        //   - Indicator c
+        //   - Indicator a
+        //   - Indicator b
+        // - Group b
+        //   - Indicator f
+        //   - Indicator d
+        //   - Indicator e
         var ordering = new List<IndicatorGroupSequenceEntry>
         {
             // A group that does not exist in the input list
@@ -332,7 +332,7 @@ public class IndicatorsBuilderTests
                 indicatorGroups[2].Id,
                 new List<Guid>
                 {
-                    // Indicator c, Indicator a, Indicator b
+                    // Indicator i, Indicator g, Indicator h
                     indicatorGroups[2].Indicators[2].Id,
                     indicatorGroups[2].Indicators[0].Id,
                     indicatorGroups[2].Indicators[1].Id
@@ -343,7 +343,7 @@ public class IndicatorsBuilderTests
                 indicatorGroups[0].Id,
                 new List<Guid>
                 {
-                    //Indicator f, Indicator d, Indicator e
+                    //Indicator c, Indicator a, Indicator b
                     indicatorGroups[0].Indicators[2].Id,
                     indicatorGroups[0].Indicators[0].Id,
                     indicatorGroups[0].Indicators[1].Id
@@ -354,7 +354,7 @@ public class IndicatorsBuilderTests
                 indicatorGroups[1].Id,
                 new List<Guid>
                 {
-                    // Indicator i, Indicator g, Indicator h
+                    // Indicator f, Indicator d, Indicator e
                     indicatorGroups[1].Indicators[2].Id,
                     indicatorGroups[1].Indicators[0].Id,
                     indicatorGroups[1].Indicators[1].Id
