@@ -11,7 +11,7 @@ import { LegendConfiguration } from '@common/modules/charts/types/legend';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { TableDataResponse } from '@common/services/tableBuilderService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('recharts/lib/util/LogUtils');
@@ -481,5 +481,36 @@ describe('HorizontalBarBlock', () => {
     expect(screen.getByTestId('y-axis-label')).toHaveTextContent(
       'Test axis label 1',
     );
+  });
+
+  test('can add reference lines', () => {
+    const { container } = render(
+      <HorizontalBarBlock
+        {...props}
+        axes={{
+          ...axes,
+          major: {
+            ...axes.major,
+            referenceLines: [{ label: 'Test label 1', position: '2015_AY' }],
+          },
+          minor: {
+            ...axes.minor,
+            referenceLines: [{ label: 'Test label 2', position: 3.4 }],
+          },
+        }}
+      />,
+    );
+
+    const referenceLines = container.querySelectorAll<HTMLElement>(
+      '.recharts-reference-line',
+    );
+
+    expect(referenceLines).toHaveLength(2);
+    expect(
+      within(referenceLines[0]).getByText('Test label 1'),
+    ).toBeInTheDocument();
+    expect(
+      within(referenceLines[1]).getByText('Test label 2'),
+    ).toBeInTheDocument();
   });
 });

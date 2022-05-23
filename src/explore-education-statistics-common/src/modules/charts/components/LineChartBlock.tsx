@@ -1,4 +1,5 @@
 import ChartContainer from '@common/modules/charts/components/ChartContainer';
+import createReferenceLine from '@common/modules/charts/components/utils/createReferenceLine';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import useLegend from '@common/modules/charts/components/hooks/useLegend';
 import {
@@ -30,7 +31,6 @@ import {
   LegendType,
   Line,
   LineChart,
-  ReferenceLine,
   ResponsiveContainer,
   Symbols,
   SymbolsProps,
@@ -39,7 +39,6 @@ import {
   YAxis,
 } from 'recharts';
 import getDataSetCategoryConfigs from '@common/modules/charts/util/getDataSetCategoryConfigs';
-import CustomReferenceLineLabel from '@common/modules/charts/components/CustomReferenceLineLabel';
 
 const lineStyles: Dictionary<string> = {
   solid: '',
@@ -203,27 +202,23 @@ const LineChartBlock = ({
             />
           ))}
 
-          {axes.major.referenceLines?.map(referenceLine => (
-            <ReferenceLine
-              key={`${referenceLine.position}_${referenceLine.label}`}
-              x={referenceLine.position}
-              label={props => (
-                <CustomReferenceLineLabel
-                  chartData={chartData}
-                  referenceLine={referenceLine}
-                  referenceLineProps={props}
-                />
-              )}
-            />
-          ))}
+          {axes.major.referenceLines?.map(referenceLine =>
+            createReferenceLine({
+              chartData,
+              label: referenceLine.label,
+              position: referenceLine.position,
+              x: referenceLine.position,
+            }),
+          )}
 
-          {axes.minor.referenceLines?.map(referenceLine => (
-            <ReferenceLine
-              key={`${referenceLine.position}_${referenceLine.label}`}
-              y={referenceLine.position}
-              label={referenceLine.label}
-            />
-          ))}
+          {axes.minor.referenceLines?.map(referenceLine =>
+            createReferenceLine({
+              chartData,
+              label: referenceLine.label,
+              position: referenceLine.position,
+              y: referenceLine.position,
+            }),
+          )}
         </LineChart>
       </ResponsiveContainer>
     </ChartContainer>

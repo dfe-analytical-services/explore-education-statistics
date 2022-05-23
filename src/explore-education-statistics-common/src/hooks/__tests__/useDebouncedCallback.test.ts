@@ -116,6 +116,7 @@ describe('useDebouncedCallback', () => {
         },
       },
     );
+
     const [run] = result.current;
 
     run();
@@ -132,6 +133,40 @@ describe('useDebouncedCallback', () => {
 
     jest.advanceTimersByTime(10);
     expect(callback).not.toHaveBeenCalled();
+  });
+
+  test('awaiting run function waits until wrapped function and debounce complete', () => {
+    let resolved = false;
+
+    const callback = jest.fn(() => {
+      return new Promise<void>(resolve =>
+        setTimeout(() => {
+          resolve();
+          resolved = true;
+        }, 50),
+      );
+    });
+
+    const { result } = renderHook(({ cb }) => useDebouncedCallback(cb, 10), {
+      initialProps: {
+        cb: callback,
+      },
+    });
+
+    const [run] = result.current;
+
+    run();
+
+    expect(callback).not.toHaveBeenCalled();
+
+    jest.advanceTimersByTime(10);
+    expect(callback).toHaveBeenCalled();
+
+    expect(resolved).toBe(false);
+
+    jest.advanceTimersByTime(50);
+
+    expect(resolved).toBe(true);
   });
 
   test('calling cancel function prevents the callback from running', () => {

@@ -46,7 +46,7 @@ const ChartDataSetsConfiguration = ({
   dataSets = [],
   onChange,
 }: Props) => {
-  const { forms, updateForm, submit } = useChartBuilderFormsContext();
+  const { forms, updateForm, submitForms } = useChartBuilderFormsContext();
   const [isReordering, toggleIsReordering] = useToggle(false);
 
   const indicatorOptions = useMemo(() => Object.values(meta.indicators), [
@@ -315,7 +315,7 @@ const ChartDataSetsConfiguration = ({
               <ChartBuilderSaveActions
                 formId={formId}
                 formKey="dataSets"
-                onClick={() => {
+                onClick={async () => {
                   if (!forms.dataSets) {
                     return;
                   }
@@ -325,7 +325,7 @@ const ChartDataSetsConfiguration = ({
                     submitCount: forms.dataSets.submitCount + 1,
                   });
 
-                  submit();
+                  await submitForms();
                 }}
               >
                 {buttons}

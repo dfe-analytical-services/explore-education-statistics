@@ -2,7 +2,7 @@ import useMountedRef from '@common/hooks/useMountedRef';
 import { useCallback, useEffect, useRef } from 'react';
 
 export type UseDebouncedCallbackReturn<Args extends unknown[]> = [
-  (...args: Args) => void,
+  (...args: Args) => Promise<void>,
   () => void,
 ];
 
@@ -24,17 +24,21 @@ export default function useDebouncedCallback<Args extends unknown[] = []>(
   callbackRef.current = callback;
 
   const run = useCallback(
-    (...args: Args) => {
+    async (...args: Args) => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
 
-      timeoutRef.current = setTimeout(() => {
-        if (mountedRef.current) {
-          callbackRef.current(...args);
-          timeoutRef.current = undefined;
-        }
-      }, timeout);
+      return new Promise<void>(resolve => {
+        timeoutRef.current = setTimeout(() => {
+          if (mountedRef.current) {
+            callbackRef.current(...args);
+            timeoutRef.current = undefined;
+          }
+
+          resolve();
+        }, timeout);
+      });
     },
     [timeout],
   );

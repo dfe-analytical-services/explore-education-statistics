@@ -51,7 +51,9 @@ const FormBaseInput = ({
           {hint}
         </span>
       )}
+
       {error && <ErrorMessage id={`${id}-error`}>{error}</ErrorMessage>}
+
       <input
         // eslint-disable-next-line react/jsx-props-no-spreading
         {...props}
@@ -63,6 +65,7 @@ const FormBaseInput = ({
         }
         className={classNames('govuk-input', className, {
           [`govuk-input--width-${width}`]: width !== undefined,
+          'govuk-input--error': !!error,
         })}
         id={id}
         type={type}
