@@ -47,7 +47,7 @@ public class LocationViewModelBuilder
             : new LocationAttributeViewModel
             {
                 Label = locationAttribute.Name ?? string.Empty,
-                Level = locationAttribute.GetType().Name.CamelCase(),
+                Level = locationAttribute.GeographicLevel,
                 Value = locationAttribute.GetCodeOrFallback(),
                 Options = BuildLocationAttributeViewModels(locationAttributeNode.Children, geoJsonByCode)
             };
@@ -76,7 +76,7 @@ public class LocationViewModelBuilder
     private static List<LocationAttributeViewModel> DeduplicateLocationViewModels(
         List<LocationAttributeViewModel> locations)
     {
-        // Find duplicates due to having the same label which also have the same value.
+        // Find duplicates by label which also have the same value.
         // They are unique by some other attribute of location and appending the value of this attribute won't deduplicate them.
         // TODO EES-2954 enhance the deduplication to append other attributes of the location
         var notDistinctByLabelAndValue = locations

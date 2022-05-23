@@ -1,5 +1,8 @@
 #nullable enable
 
+using System;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
+
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model;
 
 public abstract record LocationAttribute(string? Code, string? Name)
@@ -20,6 +23,8 @@ public abstract record LocationAttribute(string? Code, string? Name)
     {
         return Code ?? string.Empty;
     }
+
+    public GeographicLevel GeographicLevel => Enum.Parse<GeographicLevel>(GetType().Name);
 }
 
 public record Country(string? Code, string? Name) : LocationAttribute(Code, Name);
