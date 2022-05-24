@@ -4,12 +4,14 @@ Resource    ../libs/charts.robot
 Library     ../libs/visual.py
 Library     tables_and_charts.py
 
+
 *** Variables ***
 ${SNAPSHOT_FOLDER}=             test-results/snapshots/%{RUN_IDENTIFIER}
 ${KEY_STATS_FOLDER}=            key-stats
 ${SECONDARY_STATS_FOLDER}=      secondary-stats
 ${CONTENT_SECTIONS_FOLDER}=     content-sections
 ${FAST_TRACKS_FOLDER}=          fast-tracks
+
 
 *** Keywords ***
 Check release
@@ -20,8 +22,7 @@ Check release
 
     user navigates to public frontend    %{PUBLIC_URL}${release.url}
 
-    IF    ${release.has_key_stat_blocks} is ${TRUE}
-
+    IF    ${release.has_key_stat_blocks}
         Log to console    \n\tCapturing Key Stats:
 
         user waits until page contains element    xpath://h2[contains(text(), "Headline facts and figures")]
@@ -33,7 +34,7 @@ Check release
         END
     END
 
-    IF    ${release.has_secondary_stat_blocks} is ${TRUE}
+    IF    ${release.has_secondary_stat_blocks}
         Log to console    \n\tCapturing Secondary Stats:
 
         FOR    ${content_block}    IN    @{release.secondary_stat_blocks}
@@ -41,17 +42,17 @@ Check release
         END
     END
 
-    IF    ${release.has_content_section_blocks} is ${TRUE}
+    IF    ${release.has_content_section_blocks}
         Log to console    \n\tCapturing Content Section Data Blocks:
 
         FOR    ${content_block}    IN    @{release.content_section_blocks}
-            IF    ${content_block.has_table_config} is ${TRUE}
+            IF    ${content_block.has_table_config}
                 check content block table    ${content_block}
             END
         END
     END
 
-    IF    ${release.has_fast_track_blocks} is ${TRUE}
+    IF    ${release.has_fast_track_blocks}
         Log to console    \n\tCapturing Fast Tracks:
 
         FOR    ${content_block}    IN    @{release.fast_track_blocks}
@@ -93,7 +94,7 @@ Check Content Block Table
     user takes html snapshot of element    ${data_block}
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${CONTENT_SECTIONS_FOLDER}/${content_block.content_block_id}-table.html
     ${chart_filepath}=    Set Variable
-    IF    ${content_block.has_chart_config} is ${TRUE}
+    IF    ${content_block.has_chart_config}
         ${data_block_chart_tab}=    get child element    ${data_block}
         ...    id:dataBlock-${content_block.content_block_id}-charts-tab
         user clicks element    ${data_block_chart_tab}
@@ -105,7 +106,7 @@ Check Content Block Table
         ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${CONTENT_SECTIONS_FOLDER}/${content_block.content_block_id}-${content_block.chart_type}-chart.html
     END
     user closes accordion section with id    content-${content_block.content_section_position}    id:content
-    log content block details    ${content_block}    Content Block    ${table_filepath}    ${chart_filepath}
+    log content block details    ${content_block}    Content Block    ${content_block.has_chart_config}
 
 Check Secondary Stats Table
     [Arguments]    ${content_block}
@@ -118,7 +119,7 @@ Check Secondary Stats Table
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${SECONDARY_STATS_FOLDER}/${content_block.content_block_id}-table.png
     user takes html snapshot of element    id:releaseHeadlines-tables
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${SECONDARY_STATS_FOLDER}/${content_block.content_block_id}-table.html
-    log content block details    ${content_block}    Secondary Stats Table    ${filepath}
+    log content block details    ${content_block}    Secondary Stats Table
 
 Check Key Stats Table
     [Arguments]    ${content_block}
@@ -131,16 +132,15 @@ Check Key Stats Table
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${KEY_STATS_FOLDER}/${content_block.content_block_id}-table.png
     user takes html snapshot of element    xpath://div[@data-testid="keyStat"][${content_block.content_block_position}]
     ...    ${SNAPSHOT_FOLDER}/${content_block.release_id}/${KEY_STATS_FOLDER}/${content_block.content_block_id}-table.html
-    log content block details    ${content_block}    Key Stats Table    ${filepath}
+    log content block details    ${content_block}    Key Stats Table
 
 Log Content Block Details
     [Arguments]
     ...    ${content_block}
     ...    ${type_description}
-    ...    ${table_snapshot_filepath}
-    ...    ${chart_snapshot_filepath}=
+    ...    ${has_chart}=False
     Log to console    \t\tTable snapshot taken for block ${content_block.content_block_id}
-    IF    "${chart_snapshot_filepath}" != ""
+    IF    ${has_chart}
         Log to console    \t\tChart snapshot taken for block ${content_block.content_block_id}
     END
 
