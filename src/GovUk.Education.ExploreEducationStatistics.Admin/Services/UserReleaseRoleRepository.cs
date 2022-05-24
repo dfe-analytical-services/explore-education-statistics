@@ -149,26 +149,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await RemoveMany(userReleaseRoles, deletedById);
         }
 
-        public async Task<List<ReleaseRole>> GetAllRolesByUser(Guid userId)
+        public async Task<List<ReleaseRole>> GetDistinctRolesByUser(Guid userId)
         {
             return await _contentDbContext
                 .UserReleaseRoles
                 .AsQueryable()
                 .Where(r => r.UserId == userId)
                 .Select(r => r.Role)
+                .Distinct()
                 .ToListAsync();
         }
 
-        public async Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId, Guid releaseId)
+        public async Task<List<ReleaseRole>> GetDistinctRolesByUserAndRelease(Guid userId, Guid releaseId)
         {
             return await _contentDbContext
                 .UserReleaseRoles
-                    .AsQueryable()
-                    .Where(r =>
-                        r.UserId == userId &&
-                        r.ReleaseId == releaseId)
-                    .Select(r => r.Role)
-                    .ToListAsync();
+                .AsQueryable()
+                .Where(r =>
+                    r.UserId == userId &&
+                    r.ReleaseId == releaseId)
+                .Select(r => r.Role)
+                .Distinct()
+                .ToListAsync();
         }
 
         public async Task<bool> IsUserApproverOnLatestRelease(Guid userId, Guid publicationId)

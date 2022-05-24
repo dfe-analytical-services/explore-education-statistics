@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             var publicationRoles =
-                await _userPublicationRoleRepository.GetAllRolesByUserAndPublicationId(context.User.GetUserId(), release.PublicationId);
+                await _userPublicationRoleRepository.GetAllRolesByUserAndPublication(context.User.GetUserId(), release.PublicationId);
 
             if (ContainPublicationOwnerRole(publicationRoles))
             {

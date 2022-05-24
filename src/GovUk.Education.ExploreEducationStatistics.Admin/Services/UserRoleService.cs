@@ -197,16 +197,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var highestPrecedenceRoleNameToRetain = higherPrecedenceExistingGlobalRoleNames
                 .Concat(requiredGlobalRoleNames)
-                .OrderBy(GlobalRolePrecedenceOrder.IndexOf)
-                .LastOrDefault();
+                .MaxBy(GlobalRolePrecedenceOrder.IndexOf);
 
             await SetExclusiveGlobalRole(highestPrecedenceRoleNameToRetain, user);
         }
 
         private async Task<List<string>> GetRequiredGlobalRoleNamesForResourceRoles(ApplicationUser user)
         {
-            var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(Guid.Parse(user.Id));
-            var publicationRoles = await _userPublicationRoleRepository.GetAllRolesByUser(Guid.Parse(user.Id));
+            var releaseRoles = await _userReleaseRoleRepository.GetDistinctRolesByUser(Guid.Parse(user.Id));
+            var publicationRoles = await _userPublicationRoleRepository.GetDistinctRolesByUser(Guid.Parse(user.Id));
             var requiredGlobalRoleNames =
                 releaseRoles.Select(GetAssociatedGlobalRoleNameForReleaseRole)
                     .Concat(publicationRoles.Select(GetAssociatedGlobalRoleNameForPublicationRole))
@@ -217,16 +216,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private string GetAssociatedGlobalRoleNameForReleaseRole(ReleaseRole role)
         {
-            return role == PrereleaseViewer ? RoleNames.PrereleaseUser : RoleNames.Analyst;
+            switch (role)
+            {
+                case Viewer:
+                case Contributor:
+                case Lead:
+                case Approver:
+                    return RoleNames.Analyst;
+                case PrereleaseViewer:
+                    return RoleNames.PrereleaseUser;
+                default:
+                    throw new ArgumentOutOfRangeException(
+                        nameof(role), 
+                        role, 
+                        "Unable to find associated Global Role for Release Role");
+            }
         }
 
-        // ReSharper disable once UnusedParameter.Local
         // For simplicity of coding styles between dealing with ReleaseRoles and PublicationRoles, leaving this `role`
         // field here even though currently we only have a single Publication Role of "Owner" and therefore a single 
         // required Global Role of Analyst in return.
         private string GetAssociatedGlobalRoleNameForPublicationRole(PublicationRole role)
         {
-            return RoleNames.Analyst;
+            switch (role)
+            {
+                case PublicationRole.Owner:
+                    return RoleNames.Analyst;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(role), role, 
+                        "Unable to find associated Global Role for Publication Role");
+            }
         }
 
         public async Task<Either<ActionResult, List<RoleViewModel>>> GetAllGlobalRoles()

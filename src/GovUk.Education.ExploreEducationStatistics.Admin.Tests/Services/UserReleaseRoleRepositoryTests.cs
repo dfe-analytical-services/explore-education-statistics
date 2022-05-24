@@ -684,11 +684,89 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.GetAllRolesByUserAndRelease(user.Id, release.Id);
+                var result = await service.GetDistinctRolesByUserAndRelease(user.Id, release.Id);
 
                 Assert.Equal(2, result.Count);
                 Assert.Equal(Contributor, result[0]);
                 Assert.Equal(Lead, result[1]);
+            }
+        }
+        
+        [Fact]
+        public async Task GetDistinctRolesByUser()
+        {
+            var user = new User();
+            var release1 = new Release();
+            var release2 = new Release();
+
+            var userReleaseRoles = new List<UserReleaseRole>
+            {
+                new()
+                {
+                    User = user,
+                    Release = release1,
+                    Role = Contributor
+                },
+                new()
+                {
+                    User = user,
+                    Release = release1,
+                    Role = Lead
+                },
+                new()
+                {
+                    User = user,
+                    Release = release2,
+                    Role = Approver,
+                },
+                new()
+                {
+                    User = user,
+                    Release = release2,
+                    Role = Lead
+                }
+            };
+
+            var otherUserReleaseRoles = new List<UserReleaseRole>
+            {
+                // Role for different release
+                new()
+                {
+                    User = user,
+                    Release = new Release(),
+                    Role = Approver
+                },
+                // Role for different user
+                new()
+                {
+                    User = new User(),
+                    Release = release1,
+                    Role = Approver
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(user);
+                await contentDbContext.AddRangeAsync(release1, release2);
+                await contentDbContext.AddRangeAsync(userReleaseRoles);
+                await contentDbContext.AddRangeAsync(otherUserReleaseRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserReleaseRoleRepository(contentDbContext);
+
+                var result = await service.GetDistinctRolesByUser(user.Id);
+
+                // Expect 3 distinct results.  The 4th duplicate "Lead" role is filtered out.
+                Assert.Equal(3, result.Count);
+                Assert.Equal(Contributor, result[0]);
+                Assert.Equal(Lead, result[1]);
+                Assert.Equal(Approver, result[2]);
             }
         }
 
