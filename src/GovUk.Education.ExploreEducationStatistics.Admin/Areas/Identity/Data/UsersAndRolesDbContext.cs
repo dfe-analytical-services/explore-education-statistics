@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data
 {

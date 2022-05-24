@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -12,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {

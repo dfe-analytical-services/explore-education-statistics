@@ -3,10 +3,10 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {

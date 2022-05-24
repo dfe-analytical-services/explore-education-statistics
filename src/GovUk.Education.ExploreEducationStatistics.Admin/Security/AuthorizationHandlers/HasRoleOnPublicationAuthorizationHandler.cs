@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             TRequirement requirement,
             Publication publication)
         {
-            var publicationRoles = await _publicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), publication.Id);
+            var publicationRoles = await _publicationRoleRepository.GetAllRolesByUserAndPublication(context.User.GetUserId(), publication.Id);
 
             if (publicationRoles.Any())
             {

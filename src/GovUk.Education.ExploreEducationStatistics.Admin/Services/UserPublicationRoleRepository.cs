@@ -39,7 +39,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return created;
         }
 
-        public async Task<List<PublicationRole>> GetAllRolesByUser(Guid userId, Guid publicationId)
+        public async Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId)
+        {
+            return await _contentDbContext
+                .UserPublicationRoles
+                .AsQueryable()
+                .Where(r => r.UserId == userId)
+                .Select(r => r.Role)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        public async Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId)
         {
             return await _contentDbContext.UserPublicationRoles
                 .AsQueryable()
@@ -47,6 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     r.UserId == userId &&
                     r.PublicationId == publicationId)
                 .Select(role => role.Role)
+                .Distinct()
                 .ToListAsync();
         }
 

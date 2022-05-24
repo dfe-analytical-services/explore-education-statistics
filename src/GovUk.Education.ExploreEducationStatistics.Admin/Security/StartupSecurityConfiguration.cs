@@ -1,5 +1,4 @@
 #nullable enable
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
@@ -9,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security
 {

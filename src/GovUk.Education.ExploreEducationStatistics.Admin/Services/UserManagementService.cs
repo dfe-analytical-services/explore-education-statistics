@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 
@@ -52,35 +53,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccess(() =>
+                .OnSuccess(async () =>
                 {
-                    return _usersAndRolesDbContext.Users
-                        .AsQueryable()
-                        .Join(
-                            _usersAndRolesDbContext.UserRoles,
-                            user => user.Id,
-                            userRole => userRole.UserId,
-                            (user, userRole) => new
-                            {
-                                user,
-                                userRoleId = userRole.RoleId
-                            }
-                        )
-                        .Join(
-                            _usersAndRolesDbContext.Roles,
-                            prev => prev.userRoleId,
-                            role => role.Id,
-                            (prev, role) => new UserViewModel
-                            {
-                                Id = Guid.Parse(prev.user.Id),
-                                Name = prev.user.FirstName + " " + prev.user.LastName,
-                                Email = prev.user.Email,
-                                Role = role.Name
-                            }
-                        )
-                        .Where(uvm => uvm.Role != Role.PrereleaseUser.GetEnumLabel())
-                        .OrderBy(uvm => uvm.Name)
+                    var roles = await _usersAndRolesDbContext.Roles.ToListAsync();
+                    var prereleaseRole = roles
+                        .Single(role => role.Name == RoleNames.PrereleaseUser);
+                    var users = _usersAndRolesDbContext.Users;
+                    var userRoles = _usersAndRolesDbContext.UserRoles;
+                    var nonPrereleaseUsers = users
+                        .Where(user => !userRoles.Any(userRole =>
+                            userRole.UserId == user.Id && userRole.RoleId == prereleaseRole.Id));
+                    var usersAndRoles = await nonPrereleaseUsers
+                        .Select(user => new
+                        {
+                            Id = Guid.Parse(user.Id),
+                            Name = user.FirstName + " " + user.LastName,
+                            user.Email,
+                            Role = userRoles
+                                .Where(userRole => userRole.UserId == user.Id)
+                                .Select(userRole => userRole.RoleId)
+                                .FirstOrDefault()
+                        })
                         .ToListAsync();
+
+                    return usersAndRoles
+                        .Select(userAndRole => new UserViewModel
+                        {
+                            Id = userAndRole.Id,
+                            Name = userAndRole.Name,
+                            Email = userAndRole.Email,
+                            Role = roles.SingleOrDefault(role => role.Id == userAndRole.Role)?.Name
+                        })
+                        .OrderBy(userAndRole => userAndRole.Name)
+                        .ToList();
                 });
         }
 
@@ -164,21 +169,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OnSuccess(async user =>
                         {
                             return await _userRoleService.GetGlobalRoles(user.Id)
-                                .OnSuccessCombineWith(globalRoles => _userRoleService.GetPublicationRoles(id))
-                                .OnSuccessCombineWith(globalAndPublicationRoles => _userRoleService.GetReleaseRoles(id))
+                                .OnSuccessCombineWith(_ => _userRoleService.GetPublicationRoles(id))
+                                .OnSuccessCombineWith(_ => _userRoleService.GetReleaseRoles(id))
                                 .OnSuccess(tuple =>
                                 {
                                     var (globalRoles, publicationRoles, releaseRoles) = tuple;
 
-                                    // Currently we only allow a user to have a maximum of one global role
-                                    var globalRole = globalRoles.First();
+                                    // Currently we only allow a user to have a maximum of one global role,
+                                    // and potentially no global role at all if other permissions in the system
+                                    // have been removed.
+                                    var globalRole = globalRoles.FirstOrDefault();
 
                                     return new UserViewModel
                                     {
                                         Id = id,
                                         Name = user.FirstName + " " + user.LastName,
                                         Email = user.Email,
-                                        Role = globalRole.Id,
+                                        Role = globalRole?.Id,
                                         UserPublicationRoles = publicationRoles,
                                         UserReleaseRoles = releaseRoles
                                     };
@@ -260,22 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _userService
                 .CheckCanManageAllUsers()
-                .OnSuccess(async () =>
-                {
-                    // Currently we only allow a user to have a maximum of one global role
-                    var existingRole =
-                        await _usersAndRolesDbContext.UserRoles
-                            .AsQueryable()
-                            .FirstOrDefaultAsync(userRole => userRole.UserId == userId);
-
-                    if (existingRole == null)
-                    {
-                        return await _userRoleService.AddGlobalRole(userId, roleId);
-                    }
-
-                    return await _userRoleService.RemoveGlobalRole(userId, existingRole.RoleId)
-                        .OnSuccess(() => _userRoleService.AddGlobalRole(userId, roleId));
-                });
+                .OnSuccess(() => _userRoleService.SetGlobalRole(userId, roleId));
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateUserDoesNotExist(string email)
