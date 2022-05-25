@@ -1,13 +1,13 @@
-UPDATE AspNetUsers SET NormalizedUserName = 'EES-BAU1@EDUCATION.GOV.UK' WHERE NormalizedUserName = 'EES-TEST.BAU1@education.gov.uk'; 
+UPDATE AspNetUsers SET NormalizedUserName = 'EES-BAU1@EDUCATION.GOV.UK' WHERE NormalizedUserName = 'EES-TEST.BAU1@education.gov.uk';
 UPDATE AspNetUsers SET Email = 'ees-bau1@education.gov.uk' WHERE Email = 'EES-test.BAU1@education.gov.uk';
 UPDATE AspNetUsers SET NormalizedEmail = 'EES-BAU1@education.gov.uk' WHERE NormalizedEmail = 'EES-TEST.BAU1@education.gov.uk';
 UPDATE AspNetUsers SET UserName = 'ees-bau1@education.gov.uk' WHERE UserName = 'ees-test.bau1@education.gov.uk';
 UPDATE Users SET Email = 'ees-bau1@education.gov.uk' WHERE Email = 'ees-test.bau1@education.gov.uk';
-UPDATE UserInvites SET Email = 'bau1@azurehiveitco.onmicrosoft.com' WHERE Email = 'ees-test.bau1@education.gov.uk'; 
+UPDATE UserInvites SET Email = 'bau1@azurehiveitco.onmicrosoft.com' WHERE Email = 'ees-test.bau1@education.gov.uk';
 
 
-UPDATE AspNetUsers SET Email = 'ees-bau2@education.gov.uk' WHERE Email = 'EES-test.BAU2@education.gov.uk'; 
-UPDATE AspNetUsers SET NormalizedEmail = 'EES-BAU2@education.gov.uk' WHERE NormalizedEmail = 'EES-TEST.BAU2@education.gov.uk'; 
+UPDATE AspNetUsers SET Email = 'ees-bau2@education.gov.uk' WHERE Email = 'EES-test.BAU2@education.gov.uk';
+UPDATE AspNetUsers SET NormalizedEmail = 'EES-BAU2@education.gov.uk' WHERE NormalizedEmail = 'EES-TEST.BAU2@education.gov.uk';
 UPDATE AspNetUsers SET NormalizedUserName = 'EES-BAU2@EDUCATION.GOV.UK' WHERE NormalizedUserName = 'EES-TEST.BAU2@education.gov.uk';
 UPDATE AspNetUsers SET UserName = 'ees-bau2@education.gov.uk' WHERE UserName = 'ees-test.bau2@education.gov.uk';
 UPDATE Users SET Email = 'ees-bau2@education.gov.uk' WHERE Email = 'ees-test.bau2@education.gov.uk';

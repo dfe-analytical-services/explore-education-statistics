@@ -6,17 +6,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.UsersAndRo
 {
     public partial class EES_3388RenameTestUserEmails : Migration
     {
-        public const string MigrationId = '20220519104448';
+        public const string MigrationId = "20220519104448";
+
+        private const string RenameTestUserEmailsUpSqlFile = $"{MigrationId}_EES_3388RenameTestUserEmails.sql";
+        private const string RenameTestUserEmailsDownSqlFile = $"{MigrationId}_EES_3388RenameTestUserEmails-down.sql";
 
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_EES_3388RenameTestUserEmails.sql");
+            migrationBuilder.SqlFromFile(UsersAndRolesMigrationsPath, RenameTestUserEmailsUpSqlFile);
 
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.SqlFromFile(MigrationsPath, $"{MigrationId}_EES_3388RenameTestUserEmails-down.sql");
+            migrationBuilder.SqlFromFile(UsersAndRolesMigrationsPath, RenameTestUserEmailsDownSqlFile);
 
         }
     }
