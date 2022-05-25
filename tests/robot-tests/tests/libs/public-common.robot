@@ -2,16 +2,15 @@
 Resource    ./common.robot
 Library     public-utilities.py
 
-
 *** Keywords ***
 user checks headline summary contains
     [Arguments]    ${text}
     user waits until element is visible    xpath://*[@id="releaseHeadlines-summary"]//li[text()="${text}"]
 
 user checks number of release updates
-    [Arguments]    ${number}
+    [Arguments]    ${count}
     user waits until page contains element    id:releaseLastUpdates
-    user waits until page contains element    css:#releaseLastUpdates li    limit=${number}
+    user waits until page contains element    css:#releaseLastUpdates li    count=${count}
 
 user checks release update
     [Arguments]    ${number}    ${date}    ${text}

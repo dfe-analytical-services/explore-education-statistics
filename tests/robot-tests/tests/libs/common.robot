@@ -10,7 +10,6 @@ Library     visual.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
 
-
 *** Variables ***
 ${browser}=                             chrome
 ${headless}=                            1
@@ -21,7 +20,6 @@ ${implicit_wait}=                       %{IMPLICIT_WAIT}
 ${RELEASE_COMPLETE_WAIT}=               %{RELEASE_COMPLETE_WAIT}
 ${prompt_to_continue_on_failure}=       0
 ${FAIL_TEST_SUITES_FAST}=               %{FAIL_TEST_SUITES_FAST}
-
 
 *** Keywords ***
 do this on failure
@@ -252,8 +250,8 @@ user verifies accordion is closed
     ...    xpath://*[@class="govuk-accordion__section-button" and text()="${section_text}" and @aria-expanded="false"]
 
 user checks there are x accordion sections
-    [Arguments]    ${num}    ${parent}=css:body
-    user waits until parent contains element    ${parent}    css:[data-testid="accordionSection"]    limit=${num}
+    [Arguments]    ${count}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    css:[data-testid="accordionSection"]    count=${count}
 
 user checks accordion is in position
     [Arguments]    ${section_text}    ${position}    ${parent}=css:[data-testid="accordion"]
@@ -537,6 +535,10 @@ user waits until h3 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is visible    xpath://h3[text()="${text}"]    ${wait}
 
+user waits until h3 is not visible
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until element is not visible    xpath://h3[text()="${text}"]    ${wait}
+
 user waits until legend is visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is visible    xpath://legend[text()="${text}"]    ${wait}
@@ -637,8 +639,8 @@ user enters text into element
     sleep    0.1
 
 user checks element count is x
-    [Arguments]    ${locator}    ${amount}
-    page should contain element    ${locator}    limit=${amount}
+    [Arguments]    ${locator}    ${count}
+    page should contain element    ${locator}    count=${count}
 
 user checks url contains
     [Arguments]    ${text}
@@ -768,9 +770,7 @@ user checks list has x items
     [Arguments]    ${locator}    ${num}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
-    user waits until parent contains element    ${list}    css:li    limit=${num}
-    ${items}=    get child elements    ${list}    css:li
-    length should be    ${items}    ${num}
+    user waits until parent contains element    ${list}    css:li    count=${num}
 
 user gets list item element
     [Arguments]    ${locator}    ${item_num}    ${parent}=css:body
@@ -783,6 +783,17 @@ user checks list item contains
     [Arguments]    ${locator}    ${item_num}    ${content}    ${parent}=css:body
     ${item}=    user gets list item element    ${locator}    ${item_num}    ${parent}
     user checks element should contain    ${item}    ${content}
+
+user checks list contains exactly items in order
+    [Arguments]    ${locator}    ${items}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    ${locator}
+    ${length}=    Get Length    ${items}
+    ${list}=    get child element    ${parent}    ${locator}
+    user checks list has x items    ${locator}    ${length}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{items}    start=1
+        ${item}=    get child element    ${list}    css:li:nth-child(${index})
+        user checks element should contain    ${item}    ${content}
+    END
 
 user checks breadcrumb count should be
     [Arguments]    ${count}

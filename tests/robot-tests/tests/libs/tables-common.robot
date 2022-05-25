@@ -1,7 +1,6 @@
 *** Settings ***
 Resource    ./common.robot
 
-
 *** Keywords ***
 user waits until table is visible
     [Arguments]    ${parent}=css:body    ${wait}=${timeout}
@@ -47,8 +46,8 @@ user gets table row with heading
     [Return]    ${elem}
 
 user checks table body has x rows
-    [Arguments]    ${number}    ${parent}=css:table    ${wait}=${timeout}
-    user waits until parent contains element    ${parent}    xpath:.//tbody/tr    timeout=${wait}    limit=${number}
+    [Arguments]    ${count}    ${parent}=css:table    ${wait}=${timeout}
+    user waits until parent contains element    ${parent}    xpath:.//tbody/tr    timeout=${wait}    count=${count}
 
 user checks headed table body row contains
     [Arguments]    ${row_heading}    ${content}    ${parent}=css:table    ${wait}=${timeout}

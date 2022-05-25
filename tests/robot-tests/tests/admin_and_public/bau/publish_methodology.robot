@@ -10,12 +10,10 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
-
 *** Variables ***
 ${PUBLICATION_NAME}=                    UI tests - publish methodology %{RUN_IDENTIFIER}
 ${PUBLIC_METHODOLOGY_URL_ENDING}=       /methodology/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
 ${RELEASE_NAME}=                        Academic Year 2021/22
-
 
 *** Test Cases ***
 Create a draft release
@@ -196,7 +194,7 @@ Verify that the amended methodology content is correct
 Verify the list of notes
     ${date}=    get current datetime    %-d %B %Y
     user opens details dropdown    See all notes (2)
-    user waits until page contains element    css:[data-testid="notes"] li    limit=2
+    user waits until page contains element    css:[data-testid="notes"] li    count=2
     user checks methodology note    1    ${date}    Latest note
     user checks methodology note    2    1 March 2021    Note which should be updated - edited
     user closes details dropdown    See all notes (2)

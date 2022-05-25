@@ -69,6 +69,7 @@ interface ReorderListProps {
   )[];
   categoryId?: string;
   groupId?: string;
+  testId?: string;
   onReorder: ({
     reordered,
     parentCategoryId,
@@ -79,6 +80,7 @@ const ReorderList = ({
   listItems,
   categoryId,
   groupId,
+  testId,
   onReorder,
 }: ReorderListProps) => {
   const [reorderingGroups, setReorderingGroups] = useState<string[]>([]);
@@ -129,7 +131,7 @@ const ReorderList = ({
             className={classNames(styles.dropArea, {
               [styles.dropAreaActive]: droppableSnapshot.isDraggingOver,
             })}
-            data-testid="reorder-list"
+            data-testid={testId ? `${testId}-reorder-list` : 'reorder-list'}
             ref={droppableProvided.innerRef}
           >
             {options.map((option, index) => {
@@ -193,6 +195,7 @@ const ReorderList = ({
                             listItems={childOptions}
                             categoryId={categoryId || option.id}
                             groupId={parentGroupId}
+                            testId={option.label}
                             onReorder={onReorder}
                           />
                         )}
