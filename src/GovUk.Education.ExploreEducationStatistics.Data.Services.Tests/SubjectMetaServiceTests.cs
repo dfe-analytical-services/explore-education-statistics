@@ -252,8 +252,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 // Expect no hierarchy within the Country level
                 var countries = locationViewModels["country"];
-
                 Assert.Equal("National", countries.Legend);
+
                 var countryOption1 = Assert.Single(countries.Options);
                 Assert.NotNull(countryOption1);
                 Assert.Equal(locations[0].Id, countryOption1.Id);
@@ -264,25 +264,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 // Expect no hierarchy within the Region level
                 var regions = locationViewModels["region"];
-
                 Assert.Equal("Regional", regions.Legend);
-                Assert.Equal(3, regions.Options.Count);
-                var regionOption1 = regions.Options[0];
-                var regionOption2 = regions.Options[1];
-                var regionOption3 = regions.Options[2];
 
+                Assert.Equal(3, regions.Options.Count);
+                
+                var regionOption1 = regions.Options[0];
                 Assert.Equal(locations[1].Id, regionOption1.Id);
                 Assert.Equal(_northEast.Name, regionOption1.Label);
                 Assert.Equal(_northEast.Code, regionOption1.Value);
                 Assert.Null(regionOption1.Level);
                 Assert.Null(regionOption1.Options);
 
+                var regionOption2 = regions.Options[1];
                 Assert.Equal(locations[2].Id, regionOption2.Id);
                 Assert.Equal(_northWest.Name, regionOption2.Label);
                 Assert.Equal(_northWest.Code, regionOption2.Value);
                 Assert.Null(regionOption2.Level);
                 Assert.Null(regionOption2.Options);
 
+                var regionOption3 = regions.Options[2];
                 Assert.Equal(locations[3].Id, regionOption3.Id);
                 Assert.Equal(_eastMidlands.Name, regionOption3.Label);
                 Assert.Equal(_eastMidlands.Code, regionOption3.Value);
@@ -291,6 +291,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 // Expect a hierarchy of Country-Region-LA within the Local Authority level
                 var localAuthorities = locationViewModels["localAuthority"];
+                Assert.Equal("Local Authority", localAuthorities.Legend);
+
                 var laOption1 = Assert.Single(localAuthorities.Options);
                 Assert.NotNull(laOption1);
                 Assert.Null(laOption1.Id);
@@ -315,144 +317,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
                 var laOption1SubOption1SubOption2 = laOption1SubOption1.Options[1];
                 Assert.Equal(locations[5].Id, laOption1SubOption1SubOption2.Id);
-                Assert.Equal(_nottingham.Name, laOption1SubOption1SubOption2.Label);
-                Assert.Equal(_nottingham.Code, laOption1SubOption1SubOption2.Value);
-                Assert.Null(laOption1SubOption1SubOption2.Level);
-                Assert.Null(laOption1SubOption1SubOption2.Options);
-
-                Assert.Empty(viewModel.Filters);
-                Assert.Empty(viewModel.Indicators);
-                Assert.Empty(viewModel.TimePeriod.Options);
-            }
-        }
-
-        [Fact]
-        public async Task GetSubjectMeta_LocationsForSubject_LocationAttributeOfHierarchyIsMissing()
-        {
-            var releaseSubject = new ReleaseSubject
-            {
-                Release = new Release(),
-                Subject = new Subject()
-            };
-
-            // Setup a hierarchy of Country-Region-LA data within the Local Authority level where one of the attributes
-            // of the hierarchy is not present (possible if the data was not provided, e.g. LA data supplied without Regions).
-            var locations = ListOf(
-                new Location
-                {
-                    Id = Guid.NewGuid(),
-                    GeographicLevel = GeographicLevel.LocalAuthority,
-                    Country = _england,
-                    LocalAuthority = _derby
-                },
-                new Location
-                {
-                    Id = Guid.NewGuid(),
-                    GeographicLevel = GeographicLevel.LocalAuthority,
-                    Country = _england,
-                    LocalAuthority = _nottingham
-                });
-
-            var options = Options.Create(new LocationsOptions
-            {
-                Hierarchies = new Dictionary<GeographicLevel, List<string>>
-                {
-                    {
-                        GeographicLevel.LocalAuthority,
-                        new List<string>
-                        {
-                            "Country",
-                            "Region"
-                        }
-                    }
-                }
-            });
-
-            var statisticsDbContextId = Guid.NewGuid().ToString();
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                await statisticsDbContext.ReleaseSubject.AddAsync(releaseSubject);
-                await statisticsDbContext.SaveChangesAsync();
-            }
-
-            var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
-            var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
-            var locationRepository = new Mock<ILocationRepository>(MockBehavior.Strict);
-            var timePeriodService = new Mock<ITimePeriodService>(MockBehavior.Strict);
-
-            filterRepository
-                .Setup(s => s.GetFiltersIncludingItems(releaseSubject.SubjectId))
-                .ReturnsAsync(new List<Filter>());
-
-            indicatorGroupRepository
-                .Setup(s => s.GetIndicatorGroups(releaseSubject.SubjectId))
-                .ReturnsAsync(new List<IndicatorGroup>());
-
-            timePeriodService
-                .Setup(s => s.GetTimePeriods(releaseSubject.SubjectId))
-                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
-
-            locationRepository
-                .Setup(s => s.GetDistinctForSubject(releaseSubject.SubjectId))
-                .ReturnsAsync(locations);
-
-            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
-            {
-                var service = BuildSubjectMetaService(
-                    statisticsDbContext,
-                    filterRepository: filterRepository.Object,
-                    indicatorGroupRepository: indicatorGroupRepository.Object,
-                    locationRepository: locationRepository.Object,
-                    timePeriodService: timePeriodService.Object,
-                    options: options
-                );
-
-                var result = (await service.GetSubjectMeta(releaseId: releaseSubject.ReleaseId,
-                        subjectId: releaseSubject.SubjectId))
-                    .AssertRight();
-
-                VerifyAllMocks(
-                    filterRepository,
-                    indicatorGroupRepository,
-                    locationRepository,
-                    timePeriodService);
-
-                var viewModel = Assert.IsAssignableFrom<SubjectMetaViewModel>(result);
-
-                var locationViewModels = viewModel.Locations;
-
-                // Local Authority is the only level in the data
-                Assert.Single(locationViewModels);
-                Assert.True(locationViewModels.ContainsKey("localAuthority"));
-
-                // Expect a hierarchy of Country-Region-LA within the Local Authority level
-                var localAuthorities = locationViewModels["localAuthority"];
-                var laOption1 = Assert.Single(localAuthorities.Options);
-                Assert.NotNull(laOption1);
-                Assert.Null(laOption1.Id);
-                Assert.Equal(_england.Name, laOption1.Label);
-                Assert.Equal(_england.Code, laOption1.Value);
-                Assert.Equal(GeographicLevel.Country, laOption1.Level);
-
-                // Expect an empty Region option grouping the Local Authorities
-                var laOption1SubOption1 = Assert.Single(laOption1.Options!);
-                Assert.NotNull(laOption1SubOption1);
-                Assert.Null(laOption1SubOption1.Id);
-                Assert.Equal(string.Empty, laOption1SubOption1.Label);
-                Assert.Equal(string.Empty, laOption1SubOption1.Value);
-                Assert.Equal(GeographicLevel.Region, laOption1SubOption1.Level);
-                Assert.Equal(2, laOption1SubOption1.Options!.Count);
-
-                var laOption1SubOption1SubOption1 = laOption1SubOption1.Options[0];
-                Assert.Equal(locations[0].Id, laOption1SubOption1SubOption1.Id);
-                Assert.Equal(_derby.Name, laOption1SubOption1SubOption1.Label);
-                Assert.Equal(_derby.Code, laOption1SubOption1SubOption1.Value);
-                Assert.Null(laOption1SubOption1SubOption1.Level);
-                Assert.Null(laOption1SubOption1SubOption1.Options);
-
-                var laOption1SubOption1SubOption2 = laOption1SubOption1.Options[1];
-                Assert.Equal(locations[1].Id, laOption1SubOption1SubOption2.Id);
                 Assert.Equal(_nottingham.Name, laOption1SubOption1SubOption2.Label);
                 Assert.Equal(_nottingham.Code, laOption1SubOption1SubOption2.Value);
                 Assert.Null(laOption1SubOption1SubOption2.Level);

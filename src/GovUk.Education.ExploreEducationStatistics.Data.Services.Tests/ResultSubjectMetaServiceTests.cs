@@ -378,7 +378,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetSubjectMeta_HierarchicalLocationViewModelsReturnedForSubject()
+        public async Task GetSubjectMeta_LocationViewModelsReturnedForSubject()
         {
             var publication = new Publication();
             var release = new Release();
@@ -605,31 +605,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(location1.Id, countryOption1.Id);
                 Assert.Equal(_england.Name, countryOption1.Label);
                 Assert.Equal(_england.Code, countryOption1.Value);
-                Assert.Null(countryOption1.GeoJson);
                 Assert.Null(countryOption1.Level);
                 Assert.Null(countryOption1.Options);
 
                 // Expect no hierarchy within the Region level
                 var regions = locationViewModels["region"];
-
                 Assert.Equal(3, regions.Count);
+
                 var regionOption1 = regions[0];
-                var regionOption2 = regions[1];
-                var regionOption3 = regions[2];
                 Assert.Equal(location2.Id, regionOption1.Id);
-                Assert.Null(regionOption1.GeoJson);
                 Assert.Equal(_northEast.Name, regionOption1.Label);
                 Assert.Equal(_northEast.Code, regionOption1.Value);
                 Assert.Null(regionOption1.Level);
                 Assert.Null(regionOption1.Options);
+
+                var regionOption2 = regions[1];
                 Assert.Equal(location3.Id, regionOption2.Id);
-                Assert.Null(regionOption2.GeoJson);
                 Assert.Equal(_northWest.Name, regionOption2.Label);
                 Assert.Equal(_northWest.Code, regionOption2.Value);
                 Assert.Null(regionOption2.Level);
                 Assert.Null(regionOption2.Options);
+
+                var regionOption3 = regions[2];
                 Assert.Equal(location4.Id, regionOption3.Id);
-                Assert.Null(regionOption3.GeoJson);
                 Assert.Equal(_eastMidlands.Name, regionOption3.Label);
                 Assert.Equal(_eastMidlands.Code, regionOption3.Value);
                 Assert.Null(regionOption3.Level);
@@ -672,7 +670,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
         }
 
         [Fact]
-        public async Task GetSubjectMeta_HierarchicalLocationViewModelsReturnedForSubject_SpecificBoundaryLevelId()
+        public async Task GetSubjectMeta_LocationViewModelsReturnedForSubject_SpecificBoundaryLevelId()
         {
             var publication = new Publication();
             var release = new Release();
