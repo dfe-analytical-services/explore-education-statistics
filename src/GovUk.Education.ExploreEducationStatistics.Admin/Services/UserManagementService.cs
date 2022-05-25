@@ -31,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserRoleService _userRoleService;
         private readonly IUserService _userService;
         private readonly IUserInviteRepository _userInviteRepository;
+        private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
 
         public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext,
             ContentDbContext contentDbContext,
@@ -38,7 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IEmailTemplateService emailTemplateService,
             IUserRoleService userRoleService,
             IUserService userService,
-            IUserInviteRepository userInviteRepository)
+            IUserInviteRepository userInviteRepository,
+            IUserReleaseInviteRepository userReleaseInviteRepository)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -47,6 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userRoleService = userRoleService;
             _userService = userService;
             _userInviteRepository = userInviteRepository;
+            _userReleaseInviteRepository = userReleaseInviteRepository;
         }
 
         public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()
@@ -207,12 +210,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Select(ui => new UserViewModel
                         {
                             Email = ui.Email,
-                            Role = ui.Role.Name
+                            Role = ui.Role.Name,
                         }).ToListAsync()
                 );
         }
 
-        public async Task<Either<ActionResult, UserInvite>> InviteUser(string email, string roleId)
+        public async Task<Either<ActionResult, UserInvite>> InviteUser(
+            string email,
+            string roleId,
+            List<AddUserReleaseRoleViewModel> userReleaseRoles)
         {
             return await _userService
                 .CheckCanManageAllUsers()
@@ -228,10 +234,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(InvalidUserRole);
                     }
 
-                    return await _userInviteRepository.Create(
+                    var userInvite = await _userInviteRepository.Create(
                         email: email.ToLower(),
                         roleId: roleId,
                         createdById: _userService.GetUserId());
+
+                    foreach (var userReleaseRole in userReleaseRoles)
+                    {
+                        await _userReleaseInviteRepository.Create(
+                            releaseId: userReleaseRole.ReleaseId,
+                            email: email,
+                            releaseRole: userReleaseRole.ReleaseRole,
+                            emailSent: true, // EES-3403
+                            createdById: _userService.GetUserId());
+                    }
+
+                    return userInvite;
                 })
                 .OnSuccess(invite =>
                 {

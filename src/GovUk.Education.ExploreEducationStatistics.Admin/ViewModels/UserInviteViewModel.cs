@@ -1,6 +1,7 @@
+#nullable enable
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-#nullable enable
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
     public class UserInviteViewModel
@@ -9,5 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [Required(AllowEmptyStrings = false)]
         public string RoleId { get; set; } = string.Empty;
+
+        public List<AddUserReleaseRoleViewModel> UserReleaseRoles { get; set; } = new();
     }
 }
