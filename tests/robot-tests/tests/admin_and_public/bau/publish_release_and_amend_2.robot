@@ -9,12 +9,14 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Variables ***
 ${RELEASE_NAME}         Academic Year Q1 2020/21
 ${PUBLICATION_NAME}     UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}         Seven filters
 ${SECOND_SUBJECT}       upload file test
 ${THIRD_SUBJECT}        upload file test with filter subject
+
 
 *** Test Cases ***
 Create publication
@@ -303,7 +305,7 @@ Validate Release status table row is correct
     table cell should contain    css:table    2    2    Approved    # Status
     table cell should contain    css:table    2    3    Approved by UI tests    # Internal note
     table cell should contain    css:table    2    4    1    # Release version
-    table cell should contain    css:table    2    5    ees-bau1@education.gov.uk    # By user
+    table cell should contain    css:table    2    5    ees-test.bau1@education.gov.uk    # By user
 
 Approve release amendment
     user approves amended release for immediate publication

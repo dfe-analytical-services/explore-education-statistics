@@ -10,6 +10,7 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Test Cases ***
 Navigate to manage users page as bau1
     user navigates to admin frontend    %{ADMIN_URL}/administration/users
@@ -25,22 +26,22 @@ Assert that test users are present in table
     user checks results table row heading contains    4    1    Bau1 User1
     user checks results table row heading contains    5    1    Bau2 User2
 
-    user checks results table cell contains    1    1    ees-analyst1@education.gov.uk
+    user checks results table cell contains    1    1    EES-test.ANALYST1@education.gov.uk
     user checks results table cell contains    1    2    Analyst
     user checks results table cell contains    1    3    Manage
 
-    user checks results table cell contains    2    1    ees-analyst2@education.gov.uk
+    user checks results table cell contains    2    1    EES-test.ANALYST2@education.gov.uk
     user checks results table cell contains    2    2    Analyst
     user checks results table cell contains    2    3    Manage
 
-    user checks results table cell contains    3    1    ees-analyst3@education.gov.uk
+    user checks results table cell contains    3    1    EES-test.ANALYST3@education.gov.uk
     user checks results table cell contains    3    2    Analyst
     user checks results table cell contains    3    3    Manage
 
-    user checks results table cell contains    4    1    ees-bau1@education.gov.uk
+    user checks results table cell contains    4    1    EES-test.BAU1@education.gov.uk
     user checks results table cell contains    4    2    BAU User
     user checks results table cell contains    4    3    Manage
 
-    user checks results table cell contains    5    1    ees-bau2@education.gov.uk
+    user checks results table cell contains    5    1    EES-test.BAU2@education.gov.uk
     user checks results table cell contains    5    2    BAU User
     user checks results table cell contains    5    3    Manage

@@ -10,11 +10,13 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData    Footnotes
 
+
 *** Variables ***
 ${PUBLICATION_NAME}     UI tests - publication_owner %{RUN_IDENTIFIER}
 ${RELEASE_TYPE}         Academic Year 2025/26
 ${RELEASE_NAME}         ${PUBLICATION_NAME} - ${RELEASE_TYPE}
 ${SUBJECT_NAME}         UI test subject
+
 
 *** Test Cases ***
 Create new publication and release via API
@@ -94,7 +96,7 @@ Validates Release status table is correct
     table cell should contain    css:table    2    2    HigherLevelReview    # Status
     table cell should contain    css:table    2    3    ready for higher review (publication owner)    # Internal note
     table cell should contain    css:table    2    4    1    # Release version
-    table cell should contain    css:table    2    5    ees-analyst1@education.gov.uk    # By user
+    table cell should contain    css:table    2    5    ees-test.analyst1@education.gov.uk    # By user
 
 Check publication owner can edit release status to "In draft"
     user clicks button    Edit release status
@@ -115,14 +117,14 @@ Validates Release status table is correct again
     # Internal note
     table cell should contain    css:table    2    3    Moving back to Draft state (publication owner)
     table cell should contain    css:table    2    4    1    # Release version
-    table cell should contain    css:table    2    5    ees-analyst1@education.gov.uk    # By user
+    table cell should contain    css:table    2    5    ees-test.analyst1@education.gov.uk    # By user
 
     # Higher review row
     table cell should contain    css:table    3    1    ${datetime}    # Date
     table cell should contain    css:table    3    2    HigherLevelReview    # Status
     table cell should contain    css:table    3    3    ready for higher review (publication owner)    # Internal note
     table cell should contain    css:table    3    4    1    # Release version
-    table cell should contain    css:table    3    5    ees-analyst1@education.gov.uk    # By user
+    table cell should contain    css:table    3    5    ees-test.analyst1@education.gov.uk    # By user
 
 Check that a publication owner can make a new release
     user opens publication on the admin dashboard    ${PUBLICATION_NAME}

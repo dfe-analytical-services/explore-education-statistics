@@ -11,12 +11,14 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${TOPIC_NAME}=                              %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=                        UI tests - prerelease %{RUN_IDENTIFIER}
 ${DATABLOCK_NAME}=                          UI test table
 ${DATABLOCK_FEATURED_NAME}=                 UI test featured table name
 ${DATABLOCK_FEATURED_TABLE_DESCRIPTION}=    UI test featured table description
+
 
 *** Test Cases ***
 Create test publication and release via API
@@ -160,7 +162,7 @@ Validate the invite emails field is required
 
 Validate the invite emails field only accepts @education.gov.uk email addresses
     ${emails}=    Catenate    SEPARATOR=\n
-    ...    ees-analyst1@education.gov.uk
+    ...    EES-test.ANALYST1@education.gov.uk
     ...    test@test.com
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
@@ -170,7 +172,7 @@ Validate the invite emails field only accepts @education.gov.uk email addresses
 Invite users to the prerelease
     ${emails}=    Catenate    SEPARATOR=\n
     ...    simulate-delivered@notifications.service.gov.uk
-    ...    ees-analyst1@education.gov.uk
+    ...    EES-test.ANALYST1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     ${modal}=    user waits until modal is visible    Confirm pre-release invitations
@@ -179,16 +181,16 @@ Invite users to the prerelease
     user checks list has x items    testid:invitableList    2    ${modal}
     user checks list item contains    testid:invitableList    1    simulate-delivered@notifications.service.gov.uk
     ...    ${modal}
-    user checks list item contains    testid:invitableList    2    ees-analyst1@education.gov.uk    ${modal}
+    user checks list item contains    testid:invitableList    2    EES-test.ANALYST1@education.gov.uk    ${modal}
     user clicks button    Confirm
     user checks table column heading contains    1    1    User email
     user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
-    user checks results table cell contains    2    1    ees-analyst1@education.gov.uk
+    user checks results table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
 
 Validate the invite emails field is invalid for addresses that are all already invited or accepted
     ${emails}=    Catenate    SEPARATOR=\n
     ...    simulate-delivered@notifications.service.gov.uk
-    ...    ees-analyst1@education.gov.uk
+    ...    EES-test.ANALYST1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     user waits until element contains    id:preReleaseUserAccessForm-emails-error
@@ -199,7 +201,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
     ...    simulate-delivered@notifications.service.gov.uk
     ...    simulate-delivered-2@notifications.service.gov.uk
     ...    simulate-delivered-3@notifications.service.gov.uk
-    ...    ees-analyst1@education.gov.uk
+    ...    EES-test.ANALYST1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     ${modal}=    user waits until modal is visible    Confirm pre-release invitations
@@ -212,7 +214,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
     ...    ${modal}
 
     user checks list has x items    testid:acceptedList    1    ${modal}
-    user checks list item contains    testid:acceptedList    1    ees-analyst1@education.gov.uk    ${modal}
+    user checks list item contains    testid:acceptedList    1    EES-test.ANALYST1@education.gov.uk    ${modal}
 
     user checks list has x items    testid:invitedList    1    ${modal}
     user checks list item contains    testid:invitedList    1    simulate-delivered@notifications.service.gov.uk
@@ -221,7 +223,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
     user clicks button    Confirm
     user checks table column heading contains    1    1    User email
     user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
-    user checks results table cell contains    2    1    ees-analyst1@education.gov.uk
+    user checks results table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
     user checks results table cell contains    3    1    simulate-delivered-2@notifications.service.gov.uk
     user checks results table cell contains    4    1    simulate-delivered-3@notifications.service.gov.uk
 
@@ -500,6 +502,7 @@ Unschedule release
     user clicks button    Update status
 
     user checks summary list contains    Current status    In Draft
+
 
 *** Keywords ***
 user chooses location, time period and filters
