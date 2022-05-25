@@ -17,11 +17,11 @@ public class LocationViewModelBuilder
     {
         var locationAttributes = locations.GetLocationAttributesHierarchical(hierarchies);
         return locationAttributes.ToDictionary(
-            pair => pair.Key,
-            pair =>
+            levelAndLocationAttributes => levelAndLocationAttributes.Key,
+            levelAndLocationAttributes =>
             {
-                var geoJsonByCode = geoJson?.GetValueOrDefault(pair.Key);
-                return BuildLocationAttributeViewModels(pair.Value, geoJsonByCode);
+                var geoJsonByCode = geoJson?.GetValueOrDefault(levelAndLocationAttributes.Key);
+                return BuildLocationAttributeViewModels(levelAndLocationAttributes.Value, geoJsonByCode);
             });
     }
 
@@ -31,7 +31,7 @@ public class LocationViewModelBuilder
     {
         return DeduplicateLocationViewModels(
             locationAttributes
-                .OrderBy(OrderLocationAttributes)
+                .OrderBy(OrderingKey)
                 .Select(locationAttribute => BuildLocationAttributeViewModel(locationAttribute, geoJsonByCode))
                 .ToList()
         );
@@ -110,7 +110,7 @@ public class LocationViewModelBuilder
         }).ToList();
     }
 
-    private static string OrderLocationAttributes(LocationAttributeNode node)
+    private static string OrderingKey(LocationAttributeNode node)
     {
         var locationAttribute = node.Attribute;
 
