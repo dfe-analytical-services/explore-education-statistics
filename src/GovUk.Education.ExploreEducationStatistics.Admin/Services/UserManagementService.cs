@@ -278,6 +278,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     await _usersAndRolesDbContext.SaveChangesAsync();
 
                     return Unit.Instance;
+                })
+                .OnSuccess(async () =>
+                {
+                    var releaseInvites = await _contentDbContext.UserReleaseInvites
+                        .AsQueryable()
+                        .Where(i => i.Email.ToLower() == email.ToLower())
+                        .ToListAsync();
+
+                    _contentDbContext.UserReleaseInvites.RemoveRange(releaseInvites);
+                    await _contentDbContext.SaveChangesAsync();
+
+                    return Unit.Instance;
                 });
         }
 

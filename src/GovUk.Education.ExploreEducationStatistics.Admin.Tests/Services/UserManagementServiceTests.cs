@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
+using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -396,6 +397,103 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var actionResult = result.AssertLeft();
                 actionResult.AssertBadRequest(ValidationErrorMessages.InvalidUserRole);
+        }
+
+        [Fact]
+        public async Task CancelInvite()
+        {
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                await usersAndRolesDbContext.UserInvites.AddRangeAsync(
+                    new UserInvite { Email = "test@test.com" },
+                    new UserInvite { Email = "should.not@be.removed" });
+                await usersAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.UserReleaseInvites.AddRangeAsync(
+                    new UserReleaseInvite
+                    {
+                        Email = "test@test.com",
+                        Role = Approver,
+                        Created = DateTime.Now,
+                    },
+                    new UserReleaseInvite
+                    {
+                        Email = "test@test.com",
+                        Role = Contributor,
+                        Created = DateTime.Now,
+                    },
+                    new UserReleaseInvite
+                    {
+                        Email = "should.not@be.removed",
+                        Role = Lead,
+                        Created = DateTime.Now,
+                    });
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var service = SetupUserManagementService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: usersAndRolesDbContext);
+                var result = await service.CancelInvite("test@test.com");
+                result.AssertRight();
+            }
+
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var invites = usersAndRolesDbContext.UserInvites.ToList();
+                var unremovedInvite = Assert.Single(invites);
+                Assert.Equal("should.not@be.removed", unremovedInvite.Email);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseInvites = contentDbContext.UserReleaseInvites.ToList();
+                var unremovedReleaseInvite = Assert.Single(releaseInvites);
+                Assert.Equal("should.not@be.removed", unremovedReleaseInvite.Email);
+            }
+        }
+
+        [Fact]
+        public async Task CancelInvite_NoUserReleaseRoles()
+        {
+            var usersAndRolesDbContextId = Guid.NewGuid().ToString();
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                await usersAndRolesDbContext.UserInvites.AddRangeAsync(
+                    new UserInvite { Email = "test@test.com" });
+                await usersAndRolesDbContext.SaveChangesAsync();
+            }
+
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var service = SetupUserManagementService(
+                    usersAndRolesDbContext: usersAndRolesDbContext);
+                var result = await service.CancelInvite("test@test.com");
+                result.AssertRight();
+            }
+
+            await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
+            {
+                var invites = usersAndRolesDbContext.UserInvites.ToList();
+                Assert.Empty(invites);
+            }
+        }
+
+        [Fact]
+        public async Task CancelInvite_InviteNotFound()
+        {
+                var service = SetupUserManagementService();
+                var result = await service.CancelInvite("test@test.com");
+                var actionResult = result.AssertLeft();
+                actionResult.AssertBadRequest(ValidationErrorMessages.InviteNotFound);
         }
 
         private static UserManagementService SetupUserManagementService(
