@@ -29,13 +29,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
                 .Where(level => geographicLevels.Contains(level.Level))
                 .OrderByDescending(level => level.Published);
         }
-
-        public BoundaryLevel? FindLatestByGeographicLevel(GeographicLevel geographicLevel)
-        {
-            return _context.BoundaryLevel
-                .Where(level => level.Level == geographicLevel)
-                .OrderByDescending(level => level.Published)
-                .FirstOrDefault();
-        }
     }
 }

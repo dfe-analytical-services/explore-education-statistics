@@ -7,7 +7,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -24,11 +23,12 @@ using Microsoft.Extensions.Options;
 using static GovUk.Education.ExploreEducationStatistics.Common.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.FilterAndIndicatorViewModelBuilders;
 using static GovUk.Education.ExploreEducationStatistics.Data.Services.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.LocationViewModelBuilder;
 using Unit = GovUk.Education.ExploreEducationStatistics.Common.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
-    public class SubjectMetaService : AbstractSubjectMetaService, ISubjectMetaService
+    public class SubjectMetaService : ISubjectMetaService
     {
         private enum SubjectMetaQueryStep
         {
@@ -247,9 +247,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private async Task<Dictionary<string, LocationsMetaViewModel>> GetLocations(Guid subjectId)
         {
             var locations = await _locationRepository.GetDistinctForSubject(subjectId);
-            var locationsHierarchical =
-                locations.GetLocationAttributesHierarchical(_locationOptions.Hierarchies);
-            return BuildLocationAttributeViewModels(locationsHierarchical);
+            var locationViewModels = BuildLocationAttributeViewModels(locations,
+                _locationOptions.Hierarchies);
+
+            return locationViewModels
+                .ToDictionary(
+                    pair => pair.Key.ToString().CamelCase(),
+                    pair => new LocationsMetaViewModel
+                    {
+                        Legend = pair.Key.GetEnumLabel(),
+                        Options = pair.Value
+                    }
+                );
         }
 
         private async Task<Dictionary<string, IndicatorGroupMetaViewModel>> GetIndicators(ReleaseSubject releaseSubject)
@@ -257,60 +266,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             var indicators = await _indicatorGroupRepository.GetIndicatorGroups(releaseSubject.SubjectId);
             return IndicatorsViewModelBuilder.BuildIndicatorGroups(indicators,
                 releaseSubject.IndicatorSequence);
-        }
-
-        private static Dictionary<string, LocationsMetaViewModel> BuildLocationAttributeViewModels(
-            Dictionary<GeographicLevel, List<LocationAttributeNode>> locationAttributes)
-        {
-            return locationAttributes
-                .ToDictionary(
-                    pair => pair.Key.ToString().CamelCase(),
-                    pair => new LocationsMetaViewModel
-                    {
-                        Legend = pair.Key.GetEnumLabel(),
-                        Options = DeduplicateLocationViewModels(
-                                pair.Value
-                                    .OrderBy(OrderLocationAttributes)
-                                    .Select(BuildLocationAttributeViewModel)
-                            )
-                            .ToList()
-                    }
-                );
-        }
-
-        private static LocationAttributeViewModel BuildLocationAttributeViewModel(
-            LocationAttributeNode locationAttributeNode)
-        {
-            return locationAttributeNode.IsLeaf
-                ? new LocationAttributeViewModel
-                {
-                    Id = locationAttributeNode.LocationId.Value,
-                    Label = locationAttributeNode.Attribute.Name ?? string.Empty,
-                    Value = locationAttributeNode.Attribute.GetCodeOrFallback()
-                }
-                : new LocationAttributeViewModel
-                {
-                    Label = locationAttributeNode.Attribute.Name ?? string.Empty,
-                    Level = locationAttributeNode.Attribute.GetType().Name.CamelCase(),
-                    Value = locationAttributeNode.Attribute.GetCodeOrFallback(),
-                    Options = DeduplicateLocationViewModels(
-                            locationAttributeNode.Children
-                                .OrderBy(OrderLocationAttributes)
-                                .Select(BuildLocationAttributeViewModel)
-                        )
-                        .ToList()
-                };
-        }
-
-        private static string OrderLocationAttributes(LocationAttributeNode node)
-        {
-            var locationAttribute = node.Attribute;
-
-            return locationAttribute switch
-            {
-                Region region => region.Code ?? string.Empty,
-                _ => locationAttribute.Name ?? string.Empty
-            };
         }
 
         private static TimePeriodsMetaViewModel BuildTimePeriodsViewModels(

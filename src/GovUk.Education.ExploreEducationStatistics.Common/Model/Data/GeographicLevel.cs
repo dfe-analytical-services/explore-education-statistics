@@ -35,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Data
 
         [EnumLabelValue("Regional", "REG")] Region,
 
+        // Regional School Commissioner Region
         [EnumLabelValue("RSC Region", "RSCR")] RscRegion,
 
         [EnumLabelValue("School", "SCH")] School,

@@ -243,18 +243,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                                     new()
                                     {
                                         Label = "A label",
-                                        Level = "Level",
+                                        Value = "A value",
+                                        Level = GeographicLevel.Region,
                                         Options = new List<LocationAttributeViewModel>
                                         {
                                             new()
                                             {
+                                                Id = Guid.NewGuid(),
                                                 Label = "A label",
-                                                Level = "Level",
-                                                Options = new List<LocationAttributeViewModel>()
+                                                Value = "A value",
+                                                GeoJson = true
                                             }
-                                        },
-                                        Value = "A value",
-                                        GeoJson = true
+                                        }
                                     }
                                 }
                             }
