@@ -196,12 +196,12 @@ const PublicationForm = ({
             <ButtonGroup>
               <Button
                 type="submit"
-                onClick={e => {
+                onClick={async e => {
                   e.preventDefault();
                   if (confirmOnSubmit && form.isValid) {
                     setShowConfirmSubmitModal(true);
                   } else {
-                    form.submitForm();
+                    await form.submitForm();
                   }
                 }}
               >
@@ -212,8 +212,8 @@ const PublicationForm = ({
           </Form>
           <ModalConfirm
             title="Confirm publication changes"
-            onConfirm={() => {
-              form.submitForm();
+            onConfirm={async () => {
+              await form.submitForm();
               setShowConfirmSubmitModal(false);
             }}
             onExit={() => setShowConfirmSubmitModal(false)}
