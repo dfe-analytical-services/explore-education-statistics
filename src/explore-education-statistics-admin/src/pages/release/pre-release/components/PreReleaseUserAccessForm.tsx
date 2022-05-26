@@ -181,8 +181,8 @@ const PreReleaseUserAccessForm = ({
                 <PreReleaseInvitePlanModal
                   isReleaseApproved={isReleaseApproved}
                   invitePlan={invitePlan}
-                  onConfirm={() => {
-                    handleModalSubmit(form.values, form);
+                  onConfirm={async () => {
+                    await handleModalSubmit(form.values, form);
                     setInvitePlan(undefined);
                   }}
                   onCancel={handleModalCancel}

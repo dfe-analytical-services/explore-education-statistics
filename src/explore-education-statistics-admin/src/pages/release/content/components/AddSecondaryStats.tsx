@@ -49,8 +49,8 @@ const AddSecondaryStats = ({ release, updating = false }: Props) => {
         )}
 
         <ModalConfirm
-          onConfirm={() => {
-            Promise.all(
+          onConfirm={async () => {
+            await Promise.all(
               release.keyStatisticsSecondarySection.content.map(
                 async content => {
                   if (release.keyStatisticsSecondarySection?.content) {

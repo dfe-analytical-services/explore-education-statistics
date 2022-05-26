@@ -133,7 +133,7 @@ export default function useBlockLock({
       // Add some extra milliseconds in case there are
       // any rounding errors in the calculated timeout.
       setLockTimeout(remainingLockTime + 2);
-      startLockCheck();
+      await startLockCheck();
     } else {
       setLockTimeout(0);
       await endLock();
