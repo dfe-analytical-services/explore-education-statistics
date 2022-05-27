@@ -55,18 +55,17 @@ Reorder filters
     ...    ${{['Filter 2', 'Filter 1']}}
 
 Check the initial order of filter 1's filter groups
-    # TODO Total first
     user clicks button to reorder options within list    2
     user checks list contains exactly items in order    testid:Filter 1-reorder-list
-    ...    ${{['Filter 1 group 1', 'Filter 1 group 2']}}
+    ...    ${{['Total', 'Filter 1 group 1', 'Filter 1 group 2']}}
 
 Reorder filter 1's filter groups
-    user moves item of draggable list down    testid:Filter 1-reorder-list    1
+    user moves item of draggable list down    testid:Filter 1-reorder-list    2
     user checks list contains exactly items in order    testid:Filter 1-reorder-list
-    ...    ${{['Filter 1 group 2', 'Filter 1 group 1']}}
+    ...    ${{['Total', 'Filter 1 group 2', 'Filter 1 group 1']}}
 
 Check the initial order of filter 1 group 1's filter items
-    user clicks button to reorder options within list    2    Filter 1-reorder-list
+    user clicks button to reorder options within list    3    Filter 1-reorder-list
     user checks list contains exactly items in order    testid:Filter 1 group 1-reorder-list
     ...    ${{['F1G1-1', 'F1G1-2']}}
 
@@ -74,10 +73,10 @@ Reorder filter 1 group 1's filter items
     user moves item of draggable list down    testid:Filter 1 group 1-reorder-list    1
     user checks list contains exactly items in order    testid:Filter 1 group 1-reorder-list
     ...    ${{['F1G1-2', 'F1G1-1']}}
-    user clicks done button to collapse reorder list    2    Filter 1-reorder-list
+    user clicks done button to collapse reorder list    3    Filter 1-reorder-list
 
 Check the initial order of filter 1 group 2's filter items
-    user clicks button to reorder options within list    1    Filter 1-reorder-list
+    user clicks button to reorder options within list    2    Filter 1-reorder-list
     user checks list contains exactly items in order    testid:Filter 1 group 2-reorder-list
     ...    ${{['F1G2-1', 'F1G2-2']}}
 
@@ -85,7 +84,7 @@ Reorder filter 1 group 2's filter items
     user moves item of draggable list down    testid:Filter 1 group 2-reorder-list    1
     user checks list contains exactly items in order    testid:Filter 1 group 2-reorder-list
     ...    ${{['F1G2-2', 'F1G2-1']}}
-    user clicks done button to collapse reorder list    1    Filter 1-reorder-list
+    user clicks done button to collapse reorder list    2    Filter 1-reorder-list
     user clicks done button to collapse reorder list    2
 
 Save reordered filters, filter groups and filter items
@@ -101,37 +100,37 @@ Check the saved order of filters
 Check the saved order of filter 1's filter groups
     user clicks button to reorder options within list    2
     user checks list contains exactly items in order    testid:Filter 1-reorder-list
-    ...    ${{['Filter 1 group 2', 'Filter 1 group 1']}}
+    ...    ${{['Total', 'Filter 1 group 2', 'Filter 1 group 1']}}
 
 Check the saved order of filter 1 group 1's filter items
-    user clicks button to reorder options within list    2    Filter 1-reorder-list
+    user clicks button to reorder options within list    3    Filter 1-reorder-list
     user checks list contains exactly items in order    testid:Filter 1 group 1-reorder-list
     ...    ${{['F1G1-2', 'F1G1-1']}}
-    user clicks done button to collapse reorder list    2    Filter 1-reorder-list
+    user clicks done button to collapse reorder list    3    Filter 1-reorder-list
 
 Check the saved order of filter 1 group 2's filter items
-    user clicks button to reorder options within list    1    Filter 1-reorder-list
+    user clicks button to reorder options within list    2    Filter 1-reorder-list
     user checks list contains exactly items in order    testid:Filter 1 group 2-reorder-list
     ...    ${{['F1G2-2', 'F1G2-1']}}
-    user clicks done button to collapse reorder list    1    Filter 1-reorder-list
+    user clicks done button to collapse reorder list    2    Filter 1-reorder-list
     user clicks done button to collapse reorder list    2
 
 Check the saved order of filter 2's filter groups remains untouched
     user clicks button to reorder options within list    1
     user checks list contains exactly items in order    testid:Filter 2-reorder-list
-    ...    ${{['Filter 2 group 1', 'Filter 2 group 2']}}
+    ...    ${{['Total', 'Filter 2 group 1', 'Filter 2 group 2']}}
 
 Check the saved order of filter 2 group 1's filter items remains untouched
-    user clicks button to reorder options within list    1    Filter 2-reorder-list
+    user clicks button to reorder options within list    2    Filter 2-reorder-list
     user checks list contains exactly items in order    testid:Filter 2 group 1-reorder-list
     ...    ${{['F2G1-1', 'F2G1-2']}}
-    user clicks done button to collapse reorder list    1    Filter 2-reorder-list
+    user clicks done button to collapse reorder list    2    Filter 2-reorder-list
 
 Check the saved order of filter 2 group 2's filter items remains untouched
-    user clicks button to reorder options within list    2    Filter 2-reorder-list
+    user clicks button to reorder options within list    3    Filter 2-reorder-list
     user checks list contains exactly items in order    testid:Filter 2 group 2-reorder-list
     ...    ${{['F2G2-1', 'F2G2-2']}}
-    user clicks done button to collapse reorder list    2    Filter 2-reorder-list
+    user clicks done button to collapse reorder list    3    Filter 2-reorder-list
     user clicks done button to collapse reorder list    1
 
 Cancels reordering filters
