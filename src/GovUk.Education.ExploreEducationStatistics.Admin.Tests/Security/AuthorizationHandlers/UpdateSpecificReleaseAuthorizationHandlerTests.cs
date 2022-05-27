@@ -7,14 +7,12 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
@@ -123,25 +121,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 ApprovalStatus = status
                             };
 
-                            // Assert that a User who has the Publication Owner role on a
-                            // Release can update it if it is not Approved
+                            // Assert that a User who has the Publication Owner or Approver role
+                            // can update it if it is not Approved
                             if (status != Approved)
                             {
                                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
                                     UpdateSpecificReleaseRequirement>(
                                     HandlerSupplier(release),
                                     release,
-                                    Owner
+                                    Owner, ReleaseApprover
                                 );
                             }
                             else
                             {
-                                // Assert that a User who has the Publication Owner role on a
-                                // Release cannot update it if it is not Approved
+                                // Assert that a User who has the Publication Approver role
+                                // can update it even if it is Approved
                                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
                                     UpdateSpecificReleaseRequirement>(
                                     HandlerSupplier(release),
-                                    release
+                                    release,
+                                    ReleaseApprover
                                 );
                             }
                         }
@@ -346,9 +345,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 return new UpdateSpecificReleaseAuthorizationHandler(
                     releaseStatusRepository.Object,
-                    new UserPublicationRoleRepository(contentDbContext),
-                    new UserReleaseRoleRepository(contentDbContext)
-                );
+                    new AuthorizationHandlerResourceRoleService(
+                        new UserReleaseRoleRepository(contentDbContext),
+                        new UserPublicationRoleRepository(contentDbContext),
+                        Mock.Of<IPublicationRepository>(MockBehavior.Strict)));
             };
         }
     }

@@ -3,7 +3,10 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
@@ -22,9 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that no users can delete a non-amendment release
                 await AssertReleaseHandlerSucceedsWithCorrectClaims<DeleteSpecificReleaseRequirement>(
-                    contentDbContext =>
-                        new DeleteSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext)),
+                    CreateHandler,
                     new Release
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Draft,
@@ -37,9 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that no users can delete an amendment release that is approved
                 await AssertReleaseHandlerSucceedsWithCorrectClaims<DeleteSpecificReleaseRequirement>(
-                    contentDbContext =>
-                        new DeleteSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext)),
+                    CreateHandler,
                     new Release
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Approved,
@@ -53,9 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // Assert that users with the "DeleteAllReleaseAmendments" claim can delete an amendment release that is not
                 // yet approved
                 await AssertReleaseHandlerSucceedsWithCorrectClaims<DeleteSpecificReleaseRequirement>(
-                    contentDbContext =>
-                        new DeleteSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext)),
+                    CreateHandler,
                     new Release
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Draft,
@@ -82,14 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 // Assert that no User Publication roles will allow a Release to be deleted that is not an Amendment
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
-                    contentDbContext =>
-                    {
-                        contentDbContext.Add(release);
-                        contentDbContext.SaveChanges();
-
-                        return new DeleteSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext));
-                    },
+                    CreateHandler,
                     release);
             }
 
@@ -108,14 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 // Assert that no User Publication roles will allow an Amendment to be deleted when it is Approved
                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<DeleteSpecificReleaseRequirement>(
-                    contentDbContext =>
-                    {
-                        contentDbContext.Add(release);
-                        contentDbContext.SaveChanges();
-
-                        return new DeleteSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext));
-                    },
+                    CreateHandler,
                     release);
             }
 
@@ -139,8 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         contentDbContext.Add(release);
                         contentDbContext.SaveChanges();
 
-                        return new DeleteSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext));
+                        return CreateHandler(contentDbContext);
                     },
                     release,
                     Owner);
@@ -154,9 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that no User Release roles will allow a Release to be deleted that is not an Amendment
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
-                    contentDbContext =>
-                        new DeleteSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext)),
+                    CreateHandler,
                     new Release
                     {
                         Publication = new Publication
@@ -173,9 +153,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that no User Release roles will allow an Amendment to be deleted when it is Approved
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
-                    contentDbContext =>
-                        new DeleteSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext)),
+                    CreateHandler,
                     new Release
                     {
                         Publication = new Publication
@@ -192,9 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 // Assert that no User Release roles will allow an Amendment to be deleted if it is not yet approved
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<DeleteSpecificReleaseRequirement>(
-                    contentDbContext =>
-                        new DeleteSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext)),
+                    CreateHandler,
                     new Release
                     {
                         Publication = new Publication
@@ -205,6 +181,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         Version = 1
                     });
             }
+        }
+
+        private static DeleteSpecificReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        {
+            return new DeleteSpecificReleaseAuthorizationHandler(
+                new AuthorizationHandlerResourceRoleService(
+                    new UserReleaseRoleRepository(contentDbContext),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPublicationRepository>(MockBehavior.Strict)));
         }
     }
 }

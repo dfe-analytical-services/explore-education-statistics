@@ -2,15 +2,18 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.ViewSpecificPublicationAuthorizationHandler;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -42,7 +45,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             await AssertPublicationHandlerSucceedsWithPublicationOwnerRole<
                 ViewSpecificPublicationRequirement>(contentDbContext =>
                 new HasOwnerRoleOnPublicationAuthorizationHandler(
-                    new UserPublicationRoleRepository(contentDbContext)));
+                    new AuthorizationHandlerResourceRoleService(
+                        Mock.Of<IUserReleaseRoleRepository>(Strict),
+                        new UserPublicationRoleRepository(contentDbContext),
+                        Mock.Of<IPublicationRepository>(Strict))));
         }
 
         [Fact]
@@ -103,7 +109,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 context.UserReleaseRoles.AddRange(releaseRoles);
                 await context.SaveChangesAsync();
 
-                var handler = new ViewSpecificPublicationAuthorizationHandler(context);
+                var handler = new ViewSpecificPublicationAuthorizationHandler(
+                    context,
+                    new AuthorizationHandlerResourceRoleService(
+                        Mock.Of<IUserReleaseRoleRepository>(Strict),
+                        new UserPublicationRoleRepository(context),
+                        Mock.Of<IPublicationRepository>(Strict)));
                 
                 var authContext = new AuthorizationHandlerContext(
                     new IAuthorizationRequirement[] {new ViewSpecificPublicationRequirement()},

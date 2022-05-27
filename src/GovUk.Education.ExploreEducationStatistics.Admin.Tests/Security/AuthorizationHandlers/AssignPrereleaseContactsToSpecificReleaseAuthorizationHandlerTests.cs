@@ -3,13 +3,18 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Microsoft.AspNetCore.Authorization;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -25,10 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // that's unapproved
                 await AssertReleaseHandlerSucceedsWithCorrectClaims
                     <AssignPrereleaseContactsToSpecificReleaseRequirement>(
-                        contentDbContext =>
-                            new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-                                new UserPublicationRoleRepository(contentDbContext),
-                                new UserReleaseRoleRepository(contentDbContext)),
+                        CreateHandler,
                         new Release
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Draft
@@ -43,10 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // that's approved
                 await AssertReleaseHandlerSucceedsWithCorrectClaims
                     <AssignPrereleaseContactsToSpecificReleaseRequirement>(
-                        contentDbContext =>
-                            new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-                                new UserPublicationRoleRepository(contentDbContext),
-                                new UserReleaseRoleRepository(contentDbContext)),
+                        CreateHandler,
                         new Release
                         {
                             ApprovalStatus = ReleaseApprovalStatus.Approved
@@ -78,9 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         contentDbContext.Add(release);
                         contentDbContext.SaveChanges();
 
-                        return new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext),
-                            new UserReleaseRoleRepository(contentDbContext));
+                        return CreateHandler(contentDbContext);
                     },
                     release,
                     Owner);
@@ -107,9 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                         contentDbContext.Add(release);
                         contentDbContext.SaveChanges();
 
-                        return new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext),
-                            new UserReleaseRoleRepository(contentDbContext));
+                        return CreateHandler(contentDbContext);
                     },
                     release,
                     Owner);
@@ -125,10 +120,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // that's unapproved
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
                     AssignPrereleaseContactsToSpecificReleaseRequirement>(
-                    contentDbContext =>
-                        new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext),
-                            new UserReleaseRoleRepository(contentDbContext)),
+                    CreateHandler,
                     new Release
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Draft
@@ -143,16 +135,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 // that's approved
                 await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<
                     AssignPrereleaseContactsToSpecificReleaseRequirement>(
-                    contentDbContext =>
-                        new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext),
-                            new UserReleaseRoleRepository(contentDbContext)),
+                    CreateHandler,
                     new Release
                     {
                         ApprovalStatus = ReleaseApprovalStatus.Approved
                     },
                     Approver, Contributor, Lead);
             }
+        }
+
+        private static IAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        {
+            return new AssignPrereleaseContactsToSpecificReleaseAuthorizationHandler(
+                new AuthorizationHandlerResourceRoleService(
+                    new UserReleaseRoleRepository(contentDbContext),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPublicationRepository>(Strict))
+            );
         }
     }
 }
