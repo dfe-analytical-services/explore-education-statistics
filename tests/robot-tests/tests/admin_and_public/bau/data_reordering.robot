@@ -102,6 +102,10 @@ Check the saved order of filter 1's filter groups
     user checks list contains exactly items in order    testid:Filter 1-reorder-list
     ...    ${{['Total', 'Filter 1 group 2', 'Filter 1 group 1']}}
 
+Check no reordering is possible for filter 1's Total group
+    # Filter 1's 'Total' group only has one filter item which can't be reordered alone
+    user checks reorder list has no reorder options button    1    Filter 1-reorder-list
+
 Check the saved order of filter 1 group 1's filter items
     user clicks button to reorder options within list    3    Filter 1-reorder-list
     user checks list contains exactly items in order    testid:Filter 1 group 1-reorder-list
@@ -120,6 +124,10 @@ Check the saved order of filter 2's filter groups remains untouched
     user checks list contains exactly items in order    testid:Filter 2-reorder-list
     ...    ${{['Total', 'Filter 2 group 1', 'Filter 2 group 2']}}
 
+Check no reordering is possible for filter 2's Total group
+    # Filter 2's 'Total' group only has one filter item which can't be reordered alone
+    user checks reorder list has no reorder options button    1    Filter 2-reorder-list
+
 Check the saved order of filter 2 group 1's filter items remains untouched
     user clicks button to reorder options within list    2    Filter 2-reorder-list
     user checks list contains exactly items in order    testid:Filter 2 group 1-reorder-list
@@ -133,7 +141,7 @@ Check the saved order of filter 2 group 2's filter items remains untouched
     user clicks done button to collapse reorder list    3    Filter 2-reorder-list
     user clicks done button to collapse reorder list    1
 
-Cancels reordering filters
+Cancel reordering filters
     user clicks button    Cancel    id:reordering
     user waits until h3 is not visible    Reorder filters for ${SUBJECT_NAME}
 
@@ -185,6 +193,149 @@ Cancel reordering indicators
     user clicks button    Cancel    id:reordering
     user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
 
+Replace subject data
+    user clicks link    Data uploads
+    user waits until h2 is visible    Uploaded data files
+    ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
+    user clicks link    Replace data    ${section}
+    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}grouped-filters-and-indicators-replacement.csv
+    user chooses file    id:dataFileUploadForm-metadataFile
+    ...    ${FILES_DIR}grouped-filters-and-indicators-replacement.meta.csv
+    user clicks button    Upload data files
+
+    user waits until page contains element    testid:Replacement Subject title
+    user checks table column heading contains    1    1    Original file
+    user checks table column heading contains    1    2    Replacement file
+
+    user checks headed table body row cell contains    Subject title    1    ${SUBJECT_NAME}
+    user checks headed table body row cell contains    Data file    1    grouped-filters-and-indicators.csv
+    user checks headed table body row cell contains    Metadata file    1    grouped-filters-and-indicators.meta.csv
+    user checks headed table body row cell contains    Number of rows    1    101
+    user checks headed table body row cell contains    Data file size    1    13 Kb
+    user checks headed table body row cell contains    Status    1    Data replacement in progress    wait=%{WAIT_LONG}
+
+    user checks headed table body row cell contains    Subject title    2    ${SUBJECT_NAME}
+    user checks headed table body row cell contains    Data file    2    grouped-filters-and-indicators-replacement.csv
+    user checks headed table body row cell contains    Metadata file    2
+    ...    grouped-filters-and-indicators-replacement.meta.csv
+    user checks headed table body row cell contains    Number of rows    2    141
+    user checks headed table body row cell contains    Data file size    2    19 Kb
+    user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
+
+Confirm data replacement
+    user waits until page contains    Data blocks: OK
+    user waits until page contains    Footnotes: OK
+    user clicks button    Confirm data replacement
+    user waits until h2 is visible    Data replacement complete
+
+Open reorder filters and indicators tab after data replacement
+    user clicks link    Data and files
+    user clicks link    Reorder filters and indicators
+    user waits until h2 is visible    Reorder filters and indicators
+
+Check reordering table contains subject row after data replacement
+    user waits until table is visible    id:reordering
+    user checks table column heading contains    1    1    Data file    id:reordering
+    user checks table body has x rows    1    id:reordering
+
+    user checks results table cell contains    1    1    ${SUBJECT_NAME}    id:reordering
+    user checks results table cell contains    1    2    Reorder filters    id:reordering
+    user checks results table cell contains    1    2    Reorder indicators    id:reordering
+
+Check the order of filters after data replacement
+    # Filters are identical in the replacement so the previous order should be retained
+    user clicks button in table cell    1    2    Reorder filters    id:reordering
+    user waits until h3 is visible    Reorder filters for ${SUBJECT_NAME}
+    user checks list contains exactly items in order    testid:reorder-list
+    ...    ${{['Filter 2', 'Filter 1']}}
+
+Check the order of filter 1's filter groups after data replacement
+    # 'Filter 1 group 3' is new in the replacement so should be appended
+    user clicks button to reorder options within list    2
+    user checks list contains exactly items in order    testid:Filter 1-reorder-list
+    ...    ${{['Total', 'Filter 1 group 2', 'Filter 1 group 1', 'Filter 1 group 3']}}
+
+Check no reordering is possible for filter 1's Total group after data replacement
+    # Filter 1's 'Total' group only has one filter item which can't be reordered alone
+    user checks reorder list has no reorder options button    1    Filter 1-reorder-list
+
+Check the order of filter 1 group 1's filter items after data replacement
+    # 'F1G1-3' is new in the replacement so should be appended
+    user clicks button to reorder options within list    3    Filter 1-reorder-list
+    user checks list contains exactly items in order    testid:Filter 1 group 1-reorder-list
+    ...    ${{['F1G1-2', 'F1G1-1', 'F1G1-3']}}
+    user clicks done button to collapse reorder list    3    Filter 1-reorder-list
+
+Check no reordering is possible for filter 1 group 2's filter items after data replacement
+    # 'F1G2-1' is removed in the replacement leaving only 'F1G2-2' which can't be reordered alone
+    user checks reorder list has no reorder options button    2    Filter 1-reorder-list
+
+Check the order of filter 1 group 3's filter items after data replacement
+    # 'Filter 1 group 3' is new in the replacement so the filter items should be ordered by label
+    user clicks button to reorder options within list    4    Filter 1-reorder-list
+    user checks list contains exactly items in order    testid:Filter 1 group 3-reorder-list
+    ...    ${{['F1G3-1', 'F1G3-2']}}
+    user clicks done button to collapse reorder list    4    Filter 1-reorder-list
+    user clicks done button to collapse reorder list    2
+
+Check the order of filter 2's filter groups after data replacement
+    # Filter 2's filter groups are identical in the replacement so the previous order should be retained
+    user clicks button to reorder options within list    1
+    user checks list contains exactly items in order    testid:Filter 2-reorder-list
+    ...    ${{['Total', 'Filter 2 group 1', 'Filter 2 group 2']}}
+
+Check no reordering is possible for filter 2's Total group after data replacement
+    # Filter 2's 'Total' group only has one filter item which can't be reordered alone
+    user checks reorder list has no reorder options button    1    Filter 2-reorder-list
+
+Check the order of filter 2 group 1's filter items after data replacement
+    # Filter 2 group 1's filter items are identical in the replacement so the previous order should be retained
+    user clicks button to reorder options within list    2    Filter 2-reorder-list
+    user checks list contains exactly items in order    testid:Filter 2 group 1-reorder-list
+    ...    ${{['F2G1-1', 'F2G1-2']}}
+    user clicks done button to collapse reorder list    2    Filter 2-reorder-list
+
+Check the order of filter 2 group 2's filter items after data replacement
+    # Filter 2 group 2's filter items are identical in the replacement so the previous order should be retained
+    user clicks button to reorder options within list    3    Filter 2-reorder-list
+    user checks list contains exactly items in order    testid:Filter 2 group 2-reorder-list
+    ...    ${{['F2G2-1', 'F2G2-2']}}
+    user clicks done button to collapse reorder list    3    Filter 2-reorder-list
+    user clicks done button to collapse reorder list    1
+
+Cancel reordering filters after data replacement
+    user clicks button    Cancel    id:reordering
+    user waits until h3 is not visible    Reorder filters for ${SUBJECT_NAME}
+
+Check the order of indicator groups after data replacement
+    # 'Indicator group 3' is new in the replacement so should be appended
+    user clicks button in table cell    1    2    Reorder indicators    id:reordering
+    user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
+    user checks list contains exactly items in order    testid:reorder-list
+    ...    ${{['Indicator group 2', 'Indicator group 1', 'Indicator group 3']}}
+
+Check the order of indicator group 1's indicators after data replacement
+    # Indicator group 1's indicators are identical in the replacement so the previous order should be retained
+    user clicks button to reorder options within list    2
+    user checks list contains exactly items in order    testid:Indicator group 1-reorder-list
+    ...    ${{['Indicator 2', 'Indicator 1']}}
+    user clicks done button to collapse reorder list    2
+
+Check no reordering is possible for indicator group 2's indicaotrs after data replacement
+    # 'Indicator 3' is removed in the replacement leaving only 'Indicator 4' which can't be reordered alone
+    user checks reorder list has no reorder options button    1
+
+Check the order of indicator group 3's indicators after data replacement
+    # 'Indicator group 3' is new in the replacement so the indicators should be ordered by label
+    user clicks button to reorder options within list    3
+    user checks list contains exactly items in order    testid:Indicator group 3-reorder-list
+    ...    ${{['Indicator 5', 'Indicator 6']}}
+    user clicks done button to collapse reorder list    3
+
+Cancel reordering indicators after data replacement
+    user clicks button    Cancel    id:reordering
+    user waits until h3 is not visible    Reorder indicators for ${SUBJECT_NAME}
+
 Add data guidance to subject
     user clicks link    Data guidance
     user waits until h2 is visible    Public data guidance
@@ -225,8 +376,17 @@ user moves item of draggable list down
     user presses keys    ${SPACE}
 
 user clicks button in reorder list
-    [Arguments]    ${text}    ${item_num}    ${list_test_id}=reorder-list
-    user clicks button    ${text}    xpath://ol[@data-testid="${list_test_id}"]/li[position()=${item_num}]
+    [Arguments]    ${button_text}    ${item_num}    ${list_test_id}=reorder-list
+    user clicks button    ${button_text}    xpath://ol[@data-testid="${list_test_id}"]/li[position()=${item_num}]
+
+user checks button is not in reorder list
+    [Arguments]    ${button_text}    ${item_num}    ${list_test_id}=reorder-list
+    user checks page does not contain element
+    ...    xpath://ol[@data-testid="${list_test_id}"]/li[position()=${item_num}]//button[text()="${button_text}"]
+
+user checks reorder list has no reorder options button
+    [Arguments]    ${item_num}    ${list_test_id}=reorder-list
+    user checks button is not in reorder list    Reorder options within this group    ${item_num}    ${list_test_id}
 
 user clicks button to reorder options within list
     [Arguments]    ${item_num}    ${list_test_id}=reorder-list
