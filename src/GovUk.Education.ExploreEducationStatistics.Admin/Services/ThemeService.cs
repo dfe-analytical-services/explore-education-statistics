@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -180,17 +181,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             var userId = _userService.GetUserId();
 
-            var topics = await (
-                    from userReleaseRole in _context.UserReleaseRoles.AsQueryable()
-                    where userReleaseRole.UserId == userId
-                          && userReleaseRole.Role != ReleaseRole.PrereleaseViewer
-                    select userReleaseRole.Release.Publication
-                ).Concat(
-                    from userPublicationRole in _context.UserPublicationRoles.AsQueryable()
-                    where userPublicationRole.UserId == userId
-                          && userPublicationRole.Role == Owner
-                    select userPublicationRole.Publication
-                ).Include(publication => publication.Topic)
+            var topics = await _context
+                .UserReleaseRoles
+                .AsQueryable()
+                .Where(userReleaseRole => 
+                    userReleaseRole.UserId == userId &&
+                    userReleaseRole.Role != ReleaseRole.PrereleaseViewer)
+                .Select(userReleaseRole => userReleaseRole.Release.Publication)
+                .Concat(_context
+                    .UserPublicationRoles
+                    .AsQueryable()
+                    .Where(userPublicationRole => 
+                        userPublicationRole.UserId == userId &&
+                        ListOf(Owner, ReleaseApprover).Contains(userPublicationRole.Role))
+                    .Select(userPublicationRole => userPublicationRole.Publication))
+                .Include(publication => publication.Topic)
                 .ThenInclude(topic => topic.Theme)
                 .Select(publication => publication.Topic)
                 .Distinct()
@@ -198,13 +203,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return topics
                 .GroupBy(topic => topic.Theme)
-                .Select(
-                    group =>
+                .Select(group =>
                     {
                         group.Key.Topics = group.ToList();
                         return group.Key;
-                    }
-                )
+                    })
                 .ToList();
         }
     }

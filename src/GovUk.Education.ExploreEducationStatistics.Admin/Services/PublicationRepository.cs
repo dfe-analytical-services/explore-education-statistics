@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -36,18 +37,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ToList();
         }
 
-        public async Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUser(Guid topicId,
+        public async Task<List<MyPublicationViewModel>> GetPublicationsForTopicRelatedToUser(
+            Guid topicId,
             Guid userId)
         {
-            var publicationsGrantedByPublicationOwnerRole = await _context.UserPublicationRoles
+            var publicationsGrantedByPublicationRole = await _context
+                .UserPublicationRoles
                 .AsQueryable()
                 .Where(userPublicationRole => userPublicationRole.UserId == userId &&
                                               userPublicationRole.Publication.TopicId == topicId &&
-                                              userPublicationRole.Role == PublicationRole.Owner)
+                                              ListOf(PublicationRole.Owner, PublicationRole.ReleaseApprover)
+                                                  .Contains(userPublicationRole.Role))
                 .Select(userPublicationRole => userPublicationRole.Publication)
                 .ToListAsync();
 
-            var publicationIdsGrantedByPublicationOwnerRole = publicationsGrantedByPublicationOwnerRole
+            var publicationIdsGrantedByPublicationRole = publicationsGrantedByPublicationRole
                 .Select(publication => publication.Id)
                 .ToList();
 
@@ -62,7 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var publicationViewModels = new List<MyPublicationViewModel>();
 
             // Add publication view models for the Publications granted by the Publication Owner role
-            publicationViewModels.AddRange(await publicationsGrantedByPublicationOwnerRole
+            publicationViewModels.AddRange(await publicationsGrantedByPublicationRole
                 .SelectAsync(async publication =>
                     // Include all Releases of the Publication unconditionally
                     await GetPublicationWithAllReleases(publication.Id)));
@@ -74,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     // Don't include a publication that's already been included by Publication Owner role
                     var publication = publicationWithReleases.Key;
-                    return !publicationIdsGrantedByPublicationOwnerRole.Contains(publication.Id);
+                    return !publicationIdsGrantedByPublicationRole.Contains(publication.Id);
                 })
                 .SelectAsync(async publicationWithReleases =>
                 {

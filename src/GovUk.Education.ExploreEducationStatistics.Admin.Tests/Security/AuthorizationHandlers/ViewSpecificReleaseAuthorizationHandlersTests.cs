@@ -47,14 +47,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public async Task HasOwnerRoleOnParentPublicationAuthorizationHandler()
+        public async Task HasOwnerOrApproverRoleOnParentPublicationAuthorizationHandler()
         {
             var publication = new Publication
             {
                 Id = Guid.NewGuid()
             };
             await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseRequirement>(
-                contentDbContext => new HasOwnerRoleOnParentPublicationAuthorizationHandler(
+                contentDbContext => new HasOwnerOrApproverRoleOnParentPublicationAuthorizationHandler(
                         new AuthorizationHandlerResourceRoleService(
                             Mock.Of<IUserReleaseRoleRepository>(Strict),
                             new UserPublicationRoleRepository(contentDbContext),
@@ -64,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     PublicationId = publication.Id,
                     Publication = publication
                 },
-                Owner);
+                Owner, ReleaseApprover);
         }
 
         [Fact]

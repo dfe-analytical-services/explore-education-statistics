@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService) 
             : base(
                 new CanSeeAllReleasesAuthorizationHandler(),
-                new HasOwnerRoleOnParentPublicationAuthorizationHandler(authorizationHandlerResourceRoleService),
+                new HasOwnerOrApproverRoleOnParentPublicationAuthorizationHandler(authorizationHandlerResourceRoleService),
                 new HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(authorizationHandlerResourceRoleService),
                 new HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(preReleaseService, authorizationHandlerResourceRoleService))
         {
@@ -62,12 +62,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
         }
 
-        public class HasOwnerRoleOnParentPublicationAuthorizationHandler
+        public class HasOwnerOrApproverRoleOnParentPublicationAuthorizationHandler
             : AuthorizationHandler<ViewReleaseRequirement, Release>
         {
             private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-            public HasOwnerRoleOnParentPublicationAuthorizationHandler(
+            public HasOwnerOrApproverRoleOnParentPublicationAuthorizationHandler(
                 AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
             {
                 _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         .HasRolesOnPublication(
                             context.User.GetUserId(),
                             release.PublicationId,
-                            Owner))
+                            Owner, ReleaseApprover))
                 {
                     context.Succeed(requirement);
                 }

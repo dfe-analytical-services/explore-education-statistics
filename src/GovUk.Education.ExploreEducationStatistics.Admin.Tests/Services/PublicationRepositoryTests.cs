@@ -73,7 +73,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             });
 
-            // Set up a publication and releases related to the topic that will be granted via a publication role
+            // Set up a publication and releases related to the topic that will be granted via the Publication
+            // Owner role
 
             userPublicationRoles.Add(new UserPublicationRole
             {
@@ -99,6 +100,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Role = Owner
             });
 
+            // Set up a publication and releases related to the topic that will be granted via the Publication
+            // ReleaseApprover role
+
+            userPublicationRoles.Add(new UserPublicationRole
+            {
+                Publication = new Publication
+                {
+                    Title = "Related publication 3",
+                    Releases = new List<Release>
+                    {
+                        new()
+                        {
+                            ReleaseName = "2015",
+                            TimePeriodCoverage = AcademicYear
+                        },
+                        new()
+                        {
+                            ReleaseName = "2016",
+                            TimePeriodCoverage = AcademicYear
+                        }
+                    },
+                    Topic = topic
+                },
+                User = user,
+                Role = ReleaseApprover
+            });
+
             // Set up a publication and release related to the topic that will be granted solely via the PrereleaseViewer role
 
             userReleaseRoles.Add(new UserReleaseRole
@@ -109,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TimePeriodCoverage = AcademicYear,
                     Publication = new Publication
                     {
-                        Title = "Related publication 3",
+                        Title = "Related publication 4",
                         Topic = topic
                     }
                 },
@@ -135,7 +163,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Role = Contributor
             });
 
-            // Set up publication and release unrelated to the topic that will be granted via a publication role
+            // Set up publication and release unrelated to the topic that will be granted via the Publication
+            // Owner role
 
             userPublicationRoles.Add(new UserPublicationRole
             {
@@ -156,6 +185,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Role = Owner
             });
 
+            // Set up publication and release unrelated to the topic that will be granted via the Publication
+            // ReleaseApprover role
+
+            userPublicationRoles.Add(new UserPublicationRole
+            {
+                Publication = new Publication
+                {
+                    Title = "Unrelated publication 3",
+                    Releases = new List<Release>
+                    {
+                        new()
+                        {
+                            ReleaseName = "2012",
+                            TimePeriodCoverage = AcademicYear
+                        }
+                    },
+                    Topic = new Topic()
+                },
+                User = user,
+                Role = ReleaseApprover
+            });
+
             var contextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
@@ -173,10 +224,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupPublicationRepository(contentDbContext);
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
-                // Result should contain Related publication 1 and Related publication 2
-                // Related publication 3 is excluded because it's only granted via the PrereleaseViewer release role
+                // Result should contain Related publication 1, Related publication 2 and Related publication 3.
+                // Related publication 4 is excluded because it's only granted via the PrereleaseViewer release role
                 // Unrelated publications are excluded since they are for different topics
-                Assert.Equal(2, result.Count);
+                Assert.Equal(3, result.Count);
 
                 Assert.Equal("Related publication 1", result[0].Title);
                 Assert.Equal(2, result[0].Releases.Count);
@@ -187,6 +238,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, result[1].Releases.Count);
                 Assert.Equal("Academic Year 2016/17", result[1].Releases[0].Title);
                 Assert.Equal("Academic Year 2015/16", result[1].Releases[1].Title);
+
+                Assert.Equal("Related publication 3", result[2].Title);
+                Assert.Equal(2, result[1].Releases.Count);
+                Assert.Equal("Academic Year 2016/17", result[2].Releases[0].Title);
+                Assert.Equal("Academic Year 2015/16", result[2].Releases[1].Title);
             }
         }
 
