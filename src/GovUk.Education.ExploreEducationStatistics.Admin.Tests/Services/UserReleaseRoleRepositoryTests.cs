@@ -4,11 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
-using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
@@ -189,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 await service.CreateManyIfNotExists(
                     userIds: ListOf(user1.Id, user2.Id, user3.Id, user4.Id),
-                    releaseId: release.Id,
+                    resourceId: release.Id,
                     role: Contributor,
                     createdById: createdByUser.Id);
             }
@@ -265,7 +263,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 await service.CreateManyIfNotExists(
                     userId: user.Id,
-                    releaseIds: ListOf(release1.Id, release2.Id, release3.Id, release4.Id),
+                    resourceIds: ListOf(release1.Id, release2.Id, release3.Id, release4.Id),
                     role: Contributor,
                     createdById: createdByUser.Id);
             }
@@ -684,7 +682,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserReleaseRoleRepository(contentDbContext);
 
-                var result = await service.GetDistinctRolesByUserAndRelease(user.Id, release.Id);
+                var result = await service.GetAllRolesByUserAndRelease(user.Id, release.Id);
 
                 Assert.Equal(2, result.Count);
                 Assert.Equal(Contributor, result[0]);

@@ -344,7 +344,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userId, assignedRole.UserId);
                 Assert.Equal(publication.Id, assignedRole.PublicationId);
                 Assert.Equal(Owner, assignedRole.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
@@ -425,7 +425,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userId, assignedRole.UserId);
                 Assert.Equal(publication.Id, assignedRole.PublicationId);
                 Assert.Equal(Owner, assignedRole.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
@@ -504,7 +504,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userId, assignedRole.UserId);
                 Assert.Equal(publication.Id, assignedRole.PublicationId);
                 Assert.Equal(Owner, assignedRole.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
@@ -592,7 +592,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userId, assignedRole.UserId);
                 Assert.Equal(publication.Id, assignedRole.PublicationId);
                 Assert.Equal(Owner, assignedRole.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
@@ -654,7 +654,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(userId, assignedRole.UserId);
                 Assert.Equal(publication.Id, assignedRole.PublicationId);
                 Assert.Equal(Owner, assignedRole.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
@@ -1269,7 +1268,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.True(result.Right.ContainsKey("Publication"));
             Assert.True(result.Right.ContainsKey("Release"));
 
-            Assert.Single(result.Right["Publication"]);
+            Assert.Equal(2, result.Right["Publication"].Count);
             Assert.Equal(5, result.Right["Release"].Count);
         }
 

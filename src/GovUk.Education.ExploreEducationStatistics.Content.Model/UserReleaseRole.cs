@@ -1,43 +1,30 @@
 #nullable enable
 using System;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Model
+namespace GovUk.Education.ExploreEducationStatistics.Content.Model;
+
+public class UserReleaseRole : ResourceRole<ReleaseRole, Release>
 {
-    public class UserReleaseRole
+    public Release Release
     {
-        public Guid Id { get; set; }
+        get => Resource;
+        set => Resource = value;
+    }
 
-        public User User { get; set; } = null!;
+    public Guid ReleaseId 
+    {
+        get => ResourceId;
+        set => ResourceId = value;
+    }
         
-        public Guid UserId { get; set; }
+    public bool SoftDeleted { get; set; }
 
-        public Release Release { get; set; } = null!;
-        
-        public Guid ReleaseId { get; set; }
-        
-        public ReleaseRole Role { get; set; }
-
-        public Guid? CreatedById { get; set; }
-
-        public User? CreatedBy { get; set; }
-
-        public DateTime? Created { get; set; }
-
-        public Guid? DeletedById { get; set; }
-
-        public User? DeletedBy { get; set; }
-
-        public DateTime? Deleted { get; set; }
-        
-        public bool SoftDeleted { get; set; }
-
-        public UserReleaseRole CopyForAmendment(Release amendment)
-        {
-            var copy = MemberwiseClone() as UserReleaseRole;
-            copy.Id = Guid.NewGuid();
-            copy.Release = amendment;
-            copy.ReleaseId = amendment.Id;
-            return copy;
-        }
+    public UserReleaseRole CopyForAmendment(Release amendment)
+    {
+        var copy = MemberwiseClone() as UserReleaseRole;
+        copy.Id = Guid.NewGuid();
+        copy.Resource = amendment;
+        copy.ResourceId = amendment.Id;
+        return copy;
     }
 }

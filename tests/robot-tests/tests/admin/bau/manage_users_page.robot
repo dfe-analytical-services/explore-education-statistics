@@ -87,8 +87,9 @@ Check the initial manage user page
 
     user checks select contains option    name:selectedPublicationId    ${PUBLICATION_NAME}
     user checks select contains option    name:selectedPublicationId    ${PUBLICATION_2_NAME}
-    user checks select contains x options    name:selectedPublicationRole    1
+    user checks select contains x options    name:selectedPublicationRole    2
     user checks select contains option    name:selectedPublicationRole    Owner
+    user checks select contains option    name:selectedPublicationRole    ReleaseApprover
     user checks table body has x rows    0    testid:publicationAccessTable
 
 Give the user prerelease access to a release

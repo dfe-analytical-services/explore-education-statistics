@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220518115203_EES3321_AddDeletedAndDeletedByToUserPublicationRole")]
+    partial class EES3321_AddDeletedAndDeletedByToUserPublicationRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,13 +104,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<DateTime?>("Created")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("Locked")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid?>("LockedById")
-                        .IsConcurrencyToken()
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<int>("Order")
                         .HasColumnType("int");
 
@@ -116,14 +111,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("datetime2");
-
                     b.HasKey("Id");
 
                     b.HasIndex("ContentSectionId");
-
-                    b.HasIndex("LockedById");
 
                     b.ToTable("ContentBlock", (string)null);
 
@@ -947,12 +937,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock");
 
                     b.Property<string>("Charts")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Charts");
 
                     b.Property<string>("Heading")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Heading");
 
@@ -965,16 +953,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnName("DataBlock_HighlightName");
 
                     b.Property<string>("Name")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Query")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Query");
 
                     b.Property<string>("Source")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Summary")
@@ -982,7 +967,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnName("DataBlock_Summary");
 
                     b.Property<string>("Table")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("DataBlock_Table");
 
@@ -994,7 +978,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock");
 
                     b.Property<string>("Body")
-                        .IsRequired()
                         .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Body");
@@ -1007,7 +990,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.HasBaseType("GovUk.Education.ExploreEducationStatistics.Content.Model.ContentBlock");
 
                     b.Property<string>("Body")
-                        .IsRequired()
                         .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Body");
@@ -1044,13 +1026,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .WithMany("Content")
                         .HasForeignKey("ContentSectionId");
 
-                    b.HasOne("GovUk.Education.ExploreEducationStatistics.Content.Model.User", "LockedBy")
-                        .WithMany()
-                        .HasForeignKey("LockedById");
-
                     b.Navigation("ContentSection");
-
-                    b.Navigation("LockedBy");
                 });
 
             modelBuilder.Entity("GovUk.Education.ExploreEducationStatistics.Content.Model.DataImport", b =>
