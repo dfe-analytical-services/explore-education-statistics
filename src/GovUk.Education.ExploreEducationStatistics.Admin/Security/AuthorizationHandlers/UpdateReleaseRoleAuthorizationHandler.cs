@@ -6,6 +6,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -16,14 +17,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class UpdateReleaseRoleAuthorizationHandler :
         AuthorizationHandler<UpdateReleaseRoleRequirement, Tuple<Publication, ReleaseRole>>
     {
-        private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
+        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-        public UpdateReleaseRoleAuthorizationHandler(IUserPublicationRoleRepository userPublicationRoleRepository)
+        public UpdateReleaseRoleAuthorizationHandler(
+            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
-            _userPublicationRoleRepository = userPublicationRoleRepository;
+            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
         }
 
-        protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
+        protected override async Task HandleRequirementAsync(
+            AuthorizationHandlerContext context,
             UpdateReleaseRoleRequirement requirement,
             Tuple<Publication, ReleaseRole> tuple)
         {
@@ -35,11 +38,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
 
-            if (releaseRole == ReleaseRole.Contributor
-                && await _userPublicationRoleRepository
-                    .IsUserPublicationOwner(context.User.GetUserId(), publication.Id))
+            if (releaseRole == ReleaseRole.Contributor)
             {
-                context.Succeed(requirement);
+                if (await _authorizationHandlerResourceRoleService
+                        .HasRolesOnPublication(
+                            context.User.GetUserId(),
+                            publication.Id,
+                            Owner))
+                {
+                    context.Succeed(requirement);
+                }
             }
         }
     }

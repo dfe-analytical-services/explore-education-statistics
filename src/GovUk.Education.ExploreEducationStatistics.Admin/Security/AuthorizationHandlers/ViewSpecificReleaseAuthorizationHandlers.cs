@@ -6,20 +6,23 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using Microsoft.AspNetCore.Authorization;
 using static System.DateTime;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
     public class ViewSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<ViewReleaseRequirement, Release>
     {
+        // TODO DW - probably easier to maintain without the compound nature here
         public ViewSpecificReleaseAuthorizationHandler(
-            IUserPublicationRoleRepository userPublicationRoleRepository,
-            IUserReleaseRoleRepository userReleaseRoleRepository,
-            IPreReleaseService preReleaseService) : base(
-            new CanSeeAllReleasesAuthorizationHandler(),
-            new HasOwnerRoleOnParentPublicationAuthorizationHandler(userPublicationRoleRepository),
-            new HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(userReleaseRoleRepository),
-            new HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(userReleaseRoleRepository, preReleaseService))
+            IPreReleaseService preReleaseService,
+            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService) 
+            : base(
+                new CanSeeAllReleasesAuthorizationHandler(),
+                new HasOwnerRoleOnParentPublicationAuthorizationHandler(authorizationHandlerResourceRoleService),
+                new HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(authorizationHandlerResourceRoleService),
+                new HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(preReleaseService, authorizationHandlerResourceRoleService))
         {
         }
 
@@ -31,26 +34,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             {
             }
         }
-
+        
         public class HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler
-            : HasRoleOnReleaseAuthorizationHandler<ViewReleaseRequirement>
-        {
-            public HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(
-                IUserReleaseRoleRepository userReleaseRoleRepository)
-                : base(userReleaseRoleRepository, context => ContainsUnrestrictedViewerRole(context.Roles))
-            {
-            }
-        }
-
-        public class HasOwnerRoleOnParentPublicationAuthorizationHandler
             : AuthorizationHandler<ViewReleaseRequirement, Release>
         {
-            private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
+            private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-            public HasOwnerRoleOnParentPublicationAuthorizationHandler(
-                IUserPublicationRoleRepository userPublicationRoleRepository)
+            public HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(
+                AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
             {
-                _userPublicationRoleRepository = userPublicationRoleRepository;
+                _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
             }
 
             protected override async Task HandleRequirementAsync(
@@ -58,33 +51,77 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 ViewReleaseRequirement requirement,
                 Release release)
             {
-                var publicationRoles =
-                    await _userPublicationRoleRepository.GetAllRolesByUserAndPublication(context.User.GetUserId(),
-                        release.PublicationId);
-
-                if (ContainPublicationOwnerRole(publicationRoles))
+                if (await _authorizationHandlerResourceRoleService
+                        .HasRolesOnRelease(
+                            context.User.GetUserId(),
+                            release.Id,
+                            UnrestrictedReleaseViewerRoles))
                 {
                     context.Succeed(requirement);
                 }
             }
         }
 
-        public class HasPreReleaseRoleWithinAccessWindowAuthorizationHandler
-            : HasRoleOnReleaseAuthorizationHandler<ViewReleaseRequirement>
+        public class HasOwnerRoleOnParentPublicationAuthorizationHandler
+            : AuthorizationHandler<ViewReleaseRequirement, Release>
         {
-            public HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(
-                IUserReleaseRoleRepository userReleaseRoleRepository, IPreReleaseService preReleaseService)
-                : base(userReleaseRoleRepository, context =>
-                {
-                    if (!ContainsPreReleaseViewerRole(context.Roles))
-                    {
-                        return false;
-                    }
+            private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-                    var windowStatus = preReleaseService.GetPreReleaseWindowStatus(context.Release, UtcNow);
-                    return windowStatus.Access == PreReleaseAccess.Within;
-                })
+            public HasOwnerRoleOnParentPublicationAuthorizationHandler(
+                AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
             {
+                _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            }
+
+            protected override async Task HandleRequirementAsync(
+                AuthorizationHandlerContext context,
+                ViewReleaseRequirement requirement,
+                Release release)
+            {
+                if (await _authorizationHandlerResourceRoleService
+                        .HasRolesOnPublication(
+                            context.User.GetUserId(),
+                            release.PublicationId,
+                            Owner))
+                {
+                    context.Succeed(requirement);
+                }
+            }
+        }
+        
+        
+        
+        public class HasPreReleaseRoleWithinAccessWindowAuthorizationHandler
+            : AuthorizationHandler<ViewReleaseRequirement, Release>
+        {
+            private readonly IPreReleaseService _preReleaseService;
+            private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+
+            public HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(
+                IPreReleaseService preReleaseService,
+                AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            {
+                _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+                _preReleaseService = preReleaseService;
+            }
+
+            protected override async Task HandleRequirementAsync(
+                AuthorizationHandlerContext context,
+                ViewReleaseRequirement requirement,
+                Release release)
+            {
+                if (await _authorizationHandlerResourceRoleService
+                        .HasRolesOnRelease(
+                            context.User.GetUserId(),
+                            release.Id,
+                            PrereleaseViewer))
+                {
+                    var windowStatus = _preReleaseService.GetPreReleaseWindowStatus(release, UtcNow);
+                    if (windowStatus.Access == PreReleaseAccess.Within)
+                    {
+                        context.Succeed(requirement);
+                    }
+                }
             }
         }
     }

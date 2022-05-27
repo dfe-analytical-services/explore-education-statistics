@@ -1,13 +1,11 @@
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -19,10 +17,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         ViewSpecificPublicationAuthorizationHandler : CompoundAuthorizationHandler<ViewSpecificPublicationRequirement,
             Publication>
     {
-        public ViewSpecificPublicationAuthorizationHandler(ContentDbContext contentDbContext) : base(
-            new CanSeeAllPublicationsAuthorizationHandler(),
-            new HasOwnerRoleOnPublicationAuthorizationHandler(new UserPublicationRoleRepository(contentDbContext)),
-            new HasRoleOnAnyChildReleaseAuthorizationHandler(contentDbContext))
+        public ViewSpecificPublicationAuthorizationHandler(
+            ContentDbContext contentDbContext,
+            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService) 
+            : base(
+                new CanSeeAllPublicationsAuthorizationHandler(),
+                new HasOwnerRoleOnPublicationAuthorizationHandler(authorizationHandlerResourceRoleService),
+                new HasRoleOnAnyChildReleaseAuthorizationHandler(contentDbContext))
         {
         }
 
@@ -62,12 +63,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         }
 
         public class HasOwnerRoleOnPublicationAuthorizationHandler
-            : HasRoleOnPublicationAuthorizationHandler<ViewSpecificPublicationRequirement>
+            : AuthorizationHandler<ViewSpecificPublicationRequirement, Publication>
         {
+            private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+
             public HasOwnerRoleOnPublicationAuthorizationHandler(
-                IUserPublicationRoleRepository publicationRoleRepository) : base(publicationRoleRepository, context =>
-                ContainPublicationOwnerRole(context.Roles))
+                AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
             {
+                _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            }
+
+            protected override async Task HandleRequirementAsync(
+                AuthorizationHandlerContext context, 
+                ViewSpecificPublicationRequirement requirement,
+                Publication publication)
+            {
+                if (await _authorizationHandlerResourceRoleService
+                        .HasRolesOnPublication(
+                            context.User.GetUserId(),
+                            publication.Id,
+                            Owner))
+                {
+                    context.Succeed(requirement);
+                }
             }
         }
     }

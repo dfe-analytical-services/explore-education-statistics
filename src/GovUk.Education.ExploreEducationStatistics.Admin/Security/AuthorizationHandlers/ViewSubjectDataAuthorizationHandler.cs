@@ -1,5 +1,4 @@
-﻿#nullable enable
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
@@ -17,13 +16,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         public ViewSubjectDataAuthorizationHandler(
             ContentDbContext contentDbContext,
             IPreReleaseService preReleaseService,
-            IUserPublicationRoleRepository userPublicationRoleRepository,
-            IUserReleaseRoleRepository userReleaseRoleRepository) : base(
+            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService) : base(
             new ViewSubjectDataForPublishedReleasesAuthorizationHandler(contentDbContext),
-            new SubjectBelongsToViewableReleaseAuthorizationHandler(contentDbContext,
+            new SubjectBelongsToViewableReleaseAuthorizationHandler(
+                contentDbContext,
                 preReleaseService,
-                userPublicationRoleRepository,
-                userReleaseRoleRepository))
+                authorizationHandlerResourceRoleService))
         {
         }
 
@@ -32,19 +30,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
             private readonly ContentDbContext _contentDbContext;
             private readonly IPreReleaseService _preReleaseService;
-            private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
-            private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
+            private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
             public SubjectBelongsToViewableReleaseAuthorizationHandler(
                 ContentDbContext contentDbContext,
                 IPreReleaseService preReleaseService,
-                IUserPublicationRoleRepository userPublicationRoleRepository,
-                IUserReleaseRoleRepository userReleaseRoleRepository)
+                AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
             {
                 _contentDbContext = contentDbContext;
                 _preReleaseService = preReleaseService;
-                _userPublicationRoleRepository = userPublicationRoleRepository;
-                _userReleaseRoleRepository = userReleaseRoleRepository;
+                _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
             }
 
             protected override async Task HandleRequirementAsync(
@@ -54,11 +49,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             {
                 var viewSpecificReleaseHandler = new
                     ViewSpecificReleaseAuthorizationHandler(
-                        _userPublicationRoleRepository,
-                        _userReleaseRoleRepository,
-                        _preReleaseService);
+                        _preReleaseService,
+                        _authorizationHandlerResourceRoleService);
 
-                var contentRelease = await _contentDbContext.Releases
+                var contentRelease = await _contentDbContext
+                    .Releases
                     .FirstAsync(release => release.Id == releaseSubject.ReleaseId);
 
                 var delegatedContext = new AuthorizationHandlerContext(

@@ -3,8 +3,9 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseApprovalStatus;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
@@ -15,11 +16,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class DeleteSpecificReleaseAuthorizationHandler
         : AuthorizationHandler<DeleteSpecificReleaseRequirement, Release>
     {
-        private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
+        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-        public DeleteSpecificReleaseAuthorizationHandler(IUserPublicationRoleRepository userPublicationRoleRepository)
+        public DeleteSpecificReleaseAuthorizationHandler(
+            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
-            _userPublicationRoleRepository = userPublicationRoleRepository;
+            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -37,10 +39,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 context.Succeed(requirement);
                 return;
             }
-
-            var publicationRoles = await _userPublicationRoleRepository.GetAllRolesByUserAndPublication(context.User.GetUserId(), release.PublicationId);
-
-            if (ContainPublicationOwnerRole(publicationRoles))
+            
+            if (await _authorizationHandlerResourceRoleService
+                    .HasRolesOnPublication(
+                        context.User.GetUserId(),
+                        release.PublicationId,
+                        Owner))
             {
                 context.Succeed(requirement);
             }

@@ -18,18 +18,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         private readonly ContentDbContext _contentDbContext;
         private readonly IReleasePublishingStatusRepository _releasePublishingStatusRepository;
-        private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
-        private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
+        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
         public ResolveSpecificCommentAuthorizationHandler(ContentDbContext contentDbContext,
             IReleasePublishingStatusRepository releasePublishingStatusRepository,
-            IUserPublicationRoleRepository userPublicationRoleRepository,
-            IUserReleaseRoleRepository userReleaseRoleRepository)
+            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
             _contentDbContext = contentDbContext;
             _releasePublishingStatusRepository = releasePublishingStatusRepository;
-            _userPublicationRoleRepository = userPublicationRoleRepository;
-            _userReleaseRoleRepository = userReleaseRoleRepository;
+            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
         }
 
         protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -39,9 +36,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             var release = GetRelease(_contentDbContext, resource);
             var updateSpecificReleaseContext = new AuthorizationHandlerContext(
                 new[] {new UpdateSpecificReleaseRequirement()}, context.User, release);
-            await new UpdateSpecificReleaseAuthorizationHandler(_releasePublishingStatusRepository,
-                _userPublicationRoleRepository,
-                _userReleaseRoleRepository)
+            await new UpdateSpecificReleaseAuthorizationHandler(
+                    _releasePublishingStatusRepository,
+                    _authorizationHandlerResourceRoleService)
                 .HandleAsync(updateSpecificReleaseContext);
 
             if (updateSpecificReleaseContext.HasSucceeded)
