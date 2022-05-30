@@ -767,10 +767,10 @@ user checks checkbox input is not checked
     checkbox should not be selected    ${selector}
 
 user checks list has x items
-    [Arguments]    ${locator}    ${num}    ${parent}=css:body
+    [Arguments]    ${locator}    ${count}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
-    user waits until parent contains element    ${list}    css:li    count=${num}
+    user waits until parent contains element    ${list}    css:li    count=${count}
 
 user gets list item element
     [Arguments]    ${locator}    ${item_num}    ${parent}=css:body
@@ -787,9 +787,9 @@ user checks list item contains
 user checks list contains exactly items in order
     [Arguments]    ${locator}    ${items}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
-    ${length}=    Get Length    ${items}
+    ${num_items}=    Get Length    ${items}
     ${list}=    get child element    ${parent}    ${locator}
-    user checks list has x items    ${locator}    ${length}
+    user checks list has x items    ${locator}    ${num_items}
     FOR    ${index}    ${content}    IN ENUMERATE    @{items}    start=1
         ${item}=    get child element    ${list}    css:li:nth-child(${index})
         user checks element should contain    ${item}    ${content}

@@ -1,7 +1,6 @@
 *** Settings ***
 Resource    ./common.robot
 
-
 *** Keywords ***
 user waits until results table appears
     [Arguments]    ${wait_time}
@@ -21,6 +20,54 @@ user clicks subheaded indicator checkbox
     [Arguments]    ${subheading_label}    ${indicator_label}
     user clicks element
     ...    xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input[@type="checkbox"]
+
+user checks indicator groups match exactly in order
+    [Arguments]    @{items}
+    ${list}=    Get WebElements
+    ...    xpath://*[@id="filtersForm-indicators"]//*[starts-with(@id,"filtersForm-indicators-options-")]//legend
+    ${num_items}=    Get Length    ${items}
+    length should be    ${list}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{items}
+        user checks element should contain    ${list}[${index}]    ${content}
+    END
+
+user checks indicator group contains exactly items in order
+    [Arguments]    @{items}    ${group_label}
+    ${list}=    Get WebElements    xpath://*[@id="filtersForm-indicators"]//legend[text()="${group_label}"]/..//label
+    ${num_items}=    Get Length    ${items}
+    length should be    ${list}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{items}
+        user checks element should contain    ${list}[${index}]    ${content}
+    END
+
+user checks filters match exactly in order
+    [Arguments]    @{items}
+    ${list}=    Get WebElements    xpath://*[@id="filtersForm-filters"]//details
+    ${num_items}=    Get Length    ${items}
+    length should be    ${list}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{items}
+        user checks element should contain    ${list}[${index}]    ${content}
+    END
+
+user checks filter contains exactly filter groups in order
+    [Arguments]    @{items}    ${filter_label}
+    ${list}=    Get WebElements
+    ...    xpath://*[@id="filtersForm-filters"]//details[summary[contains(., "${filter_label}")]]//*[contains(@id,"-options-")]//legend
+    ${num_items}=    Get Length    ${items}
+    length should be    ${list}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{items}
+        user checks element should contain    ${list}[${index}]    ${content}
+    END
+
+user checks filter group contains exactly items in order
+    [Arguments]    @{items}    ${filter_label}    ${group_label}
+    ${list}=    Get WebElements
+    ...    xpath://*[@id="filtersForm-filters"]//details[summary[contains(., "${filter_label}")]]//*[contains(@id,"-options-")]//legend[text()="${group_label}"]/..//label
+    ${num_items}=    Get Length    ${items}
+    length should be    ${list}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{items}
+        user checks element should contain    ${list}[${index}]    ${content}
+    END
 
 user checks subheaded indicator checkbox is checked
     [Arguments]    ${subheading_label}    ${indicator_label}
