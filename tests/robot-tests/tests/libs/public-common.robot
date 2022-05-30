@@ -10,7 +10,7 @@ user checks headline summary contains
 user checks number of release updates
     [Arguments]    ${count}
     user waits until page contains element    id:releaseLastUpdates
-    user waits until page contains element    css:#releaseLastUpdates li    count=${count}
+    user waits until page contains element    css:#releaseLastUpdates li    limit=${count}
 
 user checks release update
     [Arguments]    ${number}    ${date}    ${text}
