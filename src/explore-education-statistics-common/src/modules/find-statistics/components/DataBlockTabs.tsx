@@ -55,14 +55,24 @@ const DataBlockTabs = ({
     typeof additionalTabContent === 'function'
       ? additionalTabContent({ dataBlock })
       : additionalTabContent;
-
   return (
     <LoadingSpinner loading={isLoading}>
       <Tabs id={id} testId={testId(dataBlock)} onToggle={onToggle}>
         {firstTabs}
 
-        {dataBlock.charts?.length && (
-          <TabsSection id={`${id}-charts`} title="Chart">
+        {!!dataBlock.charts?.length && (
+          <TabsSection
+            id={`${id}-charts`}
+            tabLabel={
+              <>
+                Chart
+                <span className="govuk-visually-hidden">
+                  {` for ${dataBlock.charts[0].title}`}
+                </span>
+              </>
+            }
+            title="Chart"
+          >
             {error && errorMessage}
 
             {fullTable && (
@@ -107,7 +117,20 @@ const DataBlockTabs = ({
         )}
 
         {dataBlock.table && (
-          <TabsSection id={`${id}-tables`} title="Table">
+          <TabsSection
+            id={`${id}-tables`}
+            tabLabel={
+              dataBlock.charts?.length ? (
+                <>
+                  Table
+                  <span className="govuk-visually-hidden">
+                    {` for ${dataBlock.heading}`}
+                  </span>
+                </>
+              ) : undefined
+            }
+            title="Table"
+          >
             {error && errorMessage}
 
             {fullTable && (

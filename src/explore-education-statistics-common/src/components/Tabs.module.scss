@@ -1,3 +1,5 @@
+@import '~govuk-frontend/govuk/base';
+
 .tabs {
   @media print {
     :global(.govuk-tabs__list) {
@@ -11,5 +13,12 @@
     :global(.govuk-tabs__tab) {
       display: none;
     }
+  }
+}
+
+.mobileHidden {
+  display: none;
+  @include govuk-media-query($from: tablet) {
+    display: block;
   }
 }

@@ -11,12 +11,10 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
-
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - publish release %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial Year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
-
 
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
@@ -281,7 +279,6 @@ Verify Test text accordion section contains correct text
     ${section}=    user gets accordion section content element    Test text    id:content
     user waits until parent contains element    ${section}    xpath:.//p[text()="Some test text!"]
     user closes accordion section    Test text    id:content
-    user clicks link    Summary
 
 Return to Admin and Create amendment
     user navigates to admin dashboard    Bau1

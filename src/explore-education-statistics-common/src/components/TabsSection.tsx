@@ -17,15 +17,17 @@ export const classes = {
 
 export interface TabsSectionProps {
   children: ReactNode;
+  hasSiblings?: boolean;
   id?: string;
   /**
    * Set to true if children should not be
    * rendered until tab has been selected.
    */
   lazy?: boolean;
-  title: string;
   headingTitle?: string;
   headingTag?: 'h2' | 'h3' | 'h4';
+  tabLabel?: ReactNode;
+  title: string;
 }
 
 const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
@@ -35,6 +37,7 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
       id,
       headingTitle = '',
       headingTag = 'h3',
+      hasSiblings,
       lazy,
       ...restProps
     }: TabsSectionProps,
@@ -56,14 +59,16 @@ const TabsSection = forwardRef<HTMLElement, TabsSectionProps>(
 
     return hasRendered ? (
       <section
-        aria-labelledby={onMedia(tabProps['aria-labelledby'])}
+        aria-labelledby={
+          hasSiblings ? onMedia(tabProps['aria-labelledby']) : undefined
+        }
         hidden={hidden}
         className={classNames(classes.panel, styles.panel, {
           [styles.panelHidden]: hidden,
         })}
         id={id}
         ref={ref}
-        role={onMedia('tabpanel')}
+        role={hasSiblings ? onMedia('tabpanel') : undefined}
         tabIndex={onMedia(-1)}
       >
         {headingTitle && createElement(headingTag, null, headingTitle)}
