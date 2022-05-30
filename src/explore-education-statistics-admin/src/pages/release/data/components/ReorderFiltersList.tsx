@@ -72,7 +72,7 @@ const ReorderFiltersList = ({
       'order',
     );
     setFilters(formattedFilters);
-  }, [isLoading, subjectMeta, subjectMeta?.filters]);
+  }, [isLoading, subjectMeta]);
 
   const handleReorder = ({
     reordered,

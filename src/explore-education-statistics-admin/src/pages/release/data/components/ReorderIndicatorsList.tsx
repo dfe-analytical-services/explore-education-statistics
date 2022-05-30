@@ -65,7 +65,7 @@ const ReorderIndicatorsList = ({
     );
 
     setIndicators(formattedIndicators);
-  }, [isLoading, subjectMeta, subjectMeta?.indicators]);
+  }, [isLoading, subjectMeta]);
 
   const handleReorder = ({ reordered, parentCategoryId }: ReorderProps) => {
     // reordering indicators
