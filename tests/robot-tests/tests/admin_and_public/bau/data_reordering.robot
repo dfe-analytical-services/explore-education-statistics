@@ -9,10 +9,12 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Variables ***
 ${PUBLICATION_NAME}     UI tests - data reordering %{RUN_IDENTIFIER}
 ${RELEASE_NAME}         Calendar Year 2022
 ${SUBJECT_NAME}         UI test subject
+
 
 *** Test Cases ***
 Create new publication and release via API
@@ -353,18 +355,8 @@ Approve first release
     user clicks link    Sign off
     user approves release for immediate publication
 
-User goes to public Find Statistics page
-    user navigates to find statistics page on public frontend
-
 Verify newly published release is on Find Statistics page
-    environment variable should be set    TEST_THEME_NAME
-    environment variable should be set    TEST_TOPIC_NAME
-    user waits until page contains accordion section    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
-
-    user opens details dropdown    %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}
+    user checks publication is on find statistics page    ${PUBLICATION_NAME}
 
 Go to public table tool page
     user navigates to data tables page on public frontend
@@ -609,6 +601,7 @@ Validate table cells again
     user checks results table cell contains    5    1    4,355,910
     user checks results table cell contains    6    1    7,922,048
     user checks results table cell contains    7    1    6,759,498
+
 
 *** Keywords ***
 user moves item of draggable list down

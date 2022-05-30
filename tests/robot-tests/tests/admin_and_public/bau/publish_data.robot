@@ -405,16 +405,8 @@ Approve release
     user clicks link    Sign off
     user approves original release for immediate publication
 
-User goes to public Find Statistics page
-    user navigates to find statistics page on public frontend
-
 Verify newly published release is on Find Statistics page
-    user waits until page contains accordion section    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    ${TOPIC_NAME}
-
-    user opens details dropdown    ${TOPIC_NAME}
-    user waits until details dropdown contains publication    ${TOPIC_NAME}    ${PUBLICATION_NAME}
+    user checks publication is on find statistics page    ${PUBLICATION_NAME}
     user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
     user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
     user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
