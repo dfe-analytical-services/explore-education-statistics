@@ -60,7 +60,9 @@
   }
 
   legend {
-    padding-right: govuk-spacing(4);
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
   }
 }
 
@@ -90,11 +92,10 @@
   .dragIcon {
     display: block;
     fill: currentColor;
-    height: 18px;
-    position: absolute;
-    right: 16px;
-    top: 12px;
-    width: 18px;
+    flex-shrink: 0;
+    height: 1rem;
+    margin-top: 0.2rem;
+    width: 1rem;
   }
 }
 

@@ -24,7 +24,6 @@
   background: govuk-colour('white');
   border-bottom: 1px solid govuk-colour('mid-grey');
   padding: govuk-spacing(2);
-  position: relative;
   user-select: none;
 
   &:hover {
@@ -51,7 +50,7 @@
 
 .isDragging {
   background: govuk-colour('blue');
-  border: $govuk-focus-width solid govuk-colour('black');
+  box-shadow: inset 0 0 0 $govuk-focus-width govuk-colour('black');
   color: govuk-colour('white');
   outline: $govuk-focus-colour solid $govuk-focus-width;
 }
@@ -69,17 +68,16 @@
 .dragIcon {
   display: block;
   fill: currentColor;
-  height: 18px;
-  position: absolute;
-  right: 0;
-  top: 2px;
-  width: 18px;
+  flex-shrink: 0;
+  height: 1rem;
+  margin-top: 0.2rem;
+  width: 1rem;
 }
 
 .optionLabel {
+  display: flex;
   font-weight: $govuk-font-weight-bold;
-  padding-right: govuk-spacing(6);
-  position: relative;
+  justify-content: space-between;
   word-break: break-word;
 }
 

@@ -90,7 +90,6 @@ function FormFieldSortableListGroup<FormValues>({
               className={classNames(styles.groupsContainer, {
                 [styles.isActive]: !isDragDisabled,
               })}
-              id="groupsContainer"
             >
               {field.value.length === 0 && (
                 <div className="govuk-inset-text govuk-!-margin-0">

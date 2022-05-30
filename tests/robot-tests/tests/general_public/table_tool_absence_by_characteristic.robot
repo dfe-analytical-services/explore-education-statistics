@@ -142,7 +142,7 @@ Reorder Gender male to be second
     ${columnGroups}=    user gets testid element    columnGroups
     user clicks button    Re-order items    columnGroups
     # The /../.. to get to a focusable element
-    user sets focus to element    xpath://span[text()="Gender male"]/../..
+    user sets focus to element    xpath://*[text()="Gender male"]/../..    testId:columnGroups
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
@@ -150,7 +150,7 @@ Reorder Gender male to be second
 Reorder Authorised absence rate to be last
     user clicks button    Re-order items
     # The /../.. to get to a focusable element
-    user sets focus to element    xpath://span[text()="Authorised absence rate"]/../..
+    user sets focus to element    xpath://*[text()="Authorised absence rate"]/../..    testId:rowGroups
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
@@ -159,7 +159,7 @@ Reorder Authorised absence rate to be last
 
 Reorder Overall absence rate to be first
     # The /../.. to get to a focusable element
-    user sets focus to element    xpath://span[text()="Overall absence rate"]/../..
+    user sets focus to element    xpath://*[text()="Overall absence rate"]/../..    testId:rowGroups
     user presses keys    ${SPACE}
     user presses keys    ${SPACE}
     user presses keys    ARROW_UP
@@ -167,7 +167,8 @@ Reorder Overall absence rate to be first
     user presses keys    ${SPACE}
 
 Reorder 2012/13 to be last
-    user sets focus to element    xpath://span[text()="2012/13"]/../..    # The /../.. to get to a focusable element
+    # The /../.. to get to a focusable element
+    user sets focus to element    xpath://*[text()="2012/13"]/../..    testId:columnGroups
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
