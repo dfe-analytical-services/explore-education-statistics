@@ -787,14 +787,23 @@ user checks list item contains
     user checks element should contain    ${item}    ${content}
 
 user checks list contains exact items in order
-    [Arguments]    ${locator}    ${items}    ${parent}=css:body
+    [Arguments]    ${locator}    ${expected_items}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
-    ${num_items}=    Get Length    ${items}
     ${list}=    get child element    ${parent}    ${locator}
-    user checks list has x items    ${locator}    ${num_items}
-    FOR    ${index}    ${content}    IN ENUMERATE    @{items}    start=1
-        ${item}=    get child element    ${list}    css:li:nth-child(${index})
-        user checks element should contain    ${item}    ${content}
+    ${actual}=    get child elements    ${list}    css:li
+    ${num_items}=    Get Length    ${expected_items}
+    length should be    ${actual}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{expected_items}
+        user checks element should contain    ${actual}[${index}]    ${content}
+    END
+
+user checks items matching locator contain exact items in order
+    [Arguments]    @{expected_items}    ${locator}
+    ${actual}=    Get WebElements    ${locator}
+    ${num_items}=    Get Length    ${expected_items}
+    length should be    ${actual}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{expected_items}
+        user checks element should contain    ${actual}[${index}]    ${content}
     END
 
 user checks breadcrumb count should be
