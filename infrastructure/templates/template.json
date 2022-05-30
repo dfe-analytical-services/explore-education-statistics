@@ -899,6 +899,17 @@
         "criterionType": "StaticThresholdCriterion"
       },
       {
+        "name": "[concat(parameters('subscription'),'PubStatsDBDataSpaceUsedPercentUrgent')]",
+        "description": "Public Statistics DB Data Space Used Percentage - URGENT",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "storage_percent",
+        "threshold": 95,
+        "operator": "GreaterThan",
+        "timeAggregation": "Maximum",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
         "name": "[concat(parameters('subscription'),'PubStatsDBBlockedByFirewall')]",
         "description": "Public Statistics DB Blocked By Firewall",
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('publicSqlServerName'), 'public-statistics')]",
@@ -965,6 +976,17 @@
         "criterionType": "StaticThresholdCriterion"
       },
       {
+        "name": "[concat(parameters('subscription'),'StatsDBDataSpaceUsedPercentUrgent')]",
+        "description": "Statistics DB Data Space Used Percentage - URGENT",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "storage_percent",
+        "threshold": 95,
+        "operator": "GreaterThan",
+        "timeAggregation": "Maximum",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
         "name": "[concat(parameters('subscription'),'StatsDBBlockedByFirewall')]",
         "description": "Statistics DB Blocked By Firewall",
         "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'statistics')]",
@@ -1026,6 +1048,17 @@
         "resourceType": "microsoft.sql/servers/databases",
         "metricName": "storage_percent",
         "threshold": 85,
+        "operator": "GreaterThan",
+        "timeAggregation": "Maximum",
+        "criterionType": "StaticThresholdCriterion"
+      },
+      {
+        "name": "[concat(parameters('subscription'),'ContentDBDataSpaceUsedPercentUrgent')]",
+        "description": "Content DB Data Space Used Percentage - URGENT",
+        "resourceId": "[resourceId('Microsoft.Sql/servers/databases', variables('sqlServerName'), 'content')]",
+        "resourceType": "microsoft.sql/servers/databases",
+        "metricName": "storage_percent",
+        "threshold": 95,
         "operator": "GreaterThan",
         "timeAggregation": "Maximum",
         "criterionType": "StaticThresholdCriterion"
