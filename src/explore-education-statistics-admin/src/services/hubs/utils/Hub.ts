@@ -24,7 +24,7 @@ export default class Hub {
   }
 
   async stop(): Promise<void> {
-    if (this.connection.state !== 'Connected') {
+    if (this.connection.state === 'Connected') {
       await this.connection.stop();
     }
   }
