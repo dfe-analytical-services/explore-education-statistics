@@ -46,43 +46,43 @@ Check reordering table contains subject row
 Check the initial order of filters
     user clicks button in table cell    1    2    Reorder filters    id:reordering
     user waits until h3 is visible    Reorder filters for ${SUBJECT_NAME}
-    user checks list contains exactly items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-list
     ...    ${{['Filter 1', 'Filter 2']}}
 
 Reorder filters
     user moves item of draggable list down    testid:reorder-list    1
-    user checks list contains exactly items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-list
     ...    ${{['Filter 2', 'Filter 1']}}
 
 Check the initial order of filter 1's filter groups
     user clicks button to reorder options within list    2
-    user checks list contains exactly items in order    testid:Filter 1-reorder-list
+    user checks list contains exact items in order    testid:Filter 1-reorder-list
     ...    ${{['Total', 'Filter 1 group 1', 'Filter 1 group 2']}}
 
 Reorder filter 1's filter groups
     user moves item of draggable list down    testid:Filter 1-reorder-list    2
-    user checks list contains exactly items in order    testid:Filter 1-reorder-list
+    user checks list contains exact items in order    testid:Filter 1-reorder-list
     ...    ${{['Total', 'Filter 1 group 2', 'Filter 1 group 1']}}
 
 Check the initial order of filter 1 group 1's filter items
     user clicks button to reorder options within list    3    Filter 1-reorder-list
-    user checks list contains exactly items in order    testid:Filter 1 group 1-reorder-list
+    user checks list contains exact items in order    testid:Filter 1 group 1-reorder-list
     ...    ${{['F1G1-1', 'F1G1-2']}}
 
 Reorder filter 1 group 1's filter items
     user moves item of draggable list down    testid:Filter 1 group 1-reorder-list    1
-    user checks list contains exactly items in order    testid:Filter 1 group 1-reorder-list
+    user checks list contains exact items in order    testid:Filter 1 group 1-reorder-list
     ...    ${{['F1G1-2', 'F1G1-1']}}
     user clicks done button to collapse reorder list    3    Filter 1-reorder-list
 
 Check the initial order of filter 1 group 2's filter items
     user clicks button to reorder options within list    2    Filter 1-reorder-list
-    user checks list contains exactly items in order    testid:Filter 1 group 2-reorder-list
+    user checks list contains exact items in order    testid:Filter 1 group 2-reorder-list
     ...    ${{['F1G2-1', 'F1G2-2']}}
 
 Reorder filter 1 group 2's filter items
     user moves item of draggable list down    testid:Filter 1 group 2-reorder-list    1
-    user checks list contains exactly items in order    testid:Filter 1 group 2-reorder-list
+    user checks list contains exact items in order    testid:Filter 1 group 2-reorder-list
     ...    ${{['F1G2-2', 'F1G2-1']}}
     user clicks done button to collapse reorder list    2    Filter 1-reorder-list
     user clicks done button to collapse reorder list    2
@@ -94,12 +94,12 @@ Save reordered filters, filter groups and filter items
 Check the saved order of filters
     user clicks button in table cell    1    2    Reorder filters    id:reordering
     user waits until h3 is visible    Reorder filters for ${SUBJECT_NAME}
-    user checks list contains exactly items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-list
     ...    ${{['Filter 2', 'Filter 1']}}
 
 Check the saved order of filter 1's filter groups
     user clicks button to reorder options within list    2
-    user checks list contains exactly items in order    testid:Filter 1-reorder-list
+    user checks list contains exact items in order    testid:Filter 1-reorder-list
     ...    ${{['Total', 'Filter 1 group 2', 'Filter 1 group 1']}}
 
 Check no reordering is possible for filter 1's Total group
@@ -108,20 +108,20 @@ Check no reordering is possible for filter 1's Total group
 
 Check the saved order of filter 1 group 1's filter items
     user clicks button to reorder options within list    3    Filter 1-reorder-list
-    user checks list contains exactly items in order    testid:Filter 1 group 1-reorder-list
+    user checks list contains exact items in order    testid:Filter 1 group 1-reorder-list
     ...    ${{['F1G1-2', 'F1G1-1']}}
     user clicks done button to collapse reorder list    3    Filter 1-reorder-list
 
 Check the saved order of filter 1 group 2's filter items
     user clicks button to reorder options within list    2    Filter 1-reorder-list
-    user checks list contains exactly items in order    testid:Filter 1 group 2-reorder-list
+    user checks list contains exact items in order    testid:Filter 1 group 2-reorder-list
     ...    ${{['F1G2-2', 'F1G2-1']}}
     user clicks done button to collapse reorder list    2    Filter 1-reorder-list
     user clicks done button to collapse reorder list    2
 
 Check the saved order of filter 2's filter groups remains untouched
     user clicks button to reorder options within list    1
-    user checks list contains exactly items in order    testid:Filter 2-reorder-list
+    user checks list contains exact items in order    testid:Filter 2-reorder-list
     ...    ${{['Total', 'Filter 2 group 1', 'Filter 2 group 2']}}
 
 Check no reordering is possible for filter 2's Total group
@@ -130,13 +130,13 @@ Check no reordering is possible for filter 2's Total group
 
 Check the saved order of filter 2 group 1's filter items remains untouched
     user clicks button to reorder options within list    2    Filter 2-reorder-list
-    user checks list contains exactly items in order    testid:Filter 2 group 1-reorder-list
+    user checks list contains exact items in order    testid:Filter 2 group 1-reorder-list
     ...    ${{['F2G1-1', 'F2G1-2']}}
     user clicks done button to collapse reorder list    2    Filter 2-reorder-list
 
 Check the saved order of filter 2 group 2's filter items remains untouched
     user clicks button to reorder options within list    3    Filter 2-reorder-list
-    user checks list contains exactly items in order    testid:Filter 2 group 2-reorder-list
+    user checks list contains exact items in order    testid:Filter 2 group 2-reorder-list
     ...    ${{['F2G2-1', 'F2G2-2']}}
     user clicks done button to collapse reorder list    3    Filter 2-reorder-list
     user clicks done button to collapse reorder list    1
@@ -148,22 +148,22 @@ Cancel reordering filters
 Check the initial order of indicator groups
     user clicks button in table cell    1    2    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
-    user checks list contains exactly items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-list
     ...    ${{['Indicator group 1', 'Indicator group 2']}}
 
 Reorder indicator groups
     user moves item of draggable list down    testid:reorder-list    1
-    user checks list contains exactly items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-list
     ...    ${{['Indicator group 2', 'Indicator group 1']}}
 
 Check the initial order of indicator group 1's indicators
     user clicks button to reorder options within list    2
-    user checks list contains exactly items in order    testid:Indicator group 1-reorder-list
+    user checks list contains exact items in order    testid:Indicator group 1-reorder-list
     ...    ${{['Indicator 1', 'Indicator 2']}}
 
 Reorder indicator group 1's indicators
     user moves item of draggable list down    testid:Indicator group 1-reorder-list    1
-    user checks list contains exactly items in order    testid:Indicator group 1-reorder-list
+    user checks list contains exact items in order    testid:Indicator group 1-reorder-list
     ...    ${{['Indicator 2', 'Indicator 1']}}
     user clicks done button to collapse reorder list    2
 
@@ -174,18 +174,18 @@ Save reordered indicator groups and indicators
 Check the saved order of indicator groups
     user clicks button in table cell    1    2    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
-    user checks list contains exactly items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-list
     ...    ${{['Indicator group 2', 'Indicator group 1']}}
 
 Check the saved order of indicator group 1's indicators
     user clicks button to reorder options within list    2
-    user checks list contains exactly items in order    testid:Indicator group 1-reorder-list
+    user checks list contains exact items in order    testid:Indicator group 1-reorder-list
     ...    ${{['Indicator 2', 'Indicator 1']}}
     user clicks done button to collapse reorder list    2
 
 Check the saved order of indicator group 2's indicators remains untouched
     user clicks button to reorder options within list    1
-    user checks list contains exactly items in order    testid:Indicator group 2-reorder-list
+    user checks list contains exact items in order    testid:Indicator group 2-reorder-list
     ...    ${{['Indicator 3', 'Indicator 4']}}
     user clicks done button to collapse reorder list    1
 
@@ -246,13 +246,13 @@ Check the order of filters after data replacement
     # Filters are identical in the replacement so the previous order should be retained
     user clicks button in table cell    1    2    Reorder filters    id:reordering
     user waits until h3 is visible    Reorder filters for ${SUBJECT_NAME}
-    user checks list contains exactly items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-list
     ...    ${{['Filter 2', 'Filter 1']}}
 
 Check the order of filter 1's filter groups after data replacement
     # 'Filter 1 group 3' is new in the replacement so should be appended
     user clicks button to reorder options within list    2
-    user checks list contains exactly items in order    testid:Filter 1-reorder-list
+    user checks list contains exact items in order    testid:Filter 1-reorder-list
     ...    ${{['Total', 'Filter 1 group 2', 'Filter 1 group 1', 'Filter 1 group 3']}}
 
 Check no reordering is possible for filter 1's Total group after data replacement
@@ -262,7 +262,7 @@ Check no reordering is possible for filter 1's Total group after data replacemen
 Check the order of filter 1 group 1's filter items after data replacement
     # 'F1G1-3' is new in the replacement so should be appended
     user clicks button to reorder options within list    3    Filter 1-reorder-list
-    user checks list contains exactly items in order    testid:Filter 1 group 1-reorder-list
+    user checks list contains exact items in order    testid:Filter 1 group 1-reorder-list
     ...    ${{['F1G1-2', 'F1G1-1', 'F1G1-3']}}
     user clicks done button to collapse reorder list    3    Filter 1-reorder-list
 
@@ -273,7 +273,7 @@ Check no reordering is possible for filter 1 group 2's filter items after data r
 Check the order of filter 1 group 3's filter items after data replacement
     # 'Filter 1 group 3' is new in the replacement so the filter items should be ordered by label
     user clicks button to reorder options within list    4    Filter 1-reorder-list
-    user checks list contains exactly items in order    testid:Filter 1 group 3-reorder-list
+    user checks list contains exact items in order    testid:Filter 1 group 3-reorder-list
     ...    ${{['F1G3-1', 'F1G3-2']}}
     user clicks done button to collapse reorder list    4    Filter 1-reorder-list
     user clicks done button to collapse reorder list    2
@@ -281,7 +281,7 @@ Check the order of filter 1 group 3's filter items after data replacement
 Check the order of filter 2's filter groups after data replacement
     # Filter 2's filter groups are identical in the replacement so the previous order should be retained
     user clicks button to reorder options within list    1
-    user checks list contains exactly items in order    testid:Filter 2-reorder-list
+    user checks list contains exact items in order    testid:Filter 2-reorder-list
     ...    ${{['Total', 'Filter 2 group 1', 'Filter 2 group 2']}}
 
 Check no reordering is possible for filter 2's Total group after data replacement
@@ -291,14 +291,14 @@ Check no reordering is possible for filter 2's Total group after data replacemen
 Check the order of filter 2 group 1's filter items after data replacement
     # Filter 2 group 1's filter items are identical in the replacement so the previous order should be retained
     user clicks button to reorder options within list    2    Filter 2-reorder-list
-    user checks list contains exactly items in order    testid:Filter 2 group 1-reorder-list
+    user checks list contains exact items in order    testid:Filter 2 group 1-reorder-list
     ...    ${{['F2G1-1', 'F2G1-2']}}
     user clicks done button to collapse reorder list    2    Filter 2-reorder-list
 
 Check the order of filter 2 group 2's filter items after data replacement
     # Filter 2 group 2's filter items are identical in the replacement so the previous order should be retained
     user clicks button to reorder options within list    3    Filter 2-reorder-list
-    user checks list contains exactly items in order    testid:Filter 2 group 2-reorder-list
+    user checks list contains exact items in order    testid:Filter 2 group 2-reorder-list
     ...    ${{['F2G2-1', 'F2G2-2']}}
     user clicks done button to collapse reorder list    3    Filter 2-reorder-list
     user clicks done button to collapse reorder list    1
@@ -311,24 +311,24 @@ Check the order of indicator groups after data replacement
     # 'Indicator group 3' is new in the replacement so should be appended
     user clicks button in table cell    1    2    Reorder indicators    id:reordering
     user waits until h3 is visible    Reorder indicators for ${SUBJECT_NAME}
-    user checks list contains exactly items in order    testid:reorder-list
+    user checks list contains exact items in order    testid:reorder-list
     ...    ${{['Indicator group 2', 'Indicator group 1', 'Indicator group 3']}}
 
 Check the order of indicator group 1's indicators after data replacement
     # Indicator group 1's indicators are identical in the replacement so the previous order should be retained
     user clicks button to reorder options within list    2
-    user checks list contains exactly items in order    testid:Indicator group 1-reorder-list
+    user checks list contains exact items in order    testid:Indicator group 1-reorder-list
     ...    ${{['Indicator 2', 'Indicator 1']}}
     user clicks done button to collapse reorder list    2
 
-Check no reordering is possible for indicator group 2's indicaotrs after data replacement
+Check no reordering is possible for indicator group 2's indicators after data replacement
     # 'Indicator 3' is removed in the replacement leaving only 'Indicator 4' which can't be reordered alone
     user checks reorder list has no reorder options button    1
 
 Check the order of indicator group 3's indicators after data replacement
     # 'Indicator group 3' is new in the replacement so the indicators should be ordered by label
     user clicks button to reorder options within list    3
-    user checks list contains exactly items in order    testid:Indicator group 3-reorder-list
+    user checks list contains exact items in order    testid:Indicator group 3-reorder-list
     ...    ${{['Indicator 5', 'Indicator 6']}}
     user clicks done button to collapse reorder list    3
 
@@ -402,39 +402,39 @@ Select start date and end date
     user checks previous table tool step contains    4    Time period    2021 to 2022
 
 Check indicator groups match the expected order
-    user checks indicator groups match exactly in order
+    user checks indicator groups list contains exact items in order
     ...    Indicator group 2
     ...    Indicator group 1
     ...    Indicator group 3
 
 Check indicators match the expected order
-    user checks indicator group contains exactly items in order
+    user checks indicator group contains exact items in order
     ...    Indicator 4
     ...    group_label=Indicator group 2
-    user checks indicator group contains exactly items in order
+    user checks indicator group contains exact items in order
     ...    Indicator 2
     ...    Indicator 1
     ...    group_label=Indicator group 1
-    user checks indicator group contains exactly items in order
+    user checks indicator group contains exact items in order
     ...    Indicator 5
     ...    Indicator 6
     ...    group_label=Indicator group 3
 
 Check filters match the expected order
-    user checks filters match exactly in order
+    user checks filters list contains exact items in order
     ...    Filter 2
     ...    Filter 1
 
 Check filter groups match the expected order
     user opens details dropdown    Filter 2
-    user checks filter contains exactly filter groups in order
+    user checks filter contains exact items in order
     ...    Total
     ...    Filter 2 group 1
     ...    Filter 2 group 2
     ...    filter_label=Filter 2
 
     user opens details dropdown    Filter 1
-    user checks filter contains exactly filter groups in order
+    user checks filter contains exact items in order
     ...    Total
     ...    Filter 1 group 2
     ...    Filter 1 group 1
@@ -442,37 +442,37 @@ Check filter groups match the expected order
     ...    filter_label=Filter 1
 
 Check filter 2's filter items match the expected order
-    user checks filter group contains exactly items in order
+    user checks filter group contains exact items in order
     ...    Total
     ...    filter_label=Filter 2
     ...    group_label=Total
-    user checks filter group contains exactly items in order
+    user checks filter group contains exact items in order
     ...    F2G1-1
     ...    F2G1-2
     ...    filter_label=Filter 2
     ...    group_label=Filter 2 group 1
-    user checks filter group contains exactly items in order
+    user checks filter group contains exact items in order
     ...    F2G2-1
     ...    F2G2-2
     ...    filter_label=Filter 2
     ...    group_label=Filter 2 group 2
 
 Check filter 1's filter items match the expected order
-    user checks filter group contains exactly items in order
+    user checks filter group contains exact items in order
     ...    Total
     ...    filter_label=Filter 1
     ...    group_label=Total
-    user checks filter group contains exactly items in order
+    user checks filter group contains exact items in order
     ...    F1G2-2
     ...    filter_label=Filter 1
     ...    group_label=Filter 1 group 2
-    user checks filter group contains exactly items in order
+    user checks filter group contains exact items in order
     ...    F1G1-2
     ...    F1G1-1
     ...    F1G1-3
     ...    filter_label=Filter 1
     ...    group_label=Filter 1 group 1
-    user checks filter group contains exactly items in order
+    user checks filter group contains exact items in order
     ...    F1G3-1
     ...    F1G3-2
     ...    filter_label=Filter 1

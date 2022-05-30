@@ -784,7 +784,7 @@ user checks list item contains
     ${item}=    user gets list item element    ${locator}    ${item_num}    ${parent}
     user checks element should contain    ${item}    ${content}
 
-user checks list contains exactly items in order
+user checks list contains exact items in order
     [Arguments]    ${locator}    ${items}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${num_items}=    Get Length    ${items}
