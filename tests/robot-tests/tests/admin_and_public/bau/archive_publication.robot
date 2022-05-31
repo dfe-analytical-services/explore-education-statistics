@@ -74,14 +74,7 @@ Validate archive warning is on Admin dashboard for archive-publication release
     ...    This publication will be archived when its superseding publication has a live release published.
 
 Validate that archive-publication appears correctly on Find stats page
-    user navigates to find statistics page on public frontend
-
-    user waits until page contains accordion section    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
-
-    user opens details dropdown    %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME_ARCHIVE}
+    user checks publication is on find statistics page    ${PUBLICATION_NAME_ARCHIVE}
     user checks publication bullet contains link    ${PUBLICATION_NAME_ARCHIVE}    View statistics and data
 
     user clicks element    testid:View stats link for ${PUBLICATION_NAME_ARCHIVE}

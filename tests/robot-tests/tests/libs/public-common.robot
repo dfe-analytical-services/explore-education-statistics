@@ -9,14 +9,29 @@ user checks headline summary contains
     user waits until element is visible    xpath://*[@id="releaseHeadlines-summary"]//li[text()="${text}"]
 
 user checks number of release updates
-    [Arguments]    ${number}
+    [Arguments]    ${count}
     user waits until page contains element    id:releaseLastUpdates
-    user waits until page contains element    css:#releaseLastUpdates li    limit=${number}
+    user waits until page contains element    css:#releaseLastUpdates li    limit=${count}
 
 user checks release update
     [Arguments]    ${number}    ${date}    ${text}
     user waits until element contains    css:#releaseLastUpdates li:nth-of-type(${number}) time    ${date}
     user waits until element contains    css:#releaseLastUpdates li:nth-of-type(${number}) p    ${text}
+
+user checks publication is on find statistics page
+    [Arguments]    ${publication_name}    ${publication_type}=National and official statistics
+    environment variable should be set    TEST_THEME_NAME
+    environment variable should be set    TEST_TOPIC_NAME
+    user navigates to find statistics page on public frontend
+    user waits until page contains accordion section    %{TEST_THEME_NAME}
+    user opens accordion section    %{TEST_THEME_NAME}
+    user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
+
+    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user waits until details dropdown contains publication
+    ...    %{TEST_TOPIC_NAME}
+    ...    ${publication_name}
+    ...    ${publication_type}
 
 user waits until details dropdown contains publication
     [Arguments]    ${details_heading}    ${publication_name}    ${publication_type}=National and official statistics

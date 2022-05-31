@@ -252,8 +252,8 @@ user verifies accordion is closed
     ...    xpath://*[@class="govuk-accordion__section-button" and text()="${section_text}" and @aria-expanded="false"]
 
 user checks there are x accordion sections
-    [Arguments]    ${num}    ${parent}=css:body
-    user waits until parent contains element    ${parent}    css:[data-testid="accordionSection"]    limit=${num}
+    [Arguments]    ${count}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    css:[data-testid="accordionSection"]    count=${count}
 
 user checks accordion is in position
     [Arguments]    ${section_text}    ${position}    ${parent}=css:[data-testid="accordion"]
@@ -537,6 +537,10 @@ user waits until h3 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is visible    xpath://h3[text()="${text}"]    ${wait}
 
+user waits until h3 is not visible
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until element is not visible    xpath://h3[text()="${text}"]    ${wait}
+
 user waits until legend is visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is visible    xpath://legend[text()="${text}"]    ${wait}
@@ -637,8 +641,8 @@ user enters text into element
     sleep    0.1
 
 user checks element count is x
-    [Arguments]    ${locator}    ${amount}
-    page should contain element    ${locator}    limit=${amount}
+    [Arguments]    ${locator}    ${count}
+    page should contain element    ${locator}    count=${count}
 
 user checks url contains
     [Arguments]    ${text}
@@ -765,12 +769,10 @@ user checks checkbox input is not checked
     checkbox should not be selected    ${selector}
 
 user checks list has x items
-    [Arguments]    ${locator}    ${num}    ${parent}=css:body
+    [Arguments]    ${locator}    ${count}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
-    user waits until parent contains element    ${list}    css:li    limit=${num}
-    ${items}=    get child elements    ${list}    css:li
-    length should be    ${items}    ${num}
+    user waits until parent contains element    ${list}    css:li    count=${count}
 
 user gets list item element
     [Arguments]    ${locator}    ${item_num}    ${parent}=css:body
@@ -783,6 +785,26 @@ user checks list item contains
     [Arguments]    ${locator}    ${item_num}    ${content}    ${parent}=css:body
     ${item}=    user gets list item element    ${locator}    ${item_num}    ${parent}
     user checks element should contain    ${item}    ${content}
+
+user checks list contains exact items in order
+    [Arguments]    ${locator}    ${expected_items}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    ${locator}
+    ${list}=    get child element    ${parent}    ${locator}
+    ${actual}=    get child elements    ${list}    css:li
+    ${num_items}=    Get Length    ${expected_items}
+    length should be    ${actual}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{expected_items}
+        user checks element should contain    ${actual}[${index}]    ${content}
+    END
+
+user checks items matching locator contain exact items in order
+    [Arguments]    @{expected_items}    ${locator}
+    ${actual}=    Get WebElements    ${locator}
+    ${num_items}=    Get Length    ${expected_items}
+    length should be    ${actual}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{expected_items}
+        user checks element should contain    ${actual}[${index}]    ${content}
+    END
 
 user checks breadcrumb count should be
     [Arguments]    ${count}

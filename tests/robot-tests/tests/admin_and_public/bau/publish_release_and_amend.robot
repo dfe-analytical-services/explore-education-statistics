@@ -133,16 +133,8 @@ Verify release is scheduled
 Approve release for immediate publication
     user approves original release for immediate publication
 
-User goes to public Find Statistics page
-    user navigates to find statistics page on public frontend
-
 Verify newly published release is on Find Statistics page
-    user waits until page contains accordion section    %{TEST_THEME_NAME}    %{WAIT_MEDIUM}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}    %{WAIT_MEDIUM}
-
-    user opens details dropdown    %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}
+    user checks publication is on find statistics page    ${PUBLICATION_NAME}
     user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
     user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
     user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE
@@ -486,18 +478,8 @@ Approve amendment for immediate release
     user clicks link    Sign off
     user approves amended release for immediate publication
 
-Go back to public find-statistics page
-    user navigates to public frontend    %{PUBLIC_URL}/find-statistics
-    user waits until h1 is visible    Find statistics and data
-    user waits for page to finish loading
-
 Verify amendment is on Find Statistics page again
-    user waits until page contains accordion section    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
-
-    user opens details dropdown    %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}
+    user checks publication is on find statistics page    ${PUBLICATION_NAME}
     ...    Experimental statistics
     user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
     user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
