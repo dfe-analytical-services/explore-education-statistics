@@ -615,7 +615,6 @@
     "adminAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-admin')]",
     "adminPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-admin')]",
     "adminSignalRName": "[concat(parameters('subscription'), '-sr-', parameters('environment'), '-admin')]",
-    "adminSignalRPrivateEndpointName": "[concat(parameters('subscription'), '-srpe-', parameters('environment'), '-admin')]",
     "adminAppInsights": "[concat(parameters('subscription'), '-ai-', parameters('environment'), '-admin')]",
     "publicAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-public')]",
     "publicAppUrl": "[concat('https://', parameters('domain'))]",
@@ -1890,17 +1889,12 @@
           "defaultAction": "deny",
           "publicNetwork": {
             "allow": [
-              "ClientConnection"
+              "ClientConnection",
+              "ServerConnection",
+              "RESTAPI",
+              "Trace"
             ]
-          },
-          "privateEndpoints": [
-            {
-              "name": "[variables('adminSignalRPrivateEndpointName')]",
-              "allow": [
-                "ServerConnection"
-              ]
-            }
-          ]
+          }
         },
         "upstream": {
           "templates": [
