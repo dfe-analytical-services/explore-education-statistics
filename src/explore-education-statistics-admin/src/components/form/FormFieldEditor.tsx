@@ -13,9 +13,7 @@ import React, { useRef } from 'react';
 export const elementsFieldName = (name: string) => `__${name}`;
 
 type Props<FormValues> = {
-  blockId?: string;
   formGroupClass?: string;
-  handleBlur?: (isDirty: boolean) => void;
   id?: string;
   name: keyof FormValues | string;
   showError?: boolean;
@@ -23,18 +21,18 @@ type Props<FormValues> = {
   validateElements?: (
     elements: Element[],
   ) => string | undefined | Promise<string | undefined>;
-} & OmitStrict<FormEditorProps, 'blockId' | 'id' | 'value' | 'onChange'>;
+  onBlur?: (isDirty: boolean) => void;
+} & OmitStrict<FormEditorProps, 'id' | 'value' | 'onChange' | 'onBlur'>;
 
 function FormFieldEditor<T>({
-  blockId,
   error,
   formGroupClass,
-  handleBlur,
   id,
   name,
   showError = true,
   testId,
   validateElements,
+  onBlur,
   ...props
 }: Props<T>) {
   const { prefixFormId, fieldId } = useFormContext();
@@ -66,12 +64,11 @@ function FormFieldEditor<T>({
               testId={testId}
               {...props}
               {...field}
-              blockId={blockId}
               id={id ? prefixFormId(id) : fieldId(name as string)}
               onBlur={() => {
                 form.setFieldTouched(name as string, true);
-                if (handleBlur) {
-                  handleBlur(form.dirty);
+                if (onBlur) {
+                  onBlur(form.dirty);
                 }
               }}
               onElementsChange={handleElements}

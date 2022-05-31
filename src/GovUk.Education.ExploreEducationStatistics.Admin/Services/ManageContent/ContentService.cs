@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GovUk.Education.ExploreEducationStatistics.Admin.Hubs;
+using GovUk.Education.ExploreEducationStatistics.Admin.Hubs.Clients;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.ManageContent;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -14,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
@@ -27,18 +30,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private readonly ContentDbContext _context;
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IReleaseContentSectionRepository _releaseContentSectionRepository;
+        private readonly IHubContext<ReleaseContentHub, IReleaseContentHubClient> _hubContext;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
 
         public ContentService(ContentDbContext context,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IReleaseContentSectionRepository releaseContentSectionRepository,
+            IHubContext<ReleaseContentHub, IReleaseContentHubClient> hubContext,
             IUserService userService,
             IMapper mapper)
         {
             _context = context;
             _persistenceHelper = persistenceHelper;
             _releaseContentSectionRepository = releaseContentSectionRepository;
+            _hubContext = hubContext;
             _userService = userService;
             _mapper = mapper;
         }
@@ -68,13 +74,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                 .OnSuccess(CheckCanUpdateRelease)
                 .OnSuccess(async release =>
                 {
+                    var contentSections = release
+                        .GenericContent
+                        .ToList();
+
                     newSectionOrder.ToList().ForEach(kvp =>
                     {
                         var (sectionId, newOrder) = kvp;
-                        release
-                            .GenericContent
-                            .ToList()
-                            .Find(section => section.Id == sectionId).Order = newOrder;
+
+                        var matchingSection = contentSections.Find(section => section.Id == sectionId);
+
+                        if (matchingSection is not null)
+                        {
+                            matchingSection.Order = newOrder;
+                        }
                     });
 
                     _context.Releases.Update(release);
@@ -173,7 +186,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .OnSuccess(tuple => _mapper.Map<ContentSectionViewModel>(tuple.Item2));
         }
 
-        public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(Guid releaseId, Guid contentSectionId, Dictionary<Guid, int> newBlocksOrder)
+        public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
+            Guid releaseId,
+            Guid contentSectionId,
+            Dictionary<Guid, int> newBlocksOrder)
         {
             return
                 CheckContentSectionExists(releaseId, contentSectionId)
@@ -185,7 +201,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         newBlocksOrder.ToList().ForEach(kvp =>
                         {
                             var (blockId, newOrder) = kvp;
-                            section.Content.Find(block => block.Id == blockId).Order = newOrder;
+
+                            var matchingBlock = section.Content.Find(block => block.Id == blockId);
+
+                            if (matchingBlock is not null)
+                            {
+                                matchingBlock.Order = newOrder;
+                            }
                         });
 
                         _context.ContentSections.Update(section);
@@ -303,7 +325,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                         DataBlock _ => ValidationActionResult(IncorrectContentBlockTypeForUpdate),
                         _ => throw new ArgumentOutOfRangeException()
                     };
-                });
+                })
+                .OnSuccessDo(block => _hubContext.Clients.Group(releaseId.ToString()).ContentBlockUpdated(block));
         }
 
         public async Task<Either<ActionResult, List<T>>> GetUnattachedContentBlocks<T>(Guid releaseId)
@@ -484,9 +507,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
         private static ContentBlock CreateContentBlockForType(ContentBlockType type)
         {
             var classType = GetContentBlockClassTypeFromEnumValue(type);
-            var newContentBlock = (ContentBlock) Activator.CreateInstance(classType);
-            newContentBlock.Created = DateTime.UtcNow;
-            return newContentBlock;
+            return (ContentBlock) Activator.CreateInstance(classType);
         }
 
         private List<IContentBlockViewModel> OrderedContentBlocks(ContentSection section)
@@ -516,7 +537,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.ManageConten
                     .ThenInclude(join => join.ContentSection)
                     .ThenInclude(section => section.Content)
                     .ThenInclude(content => content.Comments)
-                    .ThenInclude(comment => comment.ResolvedBy);
+                    .ThenInclude(comment => comment.ResolvedBy)
+                .Include(r => r.Content)
+                    .ThenInclude(join => join.ContentSection)
+                    .ThenInclude(section => section.Content)
+                    .ThenInclude(content => content.LockedBy);
         }
 
         private Task<Either<ActionResult, Tuple<Release, ContentSection>>> CheckContentSectionExists(

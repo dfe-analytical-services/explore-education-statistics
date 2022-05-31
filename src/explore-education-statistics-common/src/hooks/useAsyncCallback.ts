@@ -34,6 +34,17 @@ export interface AsyncCallbackState<T> extends AsyncState<T> {
 
 export type AsyncCallback<Args extends unknown[]> = (...args: Args) => void;
 
+export interface UseAsyncCallbackOptions<Value> {
+  initialState?: AsyncStateSetterParam<Value>;
+  /**
+   * When set to true, the last value will be
+   * kept in state when re-running the callback.
+   * By default, the last value is unset from
+   * state whilst the callback is running.
+   */
+  keepStaleValue?: boolean;
+}
+
 /**
  * Hook that encapsulates state around an asynchronous
  * callback such as loading, error and successful values.
@@ -41,11 +52,17 @@ export type AsyncCallback<Args extends unknown[]> = (...args: Args) => void;
 export default function useAsyncCallback<Value, Args extends unknown[] = []>(
   callback: (...args: Args) => Promise<Value>,
   deps: DependencyList = [],
-  initialState: AsyncStateSetterParam<Value> = {
-    isLoading: false,
-  },
+  options: UseAsyncCallbackOptions<Value> = {},
 ): [AsyncCallbackState<Value>, AsyncCallback<Args>] {
+  const {
+    initialState = {
+      isLoading: false,
+    },
+    keepStaleValue,
+  } = options;
+
   const previousCall = useRef(0);
+
   const [state, setState] = useState<AsyncState<Value>>(
     initialState as AsyncState<Value>,
   );
@@ -55,21 +72,26 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
 
     const currentCall = previousCall.current;
 
-    setState({
-      isLoading: true,
-    });
+    setState(prev =>
+      keepStaleValue && prev.value
+        ? {
+            isLoading: true,
+            value: prev.value,
+          }
+        : {
+            isLoading: true,
+          },
+    );
 
     try {
-      const result = await callback(...args);
+      const nextValue = await callback(...args);
 
       if (currentCall === previousCall.current) {
         setState({
           isLoading: false,
-          value: result,
+          value: nextValue,
         });
       }
-
-      return result;
     } catch (error) {
       if (currentCall === previousCall.current) {
         if (process.env.NODE_ENV !== 'test') {
@@ -81,8 +103,6 @@ export default function useAsyncCallback<Value, Args extends unknown[] = []>(
           error,
         });
       }
-
-      return error;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);

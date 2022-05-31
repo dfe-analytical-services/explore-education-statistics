@@ -24,7 +24,7 @@ import {
 export interface EditableAccordionProps
   extends OmitStrict<AccordionProps, 'openAll'> {
   sectionName?: string;
-  onAddSection: () => Promise<unknown>;
+  onAddSection: () => void;
   onReorder: (sectionIds: string[]) => void;
 }
 

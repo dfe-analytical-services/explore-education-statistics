@@ -1,15 +1,4 @@
 #nullable enable
-namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
-{
-    public record BoundaryLevelViewModel
-    {
-        public long Id { get; }
-        public string Label { get; }
+namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 
-        public BoundaryLevelViewModel(long id, string label)
-        {
-            Id = id;
-            Label = label;
-        }
-    }
-}
+public record BoundaryLevelViewModel(long Id, string Label);

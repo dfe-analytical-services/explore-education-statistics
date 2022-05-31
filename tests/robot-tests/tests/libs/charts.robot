@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ./common.robot
 
+
 *** Keywords ***
 user waits until element contains line chart
     [Arguments]    ${locator}

@@ -37,6 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly IFilterRepository _filterRepository;
         private readonly IIndicatorRepository _indicatorRepository;
+        private readonly IIndicatorGroupRepository _indicatorGroupRepository;
         private readonly ILocationRepository _locationRepository;
         private readonly IFootnoteRepository _footnoteRepository;
         private readonly IReleaseService _releaseService;
@@ -52,6 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             StatisticsDbContext statisticsDbContext,
             IFilterRepository filterRepository,
             IIndicatorRepository indicatorRepository,
+            IIndicatorGroupRepository indicatorGroupRepository,
             ILocationRepository locationRepository,
             IFootnoteRepository footnoteRepository,
             IReleaseService releaseService,
@@ -65,6 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _statisticsDbContext = statisticsDbContext;
             _filterRepository = filterRepository;
             _indicatorRepository = indicatorRepository;
+            _indicatorGroupRepository = indicatorGroupRepository;
             _locationRepository = locationRepository;
             _footnoteRepository = footnoteRepository;
             _releaseService = releaseService;
@@ -113,28 +116,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Guid replacementFileId)
         {
             return await GetReplacementPlan(releaseId, originalFileId, replacementFileId)
-                .OnSuccess(async replacementPlan =>
+                .OnSuccess(async plan =>
                 {
-                    if (!replacementPlan.Valid)
+                    if (!plan.Valid)
                     {
                         return ValidationActionResult(ReplacementMustBeValid);
                     }
 
-                    await replacementPlan.DataBlocks
+                    var originalSubjectId = plan.OriginalSubjectId;
+                    var replacementSubjectId = plan.ReplacementSubjectId;
+
+                    await plan.DataBlocks
                         .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(plan =>
-                            InvalidateDataBlockCachedResults(plan, releaseId));
-                    await replacementPlan.DataBlocks
+                        .ForEachAwaitAsync(async dataBlockPlan =>
+                        {
+                            await InvalidateDataBlockCachedResults(dataBlockPlan, releaseId);
+                            await ReplaceLinksForDataBlock(dataBlockPlan, replacementSubjectId);
+                        });
+
+                    await plan.Footnotes
                         .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(plan =>
-                            ReplaceLinksForDataBlock(plan, replacementPlan.ReplacementSubjectId));
-                    await replacementPlan.Footnotes
-                        .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(plan =>
-                            ReplaceLinksForFootnote(plan, replacementPlan.OriginalSubjectId,
-                                replacementPlan.ReplacementSubjectId));
-                    await ReplaceDataGuidance(releaseId, replacementPlan.OriginalSubjectId,
-                        replacementPlan.ReplacementSubjectId);
+                        .ForEachAwaitAsync(footnotePlan =>
+                            ReplaceLinksForFootnote(footnotePlan, originalSubjectId, replacementSubjectId));
+
+                    await ReplaceReleaseSubject(releaseId, originalSubjectId, replacementSubjectId);
 
                     await _contentDbContext.SaveChangesAsync();
                     await _statisticsDbContext.SaveChangesAsync();
@@ -163,13 +168,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<ReplacementSubjectMeta> GetReplacementSubjectMeta(Guid subjectId)
         {
-            var filtersIncludingItems = _filterRepository.GetFiltersIncludingItems(subjectId);
+            var filtersIncludingItems = await _filterRepository.GetFiltersIncludingItems(subjectId);
 
             var filters = filtersIncludingItems
                 .ToDictionary(filter => filter.Name, filter => filter);
 
             var indicators = _indicatorRepository.GetIndicators(subjectId)
-                .ToDictionary(filterItem => filterItem.Name, filterItem => filterItem);
+                .ToDictionary(indicator => indicator.Name, indicator => indicator);
 
             var locations = await _locationRepository.GetDistinctForSubject(subjectId);
 
@@ -1002,25 +1007,67 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
         }
 
-        private async Task ReplaceDataGuidance(
-            Guid releaseId,
-            Guid originalSubject,
-            Guid replacementSubject)
+        private async Task ReplaceReleaseSubject(Guid releaseId,
+            Guid originalSubjectId,
+            Guid replacementSubjectId)
         {
             var originalReleaseSubject = await _statisticsDbContext.ReleaseSubject
-                .AsQueryable()
-                .Where(rs => rs.ReleaseId == releaseId &&
-                             rs.SubjectId == originalSubject)
-                .FirstAsync();
+                .SingleAsync(rs => rs.ReleaseId == releaseId &&
+                                   rs.SubjectId == originalSubjectId);
 
             var replacementReleaseSubject = await _statisticsDbContext.ReleaseSubject
-                .AsQueryable()
-                .Where(rs => rs.ReleaseId == releaseId &&
-                             rs.SubjectId == replacementSubject)
-                .FirstAsync();
+                .SingleAsync(rs => rs.ReleaseId == releaseId &&
+                                   rs.SubjectId == replacementSubjectId);
 
             _statisticsDbContext.Update(replacementReleaseSubject);
+
             replacementReleaseSubject.DataGuidance = originalReleaseSubject.DataGuidance;
+
+            replacementReleaseSubject.FilterSequence =
+                await ReplaceFilterSequence(originalReleaseSubject, replacementReleaseSubject);
+            replacementReleaseSubject.IndicatorSequence =
+                await ReplaceIndicatorSequence(originalReleaseSubject, replacementReleaseSubject);
+        }
+
+        private async Task<List<FilterSequenceEntry>?> ReplaceFilterSequence(ReleaseSubject originalReleaseSubject,
+            ReleaseSubject replacementReleaseSubject)
+        {
+            // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
+            if (originalReleaseSubject.FilterSequence == null)
+            {
+                return null;
+            }
+
+            var originalFilters = 
+                await _filterRepository.GetFiltersIncludingItems(originalReleaseSubject.SubjectId);
+            var replacementFilters =
+                await _filterRepository.GetFiltersIncludingItems(replacementReleaseSubject.SubjectId);
+
+            return ReplacementServiceHelper.ReplaceFilterSequence(
+                originalFilters: originalFilters,
+                replacementFilters: replacementFilters,
+                originalReleaseSubject);
+        }
+
+        private async Task<List<IndicatorGroupSequenceEntry>?> ReplaceIndicatorSequence(
+            ReleaseSubject originalReleaseSubject,
+            ReleaseSubject replacementReleaseSubject)
+        {
+            // If the sequence is undefined then leave it so we continue to fallback to ordering by label alphabetically
+            if (originalReleaseSubject.IndicatorSequence == null)
+            {
+                return null;
+            }
+
+            var originalIndicatorGroups =
+                await _indicatorGroupRepository.GetIndicatorGroups(originalReleaseSubject.SubjectId);
+            var replacementIndicatorGroups =
+                await _indicatorGroupRepository.GetIndicatorGroups(replacementReleaseSubject.SubjectId);
+
+            return ReplacementServiceHelper.ReplaceIndicatorSequence(
+                originalIndicatorGroups: originalIndicatorGroups,
+                replacementIndicatorGroups: replacementIndicatorGroups,
+                originalReleaseSubject);
         }
 
         private async Task<Either<ActionResult, Unit>> RemoveOriginalSubjectAndFileFromRelease(

@@ -22,6 +22,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -31,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PreReleaseUserServiceTests
     {
-        private static readonly Guid _userId = Guid.NewGuid();
         private const string PreReleaseTemplateId = "prerelease-template-id";
 
         private static readonly DateTime PublishedScheduledStartOfDay =
@@ -1867,7 +1867,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 emailService ?? Mock.Of<IEmailService>(MockBehavior.Strict),
                 preReleaseService ?? Mock.Of<IPreReleaseService>(MockBehavior.Strict),
                 persistenceHelper ?? new PersistenceHelper<ContentDbContext>(context),
-                userService ?? AlwaysTrueUserService(_userId).Object,
+                userService ?? AlwaysTrueUserService().Object,
                 userRepository ?? new UserRepository(context),
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(context),

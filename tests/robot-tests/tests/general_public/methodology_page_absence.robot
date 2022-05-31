@@ -7,6 +7,7 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev
 
+
 *** Test Cases ***
 Navigate to Pupil absence in schools in England methodology page
     user navigates to public methodologies page
@@ -78,8 +79,7 @@ Search for "pupil"
     [Documentation]    EES-807
     user verifies accordion is closed    1. Overview of absence statistics
 
-    user clicks element    id:pageSearchForm-input
-    user presses keys    pupil
+    user enters text into element    id:pageSearchForm-input    pupil
     user waits until element contains    id:pageSearchForm-resultsLabel    Found 127 results
     user clicks element    id:pageSearchForm-option-0
 
@@ -92,7 +92,7 @@ Search for "specific enquiry"
     user verifies accordion is closed    7. Contacts
 
     user clears element text    id:pageSearchForm-input
-    user presses keys    specific enquiry    id:pageSearchForm-input
+    user enters text into element    id:pageSearchForm-input    specific enquiry
     user waits until element contains    id:pageSearchForm-resultsLabel    Found 1 result
     user clicks element    id:pageSearchForm-option-0
 

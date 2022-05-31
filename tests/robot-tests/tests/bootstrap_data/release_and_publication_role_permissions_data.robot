@@ -7,6 +7,7 @@
 # there is a unique Release for each combination of Release approval status available and Release / Publication role.
 #
 
+
 *** Settings ***
 Library             ../libs/admin_api.py
 Resource            ../libs/bootstrap_data/bootstrap_common.robot
@@ -18,6 +19,7 @@ Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
 Force Tags          BootstrapData    Local    Dev
+
 
 *** Test Cases ***
 Create test theme and topic
@@ -49,6 +51,7 @@ Create new publications and published releases - for Release Approver
     user creates releases in all states for publication    ${PUBLICATION_ID}    ${PUBLICATION_FOR_RELEASE_APPROVER}
     user gives release access to all releases of publication to analyst    ${PUBLICATION_FOR_RELEASE_APPROVER}
     ...    Approver
+
 
 *** Keywords ***
 user creates releases in all states for publication

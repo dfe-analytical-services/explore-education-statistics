@@ -9,9 +9,11 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=            UI tests - publish publication update %{RUN_IDENTIFIER}
 ${PUBLICATION_NAME_UPDATED}=    ${PUBLICATION_NAME} updated
+
 
 *** Test Cases ***
 Create Publication as bau1
@@ -52,13 +54,7 @@ Check publication is updated on dashboard
     ...    xpath://*[@data-testid="Contact phone number for ${PUBLICATION_NAME_UPDATED}" and text()="4321 4321"]
 
 Go to public release page
-    user navigates to find statistics page on public frontend
-    user waits until page contains accordion section    %{TEST_THEME_NAME}    %{WAIT_MEDIUM}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}    %{WAIT_MEDIUM}
-
-    user opens details dropdown    %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME_UPDATED}
+    user checks publication is on find statistics page    ${PUBLICATION_NAME_UPDATED}
     user clicks element    testid:View stats link for ${PUBLICATION_NAME_UPDATED}
     user waits until h1 is visible    ${PUBLICATION_NAME_UPDATED}    %{WAIT_MEDIUM}
 

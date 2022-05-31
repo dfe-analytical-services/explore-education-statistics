@@ -298,8 +298,8 @@ const ReleaseStatusForm = ({
           </Form>
           <ModalConfirm
             title="Confirm publish date"
-            onConfirm={() => {
-              form.submitForm();
+            onConfirm={async () => {
+              await form.submitForm();
               setShowScheduledConfirmModal(false);
             }}
             onExit={() => setShowScheduledConfirmModal(false)}

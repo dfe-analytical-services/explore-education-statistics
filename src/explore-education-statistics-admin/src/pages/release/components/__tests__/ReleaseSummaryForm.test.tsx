@@ -172,7 +172,7 @@ describe('ReleaseSummaryForm', () => {
       name: 'Create new release',
     });
 
-    userEvent.type(inputYear, '2');
+    await userEvent.type(inputYear, '2');
     userEvent.click(screen.getByLabelText(releaseTypes.AdHocStatistics));
     userEvent.click(buttonCreate);
 
@@ -226,7 +226,7 @@ describe('ReleaseSummaryForm', () => {
       name: 'Create new release',
     });
 
-    userEvent.type(inputYear, '202021');
+    await userEvent.type(inputYear, '202021');
     userEvent.click(screen.getByLabelText(releaseTypes.AdHocStatistics));
     userEvent.click(buttonCreate);
 
@@ -285,7 +285,7 @@ describe('ReleaseSummaryForm', () => {
       name: 'Create new release',
     });
 
-    userEvent.type(inputYear, '1966');
+    await userEvent.type(inputYear, '1966');
     userEvent.click(buttonCreate);
 
     await waitFor(() => {
@@ -378,7 +378,7 @@ describe('ReleaseSummaryForm', () => {
     const inputYear = screen.getByLabelText(
       testTimeIdentifiers[0].category.label,
     );
-    userEvent.type(inputYear, '1966');
+    await userEvent.type(inputYear, '1966');
 
     const radioOptionReleaseTypeNationalStats = screen.getByLabelText(
       releaseTypes.NationalStatistics,

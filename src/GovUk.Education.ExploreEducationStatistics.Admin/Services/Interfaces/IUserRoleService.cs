@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IUserRoleService
     {
-        Task<Either<ActionResult, Unit>> AddGlobalRole(string userId, string roleId);
+        Task<Either<ActionResult, Unit>> SetGlobalRole(string userId, string roleId);
 
         Task<Either<ActionResult, Unit>> AddPublicationRole(Guid userId, Guid publicationId, PublicationRole role);
 
@@ -26,8 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, List<UserPublicationRoleViewModel>>> GetPublicationRoles(Guid userId);
 
         Task<Either<ActionResult, List<UserReleaseRoleViewModel>>> GetReleaseRoles(Guid userId);
-
-        Task<Either<ActionResult, Unit>> RemoveGlobalRole(string userId, string roleId);
 
         Task<Either<ActionResult, Unit>> RemoveUserPublicationRole(Guid userPublicationRoleId);
 

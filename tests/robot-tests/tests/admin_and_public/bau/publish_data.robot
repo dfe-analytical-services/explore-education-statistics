@@ -9,6 +9,7 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${TOPIC_NAME}=                          %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=                    UI tests - publish data %{RUN_IDENTIFIER}
@@ -26,6 +27,7 @@ ${FOOTNOTE_SUBJECT_1_FILTER}=           Footnote for subject 1 - filter
 ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}=     Footnote for subject 1 - filter group
 ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}=      Footnote for subject 1 - filter item
 ${FOOTNOTE_SUBJECT_1_MIXTURE}=          Footnote for subject 1 - mixture of all
+
 
 *** Test Cases ***
 Create new publication and release via API
@@ -403,16 +405,8 @@ Approve release
     user clicks link    Sign off
     user approves original release for immediate publication
 
-User goes to public Find Statistics page
-    user navigates to find statistics page on public frontend
-
 Verify newly published release is on Find Statistics page
-    user waits until page contains accordion section    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    ${TOPIC_NAME}
-
-    user opens details dropdown    ${TOPIC_NAME}
-    user waits until details dropdown contains publication    ${TOPIC_NAME}    ${PUBLICATION_NAME}
+    user checks publication is on find statistics page    ${PUBLICATION_NAME}
     user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
     user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables
     user checks publication bullet does not contain link    ${PUBLICATION_NAME}    Statistics at DfE

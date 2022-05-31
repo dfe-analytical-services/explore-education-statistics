@@ -11,13 +11,40 @@ describe('Button', () => {
     expect(container.innerHTML).toMatchSnapshot();
   });
 
-  test('correctly sets disabled attributes', () => {
+  test('correctly sets attributes when `disabled = true`', () => {
     render(<Button disabled>Test button</Button>);
 
     const button = screen.getByRole('button', { name: 'Test button' });
 
-    expect(button).toHaveAttribute('disabled');
-    expect(button).toHaveAttribute('aria-disabled', 'true');
+    expect(button).toBeDisabled();
+    expect(button).toBeAriaDisabled();
+    expect(button).not.toHaveAttribute('aria-describedby');
+  });
+
+  test('correctly sets attributes when `ariaDisabled = true`', () => {
+    render(
+      <Button ariaDisabled id="test-button">
+        Test button
+      </Button>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Test button' });
+
+    expect(button).not.toBeDisabled();
+    expect(button).toBeAriaDisabled();
+  });
+
+  test('correctly sets attributes when using both `disabled` and `ariaDisabled`', () => {
+    render(
+      <Button disabled ariaDisabled id="test-button">
+        Test button
+      </Button>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Test button' });
+
+    expect(button).not.toBeDisabled();
+    expect(button).toBeAriaDisabled();
   });
 
   test('disabled if current `onClick` handler is processing', async () => {

@@ -93,7 +93,7 @@ describe('FormFieldset', () => {
     const group = screen.getByRole('group');
     expect(group).toHaveAttribute('id', 'test-fieldset');
 
-    const describingElements = getAllDescribedBy(group, group);
+    const describingElements = getAllDescribedBy(group);
 
     expect(describingElements).toHaveLength(2);
     expect(describingElements[0]).toHaveAttribute('id', 'test-fieldset-error');
@@ -155,7 +155,7 @@ describe('FormFieldset', () => {
     const group = screen.getByRole('group');
     expect(group).toHaveAttribute('id', 'testForm-test-fieldset');
 
-    const describingElements = getAllDescribedBy(group, group);
+    const describingElements = getAllDescribedBy(group);
 
     expect(describingElements).toHaveLength(2);
     expect(describingElements[0]).toHaveAttribute(

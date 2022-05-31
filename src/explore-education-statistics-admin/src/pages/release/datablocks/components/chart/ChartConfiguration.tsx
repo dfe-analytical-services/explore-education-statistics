@@ -72,7 +72,11 @@ const ChartConfiguration = ({
   onChange,
   onSubmit,
 }: Props) => {
-  const { hasSubmitted, updateForm, submit } = useChartBuilderFormsContext();
+  const {
+    hasSubmitted,
+    updateForm,
+    submitForms,
+  } = useChartBuilderFormsContext();
 
   const validationSchema = useMemo<ObjectSchema<FormValues>>(() => {
     let schema: ObjectSchema<FormValues> = Yup.object<FormValues>({
@@ -187,9 +191,9 @@ const ChartConfiguration = ({
       }
       validateOnMount
       validationSchema={validationSchema}
-      onSubmit={values => {
+      onSubmit={async values => {
         onSubmit(normalizeValues(values));
-        submit();
+        await submitForms();
       }}
     >
       {form => {
@@ -318,7 +322,11 @@ const ChartConfiguration = ({
               </FormGroup>
             )}
 
-            <ChartBuilderSaveActions formId={formId} formKey="options">
+            <ChartBuilderSaveActions
+              formId={formId}
+              formKey="options"
+              disabled={form.isSubmitting}
+            >
               {buttons}
             </ChartBuilderSaveActions>
           </Form>

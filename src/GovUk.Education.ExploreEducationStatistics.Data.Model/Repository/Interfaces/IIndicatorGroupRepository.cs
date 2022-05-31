@@ -1,11 +1,12 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
 {
-    public interface IIndicatorGroupRepository : IRepository<IndicatorGroup, Guid>
+    public interface IIndicatorGroupRepository
     {
-        List<IndicatorGroup> GetIndicatorGroups(Guid subjectId);
+        Task<List<IndicatorGroup>> GetIndicatorGroups(Guid subjectId);
     }
 }

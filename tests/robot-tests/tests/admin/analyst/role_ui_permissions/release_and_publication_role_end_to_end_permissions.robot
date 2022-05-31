@@ -10,11 +10,13 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData    Footnotes
 
+
 *** Variables ***
 ${PUBLICATION_NAME}     UI tests - publication_owner %{RUN_IDENTIFIER}
 ${RELEASE_TYPE}         Academic Year 2025/26
 ${RELEASE_NAME}         ${PUBLICATION_NAME} - ${RELEASE_TYPE}
 ${SUBJECT_NAME}         UI test subject
+
 
 *** Test Cases ***
 Create new publication and release via API

@@ -175,7 +175,19 @@ export const testEditableRelease: EditableRelease = {
         type: 'DataBlock',
         id: 'e2db1389-8220-41f0-a29a-bb8dd1ccfc9c',
         order: 0,
-        comments: [],
+        comments: [
+          {
+            id: 'comment-3',
+            content: 'Test comment 3',
+            createdBy: {
+              id: 'user-1',
+              firstName: 'Bau1',
+              lastName: '',
+              email: 'bau1@test.com',
+            },
+            created: '2020-03-09T12:00:00.000',
+          },
+        ],
       },
       {
         heading:

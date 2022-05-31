@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
@@ -16,13 +17,16 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -35,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         };
 
         [Fact]
-        public async Task AddGlobalRole()
+        public async Task SetGlobalRole()
         {
             var user = new ApplicationUser
             {
@@ -44,7 +48,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var role = new IdentityRole
             {
-                Id = Guid.NewGuid().ToString()
+                Id = Guid.NewGuid().ToString(),
+                Name = "Role"
             };
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -58,10 +63,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var userManager = MockUserManager();
 
-            userManager.Setup(mock => mock.AddToRoleAsync(
-                    It.Is<ApplicationUser>(
-                        applicationUser => applicationUser.Id == user.Id),
-                    role.Name))
+            userManager
+                .Setup(mock => mock.GetRolesAsync(ItIsUser(user)))
+                .ReturnsAsync(new List<string>());
+            
+            userManager.Setup(mock => 
+                    mock.AddToRoleAsync(ItIsUser(user), role.Name))
                 .ReturnsAsync(new IdentityResult());
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
@@ -70,9 +77,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object);
 
-                var result = await service.AddGlobalRole(user.Id, role.Id);
+                var result = await service.SetGlobalRole(user.Id, role.Id);
 
-                Assert.True(result.IsRight);
+                VerifyAllMocks(userManager);
+
+                result.AssertRight();
 
                 userManager.Verify(mock => mock.AddToRoleAsync(
                         It.Is<ApplicationUser>(
@@ -80,13 +89,126 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         role.Name),
                     Times.Once);
             }
-
-            userManager.VerifySet(mock => mock.Logger = null, Times.Once());
-            VerifyAllMocks(userManager);
         }
 
         [Fact]
-        public async Task AddGlobalRole_NoRole()
+        public async Task SetGlobalRole_AlreadyHasSameRole()
+        {
+            var user = new ApplicationUser
+            {
+                Id = Guid.NewGuid().ToString()
+            };
+
+            var role = new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Role"
+            };
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.AddAsync(user);
+                await userAndRolesDbContext.AddAsync(role);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            userManager
+                .Setup(mock => mock.GetRolesAsync(
+                    ItIsUser(user)))
+                .ReturnsAsync(ListOf(role.Name));
+            
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.SetGlobalRole(user.Id, role.Id);
+
+                VerifyAllMocks(userManager);
+
+                result.AssertRight();
+
+                VerifyAllMocks(userManager);
+            }
+        }
+
+        [Fact]
+        public async Task SetGlobalRole_AlreadyHasAnotherRole()
+        {
+            var user = new ApplicationUser
+            {
+                Id = Guid.NewGuid().ToString()
+            };
+
+            var newRole = new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "New Role"
+            };
+            
+            var existingRole = new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = "Existing Role"
+            };
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.AddAsync(user);
+                await userAndRolesDbContext.AddRangeAsync(newRole, existingRole);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here we are setting up the user so that they have a different Global Role currently assigned
+            // than the new one being set.  They will have the existing one removed and the new one added.
+            userManager
+                .Setup(mock => mock.GetRolesAsync(
+                    ItIsUser(user)))
+                .ReturnsAsync(ListOf(existingRole.Name));
+
+            userManager
+                .Setup(mock => mock.AddToRoleAsync(
+                    ItIsUser(user), newRole.Name))
+                .ReturnsAsync(new IdentityResult());
+            
+            userManager
+                .Setup(mock => mock.RemoveFromRolesAsync(
+                    ItIsUser(user), ItIs.ListSequenceEqualTo(ListOf(existingRole.Name))))
+                .ReturnsAsync(new IdentityResult());
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.SetGlobalRole(user.Id, newRole.Id);
+
+                VerifyAllMocks(userManager);
+
+                result.AssertRight();
+
+                VerifyAllMocks(userManager);
+            }
+        }
+
+        private static ApplicationUser ItIsUser(ApplicationUser user)
+        {
+            return It.Is<ApplicationUser>(
+                applicationUser => applicationUser.Id == user.Id);
+        }
+
+        [Fact]
+        public async Task SetGlobalRole_NoRole()
         {
             var user = new ApplicationUser
             {
@@ -109,7 +231,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object);
 
-                var result = await service.AddGlobalRole(user.Id, Guid.NewGuid().ToString());
+                var result = await service.SetGlobalRole(user.Id, Guid.NewGuid().ToString());
 
                 result.AssertNotFound();
             }
@@ -119,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task AddGlobalRole_NoUser()
+        public async Task SetGlobalRole_NoUser()
         {
             var role = new IdentityRole
             {
@@ -142,12 +264,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     usersAndRolesDbContext: userAndRolesDbContext,
                     userManager: userManager.Object);
 
-                var result = await service.AddGlobalRole(Guid.NewGuid().ToString(), role.Id);
+                var result = await service.SetGlobalRole(Guid.NewGuid().ToString(), role.Id);
 
                 result.AssertNotFound();
             }
 
-            userManager.VerifySet(mock => mock.Logger = null, Times.Once());
             VerifyAllMocks(userManager);
         }
 
@@ -176,7 +297,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
 
             emailTemplateService.Setup(mock =>
                     mock.SendPublicationRoleEmail(user.Email,
@@ -184,14 +305,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Owner))
                 .Returns(Unit.Instance);
 
+            var userManager = MockUserManager();
+
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(user)))
+                .ReturnsAsync(ListOf(RoleNames.Analyst));
+
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext,
-                    emailTemplateService: emailTemplateService.Object);
+                    emailTemplateService: emailTemplateService.Object,
+                    userManager: userManager.Object);
 
                 var result = await service.AddPublicationRole(userId, publication.Id, Owner);
+
+                VerifyAllMocks(emailTemplateService, userManager);
 
                 result.AssertRight();
 
@@ -204,20 +334,267 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles
-                    .AsQueryable()
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
                     .ToListAsync();
-                Assert.Single(userPublicationRoles);
+                
+                var assignedRole = Assert.Single(userPublicationRoles);
 
-                Assert.NotEqual(Guid.Empty, userPublicationRoles[0].Id);
-                Assert.Equal(userId, userPublicationRoles[0].UserId);
-                Assert.Equal(publication.Id, userPublicationRoles[0].PublicationId);
-                Assert.Equal(Owner, userPublicationRoles[0].Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(userPublicationRoles[0].Created).Milliseconds, 0, 1500);
-                Assert.Equal(_user.Id, userPublicationRoles[0].CreatedById);
+                Assert.NotEqual(Guid.Empty, assignedRole.Id);
+                Assert.Equal(userId, assignedRole.UserId);
+                Assert.Equal(publication.Id, assignedRole.PublicationId);
+                Assert.Equal(Owner, assignedRole.Role);
+                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, assignedRole.CreatedById);
+            }
+        }
+
+        [Fact]
+        public async Task AddPublicationRole_AssignedAnalystGlobalRole()
+        {
+            var userId = Guid.NewGuid();
+
+            var user = new ApplicationUser
+            {
+                Id = userId.ToString()
+            };
+
+            var publication = new Publication();
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await userAndRolesDbContext.AddAsync(user);
+                await userAndRolesDbContext.SaveChangesAsync();
+
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
             }
 
-            VerifyAllMocks(emailTemplateService);
+            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
+
+            emailTemplateService.Setup(mock =>
+                    mock.SendPublicationRoleEmail(user.Email,
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        Owner))
+                .Returns(Unit.Instance);
+
+            var userManager = MockUserManager();
+
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(user)))
+                .ReturnsAsync(new List<string>());
+
+            userManager
+                .Setup(s => s.AddToRoleAsync(ItIsUser(user), RoleNames.Analyst))
+                .ReturnsAsync(new IdentityResult());
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
+                    contentDbContext: contentDbContext,
+                    emailTemplateService: emailTemplateService.Object,
+                    userManager: userManager.Object);
+
+                var result = await service.AddPublicationRole(userId, publication.Id, Owner);
+
+                VerifyAllMocks(emailTemplateService, userManager);
+
+                result.AssertRight();
+
+                emailTemplateService.Verify(mock =>
+                        mock.SendPublicationRoleEmail(user.Email,
+                            It.Is<Publication>(p => p.Id == publication.Id),
+                            Owner),
+                    Times.Once);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
+                    .ToListAsync();
+
+                var assignedRole = Assert.Single(userPublicationRoles);
+
+                Assert.NotEqual(Guid.Empty, assignedRole.Id);
+                Assert.Equal(userId, assignedRole.UserId);
+                Assert.Equal(publication.Id, assignedRole.PublicationId);
+                Assert.Equal(Owner, assignedRole.Role);
+                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, assignedRole.CreatedById);
+            }
+        }
+
+        [Fact]
+        public async Task AddPublicationRole_HasHigherGlobalRoleThanAnalyst()
+        {
+            var userId = Guid.NewGuid();
+
+            var user = new ApplicationUser
+            {
+                Id = userId.ToString()
+            };
+
+            var publication = new Publication();
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await userAndRolesDbContext.AddAsync(user);
+                await userAndRolesDbContext.SaveChangesAsync();
+
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
+
+            emailTemplateService.Setup(mock =>
+                    mock.SendPublicationRoleEmail(user.Email,
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        Owner))
+                .Returns(Unit.Instance);
+
+            var userManager = MockUserManager();
+
+            // Here we are testing that if the user already has a higher-powered role than Analyst, there's no need
+            // to assign them the lower-powered Analyst role.
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(user)))
+                .ReturnsAsync(ListOf(RoleNames.BauUser));
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
+                    contentDbContext: contentDbContext,
+                    emailTemplateService: emailTemplateService.Object,
+                    userManager: userManager.Object);
+
+                var result = await service.AddPublicationRole(userId, publication.Id, Owner);
+
+                VerifyAllMocks(emailTemplateService, userManager);
+
+                result.AssertRight();
+
+                emailTemplateService.Verify(mock =>
+                        mock.SendPublicationRoleEmail(user.Email,
+                            It.Is<Publication>(p => p.Id == publication.Id),
+                            Owner),
+                    Times.Once);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
+                    .ToListAsync();
+
+                var assignedRole = Assert.Single(userPublicationRoles);
+
+                Assert.NotEqual(Guid.Empty, assignedRole.Id);
+                Assert.Equal(userId, assignedRole.UserId);
+                Assert.Equal(publication.Id, assignedRole.PublicationId);
+                Assert.Equal(Owner, assignedRole.Role);
+                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, assignedRole.CreatedById);
+            }
+        }
+
+        [Fact]
+        public async Task AddPublicationRole_HasLowerGlobalRoleThanAnalyst()
+        {
+            var userId = Guid.NewGuid();
+
+            var user = new ApplicationUser
+            {
+                Id = userId.ToString()
+            };
+
+            var publication = new Publication();
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await userAndRolesDbContext.AddAsync(user);
+                await userAndRolesDbContext.SaveChangesAsync();
+
+                await contentDbContext.Publications.AddAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
+
+            emailTemplateService.Setup(mock =>
+                    mock.SendPublicationRoleEmail(user.Email,
+                        It.Is<Publication>(p => p.Id == publication.Id),
+                        Owner))
+                .Returns(Unit.Instance);
+
+            var userManager = MockUserManager();
+
+            // Here we are checking to see that the user is "upgraded" to the higher-powered Analyst role by their
+            // existing PrereleaseUser role being removed and the higher-powered Analyst role being added. 
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(user)))
+                .ReturnsAsync(ListOf(RoleNames.PrereleaseUser));
+            
+            userManager
+                .Setup(s => s.AddToRoleAsync(ItIsUser(user), RoleNames.Analyst))
+                .ReturnsAsync(new IdentityResult());
+
+            userManager
+                .Setup(s => s.RemoveFromRolesAsync(ItIsUser(user), 
+                    ItIs.ListSequenceEqualTo(ListOf(RoleNames.PrereleaseUser))))
+                .ReturnsAsync(new IdentityResult());
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
+                    contentDbContext: contentDbContext,
+                    emailTemplateService: emailTemplateService.Object,
+                    userManager: userManager.Object);
+
+                var result = await service.AddPublicationRole(userId, publication.Id, Owner);
+
+                VerifyAllMocks(emailTemplateService, userManager);
+
+                result.AssertRight();
+
+                emailTemplateService.Verify(mock =>
+                        mock.SendPublicationRoleEmail(user.Email,
+                            It.Is<Publication>(p => p.Id == publication.Id),
+                            Owner),
+                    Times.Once);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
+                    .ToListAsync();
+
+                var assignedRole = Assert.Single(userPublicationRoles);
+
+                Assert.NotEqual(Guid.Empty, assignedRole.Id);
+                Assert.Equal(userId, assignedRole.UserId);
+                Assert.Equal(publication.Id, assignedRole.PublicationId);
+                Assert.Equal(Owner, assignedRole.Role);
+                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, assignedRole.CreatedById);
+            }
         }
 
         [Fact]
@@ -236,7 +613,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 UserId = userId,
                 Publication = publication,
-                Role = Owner
+                Role = Owner,
+                CreatedById = _user.Id
             };
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -266,12 +644,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles
-                    .AsQueryable()
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
                     .ToListAsync();
-                Assert.Single(userPublicationRoles);
+                
+                var assignedRole = Assert.Single(userPublicationRoles);
 
-                Assert.Equal(userPublicationRole.Id, userPublicationRoles[0].Id);
+                Assert.NotEqual(Guid.Empty, assignedRole.Id);
+                Assert.Equal(userId, assignedRole.UserId);
+                Assert.Equal(publication.Id, assignedRole.PublicationId);
+                Assert.Equal(Owner, assignedRole.Role);
+                Assert.InRange(DateTime.UtcNow.Subtract(assignedRole.Created).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
 
@@ -302,9 +686,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles
-                    .AsQueryable()
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
                     .ToListAsync();
+                
                 Assert.Empty(userPublicationRoles);
             }
         }
@@ -341,9 +726,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles
-                    .AsQueryable()
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
                     .ToListAsync();
+                
                 Assert.Empty(userPublicationRoles);
             }
         }
@@ -376,7 +762,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var emailTemplateService = new Mock<IEmailTemplateService>(MockBehavior.Strict);
+            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
 
             emailTemplateService.Setup(mock =>
                     mock.SendReleaseRoleEmail(user.Email,
@@ -384,14 +770,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Contributor))
                 .Returns(Unit.Instance);
 
+            var userManager = MockUserManager();
+
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(user)))
+                .ReturnsAsync(ListOf(RoleNames.Analyst));
+            
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
                     contentDbContext: contentDbContext,
-                    emailTemplateService: emailTemplateService.Object);
+                    emailTemplateService: emailTemplateService.Object,
+                    userManager: userManager.Object);
 
                 var result = await service.AddReleaseRole(userId, release.Id, Contributor);
+
+                VerifyAllMocks(emailTemplateService, userManager);
 
                 result.AssertRight();
 
@@ -404,23 +799,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles
-                    .AsQueryable()
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
                     .ToListAsync();
-                Assert.Single(userReleaseRoles);
+                
+                var assignedRole = Assert.Single(userReleaseRoles);
 
-                Assert.NotEqual(Guid.Empty, userReleaseRoles[0].Id);
-                Assert.Equal(userId, userReleaseRoles[0].UserId);
-                Assert.Equal(release.Id, userReleaseRoles[0].ReleaseId);
-                Assert.Equal(Contributor, userReleaseRoles[0].Role);
-                Assert.Equal(_user.Id, userReleaseRoles[0].CreatedById);
+                Assert.NotEqual(Guid.Empty, assignedRole.Id);
+                Assert.Equal(userId, assignedRole.UserId);
+                Assert.Equal(release.Id, assignedRole.ReleaseId);
+                Assert.Equal(Contributor, assignedRole.Role);
+                Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
-
-            VerifyAllMocks(emailTemplateService);
         }
 
         [Fact]
-        public async Task AddReleaseRole_UserAlreadyHasRole()
+        public async Task AddReleaseRole_UserAlreadyHasReleaseRole()
         {
             var userId = Guid.NewGuid();
 
@@ -438,7 +832,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 UserId = userId,
                 Release = release,
-                Role = Contributor
+                Role = Contributor,
+                CreatedById = _user.Id
             };
 
             var userAndRolesDbContextId = Guid.NewGuid().ToString();
@@ -468,12 +863,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles
-                    .AsQueryable()
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
                     .ToListAsync();
-                Assert.Single(userReleaseRoles);
-
-                Assert.Equal(userReleaseRole.Id, userReleaseRoles[0].Id);
+                
+                var assignedRole = Assert.Single(userReleaseRoles);
+                
+                Assert.NotEqual(Guid.Empty, assignedRole.Id);
+                Assert.Equal(userId, assignedRole.UserId);
+                Assert.Equal(release.Id, assignedRole.ReleaseId);
+                Assert.Equal(Contributor, assignedRole.Role);
+                Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
 
@@ -507,9 +907,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles
-                    .AsQueryable()
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
                     .ToListAsync();
+                
                 Assert.Empty(userReleaseRoles);
             }
         }
@@ -546,10 +947,266 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles
-                    .AsQueryable()
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
                     .ToListAsync();
+                
                 Assert.Empty(userReleaseRoles);
+            }
+        }
+        
+        [Fact]
+        public async Task AddReleaseRole_AssignedAnalystGlobalRole()
+        {
+            var userId = Guid.NewGuid();
+
+            var user = new ApplicationUser
+            {
+                Id = userId.ToString()
+            };
+
+            var release = new Release
+            {
+                Publication = new Publication()
+            };
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await userAndRolesDbContext.AddAsync(user);
+                await userAndRolesDbContext.SaveChangesAsync();
+
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
+
+            emailTemplateService.Setup(mock =>
+                    mock.SendReleaseRoleEmail(user.Email,
+                        It.Is<Release>(r => r.Id == release.Id),
+                        Contributor))
+                .Returns(Unit.Instance);
+
+            var userManager = MockUserManager();
+
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(user)))
+                .ReturnsAsync(new List<string>());
+            
+            userManager
+                .Setup(s => s.AddToRoleAsync(ItIsUser(user), RoleNames.Analyst))
+                .ReturnsAsync(new IdentityResult());
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    contentDbContext: contentDbContext,
+                    emailTemplateService: emailTemplateService.Object,
+                    userManager: userManager.Object);
+
+                var result = await service.AddReleaseRole(userId, release.Id, Contributor);
+                
+                emailTemplateService.Verify(mock =>
+                        mock.SendReleaseRoleEmail(user.Email,
+                            It.Is<Release>(p => p.Id == release.Id),
+                            Contributor),
+                    Times.Once);
+                VerifyAllMocks(emailTemplateService, userManager);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
+                    .ToListAsync();
+
+                var assignedRole = Assert.Single(userReleaseRoles);
+
+                Assert.NotEqual(Guid.Empty, assignedRole.Id);
+                Assert.Equal(userId, assignedRole.UserId);
+                Assert.Equal(release.Id, assignedRole.ReleaseId);
+                Assert.Equal(Contributor, assignedRole.Role);
+                Assert.Equal(_user.Id, assignedRole.CreatedById);
+            }
+        }
+
+        [Fact]
+        public async Task AddReleaseRole_HasLowerGlobalRoleThanAnalyst()
+        {
+            var userId = Guid.NewGuid();
+
+            var user = new ApplicationUser
+            {
+                Id = userId.ToString()
+            };
+
+            var release = new Release
+            {
+                Publication = new Publication()
+            };
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await userAndRolesDbContext.AddAsync(user);
+                await userAndRolesDbContext.SaveChangesAsync();
+
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
+
+            emailTemplateService.Setup(mock =>
+                    mock.SendReleaseRoleEmail(user.Email,
+                        It.Is<Release>(r => r.Id == release.Id),
+                        Contributor))
+                .Returns(Unit.Instance);
+
+            var userManager = MockUserManager();
+
+            // Here we are checking to see that the user is "upgraded" to the higher-powered Analyst role by their
+            // existing PrereleaseUser role being removed and the higher-powered Analyst role being added. 
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(user)))
+                .ReturnsAsync(ListOf(RoleNames.PrereleaseUser));
+            
+            userManager
+                .Setup(s => s.AddToRoleAsync(ItIsUser(user), RoleNames.Analyst))
+                .ReturnsAsync(new IdentityResult());
+
+            userManager
+                .Setup(s => s.RemoveFromRolesAsync(ItIsUser(user), 
+                        ItIs.ListSequenceEqualTo(ListOf(RoleNames.PrereleaseUser))))
+                .ReturnsAsync(new IdentityResult());
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    contentDbContext: contentDbContext,
+                    emailTemplateService: emailTemplateService.Object,
+                    userManager: userManager.Object);
+
+                var result = await service.AddReleaseRole(userId, release.Id, Contributor);
+                
+                VerifyAllMocks(emailTemplateService, userManager);
+                
+                emailTemplateService.Verify(mock =>
+                        mock.SendReleaseRoleEmail(user.Email,
+                            It.Is<Release>(p => p.Id == release.Id),
+                            Contributor),
+                    Times.Once);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
+                    .ToListAsync();
+
+                var assignedRole = Assert.Single(userReleaseRoles);
+
+                Assert.NotEqual(Guid.Empty, assignedRole.Id);
+                Assert.Equal(userId, assignedRole.UserId);
+                Assert.Equal(release.Id, assignedRole.ReleaseId);
+                Assert.Equal(Contributor, assignedRole.Role);
+                Assert.Equal(_user.Id, assignedRole.CreatedById);
+            }
+        }
+
+        [Fact]
+        public async Task AddReleaseRole_HasHigherGlobalRoleThanAnalyst()
+        {
+            var userId = Guid.NewGuid();
+
+            var user = new ApplicationUser
+            {
+                Id = userId.ToString()
+            };
+
+            var release = new Release
+            {
+                Publication = new Publication()
+            };
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await userAndRolesDbContext.AddAsync(user);
+                await userAndRolesDbContext.SaveChangesAsync();
+
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
+
+            emailTemplateService.Setup(mock =>
+                    mock.SendReleaseRoleEmail(user.Email,
+                        It.Is<Release>(r => r.Id == release.Id),
+                        Contributor))
+                .Returns(Unit.Instance);
+
+            var userManager = MockUserManager();
+
+            // Here we are testing that if the user already has a higher-powered role than Analyst, there's no need
+            // to assign them the lower-powered Analyst role.
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(user)))
+                .ReturnsAsync(ListOf(RoleNames.BauUser));
+            
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    contentDbContext: contentDbContext,
+                    emailTemplateService: emailTemplateService.Object,
+                    userManager: userManager.Object);
+
+                var result = await service.AddReleaseRole(userId, release.Id, Contributor);
+                
+                emailTemplateService.Verify(mock =>
+                        mock.SendReleaseRoleEmail(user.Email,
+                            It.Is<Release>(p => p.Id == release.Id),
+                            Contributor),
+                    Times.Once);
+                VerifyAllMocks(emailTemplateService, userManager);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
+                    .ToListAsync();
+
+                var assignedRole = Assert.Single(userReleaseRoles);
+
+                Assert.NotEqual(Guid.Empty, assignedRole.Id);
+                Assert.Equal(userId, assignedRole.UserId);
+                Assert.Equal(release.Id, assignedRole.ReleaseId);
+                Assert.Equal(Contributor, assignedRole.Role);
+                Assert.Equal(_user.Id, assignedRole.CreatedById);
             }
         }
 
@@ -585,7 +1242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetAllGlobalRoles();
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 var globalRoles = result.Right.ToList();
                 Assert.Equal(2, globalRoles.Count);
@@ -607,7 +1264,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var result = await service.GetAllResourceRoles();
 
-            Assert.True(result.IsRight);
+            result.AssertRight();
 
             Assert.True(result.Right.ContainsKey("Publication"));
             Assert.True(result.Right.ContainsKey("Release"));
@@ -675,7 +1332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetGlobalRoles(user.Id);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 var globalRoles = result.Right;
                 Assert.Equal(2, globalRoles.Count);
@@ -693,14 +1350,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetGlobalRoles_NoUser()
         {
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
-            {
-                var service = SetupUserRoleService(
-                    usersAndRolesDbContext: userAndRolesDbContext);
+            await using var userAndRolesDbContext = InMemoryUserAndRolesDbContext();
+            var service = SetupUserRoleService(
+                usersAndRolesDbContext: userAndRolesDbContext);
 
-                var result = await service.GetGlobalRoles(Guid.NewGuid().ToString());
-                result.AssertNotFound();
-            }
+            var result = await service.GetGlobalRoles(Guid.NewGuid().ToString());
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -757,7 +1412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetPublicationRoles(user.Id);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 var userPublicationRoles = result.Right;
                 Assert.Equal(2, userPublicationRoles.Count);
@@ -850,7 +1505,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetReleaseRoles(user.Id);
 
-                Assert.True(result.IsRight);
+                result.AssertRight();
 
                 var userReleaseRoles = result.Right;
                 Assert.Equal(2, userReleaseRoles.Count);
@@ -881,130 +1536,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task RemoveGlobalRole()
-        {
-            var user = new ApplicationUser
-            {
-                Id = Guid.NewGuid().ToString()
-            };
-
-            var role = new IdentityRole
-            {
-                Id = Guid.NewGuid().ToString()
-            };
-
-            var userAndRolesDbContextId = Guid.NewGuid().ToString();
-
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                await userAndRolesDbContext.AddAsync(user);
-                await userAndRolesDbContext.AddAsync(role);
-                await userAndRolesDbContext.SaveChangesAsync();
-            }
-
-            var userManager = MockUserManager();
-
-            userManager.Setup(mock => mock.RemoveFromRoleAsync(
-                    It.Is<ApplicationUser>(
-                        applicationUser => applicationUser.Id == user.Id),
-                    role.Name))
-                .ReturnsAsync(new IdentityResult());
-
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
-                    userManager: userManager.Object);
-
-                var result = await service.RemoveGlobalRole(user.Id, role.Id);
-
-                Assert.True(result.IsRight);
-
-                userManager.Verify(mock => mock.RemoveFromRoleAsync(
-                        It.Is<ApplicationUser>(
-                            applicationUser => applicationUser.Id == user.Id),
-                        role.Name),
-                    Times.Once);
-            }
-
-            userManager.VerifySet(mock => mock.Logger = null, Times.Once());
-            VerifyAllMocks(userManager);
-        }
-
-        [Fact]
-        public async Task RemoveGlobalRole_NoUser()
-        {
-            var role = new IdentityRole
-            {
-                Id = Guid.NewGuid().ToString()
-            };
-
-            var userAndRolesDbContextId = Guid.NewGuid().ToString();
-
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                await userAndRolesDbContext.AddAsync(role);
-                await userAndRolesDbContext.SaveChangesAsync();
-            }
-
-            var userManager = MockUserManager();
-
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
-                    userManager: userManager.Object);
-
-                var result = await service.RemoveGlobalRole(Guid.NewGuid().ToString(), role.Id);
-
-                result.AssertNotFound();
-            }
-
-            userManager.VerifySet(mock => mock.Logger = null, Times.Once());
-            VerifyAllMocks(userManager);
-        }
-
-        [Fact]
-        public async Task RemoveGlobalRole_NoRole()
-        {
-            var user = new ApplicationUser
-            {
-                Id = Guid.NewGuid().ToString()
-            };
-
-            var userAndRolesDbContextId = Guid.NewGuid().ToString();
-
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                await userAndRolesDbContext.AddAsync(user);
-                await userAndRolesDbContext.SaveChangesAsync();
-            }
-
-            var userManager = MockUserManager();
-
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext,
-                    userManager: userManager.Object);
-
-                var result = await service.RemoveGlobalRole(user.Id, Guid.NewGuid().ToString());
-
-                result.AssertNotFound();
-            }
-
-            userManager.VerifySet(mock => mock.Logger = null, Times.Once());
-            VerifyAllMocks(userManager);
-        }
-
-        [Fact]
         public async Task RemoveUserPublicationRole()
         {
+            var user = new User
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var identityUser = new ApplicationUser
+            {
+                Id = user.Id.ToString()
+            };
+            
             var userPublicationRole = new UserPublicationRole
             {
-                User = new User(),
-                Publication = new Publication(),
+                User = user,
+                PublicationId = Guid.NewGuid(),
                 Role = Owner
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1012,20 +1564,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(contentDbContext: contentDbContext);
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .ReturnsAsync(ListOf(RoleNames.Analyst));
+
+            userManager
+                .Setup(s => s.RemoveFromRolesAsync(
+                    ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
+                .ReturnsAsync(new IdentityResult());
+            
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
 
                 var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
 
-                Assert.True(result.IsRight);
+                VerifyAllMocks(userManager);
+                
+                result.AssertRight();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userPublicationRoles = await contentDbContext.UserPublicationRoles
-                    .AsQueryable()
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
                     .ToListAsync();
+                
                 Assert.Empty(userPublicationRoles);
             }
         }
@@ -1033,30 +1609,348 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserPublicationRole_NoUserPublicationRole()
         {
-            await using (var contentDbContext = InMemoryApplicationDbContext())
+            await using var contentDbContext = InMemoryApplicationDbContext();
+            var service = SetupUserRoleService(contentDbContext: contentDbContext);
+
+            var result = await service.RemoveUserPublicationRole(Guid.NewGuid());
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task RemoveUserPublicationRole_HasHigherGlobalRoleThanAnalyst()
+        {
+            var user = new User
             {
-                var service = SetupUserRoleService(contentDbContext: contentDbContext);
+                Id = Guid.NewGuid()
+            };
 
-                var result = await service.RemoveUserPublicationRole(Guid.NewGuid());
+            var identityUser = new ApplicationUser
+            {
+                Id = user.Id.ToString()
+            };
+            
+            var userPublicationRole = new UserPublicationRole
+            {
+                User = user,
+                PublicationId = Guid.NewGuid(),
+                Role = Owner
+            };
 
-                result.AssertNotFound();
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the BAU role, which is higher-powered than Analyst, so we will test that they remain 
+            // a BAU user and do not have any roles removed.
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .ReturnsAsync(ListOf(RoleNames.BauUser));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
+
+                VerifyAllMocks(userManager);
+                
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
+                    .ToListAsync();
+                
+                Assert.Empty(userPublicationRoles);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveUserPublicationRole_AnalystRoleStillRequiredForOtherPublications()
+        {
+            var user = new User
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var identityUser = new ApplicationUser
+            {
+                Id = user.Id.ToString()
+            };
+
+            var userPublicationRole = new UserPublicationRole
+            {
+                User = user,
+                PublicationId = Guid.NewGuid(),
+                Role = Owner
+            };
+
+            var anotherUserPublicationRole = new UserPublicationRole
+            {
+                User = user,
+                PublicationId = Guid.NewGuid(),
+                Role = Owner
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.UserPublicationRoles.AddRangeAsync(
+                    userPublicationRole, anotherUserPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the Analyst role currently.  We will test that they retain the Analyst role  because 
+            // they still have need of it in other Publication roles.
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .ReturnsAsync(ListOf(RoleNames.Analyst));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
+
+                VerifyAllMocks(userManager);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
+                    .ToListAsync();
+
+                var remainingPublicationRole = Assert.Single(userPublicationRoles);
+                Assert.Equal(anotherUserPublicationRole.PublicationId, remainingPublicationRole.PublicationId);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveUserPublicationRole_AnalystRoleStillRequiredForOtherReleases()
+        {
+            var user = new User
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var identityUser = new ApplicationUser
+            {
+                Id = user.Id.ToString()
+            };
+
+            var userPublicationRole = new UserPublicationRole
+            {
+                User = user,
+                PublicationId = Guid.NewGuid(),
+                Role = Owner
+            };
+
+            var userReleaseRole = new UserReleaseRole
+            {
+                User = user,
+                Role = Approver
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
+                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the Analyst role currently.  We will test that they retain the Analyst role because 
+            // they still have need of it in other Release roles.
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .ReturnsAsync(ListOf(RoleNames.Analyst));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
+
+                VerifyAllMocks(userManager);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
+                    .ToListAsync();
+                
+                Assert.Empty(userPublicationRoles);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveUserPublicationRole_DowngradeToPrereleaseRole()
+        {
+            var user = new User
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var identityUser = new ApplicationUser
+            {
+                Id = user.Id.ToString()
+            };
+            
+            var userPublicationRole = new UserPublicationRole
+            {
+                User = user,
+                PublicationId = Guid.NewGuid(),
+                Role = Owner
+            };
+            
+            var prereleaseRole = new UserReleaseRole
+            {
+                User = user,
+                Role = PrereleaseViewer
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
+                await contentDbContext.UserReleaseRoles.AddAsync(prereleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the Analyst role currently.  We will test that they lose the Analyst role but gain the
+            // PrereleaseUser role, as they have need of this role elsewhere.
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .ReturnsAsync(ListOf(RoleNames.Analyst));
+
+            userManager
+                .Setup(s => s.RemoveFromRolesAsync(
+                    ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
+                .ReturnsAsync(new IdentityResult());
+
+            userManager
+                .Setup(s => s.AddToRoleAsync(ItIsUser(identityUser), RoleNames.PrereleaseUser))
+                .ReturnsAsync(new IdentityResult());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.RemoveUserPublicationRole(userPublicationRole.Id);
+
+                VerifyAllMocks(userManager);
+                
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
+                    .ToListAsync();
+                
+                Assert.Empty(userPublicationRoles);
             }
         }
 
         [Fact]
         public async Task RemoveUserReleaseRole()
         {
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+            
+            var user = new User
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var identityUser = new ApplicationUser
+            {
+                Id = user.Id.ToString()
+            };
+            
             var userReleaseRole = new UserReleaseRole
             {
-                User = new User(),
-                Release = new Release
-                {
-                    Publication = new Publication(),
-                },
-                Role = Contributor
+                User = user,
+                Release = release,
+                Role = Approver
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -1064,20 +1958,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
             {
-                var service = SetupUserRoleService(contentDbContext: contentDbContext);
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .ReturnsAsync(ListOf(RoleNames.Analyst));
+
+            userManager
+                .Setup(s => s.RemoveFromRolesAsync(
+                    ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
+                .ReturnsAsync(new IdentityResult());
+            
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
 
                 var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
 
+                VerifyAllMocks(userManager);
+                
                 result.AssertRight();
             }
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var userReleaseRoles = await contentDbContext.UserReleaseRoles
-                    .AsQueryable()
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
                     .ToListAsync();
+                
                 Assert.Empty(userReleaseRoles);
             }
         }
@@ -1085,13 +2003,440 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task RemoveUserReleaseRole_NoUserReleaseRole()
         {
-            await using (var contentDbContext = InMemoryApplicationDbContext())
+            await using var contentDbContext = InMemoryApplicationDbContext();
+            var service = SetupUserRoleService(contentDbContext: contentDbContext);
+
+            var result = await service.RemoveUserReleaseRole(Guid.NewGuid());
+
+            result.AssertNotFound();
+        }
+
+        [Fact]
+        public async Task RemoveUserReleaseRole_HasHigherGlobalRoleThanAnalyst()
+        {
+            var release = new Release
             {
-                var service = SetupUserRoleService(contentDbContext: contentDbContext);
+                Publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
 
-                var result = await service.RemoveUserReleaseRole(Guid.NewGuid());
+            var user = new User
+            {
+                Id = Guid.NewGuid()
+            };
 
-                result.AssertNotFound();
+            var identityUser = new ApplicationUser
+            {
+                Id = user.Id.ToString()
+            };
+            
+            var userReleaseRole = new UserReleaseRole
+            {
+                User = user,
+                Release = release,
+                Role = Approver
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the BAU role, which is higher-powered than Analyst, so we will test that they remain 
+            // a BAU user and do not have any roles removed.
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .ReturnsAsync(ListOf(RoleNames.BauUser));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
+
+                VerifyAllMocks(userManager);
+                
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
+                    .ToListAsync();
+                
+                Assert.Empty(userReleaseRoles);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveUserReleaseRole_AnalystRoleStillRequiredForOtherReleases()
+        {
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            var user = new User
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var identityUser = new ApplicationUser
+            {
+                Id = user.Id.ToString()
+            };
+
+            var userReleaseRole = new UserReleaseRole
+            {
+                User = user,
+                Release = release,
+                Role = Approver
+            };
+
+            var anotherUserReleaseRole = new UserReleaseRole
+            {
+                User = user,
+                ReleaseId = Guid.NewGuid(),
+                Role = Approver
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(
+                    userReleaseRole, anotherUserReleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the Analyst role currently.  We will test that they retain the Analyst role  because 
+            // they still have need of it in other Release roles.
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .ReturnsAsync(ListOf(RoleNames.Analyst));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
+
+                VerifyAllMocks(userManager);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
+                    .ToListAsync();
+
+                var remainingReleaseRole = Assert.Single(userReleaseRoles);
+                Assert.Equal(anotherUserReleaseRole.ReleaseId, remainingReleaseRole.ReleaseId);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveUserReleaseRole_AnalystRoleStillRequiredForOtherPublications()
+        {
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            var user = new User
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var identityUser = new ApplicationUser
+            {
+                Id = user.Id.ToString()
+            };
+
+            var userReleaseRole = new UserReleaseRole
+            {
+                User = user,
+                Release = release,
+                Role = Approver
+            };
+
+            var userPublicationRole = new UserPublicationRole
+            {
+                User = user,
+                Role = Owner
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.UserReleaseRoles.AddAsync(userReleaseRole);
+                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the Analyst role currently.  We will test that they retain the Analyst role because 
+            // they still have need of it in other Publication roles.
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .ReturnsAsync(ListOf(RoleNames.Analyst));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
+
+                VerifyAllMocks(userManager);
+
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
+                    .ToListAsync();
+                
+                Assert.Empty(userReleaseRoles);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveUserReleaseRole_DowngradeToPrereleaseRole()
+        {
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            var anotherRelease = new Release
+            {
+                Publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            var user = new User
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var identityUser = new ApplicationUser
+            {
+                Id = user.Id.ToString()
+            };
+            
+            var userReleaseRole = new UserReleaseRole
+            {
+                User = user,
+                Release = release,
+                Role = Approver
+            };
+            
+            var prereleaseRole = new UserReleaseRole
+            {
+                User = user,
+                Release = anotherRelease,
+                Role = PrereleaseViewer
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(userReleaseRole, prereleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the Analyst role currently.  We will test that they lose the Analyst role but gain the
+            // PrereleaseUser role, as they have need of this role elsewhere.
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .ReturnsAsync(ListOf(RoleNames.Analyst));
+
+            userManager
+                .Setup(s => s.RemoveFromRolesAsync(
+                    ItIsUser(identityUser), ItIs.ListSequenceEqualTo(ListOf(RoleNames.Analyst))))
+                .ReturnsAsync(new IdentityResult());
+
+            userManager
+                .Setup(s => s.AddToRoleAsync(ItIsUser(identityUser), RoleNames.PrereleaseUser))
+                .ReturnsAsync(new IdentityResult());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.RemoveUserReleaseRole(userReleaseRole.Id);
+
+                VerifyAllMocks(userManager);
+                
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userReleaseRoles = await contentDbContext
+                    .UserReleaseRoles
+                    .ToListAsync();
+                
+                var releaseRole = Assert.Single(userReleaseRoles);
+                Assert.Equal(prereleaseRole.ReleaseId, releaseRole.ReleaseId);
+            }
+        }
+
+        [Fact]
+        public async Task RemoveUserReleaseRoleAsPrerelease_AnalystRoleRetained()
+        {
+            var release = new Release
+            {
+                Publication = new Publication
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            var user = new User
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var identityUser = new ApplicationUser
+            {
+                Id = user.Id.ToString()
+            };
+            
+            var approverRole = new UserReleaseRole
+            {
+                User = user,
+                Release = release,
+                Role = Approver
+            };
+            
+            var prereleaseRole = new UserReleaseRole
+            {
+                User = user,
+                Release = release,
+                Role = PrereleaseViewer
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.UserReleaseRoles.AddRangeAsync(approverRole, prereleaseRole);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddAsync(identityUser);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here the user has the Analyst role currently but now we are removing a Prerelease Release Role.
+            // We will test that they retain the Analyst role.
+            userManager
+                .Setup(s => s.GetRolesAsync(ItIsUser(identityUser)))
+                .ReturnsAsync(ListOf(RoleNames.Analyst));
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    contentDbContext: contentDbContext,
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.RemoveUserReleaseRole(prereleaseRole.Id);
+
+                VerifyAllMocks(userManager);
+                
+                result.AssertRight();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var userPublicationRoles = await contentDbContext
+                    .UserReleaseRoles
+                    .ToListAsync();
+                
+                var releaseRole = Assert.Single(userPublicationRoles);
+                Assert.Equal(approverRole.ReleaseId, releaseRole.ReleaseId);
             }
         }
 
@@ -1117,7 +2462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 usersAndRolesPersistenceHelper ?? new PersistenceHelper<UsersAndRolesDbContext>(usersAndRolesDbContext),
-                emailTemplateService ?? new Mock<IEmailTemplateService>(MockBehavior.Strict).Object,
+                emailTemplateService ?? new Mock<IEmailTemplateService>(Strict).Object,
                 userService ?? AlwaysTrueUserService(_user.Id).Object,
                 userPublicationRoleRepository ?? new UserPublicationRoleRepository(contentDbContext),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(contentDbContext),

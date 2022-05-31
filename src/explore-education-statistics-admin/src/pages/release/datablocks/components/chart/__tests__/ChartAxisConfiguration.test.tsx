@@ -10,13 +10,7 @@ import { AxisConfiguration } from '@common/modules/charts/types/chart';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import noop from 'lodash/noop';
-import {
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 
 describe('ChartAxisConfiguration', () => {
   const testFormState: ChartBuilderForms = {
@@ -31,6 +25,12 @@ describe('ChartAxisConfiguration', () => {
       isValid: true,
       submitCount: 0,
       title: 'X Axis (major axis)',
+    },
+    minor: {
+      id: 'chartBuilder-minor',
+      isValid: true,
+      submitCount: 0,
+      title: 'Y Axis (minor axis)',
     },
   };
 
@@ -51,16 +51,6 @@ describe('ChartAxisConfiguration', () => {
     label: {
       text: '',
     },
-  };
-
-  const testAxisConfigurationWithReferenceLines = {
-    ...testAxisConfiguration,
-    referenceLines: [
-      {
-        label: 'I am label',
-        position: '2014_AY',
-      },
-    ],
   };
 
   const testTable = mapFullTable(testTableData);
@@ -183,19 +173,23 @@ describe('ChartAxisConfiguration', () => {
     userEvent.tab();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: 'Enter tick spacing' }),
-      ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('link', { name: 'Enter tick spacing' }),
+    ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
 
     await userEvent.type(screen.getByLabelText('Every nth value'), '-1');
     userEvent.tab();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: 'Tick spacing must be positive' }),
-      ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('link', { name: 'Tick spacing must be positive' }),
+    ).toHaveAttribute('href', '#chartBuilder-major-tickSpacing');
   });
 
   test('shows validation error if invalid label width given', async () => {
@@ -218,10 +212,12 @@ describe('ChartAxisConfiguration', () => {
     userEvent.tab();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: 'Label width must be positive' }),
-      ).toHaveAttribute('href', '#chartBuilder-major-labelWidth');
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('link', { name: 'Label width must be positive' }),
+    ).toHaveAttribute('href', '#chartBuilder-major-labelWidth');
   });
 
   test('shows validation error if invalid axis width given', async () => {
@@ -244,10 +240,12 @@ describe('ChartAxisConfiguration', () => {
     userEvent.tab();
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('link', { name: 'Size of axis must be positive' }),
-      ).toHaveAttribute('href', '#chartBuilder-major-size');
+      expect(screen.getByText('There is a problem')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('link', { name: 'Size of axis must be positive' }),
+    ).toHaveAttribute('href', '#chartBuilder-major-size');
   });
 
   test('submitting fails with invalid values', async () => {
@@ -328,7 +326,7 @@ describe('ChartAxisConfiguration', () => {
     });
   });
 
-  describe('Group data by', () => {
+  describe('group data by', () => {
     test('submitting succeeds with the group data by option changed', async () => {
       const handleSubmit = jest.fn();
 
@@ -398,9 +396,9 @@ describe('ChartAxisConfiguration', () => {
 
       userEvent.click(screen.getByRole('radio', { name: 'Filters' }));
 
-      fireEvent.change(screen.getByLabelText('Select a filter'), {
-        target: { value: 'school_type' },
-      });
+      userEvent.selectOptions(screen.getByLabelText('Select a filter'), [
+        'school_type',
+      ]);
 
       userEvent.click(
         screen.getByRole('button', { name: 'Save chart options' }),
@@ -432,10 +430,8 @@ describe('ChartAxisConfiguration', () => {
     });
   });
 
-  describe('Reference lines', () => {
-    test('adding reference lines', async () => {
-      const handleSubmit = jest.fn();
-
+  describe('reference lines', () => {
+    test('adding reference line for major axis', async () => {
       render(
         <ChartBuilderFormsContextProvider initialForms={testFormState}>
           <ChartAxisConfiguration
@@ -446,37 +442,96 @@ describe('ChartAxisConfiguration', () => {
             data={testTable.results}
             meta={testTable.subjectMeta}
             onChange={noop}
-            onSubmit={handleSubmit}
+            onSubmit={noop}
           />
         </ChartBuilderFormsContextProvider>,
       );
 
-      const referenceLinesSection = within(
+      const referenceLines = within(
         screen.getByRole('table', { name: 'Reference lines' }),
       );
-      expect(referenceLinesSection.getAllByRole('row')).toHaveLength(2);
+      expect(referenceLines.getAllByRole('row')).toHaveLength(2);
 
-      fireEvent.change(referenceLinesSection.getByLabelText('Position'), {
-        target: { value: '2014_AY' },
-      });
+      userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
+        '2014_AY',
+      ]);
 
       await userEvent.type(
-        referenceLinesSection.getByLabelText('Label'),
-        'I am label',
+        referenceLines.getByLabelText('Label'),
+        'Test label',
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
       await waitFor(() => {
-        const rows = referenceLinesSection.getAllByRole('row');
-        expect(rows).toHaveLength(3);
-        expect(rows[1]).toHaveTextContent('2014_AY');
-        expect(rows[1]).toHaveTextContent('I am label');
-        expect(within(rows[1]).getByRole('button', { name: 'Remove' }));
+        expect(referenceLines.getByText('Test label')).toBeInTheDocument();
       });
+
+      const rows = referenceLines.getAllByRole('row');
+
+      expect(rows).toHaveLength(3);
+      expect(within(rows[1]).getByText('2014/15')).toBeInTheDocument();
+      expect(within(rows[1]).getByText('Test label')).toBeInTheDocument();
+      expect(within(rows[1]).getByRole('button', { name: /Remove line/ }));
+
+      // Added reference line should be removed from Position options
+      const position = within(rows[2]).getByLabelText('Position');
+      const options = within(position).getAllByRole('option');
+
+      expect(options).toHaveLength(2);
+      expect(options[0]).toHaveTextContent('Choose position');
+      expect(options[0]).toHaveAttribute('value', '');
+      expect(options[1]).toHaveTextContent('2015/16');
+      expect(options[1]).toHaveAttribute('value', '2015_AY');
     });
 
-    test('successfully submitting with reference lines', async () => {
+    test('adding reference line for minor axis', async () => {
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-major"
+            type="minor"
+            configuration={{
+              ...testAxisConfiguration,
+              type: 'minor',
+              groupBy: undefined,
+            }}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            onChange={noop}
+            onSubmit={noop}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      const referenceLines = within(
+        screen.getByRole('table', { name: 'Reference lines' }),
+      );
+      expect(referenceLines.getAllByRole('row')).toHaveLength(2);
+
+      await userEvent.type(referenceLines.getByLabelText('Position'), '3000');
+
+      await userEvent.type(
+        referenceLines.getByLabelText('Label'),
+        'Test label',
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+
+      await waitFor(() => {
+        expect(referenceLines.getByText('Test label')).toBeInTheDocument();
+      });
+
+      const rows = referenceLines.getAllByRole('row');
+
+      expect(rows).toHaveLength(3);
+      expect(within(rows[1]).getByText('3000')).toBeInTheDocument();
+      expect(within(rows[1]).getByText('Test label')).toBeInTheDocument();
+      expect(within(rows[1]).getByRole('button', { name: /Remove line/ }));
+    });
+
+    test('successfully submitting with new reference line', async () => {
       const handleSubmit = jest.fn();
 
       render(
@@ -499,9 +554,10 @@ describe('ChartAxisConfiguration', () => {
       );
       expect(referenceLinesSection.getAllByRole('row')).toHaveLength(2);
 
-      fireEvent.change(referenceLinesSection.getByLabelText('Position'), {
-        target: { value: '2014_AY' },
-      });
+      userEvent.selectOptions(
+        referenceLinesSection.getByLabelText('Position'),
+        ['2014_AY'],
+      );
 
       await userEvent.type(
         referenceLinesSection.getByLabelText('Label'),
@@ -551,7 +607,13 @@ describe('ChartAxisConfiguration', () => {
           <ChartAxisConfiguration
             id="chartBuilder-major"
             type="major"
-            configuration={testAxisConfigurationWithReferenceLines}
+            configuration={{
+              ...testAxisConfiguration,
+              referenceLines: [
+                { position: '2014_AY', label: 'Test label 1' },
+                { position: '2015_AY', label: 'Test label 2' },
+              ],
+            }}
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
@@ -561,22 +623,35 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      const referenceLinesSection = within(
+      const referenceLines = within(
         screen.getByRole('table', { name: 'Reference lines' }),
       );
-      expect(referenceLinesSection.getAllByRole('row')).toHaveLength(3);
+
+      let rows = referenceLines.getAllByRole('row');
+
+      expect(rows).toHaveLength(3);
 
       userEvent.click(
-        referenceLinesSection.getByRole('button', { name: 'Remove' }),
+        within(rows[2]).getByRole('button', { name: /Remove line/ }),
       );
 
       await waitFor(() => {
-        const rows = referenceLinesSection.getAllByRole('row');
-        expect(rows).toHaveLength(2);
+        expect(
+          referenceLines.queryByText('Test label 2'),
+        ).not.toBeInTheDocument();
       });
+
+      rows = referenceLines.getAllByRole('row');
+
+      expect(rows).toHaveLength(3);
+      expect(within(rows[1]).getByText('2014/15')).toBeInTheDocument();
+      expect(within(rows[1]).getByText('Test label 1')).toBeInTheDocument();
+
+      expect(within(rows[2]).getByLabelText('Position')).toBeInTheDocument();
+      expect(within(rows[2]).getByLabelText('Label')).toBeInTheDocument();
     });
 
-    test('successfully submit with reference lines removed', async () => {
+    test('successfully submitting with removed reference line', async () => {
       const handleSubmit = jest.fn();
 
       render(
@@ -584,7 +659,13 @@ describe('ChartAxisConfiguration', () => {
           <ChartAxisConfiguration
             id="chartBuilder-major"
             type="major"
-            configuration={testAxisConfigurationWithReferenceLines}
+            configuration={{
+              ...testAxisConfiguration,
+              referenceLines: [
+                { position: '2014_AY', label: 'Test label 1' },
+                { position: '2015_AY', label: 'Test label 2' },
+              ],
+            }}
             definition={verticalBarBlockDefinition}
             data={testTable.results}
             meta={testTable.subjectMeta}
@@ -594,13 +675,73 @@ describe('ChartAxisConfiguration', () => {
         </ChartBuilderFormsContextProvider>,
       );
 
-      const referenceLinesSection = within(
+      const referenceLines = within(
         screen.getByRole('table', { name: 'Reference lines' }),
       );
-      expect(referenceLinesSection.getAllByRole('row')).toHaveLength(3);
+
+      const rows = referenceLines.getAllByRole('row');
+
+      expect(rows).toHaveLength(3);
 
       userEvent.click(
-        referenceLinesSection.getByRole('button', { name: 'Remove' }),
+        within(rows[1]).getByRole('button', { name: /Remove line/ }),
+      );
+      userEvent.click(
+        screen.getByRole('button', { name: 'Save chart options' }),
+      );
+
+      await waitFor(() => {
+        const formValues: AxisConfiguration = {
+          dataSets: [],
+          groupBy: 'timePeriod',
+          min: 0,
+          max: undefined,
+          referenceLines: [{ position: '2015_AY', label: 'Test label 2' }],
+          showGrid: true,
+          size: 50,
+          sortAsc: true,
+          sortBy: 'name',
+          tickConfig: 'default',
+          tickSpacing: 1,
+          type: 'major',
+          visible: true,
+          unit: '',
+          label: {
+            text: '',
+          },
+        };
+        expect(handleSubmit).toHaveBeenCalledWith(formValues);
+      });
+    });
+
+    test('submitting filters out reference lines that no longer match the `groupBy`', async () => {
+      const handleSubmit = jest.fn();
+
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-major"
+            type="major"
+            configuration={{
+              ...testAxisConfiguration,
+              referenceLines: [
+                { position: '2014_AY', label: 'Test label 1' },
+                { position: '2015_AY', label: 'Test label 2' },
+                { position: 'barnet', label: 'Test label 3' },
+                {
+                  position: 'authorised-absence-sessions',
+                  label: 'Test label 3',
+                },
+                { position: 'ethnicity-major-chinese', label: 'Test label 4' },
+              ],
+            }}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            onChange={noop}
+            onSubmit={handleSubmit}
+          />
+        </ChartBuilderFormsContextProvider>,
       );
 
       userEvent.click(
@@ -613,7 +754,11 @@ describe('ChartAxisConfiguration', () => {
           groupBy: 'timePeriod',
           min: 0,
           max: undefined,
-          referenceLines: [],
+          referenceLines: [
+            // Only reference lines for time periods should remain
+            { position: '2014_AY', label: 'Test label 1' },
+            { position: '2015_AY', label: 'Test label 2' },
+          ],
           showGrid: true,
           size: 50,
           sortAsc: true,
@@ -621,6 +766,63 @@ describe('ChartAxisConfiguration', () => {
           tickConfig: 'default',
           tickSpacing: 1,
           type: 'major',
+          visible: true,
+          unit: '',
+          label: {
+            text: '',
+          },
+        };
+        expect(handleSubmit).toHaveBeenCalledWith(formValues);
+      });
+    });
+
+    test('submitting does not filter out reference lines when there is no `groupBy`', async () => {
+      const handleSubmit = jest.fn();
+
+      render(
+        <ChartBuilderFormsContextProvider initialForms={testFormState}>
+          <ChartAxisConfiguration
+            id="chartBuilder-minor"
+            type="minor"
+            configuration={{
+              ...testAxisConfiguration,
+              groupBy: undefined,
+              type: 'minor',
+              referenceLines: [
+                { position: 1000, label: 'Test label 1' },
+                { position: 2000, label: 'Test label 2' },
+              ],
+            }}
+            definition={verticalBarBlockDefinition}
+            data={testTable.results}
+            meta={testTable.subjectMeta}
+            onChange={noop}
+            onSubmit={handleSubmit}
+          />
+        </ChartBuilderFormsContextProvider>,
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Save chart options' }),
+      );
+
+      await waitFor(() => {
+        const formValues: AxisConfiguration = {
+          dataSets: [],
+          groupBy: undefined,
+          min: 0,
+          max: undefined,
+          referenceLines: [
+            { position: 1000, label: 'Test label 1' },
+            { position: 2000, label: 'Test label 2' },
+          ],
+          showGrid: true,
+          size: 50,
+          sortAsc: true,
+          sortBy: 'name',
+          tickConfig: 'default',
+          tickSpacing: 1,
+          type: 'minor',
           visible: true,
           unit: '',
           label: {

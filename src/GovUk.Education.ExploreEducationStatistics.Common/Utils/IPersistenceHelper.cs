@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,21 +12,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Utils
     {
         Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity, TEntityId>(
             TEntityId id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
-        where TEntity : class;
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null)
+            where TEntity : class;
 
         Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
             Guid id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null)
             where TEntity : class;
 
         Task<Either<ActionResult, TEntity>> CheckEntityExists<TEntity>(
             Func<IQueryable<TEntity>, IQueryable<TEntity>> query)
             where TEntity : class;
 
-        Task<Either<ActionResult, TEntity>> CheckOptionalEntityExists<TEntity>(
+        Task<Either<ActionResult, TEntity?>> CheckOptionalEntityExists<TEntity>(
             Guid? id,
-            Func<IQueryable<TEntity>, IQueryable<TEntity>> hydrateEntityFn = null)
+            Func<IQueryable<TEntity>, IQueryable<TEntity>>? hydrateEntityFn = null)
             where TEntity : class;
     }
 }

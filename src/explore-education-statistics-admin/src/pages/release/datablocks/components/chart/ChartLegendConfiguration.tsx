@@ -89,7 +89,11 @@ const ChartLegendConfiguration = ({
 }: Props) => {
   const { capabilities } = definition;
 
-  const { hasSubmitted, updateForm, submit } = useChartBuilderFormsContext();
+  const {
+    hasSubmitted,
+    updateForm,
+    submitForms,
+  } = useChartBuilderFormsContext();
 
   // Prevent legend items from being a dependency of
   // `initialValues` by accessing it as a ref.
@@ -238,9 +242,9 @@ const ChartLegendConfiguration = ({
       initialTouched={initialTouched}
       validateOnMount
       validationSchema={validationSchema}
-      onSubmit={values => {
+      onSubmit={async values => {
         onSubmit(values);
-        submit();
+        await submitForms();
       }}
     >
       {form => (
@@ -352,7 +356,11 @@ const ChartLegendConfiguration = ({
             )}
           </div>
 
-          <ChartBuilderSaveActions formId={formId} formKey="legend">
+          <ChartBuilderSaveActions
+            formId={formId}
+            formKey="legend"
+            disabled={form.isSubmitting}
+          >
             {buttons}
           </ChartBuilderSaveActions>
         </Form>

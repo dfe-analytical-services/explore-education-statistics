@@ -40,7 +40,7 @@ const ReorderFiltersList = ({
   const [filters, setFilters] = useState<FormattedFilters[]>([]);
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || !subjectMeta) {
       return;
     }
     const filtersMeta = subjectMeta?.filters || {};
@@ -72,7 +72,7 @@ const ReorderFiltersList = ({
       'order',
     );
     setFilters(formattedFilters);
-  }, [isLoading, subjectMeta?.filters]);
+  }, [isLoading, subjectMeta]);
 
   const handleReorder = ({
     reordered,
@@ -129,7 +129,7 @@ const ReorderFiltersList = ({
 
   return (
     <>
-      <h3>Reorder filters for {subject.name}</h3>
+      <h3>{`Reorder filters for ${subject.name}`}</h3>
       <LoadingSpinner loading={isLoading}>
         {filters.length === 0 ? (
           <p>No filters available.</p>

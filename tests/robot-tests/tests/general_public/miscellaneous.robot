@@ -7,6 +7,7 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev    Test    Preprod    Prod
 
+
 *** Test Cases ***
 Verify public page loads
     user navigates to public frontend

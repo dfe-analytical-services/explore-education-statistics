@@ -662,7 +662,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId, updateTimestamps: false))
             {
                 await contentDbContext.DataBlocks.AddAsync(dataBlock);
                 await contentDbContext.SaveChangesAsync();
@@ -774,7 +774,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId, updateTimestamps: false))
             {
                 await contentDbContext.DataBlocks.AddAsync(dataBlock);
                 await contentDbContext.SaveChangesAsync();
@@ -885,7 +885,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId, updateTimestamps: false))
             {
                 await contentDbContext.DataBlocks.AddAsync(dataBlock);
                 await contentDbContext.SaveChangesAsync();
@@ -1004,7 +1004,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId, updateTimestamps: false))
             {
                 await contentDbContext.DataBlocks.AddAsync(dataBlock);
                 await contentDbContext.ReleaseContentBlocks.AddAsync(releaseContentBlock);
@@ -1138,7 +1138,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId, updateTimestamps: false))
             {
                 await contentDbContext.DataBlocks.AddAsync(dataBlock);
                 await contentDbContext.ReleaseContentSections.AddAsync(releaseContentSection);
@@ -1250,7 +1250,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contentDbContextId = Guid.NewGuid().ToString();
             var statisticsDbContextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId, updateTimestamps: false))
             {
                 await contentDbContext.DataBlocks.AddAsync(dataBlock);
                 await contentDbContext.SaveChangesAsync();

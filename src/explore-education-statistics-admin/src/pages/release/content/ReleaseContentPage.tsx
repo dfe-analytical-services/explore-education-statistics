@@ -1,10 +1,11 @@
 import BrowserWarning from '@admin/components/BrowserWarning';
 import EditablePageModeToggle from '@admin/components/editable/EditablePageModeToggle';
+import { ReleaseContentHubContextProvider } from '@admin/contexts/ReleaseContentHubContext';
 import { EditingContextProvider } from '@admin/contexts/EditingContext';
 import ReleaseContent from '@admin/pages/release/content/components/ReleaseContent';
 import {
   ReleaseContentProvider,
-  ReleaseContextState,
+  ReleaseContentContextState,
   useReleaseContentState,
 } from '@admin/pages/release/content/contexts/ReleaseContentContext';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
@@ -85,7 +86,9 @@ const ReleaseContentPageLoaded = () => {
                       {release.publication.title}
                     </h2>
 
-                    <ReleaseContent />
+                    <ReleaseContentHubContextProvider releaseId={release.id}>
+                      <ReleaseContent />
+                    </ReleaseContentHubContextProvider>
                   </>
                 )}
                 {editingMode === 'table-preview' && (
@@ -108,7 +111,9 @@ const ReleaseContentPage = ({
 }: RouteComponentProps<ReleaseRouteParams>) => {
   const { releaseId } = match.params;
 
-  const { value, isLoading } = useAsyncRetry<ReleaseContextState>(async () => {
+  const { value, isLoading } = useAsyncRetry<
+    ReleaseContentContextState
+  >(async () => {
     const {
       release,
       availableDataBlocks,

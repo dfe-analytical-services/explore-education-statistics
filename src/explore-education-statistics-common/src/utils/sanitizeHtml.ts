@@ -1,11 +1,17 @@
 import { Dictionary } from '@common/types';
 import sanitize from 'sanitize-html';
 
+/**
+ * Return true to filter the tag from markup.
+ */
+export type TagFilter = (frame: sanitize.IFrame) => boolean;
+
 export type SanitizeHtmlOptions = {
   allowedTags?: string[];
   allowedAttributes?: Dictionary<string[]>;
   allowedSchemesByTag?: Dictionary<string[]>;
   allowedStyles?: Dictionary<Dictionary<RegExp[]>>;
+  filterTags?: Dictionary<TagFilter>;
   transformTags?: Dictionary<string | sanitize.Transformer>;
 };
 
@@ -59,7 +65,16 @@ export const defaultSanitizeOptions: SanitizeHtmlOptions = {
 
 export default function sanitizeHtml(
   dirtyHtml: string,
-  options: SanitizeHtmlOptions = defaultSanitizeOptions,
+  { filterTags, ...options }: SanitizeHtmlOptions = defaultSanitizeOptions,
 ): string {
-  return sanitize(dirtyHtml, options);
+  return sanitize(dirtyHtml, {
+    ...options,
+    exclusiveFilter: frame => {
+      if (filterTags?.[frame.tag]) {
+        return filterTags[frame.tag](frame);
+      }
+
+      return false;
+    },
+  });
 }

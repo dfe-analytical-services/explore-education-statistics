@@ -21,12 +21,10 @@ describe('Comment', () => {
     permissions: {} as GlobalPermissions,
   };
 
-  const blockId = 'block-id';
-
   test('renders an unresolved comment correctly', () => {
-    render(<Comment blockId={blockId} comment={testComments[2]} />);
+    render(<Comment comment={testComments[2]} />);
 
-    const comment = screen.getByRole('listitem');
+    const comment = screen.getByTestId('comment');
     expect(comment).toHaveTextContent('Comment 3');
     expect(comment).toHaveTextContent('User Two');
     expect(comment).toHaveTextContent('30 Nov 2021, 13:55');
@@ -44,7 +42,7 @@ describe('Comment', () => {
           user: testUser2,
         }}
       >
-        <Comment blockId={blockId} comment={testComments[2]} />,
+        <Comment comment={testComments[2]} />,
       </AuthContext.Provider>,
     );
 
@@ -59,7 +57,7 @@ describe('Comment', () => {
           user: testUser1,
         }}
       >
-        <Comment blockId={blockId} comment={testComments[2]} />,
+        <Comment comment={testComments[2]} />,
       </AuthContext.Provider>,
     );
 
@@ -76,9 +74,9 @@ describe('Comment', () => {
       ...testComments[2],
       updated: '2021-11-30T14:00',
     };
-    render(<Comment blockId={blockId} comment={updatedComment} />);
+    render(<Comment comment={updatedComment} />);
 
-    const comment = screen.getByRole('listitem');
+    const comment = screen.getByTestId('comment');
     expect(comment).toHaveTextContent('Comment 3');
     expect(comment).toHaveTextContent(
       '30 Nov 2021, 13:55(Updated 30 Nov 2021, 14:00)',
@@ -92,11 +90,11 @@ describe('Comment', () => {
           user: testUser1,
         }}
       >
-        <Comment blockId={blockId} comment={testComments[0]} />
+        <Comment comment={testComments[0]} />
       </AuthContext.Provider>,
     );
 
-    const comment = screen.getByRole('listitem');
+    const comment = screen.getByTestId('comment');
     expect(comment).toHaveTextContent('Comment 1');
     expect(comment).toHaveTextContent('User One');
     expect(comment).toHaveTextContent('29 Nov 2021, 13:55');

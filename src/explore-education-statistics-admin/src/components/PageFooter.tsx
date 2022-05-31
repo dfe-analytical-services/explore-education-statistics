@@ -41,7 +41,6 @@ const PageFooter = ({ wide }: Props) => {
                 </Link>
               </li>
             </ul>
-
             <svg
               role="presentation"
               focusable="false"
@@ -67,6 +66,15 @@ const PageFooter = ({ wide }: Props) => {
               </a>
               , except where otherwise stated
             </span>
+
+            {process.env.REACT_APP_BUILD_NUMBER && (
+              <p
+                aria-hidden
+                className="govuk-!-margin-top-3 govuk-!-font-size-14"
+              >
+                Build: {process.env.REACT_APP_BUILD_NUMBER}
+              </p>
+            )}
           </div>
           <div className="govuk-footer__meta-item">
             <a

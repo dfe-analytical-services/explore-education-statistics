@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ./common.robot
 
+
 *** Keywords ***
 user waits until results table appears
     [Arguments]    ${wait_time}
@@ -20,6 +21,33 @@ user clicks subheaded indicator checkbox
     [Arguments]    ${subheading_label}    ${indicator_label}
     user clicks element
     ...    xpath://*[@id="filtersForm-indicators"]//legend[text()="${subheading_label}"]/..//label[text()="${indicator_label}"]/../input[@type="checkbox"]
+
+user checks indicator groups list contains exact items in order
+    [Arguments]    @{items}
+    user checks items matching locator contain exact items in order    @{items}
+    ...    locator=xpath://*[@id="filtersForm-indicators"]//*[starts-with(@id,"filtersForm-indicators-options-")]//legend
+
+user checks indicator group contains exact items in order
+    [Arguments]    @{items}    ${group_label}
+    user checks items matching locator contain exact items in order
+    ...    @{items}
+    ...    locator=xpath://*[@id="filtersForm-indicators"]//legend[text()="${group_label}"]/..//label
+
+user checks filters list contains exact items in order
+    [Arguments]    @{items}
+    user checks items matching locator contain exact items in order
+    ...    @{items}
+    ...    locator=xpath://*[@id="filtersForm-filters"]//details
+
+user checks filter contains exact items in order
+    [Arguments]    @{items}    ${filter_label}
+    user checks items matching locator contain exact items in order    @{items}
+    ...    locator=xpath://*[@id="filtersForm-filters"]//details[summary[contains(., "${filter_label}")]]//*[contains(@id,"-options-")]//legend
+
+user checks filter group contains exact items in order
+    [Arguments]    @{items}    ${filter_label}    ${group_label}
+    user checks items matching locator contain exact items in order    @{items}
+    ...    locator=xpath://*[@id="filtersForm-filters"]//details[summary[contains(., "${filter_label}")]]//*[contains(@id,"-options-")]//legend[text()="${group_label}"]/..//label
 
 user checks subheaded indicator checkbox is checked
     [Arguments]    ${subheading_label}    ${indicator_label}

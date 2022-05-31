@@ -1,0 +1,57 @@
+@import '~govuk-frontend/govuk/base';
+
+.tooltip {
+  background: govuk-colour('black');
+  border-radius: 5px;
+  color: govuk-colour('white');
+  font-size: 1rem;
+  max-width: 250px;
+  padding: govuk-spacing(1) govuk-spacing(2);
+  text-align: center;
+  white-space: pre-wrap;
+  z-index: 1000;
+
+  &.warning {
+    background: govuk-colour('orange');
+  }
+
+  &.danger {
+    background: govuk-colour('red');
+  }
+}
+
+.arrow,
+.arrow::before {
+  background: inherit;
+  height: 10px;
+  position: absolute;
+  width: 10px;
+}
+
+.arrow {
+  visibility: hidden;
+
+  &::before {
+    content: '';
+    transform: rotate(45deg);
+    visibility: visible;
+  }
+}
+
+.tooltip {
+  &[data-popper-placement^='top'] > .arrow {
+    bottom: -5px;
+  }
+
+  &[data-popper-placement^='right'] > .arrow {
+    left: -10px;
+  }
+
+  &[data-popper-placement^='bottom'] > .arrow {
+    top: -5px;
+  }
+
+  &[data-popper-placement^='left'] > .arrow {
+    right: 0;
+  }
+}

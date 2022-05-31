@@ -41,9 +41,10 @@ describe('RoleForm', () => {
     const roles = within(roleSelect).getAllByRole(
       'option',
     ) as HTMLOptionElement[];
-    expect(roles).toHaveLength(2);
-    expect(roles[0]).toHaveTextContent(testRoles[0].name);
-    expect(roles[1]).toHaveTextContent(testRoles[1].name);
+    expect(roles).toHaveLength(3);
+    expect(roles[0]).toHaveTextContent('Choose role');
+    expect(roles[1]).toHaveTextContent(testRoles[0].name);
+    expect(roles[2]).toHaveTextContent(testRoles[1].name);
 
     expect(
       screen.getByRole('button', { name: 'Update role' }),

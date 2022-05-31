@@ -13,7 +13,7 @@ exports[`FormTextInput renders correctly with error 1`] = `
 </span>
 <input name="testInput"
        aria-describedby="test-input-error"
-       class="govuk-input"
+       class="govuk-input govuk-input--error"
        id="test-input"
        type="text"
 >

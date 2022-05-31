@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
@@ -28,32 +26,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository
             return _context.Set<TEntity>();
         }
 
-        protected TEntity Find(TKey id)
-        {
-            return DbSet().Find(id);
-        }
-
         private async Task<TEntity> FindAsync(TKey id)
         {
             return await DbSet().FindAsync(id);
         }
 
-        public Either<ActionResult, TEntity> FindOrNotFound(TKey id)
-        {
-            return Find(id) ?? new Either<ActionResult, TEntity>(new NotFoundResult());
-        }
-
         public async Task<Either<ActionResult, TEntity>> FindOrNotFoundAsync(TKey id)
         {
             return await FindAsync(id) ?? new Either<ActionResult, TEntity>(new NotFoundResult());
-        }
-
-        public IQueryable<TEntity> FindMany(Expression<Func<TEntity, bool>> expression,
-            List<Expression<Func<TEntity, object>>> include = null)
-        {
-            var queryable = DbSet().Where(expression);
-            include?.ForEach(i => queryable = queryable.Include(i));
-            return queryable;
         }
 
         protected async Task<TEntity> RemoveAsync(TKey id)

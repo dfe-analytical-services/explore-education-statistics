@@ -8,8 +8,10 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - link external methodology publication %{RUN_IDENTIFIER}
+
 
 *** Test Cases ***
 Link Publication to External Methodology

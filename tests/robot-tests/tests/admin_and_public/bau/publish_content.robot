@@ -9,9 +9,11 @@ Suite Teardown      user closes the browser
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - publish content %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Calendar Year 2001
+
 
 *** Test Cases ***
 Create new publication and release via API
@@ -30,7 +32,7 @@ Add an accordion section to release content
 
 Add text block with link to absence glossary entry to accordion section
     user adds text block to editable accordion section    Test section    css:#releaseMainContent
-    ${block}=    user edits accordion section text block    Test section    1    css:#releaseMainContent
+    ${block}=    user starts editing accordion section text block    Test section    1    css:#releaseMainContent
     user presses keys    Absence
     user presses keys    CTRL+a
     user clicks element    xpath://*[@aria-label="Editor toolbar"]//button[3]    # CKEditor link button
@@ -57,16 +59,8 @@ Approve release
     user clicks link    Sign off
     user approves original release for immediate publication
 
-User goes to public Find Statistics page
-    user navigates to find statistics page on public frontend
-
 Verify newly published release is on Find Statistics page
-    user waits until page contains accordion section    %{TEST_THEME_NAME}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}
-
-    user opens details dropdown    %{TEST_TOPIC_NAME}
-    user waits until details dropdown contains publication    %{TEST_TOPIC_NAME}    ${PUBLICATION_NAME}
+    user checks publication is on find statistics page    ${PUBLICATION_NAME}
     ...    Ad hoc statistics
     user checks publication bullet contains link    ${PUBLICATION_NAME}    View statistics and data
     user checks publication bullet contains link    ${PUBLICATION_NAME}    Create your own tables

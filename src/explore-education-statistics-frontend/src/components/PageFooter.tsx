@@ -89,6 +89,15 @@ const PageFooter = ({ wide }: Props) => (
             </a>
             , except where otherwise stated
           </span>
+
+          {process.env.BUILD_NUMBER && (
+            <p
+              aria-hidden
+              className="govuk-!-margin-top-3 govuk-!-font-size-14"
+            >
+              Build: {process.env.BUILD_NUMBER}
+            </p>
+          )}
         </div>
         <div className="govuk-footer__meta-item">
           <a

@@ -17,18 +17,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return InMemoryContentDbContext();
         }
 
-        public static UsersAndRolesDbContext InMemoryUserAndRolesDbContext(string dbName)
+        public static UsersAndRolesDbContext InMemoryUserAndRolesDbContext(string dbName, bool updateTimestamps = true)
         {
             var builder = new DbContextOptionsBuilder<UsersAndRolesDbContext>();
             builder.UseInMemoryDatabase(databaseName: dbName, b => b.EnableNullChecks(false));
 
             var operationalStoreOptions = Options.Create(new OperationalStoreOptions());
-            return new UsersAndRolesDbContext(builder.Options, operationalStoreOptions);
+            return new UsersAndRolesDbContext(builder.Options, operationalStoreOptions, updateTimestamps);
         }
 
-        public static UsersAndRolesDbContext InMemoryUserAndRolesDbContext()
+        public static UsersAndRolesDbContext InMemoryUserAndRolesDbContext(bool updateTimestamps = true)
         {
-            return InMemoryUserAndRolesDbContext(Guid.NewGuid().ToString());
+            return InMemoryUserAndRolesDbContext(Guid.NewGuid().ToString(), updateTimestamps);
         }
     }
 }

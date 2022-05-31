@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -9,22 +10,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     public class UserViewModel
     {
         public Guid Id { get; set; }
-        
-        public string Name { get; set; }
-        
-        public string Email { get; set; }
-        
-        public string Role { get; set; }
 
-        public List<UserPublicationRoleViewModel> UserPublicationRoles { get; set; }
+        public string Name { get; set; } = string.Empty;
         
-        public List<UserReleaseRoleViewModel> UserReleaseRoles { get; set; }
+        public string Email { get; set; } = string.Empty;
+        
+        public string? Role { get; set; }
+
+        public List<UserPublicationRoleViewModel> UserPublicationRoles { get; set; } = new();
+        
+        public List<UserReleaseRoleViewModel> UserReleaseRoles { get; set; } = new();
     }
 
     public class UserPublicationRoleViewModel
     {
         public Guid Id { get; set; }
-        public string Publication { get; set; }
+        
+        public string Publication { get; set; } = null!;
+        
         [JsonConverter(typeof(StringEnumConverter))]
         public PublicationRole Role { get; set; }
     }
@@ -32,8 +35,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     public class UserReleaseRoleViewModel
     {
         public Guid Id { get; set; }
-        public string Publication { get; set; }
-        public string Release { get; set; }
+        
+        public string Publication { get; set; } = null!;
+        
+        public string Release { get; set; } = null!;
+        
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseRole Role { get; set; }
     }

@@ -6,6 +6,7 @@ Test Setup      fail test fast if required
 
 Force Tags      GeneralPublic    Local    Dev    Test    Preprod    Prod
 
+
 *** Test Cases ***
 Parse Find Statistics page HTML
     [Documentation]    EES-1186

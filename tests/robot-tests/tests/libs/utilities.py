@@ -13,6 +13,7 @@ import utilities_init
 import os
 import re
 from urllib.parse import urlparse
+import visual
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 element_finder = sl._element_finder
@@ -79,7 +80,7 @@ def raise_assertion_error(err_msg):
 
 def user_waits_until_parent_contains_element(parent_locator: object, child_locator: str,
                                              timeout: int = None, error: str = None,
-                                             limit: int = None):
+                                             count: int = None):
     try:
         child_locator = _normalise_child_locator(child_locator)
 
@@ -87,23 +88,23 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
             return element_finder.find(child_locator, required=False, parent=parent_el) is not None
 
-        if is_noney(limit):
+        if is_noney(count):
             return waiting._wait_until(
                 parent_contains_matching_element,
                 "Parent '%s' did not contain '%s' in <TIMEOUT>." % (parent_locator, child_locator),
                 timeout, error
             )
 
-        limit = int(limit)
+        count = int(count)
 
         def parent_contains_matching_elements() -> bool:
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
-            return len(sl.find_elements(child_locator, parent=parent_el)) == limit
+            return len(sl.find_elements(child_locator, parent=parent_el)) == count
 
         waiting._wait_until(
             parent_contains_matching_elements,
             "Parent '%s' did not contain %s '%s' element(s) within <TIMEOUT>." % (
-                parent_locator, limit, child_locator),
+                parent_locator, count, child_locator),
             timeout, error
         )
     except Exception as err:
@@ -114,7 +115,7 @@ def user_waits_until_parent_contains_element(parent_locator: object, child_locat
 
 def user_waits_until_parent_does_not_contain_element(parent_locator: object, child_locator: str,
                                                      timeout: int = None, error: str = None,
-                                                     limit: int = None):
+                                                     count: int = None):
     try:
         child_locator = _normalise_child_locator(child_locator)
 
@@ -122,7 +123,7 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
             return element_finder.find(child_locator, required=False, parent=parent_el) is None
 
-        if is_noney(limit):
+        if is_noney(count):
             return waiting._wait_until(
                 parent_does_not_contain_matching_element,
                 "Parent '%s' should not have contained '%s' in <TIMEOUT>." % (
@@ -130,16 +131,16 @@ def user_waits_until_parent_does_not_contain_element(parent_locator: object, chi
                 timeout, error
             )
 
-        limit = int(limit)
+        count = int(count)
 
         def parent_does_not_contain_matching_elements() -> bool:
             parent_el = _get_parent_webelement_from_locator(parent_locator, timeout, error)
-            return len(sl.find_elements(child_locator, parent=parent_el)) != limit
+            return len(sl.find_elements(child_locator, parent=parent_el)) != count
 
         waiting._wait_until(
             parent_does_not_contain_matching_elements,
             "Parent '%s' should not have contained %s '%s' element(s) within <TIMEOUT>." % (
-                parent_locator, limit, child_locator),
+                parent_locator, count, child_locator),
             timeout, error
         )
     except Exception as err:
@@ -237,28 +238,13 @@ def prompt_to_continue():
 
 
 def capture_large_screenshot_and_prompt_to_continue():
-    capture_large_screenshot()
+    visual.capture_large_screenshot()
     prompt_to_continue()
 
 
 def capture_large_screenshot_and_html():
-    capture_large_screenshot()
+    visual.capture_large_screenshot()
     capture_html()
-
-
-def capture_large_screenshot():
-    currentWindow = sl.get_window_size()
-    page_height = sl.driver.execute_script(
-        "return document.documentElement.scrollHeight;")
-
-    page_width = currentWindow[0]
-    original_height = currentWindow[1]
-
-    sl.set_window_size(page_width, page_height)
-    screenshot_location = sl.capture_page_screenshot()
-    sl.set_window_size(page_width, original_height)
-
-    warning(f"Captured a screenshot at URL {sl.get_location()}     Screenshot saved to file://{screenshot_location}")
 
 
 def capture_html():

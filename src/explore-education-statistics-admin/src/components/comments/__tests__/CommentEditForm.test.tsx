@@ -107,11 +107,11 @@ describe('CommentEditForm', () => {
     render(
       <CommentsContextProvider
         comments={[]}
-        onDeleteComment={jest.fn()}
-        onSaveComment={jest.fn()}
-        onSaveUpdatedComment={handleUpdateComment}
-        onUpdateUnresolvedComments={{ current: jest.fn() }}
-        onUpdateUnsavedCommentDeletions={{ current: jest.fn() }}
+        onDelete={noop}
+        onCreate={jest.fn()}
+        onUpdate={handleUpdateComment}
+        onPendingDelete={noop}
+        onPendingDeleteUndo={noop}
       >
         <CommentEditForm
           comment={testComments[2]}

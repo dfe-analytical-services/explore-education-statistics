@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
-using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -18,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseInviteServiceTests
     {
-        private static readonly Guid _createdById = Guid.NewGuid();
+        private static readonly Guid CreatedById = Guid.NewGuid();
         private const string NotifyContributorTemplateId = "contributor-invite-template-id";
 
         [Fact]
@@ -105,7 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("test@test.com", userInvites[0].Email);
                 Assert.Equal(Role.Analyst.GetEnumValue(), userInvites[0].RoleId);
-                Assert.Equal(_createdById.ToString(), userInvites[0].CreatedById);
+                Assert.Equal(CreatedById.ToString(), userInvites[0].CreatedById);
                 Assert.False(userInvites[0].Accepted);
                 Assert.InRange(DateTime.UtcNow.Subtract(userInvites[0].Created).Milliseconds, 0, 1500);
             }
@@ -126,7 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test@test.com", userReleaseInvites[0].Email);
                 Assert.Equal(release1.Id, userReleaseInvites[0].ReleaseId);
                 Assert.Equal(Contributor, userReleaseInvites[0].Role);
-                Assert.Equal(_createdById, userReleaseInvites[0].CreatedById);
+                Assert.Equal(CreatedById, userReleaseInvites[0].CreatedById);
                 Assert.False(userReleaseInvites[0].Accepted);
                 Assert.True(userReleaseInvites[0].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
@@ -134,7 +134,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test@test.com", userReleaseInvites[1].Email);
                 Assert.Equal(release2.Id, userReleaseInvites[1].ReleaseId);
                 Assert.Equal(Contributor, userReleaseInvites[1].Role);
-                Assert.Equal(_createdById, userReleaseInvites[1].CreatedById);
+                Assert.Equal(CreatedById, userReleaseInvites[1].CreatedById);
                 Assert.False(userReleaseInvites[1].Accepted);
                 Assert.True(userReleaseInvites[1].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[1].Created).Milliseconds, 0, 1500);
@@ -243,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user.Id, userReleaseRoles[1].UserId);
                 Assert.Equal(release2.Id, userReleaseRoles[1].ReleaseId);
                 Assert.Equal(Contributor, userReleaseRoles[1].Role);
-                Assert.Equal(_createdById, userReleaseRoles[1].CreatedById);
+                Assert.Equal(CreatedById, userReleaseRoles[1].CreatedById);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseRoles[1].Created!.Value).Milliseconds, 0, 1500);
 
                 var userReleaseInvites = await contentDbContext.UserReleaseInvites
@@ -255,7 +255,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test@test.com", userReleaseInvites[0].Email);
                 Assert.Equal(release2.Id, userReleaseInvites[0].ReleaseId);
                 Assert.Equal(Contributor, userReleaseInvites[0].Role);
-                Assert.Equal(_createdById, userReleaseInvites[0].CreatedById);
+                Assert.Equal(CreatedById, userReleaseInvites[0].CreatedById);
                 Assert.True(userReleaseInvites[0].Accepted);
                 Assert.True(userReleaseInvites[0].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
@@ -892,7 +892,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userRepository ?? new UserRepository(contentDbContext),
-                userService ?? AlwaysTrueUserService(_createdById).Object,
+                userService ?? AlwaysTrueUserService(CreatedById).Object,
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(contentDbContext),

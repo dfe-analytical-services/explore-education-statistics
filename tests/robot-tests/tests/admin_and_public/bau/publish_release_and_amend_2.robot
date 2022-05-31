@@ -9,12 +9,14 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Variables ***
 ${RELEASE_NAME}         Academic Year Q1 2020/21
 ${PUBLICATION_NAME}     UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}         Seven filters
 ${SECOND_SUBJECT}       upload file test
 ${THIRD_SUBJECT}        upload file test with filter subject
+
 
 *** Test Cases ***
 Create publication

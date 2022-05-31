@@ -1,6 +1,7 @@
 import ChartContainer from '@common/modules/charts/components/ChartContainer';
 import CustomTooltip from '@common/modules/charts/components/CustomTooltip';
 import useLegend from '@common/modules/charts/components/hooks/useLegend';
+import createReferenceLine from '@common/modules/charts/components/utils/createReferenceLine';
 import {
   AxisConfiguration,
   ChartDefinition,
@@ -26,7 +27,6 @@ import {
   BarChart,
   CartesianGrid,
   Legend,
-  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -166,21 +166,23 @@ const HorizontalBarBlock = ({
             />
           ))}
 
-          {axes.major.referenceLines?.map(referenceLine => (
-            <ReferenceLine
-              key={`${referenceLine.position}_${referenceLine.label}`}
-              y={referenceLine.position}
-              label={referenceLine.label}
-            />
-          ))}
+          {axes.major.referenceLines?.map(referenceLine =>
+            createReferenceLine({
+              chartData,
+              label: referenceLine.label,
+              position: referenceLine.position,
+              y: referenceLine.position,
+            }),
+          )}
 
-          {axes.minor.referenceLines?.map(referenceLine => (
-            <ReferenceLine
-              key={`${referenceLine.position}_${referenceLine.label}`}
-              x={referenceLine.position}
-              label={referenceLine.label}
-            />
-          ))}
+          {axes.minor.referenceLines?.map(referenceLine =>
+            createReferenceLine({
+              chartData,
+              label: referenceLine.label,
+              position: referenceLine.position,
+              x: referenceLine.position,
+            }),
+          )}
         </BarChart>
       </ResponsiveContainer>
     </ChartContainer>

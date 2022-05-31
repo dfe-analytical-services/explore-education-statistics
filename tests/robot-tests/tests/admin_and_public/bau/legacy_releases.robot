@@ -8,10 +8,12 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Variables ***
 ${PUBLICATION_NAME}         UI tests - legacy releases %{RUN_IDENTIFIER}
 ${DESCRIPTION}              legacy release description
 ${UPDATED_DESCRIPTION}      updated legacy release description
+
 
 *** Test Cases ***
 Create new publication for topic
@@ -178,6 +180,7 @@ Validate reordered legacy releases
     user checks results table cell contains    3    1    1
     user checks results table cell contains    3    2    Test collection 3
     user checks results table cell contains    3    3    http://test-3.com
+
 
 *** Keywords ***
 user creates legacy release

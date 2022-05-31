@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -110,55 +111,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                         .ToList()
                 );
 
-            filterRepository.Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds))).Returns(
-                new List<Filter>
-                {
-                    new Filter
+            filterRepository.Setup(s => s.GetFiltersIncludingItems(It.IsIn(subjectIds)))
+                .ReturnsAsync(
+                    new List<Filter>
                     {
-                        Id = Guid.NewGuid(),
-                        Hint = "Filter Hint",
-                        Label = "Filter label",
-                        Name = "Filter name",
-                        FilterGroups = new List<FilterGroup>
+                        new()
                         {
-                            new FilterGroup
+                            Id = Guid.NewGuid(),
+                            Hint = "Filter Hint",
+                            Label = "Filter label",
+                            Name = "Filter name",
+                            FilterGroups = new List<FilterGroup>
                             {
-                                Id = Guid.NewGuid(),
-                                Label = "Filter group",
-                                FilterItems = new List<FilterItem>
+                                new()
                                 {
-                                    new FilterItem
+                                    Id = Guid.NewGuid(),
+                                    Label = "Filter group",
+                                    FilterItems = new List<FilterItem>
                                     {
-                                        Id = Guid.NewGuid(),
-                                        Label = "Filter item",
+                                        new()
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Label = "Filter item",
+                                        }
                                     }
                                 }
                             }
                         }
                     }
-                }
-            );
+                );
 
-            indicatorGroupRepository.Setup(s => s.GetIndicatorGroups(It.IsIn(subjectIds))).Returns(
-                new List<IndicatorGroup>
-                {
-                    new IndicatorGroup
+            indicatorGroupRepository.Setup(s => s.GetIndicatorGroups(It.IsIn(subjectIds)))
+                .ReturnsAsync(
+                    new List<IndicatorGroup>
                     {
-                        Id = Guid.NewGuid(),
-                        Label = "Indicator group",
-                        Indicators = new List<Indicator>
+                        new()
                         {
-                            new Indicator
+                            Id = Guid.NewGuid(),
+                            Label = "Indicator group",
+                            Indicators = new List<Indicator>
                             {
-                                Id = Guid.NewGuid(),
-                                Label = "Indicator label",
-                                Name = "Indicator name",
-                                Unit = Data.Model.Unit.Percent,
-                                DecimalPlaces = 2
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Label = "Indicator label",
+                                    Name = "Indicator name",
+                                    Unit = Data.Model.Unit.Percent,
+                                    DecimalPlaces = 2
+                                }
                             }
                         }
-                    }
-                });
+                    });
 
             _controller = new FootnoteController(filterRepository.Object,
                 footnoteService.Object,

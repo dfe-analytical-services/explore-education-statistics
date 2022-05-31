@@ -375,9 +375,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             return hashCode.ToHashCode();
         }
 
-        public ILocationAttribute ToLocationAttribute()
+        public LocationAttribute ToLocationAttribute()
         {
-            ILocationAttribute? principalAttribute = GeographicLevel switch
+            LocationAttribute? principalAttribute = GeographicLevel switch
             {
                 GeographicLevel.Country => Country,
                 GeographicLevel.EnglishDevolvedArea => EnglishDevolvedArea,
@@ -412,7 +412,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
             Dictionary<GeographicLevel, List<string>>? hierarchies = null)
         {
             var hierarchyWithLocationSelectors = hierarchies == null
-                ? new Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute>>>()
+                ? new Dictionary<GeographicLevel, List<Func<Location, LocationAttribute>>>()
                 : MapLocationAttributeSelectors(hierarchies);
 
             return distinctLocations
@@ -438,7 +438,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                     });
         }
 
-        private static Dictionary<GeographicLevel, List<Func<Location, ILocationAttribute>>>
+        private static Dictionary<GeographicLevel, List<Func<Location, LocationAttribute>>>
             MapLocationAttributeSelectors(Dictionary<GeographicLevel, List<string>> hierarchies)
         {
             return hierarchies.ToDictionary(
@@ -447,7 +447,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                 {
                     // Function which resolves an ILocationAttribute from a Location by property name e.g. 'Region'.
                     // This gets used when grouping the attributes of a location by a property name configured in a hierarchy.
-                    return (Func<Location, ILocationAttribute>) (location =>
+                    return (Func<Location, LocationAttribute>) (location =>
                     {
                         var propertyInfo = typeof(Location).GetProperty(propertyName);
 
@@ -456,10 +456,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                             throw new ArgumentException($"{nameof(Location)} does not have a property {propertyName}");
                         }
 
-                        // Only allow properties of Location that implement ILocationAttribute to be used in a hierarchy 
-                        if (!typeof(ILocationAttribute).IsAssignableFrom(propertyInfo.PropertyType))
+                        // Only allow properties of Location that derive from LocationAttribute to be used in a hierarchy 
+                        if (!typeof(LocationAttribute).IsAssignableFrom(propertyInfo.PropertyType))
                         {
-                            throw new ArgumentException($"{nameof(Location)} property {propertyName} is not a {nameof(ILocationAttribute)}");
+                            throw new ArgumentException($"{nameof(Location)} property {propertyName} is not a {nameof(LocationAttribute)}");
                         }
 
                         var value = propertyInfo.GetValue(location);
@@ -480,7 +480,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
                             value = Activator.CreateInstance(propertyType, nullParams);
                         }
 
-                        return (value as ILocationAttribute)!;
+                        return (value as LocationAttribute)!;
                     });
                 }).ToList()
             );
@@ -488,7 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
 
         private static List<LocationAttributeNode> GroupLocationAttributes(
             IEnumerable<Location> locations,
-            IReadOnlyList<Func<Location, ILocationAttribute>> attributeSelectors)
+            IReadOnlyList<Func<Location, LocationAttribute>> attributeSelectors)
         {
             if (attributeSelectors.IsNullOrEmpty())
             {

@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             Sponsor? sponsor,
             Ward? ward)
         {
-            var locationAttributes = new ILocationAttribute?[]
+            var locationAttributes = new LocationAttribute?[]
             {
                 country,
                 englishDevolvedArea,

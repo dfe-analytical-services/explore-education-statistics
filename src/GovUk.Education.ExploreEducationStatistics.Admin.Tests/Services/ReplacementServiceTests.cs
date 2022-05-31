@@ -1751,7 +1751,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Query = new ObservationQueryContext
                 {
                     SubjectId = originalSubject.Id,
-                    Filters = new[] { originalFilterItem.Id},
+                    Filters = new[] {originalFilterItem.Id},
                     Indicators = new[] {originalIndicator.Id},
                     LocationIds = ListOf(originalLocation.Id),
                     TimePeriod = timePeriod
@@ -2282,6 +2282,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, dataBlockSchoolTypeFilterPlan.Value.Groups.Count);
 
                 var dataBlockIndividualSchoolTypeFilterGroupPlan =
+                    dataBlockSchoolTypeFilterPlan.Value.Groups.First(g =>
+                        g.Key == originalIndividualSchoolTypeFilterGroup.Id);
                     dataBlockSchoolTypeFilterPlan.Value.Groups.First(g => g.Key == originalIndividualSchoolTypeFilterGroup.Id);
 
                 Assert.Equal(originalIndividualSchoolTypeFilterGroup.Id,
@@ -3229,14 +3231,462 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(replacementSubject.Id, replacedFootnoteForSubject.Subjects.First().Subject.Id);
 
-                // Check the original guidance has been retained on the replacement
                 var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
-                    .AsQueryable()
-                    .Where(rs => rs.ReleaseId == statsReleaseVersion2.Id
-                                 && rs.SubjectId == replacementSubject.Id)
-                    .FirstAsync();
+                    .SingleAsync(rs => rs.ReleaseId == statsReleaseVersion2.Id
+                                       && rs.SubjectId == replacementSubject.Id);
 
+                // Check the original guidance has been retained on the replacement
                 Assert.Equal("Original guidance version 2", replacedReleaseSubject.DataGuidance);
+
+                // Check the sequence of filters and indicators remains untouched
+                Assert.Null(replacedReleaseSubject.FilterSequence);
+                Assert.Null(replacedReleaseSubject.IndicatorSequence);
+            }
+        }
+
+        [Fact]
+        public async Task Replace_FilterSequenceIsReplaced()
+        {
+            // Basic test replacing a filter sequence, exercising the service with in-memory data and dependencies.  
+            // See ReplaceServiceHelperTests.ReplaceFilterSequence for a more comprehensive test of the actual replacement.
+
+            var originalSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var replacementSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contentRelease = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication
+            };
+
+            var statsRelease = new Release
+            {
+                Id = contentRelease.Id
+            };
+
+            var originalFile = new File
+            {
+                Filename = "original.csv",
+                Type = FileType.Data,
+                SubjectId = originalSubject.Id
+            };
+
+            var replacementFile = new File
+            {
+                Filename = "replacement.csv",
+                Type = FileType.Data,
+                SubjectId = replacementSubject.Id,
+                Replacing = originalFile
+            };
+
+            originalFile.ReplacedBy = replacementFile;
+
+            var originalReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = originalFile
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = replacementFile
+            };
+
+            var originalReleaseSubject = new ReleaseSubject
+            {
+                Release = statsRelease,
+                Subject = originalSubject
+            };
+
+            var replacementReleaseSubject = new ReleaseSubject
+            {
+                Release = statsRelease,
+                Subject = replacementSubject
+            };
+
+            // Define a set of filters, filter groups and filter items belonging to the original subject
+            var originalFilters = new List<Filter>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Filter a",
+                    Name = "filter_a",
+                    Subject = originalSubject,
+                    FilterGroups = new List<FilterGroup>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Label = "Group a",
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Label = "Item a"
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Label = "Item b"
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            // Define a sequence for the original subject which is expected to be updated after the replacement
+            originalReleaseSubject.FilterSequence = new List<FilterSequenceEntry>
+            {
+                // Filter a
+                new(originalFilters[0].Id,
+                    new List<FilterGroupSequenceEntry>
+                    {
+                        // Group a
+                        new(
+                            originalFilters[0].FilterGroups[0].Id,
+                            new List<Guid>
+                            {
+                                // Item b, Indicator a
+                                originalFilters[0].FilterGroups[0].FilterItems[1].Id,
+                                originalFilters[0].FilterGroups[0].FilterItems[0].Id
+                            }
+                        )
+                    }
+                )
+            };
+
+            // Define the set of filters, filter groups and filter items belonging to the replacement subject
+            var replacementFilters = new List<Filter>
+            {
+                // 'Filter a' is identical
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Filter a",
+                    Name = "filter_a",
+                    Subject = replacementSubject,
+                    FilterGroups = new List<FilterGroup>
+                    {
+                        // 'Group a' is identical
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Label = "Group a",
+                            FilterItems = new List<FilterItem>
+                            {
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Label = "Item a"
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Label = "Item b"
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+
+            var mocks = Mocks();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(contentRelease);
+                await contentDbContext.Files.AddRangeAsync(originalFile, replacementFile);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.Release.AddAsync(statsRelease);
+                await statisticsDbContext.Subject.AddRangeAsync(originalSubject, replacementSubject);
+                await statisticsDbContext.Filter.AddRangeAsync(originalFilters);
+                await statisticsDbContext.Filter.AddRangeAsync(replacementFilters);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(originalReleaseSubject,
+                    replacementReleaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>());
+
+            mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
+                contentRelease.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
+
+                var result = await replacementService.Replace(
+                    releaseId: contentRelease.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
+
+                VerifyAllMocks(mocks);
+
+                result.AssertRight();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
+                    .SingleAsync(rs => rs.ReleaseId == statsRelease.Id
+                                       && rs.SubjectId == replacementSubject.Id);
+
+                // Verify the updated sequence of filters on the replacement subject
+                var updatedSequence = replacedReleaseSubject.FilterSequence;
+                Assert.NotNull(updatedSequence);
+
+                // 'Filter a' should be the only filter in the sequence
+                var filterA = Assert.Single(updatedSequence);
+                Assert.Equal(replacementFilters[0].Id, filterA.Id);
+                var filterAGroups = filterA.ChildSequence;
+
+                // 'Group a' should be the only group in the sequence
+                var filterAGroupA = Assert.Single(filterAGroups);
+                Assert.Equal(replacementFilters[0].FilterGroups[0].Id, filterAGroupA.Id);
+
+                // 'Group a' should still have two filter items in the same order as the original sequence
+                Assert.Equal(2, filterAGroupA.ChildSequence.Count);
+                Assert.Equal(replacementFilters[0].FilterGroups[0].FilterItems[1].Id, filterAGroupA.ChildSequence[0]);
+                Assert.Equal(replacementFilters[0].FilterGroups[0].FilterItems[0].Id, filterAGroupA.ChildSequence[1]);
+            }
+        }
+
+        [Fact]
+        public async Task Replace_IndicatorSequenceIsReplaced()
+        {
+            // Basic test replacing an indicator sequence, exercising the service with in-memory data and dependencies.  
+            // See ReplaceServiceHelperTests.ReplaceIndicatorSequence for a more comprehensive test of the actual replacement.
+
+            var originalSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var replacementSubject = new Subject
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var publication = new Publication
+            {
+                Id = Guid.NewGuid()
+            };
+
+            var contentRelease = new Content.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                Publication = publication
+            };
+
+            var statsRelease = new Release
+            {
+                Id = contentRelease.Id
+            };
+
+            var originalFile = new File
+            {
+                Filename = "original.csv",
+                Type = FileType.Data,
+                SubjectId = originalSubject.Id
+            };
+
+            var replacementFile = new File
+            {
+                Filename = "replacement.csv",
+                Type = FileType.Data,
+                SubjectId = replacementSubject.Id,
+                Replacing = originalFile
+            };
+
+            originalFile.ReplacedBy = replacementFile;
+
+            var originalReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = originalFile
+            };
+
+            var replacementReleaseFile = new ReleaseFile
+            {
+                Release = contentRelease,
+                File = replacementFile
+            };
+
+            var originalReleaseSubject = new ReleaseSubject
+            {
+                Release = statsRelease,
+                Subject = originalSubject
+            };
+
+            var replacementReleaseSubject = new ReleaseSubject
+            {
+                Release = statsRelease,
+                Subject = replacementSubject
+            };
+
+            // Define a set of indicator groups and indicators belonging to the original subject
+            var originalGroups = new List<IndicatorGroup>
+            {
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Group a",
+                    Subject = originalSubject,
+                    Indicators = new List<Indicator>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Label = "Indicator a",
+                            Name = "indicator_a"
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Label = "Indicator b",
+                            Name = "indicator_b"
+                        }
+                    }
+                }
+            };
+
+            // Define a sequence for the original subject which is expected to be updated after the replacement
+            originalReleaseSubject.IndicatorSequence = new List<IndicatorGroupSequenceEntry>
+            {
+                // Group a
+                new(
+                    originalGroups[0].Id,
+                    new List<Guid>
+                    {
+                        // Indicator b, Indicator a
+                        originalGroups[0].Indicators[1].Id,
+                        originalGroups[0].Indicators[0].Id
+                    }
+                )
+            };
+
+            // Define the set of indicator groups and indicators belonging to the replacement subject
+            var replacementGroups = new List<IndicatorGroup>
+            {
+                // 'Group a' is identical
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    Label = "Group a",
+                    Subject = replacementSubject,
+                    Indicators = new List<Indicator>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Label = "Indicator a",
+                            Name = "indicator_a"
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Label = "Indicator b",
+                            Name = "indicator_b"
+                        }
+                    }
+                }
+            };
+
+            var mocks = Mocks();
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(contentRelease);
+                await contentDbContext.Files.AddRangeAsync(originalFile, replacementFile);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(originalReleaseFile, replacementReleaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                await statisticsDbContext.Release.AddAsync(statsRelease);
+                await statisticsDbContext.Subject.AddRangeAsync(originalSubject, replacementSubject);
+                await statisticsDbContext.IndicatorGroup.AddRangeAsync(originalGroups);
+                await statisticsDbContext.IndicatorGroup.AddRangeAsync(replacementGroups);
+                await statisticsDbContext.ReleaseSubject.AddRangeAsync(originalReleaseSubject,
+                    replacementReleaseSubject);
+                await statisticsDbContext.SaveChangesAsync();
+            }
+
+            mocks.locationRepository.Setup(service => service.GetDistinctForSubject(replacementSubject.Id))
+                .ReturnsAsync(new List<Location>());
+
+            mocks.TimePeriodService.Setup(service => service.GetTimePeriods(replacementSubject.Id))
+                .Returns(new List<(int Year, TimeIdentifier TimeIdentifier)>());
+
+            mocks.ReleaseService.Setup(service => service.RemoveDataFiles(
+                contentRelease.Id, originalFile.Id)).ReturnsAsync(Unit.Instance);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacementService = BuildReplacementService(contentDbContext, statisticsDbContext, mocks);
+
+                var result = await replacementService.Replace(
+                    releaseId: contentRelease.Id,
+                    originalFileId: originalFile.Id,
+                    replacementFileId: replacementFile.Id);
+
+                VerifyAllMocks(mocks);
+
+                result.AssertRight();
+            }
+
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                var replacedReleaseSubject = await statisticsDbContext.ReleaseSubject
+                    .SingleAsync(rs => rs.ReleaseId == statsRelease.Id
+                                       && rs.SubjectId == replacementSubject.Id);
+
+                // Verify the updated sequence of indicators on the replacement subject
+                var updatedSequence = replacedReleaseSubject.IndicatorSequence;
+                Assert.NotNull(updatedSequence);
+
+                // 'Group a' should be the only group in the sequence
+                var groupA = Assert.Single(updatedSequence);
+                Assert.Equal(replacementGroups[0].Id, groupA.Id);
+
+                // 'Group a' should still have two indicators in the same order as the original sequence
+                Assert.Equal(2, groupA.ChildSequence.Count);
+                Assert.Equal(replacementGroups[0].Indicators[1].Id, groupA.ChildSequence[0]);
+                Assert.Equal(replacementGroups[0].Indicators[0].Id, groupA.ChildSequence[1]);
             }
         }
 
@@ -3306,6 +3756,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 statisticsDbContext,
                 new FilterRepository(statisticsDbContext),
                 new IndicatorRepository(statisticsDbContext),
+                new IndicatorGroupRepository(statisticsDbContext),
                 locationRepository.Object,
                 new FootnoteRepository(statisticsDbContext),
                 releaseService.Object,

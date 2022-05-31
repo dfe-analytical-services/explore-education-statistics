@@ -65,9 +65,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         {
         }
 
-        public StatisticsDbContext(DbContextOptions<StatisticsDbContext> options, int? timeout) : base(options)
+        public StatisticsDbContext(
+            DbContextOptions<StatisticsDbContext> options,
+            int? timeout,
+            bool updateTimestamps = true) : base(options)
         {
-            Configure(timeout);
+            Configure(timeout, updateTimestamps);
         }
 
         /// <summary>
@@ -77,15 +80,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         /// level and this doesn't really work with the DI container (unless
         /// we created an abstract base class with a type parameter).
         /// </summary>
-        protected StatisticsDbContext(DbContextOptions options, int? timeout) : base(options)
+        protected StatisticsDbContext(
+            DbContextOptions options, 
+            int? timeout, 
+            bool updateTimestamps = true) : base(options)
         {
-            Configure(timeout);
+            Configure(timeout, updateTimestamps);
         }
 
-        private void Configure(int? timeout = null)
+        private void Configure(int? timeout = null, bool updateTimestamps = true)
         {
-            ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
-            ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
+            if (updateTimestamps)
+            {
+                ChangeTracker.StateChanged += DbContextUtils.UpdateTimestamps;
+                ChangeTracker.Tracked += DbContextUtils.UpdateTimestamps;
+            }
 
             if (timeout.HasValue)
             {

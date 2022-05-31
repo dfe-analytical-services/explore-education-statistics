@@ -1,5 +1,5 @@
 import { Comment } from '@admin/services/types/content';
-import { AddComment } from '@admin/services/releaseContentCommentService';
+import { CommentCreate } from '@admin/services/releaseContentCommentService';
 import useCallbackRef from '@common/hooks/useCallbackRef';
 import React, {
   createContext,
@@ -20,16 +20,16 @@ export interface SelectedComment {
 }
 
 export interface CommentsContextState {
-  addComment: (blockId: string, comment: AddComment) => Promise<Comment | null>;
+  addComment: (comment: CommentCreate) => Promise<Comment | null>;
   comments: Comment[];
   currentInteraction: CurrentCommentInteraction;
   clearPendingDeletions: () => void;
   markersOrder: string[];
   pendingDeletions: Comment[];
-  reAddComment: MutableRefObject<(blockId: string, commentId: string) => void>;
-  removeComment: MutableRefObject<(blockId: string, commentId: string) => void>;
+  reAddComment: MutableRefObject<(commentId: string) => void>;
+  removeComment: MutableRefObject<(commentId: string) => void>;
   resolveComment: MutableRefObject<
-    (blockId: string, commentId: string, updateMarker?: boolean) => void
+    (commentId: string, updateMarker?: boolean) => void
   >;
   selectedComment: SelectedComment;
   setCurrentInteraction: (
@@ -38,7 +38,7 @@ export interface CommentsContextState {
   setMarkersOrder: (order: string[]) => void;
   setSelectedComment: (selectedComment: SelectedComment) => void;
   unresolveComment: MutableRefObject<
-    (blockId: string, commentId: string, updateMarker?: boolean) => void
+    (commentId: string, updateMarker?: boolean) => void
   >;
   updateComment: (comment: Comment) => void;
 }
@@ -66,29 +66,24 @@ export interface CommentsContextProviderProps {
   comments: Comment[];
   markersOrder?: string[];
   pendingDeletions?: Comment[];
-  onDeleteComment: (commentId: string) => Promise<void>;
-  onSaveComment: (comment: AddComment) => Promise<Comment>;
-  onSaveUpdatedComment: (comment: Comment) => Promise<Comment>;
-  onUpdateUnresolvedComments: MutableRefObject<
-    (blockId: string, commentId: string) => void
-  >;
-  onUpdateUnsavedCommentDeletions: MutableRefObject<
-    (blockId: string, commentId: string) => void
-  >;
+  onCreate: (comment: CommentCreate) => Promise<Comment>;
+  onDelete: (commentId: string) => void;
+  onPendingDelete: (commentId: string) => void;
+  onPendingDeleteUndo: (commentId: string) => void;
+  onUpdate: (comment: Comment) => void;
 }
 
 export const CommentsContextProvider = ({
   children,
-  comments: initialComments,
+  comments: commentsProp,
   markersOrder: initialMarkersOrder = [],
   pendingDeletions: initialPendingDeletions = [],
-  onDeleteComment,
-  onSaveComment,
-  onSaveUpdatedComment,
-  onUpdateUnresolvedComments,
-  onUpdateUnsavedCommentDeletions,
+  onCreate,
+  onDelete,
+  onPendingDelete,
+  onPendingDeleteUndo,
+  onUpdate,
 }: CommentsContextProviderProps) => {
-  const [comments, setComments] = useState<Comment[]>(initialComments);
   const [currentInteraction, setCurrentInteraction] = useState<
     CurrentCommentInteraction
   >();
@@ -103,15 +98,25 @@ export const CommentsContextProvider = ({
     fromEditor: false,
   });
 
-  // Use useCallbackRef for these to avoid the problem of stale references when they're called from the editor undo/redo
+  const comments = useMemo(
+    () =>
+      commentsProp.filter(
+        comment =>
+          !pendingDeletions.some(deletion => deletion.id === comment.id),
+      ),
+    [commentsProp, pendingDeletions],
+  );
+
+  // Use `useCallbackRef` for these callbacks to avoid the problem of stale
+  // references when they're called from the editor undo/redo
+
   const removeComment: CommentsContextState['removeComment'] = useCallbackRef(
-    (blockId, commentId) => {
+    commentId => {
       const commentToDelete = comments.find(
         comment => comment.id === commentId,
       );
-      if (commentToDelete) {
-        setComments(comments.filter(comment => comment.id !== commentId));
 
+      if (commentToDelete) {
         setPendingDeletions([...pendingDeletions, commentToDelete]);
 
         setCurrentInteraction({
@@ -119,30 +124,26 @@ export const CommentsContextProvider = ({
           id: commentId,
         });
 
-        onUpdateUnsavedCommentDeletions.current(blockId, commentId);
+        if (commentId !== 'commentPlaceholder') {
+          onPendingDelete(commentId);
+        }
       }
     },
     [comments, pendingDeletions],
   );
 
   const resolveComment: CommentsContextState['resolveComment'] = useCallbackRef(
-    async (blockId, commentId, updateMarker) => {
+    async (commentId, updateMarker) => {
       const comment = comments.find(c => c.id === commentId);
+
       if (!comment) {
         return;
       }
 
-      const updatedComment = await onSaveUpdatedComment({
+      await onUpdate({
         ...comment,
         setResolved: true,
       });
-      const index = comments.findIndex(c => c.id === updatedComment.id);
-      if (index !== -1) {
-        const updatedComments = [...comments];
-        updatedComments[index] = updatedComment;
-        setComments(updatedComments);
-        onUpdateUnresolvedComments.current(blockId, comment.id);
-      }
 
       if (updateMarker) {
         setCurrentInteraction({
@@ -155,39 +156,34 @@ export const CommentsContextProvider = ({
   );
 
   const reAddComment: CommentsContextState['reAddComment'] = useCallbackRef(
-    (blockId, commentId) => {
+    commentId => {
       const commentToUndelete = pendingDeletions.find(
-        comment => comment.id === commentId,
+        deletion => deletion.id === commentId,
       );
+
       if (commentToUndelete) {
         setPendingDeletions(
           pendingDeletions.filter(deletion => deletion.id !== commentId),
         );
-        setComments([...comments, commentToUndelete]);
-        onUpdateUnsavedCommentDeletions.current(blockId, commentId);
+
+        onPendingDeleteUndo(commentId);
       }
     },
     [comments, pendingDeletions],
   );
 
   const unresolveComment: CommentsContextState['unresolveComment'] = useCallbackRef(
-    async (blockId, commentId, updateMarker) => {
+    async (commentId, updateMarker) => {
       const comment = comments.find(c => c.id === commentId);
+
       if (!comment) {
         return;
       }
 
-      const updatedComment = await onSaveUpdatedComment({
+      await onUpdate({
         ...comment,
         setResolved: false,
       });
-      const index = comments.findIndex(c => c.id === updatedComment.id);
-      if (index !== -1) {
-        const updatedComments = [...comments];
-        updatedComments[index] = updatedComment;
-        setComments(updatedComments);
-        onUpdateUnresolvedComments.current(blockId, comment.id);
-      }
 
       if (updateMarker) {
         setCurrentInteraction({
@@ -200,38 +196,23 @@ export const CommentsContextProvider = ({
   );
 
   const state = useMemo<CommentsContextState>(() => {
-    const addComment: CommentsContextState['addComment'] = async (
-      blockId,
-      comment,
-    ) => {
-      const newComment = await onSaveComment(comment);
-      setComments(currentComments => [...currentComments, newComment]);
+    const addComment: CommentsContextState['addComment'] = async comment => {
+      const newComment = await onCreate(comment);
+
       setCurrentInteraction({ type: 'adding', id: newComment.id });
-      onUpdateUnresolvedComments.current(blockId, newComment.id);
+
       return newComment;
     };
 
     const clearPendingDeletions = async () => {
       await Promise.all(
-        pendingDeletions.map(deletion => onDeleteComment(deletion.id)),
+        pendingDeletions.map(deletion => onDelete(deletion.id)),
       );
       setPendingDeletions([]);
     };
 
     const updateComment: CommentsContextState['updateComment'] = async comment => {
-      const updatedComment = await onSaveUpdatedComment(comment);
-
-      setComments(currentComments => {
-        const index = currentComments.findIndex(
-          c => c.id === updatedComment.id,
-        );
-        if (index === -1) {
-          return currentComments;
-        }
-        const updatedComments = [...comments];
-        updatedComments.splice(index, 1, updatedComment);
-        return updatedComments;
-      });
+      await onUpdate(comment);
     };
 
     return {
@@ -261,10 +242,9 @@ export const CommentsContextProvider = ({
     resolveComment,
     selectedComment,
     unresolveComment,
-    onDeleteComment,
-    onSaveComment,
-    onSaveUpdatedComment,
-    onUpdateUnresolvedComments,
+    onDelete,
+    onCreate,
+    onUpdate,
   ]);
 
   return (

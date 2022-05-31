@@ -103,7 +103,7 @@ describe('SubjectStep', () => {
   test('renders non-tabbed view with subjects', () => {
     jest.useFakeTimers();
 
-    const { container } = render(
+    render(
       <SubjectStep
         {...wizardProps}
         subjects={testSubjects}
@@ -120,7 +120,7 @@ describe('SubjectStep', () => {
     expect(radios[0]).toHaveAttribute('value', 'subject-1');
     expect(radios[1]).toHaveAttribute('value', 'subject-2');
 
-    const subject1Hint = within(getDescribedBy(container, radios[0]));
+    const subject1Hint = within(getDescribedBy(radios[0]));
 
     expect(
       within(subject1Hint.getByTestId('Content')).getByText('Test content 1', {
@@ -134,7 +134,7 @@ describe('SubjectStep', () => {
       '2018/19 to 2020/21',
     );
 
-    const subject2Hint = within(getDescribedBy(container, radios[1]));
+    const subject2Hint = within(getDescribedBy(radios[1]));
 
     expect(
       within(subject2Hint.getByTestId('Content')).getByText('Test content 2', {

@@ -1,91 +1,98 @@
-import { ReleaseDispatchAction } from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
+import {
+  BlockMeta,
+  ContentSectionKeys,
+  ReleaseDispatchAction,
+} from '@admin/pages/release/content/contexts/ReleaseContentContextActionTypes';
 import { EditableRelease } from '@admin/services/releaseContentService';
 import { EditableBlock } from '@admin/services/types/content';
 import { useLoggedImmerReducer } from '@common/hooks/useLoggedReducer';
 import { ContentSection } from '@common/services/publicationService';
-import { BaseBlock, DataBlock } from '@common/services/types/blocks';
-import remove from 'lodash/remove';
+import { DataBlock } from '@common/services/types/blocks';
 import React, { createContext, ReactNode, useContext } from 'react';
 import { Reducer } from 'use-immer';
 
-export type ReleaseContextDispatch = (action: ReleaseDispatchAction) => void;
+export type ReleaseContentContextDispatch = (
+  action: ReleaseDispatchAction,
+) => void;
 
-export type ReleaseContextState = {
+export interface ReleaseContentContextState {
   release: EditableRelease;
   canUpdateRelease: boolean;
   availableDataBlocks: DataBlock[];
-};
-const ReleaseStateContext = createContext<ReleaseContextState | undefined>(
-  undefined,
-);
-const ReleaseDispatchContext = createContext<
-  ReleaseContextDispatch | undefined
+}
+
+const ReleaseContentStateContext = createContext<
+  ReleaseContentContextState | undefined
+>(undefined);
+
+const ReleaseContentDispatchContext = createContext<
+  ReleaseContentContextDispatch | undefined
 >(undefined);
 
 export const releaseReducer: Reducer<
-  ReleaseContextState,
+  ReleaseContentContextState,
   ReleaseDispatchAction
 > = (draft, action) => {
+  function getSection({
+    sectionKey,
+    sectionId,
+  }: {
+    sectionKey: ContentSectionKeys;
+    sectionId: string;
+  }): ContentSection<EditableBlock> | undefined {
+    const matchingSection = draft.release[sectionKey] as
+      | ContentSection<EditableBlock>
+      | ContentSection<EditableBlock>[];
+
+    if (!matchingSection) {
+      throw new Error(
+        `${action.type}: Section "${sectionKey}" could not be found.`,
+      );
+    }
+
+    if (Array.isArray(matchingSection)) {
+      return matchingSection.find(section => section.id === sectionId);
+    }
+
+    return matchingSection;
+  }
+
+  function getBlock({
+    sectionKey,
+    sectionId,
+    blockId,
+  }: BlockMeta): EditableBlock | undefined {
+    const section = getSection({ sectionKey, sectionId });
+
+    return section?.content.find(block => block.id === blockId);
+  }
+
   switch (action.type) {
     case 'SET_AVAILABLE_DATABLOCKS': {
       draft.availableDataBlocks = action.payload;
       return draft;
     }
-    case 'REMOVE_BLOCK_FROM_SECTION': {
-      const { sectionId, blockId, sectionKey } = action.payload.meta;
-      const matchingSection = draft.release[sectionKey] as
-        | ContentSection<BaseBlock>
-        | ContentSection<BaseBlock>[];
+    case 'REMOVE_SECTION_BLOCK': {
+      const { meta } = action.payload;
+      const { blockId } = meta;
 
-      if (!matchingSection) {
-        throw new Error(
-          `${action.type}: Section "${sectionKey}" could not be found.`,
+      const matchingSection = getSection(meta);
+
+      if (matchingSection) {
+        matchingSection.content = matchingSection.content.filter(
+          block => block.id !== blockId,
         );
-      }
-
-      if (Array.isArray(matchingSection)) {
-        const matchingContentSection = matchingSection.find(
-          section => section.id === sectionId,
-        );
-
-        if (matchingContentSection) {
-          remove(
-            matchingContentSection.content,
-            content => content.id === blockId,
-          );
-        }
-      } else {
-        remove(matchingSection.content, content => content.id === blockId);
       }
 
       return draft;
     }
-    case 'UPDATE_BLOCK_FROM_SECTION': {
+    case 'UPDATE_SECTION_BLOCK': {
       const { block, meta } = action.payload;
-      const { sectionId, blockId, sectionKey } = meta;
+      const { blockId } = meta;
 
-      const matchingSection = draft.release[sectionKey] as
-        | ContentSection<BaseBlock>
-        | ContentSection<BaseBlock>[];
+      const matchingSection = getSection(meta);
 
-      if (!matchingSection) {
-        throw new Error(
-          `${action.type}: Section "${sectionKey}" could not be found.`,
-        );
-      }
-      if (Array.isArray(matchingSection)) {
-        const matchingContentSection = matchingSection.find(
-          section => section.id === sectionId,
-        );
-
-        if (matchingContentSection) {
-          const blockIndex = matchingContentSection.content.findIndex(
-            contentBlock => contentBlock.id === blockId,
-          );
-
-          matchingContentSection.content[blockIndex] = block;
-        }
-      } else {
+      if (matchingSection) {
         const blockIndex = matchingSection.content.findIndex(
           contentBlock => contentBlock.id === blockId,
         );
@@ -97,63 +104,67 @@ export const releaseReducer: Reducer<
 
       return draft;
     }
-    case 'ADD_BLOCK_TO_SECTION': {
+    case 'ADD_SECTION_BLOCK': {
       const { block, meta } = action.payload;
-      const { sectionId, sectionKey } = meta;
 
-      const matchingSection = draft.release[sectionKey] as
-        | ContentSection<BaseBlock>
-        | ContentSection<BaseBlock>[];
+      const matchingSection = getSection(meta);
 
-      if (!matchingSection) {
-        throw new Error(
-          `${action.type}: Section "${sectionKey}" could not be found.`,
-        );
+      matchingSection?.content.push({
+        ...block,
+        comments: block.comments ?? [],
+      });
+
+      return draft;
+    }
+    case 'ADD_BLOCK_COMMENT': {
+      const { comment, meta } = action.payload;
+
+      const block = getBlock(meta);
+
+      if (block) {
+        block.comments.push(comment);
       }
 
-      // comments needs initialising to array as will be undefined if empty
-      const newBlock: EditableBlock = {
-        ...block,
-        comments: block.comments || [],
-      };
+      return draft;
+    }
+    case 'UPDATE_BLOCK_COMMENT': {
+      const { comment, meta } = action.payload;
 
-      if (Array.isArray(matchingSection)) {
-        const matchingContentSection = matchingSection.find(
-          section => section.id === sectionId,
+      const block = getBlock(meta);
+
+      if (block) {
+        const index = block.comments.findIndex(c => c.id === comment.id);
+
+        if (index !== -1) {
+          block.comments[index] = comment;
+        }
+      }
+
+      return draft;
+    }
+    case 'REMOVE_BLOCK_COMMENT': {
+      const { commentId, meta } = action.payload;
+
+      const block = getBlock(meta);
+
+      if (block) {
+        const index = block.comments.findIndex(
+          comment => comment.id === commentId,
         );
 
-        if (matchingContentSection) {
-          matchingContentSection.content.push(newBlock);
+        if (index !== -1) {
+          block.comments.splice(index, 1);
         }
-      } else {
-        matchingSection.content.push(newBlock);
       }
 
       return draft;
     }
     case 'UPDATE_SECTION_CONTENT': {
       const { sectionContent, meta } = action.payload;
-      const { sectionId, sectionKey } = meta;
 
-      const matchingSection = draft.release[sectionKey] as
-        | ContentSection<BaseBlock>
-        | ContentSection<BaseBlock>[];
+      const matchingSection = getSection(meta);
 
-      if (!matchingSection) {
-        throw new Error(
-          `${action.type}: Section "${sectionKey}" could not be found.`,
-        );
-      }
-
-      if (Array.isArray(matchingSection)) {
-        const matchingContentSection = matchingSection.find(
-          section => section.id === sectionId,
-        );
-
-        if (matchingContentSection) {
-          matchingContentSection.content = sectionContent;
-        }
-      } else {
+      if (matchingSection) {
         matchingSection.content = sectionContent;
       }
 
@@ -203,10 +214,13 @@ export const releaseReducer: Reducer<
 
 interface ReleaseProviderProps {
   children: ReactNode;
-  value: ReleaseContextState;
+  value: ReleaseContentContextState;
 }
 
-function ReleaseContentProvider({ children, value }: ReleaseProviderProps) {
+export function ReleaseContentProvider({
+  children,
+  value,
+}: ReleaseProviderProps) {
   const [state, dispatch] = useLoggedImmerReducer(
     'Release',
     releaseReducer,
@@ -214,32 +228,26 @@ function ReleaseContentProvider({ children, value }: ReleaseProviderProps) {
   );
 
   return (
-    <ReleaseStateContext.Provider value={state}>
-      <ReleaseDispatchContext.Provider value={dispatch}>
+    <ReleaseContentStateContext.Provider value={state}>
+      <ReleaseContentDispatchContext.Provider value={dispatch}>
         {children}
-      </ReleaseDispatchContext.Provider>
-    </ReleaseStateContext.Provider>
+      </ReleaseContentDispatchContext.Provider>
+    </ReleaseContentStateContext.Provider>
   );
 }
 
-function useReleaseContentState() {
-  const context = useContext(ReleaseStateContext);
+export function useReleaseContentState(): ReleaseContentContextState {
+  const context = useContext(ReleaseContentStateContext);
   if (context === undefined) {
     throw new Error('useReleaseState must be used within a ReleaseProvider');
   }
   return context;
 }
 
-function useReleaseContentDispatch() {
-  const context = useContext(ReleaseDispatchContext);
+export function useReleaseContentDispatch(): ReleaseContentContextDispatch {
+  const context = useContext(ReleaseContentDispatchContext);
   if (context === undefined) {
     throw new Error('useReleaseDispatch must be used within a ReleaseProvider');
   }
   return context;
 }
-
-export {
-  ReleaseContentProvider,
-  useReleaseContentState,
-  useReleaseContentDispatch,
-};

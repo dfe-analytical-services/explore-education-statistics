@@ -20,14 +20,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils
             return InMemoryContentDbContextOptions(Guid.NewGuid().ToString());
         }
 
-        public static ContentDbContext InMemoryContentDbContext(string databaseName)
+        public static ContentDbContext InMemoryContentDbContext(string databaseName, bool updateTimestamps = true)
         {
-            return new ContentDbContext(InMemoryContentDbContextOptions(databaseName));
+            return new ContentDbContext(InMemoryContentDbContextOptions(databaseName), updateTimestamps);
         }
 
-        public static ContentDbContext InMemoryContentDbContext()
+        public static ContentDbContext InMemoryContentDbContext(bool updateTimestamps = true)
         {
-            return new ContentDbContext(InMemoryContentDbContextOptions());
+            return new ContentDbContext(InMemoryContentDbContextOptions(), updateTimestamps);
         }
     }
 }

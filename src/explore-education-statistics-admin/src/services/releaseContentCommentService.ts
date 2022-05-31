@@ -1,8 +1,8 @@
 import { Comment } from '@admin/services/types/content';
 import client from '@admin/services/utils/service';
 
-export type AddComment = Pick<Comment, 'content'>;
-export type UpdateComment = Pick<Comment, 'id' | 'content'>;
+export type CommentCreate = Pick<Comment, 'content'>;
+export type CommentUpdate = Pick<Comment, 'id' | 'content'>;
 
 const releaseContentCommentService = {
   getContentSectionComments(
@@ -19,7 +19,7 @@ const releaseContentCommentService = {
     releaseId: string,
     sectionId: string,
     contentBlockId: string,
-    comment: AddComment,
+    comment: CommentCreate,
   ): Promise<Comment> {
     return client.post(
       `/release/${releaseId}/content/section/${sectionId}/block/${contentBlockId}/comments/add`,

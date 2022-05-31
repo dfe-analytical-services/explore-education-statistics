@@ -9,8 +9,10 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - manage publication as publication owner %{RUN_IDENTIFIER}
+
 
 *** Test Cases ***
 Create Publication as bau1

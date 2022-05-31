@@ -59,9 +59,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(createdBy.Id, userPublicationRoles[0].CreatedById);
             }
         }
+        
+        [Fact]
+        public async Task GetDistinctRolesByUser()
+        {
+            var user = new User();
+            var publication1 = new Publication();
+            var publication2 = new Publication();
+
+            var userPublicationRoles = new List<UserPublicationRole>
+            {
+                new()
+                {
+                    User = user,
+                    Publication = publication1,
+                    Role = Owner
+                },
+                new()
+                {
+                    User = user,
+                    Publication = publication2,
+                    Role = Owner
+                }
+            };
+
+            var otherUserPublicationRoles = new List<UserPublicationRole>
+            {
+                // Role for different user
+                new()
+                {
+                    User = new User(),
+                    Publication = publication1,
+                    Role = Owner
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddAsync(user);
+                await contentDbContext.AddRangeAsync(publication1, publication2);
+                await contentDbContext.AddRangeAsync(userPublicationRoles);
+                await contentDbContext.AddRangeAsync(otherUserPublicationRoles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupUserPublicationRoleRepository(contentDbContext);
+
+                var result = await service.GetDistinctRolesByUser(user.Id);
+
+                // Expect only distinct roles to be returned, therefore the 2nd "Owner" role is filtered out.
+                Assert.Single(result);
+                Assert.Equal(Owner, result[0]);
+            }
+        }
 
         [Fact]
-        public async Task GetAllByUser()
+        public async Task GetAllRolesByUserAndPublication()
         {
             var user = new User();
             var publication = new Publication();
@@ -109,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupUserPublicationRoleRepository(contentDbContext);
 
-                var result = await service.GetAllRolesByUser(user.Id, publication.Id);
+                var result = await service.GetAllRolesByUserAndPublication(user.Id, publication.Id);
 
                 Assert.Single(result);
                 Assert.Equal(Owner, result[0]);

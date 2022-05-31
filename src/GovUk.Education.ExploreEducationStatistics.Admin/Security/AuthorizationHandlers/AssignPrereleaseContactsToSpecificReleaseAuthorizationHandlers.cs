@@ -39,7 +39,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             var publicationRoles =
-                await _userPublicationRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.PublicationId);
+                await _userPublicationRoleRepository.GetAllRolesByUserAndPublication(context.User.GetUserId(), release.PublicationId);
 
             if (ContainPublicationOwnerRole(publicationRoles))
             {
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 return;
             }
             
-            var releaseRoles = await _userReleaseRoleRepository.GetAllRolesByUser(context.User.GetUserId(), release.Id);
+            var releaseRoles = await _userReleaseRoleRepository.GetDistinctRolesByUserAndRelease(context.User.GetUserId(), release.Id);
 
             if (ContainsEditorOrApproverRole(releaseRoles))
             {

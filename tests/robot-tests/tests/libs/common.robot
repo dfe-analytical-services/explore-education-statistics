@@ -6,8 +6,10 @@ Library     Collections
 Library     file_operations.py
 Library     utilities.py
 Library     fail_fast.py
+Library     visual.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
+
 
 *** Variables ***
 ${browser}=                             chrome
@@ -20,6 +22,7 @@ ${RELEASE_COMPLETE_WAIT}=               %{RELEASE_COMPLETE_WAIT}
 ${prompt_to_continue_on_failure}=       0
 ${FAIL_TEST_SUITES_FAST}=               %{FAIL_TEST_SUITES_FAST}
 
+
 *** Keywords ***
 do this on failure
     # See if the currently executing Test Suite is failing fast and if not, take a screenshot and HTML grab of the
@@ -27,7 +30,6 @@ do this on failure
     ${currently_failing_fast}=    current test suite failing fast
 
     IF    "${currently_failing_fast}" == "${FALSE}"
-
         capture large screenshot and html
 
         # Additionally, mark the current Test Suite as failing if the "FAIL_TEST_SUITES_FAST" option is enabled, and
@@ -43,42 +45,43 @@ do this on failure
     END
 
 user opens the browser
+    [Arguments]    ${alias}=main
     IF    "${browser}" == "chrome"
-        user opens chrome
+        user opens chrome    ${alias}
     END
     IF    "${browser}" == "firefox"
-        user opens firefox
+        user opens firefox    ${alias}
     END
     IF    "${browser}" == "ie"
-        user opens ie
+        user opens ie    ${alias}
     END
     go to    about:blank
 
 user opens chrome
+    [Arguments]    ${alias}=chrome
     IF    ${headless} == 1
-        user opens chrome headless
+        user opens chrome headlessly    ${alias}
     END
-    #run keyword if    ${headless} == 1    user opens chrome with xvfb
     IF    ${headless} == 0
-        user opens chrome without xvfb
+        user opens chrome visually    ${alias}
     END
 
 user opens firefox
+    [Arguments]    ${alias}=firefox
     IF    ${headless} == 1
-        user opens firefox headless
+        user opens firefox headlessly    ${alias}
     END
-    #run keyword if    ${headless} == 1    user opens firefox with xvfb
     IF    ${headless} == 0
-        user opens firefox without xvfb
+        user opens firefox visually    ${alias}
     END
 
 user opens ie
-    open browser    about:blank    ie
+    [Arguments]    ${alias}=ie
+    open browser    about:blank    ie    alias=${alias}
     maximize browser window
 
-# Requires chromedriver v2.31+ -- you can alternatively use "user opens chrome with xvfb"
-
-user opens chrome headless
+user opens chrome headlessly
+    [Arguments]    ${alias}=headless_chrome
     ${c_opts}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
     Call Method    ${c_opts}    add_argument    headless
     Call Method    ${c_opts}    add_argument    start-maximized
@@ -92,46 +95,39 @@ user opens chrome headless
     Call Method    ${c_opts}    add_argument    log-level\=3
     Call Method    ${c_opts}    add_argument    disable-logging
 
-    Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
+    Create Webdriver    Chrome    ${alias}    chrome_options=${c_opts}
 
-user opens chrome with xvfb
-    start virtual display    1920    1080
-    ${options}=    evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
-
-    # --no-sandbox allows chrome to run in a docker container: https://github.com/jessfraz/dockerfiles/issues/149
-    IF    ${docker} == 1
-        Call Method    ${options}    add_argument    --no-sandbox --ignore-certificate-errors
-    END
-
-    create webdriver    Chrome    chrome_options=${options}
-    set window size    1920    1080
-
-user opens chrome without xvfb
+user opens chrome visually
+    [Arguments]    ${alias}=chrome
     ${c_opts}=    Evaluate    sys.modules['selenium.webdriver'].ChromeOptions()    sys, selenium.webdriver
     Call Method    ${c_opts}    add_argument    no-sandbox
     Call Method    ${c_opts}    add_argument    disable-gpu
     Call Method    ${c_opts}    add_argument    disable-extensions
     Call Method    ${c_opts}    add_argument    window-size\=1920,1080
     Call Method    ${c_opts}    add_argument    ignore-certificate-errors
-    Create Webdriver    Chrome    crm_alias    chrome_options=${c_opts}
+    Create Webdriver    Chrome    ${alias}    chrome_options=${c_opts}
     maximize browser window
 
-user opens firefox headless
+user opens firefox headlessly
+    [Arguments]    ${alias}=headless_firefox
     ${f_opts}=    Evaluate    sys.modules['selenium.webdriver'].firefox.options.Options()    sys, selenium.webdriver
     Call Method    ${f_opts}    add_argument    -headless
-    Create Webdriver    Firefox    firefox_options=${f_opts}
+    Create Webdriver    Firefox    ${alias}    firefox_options=${f_opts}
 
-user opens firefox with xvfb
-    start virtual display    1920    1080
-    open browser    about:blank    firefox
-    set window size    1920    1080
-
-user opens firefox without xvfb
-    open browser    about:blank    firefox
+user opens firefox visually
+    [Arguments]    ${alias}=firefox
+    open browser    about:blank    firefox    alias=${alias}
     maximize browser window
+
+user switches browser
+    [Arguments]    ${alias}
+    switch browser    ${alias}
 
 user closes the browser
     close browser
+
+user closes all browsers
+    close all browsers
 
 user gets url
     ${url}=    get location
@@ -152,6 +148,10 @@ user scrolls to the bottom of the page
 user scrolls down
     [Arguments]    ${px}
     execute javascript    window.scrollBy(0, ${px});
+
+user scrolls up
+    [Arguments]    ${px}
+    execute javascript    window.scrollBy(0, -${px});
 
 user scrolls to element
     [Arguments]    ${element}
@@ -177,7 +177,7 @@ user waits for page to finish loading
     # hasn't finished processing the page, and so click are intermittently ignored. I'm wrapping
     # this sleep in a keyword such that if we find a way to check whether the JS processing has finished in the
     # future, we can change it here.
-    sleep    0.2
+    sleep    1
 
 user waits until page does not contain loading spinner
     # NOTE: The wait below is to prevent a transient error in CI ('Element 'css:[class^="LoadingSpinner"]' did not
@@ -190,13 +190,7 @@ user waits until page does not contain loading spinner
 
 user sets focus to element
     [Arguments]    ${selector}    ${parent}=css:body
-    ${webelement}=    is webelement    ${selector}
-    IF    ${webelement} is ${TRUE}
-        ${element}=    set variable    ${selector}
-    ELSE
-        user waits until parent contains element    ${parent}    ${selector}
-        ${element}=    get child element    ${parent}    ${selector}
-    END
+    ${element}=    lookup or return webelement    ${selector}    ${parent}
     set focus to element    ${element}
 
 user waits until page contains
@@ -258,8 +252,8 @@ user verifies accordion is closed
     ...    xpath://*[@class="govuk-accordion__section-button" and text()="${section_text}" and @aria-expanded="false"]
 
 user checks there are x accordion sections
-    [Arguments]    ${num}    ${parent}=css:body
-    user waits until parent contains element    ${parent}    css:[data-testid="accordionSection"]    limit=${num}
+    [Arguments]    ${count}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    css:[data-testid="accordionSection"]    count=${count}
 
 user checks accordion is in position
     [Arguments]    ${section_text}    ${position}    ${parent}=css:[data-testid="accordion"]
@@ -282,17 +276,49 @@ user opens accordion section
     ...    ${parent}=css:[data-testid="accordion"]
 
     ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
+    ${accordion}=    user opens accordion section with accordion header    ${header_button}    ${parent}
+    [Return]    ${accordion}
+
+user opens accordion section with id
+    [Arguments]
+    ...    ${id}
+    ...    ${parent}=css:[data-testid="accordion"]
+
+    ${header_button}=    get child element    ${parent}    id:${id}-heading
+    ${accordion}=    user opens accordion section with accordion header    ${header_button}    ${parent}
+    [Return]    ${accordion}
+
+user opens accordion section with accordion header
+    [Arguments]
+    ...    ${header_button}
+    ...    ${parent}=css:[data-testid="accordion"]
+
     ${is_expanded}=    get element attribute    ${header_button}    aria-expanded
     IF    '${is_expanded}' != 'true'
         user clicks element    ${header_button}
     END
     user checks element attribute value should be    ${header_button}    aria-expanded    true
-    ${accordion}=    user gets accordion section content element    ${heading_text}    ${parent}
+    ${accordion}=    user gets accordion section content element from heading element    ${header_button}    ${parent}
     [Return]    ${accordion}
 
 user closes accordion section
     [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]
     ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
+    user closes accordion section with accordion header    ${header_button}    ${parent}
+
+user closes accordion section with id
+    [Arguments]
+    ...    ${id}
+    ...    ${parent}=css:[data-testid="accordion"]
+
+    ${header_button}=    get child element    ${parent}    id:${id}-heading
+    user closes accordion section with accordion header    ${header_button}    ${parent}
+
+user closes accordion section with accordion header
+    [Arguments]
+    ...    ${header_button}
+    ...    ${parent}=css:[data-testid="accordion"]
+
     ${is_expanded}=    get element attribute    ${header_button}    aria-expanded
     IF    '${is_expanded}' != 'false'
         user clicks element    ${header_button}
@@ -303,6 +329,12 @@ user gets accordion section content element
     [Arguments]    ${heading_text}    ${parent}=css:[data-testid="accordion"]
     ${header_button}=    user gets accordion header button element    ${heading_text}    ${parent}
     ${content_id}=    get element attribute    ${header_button}    id
+    ${content}=    get child element    ${parent}    css:[aria-labelledby="${content_id}"]
+    [Return]    ${content}
+
+user gets accordion section content element from heading element
+    [Arguments]    ${heading_element}    ${parent}=css:[data-testid="accordion"]
+    ${content_id}=    get element attribute    ${heading_element}    id
     ${content}=    get child element    ${parent}    css:[aria-labelledby="${content_id}"]
     [Return]    ${content}
 
@@ -470,10 +502,15 @@ user waits until button is enabled
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is enabled    xpath://button[text()="${text}"]    ${wait}
 
+user waits until parent does not contain button
+    [Arguments]    ${parent}    ${text}    ${wait}=${timeout}
+    user waits until parent does not contain element    ${parent}    xpath://button[text()="${text}"]    ${wait}
+
 user gets button element
     [Arguments]    ${text}    ${parent}=css:body
-    user waits until parent contains element    ${parent}    xpath:.//button[text()="${text}"]
-    ${button}=    get child element    ${parent}    xpath:.//button[text()="${text}"]
+    user waits until parent contains element    ${parent}
+    ...    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]
+    ${button}=    get child element    ${parent}    xpath:.//button[text()="${text}" or .//*[text()="${text}"]]
     [Return]    ${button}
 
 user checks page contains tag
@@ -499,6 +536,10 @@ user waits until h2 is not visible
 user waits until h3 is visible
     [Arguments]    ${text}    ${wait}=${timeout}
     user waits until element is visible    xpath://h3[text()="${text}"]    ${wait}
+
+user waits until h3 is not visible
+    [Arguments]    ${text}    ${wait}=${timeout}
+    user waits until element is not visible    xpath://h3[text()="${text}"]    ${wait}
 
 user waits until legend is visible
     [Arguments]    ${text}    ${wait}=${timeout}
@@ -583,31 +624,25 @@ user chooses file
 user clears element text
     [Arguments]    ${selector}
     user clicks element    ${selector}
-    user presses keys    CTRL+a+BACKSPACE    ${selector}
+    press keys    ${selector}    CTRL+a+BACKSPACE
     sleep    0.1
 
 user presses keys
-    [Arguments]
-    ...    ${keys}
-    ...    ${selector}=${EMPTY}
-    IF    '${selector}' != '${EMPTY}'
-        ${element}=    lookup or return webelement    ${selector}
-        user waits until element is visible    ${element}
-        user sets focus to element    ${element}
-        user clicks element    ${element}
-    END
-    press keys    ${NONE}    ${keys}    # No selector as sometimes leads to text not being input
+    [Arguments]    @{keys}
+    press keys    ${NONE}    @{keys}    # No selector as sometimes leads to text not being input
     sleep    0.1
 
 user enters text into element
     [Arguments]    ${selector}    ${text}
+    user sets focus to element    ${selector}
     user waits until element is visible    ${selector}    %{WAIT_SMALL}
     user clears element text    ${selector}
-    user presses keys    ${text}    ${selector}
+    press keys    ${selector}    ${text}
+    sleep    0.1
 
 user checks element count is x
-    [Arguments]    ${locator}    ${amount}
-    page should contain element    ${locator}    limit=${amount}
+    [Arguments]    ${locator}    ${count}
+    page should contain element    ${locator}    count=${count}
 
 user checks url contains
     [Arguments]    ${text}
@@ -734,11 +769,10 @@ user checks checkbox input is not checked
     checkbox should not be selected    ${selector}
 
 user checks list has x items
-    [Arguments]    ${locator}    ${num}    ${parent}=css:body
+    [Arguments]    ${locator}    ${count}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
     ${list}=    get child element    ${parent}    ${locator}
-    ${items}=    get child elements    ${list}    css:li
-    length should be    ${items}    ${num}
+    user waits until parent contains element    ${list}    css:li    count=${count}
 
 user gets list item element
     [Arguments]    ${locator}    ${item_num}    ${parent}=css:body
@@ -751,6 +785,26 @@ user checks list item contains
     [Arguments]    ${locator}    ${item_num}    ${content}    ${parent}=css:body
     ${item}=    user gets list item element    ${locator}    ${item_num}    ${parent}
     user checks element should contain    ${item}    ${content}
+
+user checks list contains exact items in order
+    [Arguments]    ${locator}    ${expected_items}    ${parent}=css:body
+    user waits until parent contains element    ${parent}    ${locator}
+    ${list}=    get child element    ${parent}    ${locator}
+    ${actual}=    get child elements    ${list}    css:li
+    ${num_items}=    Get Length    ${expected_items}
+    length should be    ${actual}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{expected_items}
+        user checks element should contain    ${actual}[${index}]    ${content}
+    END
+
+user checks items matching locator contain exact items in order
+    [Arguments]    @{expected_items}    ${locator}
+    ${actual}=    Get WebElements    ${locator}
+    ${num_items}=    Get Length    ${expected_items}
+    length should be    ${actual}    ${num_items}
+    FOR    ${index}    ${content}    IN ENUMERATE    @{expected_items}
+        user checks element should contain    ${actual}[${index}]    ${content}
+    END
 
 user checks breadcrumb count should be
     [Arguments]    ${count}
@@ -826,3 +880,23 @@ lookup or return webelement
         ${element}=    get child element    ${parent}    ${selector_or_webelement}
     END
     [Return]    ${element}
+
+user takes screenshot of element
+    [Arguments]
+    ...    ${selector_or_webelement}
+    ...    ${filename}
+    ...    ${wait}=${timeout}
+    ...    ${limit}=None
+    ${element}=    lookup or return webelement    ${selector_or_webelement}
+    ${filepath}=    take screenshot of element    ${element}    ${filename}
+    [Return]    ${filepath}
+
+user takes html snapshot of element
+    [Arguments]
+    ...    ${selector_or_webelement}
+    ...    ${filename}
+    ...    ${wait}=${timeout}
+    ...    ${limit}=None
+    ${element}=    lookup or return webelement    ${selector_or_webelement}
+    ${filepath}=    take html snapshot of element    ${element}    ${filename}
+    [Return]    ${filepath}

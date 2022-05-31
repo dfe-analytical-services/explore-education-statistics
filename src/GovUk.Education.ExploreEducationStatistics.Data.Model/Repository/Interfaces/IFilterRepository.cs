@@ -1,11 +1,12 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces
 {
-    public interface IFilterRepository : IRepository<Filter, Guid>
+    public interface IFilterRepository
     {
-        List<Filter> GetFiltersIncludingItems(Guid subjectId);
+        Task<List<Filter>> GetFiltersIncludingItems(Guid subjectId);
     }
 }

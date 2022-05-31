@@ -11,50 +11,70 @@ import CommentsList from '@admin/components/comments/CommentsList';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import { Form } from '@common/components/form';
+import useAsyncCallback from '@common/hooks/useAsyncCallback';
 import useToggle from '@common/hooks/useToggle';
+import logger from '@common/services/logger';
 import Yup from '@common/validation/yup';
 import LoadingSpinner from '@common/components/LoadingSpinner';
-import { Formik } from 'formik';
-import React, { useCallback, useRef } from 'react';
 import classNames from 'classnames';
+import { Formik, FormikHelpers } from 'formik';
+import React, { useCallback, useRef } from 'react';
+import { useIdleTimer } from 'react-idle-timer';
 
 interface FormValues {
   content: string;
 }
 
 export interface Props {
+  actionThrottle?: number;
   allowComments?: boolean;
-  autoSave?: boolean;
   content: string;
   hideLabel?: boolean;
-  handleBlur?: (isDirty: boolean) => void;
   id: string;
-  isSaving?: boolean;
+  idleTimeout?: number;
   label: string;
-  onCancel: () => void;
+  onAction?: () => void;
+  onAutoSave?: (content: string) => void;
+  onBlur?: (isDirty: boolean) => void;
+  onCancel?: () => void;
+  onIdle?: () => void;
   onImageUpload?: ImageUploadHandler;
   onImageUploadCancel?: ImageUploadCancelHandler;
-  onSubmit: (content: string, isAutoSave?: boolean) => void;
+  onSubmit: (content: string) => void;
 }
 
 const EditableContentForm = ({
+  actionThrottle = 5_000,
   allowComments = false,
-  autoSave = false,
   content,
   hideLabel = false,
-  handleBlur,
   id,
-  isSaving = false,
+  idleTimeout = 600_000,
   label,
+  onAction,
+  onAutoSave,
+  onBlur,
   onCancel,
+  onIdle,
   onImageUpload,
   onImageUploadCancel,
   onSubmit,
 }: Props) => {
   const { comments, clearPendingDeletions } = useCommentsContext();
+
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCommentAddForm, toggleCommentAddForm] = useToggle(false);
-  const blockId = id.replace('block-', '');
+
+  useIdleTimer({
+    element: containerRef.current ?? document,
+    // Disable cross tab in tests as it seems to
+    // prevent idle callback from being triggered.
+    crossTab: process.env.NODE_ENV !== 'test',
+    throttle: actionThrottle,
+    timeout: idleTimeout,
+    onAction,
+    onIdle,
+  });
 
   const validateElements = useCallback((elements: Element[]) => {
     let error: string | undefined;
@@ -71,25 +91,50 @@ const EditableContentForm = ({
     return error;
   }, []);
 
+  const [
+    { isLoading: isAutoSaving, error: autoSaveError },
+    handleAutoSave,
+  ] = useAsyncCallback(
+    async (nextContent: string) => {
+      await onAutoSave?.(nextContent);
+    },
+    [onAutoSave],
+  );
+
+  const handleSubmit = useCallback(
+    async (values: FormValues, helpers: FormikHelpers<FormValues>) => {
+      try {
+        await clearPendingDeletions?.();
+        await onSubmit(values.content);
+      } catch (err) {
+        logger.error(err);
+        helpers.setFieldError('content', 'Could not save content');
+      }
+    },
+    [clearPendingDeletions, onSubmit],
+  );
+
   return (
     <div className={styles.container} ref={containerRef}>
-      {showCommentAddForm && (
-        <CommentAddForm
-          blockId={blockId}
-          containerRef={containerRef}
-          onCancel={toggleCommentAddForm.off}
-          onSave={toggleCommentAddForm.off}
-        />
+      {allowComments && (
+        <div data-testid="comments-sidebar">
+          {showCommentAddForm && (
+            <CommentAddForm
+              baseId={id}
+              containerRef={containerRef}
+              onCancel={toggleCommentAddForm.off}
+              onSave={toggleCommentAddForm.off}
+            />
+          )}
+          {comments.length > 0 && (
+            <CommentsList
+              className={classNames(styles.commentsList, {
+                [styles.padTop]: showCommentAddForm,
+              })}
+            />
+          )}
+        </div>
       )}
-      <div
-        className={classNames(styles.commentsSidebar, {
-          [styles.showCommentAddForm]: showCommentAddForm,
-        })}
-      >
-        {allowComments && comments.length > 0 && (
-          <CommentsList blockId={blockId} />
-        )}
-      </div>
 
       <div className={styles.form}>
         <Formik<FormValues>
@@ -100,53 +145,53 @@ const EditableContentForm = ({
           validationSchema={Yup.object({
             content: Yup.string().required('Enter content'),
           })}
-          onSubmit={async values => {
-            await clearPendingDeletions?.();
-            onSubmit(values.content);
-          }}
+          onSubmit={handleSubmit}
         >
-          <Form id={`${id}-form`}>
-            <FormFieldEditor<FormValues>
-              id={id}
-              allowComments={allowComments}
-              blockId={blockId}
-              focusOnInit
-              handleBlur={handleBlur}
-              hideLabel={hideLabel}
-              label={label}
-              name="content"
-              validateElements={validateElements}
-              onAutoSave={values => {
-                onSubmit(values, true);
-              }}
-              onCancelComment={toggleCommentAddForm.off}
-              onClickAddComment={toggleCommentAddForm.on}
-              onImageUpload={onImageUpload}
-              onImageUploadCancel={onImageUploadCancel}
-            />
+          {form => {
+            const isSaving = form.isSubmitting || isAutoSaving;
 
-            <ButtonGroup>
-              <Button type="submit" disabled={isSaving}>
-                {autoSave ? 'Save & close' : 'Save'}
-              </Button>
-              <LoadingSpinner
-                inline
-                hideText
-                loading={autoSave && isSaving}
-                size="md"
-                text="Saving"
-              />
-              {!autoSave && (
-                <Button variant="secondary" onClick={onCancel}>
-                  Cancel
-                </Button>
-              )}
-            </ButtonGroup>
-          </Form>
+            return (
+              <Form id={`${id}-form`}>
+                <FormFieldEditor<FormValues>
+                  allowComments={allowComments}
+                  error={autoSaveError ? 'Could not save content' : undefined}
+                  focusOnInit
+                  hideLabel={hideLabel}
+                  label={label}
+                  name="content"
+                  validateElements={validateElements}
+                  onAutoSave={handleAutoSave}
+                  onBlur={onBlur}
+                  onCancelComment={toggleCommentAddForm.off}
+                  onClickAddComment={toggleCommentAddForm.on}
+                  onImageUpload={onImageUpload}
+                  onImageUploadCancel={onImageUploadCancel}
+                />
+
+                <ButtonGroup>
+                  <Button type="submit" disabled={isSaving}>
+                    {onAutoSave ? 'Save & close' : 'Save'}
+                  </Button>
+                  {!onAutoSave && onCancel && (
+                    <Button variant="secondary" onClick={onCancel}>
+                      Cancel
+                    </Button>
+                  )}
+
+                  <LoadingSpinner
+                    inline
+                    hideText
+                    loading={isSaving}
+                    size="md"
+                    text="Saving"
+                  />
+                </ButtonGroup>
+              </Form>
+            );
+          }}
         </Formik>
       </div>
     </div>
   );
 };
-
 export default EditableContentForm;

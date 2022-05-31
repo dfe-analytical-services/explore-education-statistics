@@ -3,8 +3,10 @@ Resource    ../common.robot
 Resource    ../admin-common.robot
 Library     ../admin_api.py
 
+
 *** Variables ***
 ${SUBJECT_NAME}     UI test subject
+
 
 *** Keywords ***
 user creates a fully populated higher review release

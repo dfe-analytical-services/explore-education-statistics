@@ -179,6 +179,10 @@ VScode:
   - Arguments: `run python run_tests.py --visual -i robot -f "$FilePath$" -e dev`
   - Working directory: `$ProjectFileDir$` (which should represent the robot-tests directory. You may have to do something like `$ProjectFileDir$/../tests/robot-tests`)
 
+## Visual testing - tables, charts and permalinks
+
+We provide a suite of tests for visually checking tables, charts and permalinks and comparing before and after images. More information can be found in the [Visual Testing README](scripts/visual-testing/README.md).
+
 ## **Troubleshooting**
 
 ### The tests are flaky when I run them locally.
@@ -228,8 +232,8 @@ There is a known bug with pyderman which is responsible for downloading chromedr
 
 To fix this, you can manually download the correct [chromedriver](https://chromedriver.chromium.org/downloads) and put it in the webdriver directory.
 
-
 # Who should I talk to?
 
 Luke Howsam  
 Mark Youngman
+Duncan Watson

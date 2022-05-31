@@ -8,6 +8,7 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${THEME_NAME}               UI test theme - suite %{RUN_IDENTIFIER}
 ${TOPIC_NAME}               UI test topic - suite %{RUN_IDENTIFIER}
@@ -15,6 +16,7 @@ ${TOPIC_NAME}               UI test topic - suite %{RUN_IDENTIFIER}
 ${CREATED_THEME_ID}         ${EMPTY}
 ${CREATED_THEME_NAME}       UI test theme - suite created %{RUN_IDENTIFIER}
 ${CREATED_TOPIC_NAME}       UI test topic - suite created %{RUN_IDENTIFIER}
+
 
 *** Test Cases ***
 Go to 'Manage themes and topics'
@@ -97,6 +99,7 @@ Verify updated topic
     user waits until h1 is visible    Manage themes and topics
     user waits until page contains accordion section    ${THEME_NAME}
     user checks topic is in correct position    ${THEME_NAME}    1    ${TOPIC_NAME}
+
 
 *** Keywords ***
 user checks topic is in correct position

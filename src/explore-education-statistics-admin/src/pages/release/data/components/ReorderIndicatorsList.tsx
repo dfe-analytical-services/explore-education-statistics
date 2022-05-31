@@ -42,7 +42,7 @@ const ReorderIndicatorsList = ({
   const [indicators, setIndicators] = useState<FormattedIndicators[]>([]);
 
   useEffect(() => {
-    if (isLoading) {
+    if (isLoading || !subjectMeta) {
       return;
     }
     const indicatorsMeta = subjectMeta?.indicators || {};
@@ -65,7 +65,7 @@ const ReorderIndicatorsList = ({
     );
 
     setIndicators(formattedIndicators);
-  }, [isLoading, subjectMeta?.indicators]);
+  }, [isLoading, subjectMeta]);
 
   const handleReorder = ({ reordered, parentCategoryId }: ReorderProps) => {
     // reordering indicators
@@ -97,7 +97,7 @@ const ReorderIndicatorsList = ({
 
   return (
     <>
-      <h3>Reorder indicators for {subject.name}</h3>
+      <h3>{`Reorder indicators for ${subject.name}`}</h3>
       <LoadingSpinner loading={isLoading}>
         {indicators.length === 0 ? (
           <p>No indicators available.</p>

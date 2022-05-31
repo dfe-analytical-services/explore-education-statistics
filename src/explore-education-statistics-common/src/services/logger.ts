@@ -19,6 +19,11 @@ const logger = {
       console.log(...args);
     }
   },
+  debugTime(...args: unknown[]) {
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[${new Date().toISOString()}]`, ...args);
+    }
+  },
   info(message: string) {
     if (process.env.NODE_ENV === 'test') {
       return;

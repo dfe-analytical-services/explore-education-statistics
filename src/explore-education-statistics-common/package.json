@@ -4,6 +4,8 @@
   "description": "",
   "devDependencies": {
     "@microsoft/applicationinsights-web": "^2.5.9",
+    "@popperjs/core": "^2.11.2",
+    "@reach/auto-id": "^0.16.0",
     "@testing-library/dom": "^7.24.4",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.0.4",
@@ -52,6 +54,7 @@
     "jest": "^26.5.2",
     "jest-junit": "^12.0.0",
     "jest-matcher-utils": "^26.5.2",
+    "jest-mock-extended": "^2.0.4",
     "jest-resolve": "^26.5.2",
     "jest-serializer-html": "^7.0.0",
     "jest-watch-typeahead": "^0.6.1",
@@ -131,7 +134,7 @@
       "^.+\\.module\\.(css|sass|scss)$": "identity-obj-proxy",
       "^@common/(.*)$": "<rootDir>/src/$1",
       "^@common-test/(.*)$": "<rootDir>/test/$1",
-      "\\.worker.js":"<rootDir>/__mocks__/mock.worker.ts"
+      "\\.worker.js": "<rootDir>/__mocks__/mock.worker.ts"
     },
     "moduleFileExtensions": [
       "web.js",

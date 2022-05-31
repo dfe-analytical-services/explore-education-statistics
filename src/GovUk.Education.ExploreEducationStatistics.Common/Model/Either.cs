@@ -47,6 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public Either<TL, T> OnSuccess<T>(Func<T> func) => Map(_ => func.Invoke());
 
+        public Either<TL, T> OnSuccess<T>(Func<TR, Either<TL, T>> func) => IsLeft ? Left : func.Invoke(Right);
+
         public Either<TL, TR> OrElse(Func<TR> func) => IsLeft ? func() : Right;
 
         public Either<TL, TR> OrElse(Func<TL, TR> func) => IsLeft ? func(Left) : Right;
@@ -61,11 +63,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public static implicit operator Either<TL, TR>(TR right) => new(right);
     }
-    
-    public static class EitherExtensions {
-        public static T Result<T>(this Either<T, T> either)
+
+    public static class EitherExtensions
+    {
+        public static Either<TFailure, List<TSuccess>> OnSuccessAll<TFailure, TSuccess>(
+            this IEnumerable<Either<TFailure, TSuccess>> items)
         {
-            return either.IsLeft ? either.Left : either.Right;
+            var result = new List<TSuccess>();
+            foreach (var either in items)
+            {
+                if (either.IsLeft)
+                {
+                    return either.Left;
+                }
+
+                result.Add(either.Right);
+            }
+            return result;
+        }
+
+        public static Either<TFailure, Unit> OnSuccessVoid<TFailure, TSuccess>(
+            this Either<TFailure, TSuccess> either)
+        {
+            if (either.IsLeft)
+            {
+                return either.Left;
+            }
+
+            return Unit.Instance;
         }
     }
 
@@ -98,6 +123,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             Func<Task<Either<TFailure, TSuccess2>>> successTask)
         {
             return await task.OnSuccessDo(async _ => await successTask());
+        }
+
+        public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
+            this Task<Either<TFailure, TSuccess1>> task,
+            Func<Either<TFailure, TSuccess2>> successTask)
+        {
+            return await task.OnSuccessDo(async _ => await Task.FromResult(successTask()));
+        }
+
+        public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
+            this Task<Either<TFailure, TSuccess1>> task,
+            Func<TSuccess1, Either<TFailure, TSuccess2>> successTask)
+        {
+            return await task.OnSuccessDo(async result => await Task.FromResult(successTask(result)));
         }
 
         public static async Task<Either<TFailure, TSuccess1>> OnSuccessDo<TFailure, TSuccess1, TSuccess2>(
@@ -184,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
             return await func();
         }
-        
+
         [Obsolete("Use OnSuccessDo or OnSuccessVoid for chaining a non-generic Task")]
         public static async Task<Either<TFailure, Unit>> OnSuccess<TFailure, TSuccess1>(
             this Task<Either<TFailure, TSuccess1>> task,
@@ -226,7 +265,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
             return Unit.Instance;
         }
-        
+
         /**
          * Convenience method so that the chained function can be
          * void and doesn't have to explicitly return a Unit.
@@ -239,7 +278,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
                 .OnSuccess(task2.Invoke)
                 .OnSuccessVoid();
         }
-        
+
         /**
          * Convenience method so that the chained function can be
          * void and doesn't have to explicitly return a Unit.
