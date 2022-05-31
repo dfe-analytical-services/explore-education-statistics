@@ -13,6 +13,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
     AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     PublicationAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
@@ -35,8 +36,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             [Fact]
             public async Task CreateLegacyRelease_PublicationRoles()
             {
-                await AssertPublicationHandlerSucceedsWithPublicationOwnerRole<CreateLegacyReleaseRequirement>(
-                    CreateHandler);
+                await AssertPublicationHandlerSucceedsWithPublicationRoles<CreateLegacyReleaseRequirement>(
+                    CreateHandler, Owner);
             }
 
             private static CreateLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
@@ -74,7 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     legacyRelease,
                     contentDbContext => contentDbContext.Add(legacyRelease),
                     CreateHandler,
-                    PublicationRole.Owner);
+                    Owner);
             }
 
             private static ViewLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
@@ -112,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     legacyRelease,
                     contentDbContext => contentDbContext.Add(legacyRelease),
                     CreateHandler,
-                    PublicationRole.Owner);
+                    Owner);
             }
 
             private static UpdateLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
@@ -150,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     legacyRelease,
                     contentDbContext => contentDbContext.Add(legacyRelease),
                     CreateHandler,
-                    PublicationRole.Owner);
+                    Owner);
             }
 
             private static DeleteLegacyReleaseAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)

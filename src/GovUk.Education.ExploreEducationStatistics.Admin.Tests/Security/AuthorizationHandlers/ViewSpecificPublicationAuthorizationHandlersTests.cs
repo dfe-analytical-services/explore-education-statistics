@@ -13,6 +13,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityC
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
@@ -40,15 +41,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         }
 
         [Fact]
-        public async Task HasOwnerRoleOnPublicationAuthorizationHandler_SucceedsWithPublicationOwner()
+        public async Task HasOwnerOrReleaseApproverRoleOnPublicationAuthorizationHandler_Succeeds()
         {
-            await AssertPublicationHandlerSucceedsWithPublicationOwnerRole<
+            await AssertPublicationHandlerSucceedsWithPublicationRoles<
                 ViewSpecificPublicationRequirement>(contentDbContext =>
                 new HasOwnerOrApproverRoleOnPublicationAuthorizationHandler(
                     new AuthorizationHandlerResourceRoleService(
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
                         new UserPublicationRoleRepository(contentDbContext),
-                        Mock.Of<IPublicationRepository>(Strict))));
+                        Mock.Of<IPublicationRepository>(Strict))),
+                Owner, ReleaseApprover);
         }
 
         [Fact]

@@ -9,6 +9,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.PublicationAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
@@ -28,8 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         [Fact]
         public async Task CanUpdateAllPublicationsAuthorizationHandler_SucceedsWithPublicationOwner()
         {
-            await AssertPublicationHandlerSucceedsWithPublicationOwnerRole<UpdatePublicationRequirement>(
-                CreateHandler);
+            await AssertPublicationHandlerSucceedsWithPublicationRoles<UpdatePublicationRequirement>(
+                CreateHandler, Owner);
         }
 
         private static UpdatePublicationAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
