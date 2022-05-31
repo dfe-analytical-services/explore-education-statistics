@@ -65,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var publicationViewModels = new List<MyPublicationViewModel>();
 
-            // Add publication view models for the Publications granted by the Publication Owner role
+            // Add publication view models for the Publications granted directly via Publication roles
             publicationViewModels.AddRange(await publicationsGrantedByPublicationRole
                 .SelectAsync(async publication =>
                     // Include all Releases of the Publication unconditionally
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .GroupBy(release => release.Publication)
                 .Where(publicationWithReleases =>
                 {
-                    // Don't include a publication that's already been included by Publication Owner role
+                    // Don't include a publication that's already been included by Publication roles
                     var publication = publicationWithReleases.Key;
                     return !publicationIdsGrantedByPublicationRole.Contains(publication.Id);
                 })

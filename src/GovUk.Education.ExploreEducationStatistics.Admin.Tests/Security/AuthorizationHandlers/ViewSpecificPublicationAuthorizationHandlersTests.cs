@@ -44,7 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             await AssertPublicationHandlerSucceedsWithPublicationOwnerRole<
                 ViewSpecificPublicationRequirement>(contentDbContext =>
-                new HasOwnerRoleOnPublicationAuthorizationHandler(
+                new HasOwnerOrApproverRoleOnPublicationAuthorizationHandler(
                     new AuthorizationHandlerResourceRoleService(
                         Mock.Of<IUserReleaseRoleRepository>(Strict),
                         new UserPublicationRoleRepository(contentDbContext),

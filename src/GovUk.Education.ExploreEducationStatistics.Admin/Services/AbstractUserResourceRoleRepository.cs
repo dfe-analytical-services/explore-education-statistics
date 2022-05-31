@@ -23,12 +23,12 @@ public abstract class AbstractUserResourceRoleRepository<TResourceRole, TResourc
 
     public async Task<TResourceRole> Create(Guid userId, Guid resourceId, TRoleEnum role, Guid createdById)
     {
-        var resourceRole = NewResourceRole(userId, resourceId, role, createdById);
+        var newResourceRole = NewResourceRole(userId, resourceId, role, createdById);
 
-        var created =
-            (await ContentDbContext.Set<TResourceRole>().AddAsync(resourceRole)).Entity;
+        await ContentDbContext.Set<TResourceRole>().AddAsync(newResourceRole);
         await ContentDbContext.SaveChangesAsync();
-        return created;
+        
+        return newResourceRole;
     }
 
     public async Task<TResourceRole> CreateIfNotExists(Guid userId, Guid resourceId, TRoleEnum role,

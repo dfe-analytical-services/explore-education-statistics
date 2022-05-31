@@ -14,7 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 {
     public class ViewSpecificReleaseAuthorizationHandler : CompoundAuthorizationHandler<ViewReleaseRequirement, Release>
     {
-        // TODO DW - probably easier to maintain without the compound nature here
         public ViewSpecificReleaseAuthorizationHandler(
             IPreReleaseService preReleaseService,
             AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService) 

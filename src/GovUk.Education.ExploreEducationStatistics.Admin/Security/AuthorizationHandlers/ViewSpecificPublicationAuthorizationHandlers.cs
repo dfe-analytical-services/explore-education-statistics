@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService) 
             : base(
                 new CanSeeAllPublicationsAuthorizationHandler(),
-                new HasOwnerRoleOnPublicationAuthorizationHandler(authorizationHandlerResourceRoleService),
+                new HasOwnerOrApproverRoleOnPublicationAuthorizationHandler(authorizationHandlerResourceRoleService),
                 new HasRoleOnAnyChildReleaseAuthorizationHandler(contentDbContext))
         {
         }
@@ -62,12 +62,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
         }
 
-        public class HasOwnerRoleOnPublicationAuthorizationHandler
+        public class HasOwnerOrApproverRoleOnPublicationAuthorizationHandler
             : AuthorizationHandler<ViewSpecificPublicationRequirement, Publication>
         {
             private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-            public HasOwnerRoleOnPublicationAuthorizationHandler(
+            public HasOwnerOrApproverRoleOnPublicationAuthorizationHandler(
                 AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
             {
                 _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
@@ -82,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                         .HasRolesOnPublication(
                             context.User.GetUserId(),
                             publication.Id,
-                            Owner))
+                            Owner, ReleaseApprover))
                 {
                     context.Succeed(requirement);
                 }
