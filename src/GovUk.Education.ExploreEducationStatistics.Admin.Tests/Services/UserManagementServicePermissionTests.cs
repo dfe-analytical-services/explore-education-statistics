@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     return await service.InviteUser(
                         "test@test.com",
                         Guid.NewGuid().ToString(),
-                        new List<AddUserReleaseRoleViewModel>());
+                        new List<UserReleaseRoleAddViewModel>());
                 });
         }
 

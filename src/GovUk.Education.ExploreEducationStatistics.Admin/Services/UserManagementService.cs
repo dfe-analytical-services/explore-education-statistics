@@ -218,7 +218,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, UserInvite>> InviteUser(
             string email,
             string roleId,
-            List<AddUserReleaseRoleViewModel> userReleaseRoles)
+            List<UserReleaseRoleAddViewModel> userReleaseRoles)
         {
             return await _userService
                 .CheckCanManageAllUsers()
@@ -267,7 +267,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var invite = await _usersAndRolesDbContext.UserInvites
                         .AsQueryable()
-                        .FirstOrDefaultAsync(i => i.Email == email);
+                        .FirstOrDefaultAsync(i => i.Email.ToLower() == email.ToLower());
 
                     if (invite == null)
                     {

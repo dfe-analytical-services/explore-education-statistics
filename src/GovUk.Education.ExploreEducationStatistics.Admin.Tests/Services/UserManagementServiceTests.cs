@@ -121,6 +121,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetUser(userId);
 
+                VerifyAllMocks(userRoleService);
+
                 Assert.True(result.IsRight);
                 var userViewModel = result.Right;
 
@@ -136,8 +138,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userRoleService.Verify(mock => mock.GetPublicationRoles(userId), Times.Once);
                 userRoleService.Verify(mock => mock.GetReleaseRoles(userId), Times.Once);
             }
-
-            VerifyAllMocks(userRoleService);
         }
 
         [Fact]
@@ -153,10 +153,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.GetUser(Guid.NewGuid());
 
+                VerifyAllMocks(userRoleService);
+
                 result.AssertNotFound();
             }
-
-            VerifyAllMocks(userRoleService);
         }
 
         [Fact]
@@ -196,14 +196,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.UpdateUser(user.Id, role.Id);
 
+                VerifyAllMocks(userRoleService);
+
                 Assert.True(result.IsRight);
 
                 userRoleService.Verify(mock => mock.SetGlobalRole(
                         user.Id, role.Id),
                     Times.Once);
             }
-
-            VerifyAllMocks(userRoleService);
         }
 
         [Fact]
@@ -248,7 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.InviteUser("test@test.com",
                     role.Id,
-                    new List<AddUserReleaseRoleViewModel>
+                    new List<UserReleaseRoleAddViewModel>
                     {
                         new ()
                         {
@@ -257,13 +257,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         },
                     });
 
+                VerifyAllMocks(emailTemplateService);
+
                 result.AssertRight();
             }
 
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var userInvites = usersAndRolesDbContext.UserInvites
-                    .Where(invite => invite.Email == "test@test.com")
                     .ToList();
 
                 var userInvite = Assert.Single(userInvites);
@@ -277,7 +278,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
                 var userReleaseInvites = contentDbContext.UserReleaseInvites
-                    .Where(invite => invite.Email == "test@test.com")
                     .ToList();
 
                 var userReleaseInvite = Assert.Single(userReleaseInvites);
@@ -289,8 +289,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvite.Created).Milliseconds, 0, 1500);
                 Assert.Equal(_createdById, userReleaseInvite.CreatedById);
             }
-
-            VerifyAllMocks(emailTemplateService);
         }
 
         [Fact]
@@ -333,7 +331,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.InviteUser("test@test.com",
                     role.Id,
-                    new List<AddUserReleaseRoleViewModel>());
+                    new List<UserReleaseRoleAddViewModel>());
+
+                VerifyAllMocks(emailTemplateService);
 
                 result.AssertRight();
             }
@@ -341,7 +341,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var userInvites = usersAndRolesDbContext.UserInvites
-                    .Where(invite => invite.Email == "test@test.com")
                     .ToList();
                 var userInvite = Assert.Single(userInvites);
                 Assert.Equal("test@test.com", userInvite.Email);
@@ -353,8 +352,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToList();
                 Assert.Empty(userReleaseInvites);
             }
-
-            VerifyAllMocks(emailTemplateService);
         }
 
         [Fact]
@@ -379,7 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.InviteUser("test@test.com",
                     Guid.NewGuid().ToString(),
-                    new List<AddUserReleaseRoleViewModel>());
+                    new List<UserReleaseRoleAddViewModel>());
 
                 var actionResult = result.AssertLeft();
                 actionResult.AssertBadRequest(ValidationErrorMessages.UserAlreadyExists);
@@ -393,7 +390,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.InviteUser("test@test.com",
                     Guid.NewGuid().ToString(),
-                    new List<AddUserReleaseRoleViewModel>());
+                    new List<UserReleaseRoleAddViewModel>());
 
                 var actionResult = result.AssertLeft();
                 actionResult.AssertBadRequest(ValidationErrorMessages.InvalidUserRole);

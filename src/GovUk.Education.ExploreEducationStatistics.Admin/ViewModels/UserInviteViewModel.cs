@@ -11,6 +11,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [Required(AllowEmptyStrings = false)]
         public string RoleId { get; set; } = string.Empty;
 
-        public List<AddUserReleaseRoleViewModel> UserReleaseRoles { get; set; } = new();
+        public List<UserReleaseRoleAddViewModel> UserReleaseRoles { get; set; } = new();
     }
 }
