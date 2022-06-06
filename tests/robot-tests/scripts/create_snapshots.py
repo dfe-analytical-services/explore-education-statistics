@@ -4,12 +4,13 @@ import argparse
 import requests
 from bs4 import BeautifulSoup
 
-""" 
+"""
 Script to check find statistics, table tool, methodologies and data catalogue snapshots.
 
 Usage: python create_snapshots.py <public_url>
 by default, the script will run against production
 """
+
 
 def _gets_parsed_html_from_page(url):
     requests.sessions.HTTPAdapter(
