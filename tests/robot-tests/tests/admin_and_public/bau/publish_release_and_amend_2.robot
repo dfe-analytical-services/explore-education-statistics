@@ -305,7 +305,7 @@ Validate Release status table row is correct
     table cell should contain    css:table    2    2    Approved    # Status
     table cell should contain    css:table    2    3    Approved by UI tests    # Internal note
     table cell should contain    css:table    2    4    1    # Release version
-    table cell should contain    css:table    2    5    ees-bau1@education.gov.uk    # By user
+    table cell should contain    css:table    2    5    ees-test.bau1@education.gov.uk    # By user
 
 Approve release amendment
     user approves amended release for immediate publication

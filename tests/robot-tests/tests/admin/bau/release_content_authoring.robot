@@ -81,7 +81,7 @@ Switch to bau1 to view release
 Check second text block is locked as bau1
     ${block}=    get accordion section block    First content section    2    id:releaseMainContent
     user checks element contains    ${block}
-    ...    Analyst1 User1 (ees-analyst1@education.gov.uk) is currently editing this block
+    ...    Analyst1 User1 (ees-test.analyst1@education.gov.uk) is currently editing this block
     user checks element contains    ${block}    Analyst1 User1 is editing
 
 Switch to analyst1 to save second text block
@@ -155,7 +155,7 @@ Switch to analyst1 to check second text block is locked
     ${block}=    get accordion section block    First content section    2    id:releaseMainContent
 
     user waits until element contains    ${block}
-    ...    Bau1 User1 (ees-bau1@education.gov.uk) is currently editing this block
+    ...    Bau1 User1 (ees-test.bau1@education.gov.uk) is currently editing this block
     user waits until element contains    ${block}    Bau1 User1 is editing
 
 Switch to bau1 to save second text block
@@ -169,14 +169,14 @@ Switch to analyst1 to start resolving comments
     ${block}=    get accordion section block    First content section    1    id:releaseMainContent
 
     user checks element does not contain    ${block}
-    ...    Bau1 User1 (ees-bau1@education.gov.uk) is currently editing this block
+    ...    Bau1 User1 (ees-test.bau1@education.gov.uk) is currently editing this block
     user checks element does not contain    ${block}    Bau1 User1 is editing
 
     # Start resolving comments
     user clicks button    View comments    ${block}
 
     user checks element does not contain    ${block}
-    ...    Analyst1 User1 (ees-analyst1@education.gov.uk) is currently editing this block
+    ...    Analyst1 User1 (ees-test.analyst1@education.gov.uk) is currently editing this block
     user checks element does not contain    ${block}    Analyst1 User1 is editing
 
     # avoid set page view box getting in the way
@@ -187,7 +187,7 @@ Switch to bau1 to check first text block is locked
     ${block}=    get accordion section block    First content section    1    id:releaseMainContent
 
     user waits until element contains    ${block}
-    ...    Analyst1 User1 (ees-analyst1@education.gov.uk) is currently editing this block
+    ...    Analyst1 User1 (ees-test.analyst1@education.gov.uk) is currently editing this block
     user waits until element contains    ${block}    Analyst1 User1 is editing
 
 Switch to analyst1 to resolve comment for first text block
@@ -226,7 +226,7 @@ Switch to bau1 to check first text block is unlocked
     ${block}=    get accordion section block    First content section    1    id:releaseMainContent
 
     user checks element does not contain    ${block}
-    ...    Analyst1 User1 (ees-analyst1@education.gov.uk) is currently editing this block
+    ...    Analyst1 User1 (ees-test.analyst1@education.gov.uk) is currently editing this block
     user checks element does not contain    ${block}    Analyst1 User1 is editing
 
 Switch back to analyst1 to resolve second text block

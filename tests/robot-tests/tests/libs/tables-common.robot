@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ./common.robot
 
+
 *** Keywords ***
 user waits until table is visible
     [Arguments]    ${parent}=css:body    ${wait}=${timeout}

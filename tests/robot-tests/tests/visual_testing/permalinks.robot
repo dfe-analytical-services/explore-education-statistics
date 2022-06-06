@@ -4,9 +4,11 @@ Resource    ../libs/charts.robot
 Library     ../libs/visual.py
 Library     tables_and_charts.py
 
+
 *** Variables ***
 ${SNAPSHOT_FOLDER}=         test-results/snapshots/%{RUN_IDENTIFIER}
 ${PERMALINKS_FOLDER}=       permalinks
+
 
 *** Keywords ***
 Check permalink with id

@@ -667,7 +667,7 @@ user changes methodology status to Draft
     user checks page contains tag    In Draft
 
 user gives analyst publication owner access
-    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     user chooses select option    css:[name="selectedPublicationId"]    ${PUBLICATION_NAME}
     user waits until element is enabled    css:[name="selectedPublicationRole"]
@@ -676,7 +676,7 @@ user gives analyst publication owner access
     user waits until page does not contain loading spinner
 
 user gives release access to analyst
-    [Arguments]    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    [Arguments]    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     user scrolls to element    css:[name="selectedReleaseId"]
     user chooses select option    css:[name="selectedReleaseId"]    ${RELEASE_NAME}
@@ -686,7 +686,7 @@ user gives release access to analyst
     user waits until page does not contain loading spinner
 
 user removes publication owner access from analyst
-    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     ${table}=    user gets testid element    publicationAccessTable
     ${row}=    get child element    ${table}
@@ -695,7 +695,7 @@ user removes publication owner access from analyst
     user waits until page does not contain loading spinner
 
 user removes release access from analyst
-    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     ${table}=    user gets testid element    releaseAccessTable
     ${row}=    get child element    ${table}
