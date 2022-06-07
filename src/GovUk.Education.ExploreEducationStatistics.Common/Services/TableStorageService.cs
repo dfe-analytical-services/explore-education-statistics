@@ -1,6 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
-using System.Threading.Tasks.Dataflow;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Azure.Cosmos.Table;
@@ -35,24 +35,70 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return table;
         }
 
+        // public async Task DeleteByPartitionKeys(string tableName, IEnumerable<string> partitionKeys)
+        // {
+        //     var block = new ActionBlock<(CloudTable table, string partitionKey)>(
+        //         async tuple => { await DeleteByPartitionKey(tuple.table, tuple.partitionKey); },
+        //         new ExecutionDataflowBlockOptions
+        //         {
+        //             BoundedCapacity = 100,
+        //             MaxDegreeOfParallelism = 16
+        //         });
+        //
+        //     var table = await GetTableAsync(tableName);
+        //     foreach (var partitionKey in partitionKeys)
+        //     {
+        //         await block.SendAsync((table, partitionKey));
+        //     }
+        //
+        //     block.Complete();
+        //     await block.Completion;
+        // }
+        
         public async Task DeleteByPartitionKeys(string tableName, IEnumerable<string> partitionKeys)
         {
-            var block = new ActionBlock<(CloudTable table, string partitionKey)>(
-                async tuple => { await DeleteByPartitionKey(tuple.table, tuple.partitionKey); },
-                new ExecutionDataflowBlockOptions
-                {
-                    BoundedCapacity = 100,
-                    MaxDegreeOfParallelism = 16
-                });
-
             var table = await GetTableAsync(tableName);
+
             foreach (var partitionKey in partitionKeys)
             {
-                await block.SendAsync((table, partitionKey));
-            }
+                TableQuery<TableEntity> deleteQuery = new TableQuery<TableEntity>()
+                    .Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey)
+                            // TableOperators.And,
+                            // TableQuery.GenerateFilterCondition("RowKey", QueryComparisons.LessThan, timestamp)
+                        // )
+                    )
+                    .Select(new string[] { "PartitionKey", "RowKey" });
 
-            block.Complete();
-            await block.Completion;
+                TableContinuationToken continuationToken = null;
+
+                do
+                {
+                    var tableQueryResult = await table.ExecuteQuerySegmentedAsync(deleteQuery, continuationToken);
+
+                    continuationToken = tableQueryResult.ContinuationToken;
+
+                    foreach (var row in tableQueryResult)
+                    {
+                        await table.ExecuteAsync(TableOperation.Delete(row));
+                    }
+                    // // Split into chunks of 100 for batching
+                    // List<List<TableEntity>> rowsChunked = tableQueryResult.Result.Select((x, index) => new { Index = index, Value = x })
+                    //     .Where(x => x.Value != null)
+                    //     .GroupBy(x => x.Index / 100)
+                    //     .Select(x => x.Select(v => v.Value).ToList())
+                    //     .ToList();
+                    //
+                    // // Delete each chunk of 100 in a batch
+                    // foreach (List<TableEntity> rows in rowsChunked)
+                    // {
+                    //     TableBatchOperation tableBatchOperation = new TableBatchOperation();
+                    //     rows.ForEach(x => tableBatchOperation.Add(TableOperation.Delete(x)));
+                    //
+                    //     await table.ExecuteBatchAsync(tableBatchOperation);
+                    // }
+                }
+                while (continuationToken != null);
+            }
         }
 
         public async Task DeleteByPartitionKey(string tableName, string partitionKey)
@@ -115,16 +161,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 var queryResult = await table.ExecuteQuerySegmentedAsync(query, token);
                 token = queryResult.ContinuationToken;
 
-                var batches = queryResult.Batch(100);
-                foreach (var batch in batches)
+                // var batches = queryResult.Batch(100);
+                // foreach (var batch in batches)
+                // {
+                //     var tableBatchOperation = new TableBatchOperation();
+                //     foreach (var entity in batch)
+                //     {
+                //         tableBatchOperation.Add(TableOperation.Delete(entity));
+                //     }
+                //
+                //     await table.ExecuteBatchAsync(tableBatchOperation);
+                // }
+                foreach (var row in queryResult)
                 {
-                    var tableBatchOperation = new TableBatchOperation();
-                    foreach (var entity in batch)
-                    {
-                        tableBatchOperation.Add(TableOperation.Delete(entity));
-                    }
-
-                    await table.ExecuteBatchAsync(tableBatchOperation);
+                    await table.ExecuteAsync(TableOperation.Delete(row));
                 }
             } while (token != null);
         }

@@ -96,6 +96,7 @@ Add basic release content
 
 Add public prerelease access list
     user clicks link    Pre-release access
+    user waits until h2 is visible    Manage pre-release user access
     user creates public prerelease access list    Initial test public access list
 
 Update public prerelease access list
@@ -363,14 +364,14 @@ Create and validate custom table
     user chooses location, time period and filters
     user validates table rows
 
- Go to prerelease methodology page
+Go to prerelease methodology page
     user clicks link    Methodologies
     user waits until h1 is visible    Methodologies    %{WAIT_SMALL}
 
- Validate no methodologies
+Validate no methodologies
     user waits until page contains    No methodologies available
 
- Create and validate methodology
+Create and validate methodology
     user creates methodology for publication    ${PUBLICATION_NAME}
     approve methodology from methodology view
     user navigates to admin frontend    ${RELEASE_URL}/prerelease/methodologies
@@ -497,11 +498,7 @@ Unschedule release
     # by test topic teardown. Unscheduling prevents an error when the scheduled publishing begins.
     user changes to bau1
     user navigates to admin frontend    ${RELEASE_URL}/status
-    user clicks button    Edit release status
-    user clicks radio    In draft
-    user clicks button    Update status
-
-    user checks summary list contains    Current status    In Draft
+    user puts release into draft    expected_next_release_date=January 2001
 
 
 *** Keywords ***

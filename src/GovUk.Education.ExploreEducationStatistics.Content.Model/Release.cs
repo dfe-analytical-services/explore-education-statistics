@@ -225,6 +225,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
                 {
                     _nextReleaseDate = value;
                 }
+                else if (value.IsEmpty())
+                {
+                    _nextReleaseDate = null;
+                }
                 else
                 {
                     throw new FormatException("The next release date is invalid");

@@ -14,9 +14,9 @@ Force Tags          Admin    Local    Dev
 *** Test Cases ***
 Import permissions test variables
     Import bootstrap data roles and permissions variables
-    Set suite variable    ${PUBLICATION_NAME}    ${PUBLICATION_FOR_PUBLICATION_RELEASE_APPROVER}
+    Set suite variable    ${PUBLICATION_NAME}    ${PUBLICATION_FOR_RELEASE_APPROVER}
 
-Navigate to Release where analyst has Release Approver role
+Navigate to Release where analyst has Publication Release Approver role
     user navigates to publication on admin dashboard    ${PUBLICATION_NAME}    ${THEME_NAME}    ${TOPIC_NAME}
 
 Check cannot create a Methodology for a Publication if they don't have Publication Owner role

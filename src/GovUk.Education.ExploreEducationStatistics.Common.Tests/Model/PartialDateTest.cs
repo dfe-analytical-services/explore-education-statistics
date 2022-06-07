@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Xunit;
 
@@ -45,6 +46,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Model
             Assert.False(new PartialDate {Year = "", Month = "1", Day = "0"}.IsValid());
 
             Assert.False(new PartialDate {Year = "2017", Month = "2", Day = "29"}.IsValid()); // Not a leap year
+        }
+        
+        [Fact]
+        public void TestEmptyPartialDate()
+        {
+            Assert.True(new PartialDate {Year = "", Month = "", Day = ""}.IsEmpty());
+            Assert.False(new PartialDate {Year = "1", Month = "", Day = ""}.IsEmpty());
+            Assert.False(new PartialDate {Year = "", Month = "1", Day = ""}.IsEmpty());
+            Assert.False(new PartialDate {Year = "", Month = "", Day = "1"}.IsEmpty());
         }
     }
 }

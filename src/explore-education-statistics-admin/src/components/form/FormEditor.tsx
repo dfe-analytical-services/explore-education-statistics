@@ -172,7 +172,7 @@ const FormEditor = ({
     // This may be fixable in React 18 with the new `useTransition` hook.
     setTimeout(() => {
       onBlur?.();
-    }, 100);
+    }, 0);
   }, [onBlur, toggleFocused]);
 
   // Change editor to add attributes like `aria-describedby`
