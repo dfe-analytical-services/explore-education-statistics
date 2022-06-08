@@ -70,9 +70,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
         public DbSet<UserPublicationRole> UserPublicationRoles { get; set; }
         public DbSet<UserReleaseRole> UserReleaseRoles { get; set; }
         public DbSet<GlossaryEntry> GlossaryEntries { get; set; }
-
         public DbSet<Comment> Comment { get; set; }
         public DbSet<UserReleaseInvite> UserReleaseInvites { get; set; }
+        public DbSet<UserPublicationInvite> UserPublicationInvites { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -447,6 +447,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasQueryFilter(r => !r.SoftDeleted);
 
             modelBuilder.Entity<UserReleaseInvite>()
+                .Property(invite => invite.Created)
+                .HasConversion(
+                    v => v,
+                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            modelBuilder.Entity<UserPublicationInvite>()
+                .Property(r => r.Role)
+                .HasConversion(new EnumToStringConverter<PublicationRole>());
+
+            modelBuilder.Entity<UserPublicationInvite>()
+                .HasQueryFilter(r => !r.SoftDeleted);
+
+            modelBuilder.Entity<UserPublicationInvite>()
                 .Property(invite => invite.Created)
                 .HasConversion(
                     v => v,
