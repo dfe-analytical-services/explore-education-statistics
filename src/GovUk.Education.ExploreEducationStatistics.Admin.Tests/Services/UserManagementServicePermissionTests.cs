@@ -94,7 +94,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     return await service.InviteUser(
                         "test@test.com",
                         Guid.NewGuid().ToString(),
-                        new List<UserReleaseRoleAddViewModel>());
+                        new List<UserReleaseRoleAddViewModel>(),
+                        new List<UserPublicationRoleAddViewModel>());
                 });
         }
 
@@ -131,7 +132,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserRoleService? userRoleService = null,
             IUserService? userService = null,
             IUserInviteRepository? userInviteRepository = null,
-            IUserReleaseInviteRepository? userReleaseInviteRepository = null)
+            IUserReleaseInviteRepository? userReleaseInviteRepository = null,
+            IUserPublicationInviteRepository? userPublicationInviteRepository = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -144,7 +146,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userRoleService ?? Mock.Of<IUserRoleService>(Strict),
                 userService ?? AlwaysTrueUserService().Object,
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
-                userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext)
+                userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
+                userPublicationInviteRepository ?? new UserPublicationInviteRepository(contentDbContext)
             );
         }
     }
