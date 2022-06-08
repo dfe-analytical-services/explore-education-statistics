@@ -75,6 +75,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             return true;
         }
 
+        public bool IsEmpty()
+        {
+            var hasYear = !Year.IsNullOrWhitespace();
+            var hasMonth = !Month.IsNullOrWhitespace();
+            var hasDay = !Day.IsNullOrWhitespace();
+
+            return !hasYear && !hasMonth && !hasDay;
+        }
+
         private static bool EmptyOrBetween(string value, int lower, int upper)
         {
             return IsNullOrEmpty(value) || (Parse(value) >= lower && Parse(value) <= upper);

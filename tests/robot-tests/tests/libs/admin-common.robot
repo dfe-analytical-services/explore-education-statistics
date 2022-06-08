@@ -583,6 +583,29 @@ user uploads subject
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
     user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_LONG}
 
+user puts release into draft
+    [Arguments]
+    ...    ${release_note}=Moving back to draft
+    ...    ${next_release_date_month}=
+    ...    ${next_release_date_year}=
+    ...    ${expected_scheduled_release_date}=Not scheduled
+    ...    ${expected_next_release_date}=Not set
+
+    user clicks button    Edit release status
+    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
+    user clicks radio    In draft
+    user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    ${release_note}
+    IF    "${next_release_date_month}" != "${EMPTY}"
+        user enters text into element    id:releaseStatusForm-nextReleaseDate-month    ${next_release_date_month}
+    END
+    IF    "${next_release_date_year}" != "${EMPTY}"
+        user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${next_release_date_year}
+    END
+    user clicks button    Update status
+    user checks summary list contains    Current status    In Draft
+    user checks summary list contains    Scheduled release    ${expected_scheduled_release_date}
+    user checks summary list contains    Next release expected    ${expected_next_release_date}
+
 user puts release into higher level review
     user clicks link    Sign off
     user waits until page does not contain loading spinner
@@ -668,11 +691,42 @@ user changes methodology status to Draft
 
 user gives analyst publication owner access
     [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    user gives publication access to analyst    ${PUBLICATION_NAME}    Owner    ${ANALYST_EMAIL}
+
+user gives analyst publication release approver access
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    user gives publication access to analyst    ${PUBLICATION_NAME}    ReleaseApprover    ${ANALYST_EMAIL}
+
+user removes publication owner access from analyst
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    user removes publication access from analyst    ${PUBLICATION_NAME}    Owner    ${ANALYST_EMAIL}
+
+user removes publication release approver access from analyst
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    user removes publication access from analyst    ${PUBLICATION_NAME}    ReleaseApprover    ${ANALYST_EMAIL}
+
+user gives publication access to analyst
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${ROLE}
+    ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     user chooses select option    css:[name="selectedPublicationId"]    ${PUBLICATION_NAME}
     user waits until element is enabled    css:[name="selectedPublicationRole"]
-    user chooses select option    css:[name="selectedPublicationRole"]    Owner
+    user chooses select option    css:[name="selectedPublicationRole"]    ${ROLE}
     user clicks button    Add publication access
+    user waits until page does not contain loading spinner
+
+user removes publication access from analyst
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${ROLE}
+    ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    user goes to manage user    ${ANALYST_EMAIL}
+    ${table}=    user gets testid element    publicationAccessTable
+    ${row}=    get child element    ${table}
+    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
+    user clicks button    Remove    ${row}
     user waits until page does not contain loading spinner
 
 user gives release access to analyst
@@ -683,15 +737,6 @@ user gives release access to analyst
     user waits until element is enabled    css:[name="selectedReleaseRole"]
     user chooses select option    css:[name="selectedReleaseRole"]    ${ROLE}
     user clicks button    Add release access
-    user waits until page does not contain loading spinner
-
-user removes publication owner access from analyst
-    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
-    user goes to manage user    ${ANALYST_EMAIL}
-    ${table}=    user gets testid element    publicationAccessTable
-    ${row}=    get child element    ${table}
-    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Role"] and text()="Owner"]]
-    user clicks button    Remove    ${row}
     user waits until page does not contain loading spinner
 
 user removes release access from analyst

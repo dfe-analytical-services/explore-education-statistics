@@ -1,10 +1,9 @@
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -15,11 +14,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class
         PublishSpecificReleaseAuthorizationHandler : AuthorizationHandler<PublishSpecificReleaseRequirement, Release>
     {
-        private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
+        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-        public PublishSpecificReleaseAuthorizationHandler(IUserReleaseRoleRepository userReleaseRoleRepository)
+        public PublishSpecificReleaseAuthorizationHandler(
+            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
-            _userReleaseRoleRepository = userReleaseRoleRepository;
+            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -37,10 +37,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 context.Succeed(requirement);
                 return;
             }
-
-            var releaseRoles = await _userReleaseRoleRepository.GetDistinctRolesByUserAndRelease(context.User.GetUserId(), release.Id);
-
-            if (ContainsApproverRole(releaseRoles))
+            
+            if (await _authorizationHandlerResourceRoleService
+                    .HasRolesOnPublicationOrRelease(
+                        context.User.GetUserId(),
+                        release.PublicationId,
+                        release.Id,
+                        ListOf(PublicationRole.Owner),
+                        ListOf(ReleaseRole.Approver)))
             {
                 context.Succeed(requirement);
             }

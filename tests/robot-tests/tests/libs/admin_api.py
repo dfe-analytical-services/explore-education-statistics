@@ -125,6 +125,42 @@ def user_creates_test_publication_via_api(publication_name: str, topic_id: str =
     return response.json()['id']
 
 
+def user_adds_release_role_to_user_via_api(
+        user_email: str,
+        release_id: str,
+        role_name: str = None):
+
+    user_id = get_user_details_via_api(user_email)['id']
+
+    response = admin_client.post(
+        f'/api/user-management/users/{user_id}/release-role',
+        {
+            "releaseId": release_id,
+            "releaseRole": role_name,
+        }
+    )
+    assert response.status_code < 300, \
+        f'Adding release role to user API request failed with {response.status_code} and {response.text}'
+
+
+def user_adds_publication_role_to_user_via_api(
+        user_email: str,
+        publication_id: str,
+        role_name: str = None):
+
+    user_id = get_user_details_via_api(user_email)['id']
+
+    response = admin_client.post(
+        f'/api/user-management/users/{user_id}/publication-role',
+        {
+            "publicationId": publication_id,
+            "publicationRole": role_name,
+        }
+    )
+    assert response.status_code < 300, \
+        f'Adding publication role to user API request failed with {response.status_code} and {response.text}'
+
+
 def user_create_test_release_via_api(
         publication_id: str,
         time_period: str,
@@ -145,3 +181,11 @@ def user_create_test_release_via_api(
 
     assert response.status_code < 300, \
         f'Creating release API request failed with {response.status_code} and {response.text}'
+
+
+def get_user_details_via_api(
+        user_email: str):
+
+    users = admin_client.get('/api/user-management/users').json()
+
+    return list(filter(lambda user: user['email'] == user_email, users))[0]

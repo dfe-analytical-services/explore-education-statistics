@@ -1,9 +1,10 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Moq;
 using Xunit;
@@ -42,7 +43,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     if (!expectedToPassByClaimAlone)
                     {
-                        userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, Publication, false);
+                        userPublicationRoleRepository
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                            .ReturnsAsync(new List<PublicationRole>());
                     }
 
                     var user = CreateClaimsPrincipal(UserId, claim);
@@ -71,8 +74,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     var handler = SetupHandler(userPublicationRoleRepository.Object);
 
-                    userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(UserId, Publication,
-                        publicationRole == Owner);
+                    userPublicationRoleRepository
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, Publication.Id))
+                        .ReturnsAsync(CollectionUtils.ListOf(publicationRole));
 
                     var user = CreateClaimsPrincipal(UserId);
                     var authContext =
@@ -93,9 +97,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             IUserPublicationRoleRepository? userPublicationRoleRepository = null
         )
         {
-            return new(
-                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
-            );
+            return new AdoptMethodologyForSpecificPublicationAuthorizationHandler(
+                new AuthorizationHandlerResourceRoleService(
+                    Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+                    Mock.Of<IPublicationRepository>(Strict)));
         }
     }
 }

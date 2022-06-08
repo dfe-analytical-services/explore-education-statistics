@@ -42,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user.Id, result.UserId);
                 Assert.Equal(publication.Id, result.PublicationId);
                 Assert.Equal(Owner, result.Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(createdBy.Id, result.CreatedById);
             }
 
@@ -55,7 +55,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user.Id, userPublicationRoles[0].UserId);
                 Assert.Equal(publication.Id, userPublicationRoles[0].PublicationId);
                 Assert.Equal(Owner, userPublicationRoles[0].Role);
-                Assert.InRange(DateTime.UtcNow.Subtract(userPublicationRoles[0].Created).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(userPublicationRoles[0].Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(createdBy.Id, userPublicationRoles[0].CreatedById);
             }
         }
@@ -114,122 +114,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Expect only distinct roles to be returned, therefore the 2nd "Owner" role is filtered out.
                 Assert.Single(result);
                 Assert.Equal(Owner, result[0]);
-            }
-        }
-
-        [Fact]
-        public async Task GetAllRolesByUserAndPublication()
-        {
-            var user = new User();
-            var publication = new Publication();
-
-            var userPublicationRoles = new List<UserPublicationRole>
-            {
-                new()
-                {
-                    User = user,
-                    Publication = publication,
-                    Role = Owner
-                }
-            };
-
-            var otherUserPublicationRoles = new List<UserPublicationRole>
-            {
-                // Role for different publication
-                new()
-                {
-                    User = user,
-                    Publication = new Publication(),
-                    Role = Owner
-                },
-                // Role for different user
-                new()
-                {
-                    User = new User(),
-                    Publication = publication,
-                    Role = Owner
-                }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(user);
-                await contentDbContext.AddAsync(publication);
-                await contentDbContext.AddRangeAsync(userPublicationRoles);
-                await contentDbContext.AddRangeAsync(otherUserPublicationRoles);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupUserPublicationRoleRepository(contentDbContext);
-
-                var result = await service.GetAllRolesByUserAndPublication(user.Id, publication.Id);
-
-                Assert.Single(result);
-                Assert.Equal(Owner, result[0]);
-            }
-        }
-
-        [Fact]
-        public async Task IsUserPublicationOwner_TrueIfOwner()
-        {
-            var userPublicationRole = new UserPublicationRole
-            {
-                User = new User(),
-                Publication = new Publication(),
-                Role = Owner
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupUserPublicationRoleRepository(contentDbContext);
-
-                Assert.True(await service.IsUserPublicationOwner(
-                    userPublicationRole.UserId,
-                    userPublicationRole.PublicationId));
-            }
-        }
-
-        [Fact]
-        public async Task IsUserPublicationOwner_FalseIfNotOwner()
-        {
-            var publication = new Publication();
-
-            // Setup an Owner role but for a different publication to make sure it has no influence
-            var userPublicationRoleOtherPublication = new UserPublicationRole
-            {
-                User = new User(),
-                Publication = new Publication(),
-                Role = Owner
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                await contentDbContext.Publications.AddAsync(publication);
-                await contentDbContext.UserPublicationRoles.AddAsync(userPublicationRoleOtherPublication);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
-            {
-                var service = SetupUserPublicationRoleRepository(contentDbContext);
-
-                Assert.False(await service.IsUserPublicationOwner(
-                    userPublicationRoleOtherPublication.UserId,
-                    publication.Id));
             }
         }
 

@@ -3,21 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.ViewSpecificReleaseAuthorizationHandler;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -39,26 +39,32 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseRequirement>(
                 contentDbContext =>
                     new HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(
-                        new UserReleaseRoleRepository(contentDbContext)),
+                        new AuthorizationHandlerResourceRoleService(
+                            new UserReleaseRoleRepository(contentDbContext),
+                            new UserPublicationRoleRepository(contentDbContext),
+                            Mock.Of<IPublicationRepository>(Strict))),
                 Viewer, Lead, Contributor, Approver);
         }
 
         [Fact]
-        public async Task HasOwnerRoleOnParentPublicationAuthorizationHandler()
+        public async Task HasOwnerOrApproverRoleOnParentPublicationAuthorizationHandler()
         {
             var publication = new Publication
             {
                 Id = Guid.NewGuid()
             };
             await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<ViewReleaseRequirement>(
-                contentDbContext => new HasOwnerRoleOnParentPublicationAuthorizationHandler(
-                    new UserPublicationRoleRepository(contentDbContext)),
+                contentDbContext => new HasOwnerOrApproverRoleOnParentPublicationAuthorizationHandler(
+                        new AuthorizationHandlerResourceRoleService(
+                            Mock.Of<IUserReleaseRoleRepository>(Strict),
+                            new UserPublicationRoleRepository(contentDbContext),
+                            Mock.Of<IPublicationRepository>(Strict))),
                 new Release
                 {
                     PublicationId = publication.Id,
                     Publication = publication
                 },
-                Owner);
+                Owner, ReleaseApprover);
         }
 
         [Fact]
@@ -80,8 +86,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             await AssertReleaseHandlerSucceedsWithCorrectReleaseRoles<ViewReleaseRequirement>(
                 contentDbContext =>
                     new HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(
-                        new UserReleaseRoleRepository(contentDbContext),
-                        preReleaseService.Object),
+                        preReleaseService.Object,
+                        new AuthorizationHandlerResourceRoleService(
+                            new UserReleaseRoleRepository(contentDbContext),
+                            new UserPublicationRoleRepository(contentDbContext),
+                            Mock.Of<IPublicationRepository>(Strict))),
                 release,
                 PrereleaseViewer);
         }
@@ -134,8 +143,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     await AssertReleaseHandlerHandlesScenarioSuccessfully<ViewReleaseRequirement>(
                         contentDbContext =>
                             new HasPreReleaseRoleWithinAccessWindowAuthorizationHandler(
-                                new UserReleaseRoleRepository(contentDbContext),
-                                preReleaseService.Object),
+                                preReleaseService.Object,
+                                new AuthorizationHandlerResourceRoleService(
+                                    new UserReleaseRoleRepository(contentDbContext),
+                                    new UserPublicationRoleRepository(contentDbContext),
+                                    Mock.Of<IPublicationRepository>(Strict))),
                         failureScenario);
                 });
         }

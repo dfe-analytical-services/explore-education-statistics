@@ -117,9 +117,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .OnSuccess(async user =>
                             {
                                 await _userReleaseRoleRepository.Create(
-                                    userId: userId,
-                                    releaseId: release.Id,
-                                    role: role,
+                                    userId,
+                                    release.Id,
+                                    role,
                                     createdById: _userService.GetUserId());
 
                                 var globalRole = GetAssociatedGlobalRoleNameForReleaseRole(role);
@@ -197,7 +197,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var highestPrecedenceRoleNameToRetain = higherPrecedenceExistingGlobalRoleNames
                 .Concat(requiredGlobalRoleNames)
-                .MaxBy(GlobalRolePrecedenceOrder.IndexOf);
+                .OrderBy(GlobalRolePrecedenceOrder.IndexOf)
+                .LastOrDefault();
 
             await SetExclusiveGlobalRole(highestPrecedenceRoleNameToRetain, user);
         }
@@ -207,7 +208,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseRoles = await _userReleaseRoleRepository.GetDistinctRolesByUser(Guid.Parse(user.Id));
             var publicationRoles = await _userPublicationRoleRepository.GetDistinctRolesByUser(Guid.Parse(user.Id));
             var requiredGlobalRoleNames =
-                releaseRoles.Select(GetAssociatedGlobalRoleNameForReleaseRole)
+                releaseRoles
+                    .Select(GetAssociatedGlobalRoleNameForReleaseRole)
                     .Concat(publicationRoles.Select(GetAssociatedGlobalRoleNameForPublicationRole))
                     .Distinct()
                     .ToList();
@@ -234,13 +236,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         // For simplicity of coding styles between dealing with ReleaseRoles and PublicationRoles, leaving this `role`
-        // field here even though currently we only have a single Publication Role of "Owner" and therefore a single 
-        // required Global Role of Analyst in return.
+        // field here even though currently we only have a single Analyst return type.
         private string GetAssociatedGlobalRoleNameForPublicationRole(PublicationRole role)
         {
             switch (role)
             {
                 case PublicationRole.Owner:
+                case PublicationRole.ReleaseApprover:
                     return RoleNames.Analyst;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(role), role, 

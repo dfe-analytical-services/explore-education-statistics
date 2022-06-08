@@ -1,19 +1,26 @@
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.ReleaseRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
     public class ViewSpecificPreReleaseSummaryRequirement : IAuthorizationRequirement
     {}
     
-    public class ViewSpecificPreReleaseSummaryAuthorizationHandler : CompoundAuthorizationHandler<ViewSpecificPreReleaseSummaryRequirement, Release>
+    public class ViewSpecificPreReleaseSummaryAuthorizationHandler 
+        : CompoundAuthorizationHandler<ViewSpecificPreReleaseSummaryRequirement, Release>
     {
-        public ViewSpecificPreReleaseSummaryAuthorizationHandler(IUserReleaseRoleRepository userReleaseRoleRepository) : base(
-            new CanSeeAllReleasesAuthorizationHandler(),
-            new HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(userReleaseRoleRepository),
-            new HasPreReleaseRoleOnReleaseAuthorizationHandler(userReleaseRoleRepository))
+        public ViewSpecificPreReleaseSummaryAuthorizationHandler(
+            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService) 
+            : base(
+                new CanSeeAllReleasesAuthorizationHandler(),
+                new ViewSpecificReleaseAuthorizationHandler.HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(authorizationHandlerResourceRoleService),
+                new HasPreReleaseRoleOnReleaseAuthorizationHandler(authorizationHandlerResourceRoleService))
         {
         }
 
@@ -23,21 +30,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             public CanSeeAllReleasesAuthorizationHandler() 
                 : base(SecurityClaimTypes.AccessAllReleases) {}
         }
-    
+        
         public class HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler
-            : HasRoleOnReleaseAuthorizationHandler<ViewSpecificPreReleaseSummaryRequirement>
+            : AuthorizationHandler<ViewSpecificPreReleaseSummaryRequirement, Release>
         {
-            public HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(IUserReleaseRoleRepository userReleaseRoleRepository) 
-                : base(userReleaseRoleRepository, context => ContainsUnrestrictedViewerRole(context.Roles))
-            {}
-        }
+            private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-        public class HasPreReleaseRoleOnReleaseAuthorizationHandler
-            : HasRoleOnReleaseAuthorizationHandler<ViewSpecificPreReleaseSummaryRequirement>
-        {
-            public HasPreReleaseRoleOnReleaseAuthorizationHandler(IUserReleaseRoleRepository userReleaseRoleRepository)
-                : base(userReleaseRoleRepository, context => ContainsPreReleaseViewerRole(context.Roles))
+            public HasUnrestrictedViewerRoleOnReleaseAuthorizationHandler(
+                AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
             {
+                _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            }
+
+            protected override async Task HandleRequirementAsync(
+                AuthorizationHandlerContext context,
+                ViewSpecificPreReleaseSummaryRequirement requirement,
+                Release release)
+            {
+                if (await _authorizationHandlerResourceRoleService
+                        .HasRolesOnPublicationOrRelease(
+                            context.User.GetUserId(),
+                            release.PublicationId,
+                            release.Id,
+                            CollectionUtils.ListOf(ReleaseApprover),
+                            UnrestrictedReleaseViewerRoles))
+                {
+                    context.Succeed(requirement);
+                }
+            }
+        }
+        
+        public class HasPreReleaseRoleOnReleaseAuthorizationHandler
+            : AuthorizationHandler<ViewSpecificPreReleaseSummaryRequirement, Release>
+        {
+            private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
+
+            public HasPreReleaseRoleOnReleaseAuthorizationHandler(
+                AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
+            {
+                _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
+            }
+
+            protected override async Task HandleRequirementAsync(
+                AuthorizationHandlerContext context,
+                ViewSpecificPreReleaseSummaryRequirement requirement,
+                Release release)
+            {
+                if (await _authorizationHandlerResourceRoleService
+                        .HasRolesOnRelease(
+                            context.User.GetUserId(),
+                            release.Id,
+                            PrereleaseViewer))
+                {
+                    context.Succeed(requirement);
+                }
             }
         }
     }

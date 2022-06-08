@@ -99,12 +99,7 @@ Validates Release status table is correct
     table cell should contain    css:table    2    5    ees-test.analyst1@education.gov.uk    # By user
 
 Check publication owner can edit release status to "In draft"
-    user clicks button    Edit release status
-    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
-    user clicks radio    In draft
-    user enters text into element    id:releaseStatusForm-latestInternalReleaseNote
-    ...    Moving back to Draft state (publication owner)
-    user clicks button    Update status
+    user puts release into draft    release_note=Moving back to Draft state (publication owner)
 
 Validates Release status table is correct again
     user waits until page contains element    css:table

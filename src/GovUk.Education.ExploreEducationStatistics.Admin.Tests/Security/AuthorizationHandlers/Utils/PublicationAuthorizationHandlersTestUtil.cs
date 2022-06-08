@@ -11,6 +11,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
@@ -18,69 +19,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 {
     public static class PublicationAuthorizationHandlersTestUtil
     {
-        public static async Task AssertPublicationHandlerSucceedsWithPublicationOwnerRole<TRequirement>(
-            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier)
+        public static async Task AssertPublicationHandlerSucceedsWithPublicationRoles<TRequirement>(
+            Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
+            params PublicationRole[] publicationRolesExpectedToPass)
             where TRequirement : IAuthorizationRequirement
         {
             var publication = new Publication();
-            await AssertPublicationHandlerSucceedsWithPublicationOwnerRole<TRequirement>(handlerSupplier, publication);
+            await AssertPublicationHandlerSucceedsWithPublicationRoles<TRequirement>(handlerSupplier, publication, publicationRolesExpectedToPass);
         }
 
-        public static async Task AssertPublicationHandlerSucceedsWithPublicationOwnerRole<TRequirement>(
+        public static async Task AssertPublicationHandlerSucceedsWithPublicationRoles<TRequirement>(
             Func<ContentDbContext, IAuthorizationHandler> handlerSupplier,
-            Publication publication)
+            Publication publication,
+            params PublicationRole[] publicationRolesExpectedToPass)
             where TRequirement : IAuthorizationRequirement
         {
             var user = CreateClaimsPrincipal(Guid.NewGuid());
-            
-            // Test the handler succeeds with the Owner role on the Publication for the User
-            await AssertPublicationHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier,
-                new PublicationHandlerTestScenario
-                {
-                    User = user,
-                    Entity = publication,
-                    UserPublicationRoles = new List<UserPublicationRole>
-                    {
-                        // Setup a UserPublicationRole for this Publication and User
-                        new UserPublicationRole
-                        {
-                            PublicationId = publication.Id,
-                            UserId = user.GetUserId(),
-                            Role = Owner
-                        }
-                    },
-                    ExpectedToPass = true,
-                    UnexpectedFailMessage =
-                        "Expected having role Owner on the Publication to have made the handler succeed",
-                });
 
-            // Test the handler fails without the Owner role on the Publication for the User
-            await AssertPublicationHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier,
-                new PublicationHandlerTestScenario
-                {
-                    User = user,
-                    Entity = publication,
-                    UserPublicationRoles = new List<UserPublicationRole>
+            await ForEachPublicationRoleAsync(async role =>
+            {
+                // Test the handler succeeds with the Owner role on the Publication for the User
+                await AssertPublicationHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier,
+                    new PublicationHandlerTestScenario
                     {
-                        // Setup a UserPublicationRole for this Publication but a different User
-                        new UserPublicationRole
+                        User = user,
+                        Entity = publication,
+                        // Setup a UserPublicationRole for this Publication and User
+                        UserPublicationRoles = ListOf(
+                            new UserPublicationRole
+                            {
+                                PublicationId = publication.Id,
+                                UserId = user.GetUserId(),
+                                Role = role
+                            }),
+                        ExpectedToPass = publicationRolesExpectedToPass.Contains(role),
+                        UnexpectedFailMessage =
+                            $"Expected having role {role} on the Publication to have made the handler succeed",
+                    });
+
+                await ForEachPublicationRoleAsync(async role =>
+                {
+                    // Test the handler fails without the role on the correct Publication or the correct User
+                    await AssertPublicationHandlerHandlesScenarioSuccessfully<TRequirement>(handlerSupplier,
+                        new PublicationHandlerTestScenario
                         {
-                            PublicationId = publication.Id,
-                            UserId = Guid.NewGuid(),
-                            Role = Owner
-                        },
-                        // Setup a UserPublicationRoles for this User but a different Publication
-                        new UserPublicationRole
-                        {
-                            PublicationId = Guid.NewGuid(),
-                            UserId = user.GetUserId(),
-                            Role = Owner
-                        }
-                    },
-                    ExpectedToPass = false,
-                    UnexpectedPassMessage =
-                        "Expected not having Owner role on the Publication would have made the handler fail"
+                            User = user,
+                            Entity = publication,
+                            // Setup a UserPublicationRole for this Publication but a different User
+                            UserPublicationRoles = ListOf(
+                                new UserPublicationRole
+                                {
+                                    PublicationId = publication.Id,
+                                    UserId = Guid.NewGuid(),
+                                    Role = role
+                                },
+                                // Setup a UserPublicationRoles for this User but a different Publication
+                                new UserPublicationRole
+                                {
+                                    PublicationId = Guid.NewGuid(),
+                                    UserId = user.GetUserId(),
+                                    Role = role
+                                }),
+                            ExpectedToPass = false,
+                            UnexpectedPassMessage =
+                                $"Expected not having {role} role on the Publication would have made the handler fail"
+                        });
                 });
+            });
         }
 
         public static async Task AssertPublicationHandlerFailsRegardlessOfPublicationOwner<TRequirement>(

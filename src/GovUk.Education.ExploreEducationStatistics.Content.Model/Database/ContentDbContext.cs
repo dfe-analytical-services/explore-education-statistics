@@ -413,7 +413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .Property(r => r.Created)
                 .HasConversion(
                     v => v,
-                    v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
 
             modelBuilder.Entity<UserPublicationRole>()
                 .HasOne(r => r.CreatedBy)

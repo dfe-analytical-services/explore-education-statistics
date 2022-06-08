@@ -6,75 +6,44 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class UserPublicationRoleRepository : IUserPublicationRoleRepository
+    public class UserPublicationRoleRepository : 
+        AbstractUserResourceRoleRepository<UserPublicationRole, Publication, PublicationRole>, 
+        IUserPublicationRoleRepository
     {
-        private readonly ContentDbContext _contentDbContext;
+        public UserPublicationRoleRepository(ContentDbContext contentDbContext) : base(contentDbContext)
+        {}
 
-        public UserPublicationRoleRepository(ContentDbContext contentDbContext)
+        protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceId(Guid publicationId)
         {
-            _contentDbContext = contentDbContext;
-        }
-
-        public async Task<UserPublicationRole> Create(Guid userId,
-            Guid publicationId,
-            PublicationRole role,
-            Guid createdById)
-        {
-            var userPublicationRole = new UserPublicationRole
-            {
-                UserId = userId,
-                PublicationId = publicationId,
-                Role = role,
-                Created = DateTime.UtcNow,
-                CreatedById = createdById
-            };
-
-            var created = (await _contentDbContext.UserPublicationRoles.AddAsync(userPublicationRole)).Entity;
-            await _contentDbContext.SaveChangesAsync();
-            return created;
-        }
-
-        public async Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId)
-        {
-            return await _contentDbContext
+            return ContentDbContext
                 .UserPublicationRoles
-                .AsQueryable()
-                .Where(r => r.UserId == userId)
-                .Select(r => r.Role)
-                .Distinct()
-                .ToListAsync();
+                .Where(role => role.PublicationId == publicationId);
         }
 
-        public async Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId)
+        protected override IQueryable<UserPublicationRole> GetResourceRolesQueryByResourceIds(List<Guid> publicationIds)
         {
-            return await _contentDbContext.UserPublicationRoles
-                .AsQueryable()
-                .Where(r =>
-                    r.UserId == userId &&
-                    r.PublicationId == publicationId)
-                .Select(role => role.Role)
-                .Distinct()
-                .ToListAsync();
+            return ContentDbContext
+                .UserPublicationRoles
+                .Where(role => publicationIds.Contains(role.PublicationId));
         }
 
-        public async Task<bool> IsUserPublicationOwner(Guid userId, Guid publicationId)
+        public Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId)
         {
-            return await UserHasRoleOnPublication(userId, publicationId, Owner);
+            return GetDistinctResourceRolesByUser(userId);
         }
 
-        public async Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role)
+        public Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId, Guid publicationId)
         {
-            return await _contentDbContext.UserPublicationRoles
-                .AsQueryable()
-                .AnyAsync(r =>
-                    r.UserId == userId &&
-                    r.PublicationId == publicationId &&
-                    r.Role == role);
+            return GetAllResourceRolesByUserAndResource(userId, publicationId);
+        }
+
+        public Task<bool> UserHasRoleOnPublication(Guid userId, Guid publicationId, PublicationRole role)
+        {
+            return UserHasRoleOnResource(userId, publicationId, role);
         }
     }
 }

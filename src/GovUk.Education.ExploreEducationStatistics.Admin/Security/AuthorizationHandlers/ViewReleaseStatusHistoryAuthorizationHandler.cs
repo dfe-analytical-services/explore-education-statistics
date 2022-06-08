@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers.AuthorizationHandlerResourceRoleService;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -14,35 +14,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class ViewReleaseStatusHistoryAuthorizationHandler
         : AuthorizationHandler<ViewReleaseStatusHistoryRequirement, Release>
     {
-        private readonly IUserPublicationRoleRepository _publicationRoleRepository;
-        private readonly IUserReleaseRoleRepository _releaseRoleRepository;
+        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
         public ViewReleaseStatusHistoryAuthorizationHandler(
-            IUserPublicationRoleRepository publicationRoleRepository,
-            IUserReleaseRoleRepository releaseRoleRepository)
+            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
-            _publicationRoleRepository = publicationRoleRepository;
-            _releaseRoleRepository = releaseRoleRepository;
+            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
         }
 
         protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext authContext,
+            AuthorizationHandlerContext context,
             ViewReleaseStatusHistoryRequirement requirement,
             Release release)
         {
-            if (SecurityUtils.HasClaim(authContext.User, SecurityClaimTypes.AccessAllReleases))
+            if (SecurityUtils.HasClaim(context.User, SecurityClaimTypes.AccessAllReleases))
             {
-                authContext.Succeed(requirement);
+                context.Succeed(requirement);
                 return;
             }
-
-            var publicationRoles = await _publicationRoleRepository
-                .GetAllRolesByUserAndPublication(authContext.User.GetUserId(), release.PublicationId);
-            var releaseRoles = await _releaseRoleRepository
-                .GetDistinctRolesByUserAndRelease(authContext.User.GetUserId(), release.Id);
-            if (ContainPublicationOwnerRole(publicationRoles) || ContainsUnrestrictedViewerRole(releaseRoles))
+            
+            if (await _authorizationHandlerResourceRoleService
+                    .HasRolesOnPublicationOrRelease(
+                        context.User.GetUserId(),
+                        release.PublicationId,
+                        release.Id,
+                        ListOf(PublicationRole.Owner, PublicationRole.ReleaseApprover),
+                        UnrestrictedReleaseViewerRoles))
             {
-                authContext.Succeed(requirement);
+                context.Succeed(requirement);
             }
         }
     }

@@ -87,8 +87,8 @@ Invite existing user analyst2 to be a contributor for 2002/03 release
 Validate contributors for 2002/03 release
     user waits until page contains    Analyst2 User2 (ees-test.analyst2@education.gov.uk)
 
-    user checks page does not contain    Analyst1 User1 (ees-test.analyst@education.gov.uk)
-    user checks page does not contain    Analyst3 User3 (ees-test.analyst@education.gov.uk)
+    user checks page does not contain    Analyst1 User1 (ees-test.analyst1@education.gov.uk)
+    user checks page does not contain    Analyst3 User3 (ees-test.analyst3@education.gov.uk)
     user checks page does not contain    There are no contributors for this release.
 
 Add new contributors to release

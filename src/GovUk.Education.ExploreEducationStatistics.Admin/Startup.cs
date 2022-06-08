@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -502,6 +503,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
             AddPersistenceHelper<UsersAndRolesDbContext>(services);
+            services.AddTransient<AuthorizationHandlerResourceRoleService>();
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();

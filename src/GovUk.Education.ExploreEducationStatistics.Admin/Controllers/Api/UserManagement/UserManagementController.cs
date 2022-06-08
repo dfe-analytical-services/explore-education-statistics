@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         /// <summary>
         /// Provides a list of resource roles that are available within the service
         /// </summary>
-        /// <returns>Name and value representation of the release role</returns>
+        /// <returns>Name and value representation of the resource role</returns>
         [HttpGet("resource-roles")]
         [ProducesResponseType(200)]
         public Task<ActionResult<Dictionary<string, List<string>>>> GetResourceRoles()

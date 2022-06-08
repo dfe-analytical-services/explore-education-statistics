@@ -38,18 +38,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<List<ReleaseRole>> GetDistinctRolesByUser(Guid userId);
         
-        Task<List<ReleaseRole>> GetDistinctRolesByUserAndRelease(Guid userId,
+        Task<List<ReleaseRole>> GetAllRolesByUserAndRelease(Guid userId,
             Guid releaseId);
 
-        Task<bool> IsUserApproverOnLatestRelease(Guid userId, Guid publicationId);
-
-        Task<bool> IsUserEditorOrApproverOnLatestRelease(Guid userId, Guid publicationId);
-
         Task<bool> IsUserPrereleaseViewerOnLatestPreReleaseRelease(Guid userId, Guid publicationId);
-
-        Task<UserReleaseRole?> GetUserReleaseRole(Guid userId,
-            Guid releaseId,
-            ReleaseRole role);
 
         Task<List<UserReleaseRole>> ListUserReleaseRoles(Guid releaseId, ReleaseRole role);
 
@@ -60,9 +52,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<bool> HasUserReleaseRole(string email,
             Guid releaseId,
             ReleaseRole role);
-
-        Task<bool> UserHasAnyOfRolesOnLatestRelease(Guid userId,
-            Guid publicationId,
-            IEnumerable<ReleaseRole> roles);
     }
 }
