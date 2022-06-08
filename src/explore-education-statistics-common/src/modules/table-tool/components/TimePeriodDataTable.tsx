@@ -3,6 +3,7 @@ import { ExpandedDataSet } from '@common/modules/charts/types/dataSet';
 import { getIndicatorPath } from '@common/modules/charts/util/groupResultMeasuresByDataSet';
 import groupResultMeasuresByCombination from '@common/modules/table-tool/components/utils/groupResultMeasuresByCombination';
 import Header from '@common/modules/table-tool/components/utils/Header';
+import logger from '@common/services/logger';
 import isErrorLike from '@common/utils/error/isErrorLike';
 import {
   CategoryFilter,
@@ -411,7 +412,10 @@ const TimePeriodDataTable = forwardRef<HTMLElement, Props>(
         </>
       );
     } catch (error) {
+      logger.error(error);
+
       onError?.(isErrorLike(error) ? error.message : 'Unknown error');
+
       return (
         <WarningMessage>
           There was a problem rendering the table.
