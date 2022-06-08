@@ -126,14 +126,3 @@ Put release back into draft again
 
 Approve release for immediate publication
     user approves original release for immediate publication
-
-User verifies the basic release details are available on the public site
-    user navigates to find statistics page on public frontend
-    user waits until page contains accordion section    %{TEST_THEME_NAME}    %{WAIT_MEDIUM}
-    user opens accordion section    %{TEST_THEME_NAME}
-    user waits until accordion section contains text    %{TEST_THEME_NAME}    %{TEST_TOPIC_NAME}    %{WAIT_MEDIUM}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
-    user clicks element    testid:View stats link for ${PUBLICATION_NAME}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
-    user checks url contains    %{PUBLIC_URL}/find-statistics/ui-tests-publication-release-approver-%{RUN_IDENTIFIER}
-    user waits until page contains title caption    ${RELEASE_NAME}
