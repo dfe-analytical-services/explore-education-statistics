@@ -43,6 +43,7 @@ export interface UserPublicationRoleSubmission {
 export interface UserInvite {
   email: string;
   roleId: string;
+  userReleaseRoles: { releaseId: string; releaseRole: string }[];
 }
 
 export interface UserUpdate {

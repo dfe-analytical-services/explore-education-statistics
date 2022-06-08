@@ -1,8 +1,11 @@
 import Page from '@admin/components/Page';
-import userService, { Role, UserInvite } from '@admin/services/userService';
+import userService, {
+  ResourceRoles,
+  Role,
+  UserInvite,
+} from '@admin/services/userService';
 import Button from '@common/components/Button';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
@@ -12,12 +15,24 @@ import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import orderBy from 'lodash/orderBy';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import { IdTitlePair } from '@admin/services/types/common';
+import ButtonGroup from '@common/components/ButtonGroup';
+import InviteUserReleaseRoleForm from '@admin/pages/users/components/InviteUserReleaseRoleForm';
+
+export interface InviteUserReleaseRole {
+  releaseId: string;
+  releaseTitle?: string;
+  releaseRole: string;
+}
 
 interface FormValues {
   userEmail: string;
-  selectedRoleId: string;
+  roleId: string;
+  userReleaseRoles: InviteUserReleaseRole[];
 }
 
 const errorMappings = [
@@ -31,28 +46,39 @@ const errorMappings = [
 
 interface InviteUserModel {
   roles: Role[];
+  resourceRoles: ResourceRoles;
+  releases: IdTitlePair[];
 }
 
 const UserInvitePage = ({
   history,
 }: RouteComponentProps & ErrorControlState) => {
-  const [model, setModel] = useState<InviteUserModel>();
   const formId = 'inviteUserForm';
 
-  useEffect(() => {
-    userService.getRoles().then(roles => {
-      setModel({
-        roles,
-      });
-    });
+  const { value: model, isLoading } = useAsyncHandledRetry<
+    InviteUserModel
+  >(async () => {
+    const [roles, resourceRoles, releases] = await Promise.all([
+      userService.getRoles(),
+      userService.getResourceRoles(),
+      userService.getReleases(),
+    ]);
+    return { roles, resourceRoles, releases };
   }, []);
 
   const cancelHandler = () => history.push('/administration/users/invites');
 
   const handleSubmit = useFormSubmit<FormValues>(async values => {
+    const userReleaseRoles = values.userReleaseRoles.map(userReleaseRole => {
+      return {
+        releaseId: userReleaseRole.releaseId,
+        releaseRole: userReleaseRole.releaseRole,
+      };
+    });
     const submission: UserInvite = {
       email: values.userEmail,
-      roleId: values.selectedRoleId,
+      roleId: values.roleId,
+      userReleaseRoles,
     };
 
     await userService.inviteUser(submission);
@@ -61,97 +87,89 @@ const UserInvitePage = ({
   }, errorMappings);
 
   return (
-    <Page
-      wide
-      breadcrumbs={[
-        { name: 'Platform administration', link: '/administration' },
-        { name: 'Invites', link: '/administration/users/invites' },
-        { name: 'Invite user' },
-      ]}
-      title="Invite user"
-    >
-      <div className="govuk-grid-row">
-        <div className="govuk-grid-column-two-thirds">
-          <h1 className="govuk-heading-xl">
-            <span className="govuk-caption-xl">
-              Manage access to the service
-            </span>
-            Invite a new user
-          </h1>
-        </div>
-        {/* EES-2464
-         <div className="govuk-grid-column-one-third">
-          <RelatedInformation heading="Help and guidance">
-            <ul className="govuk-list">
-              <li>
-                <Link to="/documentation/" target="blank">
-                  Inviting new users{' '}
-                </Link>
-              </li>
-            </ul>
-          </RelatedInformation>
-        </div> */}
-      </div>
-      {model && (
+    <LoadingSpinner loading={!model || isLoading}>
+      <Page
+        title="Invite user"
+        caption="Manage access to this service"
+        wide
+        breadcrumbs={[
+          { name: 'Platform administration', link: '/administration' },
+          { name: 'Invites', link: '/administration/users/invites' },
+          { name: 'Invite user' },
+        ]}
+      >
         <Formik<FormValues>
           enableReinitialize
           initialValues={{
             userEmail: '',
-            selectedRoleId:
-              orderBy(model.roles, role => role.name)?.[0]?.id ?? '',
+            roleId: orderBy(model?.roles, role => role.name)?.[0]?.id ?? '',
+            userReleaseRoles: [],
           }}
           validationSchema={Yup.object<FormValues>({
             userEmail: Yup.string()
               .required('Provide the users email')
               .email('Provide a valid email address'),
-            selectedRoleId: Yup.string().required('Choose role for the user'),
+            roleId: Yup.string().required('Choose role for the user'),
+            userReleaseRoles: Yup.array(),
           })}
           onSubmit={handleSubmit}
         >
-          {() => {
+          {form => {
             return (
               <Form id={formId}>
-                <FormFieldset
-                  id="email-fieldset"
-                  legend="Provide the email address for the user"
-                  legendSize="m"
-                  hint="The invited user must have a @education.gov.uk email address"
-                >
-                  <FormFieldTextInput<FormValues>
-                    label="User email"
-                    name="userEmail"
-                  />
-                </FormFieldset>
+                <FormFieldTextInput<FormValues>
+                  label="User email"
+                  name="userEmail"
+                  width={20}
+                  hint="The invited user must be on the DfE AAD. Contact explore.statistics@education.gov.uk if unsure."
+                />
 
-                <FormFieldset
-                  id="role-fieldset"
-                  legend="Role"
-                  legendSize="m"
-                  hint="The users' role within the service."
-                >
-                  <FormFieldSelect<FormValues>
-                    label="Role"
-                    name="selectedRoleId"
-                    placeholder="Choose role"
-                    options={model?.roles.map(role => ({
-                      label: role.name,
-                      value: role.id,
-                    }))}
-                  />
-                </FormFieldset>
+                <FormFieldSelect<FormValues>
+                  label="Role"
+                  name="roleId"
+                  hint="The user's role within the service."
+                  placeholder="Choose role"
+                  options={model?.roles?.map(role => ({
+                    label: role.name,
+                    value: role.id,
+                  }))}
+                />
 
-                <Button type="submit" className="govuk-!-margin-top-6">
-                  Send invite
-                </Button>
-                <div className="govuk-!-margin-top-6">
+                <InviteUserReleaseRoleForm
+                  releases={model?.releases}
+                  releaseRoles={model?.resourceRoles.Release}
+                  userReleaseRoles={form.values.userReleaseRoles}
+                  onAddUserReleaseRole={(
+                    newUserReleaseRole: InviteUserReleaseRole,
+                  ) => {
+                    form.setFieldValue('userReleaseRoles', [
+                      ...form.values.userReleaseRoles,
+                      newUserReleaseRole,
+                    ]);
+                  }}
+                  onRemoveUserReleaseRole={(
+                    userReleaseRoleToRemove: InviteUserReleaseRole,
+                  ) => {
+                    form.setFieldValue(
+                      'userReleaseRoles',
+                      form.values.userReleaseRoles.filter(
+                        userReleaseRole =>
+                          userReleaseRoleToRemove !== userReleaseRole,
+                      ),
+                    );
+                  }}
+                />
+
+                <ButtonGroup className="govuk-!-margin-top-6">
+                  <Button type="submit">Send invite</Button>
                   <ButtonText onClick={cancelHandler}>Cancel</ButtonText>
-                </div>
+                </ButtonGroup>
               </Form>
             );
           }}
         </Formik>
-      )}
-    </Page>
+      </Page>
+    </LoadingSpinner>
   );
 };
 

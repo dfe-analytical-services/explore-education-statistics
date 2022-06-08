@@ -1,10 +1,12 @@
 #nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Data;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -91,7 +93,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     var service = SetupUserManagementService(userService: userService.Object);
                     return await service.InviteUser(
                         "test@test.com",
-                        Guid.NewGuid().ToString());
+                        Guid.NewGuid().ToString(),
+                        new List<UserReleaseRoleAddViewModel>());
                 });
         }
 
@@ -127,7 +130,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IEmailTemplateService? emailTemplateService = null,
             IUserRoleService? userRoleService = null,
             IUserService? userService = null,
-            IUserInviteRepository? userInviteRepository = null)
+            IUserInviteRepository? userInviteRepository = null,
+            IUserReleaseInviteRepository? userReleaseInviteRepository = null)
         {
             contentDbContext ??= InMemoryApplicationDbContext();
             usersAndRolesDbContext ??= InMemoryUserAndRolesDbContext();
@@ -139,7 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 emailTemplateService ?? Mock.Of<IEmailTemplateService>(Strict),
                 userRoleService ?? Mock.Of<IUserRoleService>(Strict),
                 userService ?? AlwaysTrueUserService().Object,
-                userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext)
+                userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
+                userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext)
             );
         }
     }
