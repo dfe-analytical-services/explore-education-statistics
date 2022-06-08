@@ -285,8 +285,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .AsQueryable()
                         .Where(i => i.Email.ToLower() == email.ToLower())
                         .ToListAsync();
-
                     _contentDbContext.UserReleaseInvites.RemoveRange(releaseInvites);
+
+                    var publicationInvites = await _contentDbContext.UserPublicationInvites
+                        .AsQueryable()
+                        .Where(i => i.Email.ToLower() == email.ToLower())
+                        .ToListAsync();
+                    _contentDbContext.UserPublicationInvites.RemoveRange(publicationInvites);
+
                     await _contentDbContext.SaveChangesAsync();
 
                     return Unit.Instance;
