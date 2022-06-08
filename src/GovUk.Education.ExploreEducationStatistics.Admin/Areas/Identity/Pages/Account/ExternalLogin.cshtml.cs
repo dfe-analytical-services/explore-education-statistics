@@ -308,9 +308,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
                 await releaseInvites.ForEachAsync(invite =>
                 {
-                    _contentDbContext.AddAsync(new UserReleaseRole
+                    _contentDbContext.Add(new UserReleaseRole
                     {
                         ReleaseId = invite.ReleaseId,
+                        Role = invite.Role,
+                        UserId = newInternalUser.Id,
+                        Created = DateTime.UtcNow,
+                        CreatedById = invite.CreatedById,
+                    });
+
+                    invite.Accepted = true;
+                });
+
+                var publicationInvites = _contentDbContext
+                    .UserPublicationInvites
+                    .AsQueryable()
+                    .Where(i => i.Email.ToLower() == newAspNetUser.Email.ToLower());
+
+                await publicationInvites.ForEachAsync(invite =>
+                {
+                    _contentDbContext.Add(new UserPublicationRole
+                    {
+                        PublicationId = invite.PublicationId,
                         Role = invite.Role,
                         UserId = newInternalUser.Id,
                         Created = DateTime.UtcNow,
