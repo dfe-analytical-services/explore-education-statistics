@@ -32,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserService _userService;
         private readonly IUserInviteRepository _userInviteRepository;
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
+        private readonly IUserPublicationInviteRepository _userPublicationInviteRepository;
 
         public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext,
             ContentDbContext contentDbContext,
@@ -40,7 +41,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IUserRoleService userRoleService,
             IUserService userService,
             IUserInviteRepository userInviteRepository,
-            IUserReleaseInviteRepository userReleaseInviteRepository)
+            IUserReleaseInviteRepository userReleaseInviteRepository,
+            IUserPublicationInviteRepository userPublicationInviteRepository)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -50,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
             _userInviteRepository = userInviteRepository;
             _userReleaseInviteRepository = userReleaseInviteRepository;
+            _userPublicationInviteRepository = userPublicationInviteRepository;
         }
 
         public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()
@@ -218,7 +221,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, UserInvite>> InviteUser(
             string email,
             string roleId,
-            List<UserReleaseRoleAddViewModel> userReleaseRoles)
+            List<UserReleaseRoleAddViewModel> userReleaseRoles,
+            List<UserPublicationRoleAddViewModel> userPublicationRoles)
         {
             return await _userService
                 .CheckCanManageAllUsers()
@@ -245,6 +249,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             releaseId: userReleaseRole.ReleaseId,
                             email: email,
                             releaseRole: userReleaseRole.ReleaseRole,
+                            emailSent: true, // EES-3403
+                            createdById: _userService.GetUserId());
+                    }
+
+                    foreach (var userPublicationRole in userPublicationRoles)
+                    {
+                        await _userPublicationInviteRepository.Create(
+                            publicationId: userPublicationRole.PublicationId,
+                            email: email,
+                            publicationRole: userPublicationRole.PublicationRole,
                             emailSent: true, // EES-3403
                             createdById: _userService.GetUserId());
                     }

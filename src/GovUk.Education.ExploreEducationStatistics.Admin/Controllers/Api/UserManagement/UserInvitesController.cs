@@ -40,7 +40,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         public async Task<ActionResult<UserInvite>> InviteUser(UserInviteViewModel userInviteViewModel)
         {
             return await _userManagementService
-                .InviteUser(userInviteViewModel.Email, userInviteViewModel.RoleId, userInviteViewModel.UserReleaseRoles)
+                .InviteUser(
+                    userInviteViewModel.Email,
+                    userInviteViewModel.RoleId,
+                    userInviteViewModel.UserReleaseRoles,
+                    userInviteViewModel.UserPublicationRoles)
                 .HandleFailuresOrOk();
         }
 

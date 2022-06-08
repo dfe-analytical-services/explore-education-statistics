@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 
         [HttpPost("users/{userId:guid}/publication-role")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<Unit>> AddPublicationRole(Guid userId, AddPublicationRoleViewModel request)
+        public async Task<ActionResult<Unit>> AddPublicationRole(Guid userId, UserPublicationRoleAddViewModel request)
         {
             return await _userRoleService
                 .AddPublicationRole(userId, request.PublicationId, request.PublicationRole)
