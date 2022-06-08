@@ -288,6 +288,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(InviteNotFound);
                     }
 
+                    if (invite.Accepted)
+                    {
+                        return ValidationActionResult(InviteAlreadyAccepted);
+                    }
+
                     _usersAndRolesDbContext.UserInvites.Remove(invite);
                     await _usersAndRolesDbContext.SaveChangesAsync();
 

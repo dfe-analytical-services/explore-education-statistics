@@ -31,6 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         NotAllReleasesBelongToPublication,
         UserAlreadyHasReleaseRoleInvites,
         UserAlreadyHasReleaseRoles,
+        InviteAlreadyAccepted,
 
         // Methodology
         MethodologyMustBeDraft,
