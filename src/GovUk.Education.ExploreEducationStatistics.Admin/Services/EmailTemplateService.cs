@@ -1,6 +1,9 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Mvc;
@@ -19,14 +22,45 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _configuration = configuration;
         }
 
-        public Either<ActionResult, Unit> SendInviteEmail(string email)
+        public Either<ActionResult, Unit> SendInviteEmail(
+            string email,
+            List<UserReleaseInvite> userReleaseInvites,
+            List<UserPublicationInvite> userPublicationInvites)
         {
             var uri = _configuration.GetValue<string>("AdminUri");
-            var template = _configuration.GetValue<string>("NotifyInviteTemplateId");
+            var template = _configuration.GetValue<string>("NotifyInviteWithRolesTemplateId");
+
+            var releaseRoleList = userReleaseInvites
+                .OrderBy(invite => invite.Release.Publication.Title)
+                .ThenBy(invite => invite.Release.Title)
+                .ThenBy(invite => invite.Role.ToString())
+                .Select(invite =>
+                    $"* {invite.Release.Publication.Title}, {invite.Release.Title} - {invite.Role.ToString()}")
+                .ToList();
+
+            var publicationRoleList = userPublicationInvites
+                .OrderBy(invite => invite.Publication.Title)
+                .ThenBy(invite => invite.Role)
+                .Select(invite => $"* {invite.Publication.Title} - {invite.Role.ToString()}")
+                .ToList();
 
             var emailValues = new Dictionary<string, dynamic>
             {
-                {"url", $"https://{uri}"}
+                {"url", $"https://{uri}"},
+                {
+                    "release role list",
+                    releaseRoleList.IsNullOrEmpty()
+                        ? "* No release permissions granted"
+                        : releaseRoleList.JoinToString("\n")
+
+                },
+                {
+                    "publication role list",
+                    publicationRoleList.IsNullOrEmpty()
+                        ? "* No publication permissions granted"
+                        : publicationRoleList.JoinToString("\n")
+
+                },
             };
 
             return _emailService.SendEmail(email, template, emailValues);

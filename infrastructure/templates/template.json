@@ -310,15 +310,22 @@
     },
     "notifyInviteTemplateId": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "change-me"
+    },
+    "notifyInviteWithRolesTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for "
+      }
     },
     "notifyPublicationRoleTemplateId": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "change-me"
     },
     "notifyReleaseRoleTemplateId": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "change-me"
     },
     "notifyPreReleaseTemplateId": {
       "type": "securestring",

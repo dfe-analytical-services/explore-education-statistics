@@ -267,6 +267,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => ValidateUserDoesNotExist(email))
                 .OnSuccess<ActionResult, Unit, UserInvite>(async () =>
                 {
+                    email = email.Trim().ToLower();
+
                     var role = await _usersAndRolesDbContext.Roles
                         .AsQueryable()
                         .FirstOrDefaultAsync(r => r.Id == roleId);
@@ -287,7 +289,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             releaseId: userReleaseRole.ReleaseId,
                             email: email,
                             releaseRole: userReleaseRole.ReleaseRole,
-                            emailSent: true, // EES-3403
+                            emailSent: true,
                             createdById: _userService.GetUserId());
                     }
 
@@ -298,11 +300,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     return userInvite;
                 })
-                .OnSuccess(invite =>
+                .OnSuccess(userInvite =>
                 {
+                    var userReleaseInvites = _contentDbContext.UserReleaseInvites
+                        .Include(invite => invite.Release.Publication)
+                        .Where(invite => invite.Email.ToLower() == email.ToLower())
+                        .ToList();
+
+                    var userPublicationInvites = _contentDbContext.UserPublicationInvites
+                        .Include(invite => invite.Publication)
+                        .Where(invite => invite.Email.ToLower() == email.ToLower())
+                        .ToList();
+
                     return _emailTemplateService
-                        .SendInviteEmail(email)
-                        .OnSuccess(() => invite);
+                        .SendInviteEmail(email, userReleaseInvites, userPublicationInvites)
+                        .OnSuccess(() => userInvite);
                 });
         }
 
