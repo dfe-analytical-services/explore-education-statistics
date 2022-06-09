@@ -112,7 +112,7 @@ describe('ReleasePreReleaseAccessPage', () => {
       screen.queryByRole('tab', { name: 'Pre-release users' }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByRole('tab', { name: 'Public access list' }),
+      screen.getByRole('tab', { name: 'Public access list', hidden: true }),
     ).toBeInTheDocument();
   });
 

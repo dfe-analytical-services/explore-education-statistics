@@ -2,11 +2,9 @@
 Resource    ./common.robot
 Library     admin-utilities.py
 
-
 *** Variables ***
-${BAU1_BROWSER}         bau1
-${ANALYST1_BROWSER}     analyst1
-
+${BAU1_BROWSER}=        bau1
+${ANALYST1_BROWSER}=    analyst1
 
 *** Keywords ***
 user signs in as bau1
@@ -433,7 +431,6 @@ user creates public prerelease access list
 
 user updates public prerelease access list
     [Arguments]    ${content}
-    user clicks link    Public access list
     user waits until h2 is visible    Public pre-release access list
     user clicks button    Edit public pre-release access list
     user presses keys    CTRL+a

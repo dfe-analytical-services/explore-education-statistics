@@ -5,33 +5,27 @@ import Tabs from '../Tabs';
 import TabsSection from '../TabsSection';
 
 describe('Tabs', () => {
-  test('renders single tab correctly', () => {
+  test('renders with aria-hidden tabs when there is only one section', () => {
     const { container } = render(
       <Tabs id="test-tabs">
-        <TabsSection title="Tab 1" headingTitle="Tab 1">
+        <TabsSection title="Tab 1" headingTitle="Tab Heading 1">
           <p>Test section 1 content</p>
         </TabsSection>
       </Tabs>,
     );
 
-    const tabs = screen.getAllByRole('tab');
-    const sections = screen.getAllByRole('tabpanel', {
-      hidden: true,
-    });
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
+    expect(screen.queryByRole('tablist', { hidden: true })).toHaveAttribute(
+      'aria-hidden',
+      'true',
+    );
 
-    expect(tabs).toHaveLength(1);
-    expect(sections).toHaveLength(1);
-
-    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
-    expect(tabs[0]).toHaveTextContent('Tab 1');
-
+    expect(screen.queryByRole('tab')).not.toBeInTheDocument();
+    expect(screen.queryByRole('tabpanel')).not.toBeInTheDocument();
     expect(
-      within(sections[0]).getByRole('heading', {
-        name: 'Tab 1',
-      }),
-    ).toBeInTheDocument();
-
-    expect(sections[0]).toHaveTextContent('Test section 1 content');
+      screen.queryByRole('link', { name: 'Tab 1' }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Test section 1 content')).toBeInTheDocument();
 
     expect(container).toMatchSnapshot();
   });
@@ -169,6 +163,23 @@ describe('Tabs', () => {
 
     expect(heading1).toHaveTextContent('Tab 1');
     expect(heading2).toHaveTextContent('Tab 2');
+  });
+
+  test('setting tabLabel overrides the title', () => {
+    render(
+      <Tabs id="test-tabs">
+        <TabsSection tabLabel="Tab Label 1" title="Tab 1">
+          <p>Test section 1 content</p>
+        </TabsSection>
+        <TabsSection title="Tab 2">
+          <p>Test section 2 content</p>
+        </TabsSection>
+      </Tabs>,
+    );
+
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs[0]).toHaveTextContent('Tab Label 1');
+    expect(tabs[1]).toHaveTextContent('Tab 2');
   });
 
   test('does not immediately render lazy tab section', () => {
@@ -459,6 +470,9 @@ describe('Tabs', () => {
         <TabsSection title="Tab 2">
           <p>Test section 2 content</p>
         </TabsSection>
+        <TabsSection title="Tab 3">
+          <p>Test section 3 content</p>
+        </TabsSection>
       </Tabs>,
     );
 
@@ -469,22 +483,28 @@ describe('Tabs', () => {
         <TabsSection title="Tab 1">
           <p>Test section 1 content</p>
         </TabsSection>
+        <TabsSection title="Tab 3">
+          <p>Test section 3 content</p>
+        </TabsSection>
       </Tabs>,
     );
 
     const tabs = screen.getAllByRole('tab');
     const sections = screen.getAllByRole('tabpanel', { hidden: true });
 
-    expect(tabs).toHaveLength(1);
-    expect(sections).toHaveLength(1);
+    expect(tabs).toHaveLength(2);
+    expect(sections).toHaveLength(2);
 
-    expect(tabs[0]).toHaveAttribute('aria-selected', 'true');
+    expect(tabs[0]).toHaveAttribute('aria-selected', 'false');
     expect(tabs[0]).toHaveTextContent('Tab 1');
+    expect(sections[0]).not.toBeVisible();
 
-    expect(sections[0]).toBeVisible();
-    expect(sections[0]).toHaveTextContent('Test section 1 content');
+    expect(tabs[1]).toHaveAttribute('aria-selected', 'true');
+    expect(tabs[1]).toHaveTextContent('Tab 3');
+    expect(sections[1]).toBeVisible();
+    expect(sections[1]).toHaveTextContent('Test section 3 content');
 
-    expect(window.location.hash).toBe('#test-tabs-1');
+    expect(window.location.hash).toBe('#test-tabs-2');
   });
 
   describe('keyboard interactions', () => {
@@ -546,27 +566,27 @@ describe('Tabs', () => {
       expect(window.location.hash).toBe('#test-tabs-1');
     });
 
-    test('pressing left arrow key cycles to end of tabs', () => {
-      fireEvent.click(tab1);
-
-      expect(tab1).toHaveAttribute('aria-selected', 'true');
-      expect(tab3).toHaveAttribute('aria-selected', 'false');
-
-      expect(tabSection1).toBeVisible();
-      expect(tabSection3).not.toBeVisible();
-
-      expect(window.location.hash).toBe('#test-tabs-1');
-
-      fireEvent.keyDown(tab1, { key: 'ArrowLeft' });
+    test('pressing up arrow key moves to previous tab', () => {
+      fireEvent.click(tab2);
 
       expect(tab1).toHaveAttribute('aria-selected', 'false');
-      expect(tab3).toHaveAttribute('aria-selected', 'true');
-      expect(tab3).toHaveFocus();
+      expect(tab2).toHaveAttribute('aria-selected', 'true');
 
       expect(tabSection1).not.toBeVisible();
-      expect(tabSection3).toBeVisible();
+      expect(tabSection2).toBeVisible();
 
-      expect(window.location.hash).toBe('#test-tabs-3');
+      expect(window.location.hash).toBe('#test-tabs-2');
+
+      fireEvent.keyDown(tab2, { key: 'ArrowUp' });
+
+      expect(tab1).toHaveAttribute('aria-selected', 'true');
+      expect(tab1).toHaveFocus();
+      expect(tab2).toHaveAttribute('aria-selected', 'false');
+
+      expect(tabSection1).toBeVisible();
+      expect(tabSection2).not.toBeVisible();
+
+      expect(window.location.hash).toBe('#test-tabs-1');
     });
 
     test('pressing right arrow key moves to next tab', () => {
@@ -592,35 +612,27 @@ describe('Tabs', () => {
       expect(window.location.hash).toBe('#test-tabs-3');
     });
 
-    test('pressing right arrow key cycles to beginning of tabs', () => {
-      fireEvent.click(tab3);
+    test('pressing down arrow key moves to next tab', () => {
+      fireEvent.click(tab2);
 
-      expect(tab1).toHaveAttribute('aria-selected', 'false');
+      expect(tab2).toHaveAttribute('aria-selected', 'true');
+      expect(tab3).toHaveAttribute('aria-selected', 'false');
+
+      expect(tabSection2).toBeVisible();
+      expect(tabSection3).not.toBeVisible();
+
+      expect(window.location.hash).toBe('#test-tabs-2');
+
+      fireEvent.keyDown(tab2, { key: 'ArrowDown' });
+
+      expect(tab2).toHaveAttribute('aria-selected', 'false');
       expect(tab3).toHaveAttribute('aria-selected', 'true');
+      expect(tab3).toHaveFocus();
 
-      expect(tabSection1).not.toBeVisible();
+      expect(tabSection2).not.toBeVisible();
       expect(tabSection3).toBeVisible();
 
       expect(window.location.hash).toBe('#test-tabs-3');
-
-      fireEvent.keyDown(tab3, { key: 'ArrowRight' });
-
-      expect(tab1).toHaveAttribute('aria-selected', 'true');
-      expect(tab1).toHaveFocus();
-      expect(tab3).toHaveAttribute('aria-selected', 'false');
-
-      expect(tabSection1).toBeVisible();
-      expect(tabSection3).not.toBeVisible();
-
-      expect(window.location.hash).toBe('#test-tabs-1');
-    });
-
-    test('pressing down arrow key focuses the tab section', async () => {
-      expect(tab1).toHaveAttribute('aria-selected', 'true');
-
-      fireEvent.keyDown(tab1, { key: 'ArrowDown' });
-
-      expect(tabSection1).toHaveFocus();
     });
   });
 });

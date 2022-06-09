@@ -10,7 +10,6 @@ Library     visual.py
 Resource    ./tables-common.robot
 Resource    ./table_tool.robot
 
-
 *** Variables ***
 ${browser}=                             chrome
 ${headless}=                            1
@@ -21,7 +20,6 @@ ${implicit_wait}=                       %{IMPLICIT_WAIT}
 ${RELEASE_COMPLETE_WAIT}=               %{RELEASE_COMPLETE_WAIT}
 ${prompt_to_continue_on_failure}=       0
 ${FAIL_TEST_SUITES_FAST}=               %{FAIL_TEST_SUITES_FAST}
-
 
 *** Keywords ***
 do this on failure
@@ -475,7 +473,7 @@ user clicks element
 
 user clicks link
     [Arguments]    ${text}    ${parent}=css:body
-    user clicks element    link:${text}    ${parent}
+    user clicks element    xpath:.//a[text()="${text}"]    ${parent}
 
 user clicks button
     [Arguments]    ${text}    ${parent}=css:body

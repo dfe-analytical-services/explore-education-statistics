@@ -44,6 +44,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
       section,
       {
         'aria-labelledby': `${sectionId}-tab`,
+        hasSiblings: filteredChildren.length > 1,
         hidden: selectedTabIndex !== index,
         id: sectionId,
         key: sectionId,
@@ -125,6 +126,8 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
     };
   }, [sections, selectTab, selectedTabIndex]);
 
+  const hasSingleTab = sections.length === 1;
+
   return (
     <div
       className={classNames('govuk-tabs', styles.tabs)}
@@ -132,9 +135,16 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
       data-testid={testId}
       ref={ref}
     >
-      <ul className="govuk-tabs__list" role="tablist">
+      <ul
+        aria-hidden={hasSingleTab}
+        className={classNames('govuk-tabs__list', {
+          [styles.mobileHidden]: hasSingleTab,
+        })}
+        role="tablist"
+      >
         {sections.map(({ props }, index) => {
           const sectionId = props.id || `${id}-${index + 1}`;
+
           return (
             <li
               className={classNames('govuk-tabs__list-item', {
@@ -155,60 +165,44 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
                   event.preventDefault();
                   selectTab(index);
 
-                  if (onToggle) {
-                    onToggle({
-                      title: props.title,
-                      id: sectionId,
-                    });
-                  }
+                  onToggle?.({
+                    title: props.title,
+                    id: sectionId,
+                  });
                 }}
                 onKeyDown={event => {
                   switch (event.key) {
-                    case 'ArrowLeft': {
-                      const nextTabIndex =
-                        selectedTabIndex > 0
-                          ? selectedTabIndex - 1
-                          : sections.length - 1;
+                    case 'ArrowLeft':
+                    case 'ArrowUp': {
+                      event.preventDefault();
+                      const nextTabIndex = selectedTabIndex - 1;
 
-                      selectTab(nextTabIndex);
-                      focusTab(nextTabIndex);
+                      if (nextTabIndex >= 0) {
+                        selectTab(nextTabIndex);
+                        focusTab(nextTabIndex);
 
-                      if (onToggle) {
-                        onToggle({
-                          title: `${props.title}`,
-                          id: `${sectionId}`,
+                        onToggle?.({
+                          title: props.title,
+                          id: sectionId,
                         });
                       }
+
                       break;
                     }
-                    case 'ArrowRight': {
-                      const nextTabIndex =
-                        selectedTabIndex < sections.length - 1
-                          ? selectedTabIndex + 1
-                          : 0;
-
-                      selectTab(nextTabIndex);
-                      focusTab(nextTabIndex);
-
-                      if (onToggle) {
-                        onToggle({
-                          title: `${props.title}`,
-                          id: `${sectionId}`,
-                        });
-                      }
-                      break;
-                    }
+                    case 'ArrowRight':
                     case 'ArrowDown': {
-                      if (ref.current) {
-                        const section = ref.current.querySelector<
-                          HTMLDivElement
-                        >(`#${sections[selectedTabIndex].props.id}`);
+                      event.preventDefault();
+                      const nextTabIndex = selectedTabIndex + 1;
 
-                        if (section) {
-                          section.focus();
-                        }
+                      if (nextTabIndex < sections.length) {
+                        selectTab(nextTabIndex);
+                        focusTab(nextTabIndex);
+
+                        onToggle?.({
+                          title: props.title,
+                          id: sectionId,
+                        });
                       }
-
                       break;
                     }
                     default:
@@ -216,7 +210,7 @@ const Tabs = ({ children, id, modifyHash = true, testId, onToggle }: Props) => {
                   }
                 }}
               >
-                {props.title}
+                {props.tabLabel || props.title}
               </a>
             </li>
           );

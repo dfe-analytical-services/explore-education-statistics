@@ -9,7 +9,7 @@ import _dataBlockService, {
 import _tableBuilderService, {
   Subject,
 } from '@common/services/tableBuilderService';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
@@ -93,11 +93,16 @@ describe('DataBlockPageTabs', () => {
         'Step 1 (current) Choose a subject',
       );
 
-      expect(screen.getAllByRole('listitem')).toHaveLength(1);
+      expect(screen.getByTestId('wizardStep-1')).toBeVisible();
+      expect(screen.getByTestId('wizardStep-2')).not.toBeVisible();
 
       const radios = screen.getAllByRole('radio');
       expect(radios).toHaveLength(1);
-      expect(radios[0]).toEqual(screen.getByLabelText('Test subject'));
+      expect(radios[0]).toEqual(
+        within(screen.getByTestId('wizardStep-1')).getByLabelText(
+          'Test subject',
+        ),
+      );
     });
   });
 
@@ -107,7 +112,7 @@ describe('DataBlockPageTabs', () => {
     render(<DataBlockPageTabs releaseId="release-1" onDataBlockSave={noop} />);
 
     await waitFor(() => {
-      const tabs = screen.getAllByRole('tab');
+      const tabs = screen.getAllByRole('tab', { hidden: true });
 
       expect(tabs).toHaveLength(1);
       expect(tabs[0]).toHaveTextContent('Data source');

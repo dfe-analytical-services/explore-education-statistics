@@ -37,7 +37,7 @@ const ReleaseHeadlines = ({ release }: Props) => {
   }, [actions, release.id, release.headlinesSection.id]);
 
   const headlinesTab = (
-    <TabsSection title="Headlines">
+    <TabsSection title="Summary">
       <section id="releaseHeadlines-keyStatistics">
         <KeyStatistics release={release} isEditing={editingMode === 'edit'} />
       </section>
