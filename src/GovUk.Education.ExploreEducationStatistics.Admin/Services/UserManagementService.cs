@@ -200,21 +200,59 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<UserViewModel>>> ListPendingInvites()
+        public async Task<Either<ActionResult, List<PendingInviteViewModel>>> ListPendingInvites()
         {
             return await _userService
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
-                    await _usersAndRolesDbContext.UserInvites
-                        .AsQueryable()
-                        .Where(ui => !ui.Accepted)
-                        .OrderBy(ui => ui.Email)
-                        .Include(ui => ui.Role)
-                        .Select(ui => new UserViewModel
+                    {
+                        var pendingInvites = await _usersAndRolesDbContext.UserInvites
+                            .AsQueryable()
+                            .Where(ui => !ui.Accepted)
+                            .OrderBy(ui => ui.Email)
+                            .Include(ui => ui.Role)
+                            .Select(ui => new PendingInviteViewModel
+                            {
+                                Email = ui.Email,
+                                Role = ui.Role.Name,
+                            }).ToListAsync();
+
+                        foreach (var invite in pendingInvites)
                         {
-                            Email = ui.Email,
-                            Role = ui.Role.Name,
-                        }).ToListAsync()
+                            var userReleaseInvites = await _contentDbContext.UserReleaseInvites
+                                .Include(userReleaseInvite => userReleaseInvite.Release.Publication)
+                                .Where(userReleaseInvite =>
+                                    userReleaseInvite.Email.ToLower() == invite.Email.ToLower())
+                                .ToListAsync();
+
+                            invite.UserReleaseRoles = userReleaseInvites
+                                .Select(userReleaseInvite =>
+                                    new UserReleaseRoleViewModel
+                                    {
+                                        Publication = userReleaseInvite.Release.Publication.Title,
+                                        Release = userReleaseInvite.Release.Title,
+                                        Role = userReleaseInvite.Role,
+                                    }
+                                ).ToList();
+
+                            var userPublicationInvites = await _contentDbContext.UserPublicationInvites
+                                .Include(userPublicationInvite => userPublicationInvite.Publication)
+                                .Where(userPublicationInvite =>
+                                    userPublicationInvite.Email.ToLower() == invite.Email.ToLower())
+                                .ToListAsync();
+
+                            invite.UserPublicationRoles = userPublicationInvites
+                                .Select(userPublicationInvite =>
+                                    new UserPublicationRoleViewModel
+                                    {
+                                        Publication = userPublicationInvite.Publication.Title,
+                                        Role = userPublicationInvite.Role,
+                                    }
+                                ).ToList();
+                        }
+
+                        return pendingInvites;
+                    }
                 );
         }
 
@@ -253,7 +291,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             createdById: _userService.GetUserId());
                     }
 
-                    _userPublicationInviteRepository.CreateManyIfNotExists(
+                    await _userPublicationInviteRepository.CreateManyIfNotExists(
                         userPublicationRoles,
                         email,
                         _userService.GetUserId());

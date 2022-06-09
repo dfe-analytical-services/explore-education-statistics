@@ -10,12 +10,10 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
-
 *** Variables ***
 ${PUBLICATION_NAME}=                    UI tests - publish methodology %{RUN_IDENTIFIER}
 ${PUBLIC_METHODOLOGY_URL_ENDING}=       /methodology/ui-tests-publish-methodology-%{RUN_IDENTIFIER}
 ${RELEASE_NAME}=                        Academic Year 2021/22
-
 
 *** Test Cases ***
 Create a draft release
@@ -206,7 +204,7 @@ Verify that the amended methodology is visible on the public methodologies page
     user waits until page contains accordion section    %{TEST_THEME_NAME}
     user opens accordion section    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
-    user scrolls down    400    # @MarkFix
+    user scrolls down    400
     user checks page contains methodology link
     ...    %{TEST_TOPIC_NAME}
     ...    ${PUBLICATION_NAME}
