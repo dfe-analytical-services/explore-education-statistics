@@ -317,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                         CreatedById = invite.CreatedById,
                     });
 
-                    invite.Accepted = true;
+                    _contentDbContext.Remove(invite);
                 });
 
                 var publicationInvites = _contentDbContext
@@ -336,7 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
                         CreatedById = invite.CreatedById,
                     });
 
-                    invite.Accepted = true;
+                    _contentDbContext.Remove(invite);
                 });
             }
 

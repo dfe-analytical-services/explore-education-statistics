@@ -88,8 +88,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         var invitedPrereleaseContacts = await _context
                             .UserReleaseInvites
                             .AsQueryable()
-                            .Where(
-                                r => r.Role == PrereleaseViewer && !r.Accepted && r.ReleaseId == releaseId
+                            .Where(r =>
+                                r.Role == PrereleaseViewer && r.ReleaseId == releaseId
                             )
                             .Select(i => i.Email.ToLower())
                             .Distinct()
@@ -341,14 +341,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return emailResult;
                     }
                 }
-
-                await _userReleaseInviteRepository.Create(
-                    releaseId: release.Id,
-                    email: email,
-                    releaseRole: PrereleaseViewer,
-                    emailSent: sendEmail,
-                    createdById: _userService.GetUserId(),
-                    accepted: true); // accepted as user already exists
 
                 await _userReleaseRoleRepository.CreateIfNotExists(
                     userId: user.Id,

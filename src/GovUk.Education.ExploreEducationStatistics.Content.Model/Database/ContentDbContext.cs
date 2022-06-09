@@ -452,12 +452,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
+            modelBuilder.Entity<UserReleaseInvite>()
+                .Property(invite => invite.Updated)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : null);
+
             modelBuilder.Entity<UserPublicationInvite>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<PublicationRole>());
-
-            modelBuilder.Entity<UserPublicationInvite>()
-                .HasQueryFilter(r => !r.SoftDeleted);
 
             modelBuilder.Entity<UserPublicationInvite>()
                 .Property(invite => invite.Created)

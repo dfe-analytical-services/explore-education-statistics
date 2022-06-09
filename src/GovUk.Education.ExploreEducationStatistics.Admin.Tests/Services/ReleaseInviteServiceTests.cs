@@ -127,7 +127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release1.Id, userReleaseInvites[0].ReleaseId);
                 Assert.Equal(Contributor, userReleaseInvites[0].Role);
                 Assert.Equal(CreatedById, userReleaseInvites[0].CreatedById);
-                Assert.False(userReleaseInvites[0].Accepted);
                 Assert.True(userReleaseInvites[0].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
 
@@ -135,7 +134,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release2.Id, userReleaseInvites[1].ReleaseId);
                 Assert.Equal(Contributor, userReleaseInvites[1].Role);
                 Assert.Equal(CreatedById, userReleaseInvites[1].CreatedById);
-                Assert.False(userReleaseInvites[1].Accepted);
                 Assert.True(userReleaseInvites[1].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[1].Created).Milliseconds, 0, 1500);
             }
@@ -250,15 +248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .AsQueryable()
                     .ToListAsync();
 
-                Assert.Single(userReleaseInvites); // only create release invite for missing UserReleaseRole
-
-                Assert.Equal("test@test.com", userReleaseInvites[0].Email);
-                Assert.Equal(release2.Id, userReleaseInvites[0].ReleaseId);
-                Assert.Equal(Contributor, userReleaseInvites[0].Role);
-                Assert.Equal(CreatedById, userReleaseInvites[0].CreatedById);
-                Assert.True(userReleaseInvites[0].Accepted);
-                Assert.True(userReleaseInvites[0].EmailSent);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
+                Assert.Empty(userReleaseInvites); // no release invite created as user already exists
             }
         }
 

@@ -162,17 +162,13 @@ const UserInvitePage = ({
                   releases={model?.releases}
                   releaseRoles={model?.resourceRoles.Release}
                   userReleaseRoles={form.values.userReleaseRoles}
-                  onAddUserReleaseRole={(
-                    newUserReleaseRole: InviteUserReleaseRole,
-                  ) => {
+                  onAddUserReleaseRole={newUserReleaseRole => {
                     form.setFieldValue('userReleaseRoles', [
                       ...form.values.userReleaseRoles,
                       newUserReleaseRole,
                     ]);
                   }}
-                  onRemoveUserReleaseRole={(
-                    userReleaseRoleToRemove: InviteUserReleaseRole,
-                  ) => {
+                  onRemoveUserReleaseRole={userReleaseRoleToRemove => {
                     form.setFieldValue(
                       'userReleaseRoles',
                       form.values.userReleaseRoles.filter(
@@ -187,17 +183,13 @@ const UserInvitePage = ({
                   publications={model?.publications}
                   publicationRoles={model?.resourceRoles.Publication}
                   userPublicationRoles={form.values.userPublicationRoles}
-                  onAddUserPublicationRole={(
-                    newUserPublicationRole: InviteUserPublicationRole,
-                  ) => {
+                  onAddUserPublicationRole={newUserPublicationRole => {
                     form.setFieldValue('userPublicationRoles', [
                       ...form.values.userPublicationRoles,
                       newUserPublicationRole,
                     ]);
                   }}
-                  onRemoveUserPublicationRole={(
-                    userPublicationRoleToRemove: InviteUserPublicationRole,
-                  ) => {
+                  onRemoveUserPublicationRole={userPublicationRoleToRemove => {
                     form.setFieldValue(
                       'userPublicationRoles',
                       form.values.userPublicationRoles.filter(

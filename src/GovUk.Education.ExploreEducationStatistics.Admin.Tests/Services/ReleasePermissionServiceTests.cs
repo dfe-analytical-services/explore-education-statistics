@@ -215,7 +215,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Email = "user1@test.com",
                 Release = release1,
                 Role = Contributor,
-                Accepted = false,
             };
 
             var user2ReleaseInviteIgnored = new UserReleaseInvite
@@ -223,7 +222,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Email = "user2@test.com",
                 Release = release2Amendment, // ignored because not release1
                 Role = Contributor,
-                Accepted = false,
             };
 
             var user3ReleaseInvite = new UserReleaseInvite
@@ -231,7 +229,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Email = "user3@test.com",
                 Release = release1,
                 Role = Contributor,
-                Accepted = false,
             };
 
             var user3ReleaseInviteIgnored = new UserReleaseInvite
@@ -239,15 +236,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Email = "user4@test.com",
                 Release = release1,
                 Role = Lead, // ignored because not a Contributor
-                Accepted = false,
-            };
-
-            var user5ReleaseInviteIgnored = new UserReleaseInvite
-            {
-                Email = "user5@test.com",
-                Release = release1,
-                Role = Contributor,
-                Accepted = true, // ignored because invite already accepted
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -255,7 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 await contentDbContext.AddRangeAsync(release1, release2Original, release2Amendment,
                     user1ReleaseInvite, user2ReleaseInviteIgnored, user3ReleaseInvite,
-                    user3ReleaseInviteIgnored, user5ReleaseInviteIgnored);
+                    user3ReleaseInviteIgnored);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -263,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = SetupReleasePermissionService(contentDbContext);
 
-                var result = await service.ListReleaseContributorInvites(release1.Id, false);
+                var result = await service.ListReleaseContributorInvites(release1.Id);
                 var viewModel = result.AssertRight();
 
                 Assert.Equal(2, viewModel.Count);

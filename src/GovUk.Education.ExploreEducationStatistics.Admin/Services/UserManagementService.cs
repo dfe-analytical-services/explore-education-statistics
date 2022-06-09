@@ -253,15 +253,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             createdById: _userService.GetUserId());
                     }
 
-                    foreach (var userPublicationRole in userPublicationRoles)
-                    {
-                        await _userPublicationInviteRepository.Create(
-                            publicationId: userPublicationRole.PublicationId,
-                            email: email,
-                            publicationRole: userPublicationRole.PublicationRole,
-                            emailSent: true, // EES-3403
-                            createdById: _userService.GetUserId());
-                    }
+                    _userPublicationInviteRepository.CreateManyIfNotExists(
+                        userPublicationRoles,
+                        email,
+                        _userService.GetUserId());
 
                     return userInvite;
                 })

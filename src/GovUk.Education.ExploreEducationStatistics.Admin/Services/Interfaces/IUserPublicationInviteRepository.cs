@@ -2,17 +2,15 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IUserPublicationInviteRepository
     {
-        Task Create(Guid publicationId,
+        Task CreateManyIfNotExists(
+            List<UserPublicationRoleAddViewModel> userPublicationRoles,
             string email,
-            PublicationRole publicationRole,
-            bool emailSent,
-            Guid createdById,
-            bool accepted = false);
+            Guid createdById);
     }
 }

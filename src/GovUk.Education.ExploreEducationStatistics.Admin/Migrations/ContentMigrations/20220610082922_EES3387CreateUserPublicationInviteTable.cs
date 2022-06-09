@@ -9,6 +9,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql("DELETE FROM UserReleaseInvites WHERE Accepted = 1;");
+
+            migrationBuilder.DropColumn(
+                name: "Accepted",
+                table: "UserReleaseInvites");
+
+            migrationBuilder.AddColumn<DateTime>(
+                name: "Updated",
+                table: "UserReleaseInvites",
+                type: "datetime2",
+                nullable: true);
+
             migrationBuilder.CreateTable(
                 name: "UserPublicationInvites",
                 columns: table => new
@@ -17,11 +29,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PublicationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Accepted = table.Column<bool>(type: "bit", nullable: false),
-                    EmailSent = table.Column<bool>(type: "bit", nullable: false),
                     Created = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SoftDeleted = table.Column<bool>(type: "bit", nullable: false)
+                    CreatedById = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -55,6 +64,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
         {
             migrationBuilder.DropTable(
                 name: "UserPublicationInvites");
+
+            migrationBuilder.DropColumn(
+                name: "Updated",
+                table: "UserReleaseInvites");
+
+            migrationBuilder.AddColumn<bool>(
+                name: "Accepted",
+                table: "UserReleaseInvites",
+                type: "bit",
+                nullable: false,
+                defaultValue: false);
         }
     }
 }

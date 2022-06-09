@@ -24,14 +24,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         UserAlreadyHasResourceRole,
 
         // Invite
+        InviteAlreadyAccepted,
         InviteNotFound,
         InvalidEmailAddress,
-        NoInvitableEmails,
         InvalidUserRole,
+        NoInvitableEmails,
         NotAllReleasesBelongToPublication,
         UserAlreadyHasReleaseRoleInvites,
         UserAlreadyHasReleaseRoles,
-        InviteAlreadyAccepted,
 
         // Methodology
         MethodologyMustBeDraft,

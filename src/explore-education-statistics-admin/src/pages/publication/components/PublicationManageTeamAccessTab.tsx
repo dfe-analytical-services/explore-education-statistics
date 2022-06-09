@@ -33,7 +33,7 @@ const PublicationManageTeamAccessTab = ({ publication, release }: Props) => {
   } = useAsyncHandledRetry<Model>(async () => {
     const [contributors, invites] = await Promise.all([
       releasePermissionService.listReleaseContributors(release.id),
-      releasePermissionService.listReleaseContributorInvites(release.id, false),
+      releasePermissionService.listReleaseContributorInvites(release.id),
     ]);
     return { contributors, invites };
   }, [publication, release]);
