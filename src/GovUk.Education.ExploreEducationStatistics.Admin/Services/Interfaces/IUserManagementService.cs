@@ -24,7 +24,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, UserInvite>> InviteUser(
             string email,
             string roleId,
-            List<UserReleaseRoleAddViewModel> userReleaseRoles);
+            List<UserReleaseRoleAddViewModel> userReleaseRoles,
+            List<UserPublicationRoleAddViewModel> userPublicationRoles);
 
         Task<Either<ActionResult, Unit>> CancelInvite(string email);
 

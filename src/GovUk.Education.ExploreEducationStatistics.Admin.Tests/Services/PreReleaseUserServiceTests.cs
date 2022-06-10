@@ -72,14 +72,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = release,
                         Email = "invited.2@test.com",
                         Role = ReleaseRole.PrereleaseViewer,
-                        Accepted = false
                     },
                     new UserReleaseInvite
                     {
                         Release = release,
                         Email = "invited.1@test.com",
                         Role = ReleaseRole.PrereleaseViewer,
-                        Accepted = false
                     }
                 );
 
@@ -162,7 +160,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = release,
                         Email = "invited.1@test.com",
                         Role = ReleaseRole.Contributor,
-                        Accepted = false
                     },
                     // Different release
                     new UserReleaseInvite
@@ -170,15 +167,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Release = new Release(),
                         Email = "invited.2@test.com",
                         Role = ReleaseRole.PrereleaseViewer,
-                        Accepted = false
-                    },
-                    // Already accepted
-                    new UserReleaseInvite
-                    {
-                        Release = release,
-                        Email = "invited.3@test.com",
-                        Role = ReleaseRole.PrereleaseViewer,
-                        Accepted = true
                     }
                 );
 
@@ -567,14 +555,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRole.Role);
                 Assert.Equal(user.Id, savedUserReleaseRole.UserId);
 
-                var releaseInvite = Assert.Single(context.UserReleaseInvites);
-
-                Assert.NotNull(releaseInvite);
-                Assert.Equal(release.Id, releaseInvite!.ReleaseId);
-                Assert.Equal("test@test.com", releaseInvite.Email);
-                Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
-                Assert.True(releaseInvite.Accepted); // User already exists, so permission has been applied immediately
-                Assert.True(releaseInvite.EmailSent); // Email sent immediately for approved releases
+                // Accepted UserReleaseInvites are removed
+                Assert.Empty(context.UserReleaseInvites);
             }
         }
 
@@ -708,14 +690,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRole.Role);
                 Assert.Equal(user.Id, savedUserReleaseRole.UserId);
 
-                var releaseInvite = Assert.Single(context.UserReleaseInvites);
-
-                Assert.NotNull(releaseInvite);
-                Assert.Equal(release.Id, releaseInvite!.ReleaseId);
-                Assert.Equal("test@test.com", releaseInvite.Email);
-                Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
-                Assert.True(releaseInvite.Accepted); // User already exists, so permission has been applied immediately
-                Assert.False(releaseInvite.EmailSent); // Email not sent immediately for unapproved releases
+                // Release invite isn't created for an existing user
+                Assert.Empty(context.UserReleaseInvites);
             }
         }
 
@@ -797,7 +773,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Id, releaseInvite!.ReleaseId);
                 Assert.Equal("test@test.com", releaseInvite.Email);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
-                Assert.False(releaseInvite.Accepted); // User not yet created
                 Assert.True(releaseInvite.EmailSent); // Email sent immediately for approved release
             }
 
@@ -931,7 +906,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Id, releaseInvite!.ReleaseId);
                 Assert.Equal("test@test.com", releaseInvite.Email);
                 Assert.Equal(ReleaseRole.PrereleaseViewer, releaseInvite.Role);
-                Assert.False(releaseInvite.Accepted); // User not yet created
                 Assert.False(releaseInvite.EmailSent); // Email not sent immediately for unapproved releases
             }
 
@@ -1101,7 +1075,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 // Four new release invites should have been created
                 var releaseInvites = await context.UserReleaseInvites.AsQueryable().ToListAsync();
-                Assert.Equal(6, releaseInvites.Count);
+                Assert.Equal(4, releaseInvites.Count);
 
                 Assert.True(releaseInvites.All(invite => invite.ReleaseId == release.Id));
                 Assert.True(releaseInvites.All(invite => invite.Role == ReleaseRole.PrereleaseViewer));
@@ -1114,13 +1088,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // New release invites
                 Assert.Equal("new.user.1@test.com", releaseInvites[2].Email);
-                Assert.False(releaseInvites[2].Accepted);
                 Assert.Equal("new.user.2@test.com", releaseInvites[3].Email);
-                Assert.False(releaseInvites[3].Accepted);
-                Assert.Equal("existing.user.1@test.com", releaseInvites[4].Email);
-                Assert.True(releaseInvites[4].Accepted);
-                Assert.Equal("existing.user.2@test.com", releaseInvites[5].Email);
-                Assert.True(releaseInvites[5].Accepted);
 
                 // Two new role assignments should have been created corresponding with the two accepted invites
                 var roles = await context.UserReleaseRoles.AsQueryable().ToListAsync();
@@ -1267,7 +1235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 // Four new release invites should have been created
                 var releaseInvites = await context.UserReleaseInvites.AsQueryable().ToListAsync();
-                Assert.Equal(6, releaseInvites.Count);
+                Assert.Equal(4, releaseInvites.Count);
 
                 Assert.True(releaseInvites.All(invite => invite.ReleaseId == release.Id));
                 Assert.True(releaseInvites.All(invite => invite.Role == ReleaseRole.PrereleaseViewer));
@@ -1280,13 +1248,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 // New release invites
                 Assert.Equal("new.user.1@test.com", releaseInvites[2].Email);
-                Assert.False(releaseInvites[2].Accepted);
                 Assert.Equal("new.user.2@test.com", releaseInvites[3].Email);
-                Assert.False(releaseInvites[3].Accepted);
-                Assert.Equal("existing.user.1@test.com", releaseInvites[4].Email);
-                Assert.True(releaseInvites[4].Accepted);
-                Assert.Equal("existing.user.2@test.com", releaseInvites[5].Email);
-                Assert.True(releaseInvites[5].Accepted);
 
                 // Two new role assignments should have been created corresponding with the two accepted invites
                 var roles = await context.UserReleaseRoles.AsQueryable().ToListAsync();

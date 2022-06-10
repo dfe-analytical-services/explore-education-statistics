@@ -437,6 +437,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
             services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
             services.AddTransient<IUserReleaseInviteRepository, UserReleaseInviteRepository>();
+            services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
 
             services.AddTransient<INotificationClient>(s =>
             {

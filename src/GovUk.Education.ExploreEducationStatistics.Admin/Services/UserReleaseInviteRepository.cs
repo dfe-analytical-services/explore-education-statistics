@@ -24,8 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string email,
             ReleaseRole releaseRole,
             bool emailSent,
-            Guid createdById,
-            bool accepted = false)
+            Guid createdById)
         {
             await _contentDbContext.AddAsync(
                 new UserReleaseInvite
@@ -33,7 +32,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     Email = email.ToLower(),
                     ReleaseId = releaseId,
                     Role = releaseRole,
-                    Accepted = accepted,
                     EmailSent = emailSent,
                     Created = DateTime.UtcNow,
                     CreatedById = createdById,
@@ -47,8 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             string email,
             ReleaseRole releaseRole,
             bool emailSent,
-            Guid createdById,
-            bool accepted = false)
+            Guid createdById)
         {
             var invites = await releaseIds
                 .ToAsyncEnumerable()
@@ -62,7 +59,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         EmailSent = emailSent,
                         Created = DateTime.UtcNow,
                         CreatedById = createdById,
-                        Accepted = accepted,
                     }
                 ).ToListAsync();
 

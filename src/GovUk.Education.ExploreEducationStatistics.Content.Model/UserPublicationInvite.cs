@@ -5,7 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 {
-    public class UserReleaseInvite : ICreatedUpdatedTimestamps<DateTime, DateTime?>
+    public class UserPublicationInvite : ICreatedTimestamp<DateTime>
     {
         [Key] 
         [Required]
@@ -13,24 +13,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [Required] public string Email { get; set; } = null!;
 
-        [Required] public Release Release { get; set; } = null!;
+        [Required] public Publication Publication { get; set; } = null!;
 
         [Required]
-        public Guid ReleaseId { get; set; }
+        public Guid PublicationId { get; set; }
         
         [Required]
-        public ReleaseRole Role { get; set; }
-
-        public bool EmailSent { get; set; }
+        public PublicationRole Role { get; set; }
 
         public DateTime Created { get; set; }
-
-        public DateTime? Updated { get; set; }
 
         public User CreatedBy { get; set; } = null!;
 
         public Guid CreatedById { get; set; }
-
-        public bool SoftDeleted { get; set; }
     }
 }

@@ -44,6 +44,7 @@ export interface UserInvite {
   email: string;
   roleId: string;
   userReleaseRoles: { releaseId: string; releaseRole: string }[];
+  userPublicationRoles: { publicationId: string; publicationRole: string }[];
 }
 
 export interface UserUpdate {

@@ -22,6 +22,9 @@ import LoadingSpinner from '@common/components/LoadingSpinner';
 import { IdTitlePair } from '@admin/services/types/common';
 import ButtonGroup from '@common/components/ButtonGroup';
 import InviteUserReleaseRoleForm from '@admin/pages/users/components/InviteUserReleaseRoleForm';
+import publicationService from '@admin/services/publicationService';
+import { PublicationSummary } from '@common/services/publicationService';
+import InviteUserPublicationRoleForm from '@admin/pages/users/components/InviteUserPublicationRoleForm';
 
 export interface InviteUserReleaseRole {
   releaseId: string;
@@ -29,10 +32,17 @@ export interface InviteUserReleaseRole {
   releaseRole: string;
 }
 
+export interface InviteUserPublicationRole {
+  publicationId: string;
+  publicationTitle?: string;
+  publicationRole: string;
+}
+
 interface FormValues {
   userEmail: string;
   roleId: string;
   userReleaseRoles: InviteUserReleaseRole[];
+  userPublicationRoles: InviteUserPublicationRole[];
 }
 
 const errorMappings = [
@@ -48,6 +58,7 @@ interface InviteUserModel {
   roles: Role[];
   resourceRoles: ResourceRoles;
   releases: IdTitlePair[];
+  publications: PublicationSummary[];
 }
 
 const UserInvitePage = ({
@@ -58,12 +69,13 @@ const UserInvitePage = ({
   const { value: model, isLoading } = useAsyncHandledRetry<
     InviteUserModel
   >(async () => {
-    const [roles, resourceRoles, releases] = await Promise.all([
+    const [roles, resourceRoles, releases, publications] = await Promise.all([
       userService.getRoles(),
       userService.getResourceRoles(),
       userService.getReleases(),
+      publicationService.getPublicationSummaries(),
     ]);
-    return { roles, resourceRoles, releases };
+    return { roles, resourceRoles, releases, publications };
   }, []);
 
   const cancelHandler = () => history.push('/administration/users/invites');
@@ -75,10 +87,19 @@ const UserInvitePage = ({
         releaseRole: userReleaseRole.releaseRole,
       };
     });
+    const userPublicationRoles = values.userPublicationRoles.map(
+      userPublicationRole => {
+        return {
+          publicationId: userPublicationRole.publicationId,
+          publicationRole: userPublicationRole.publicationRole,
+        };
+      },
+    );
     const submission: UserInvite = {
       email: values.userEmail,
       roleId: values.roleId,
       userReleaseRoles,
+      userPublicationRoles,
     };
 
     await userService.inviteUser(submission);
@@ -104,6 +125,7 @@ const UserInvitePage = ({
             userEmail: '',
             roleId: orderBy(model?.roles, role => role.name)?.[0]?.id ?? '',
             userReleaseRoles: [],
+            userPublicationRoles: [],
           }}
           validationSchema={Yup.object<FormValues>({
             userEmail: Yup.string()
@@ -111,6 +133,7 @@ const UserInvitePage = ({
               .email('Provide a valid email address'),
             roleId: Yup.string().required('Choose role for the user'),
             userReleaseRoles: Yup.array(),
+            userPublicationRoles: Yup.array(),
           })}
           onSubmit={handleSubmit}
         >
@@ -139,22 +162,39 @@ const UserInvitePage = ({
                   releases={model?.releases}
                   releaseRoles={model?.resourceRoles.Release}
                   userReleaseRoles={form.values.userReleaseRoles}
-                  onAddUserReleaseRole={(
-                    newUserReleaseRole: InviteUserReleaseRole,
-                  ) => {
+                  onAddUserReleaseRole={newUserReleaseRole => {
                     form.setFieldValue('userReleaseRoles', [
                       ...form.values.userReleaseRoles,
                       newUserReleaseRole,
                     ]);
                   }}
-                  onRemoveUserReleaseRole={(
-                    userReleaseRoleToRemove: InviteUserReleaseRole,
-                  ) => {
+                  onRemoveUserReleaseRole={userReleaseRoleToRemove => {
                     form.setFieldValue(
                       'userReleaseRoles',
                       form.values.userReleaseRoles.filter(
                         userReleaseRole =>
                           userReleaseRoleToRemove !== userReleaseRole,
+                      ),
+                    );
+                  }}
+                />
+
+                <InviteUserPublicationRoleForm
+                  publications={model?.publications}
+                  publicationRoles={model?.resourceRoles.Publication}
+                  userPublicationRoles={form.values.userPublicationRoles}
+                  onAddUserPublicationRole={newUserPublicationRole => {
+                    form.setFieldValue('userPublicationRoles', [
+                      ...form.values.userPublicationRoles,
+                      newUserPublicationRole,
+                    ]);
+                  }}
+                  onRemoveUserPublicationRole={userPublicationRoleToRemove => {
+                    form.setFieldValue(
+                      'userPublicationRoles',
+                      form.values.userPublicationRoles.filter(
+                        userPublicationRole =>
+                          userPublicationRoleToRemove !== userPublicationRole,
                       ),
                     );
                   }}

@@ -232,18 +232,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     {
                         Email = email,
                         Role = ReleaseRole.Approver,
-                        Accepted = false
                     },
                     new UserReleaseInvite
                     {
                         Email = email,
                         Role = ReleaseRole.Lead,
-                        Accepted = false
                     },
                     new UserReleaseInvite
                     {
                         Email = "anotheruser@example.com",
-                        Accepted = false
                     });
                 await contentDbContext.SaveChangesAsync();
             }
@@ -340,14 +337,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     .SingleAsync(invite => invite.Email != email);
                 Assert.False(otherUsersInvite.Accepted);
                 
-                // Assert that the new user's release role invites have all been accepted.
+                // Assert that the new user's release role invites have all been removed.
                 var newUsersReleaseRoleInvites = await contentDbContext
                     .UserReleaseInvites
                     .AsQueryable()
                     .Where(invite => invite.Email == email)
                     .ToListAsync();
-                Assert.Equal(2, newUsersReleaseRoleInvites.Count);
-                newUsersReleaseRoleInvites.ForEach(invite => Assert.True(invite.Accepted));
+                Assert.Empty(newUsersReleaseRoleInvites);
 
                 // Assert that the other user's release role invites have all been left alone.
                 var otherUsersReleaseRoleInvites = await contentDbContext
@@ -356,7 +352,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     .Where(invite => invite.Email != email)
                     .ToListAsync();
                 Assert.Single(otherUsersReleaseRoleInvites);
-                otherUsersReleaseRoleInvites.ForEach(invite => Assert.False(invite.Accepted));
 
                 // Assert that the user has been assigned the new release roles.
                 var newUsersReleaseRoles = await contentDbContext

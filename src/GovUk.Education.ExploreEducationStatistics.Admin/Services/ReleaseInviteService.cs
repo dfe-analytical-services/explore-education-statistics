@@ -169,14 +169,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 createdById: _userService.GetUserId()
             );
 
-            await _userReleaseInviteRepository.CreateManyIfNotExists(
-                releaseIds: missingReleaseRoleReleaseIds,
-                email: email,
-                releaseRole: Contributor,
-                emailSent: true,
-                createdById: _userService.GetUserId(),
-                accepted: true);
-
             return Unit.Instance;
         }
 

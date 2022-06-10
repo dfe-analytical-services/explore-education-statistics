@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class AddPublicationRoleViewModel
+    public class UserPublicationRoleAddViewModel
     {
         public Guid PublicationId { get; set; }
 
