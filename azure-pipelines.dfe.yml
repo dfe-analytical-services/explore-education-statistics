@@ -110,9 +110,12 @@ jobs:
     pool:
       vmImage: 'ubuntu-20.04'
       demands:
-        - npm
         - azureps
     steps:
+      - task: NodeTool@0
+        displayName: 'Install Node.js 16.14.2'
+        inputs:
+          versionSpec: '16.14.2'
       - task: UseDotNet@2
         displayName: 'Install .NET Core SDK'
         inputs:
@@ -185,8 +188,12 @@ jobs:
   - job: 'Frontend'
     pool:
       vmImage: 'ubuntu-20.04'
-      demands: 'npm'
+      demands: azureps
     steps:
+      - task: NodeTool@0
+        displayName: 'Install Node.js 16.14.2'
+        inputs:
+          versionSpec: '16.14.2'
       - task: 'Npm@1'
         displayName: 'npm run ci'
         inputs:
