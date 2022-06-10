@@ -112,9 +112,9 @@ const InviteUserReleaseRoleForm = ({
                     <tr
                       key={`${userReleaseRole.releaseId}_${userReleaseRole.releaseRole}`}
                     >
-                      <td>
+                      <th>
                         {releaseTitlesById[userReleaseRole.releaseId].title}
-                      </td>
+                      </th>
                       <td>{userReleaseRole.releaseRole}</td>
                       <td>
                         <ButtonText

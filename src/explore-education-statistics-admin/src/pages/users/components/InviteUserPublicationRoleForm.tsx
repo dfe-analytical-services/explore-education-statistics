@@ -122,13 +122,13 @@ const InviteUserPublicationRoleForm = ({
                     <tr
                       key={`${userPublicationRole.publicationId}_${userPublicationRole.publicationRole}`}
                     >
-                      <td>
+                      <th>
                         {
                           publicationTitlesById[
                             userPublicationRole.publicationId
                           ].title
                         }
-                      </td>
+                      </th>
                       <td>{userPublicationRole.publicationRole}</td>
                       <td>
                         <ButtonText

@@ -72,7 +72,7 @@ const InvitedUsersPage = () => {
               <tbody className="govuk-table__body">
                 {model.pendingInvites.map(pendingInvite => (
                   <tr className="govuk-table__row" key={pendingInvite.email}>
-                    <td className="govuk-table__cell">{pendingInvite.email}</td>
+                    <th className="govuk-table__cell">{pendingInvite.email}</th>
                     <td className="govuk-table__cell">{pendingInvite.role}</td>
                     <td className="govuk-table__cell">
                       {pendingInvite.userReleaseRoles.length === 0 ? (
