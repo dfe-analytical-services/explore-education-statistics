@@ -7,7 +7,7 @@ importGeoData() {
   boundary_level_id=$4
   layer=$5
   ogr2ogr -f MSSQLSpatial \
-	  "MSSQL:Driver=ODBC Driver 17 for SQL Server;server=localhost;database=statistics;uid=SA;pwd=Your_Password123" \
+	  "MSSQL:Driver=ODBC Driver 17 for SQL Server;server=host.docker.internal;database=statistics;uid=SA;pwd=Your_Password123;" \
 	  $file \
 	  -t_srs EPSG:4326 \
 	  -progress \
@@ -26,3 +26,4 @@ importGeoData() {
 #importGeoData Local_Authority_Districts/Local_Authority_Districts_April_2019_Boundaries_UK_BUC.shp lad19cd lad19nm 8 Local_Authority_Districts_April_2019_Boundaries_UK_BUC
 #importGeoData Local_Authorities/Counties_and_Unitary_Authorities__April_2019__Boundaries_EW_BUC/Counties_and_Unitary_Authorities__April_2019__Boundaries_EW_BUC.shp ctyua19cd ctyua19nm 9 Counties_and_Unitary_Authorities__April_2019__Boundaries_EW_BUC
 #importGeoData Local_Authorities/Counties_and_Unitary_Authorities__May_2021__UK_BUC/Counties_and_Unitary_Authorities__May_2021__UK_BUC.shp ctyua21cd ctyua21nm 10 Counties_and_Unitary_Authorities__May_2021__UK_BUC
+#importGeoData Local_Authority_Districts/Local_Authority_Districts__December_2021__UK_BUC/LAD_DEC_2021_UK_BUC.shp lad21cd lad21nm 11 LAD_DEC_2021_UK_BUC
