@@ -147,14 +147,41 @@ describe('DataCataloguePage', () => {
       'aria-current',
       'step',
     );
-    expect(screen.getByLabelText('Test publication')).not.toBeVisible();
 
-    userEvent.click(screen.getByRole('button', { name: 'Pupils and schools' }));
-    userEvent.click(screen.getByRole('button', { name: 'Admission appeals' }));
+    const themeRadios = within(
+      screen.getByRole('group', { name: 'Select a theme' }),
+    ).getAllByRole('radio');
+    expect(themeRadios).toHaveLength(1);
+    expect(themeRadios[0]).toEqual(
+      screen.getByRole('radio', { name: 'Pupils and schools' }),
+    );
+
+    expect(
+      screen.queryByRole('radio', {
+        name: 'Test publication',
+      }),
+    ).not.toBeInTheDocument();
+
+    userEvent.click(screen.getByRole('radio', { name: 'Pupils and schools' }));
 
     // Check there is only one radio for the publication
-    expect(screen.getAllByRole('radio', { hidden: true })).toHaveLength(1);
-    expect(screen.getByLabelText('Test publication')).toBeVisible();
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Search or select a theme to view publications'),
+      ).not.toBeInTheDocument();
+    });
+
+    const publicationRadios = within(
+      screen.getByRole('group', {
+        name: /Select a publication/,
+      }),
+    ).queryAllByRole('radio');
+    expect(publicationRadios).toHaveLength(1);
+    expect(publicationRadios[0]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Test publication',
+      }),
+    );
   });
 
   test('can go through all the steps to download files', async () => {
@@ -174,8 +201,7 @@ describe('DataCataloguePage', () => {
 
     expect(step1.getByText('Choose a publication')).toBeInTheDocument();
 
-    userEvent.click(step1.getByRole('button', { name: 'Pupils and schools' }));
-    userEvent.click(step1.getByRole('button', { name: 'Admission appeals' }));
+    userEvent.click(step1.getByRole('radio', { name: 'Pupils and schools' }));
     userEvent.click(step1.getByRole('radio', { name: 'Test publication' }));
     userEvent.click(step1.getByRole('button', { name: 'Next step' }));
 
@@ -274,8 +300,7 @@ describe('DataCataloguePage', () => {
     // Step 1
 
     const step1 = within(screen.getByTestId('wizardStep-1'));
-    userEvent.click(step1.getByRole('button', { name: 'Pupils and schools' }));
-    userEvent.click(step1.getByRole('button', { name: 'Admission appeals' }));
+    userEvent.click(step1.getByRole('radio', { name: 'Pupils and schools' }));
     userEvent.click(step1.getByRole('radio', { name: 'Test publication' }));
     userEvent.click(step1.getByRole('button', { name: 'Next step' }));
 

@@ -4,27 +4,27 @@ import PublicationForm, {
 import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
 import { Theme } from '@common/services/themeService';
 import { waitFor } from '@testing-library/dom';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import noop from 'lodash/noop';
 import React from 'react';
 
 describe('PublicationForm', () => {
-  const testOptions: Theme[] = [
+  const testThemes: Theme[] = [
     {
       id: 'theme-1',
-      title: 'Further education',
+      title: 'Theme 1',
       summary: '',
       topics: [
         {
           id: 'topic-1',
-          title: 'Further education and skills',
+          title: 'Topic 1',
           summary: '',
           publications: [
             {
               id: 'publication-1',
-              title: 'Apprenticeships and traineeships',
-              slug: 'apprenticeships-and-traineeships',
+              title: 'Publication 1',
+              slug: 'publication-slug-1',
               type: 'NationalAndOfficial',
               isSuperseded: false,
             },
@@ -32,13 +32,13 @@ describe('PublicationForm', () => {
         },
         {
           id: 'topic-2',
-          title: 'National achievement rates tables',
+          title: 'Topic 2',
           summary: '',
           publications: [
             {
               id: 'publication-2',
-              title: 'National achievement rates tables',
-              slug: 'national-achievement-rates-tables',
+              title: 'Publication 2 find me',
+              slug: 'publication-slug-2',
               type: 'NationalAndOfficial',
               isSuperseded: false,
             },
@@ -48,18 +48,18 @@ describe('PublicationForm', () => {
     },
     {
       id: 'theme-2',
-      title: 'Children, early years and social care',
+      title: 'Theme 2',
       summary: '',
       topics: [
         {
           id: 'topic-3',
-          title: 'Early years foundation stage profile',
+          title: 'Topic 3',
           summary: '',
           publications: [
             {
               id: 'publication-3',
-              title: 'Early years foundation stage profile results',
-              slug: 'early-years-foundation-stage-profile-results',
+              title: 'Publication 3',
+              slug: 'publication-slug-3',
               type: 'NationalAndOfficial',
               isSuperseded: false,
             },
@@ -69,18 +69,18 @@ describe('PublicationForm', () => {
     },
     {
       id: 'theme-3',
-      title: 'Pupils and schools',
+      title: 'Theme 3',
       summary: '',
       topics: [
         {
           id: 'topic-4',
-          title: 'School applications',
+          title: 'Topic 4',
           summary: '',
           publications: [
             {
               id: 'publication-4',
-              title: 'Secondary and primary schools applications and offers',
-              slug: 'secondary-and-primary-schools-applications-and-offers',
+              title: 'Publication 4 find me',
+              slug: 'publication-slug-4',
               type: 'NationalAndOfficial',
               isSuperseded: false,
             },
@@ -88,13 +88,13 @@ describe('PublicationForm', () => {
         },
         {
           id: 'topic-5',
-          title: 'Pupil absence',
+          title: 'Topic 5',
           summary: '',
           publications: [
             {
               id: 'publication-5',
-              title: 'Pupil absence in schools in England',
-              slug: 'pupil-absence-in-schools-in-england',
+              title: 'Publication 5',
+              slug: 'publication-slug-5',
               type: 'NationalAndOfficial',
               isSuperseded: false,
             },
@@ -102,13 +102,13 @@ describe('PublicationForm', () => {
         },
         {
           id: 'topic-6',
-          title: 'Special educational needs (SEN)',
+          title: 'Topic 6',
           summary: '',
           publications: [
             {
               id: 'publication-6',
-              title: 'Statements of SEN and EHC plans',
-              slug: 'statements-of-sen-and-ehc-plans',
+              title: 'Publication 6',
+              slug: 'publication-slug-6',
               type: 'NationalAndOfficial',
               isSuperseded: false,
             },
@@ -116,13 +116,13 @@ describe('PublicationForm', () => {
         },
         {
           id: 'topic-7',
-          title: 'Exclusions',
+          title: 'Topic 7',
           summary: '',
           publications: [
             {
               id: 'publication-7',
-              title: 'Permanent and fixed-period exclusions in England',
-              slug: 'permanent-and-fixed-period-exclusions-in-england',
+              title: 'Publication 7',
+              slug: 'publication-slug-7',
               type: 'NationalAndOfficial',
               isSuperseded: false,
             },
@@ -132,18 +132,18 @@ describe('PublicationForm', () => {
     },
     {
       id: 'theme-4',
-      title: 'School and college outcomes and performance',
+      title: 'Theme 4',
       summary: '',
       topics: [
         {
           id: 'topic-8',
-          title: 'Key stage 2',
+          title: 'Topic 8',
           summary: '',
           publications: [
             {
               id: 'publication-8',
-              title: 'National curriculum assessments at key stage 2',
-              slug: 'national-curriculum-assessments-key-stage2',
+              title: 'Publication 8',
+              slug: 'publication-slug-8',
               type: 'NationalAndOfficial',
               isSuperseded: false,
             },
@@ -151,14 +151,13 @@ describe('PublicationForm', () => {
         },
         {
           id: 'topic-9',
-          title: 'GCSEs (key stage 4)',
+          title: 'Topic 9',
           summary: '',
           publications: [
             {
               id: 'publication-9',
-              title:
-                'GCSE and equivalent results, including pupil characteristics',
-              slug: 'gcse-results-including-pupil-characteristics',
+              title: 'Publication 9',
+              slug: 'publication-slug-9',
               type: 'NationalAndOfficial',
               isSuperseded: false,
             },
@@ -166,13 +165,13 @@ describe('PublicationForm', () => {
         },
         {
           id: 'topic-10',
-          title: '16 to 19 attainment',
+          title: 'Topic 10',
           summary: '',
           publications: [
             {
               id: 'publication-10',
-              title: 'Level 2 and 3 attainment by young people aged 19',
-              slug: 'Level 2 and 3 attainment by young people aged 19',
+              title: 'Publication 10',
+              slug: 'publication-slug-10',
               type: 'NationalAndOfficial',
               isSuperseded: false,
             },
@@ -194,67 +193,139 @@ describe('PublicationForm', () => {
     goToPreviousStep: task => task?.(),
   };
 
+  test('renders the form with the search form, themes list and empty publications list', () => {
+    render(
+      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
+    );
+
+    expect(screen.getByLabelText('Search publications')).toBeInTheDocument();
+    const themeRadios = within(
+      screen.getByRole('group', { name: 'Select a theme' }),
+    ).getAllByRole('radio');
+    expect(themeRadios).toHaveLength(4);
+    expect(themeRadios[0]).toEqual(
+      screen.getByRole('radio', { name: 'Theme 1' }),
+    );
+    expect(themeRadios[1]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Theme 2',
+      }),
+    );
+    expect(themeRadios[2]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Theme 3',
+      }),
+    );
+    expect(themeRadios[3]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Theme 4',
+      }),
+    );
+
+    const publicationRadios = within(
+      screen.getByRole('group', {
+        name: /Select a publication/,
+      }),
+    ).queryAllByRole('radio');
+    expect(publicationRadios).toHaveLength(0);
+
+    expect(
+      screen.getByText('Search or select a theme to view publications'),
+    ).toBeInTheDocument();
+  });
+
   test('renders publication options filtered by title when using search field', async () => {
     jest.useFakeTimers();
 
     render(
-      <PublicationForm
-        {...wizardProps}
-        onSubmit={noop}
-        options={testOptions}
-      />,
+      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
-
-    expect(screen.getAllByRole('radio', { hidden: true })).toHaveLength(10);
 
     await userEvent.type(
       screen.getByLabelText('Search publications'),
-      'Early years',
+      'find me',
     );
 
     jest.runOnlyPendingTimers();
 
-    expect(screen.getAllByRole('radio')).toHaveLength(1);
-    expect(
-      screen.getByLabelText('Early years foundation stage profile results'),
-    ).toHaveAttribute('type', 'radio');
+    const publicationRadios = within(
+      screen.getByRole('group', {
+        name: /Select a publication/,
+      }),
+    ).queryAllByRole('radio');
+    expect(publicationRadios).toHaveLength(2);
+
+    expect(publicationRadios[0]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Publication 2 find me (Theme 1)',
+      }),
+    );
+    expect(publicationRadios[1]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Publication 4 find me (Theme 3)',
+      }),
+    );
   });
 
   test('renders publication options filtered by case-insensitive title', async () => {
     jest.useFakeTimers();
 
     render(
-      <PublicationForm
-        {...wizardProps}
-        onSubmit={noop}
-        options={testOptions}
-      />,
+      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
-
-    expect(screen.getAllByRole('radio', { hidden: true })).toHaveLength(10);
 
     await userEvent.type(
       screen.getByLabelText('Search publications'),
-      'early years',
+      'FiND Me',
     );
 
     jest.runOnlyPendingTimers();
 
-    expect(screen.getAllByRole('radio')).toHaveLength(1);
-    expect(
-      screen.getByLabelText('Early years foundation stage profile results'),
-    ).toHaveAttribute('type', 'radio');
+    const publicationRadios = within(
+      screen.getByRole('group', {
+        name: /Select a publication/,
+      }),
+    ).queryAllByRole('radio');
+    expect(publicationRadios).toHaveLength(2);
+
+    expect(publicationRadios[0]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Publication 2 find me (Theme 1)',
+      }),
+    );
+    expect(publicationRadios[1]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Publication 4 find me (Theme 3)',
+      }),
+    );
+  });
+
+  test('renders the `no publications found` message when there are no search results', async () => {
+    jest.useFakeTimers();
+
+    render(
+      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
+    );
+
+    await userEvent.type(screen.getByLabelText('Search publications'), 'Nope');
+
+    jest.runOnlyPendingTimers();
+
+    const publicationRadios = within(
+      screen.getByRole('group', {
+        name: /Select a publication/,
+      }),
+    ).queryAllByRole('radio');
+    expect(publicationRadios).toHaveLength(0);
+
+    expect(screen.getByText('No publications found')).toBeInTheDocument();
   });
 
   test('does not throw error if regex sensitive search term is used', async () => {
     jest.useFakeTimers();
 
     render(
-      <PublicationForm
-        {...wizardProps}
-        onSubmit={noop}
-        options={testOptions}
-      />,
+      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
     await userEvent.type(screen.getByLabelText('Search publications'), '[');
@@ -264,90 +335,57 @@ describe('PublicationForm', () => {
     }).not.toThrow();
   });
 
-  test('renders empty message when there are no publication options', () => {
-    render(<PublicationForm {...wizardProps} onSubmit={noop} options={[]} />);
+  test('renders empty message when there are no themes', () => {
+    render(<PublicationForm {...wizardProps} onSubmit={noop} themes={[]} />);
 
-    expect(screen.queryAllByRole('radio')).toHaveLength(0);
-    expect(screen.queryByText('No publications found')).not.toBeNull();
-  });
+    expect(
+      screen.queryByRole('group', { name: 'Select a theme' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('group', { name: /Select a publication/ }),
+    ).not.toBeInTheDocument();
 
-  test('renders empty message when there are no filtered publication options', async () => {
-    jest.useFakeTimers();
-
-    render(
-      <PublicationForm
-        {...wizardProps}
-        onSubmit={noop}
-        options={testOptions}
-      />,
-    );
-
-    expect(screen.queryByText('No publications found')).not.toBeInTheDocument();
-    expect(screen.queryAllByRole('radio', { hidden: true })).toHaveLength(10);
-
-    await userEvent.type(
-      screen.getByLabelText('Search publications'),
-      'not a publication',
-    );
-
-    jest.runOnlyPendingTimers();
-
-    expect(screen.queryAllByRole('radio', { hidden: true })).toHaveLength(0);
     expect(screen.getByText('No publications found')).toBeInTheDocument();
   });
 
-  test('renders selected publication option even if it does not match search field', async () => {
-    jest.useFakeTimers();
-
+  test('renders the publication options when a theme is selected', async () => {
     render(
-      <PublicationForm
-        {...wizardProps}
-        onSubmit={noop}
-        options={testOptions}
-      />,
+      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
-
-    expect(screen.getAllByRole('radio', { hidden: true })).toHaveLength(10);
-    expect(screen.queryByText('No publications found')).not.toBeInTheDocument();
 
     userEvent.click(
-      screen.getByLabelText('Pupil absence in schools in England'),
+      screen.getByRole('radio', {
+        name: 'Theme 4',
+      }),
     );
 
-    await userEvent.type(
-      screen.getByLabelText('Search publications'),
-      'not a publication',
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Search or select a theme to view publications'),
+      ).not.toBeInTheDocument();
+    });
+
+    const publicationRadios = within(
+      screen.getByRole('group', {
+        name: /Select a publication/,
+      }),
+    ).queryAllByRole('radio');
+    expect(publicationRadios).toHaveLength(3);
+    expect(publicationRadios[0]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Publication 8',
+      }),
     );
-
-    jest.runOnlyPendingTimers();
-
-    expect(screen.getAllByRole('radio')).toHaveLength(1);
-    expect(
-      screen.getByLabelText('Pupil absence in schools in England'),
-    ).toBeInTheDocument();
-    expect(screen.queryByText('No publications found')).not.toBeInTheDocument();
-  });
-
-  test('renders dropdown for selected publication option as open', () => {
-    const { container } = render(
-      <PublicationForm
-        {...wizardProps}
-        onSubmit={noop}
-        options={testOptions}
-      />,
+    expect(publicationRadios[1]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Publication 9',
+      }),
     );
-
-    expect(container.querySelectorAll('details[open]')).toHaveLength(0);
-
-    userEvent.click(
-      screen.getByLabelText('Pupil absence in schools in England'),
+    expect(publicationRadios[2]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Publication 10',
+      }),
     );
-
-    const details = container.querySelectorAll('details[open]');
-
-    expect(details).toHaveLength(2);
-    expect(details[0]).toHaveTextContent('Pupils and schools');
-    expect(details[1]).toHaveTextContent('Pupil absence');
   });
 
   test('renders read-only view with initial `publicationId` when step is not active', () => {
@@ -355,45 +393,61 @@ describe('PublicationForm', () => {
       <PublicationForm
         {...wizardProps}
         initialValues={{
-          publicationId: 'publication-2',
+          publicationId: 'publication-3',
         }}
         isActive={false}
+        themes={testThemes}
         onSubmit={noop}
-        options={testOptions}
       />,
     );
 
-    expect(screen.queryAllByRole('radio')).toHaveLength(0);
+    expect(
+      screen.queryByRole('group', { name: 'Select a theme' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('group', { name: /Select a publication/ }),
+    ).not.toBeInTheDocument();
+
     expect(screen.getByTestId('Publication')).toHaveTextContent(
-      'National achievement rates tables',
+      'Publication 3',
     );
   });
 
-  test('renders read-only view with selected publication when step is not active', () => {
+  test('renders read-only view with selected publication when step is not active', async () => {
     const { rerender } = render(
-      <PublicationForm
-        {...wizardProps}
-        onSubmit={noop}
-        options={testOptions}
-      />,
+      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
     );
 
     userEvent.click(
-      screen.getByLabelText('Pupil absence in schools in England'),
+      screen.getByRole('radio', {
+        name: 'Theme 4',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Search or select a theme to view publications'),
+      ).not.toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('radio', {
+        name: 'Publication 9',
+      }),
     );
 
     rerender(
       <PublicationForm
         {...wizardProps}
         isActive={false}
+        themes={testThemes}
         onSubmit={noop}
-        options={testOptions}
       />,
     );
 
     expect(screen.queryAllByRole('radio')).toHaveLength(0);
     expect(screen.getByTestId('Publication')).toHaveTextContent(
-      'Pupil absence in schools in England',
+      'Publication 9',
     );
   });
 
@@ -403,18 +457,29 @@ describe('PublicationForm', () => {
     render(
       <PublicationForm
         {...wizardProps}
+        themes={testThemes}
         onSubmit={handleSubmit}
-        options={testOptions}
       />,
     );
 
-    expect(screen.queryByTestId('Publication')).not.toBeInTheDocument();
-
-    userEvent.click(screen.getByRole('button', { name: 'Pupils and schools' }));
-    userEvent.click(screen.getByRole('button', { name: 'Pupil absence' }));
     userEvent.click(
-      screen.getByLabelText('Pupil absence in schools in England'),
+      screen.getByRole('radio', {
+        name: 'Theme 4',
+      }),
     );
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Search or select a theme to view publications'),
+      ).not.toBeInTheDocument();
+    });
+
+    userEvent.click(
+      screen.getByRole('radio', {
+        name: 'Publication 9',
+      }),
+    );
+
     userEvent.click(screen.getByRole('button', { name: 'Next step' }));
 
     await waitFor(() => {
@@ -423,9 +488,9 @@ describe('PublicationForm', () => {
         Parameters<PublicationFormSubmitHandler>
       >({
         publication: {
-          id: 'publication-5',
-          slug: 'pupil-absence-in-schools-in-england',
-          title: 'Pupil absence in schools in England',
+          id: 'publication-9',
+          slug: 'publication-slug-9',
+          title: 'Publication 9',
           type: 'NationalAndOfficial',
           isSuperseded: false,
         },

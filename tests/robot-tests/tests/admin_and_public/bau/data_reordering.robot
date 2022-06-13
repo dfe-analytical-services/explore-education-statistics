@@ -9,16 +9,14 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-
 *** Variables ***
 ${PUBLICATION_NAME}     UI tests - data reordering %{RUN_IDENTIFIER}
 ${RELEASE_NAME}         Calendar Year 2022
 ${SUBJECT_NAME}         UI test subject
 
-
 *** Test Cases ***
 Create new publication and release via API
-    ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
+    ${PUBLICATION_ID}    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    CY    2022
 
 Navigate to release
@@ -198,7 +196,7 @@ Cancel reordering indicators
 Replace subject data
     user clicks link    Data uploads
     user waits until h2 is visible    Uploaded data files
-    ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
+    ${section}    user gets accordion section content element    ${SUBJECT_NAME}
     user clicks link    Replace data    ${section}
     user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}grouped-filters-and-indicators-replacement.csv
     user chooses file    id:dataFileUploadForm-metadataFile
@@ -364,8 +362,7 @@ Go to public table tool page
 Select "Test Topic" publication
     environment variable should be set    TEST_THEME_NAME
     environment variable should be set    TEST_TOPIC_NAME
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user clicks radio    %{TEST_THEME_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Choose a subject
@@ -602,11 +599,10 @@ Validate table cells again
     user checks results table cell contains    6    1    7,922,048
     user checks results table cell contains    7    1    6,759,498
 
-
 *** Keywords ***
 user moves item of draggable list down
     [Arguments]    ${locator}    ${item_num}
-    ${item}=    user gets list item element    ${locator}    ${item_num}
+    ${item}    user gets list item element    ${locator}    ${item_num}
     set focus to element    ${item}
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
