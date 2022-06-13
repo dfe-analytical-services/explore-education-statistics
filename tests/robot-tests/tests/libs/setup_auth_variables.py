@@ -62,7 +62,7 @@ def setup_auth_variables(user, email, password, clear_existing=False, driver=Non
             print('Found invalid authentication information in local files!', flush=True)
 
     if not authenticated:
-        print(f'Logging in to obtain {user} authentication information... ', flush=True)
+        print(f'Logging in to obtain {user} authentication information...', flush=True)
 
         os.environ[local_storage_name], os.environ[cookie_name] = get_identity_info(
             url=admin_url,

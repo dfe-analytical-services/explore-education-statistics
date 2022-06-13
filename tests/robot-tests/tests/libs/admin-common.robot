@@ -152,13 +152,14 @@ user creates publication
 
 user creates release for publication
     [Arguments]    ${publication}    ${time_period_coverage}    ${start_year}
-    user waits until page contains title caption    ${publication}
+    user waits until page contains title caption    ${publication}    %{WAIT_SMALL}
     user waits until h1 is visible    Create new release    %{WAIT_SMALL}
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    %{WAIT_SMALL}
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    ${start_year}
     user clicks radio    National statistics
     user clicks radio if exists    Create new template
+    user waits until button is enabled    Create new release    %{WAIT_SMALL}
     user clicks button    Create new release
 
     user waits until page contains element    xpath://a[text()="Edit release summary"]    %{WAIT_SMALL}

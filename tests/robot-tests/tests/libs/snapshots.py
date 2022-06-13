@@ -3,7 +3,6 @@ from alerts import send_slack_alert
 from utilities import raise_assertion_error
 from scripts.create_snapshots \
     import create_find_statistics_snapshot, create_table_tool_snapshot, create_data_catalogue_snapshot, create_all_methodologies_snapshot
-from slack_sdk.webhook import WebhookClient
 
 
 def validate_find_stats_snapshot():

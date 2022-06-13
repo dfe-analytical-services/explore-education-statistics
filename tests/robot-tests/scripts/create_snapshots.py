@@ -24,7 +24,7 @@ def _gets_parsed_html_from_page(url):
     return BeautifulSoup(response.text, "html.parser")
 
 
-def create_find_statistics_snapshot(public_url) -> str:
+def create_find_statistics_snapshot(public_url: str) -> str:
     find_stats_url = f"{public_url.rstrip('/')}/find-statistics"
     parsed_html = _gets_parsed_html_from_page(find_stats_url)
 
@@ -70,7 +70,7 @@ def create_find_statistics_snapshot(public_url) -> str:
     return json.dumps(result, sort_keys=True, indent=2)
 
 
-def create_table_tool_snapshot(public_url) -> str:
+def create_table_tool_snapshot(public_url: str) -> str:
     table_tool_url = f"{public_url.rstrip('/')}/data-tables"
     parsed_html = _gets_parsed_html_from_page(table_tool_url)
 
@@ -101,7 +101,7 @@ def create_table_tool_snapshot(public_url) -> str:
     return json.dumps(result, sort_keys=True, indent=2)
 
 
-def create_data_catalogue_snapshot(public_url) -> str:
+def create_data_catalogue_snapshot(public_url: str) -> str:
     data_catalogue_url = f"{public_url.rstrip('/')}/data-catalogue"
     parsed_html = _gets_parsed_html_from_page(data_catalogue_url)
 
@@ -132,7 +132,7 @@ def create_data_catalogue_snapshot(public_url) -> str:
     return json.dumps(result, sort_keys=True, indent=2)
 
 
-def create_all_methodologies_snapshot(public_url) -> str:
+def create_all_methodologies_snapshot(public_url: str) -> str:
     all_methodologies_url = f"{public_url.rstrip('/')}/methodology"
     parsed_html = _gets_parsed_html_from_page(all_methodologies_url)
 
@@ -169,7 +169,7 @@ def create_all_methodologies_snapshot(public_url) -> str:
     return json.dumps(result, sort_keys=True, indent=2)
 
 
-def _write_to_file(file_name, snapshot):
+def _write_to_file(file_name: str, snapshot: str):
     snapshots_path = 'tests/snapshots'
     if not os.path.exists(snapshots_path):
         os.makedirs(snapshots_path)

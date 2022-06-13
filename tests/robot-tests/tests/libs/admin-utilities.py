@@ -78,7 +78,6 @@ def user_waits_for_release_process_status_to_be(status, timeout):
         try:
             sl.driver.find_element_by_css_selector(f'#release-process-status-Failed')
             raise_assertion_error('Release process status FAILED!')
-            return
         except BaseException:
             pass
         try:

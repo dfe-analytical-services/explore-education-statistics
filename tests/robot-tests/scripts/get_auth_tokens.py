@@ -1,4 +1,3 @@
-import os
 import time
 import argparse
 import json
@@ -57,6 +56,7 @@ def get_identity_info(url, email, password, first_name="Bau1", last_name="EESADM
 
             wait_until_page_contains_xpath(driver, '//div[text()="Enter password"]')
             time.sleep(1)
+
         except BaseException:
             raise AssertionError('Error when entering/submitting email!')
 
