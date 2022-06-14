@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using AutoMapper;
 using Azure.Storage.Blobs;
@@ -45,6 +46,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using IdentityServer4;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
@@ -206,34 +208,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddEntityFrameworkStores<UsersAndRolesDbContext>()
                 .AddDefaultTokenProviders();
 
+            var identityServerConfig = services
+                .AddIdentityServer(options =>
+                {
+                    options.Events.RaiseErrorEvents = true;
+                    options.Events.RaiseInformationEvents = true;
+                    options.Events.RaiseFailureEvents = true;
+                    options.Events.RaiseSuccessEvents = true;
+                })
+                .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>(options =>
+                {
+                    var defaultClient = options
+                        .Clients
+                        .First(client => client.ClientId == "GovUk.Education.ExploreEducationStatistics.Admin");
+
+                    // Allow the use of refresh tokens to add persistent access to the service and enable the silent
+                    // login flow.
+                    defaultClient.AllowOfflineAccess = true;
+                    defaultClient.AllowedScopes = defaultClient.AllowedScopes
+                        .Append(IdentityServerConstants.StandardScopes.OfflineAccess).ToList();
+                })
+                .AddProfileService<ApplicationUserProfileService>();
+                
             if (HostEnvironment.IsDevelopment())
             {
-                services
-                    .AddIdentityServer(options =>
-                    {
-                        options.Events.RaiseErrorEvents = true;
-                        options.Events.RaiseInformationEvents = true;
-                        options.Events.RaiseFailureEvents = true;
-                        options.Events.RaiseSuccessEvents = true;
-                    })
-                    .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>()
-                    .AddProfileService<ApplicationUserProfileService>()
-                    .AddDeveloperSigningCredential();
+                identityServerConfig.AddDeveloperSigningCredential();
             }
             else
             {
-                services
-                    .AddIdentityServer(options =>
-                    {
-                        options.Events.RaiseErrorEvents = true;
-                        options.Events.RaiseInformationEvents = true;
-                        options.Events.RaiseFailureEvents = true;
-                        options.Events.RaiseSuccessEvents = true;
-                    })
-                    .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>()
-                    .AddProfileService<ApplicationUserProfileService>()
-                    // TODO DW - this should be conditional based upon whether or not we're in dev mode
-                    .AddSigningCredentials();
+                identityServerConfig.AddSigningCredentials();
 
                 services.Configure<JwtBearerOptions>(
                     IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
