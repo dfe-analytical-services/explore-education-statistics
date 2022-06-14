@@ -6,6 +6,7 @@ import puppeteer from 'puppeteer';
 interface Credentials {
   email: string;
   password: string;
+  baseUrl: string
 }
 
 export interface AuthTokens {
@@ -13,11 +14,11 @@ export interface AuthTokens {
   refresh_token: string;
 }
 
-const getAuthTokens = async ({
+export const getRawAuthTokenResponse = async ({
   email,
   password,
   baseUrl,
-}: Credentials & { baseUrl: string }): Promise<AuthTokens> => {
+}: Credentials): Promise<AuthTokens> => {
   const browser = await puppeteer.launch({
     headless: true,
     ignoreHTTPSErrors: true,
@@ -69,7 +70,7 @@ const getAuthTokens = async ({
 
   await page.waitForTimeout(10000);
 
-  const { access_token, refresh_token } = await page.evaluate(() => {
+  const rawTokenResponse = await page.evaluate(() => {
     /* eslint-disable-next-line no-plusplus */
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i) as string;
@@ -83,6 +84,12 @@ const getAuthTokens = async ({
   });
 
   await browser.close();
+  return rawTokenResponse;
+};
+
+const getAuthTokens = async (credentials: Credentials): Promise<AuthTokens> => {
+  const rawTokenResponse = await getRawAuthTokenResponse(credentials);
+  const { access_token, refresh_token } = rawTokenResponse;
   return { access_token, refresh_token };
 };
 

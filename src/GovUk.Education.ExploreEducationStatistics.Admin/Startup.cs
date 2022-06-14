@@ -47,6 +47,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using IdentityServer4;
+using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
@@ -227,6 +228,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     defaultClient.AllowOfflineAccess = true;
                     defaultClient.AllowedScopes = defaultClient.AllowedScopes
                         .Append(IdentityServerConstants.StandardScopes.OfflineAccess).ToList();
+
+                    // TODO DW - clean this up
+                    if (HostEnvironment.IsDevelopment())
+                    {
+                        defaultClient.RefreshTokenUsage = TokenUsage.ReUse;      
+                    }
                 })
                 .AddProfileService<ApplicationUserProfileService>();
                 
