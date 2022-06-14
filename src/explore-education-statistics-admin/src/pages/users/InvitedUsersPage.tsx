@@ -44,48 +44,34 @@ const InvitedUsersPage = () => {
       caption="Manage invites to the service"
     >
       {errorStatus && errorStatus === 404 ? (
-        <p>There are currently no pending user invites</p>
+        'There are currently no pending user invites'
       ) : (
         <LoadingSpinner loading={isLoading} text="Loading invited users">
-          <table className="govuk-table">
+          <table>
             <caption className="govuk-table__caption">Invited users</caption>
-            <thead className="govuk-table__head">
-              <tr className="govuk-table__row">
-                <th scope="col" className="govuk-table__header">
-                  Email
-                </th>
-                <th scope="col" className="govuk-table__header">
-                  Role
-                </th>
-                <th scope="col" className="govuk-table__header">
-                  Release Roles
-                </th>
-                <th scope="col" className="govuk-table__header">
-                  Publication Roles
-                </th>
-                <th scope="col" className="govuk-table__header">
-                  Actions
-                </th>
+            <thead>
+              <tr>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Release Roles</th>
+                <th scope="col">Publication Roles</th>
+                <th scope="col">Actions</th>
               </tr>
             </thead>
             {model && (
-              <tbody className="govuk-table__body">
+              <tbody>
                 {model.pendingInvites.map(pendingInvite => (
-                  <tr className="govuk-table__row" key={pendingInvite.email}>
-                    <th className="govuk-table__cell">{pendingInvite.email}</th>
-                    <td className="govuk-table__cell">{pendingInvite.role}</td>
-                    <td className="govuk-table__cell">
+                  <tr key={pendingInvite.email}>
+                    <td>{pendingInvite.email}</td>
+                    <td>{pendingInvite.role}</td>
+                    <td>
                       {pendingInvite.userReleaseRoles.length === 0 ? (
-                        <p className="govuk-!-margin-0">
-                          No user release roles
-                        </p>
+                        'No user release roles'
                       ) : (
                         <ul className="govuk-!-margin-0">
                           {pendingInvite.userReleaseRoles.map(releaseRole => {
                             return (
-                              <li
-                                key={`${releaseRole.publication}_${releaseRole.release}_${releaseRole.role}`}
-                              >
+                              <li key={releaseRole.id}>
                                 {releaseRole.publication}
                                 <ul>
                                   <li>{releaseRole.release}</li>
@@ -97,19 +83,15 @@ const InvitedUsersPage = () => {
                         </ul>
                       )}
                     </td>
-                    <td className="govuk-table__cell">
+                    <td>
                       {pendingInvite.userPublicationRoles.length === 0 ? (
-                        <p className="govuk-!-margin-0">
-                          No user publication roles
-                        </p>
+                        'No user publication roles'
                       ) : (
                         <ul className="govuk-!-margin-0">
                           {pendingInvite.userPublicationRoles.map(
                             publicationRole => {
                               return (
-                                <li
-                                  key={`${publicationRole.publication}_${publicationRole.role}`}
-                                >
+                                <li key={publicationRole.id}>
                                   {`${publicationRole.publication} - ${publicationRole.role}`}
                                 </li>
                               );
@@ -118,7 +100,7 @@ const InvitedUsersPage = () => {
                         </ul>
                       )}
                     </td>
-                    <td className="govuk-table__cell">
+                    <td>
                       <ButtonText
                         onClick={() => {
                           userService

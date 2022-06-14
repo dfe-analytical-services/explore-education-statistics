@@ -46,6 +46,11 @@ user gets table row with heading
     ${elem}=    get child element    ${parent}    xpath:.//tbody/tr/th[text()="${heading}"]/..
     [Return]    ${elem}
 
+user gets table row
+    [Arguments]    ${row_cell_text}    ${parent}=css:table
+    ${elem}=    get child element    ${parent}    xpath:.//tbody/tr/td[text()="${row_cell_text}"]/..
+    [Return]    ${elem}
+
 user checks table body has x rows
     [Arguments]    ${count}    ${parent}=css:table    ${wait}=${timeout}
     user waits until parent contains element    ${parent}    xpath:.//tbody/tr    timeout=${wait}    count=${count}

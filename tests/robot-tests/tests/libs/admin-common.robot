@@ -140,7 +140,7 @@ user opens release summary on the admin dashboard
 
 user creates publication
     [Arguments]    ${title}
-    user waits until h1 is visible    Create new publication    %{WAIT_SMALL}
+    user waits until h1 is visible    Create new publication
     user waits until page contains element    id:publicationForm-title    %{WAIT_SMALL}
     user enters text into element    id:publicationForm-title    ${title}
     user enters text into element    id:publicationForm-teamName    Attainment statistics team
@@ -153,7 +153,7 @@ user creates publication
 user creates release for publication
     [Arguments]    ${publication}    ${time_period_coverage}    ${start_year}
     user waits until page contains title caption    ${publication}    %{WAIT_SMALL}
-    user waits until h1 is visible    Create new release    %{WAIT_SMALL}
+    user waits until h1 is visible    Create new release
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    %{WAIT_SMALL}
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    ${start_year}
@@ -749,7 +749,7 @@ user removes release access from analyst
 user goes to manage user
     [Arguments]    ${EMAIL_ADDRESS}
     user navigates to admin frontend    %{ADMIN_URL}/administration/users
-    user waits until h1 is visible    Users    %{WAIT_SMALL}
+    user waits until h1 is visible    Users
     user waits until table is visible
     user clicks link    Manage    xpath://td[text()="${EMAIL_ADDRESS}"]/..
     # stale element exception if you don't wait until it's enabled

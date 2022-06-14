@@ -9,12 +9,14 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - invite new users %{RUN_IDENTIFIER}
 ${RELEASE1_NAME}=       ${PUBLICATION_NAME} - Academic Year 2000/01
 ${RELEASE2_NAME}=       ${PUBLICATION_NAME} - Academic Year 2001/02
 ${RELEASE3_NAME}=       ${PUBLICATION_NAME} - Academic Year 2002/03
 ${EMAIL}=               ees-ui-test-%{RUN_IDENTIFIER}@education.gov.uk
+
 
 *** Test Cases ***
 Create Publication as bau1
@@ -39,7 +41,7 @@ Invite a new user without any additional roles
     user waits until h1 is visible    Pending invites
 
 Validate newly invited user appears on Pending invites page
-    ${ROW}=    user gets table row with heading    ${EMAIL}
+    ${ROW}=    user gets table row    ${EMAIL}
     set suite variable    ${ROW}
     user checks element contains    ${ROW}    Analyst
     user checks element contains    ${ROW}    No user release roles
@@ -61,7 +63,7 @@ Invite a new user with release and publication roles
     user clicks button    Add release role
 
     user checks table body has x rows    1    testid:release-role-table
-    ${ROW}=    user gets table row with heading    ${RELEASE1_NAME}    testid:release-role-table
+    ${ROW}=    user gets table row    ${RELEASE1_NAME}    testid:release-role-table
     user checks element contains    ${ROW}    Approver
 
     user chooses select option    name:releaseId    ${RELEASE2_NAME}
@@ -69,9 +71,9 @@ Invite a new user with release and publication roles
     user clicks button    Add release role
 
     user checks table body has x rows    2    testid:release-role-table
-    ${ROW}=    user gets table row with heading    ${RELEASE1_NAME}    testid:release-role-table
+    ${ROW}=    user gets table row    ${RELEASE1_NAME}    testid:release-role-table
     user checks element contains    ${ROW}    Approver
-    ${ROW}=    user gets table row with heading    ${RELEASE2_NAME}    testid:release-role-table
+    ${ROW}=    user gets table row    ${RELEASE2_NAME}    testid:release-role-table
     user checks element contains    ${ROW}    Contributor
 
     user chooses select option    name:releaseId    ${RELEASE3_NAME}
@@ -79,7 +81,7 @@ Invite a new user with release and publication roles
     user clicks button    Add release role
 
     user checks table body has x rows    3    testid:release-role-table
-    ${ROW}=    user gets table row with heading    ${RELEASE3_NAME}    testid:release-role-table
+    ${ROW}=    user gets table row    ${RELEASE3_NAME}    testid:release-role-table
     user checks element contains    ${ROW}    PrereleaseViewer
 
     user clicks button    Remove    ${ROW}
@@ -91,14 +93,14 @@ Invite a new user with release and publication roles
     user clicks button    Add publication role
 
     user checks table body has x rows    1    testid:publication-role-table
-    ${ROW}=    user gets table row with heading    ${PUBLICATION_NAME}    testid:publication-role-table
+    ${ROW}=    user gets table row    ${PUBLICATION_NAME}    testid:publication-role-table
     user checks element contains    ${ROW}    ReleaseApprover
 
     user clicks button    Send invite
     user waits until h1 is visible    Pending invites
 
 Validate newly invited user with roles appears on Pending invites page
-    ${ROW}=    user gets table row with heading    ${EMAIL}
+    ${ROW}=    user gets table row    ${EMAIL}
     set suite variable    ${ROW}
     user checks element contains    ${ROW}    Analyst
     user checks element contains    ${ROW}    ${PUBLICATION_NAME}

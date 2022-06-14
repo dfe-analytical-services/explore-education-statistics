@@ -23,33 +23,25 @@ const PreReleaseUsersPage = () => {
         <span className="govuk-caption-xl">Manage pre-release users</span>
         Pre-release users
       </h1>
-      <table className="govuk-table">
+      <table>
         <caption className="govuk-table__caption">
           Users with pre-release access
         </caption>
-        <thead className="govuk-table__head">
-          <tr className="govuk-table__row">
-            <th scope="col" className="govuk-table__header">
-              Name
-            </th>
-            <th scope="col" className="govuk-table__header">
-              Email
-            </th>
-            <th scope="col" className="govuk-table__header">
-              Actions
-            </th>
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Actions</th>
           </tr>
         </thead>
         <LoadingSpinner loading={isLoading} text="Loading pre-release users">
           {value && (
-            <tbody className="govuk-table__body">
+            <tbody>
               {value.map(user => (
-                <tr className="govuk-table__row" key={user.id}>
-                  <th scope="row" className="govuk-table__header">
-                    {user.name}
-                  </th>
-                  <td className="govuk-table__cell">{user.email}</td>
-                  <td className="govuk-table__cell">
+                <tr key={user.id}>
+                  <th scope="row">{user.name}</th>
+                  <td>{user.email}</td>
+                  <td>
                     <Link to={`/administration/users/${user.id}`}>Manage</Link>
                     {/* <ButtonText onClick={removeAccessHander}>Remove</ButtonText> */}
                   </td>

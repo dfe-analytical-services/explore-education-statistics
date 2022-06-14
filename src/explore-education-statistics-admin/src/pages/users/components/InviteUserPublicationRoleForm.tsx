@@ -104,7 +104,7 @@ const InviteUserPublicationRoleForm = ({
             {userPublicationRoles.length === 0 ? (
               <p>No user publication roles added</p>
             ) : (
-              <table>
+              <table data-testid="publication-role-table">
                 <thead>
                   <tr>
                     <th scope="col">Publication Title</th>
@@ -122,13 +122,13 @@ const InviteUserPublicationRoleForm = ({
                     <tr
                       key={`${userPublicationRole.publicationId}_${userPublicationRole.publicationRole}`}
                     >
-                      <th>
+                      <td>
                         {
                           publicationTitlesById[
                             userPublicationRole.publicationId
                           ].title
                         }
-                      </th>
+                      </td>
                       <td>{userPublicationRole.publicationRole}</td>
                       <td>
                         <ButtonText

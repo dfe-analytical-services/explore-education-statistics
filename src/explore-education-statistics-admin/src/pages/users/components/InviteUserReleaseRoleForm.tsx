@@ -95,7 +95,7 @@ const InviteUserReleaseRoleForm = ({
             {userReleaseRoles.length === 0 ? (
               <p>No user release roles added</p>
             ) : (
-              <table>
+              <table data-testid="release-role-table">
                 <thead>
                   <tr>
                     <th scope="col">Release Title</th>
@@ -112,9 +112,9 @@ const InviteUserReleaseRoleForm = ({
                     <tr
                       key={`${userReleaseRole.releaseId}_${userReleaseRole.releaseRole}`}
                     >
-                      <th>
+                      <td>
                         {releaseTitlesById[userReleaseRole.releaseId].title}
-                      </th>
+                      </td>
                       <td>{userReleaseRole.releaseRole}</td>
                       <td>
                         <ButtonText

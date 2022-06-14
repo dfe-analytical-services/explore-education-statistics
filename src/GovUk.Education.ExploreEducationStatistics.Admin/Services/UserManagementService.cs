@@ -229,6 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 .Select(userReleaseInvite =>
                                     new UserReleaseRoleViewModel
                                     {
+                                        Id = userReleaseInvite.Id,
                                         Publication = userReleaseInvite.Release.Publication.Title,
                                         Release = userReleaseInvite.Release.Title,
                                         Role = userReleaseInvite.Role,
@@ -245,6 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 .Select(userPublicationInvite =>
                                     new UserPublicationRoleViewModel
                                     {
+                                        Id = userPublicationInvite.Id,
                                         Publication = userPublicationInvite.Publication.Title,
                                         Role = userPublicationInvite.Role,
                                     }
