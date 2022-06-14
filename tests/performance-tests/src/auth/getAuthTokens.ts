@@ -6,7 +6,7 @@ import puppeteer from 'puppeteer';
 interface Credentials {
   email: string;
   password: string;
-  baseUrl: string
+  baseUrl: string;
 }
 
 export interface AuthTokens {
@@ -27,18 +27,17 @@ export const getRawAuthTokenResponse = async ({
   const page = await browser.newPage();
 
   await page.goto(baseUrl);
-  await page.waitForNavigation({
-    waitUntil: 'networkidle0',
+
+  await page.waitForXPath('//*[.="Sign in"]', {
+    timeout: 5000,
   });
 
   await page.click('button[class="govuk-button govuk-button--start"]');
 
-  await page.waitForNavigation({
+  await page.waitForXPath("//*[.='Sign in']", {
+    visible: true,
     timeout: 5000,
-    waitUntil: 'domcontentloaded',
   });
-
-  await page.waitForTimeout(2000);
 
   const emailInput = await page.$x("//*[@name='loginfmt']");
   await emailInput[0].type(email);
@@ -46,12 +45,10 @@ export const getRawAuthTokenResponse = async ({
   const btn = await page.$x("//*[@type='submit']");
   await btn[0].click();
 
-  await page.waitForNavigation({
+  await page.waitForXPath("//*[.='Enter password']", {
+    visible: true,
     timeout: 5000,
-    waitUntil: 'domcontentloaded',
   });
-
-  await page.waitForTimeout(2000);
 
   const pwdInput = await page.$x("//*[@name='passwd']");
   await pwdInput[0].type(password);
@@ -59,16 +56,17 @@ export const getRawAuthTokenResponse = async ({
   const signInBtn = await page.$x("//*[@type='submit']");
   await signInBtn[0].click();
 
-  await page.waitForTimeout(2000);
-
-  await page.waitForXPath("//div[text()='Stay signed in?']", {
+  await page.waitForXPath("//*[.='Stay signed in?']", {
     visible: true,
-    timeout: 60000,
+    timeout: 5000,
   });
 
   await page.click('#idBtn_Back');
 
-  await page.waitForTimeout(10000);
+  await page.waitForXPath("//*[.='Dashboard']", {
+    visible: true,
+    timeout: 5000,
+  });
 
   const rawTokenResponse = await page.evaluate(() => {
     /* eslint-disable-next-line no-plusplus */
