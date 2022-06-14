@@ -7,12 +7,14 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
 using Microsoft.Extensions.Logging;
@@ -955,7 +957,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
+            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var filterRepository = new Mock<IFilterRepository>(MockBehavior.Strict);
+
+            cacheService
+                .Setup(service => service.DeleteItem(new PrivateSubjectMetaCacheKey(releaseSubject.ReleaseId,
+                    releaseSubject.SubjectId)))
+                .Returns(Task.CompletedTask);
 
             filterRepository.Setup(mock => mock.GetFiltersIncludingItems(releaseSubject.SubjectId))
                 .ReturnsAsync(filters);
@@ -963,6 +971,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildSubjectMetaService(statisticsDbContext,
+                    cacheService: cacheService.Object,
                     filterRepository: filterRepository.Object);
 
                 var result = await service.UpdateSubjectFilters(
@@ -971,7 +980,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     request
                 );
 
-                VerifyAllMocks(filterRepository);
+                VerifyAllMocks(cacheService, filterRepository);
 
                 result.AssertRight();
             }
@@ -1774,7 +1783,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 await statisticsDbContext.SaveChangesAsync();
             }
 
+            var cacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
             var indicatorGroupRepository = new Mock<IIndicatorGroupRepository>(MockBehavior.Strict);
+
+            cacheService
+                .Setup(service => service.DeleteItem(new PrivateSubjectMetaCacheKey(releaseSubject.ReleaseId,
+                    releaseSubject.SubjectId)))
+                .Returns(Task.CompletedTask);
 
             indicatorGroupRepository.Setup(mock => mock.GetIndicatorGroups(releaseSubject.SubjectId))
                 .ReturnsAsync(indicatorGroups);
@@ -1782,6 +1797,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
             {
                 var service = BuildSubjectMetaService(statisticsDbContext,
+                    cacheService: cacheService.Object,
                     indicatorGroupRepository: indicatorGroupRepository.Object);
 
                 var result = await service.UpdateSubjectIndicators(
@@ -1790,7 +1806,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     request
                 );
 
-                VerifyAllMocks(indicatorGroupRepository);
+                VerifyAllMocks(cacheService, indicatorGroupRepository);
 
                 result.AssertRight();
             }
@@ -2287,6 +2303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 
         private static SubjectMetaService BuildSubjectMetaService(
             StatisticsDbContext statisticsDbContext,
+            IBlobCacheService? cacheService = null,
             IFilterRepository? filterRepository = null,
             IFilterItemRepository? filterItemRepository = null,
             IIndicatorGroupRepository? indicatorGroupRepository = null,
@@ -2301,6 +2318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             return new(
                 statisticsPersistenceHelper ?? new PersistenceHelper<StatisticsDbContext>(statisticsDbContext),
                 statisticsDbContext,
+                cacheService ?? Mock.Of<IBlobCacheService>(MockBehavior.Strict),
                 filterRepository ?? Mock.Of<IFilterRepository>(MockBehavior.Strict),
                 filterItemRepository ?? Mock.Of<IFilterItemRepository>(MockBehavior.Strict),
                 indicatorGroupRepository ?? Mock.Of<IIndicatorGroupRepository>(MockBehavior.Strict),

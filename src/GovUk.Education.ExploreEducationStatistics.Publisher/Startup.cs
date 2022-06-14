@@ -51,16 +51,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     options.UseSqlServer(ConnectionUtils.GetAzureSqlConnectionString("PublicStatisticsDb")))
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
-                .AddScoped<IBlobCacheService, BlobCacheService>(provider =>
-                    new BlobCacheService(
-                        blobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                        logger: provider.GetRequiredService<ILogger<BlobCacheService>>()))
+                .AddScoped(provider => GetBlobCacheService(provider, "PublicStorage"))
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
                         publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
                         privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                        publicBlobCacheService: provider.GetRequiredService<IBlobCacheService>(),
+                        publicBlobCacheService: GetBlobCacheService(provider, "PublicStorage"),
                         methodologyService: provider.GetRequiredService<IMethodologyService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
@@ -69,7 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<IContentService, ContentService>(provider =>
                     new ContentService(
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                        blobCacheService: provider.GetService<IBlobCacheService>(),
+                        privateBlobCacheService: GetBlobCacheService(provider, "CoreStorage"),
+                        publicBlobCacheService: GetBlobCacheService(provider, "PublicStorage"),
                         fastTrackService: provider.GetService<IFastTrackService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>()
@@ -122,6 +120,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
             AddPersistenceHelper<PublicStatisticsDbContext>(builder.Services);
+        }
+
+        private static IBlobCacheService GetBlobCacheService(IServiceProvider provider, string connectionStringKey)
+        {
+            return new BlobCacheService(
+                blobStorageService: GetBlobStorageService(provider, connectionStringKey),
+                logger: provider.GetRequiredService<ILogger<BlobCacheService>>());
         }
 
         private static IBlobStorageService GetBlobStorageService(IServiceProvider provider, string connectionStringKey)

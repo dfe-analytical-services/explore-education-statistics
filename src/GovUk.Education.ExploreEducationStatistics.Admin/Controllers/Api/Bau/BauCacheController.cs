@@ -35,17 +35,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         }
 
         [HttpDelete("private-cache")]
-        public async Task<ActionResult> ClearPrivateCache()
+        public async Task<ActionResult> ClearPrivateCache(ClearPrivateCachePathsViewModel request)
         {
-            // Remove all cache entries as we currently don't really need
-            // any more granularity currently (we only cache data blocks).
-            await _privateBlobStorageService.DeleteBlobs(BlobContainers.PrivateContent);
+            if (request.Paths.Any())
+            {
+                var pathString = request.Paths.JoinToString('|');
+
+                await _privateBlobStorageService.DeleteBlobs(
+                    BlobContainers.PrivateContent,
+                    options: new DeleteBlobsOptions
+                    {
+                        IncludeRegex = new Regex($"^releases/.*/({pathString})/")
+                    }
+                );
+            }
 
             return NoContent();
         }
 
         [HttpDelete("public-cache/trees")]
-        public async Task<ActionResult> ClearPublicCacheTrees(ClearCacheTreePathsViewModel request)
+        public async Task<ActionResult> ClearPublicCacheTrees(ClearPublicCacheTreePathsViewModel request)
         {
             if (request.Paths.Any())
             {
@@ -61,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         }
 
         [HttpDelete("public-cache/releases")]
-        public async Task<ActionResult> ClearPublicCacheReleases(ClearCacheReleasePathsViewModel request)
+        public async Task<ActionResult> ClearPublicCacheReleases(ClearPublicCacheReleasePathsViewModel request)
         {
             if (request.Paths.Any())
             {
@@ -71,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                     BlobContainers.PublicContent,
                     options: new DeleteBlobsOptions
                     {
-                        IncludeRegex = new Regex($"publications/.*/releases/.*/({pathString})/")
+                        IncludeRegex = new Regex($"^publications/.*/releases/.*/({pathString})/")
                     }
                 );
             }
@@ -79,9 +88,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             return NoContent();
         }
 
-        public class ClearCacheTreePathsViewModel
+        public class ClearPublicCacheTreePathsViewModel
         {
-            private static readonly HashSet<string> AllowedPaths = new HashSet<string>
+            private static readonly HashSet<string> AllowedPaths = new()
             {
                 PublicationTreeCacheKey.GetKey(),
                 AllMethodologiesCacheKey.GetKey()
@@ -89,22 +98,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
 
             [MinLength(1)]
             [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
-            public HashSet<string> Paths { get; set; } = new HashSet<string>();
+            public HashSet<string> Paths { get; set; } = new();
         }
 
-        public class ClearCacheReleasePathsViewModel
+        public class ClearPublicCacheReleasePathsViewModel
         {
-            private static readonly HashSet<string> AllowedPaths = new HashSet<string>
+            private static readonly HashSet<string> AllowedPaths = new()
             {
-                FileStoragePathUtils.PublicContentDataBlocksDirectory,
+                FileStoragePathUtils.DataBlocksDirectory,
                 // TODO: EES-2865 Remove with other fast track code
-                FileStoragePathUtils.PublicContentFastTrackResultsDirectory,
-                FileStoragePathUtils.PublicContentSubjectMetaDirectory
+                FileStoragePathUtils.FastTrackResultsDirectory,
+                FileStoragePathUtils.SubjectMetaDirectory
             };
 
             [MinLength(1)]
             [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
-            public HashSet<string> Paths { get; set; } = new HashSet<string>();
+            public HashSet<string> Paths { get; set; } = new();
+        }
+
+        public class ClearPrivateCachePathsViewModel
+        {
+            private static readonly HashSet<string> AllowedPaths = new()
+            {
+                FileStoragePathUtils.DataBlocksDirectory,
+                FileStoragePathUtils.SubjectMetaDirectory
+            };
+
+            [MinLength(1)]
+            [ContainsOnly(AllowedValuesProvider = nameof(AllowedPaths))]
+            public HashSet<string> Paths { get; set; } = new();
         }
     }
 }

@@ -10,7 +10,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Newtonsoft.Json;
@@ -23,7 +22,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
     public class ContentService : IContentService
     {
-        private readonly IBlobCacheService _blobCacheService;
+        private readonly IBlobCacheService _privateBlobCacheService;
+        private readonly IBlobCacheService _publicBlobCacheService;
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IFastTrackService _fastTrackService;
         private readonly IReleaseService _releaseService;
@@ -32,14 +32,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly JsonSerializerSettings _jsonSerializerSettingsCamelCase =
             GetJsonSerializerSettings(new CamelCaseNamingStrategy());
 
-        public ContentService(IBlobStorageService publicBlobStorageService,
-            IBlobCacheService blobCacheService,
+        public ContentService(
+            IBlobCacheService privateBlobCacheService,
+            IBlobCacheService publicBlobCacheService,
+            IBlobStorageService publicBlobStorageService,
             IFastTrackService fastTrackService,
             IReleaseService releaseService,
             IPublicationService publicationService)
         {
+            _privateBlobCacheService = privateBlobCacheService;
+            _publicBlobCacheService = publicBlobCacheService;
             _publicBlobStorageService = publicBlobStorageService;
-            _blobCacheService = blobCacheService;
             _fastTrackService = fastTrackService;
             _releaseService = releaseService;
             _publicationService = publicationService;
@@ -61,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 await _fastTrackService.DeleteAllFastTracksByRelease(previousRelease.Id);
 
                 // Delete any lazily-cached results that are owned by the previous Release
-                await DeleteLazilyCachedReleaseResults(release.Publication.Slug, previousRelease.Slug);
+                await DeleteLazilyCachedReleaseResults(previousRelease.Id, release.Publication.Slug, previousRelease.Slug);
 
                 // Delete content which hasn't been overwritten because the Slug has changed
                 if (release.Slug != previousRelease.Slug)
@@ -74,12 +77,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             }
         }
 
-        private async Task DeleteLazilyCachedReleaseResults(string publicationSlug, string releaseSlug)
+        private async Task DeleteLazilyCachedReleaseResults(Guid releaseId, string publicationSlug, string releaseSlug)
         {
-            await _blobCacheService.DeleteCacheFolder(new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug));
-            await _blobCacheService.DeleteItem(new ReleaseSubjectsCacheKey(publicationSlug, releaseSlug));
-            await _blobCacheService.DeleteCacheFolder(new ReleaseFastTrackResultsFolderCacheKey(publicationSlug, releaseSlug));
-            await _blobCacheService.DeleteCacheFolder(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
+            await _privateBlobCacheService.DeleteCacheFolder(new PrivateReleaseContentFolderCacheKey(releaseId));
+
+            await _publicBlobCacheService.DeleteCacheFolder(new ReleaseDataBlockResultsFolderCacheKey(publicationSlug, releaseSlug));
+            await _publicBlobCacheService.DeleteItem(new ReleaseSubjectsCacheKey(publicationSlug, releaseSlug));
+            await _publicBlobCacheService.DeleteCacheFolder(new ReleaseFastTrackResultsFolderCacheKey(publicationSlug, releaseSlug));
+            await _publicBlobCacheService.DeleteCacheFolder(new ReleaseSubjectMetaFolderCacheKey(publicationSlug, releaseSlug));
         }
 
         public async Task DeletePreviousVersionsDownloadFiles(params Guid[] releaseIds)
@@ -144,8 +149,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task DeleteCachedTaxonomyBlobs()
         {
-            await _blobCacheService.DeleteItem(new AllMethodologiesCacheKey());
-            await _blobCacheService.DeleteItem(new PublicationTreeCacheKey());
+            await _publicBlobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+            await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey());
         }
 
         private async Task DeleteAllContent()
