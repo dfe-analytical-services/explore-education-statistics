@@ -69,7 +69,7 @@ const performTest = () => {
   const maxImportWaitTimeMillis = 10 * 1000;
   const importStartTime = Date.now();
   const importExpireTime = importStartTime + maxImportWaitTimeMillis;
-  const importComplete = false;
+  let importComplete = false;
 
   while (Date.now() < importExpireTime) {
     sleep(1);
@@ -98,6 +98,7 @@ const performTest = () => {
     if (importStatus === 'COMPLETE') {
       importSpeedTrend.add(Date.now() - importStartTime);
       importCount.add(1);
+      importComplete = true;
       break;
     }
   }

@@ -46,7 +46,7 @@ export default function ({ access_token, refresh_token }: AuthTokens) {
 
   if (
     !check(refreshedTokens1, {
-      'response with refreshed tokens was successful': res => res != null,
+      'response with refreshed tokens was successful': tokens => !!tokens,
     })
   ) {
     fail(
@@ -56,10 +56,10 @@ export default function ({ access_token, refresh_token }: AuthTokens) {
 
   if (
     !check(refreshedTokens1!, {
-      'response with refreshed tokens contained a new access_token': res =>
-        res.access_token.length > 0,
-      'response with refreshed tokens contained a new refresh_token': res =>
-        res.refresh_token.length > 0,
+      'response with refreshed tokens contained a new access_token': tokens =>
+        tokens.access_token.length > 0,
+      'response with refreshed tokens contained a new refresh_token': tokens =>
+        tokens.refresh_token.length > 0,
     })
   ) {
     fail(
@@ -91,7 +91,7 @@ export default function ({ access_token, refresh_token }: AuthTokens) {
 
   if (
     !check(refreshedTokens2, {
-      'response with re-refreshed tokens was successful': res => res != null,
+      'response with re-refreshed tokens was successful': tokens => !!tokens,
     })
   ) {
     fail(
@@ -101,10 +101,10 @@ export default function ({ access_token, refresh_token }: AuthTokens) {
 
   if (
     !check(refreshedTokens2!, {
-      'response with re-refreshed tokens contained a new access_token': res =>
-        res.access_token.length > 0,
-      'response with re-refreshed tokens contained a new refresh_token': res =>
-        res.refresh_token.length > 0,
+      'response with re-refreshed tokens contained a new access_token': tokens =>
+        tokens.access_token.length > 0,
+      'response with re-refreshed tokens contained a new refresh_token': tokens =>
+        tokens.refresh_token.length > 0,
     })
   ) {
     fail(
