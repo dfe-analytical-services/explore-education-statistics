@@ -97,7 +97,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             );
 
             // Adds Brotli and Gzip compressing
-            services.AddResponseCompression();
+            services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+            });
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(swag =>
@@ -203,6 +206,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
 
             app.UseMvc();
             app.UseHealthChecks("/api/health");
+
+            app.UseResponseCompression();
         }
 
         /**
