@@ -12,14 +12,14 @@ module.exports = {
     filename: '[name].js',
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.js', '.csv'],
   },
   module: {
     rules: [
       {
         test: /\.ts$/,
-        use: 'babel-loader',
         exclude: /node_modules/,
+        use: 'babel-loader',
       },
     ],
   },
@@ -32,13 +32,12 @@ module.exports = {
   },
   plugins: [
     new CleanWebpackPlugin(),
-    // Copy assets to the destination folder
-    // see `src/post-file-test.ts` for an test example using an asset
     new CopyPlugin({
       patterns: [
         {
-          from: path.resolve(__dirname, 'assets'),
-          noErrorOnMissing: true,
+          context: path.join(__dirname, 'src/tests'),
+          from: '**/*.csv',
+          to: path.join(__dirname, 'dist'),
         },
       ],
     }),
