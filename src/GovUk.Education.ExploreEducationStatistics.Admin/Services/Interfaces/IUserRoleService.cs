@@ -17,6 +17,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> AddReleaseRole(Guid userId, Guid releaseId, ReleaseRole role);
 
+        Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, Guid userId);
+
+        string GetAssociatedGlobalRoleNameForReleaseRole(ReleaseRole role);
+
         Task<Either<ActionResult, List<RoleViewModel>>> GetAllGlobalRoles();
 
         Task<Either<ActionResult, Dictionary<string, List<string>>>> GetAllResourceRoles();

@@ -1210,6 +1210,124 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UpgradeToGlobalRoleIfRequired_DoUpgrade()
+        {
+            var userId = Guid.NewGuid();
+            var user = new ApplicationUser
+            {
+                Id = userId.ToString()
+            };
+
+            var existingRole = new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = RoleNames.PrereleaseUser,
+            };
+
+            var newRole = new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = RoleNames.Analyst,
+            };
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddRangeAsync(user);
+                await userAndRolesDbContext.Roles.AddRangeAsync(existingRole, newRole);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // Here we are setting up the user so that they have a different Global Role currently assigned
+            // than the new one being set. They will have the existing one removed and the new one added.
+            userManager
+                .Setup(mock => mock.GetRolesAsync(
+                    ItIsUser(user)))
+                .ReturnsAsync(ListOf(existingRole.Name));
+
+            userManager
+                .Setup(mock => mock.AddToRoleAsync(
+                    ItIsUser(user), newRole.Name))
+                .ReturnsAsync(new IdentityResult());
+
+            userManager
+                .Setup(mock => mock.RemoveFromRolesAsync(
+                    ItIsUser(user), ItIs.ListSequenceEqualTo(ListOf(existingRole.Name))))
+                .ReturnsAsync(new IdentityResult());
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.UpgradeToGlobalRoleIfRequired(RoleNames.Analyst, userId);
+                result.AssertRight();
+
+                VerifyAllMocks(userManager);
+            }
+        }
+
+        [Fact]
+        public async Task UpgradeToGlobalRoleIfRequired_DoNotUpgrade()
+        {
+            var userId = Guid.NewGuid();
+            var user = new ApplicationUser
+            {
+                Id = userId.ToString()
+            };
+
+            var existingRole = new IdentityRole
+            {
+                Id = Guid.NewGuid().ToString(),
+                Name = RoleNames.Analyst,
+            };
+
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                await userAndRolesDbContext.Users.AddRangeAsync(user);
+                await userAndRolesDbContext.Roles.AddRangeAsync(existingRole);
+                await userAndRolesDbContext.SaveChangesAsync();
+            }
+
+            var userManager = MockUserManager();
+
+            // user already has the correct role
+            userManager
+                .Setup(mock => mock.GetRolesAsync(
+                    ItIsUser(user)))
+                .ReturnsAsync(ListOf(existingRole.Name));
+
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(
+                    usersAndRolesDbContext: userAndRolesDbContext,
+                    userManager: userManager.Object);
+
+                var result = await service.UpgradeToGlobalRoleIfRequired(RoleNames.Analyst, userId);
+                result.AssertRight();
+
+                VerifyAllMocks(userManager);
+            }
+        }
+
+        [Fact]
+        public async Task UpgradeToGlobalRoleIfRequired_NoUser()
+        {
+            var userAndRolesDbContextId = Guid.NewGuid().ToString();
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
+            {
+                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext);
+
+                var result = await service.UpgradeToGlobalRoleIfRequired(RoleNames.Analyst, Guid.NewGuid());
+                result.AssertNotFound();
+            }
+        }
+
+        [Fact]
         public async Task GetAllGlobalRoles()
         {
             var role1 = new IdentityRole
