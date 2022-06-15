@@ -20,32 +20,117 @@ You will need the following dependencies to run the tests successfully:
 
 ## Running the tests
 
-Firstly, start InfluxDB and Grafana:
+### Start InfluxDB and Grafana (optional)
+
+Note that this step isn't strictly necessary if we're not wanting to record metrics whilst
+generating load - the tests can run independently of these if we're just wanting to generate
+some load, for example.
 
 ```bash
 cd tests/performance-tests
-docker-compose up influxdb grafana # use docker-compose -d instead if you want to run in daemon mode
+docker-compose up influxdb grafana # use "docker-compose -d up influxdb grafana" instead if 
+                                   # wanting to run in daemon mode
 ```
 
-Then run individual tests:
+### Compile the tests
+
+The tests are written in Typescript so we need to transpile them to work in K6 (which as an aside is 
+Go-based, not Node JS-based). We use Webpack and Babel for this.
 
 ```bash
 cd tests/performance-tests
-docker-compose run k6 run src/path/to/test/script
+npm run webpack # use "npm run webpack watch" instead if wanting to continue running webpack 
+                # repeatedly during test development 
+```
+
+### Run the tests
+
+#### Create environment-specific .env.json files (optional) 
+
+This step is only required if running performance tests that require access to the Admin API.
+These files will store environment-specific user credentials for accessing Admin.
+
+As a one-off, we will need to copy `tests/performance-tests/.env.example.json` to
+`tests/performance-tests/.env.<environment>.json`, and supply the file with the correct
+environment-specific credentials for the users that we'll be using.  The `<environment>` can
+be any value that we can load test against. As an example, if doing load testing or test script
+development against a local environment, we would create a file called
+`tests/performance-tests/.env.local.json` and supply the local user credentials within the file.
+
+#### Obtain auth tokens for Admin testing (optional)
+
+This step is only required if running performance tests that require access to the Admin API.
+It requires the above step of creating environment-specific .env.json files first.
+
+As a usage example:
+
+```bash
+cd tests/performance-tests
+export AUTH_TOKENS_AS_JSON=$(node dist/logAuthTokens.js <environment> <user name>)
+```
+
+This obtains an `access_token` and a `refresh_token` that can be used to access protected resources
+in the Admin API.  The `refresh_token` allows long-running tests to refresh their access token if
+it's going to expire mid-test.
+
+This will look in the `.env.<environment>.json` file for a user with `"name": "<user name>"` and use 
+that user's credentials to log into Admin in order to obtain their auth tokens.
+
+As a concrete example:
+
+
+```bash
+cd tests/performance-tests
+export AUTH_TOKENS_AS_JSON=$(node dist/logAuthTokens.js local bau1)
+```
+
+#### Run individual tests
+
+```bash
+cd tests/performance-tests
+docker-compose run k6 run dist/some-test-script.test.js
 ```
 
 An example of running an actual script would be:
 
 ```bash
-docker-compose run k6 run src/local/latest-release/absence.test.js
+docker-compose run k6 run dist/import.test.js
 ```
 
-The `src` directory contains tests based on environments (i.e. `dev` contains tests specific to the dev environment etc.)
+TODO will this still be true???????????????
+The `src` directory contains tests based on environments (i.e. `dev` contains tests specific to the 
+dev environment etc.)
 
 ## Transpiling and Bundling
 
-By default, k6 can only run ES5.1 JavaScript code. To use TypeScript, we have to set up a bundler that converts TypeScript to JavaScript code.
+The tests are written in Typescript so we need to transpile them to work in K6 (which as an aside is
+Go-based, not Node JS-based). By default, k6 can only run ES5.1 JavaScript code. To use TypeScript, we
+set up a bundler that converts TypeScript to JavaScript code.
 
-Due to the fact that TypeScript doesn't provide a lot of value, we've chosen to not use Typescript and use JS instead.
+If you want to learn more, check out 
+[Bundling node modules in k6](https://k6.io/docs/using-k6/modules#bundling-node-modules).
 
-If you want to learn more, check out [Bundling node modules in k6](https://k6.io/docs/using-k6/modules#bundling-node-modules).
+We also have some Typescript Node scripts that are used directly by Node.js that require budling and 
+transpiling in the same fashion
+
+TODO Assets!!!!!!!!!!!!!!!!!
+
+## Troubleshooting
+
+### Exceptions and stacktraces in Typescript code
+
+We can use source maps to be able to trace errors back to the original Typescript source when 
+encountering errors in transpiled Javascript code.  This is provided via the `source-map-support` 
+package.
+
+To enable this in Node, we can supply the `-r source-map-support/register` option whilst running the 
+problem script.  For example:
+
+```bash
+node -r source-map-support/register dist/logAuthTokens.js local bau1
+```
+
+would result in stacktraces that point back to the original `src/auth/logAuthTokens.ts` Typescript 
+file.
+
+TODO Healthchecks!!!!!!!!!!!!!!!!!
