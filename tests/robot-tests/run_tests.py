@@ -406,7 +406,7 @@ try:
         if args.profile:
             # Python profiling
             cProfile.run('robot_run_cli(robotArgs)', 'profile-data')
-            stream = open('test-results/python-profiling-results.log', 'w')
+            stream = open('test-results/python-profiling-results.log', 'w', encoding='utf-8')
             p = pstats.Stats('profile-data', stream=stream)
             p.sort_stats('time')
             # p.sort_stats('cumulative')
@@ -416,18 +416,20 @@ try:
             # Keyword profiling
             kp.run_keyword_profile(f'test-results/{output_file}',
                                    printresults=False,
-                                   writepath='test-results/keyword-profiling-results.log')
-            print("\nProfiling logs created in test-results/", flush=True)
+                                   writepath=f'test-results/keyword-profiling-results.log')
+            print(
+                f'Keyword profiling results saved to {os.getcwd()}/test-results/keyword-profiling-results.log',
+                flush=True)
         else:
             robot_run_cli(robotArgs)
     elif args.interp == "pabot":
         if args.processes:
-            robotArgs = ["--processes", args.processes] + robotArgs
+            robotArgs = ["--processes", int(args.processes)] + robotArgs
 
         if args.profile:
             # Python profiling
             cProfile.run('pabot_run_cli(robotArgs)', 'profile-data')
-            stream = open('test-results/python-profiling-results.log', 'w')
+            stream = open(f'test-results{os.sep}python-profiling-results.log', 'w', encoding='utf-8', errors='ignore')
             p = pstats.Stats('profile-data', stream=stream)
             p.sort_stats('time')
             # p.sort_stats('cumulative')
@@ -435,12 +437,15 @@ try:
             os.remove('profile-data')
 
             # Keyword profiling
-            kp.run_keyword_profile(f'test-results/{output_file}',
+            kp.run_keyword_profile(f'test-results{os.sep}{output_file}',
                                    printresults=False,
-                                   writepath='test-results/keyword-profiling-results.log')
-            print("\nProfiling logs created in test-results/", flush=True)
+                                   writepath=f'test-results/keyword-profiling-results.log')
+            print(
+                f'Keyword profiling results saved to {os.getcwd()}/test-results/keyword-profiling-results.log',
+                flush=True)
         else:
             pabot_run_cli(robotArgs)
+
 finally:
     if not args.disable_teardown:
         print("Tearing down tests...", flush=True)

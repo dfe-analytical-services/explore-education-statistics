@@ -2,7 +2,6 @@ import re
 import os
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.common.exceptions import NoSuchElementException
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 
@@ -131,3 +130,4 @@ def user_reorders_table_headers(drag_selector, drop_selector):
     action.move_to_element(drop_elem).perform()
     action.move_by_offset(0, 0).pause(0.01).perform()
     action.release().perform()
+    action.reset_actions()

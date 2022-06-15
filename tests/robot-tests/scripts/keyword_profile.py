@@ -131,7 +131,7 @@ def _write_results(times, shown_keywords, limit, path):
     # NOTE(mark): Change x index to sort by a different column i.e. x[2] to sort by average_time
     kwrows.sort(key=lambda x: x[2], reverse=True)
 
-    fd = open(path, "w")
+    fd = open(path, "w", encoding="utf-8")
     fd.write('Total time (s) |   Calls | avg time (s) | median time (s) | stdev (s) | stdev/avg time % | Keyword name\n')
     shown = 0
     for k in kwrows:

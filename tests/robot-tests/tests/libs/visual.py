@@ -2,8 +2,7 @@ from selenium.webdriver.remote.webelement import WebElement
 from os import getcwd, path, pardir, makedirs
 from robot.libraries.BuiltIn import BuiltIn
 from logging import warning
-import datetime
-
+import os
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 
@@ -50,14 +49,14 @@ def highlight_element(element: WebElement):
 @with_maximised_browser
 def capture_large_screenshot():
     screenshot_location = sl.capture_page_screenshot()
-    warning(f"Captured a screenshot at URL {sl.get_location()}     Screenshot saved to file://{screenshot_location}")
+    warning(f"Captured a screenshot at URL '{sl.get_location()}' Screenshot saved to file://{screenshot_location}")
 
 
 @with_no_overflow
 @with_maximised_browser
 def take_screenshot_of_element(element: WebElement, filename: str):
     try:
-        filepath = f'{getcwd()}/{filename}'
+        filepath = f'{getcwd()}{os.sep}{filename}'
         folder = path.abspath(path.join(filepath, pardir))
         makedirs(folder, exist_ok=True)
         element.screenshot(filepath)
@@ -68,7 +67,7 @@ def take_screenshot_of_element(element: WebElement, filename: str):
 
 
 def take_html_snapshot_of_element(element: WebElement, filename: str):
-    filepath = f'{getcwd()}/{filename}'
+    filepath = f'{getcwd()}{os.sep}{filename}'
     folder = path.abspath(path.join(filepath, pardir))
     makedirs(folder, exist_ok=True)
     html = element.get_attribute('innerHTML')

@@ -250,7 +250,7 @@ def capture_large_screenshot_and_html():
 def capture_html():
     html = sl.get_source()
     current_time_millis = round(datetime.datetime.timestamp(datetime.datetime.now()) * 1000)
-    html_file = open(f"test-results/captured-html-{current_time_millis}.html", "w")
+    html_file = open(f"test-results/captured-html-{current_time_millis}.html", "w", encoding="utf-8")
     html_file.write(html)
     html_file.close()
     warning(f"Captured HTML of {sl.get_location()}      HTML saved to file://{os.path.realpath(html_file.name)}")
@@ -259,7 +259,6 @@ def capture_html():
 def user_gets_row_number_with_heading(heading: str, table_locator: str = 'css:table'):
     elem = get_child_element(table_locator, f'xpath:.//tbody/tr/th[text()="{heading}"]/..')
     rows = get_child_elements(table_locator, 'css:tbody tr')
-
     return rows.index(elem) + 1
 
 
@@ -285,7 +284,7 @@ def user_checks_row_cell_contains_text(row_elem, cell_num, expected_text):
 
     if expected_text not in elem.text:
         raise_assertion_error(
-            f'TD tag num "{cell_num}" for row element didn\'t contain text "{expected_text}". '
+            f'TD tag num "{cell_num}" for row element didn\'t contain text "{expected_text}".'
             f'Found text "{elem.text}"')
 
 

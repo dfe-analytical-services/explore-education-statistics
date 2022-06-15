@@ -1,7 +1,5 @@
 import csv
-import os
 from enum import Enum
-from logging import warning
 
 releases_by_url = {}
 
@@ -64,7 +62,7 @@ class DataBlockRow:
         elif self.content_section_type == 'KeyStatistics':
             self.type = DataBlockType.KEY_STATS
         else:
-            raise Exception(f'Unhandled Content Section Type {self.content_section_type}')
+            raise AttributeError(f'Unhandled Content Section Type {self.content_section_type}')
 
         if self.type == DataBlockType.FAST_TRACK:
             self.content_url = f'/data-tables/fast-track/{self.content_block_id}'
