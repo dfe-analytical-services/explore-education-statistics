@@ -244,9 +244,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.NotNull(contentRelease.DataLastPublished);
                 Assert.True(contentRelease.HasDataGuidance);
                 Assert.True(contentRelease.HasPreReleaseAccessList);
-                Assert.Equal(release.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
                 Assert.Equal(release.KeyStatisticsSection.Id, contentRelease.KeyStatisticsSection.Id);
                 Assert.Equal(release.KeyStatisticsSecondarySection.Id, contentRelease.KeyStatisticsSecondarySection.Id);
+                Assert.Equal(release.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
+                // @MarkFix Add RelatedDashboardSection test here
                 Assert.False(contentRelease.LatestRelease);
                 Assert.Equal("9", contentRelease.NextReleaseDate.Day);
                 Assert.Equal("9", contentRelease.NextReleaseDate.Month);

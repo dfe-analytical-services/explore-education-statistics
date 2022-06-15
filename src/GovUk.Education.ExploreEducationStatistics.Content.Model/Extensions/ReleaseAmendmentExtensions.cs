@@ -32,6 +32,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
                 ?.Select(rcs => rcs.Clone(context))
                 .ToList();
 
+            // NOTE: This is to ensure that a RelatedDashboards ContentSection exists on all new amendments.
+            // There are older releases without a RelatedDashboards ContentSection.
+            if (!amendment.Content! // amendment.Content should never be null, so suppress null warning
+                    .Any(c => c.ContentSection is { Type: ContentSectionType.RelatedDashboards }))
+            {
+                amendment.Content!.Add(new ReleaseContentSection
+                {
+                    ReleaseId = amendment.Id,
+                    ContentSection = new ContentSection
+                    {
+                        Type = ContentSectionType.RelatedDashboards,
+                    }
+                });
+            }
+
             amendment.ContentBlocks = amendment
                 .ContentBlocks
                 ?.Select(rcb => rcb.Clone(context))
