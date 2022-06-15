@@ -316,7 +316,7 @@
       "type": "securestring",
       "defaultValue": "change-me",
       "metadata": {
-        "description": "Gov UK Notify service template Id for "
+        "description": "Gov UK Notify service template Id for new user invites"
       }
     },
     "notifyPublicationRoleTemplateId": {
