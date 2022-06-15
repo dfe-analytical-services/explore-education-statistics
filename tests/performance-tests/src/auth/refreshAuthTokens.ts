@@ -1,19 +1,21 @@
 import http from 'k6/http';
-import { AuthTokens } from './getAuthTokens';
+import { AuthDetails } from './getAuthDetails';
 
 interface RefreshTokenParams {
-  baseUrl: string;
+  userName: string;
+  adminUrl: string;
   clientId: string;
   clientSecret: string;
   refreshToken: string;
 }
 
 export default function refreshAuthTokens({
-  baseUrl,
+  userName,
+  adminUrl,
   clientId,
   clientSecret,
   refreshToken,
-}: RefreshTokenParams): AuthTokens | undefined {
+}: RefreshTokenParams): AuthDetails | undefined {
   const requestBody = {
     client_id: clientId,
     client_secret: clientSecret,
@@ -21,21 +23,27 @@ export default function refreshAuthTokens({
     refresh_token: refreshToken,
   };
 
-  const response = http.post(`${baseUrl}/connect/token`, requestBody);
+  const response = http.post(`${adminUrl}/connect/token`, requestBody);
 
   if (response.status !== 200) {
+    /* eslint-disable-next-line no-console */
     console.log(
-      `Unable to refresh access token.  Got response ${JSON.stringify(
+      `Unable to refresh access token. Got response ${JSON.stringify(
         response.json(),
       )}`,
     );
     return undefined;
   }
 
-  const json = (response.json() as unknown) as AuthTokens;
+  const json = (response.json() as unknown) as AuthDetails;
 
   return {
-    access_token: json.access_token,
-    refresh_token: json.refresh_token,
+    adminUrl,
+    userName,
+    authTokens: {
+      accessToken: json.authTokens.accessToken,
+      refreshToken: json.authTokens.refreshToken,
+      expiryDate: new Date(),
+    },
   };
 }

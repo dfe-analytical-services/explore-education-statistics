@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import getAuthTokens from './getAuthTokens';
+import { getAuthTokens } from './getAuthDetails';
 
 interface User {
   name: string;
@@ -9,23 +9,19 @@ interface User {
 }
 
 interface Environment {
-  baseUrl: string;
+  adminUrl: string;
   users: User[];
 }
 
-const logAuthTokens = async (
-  baseUrl: string,
+const logAuthTokenResponse = async (
   email: string,
   password: string,
+  adminUrl: string,
 ) => {
-  const authTokens = await getAuthTokens({
-    email,
-    password,
-    baseUrl,
-  });
+  const rawTokenResponse = await getAuthTokens(email, password, adminUrl);
 
-  /* eslint-disable no-console */
-  console.log(JSON.stringify(authTokens));
+  /* eslint-disable-next-line no-console */
+  console.log(rawTokenResponse);
 };
 
 const [environment, userName] = process.argv.slice(2, 4);
@@ -36,4 +32,4 @@ require('dotenv-json-complex')({ environment });
 const env = JSON.parse(process.env.environment as string) as Environment;
 const { email, password } = env.users.find(u => u.name === userName) as User;
 
-logAuthTokens(env.baseUrl, email, password);
+logAuthTokenResponse(email, password, env.adminUrl);

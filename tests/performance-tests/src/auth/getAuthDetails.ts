@@ -3,30 +3,39 @@
 /* eslint-disable camelcase */
 import puppeteer from 'puppeteer';
 
-interface Credentials {
-  email: string;
-  password: string;
-  baseUrl: string;
+export interface AuthTokens {
+  accessToken: string;
+  refreshToken: string;
+  expiryDate: Date;
 }
 
-export interface AuthTokens {
+export interface AuthDetails {
+  userName: string;
+  adminUrl: string;
+  authTokens: AuthTokens;
+}
+
+export const getAuthTokens = async (
+  email: string,
+  password: string,
+  adminUrl: string,
+): Promise<{
+  id_token: string;
   access_token: string;
   refresh_token: string;
-}
-
-export const getRawAuthTokenResponse = async ({
-  email,
-  password,
-  baseUrl,
-}: Credentials): Promise<AuthTokens> => {
+  expires_at: Date;
+}> => {
   const browser = await puppeteer.launch({
     headless: true,
     ignoreHTTPSErrors: true,
+    product: 'chrome',
+    executablePath: '/usr/bin/google-chrome',
+    args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
   const page = await browser.newPage();
 
-  await page.goto(baseUrl);
+  await page.goto(adminUrl);
 
   await page.waitForXPath('//*[.="Sign in"]', {
     timeout: 5000,
@@ -85,10 +94,23 @@ export const getRawAuthTokenResponse = async ({
   return rawTokenResponse;
 };
 
-const getAuthTokens = async (credentials: Credentials): Promise<AuthTokens> => {
-  const rawTokenResponse = await getRawAuthTokenResponse(credentials);
-  const { access_token, refresh_token } = rawTokenResponse;
-  return { access_token, refresh_token };
+const getAuthDetails = async (
+  userName: string,
+  email: string,
+  password: string,
+  adminUrl: string,
+): Promise<AuthDetails> => {
+  const authTokens = await getAuthTokens(email, password, adminUrl);
+
+  return {
+    userName,
+    adminUrl,
+    authTokens: {
+      accessToken: authTokens.access_token,
+      refreshToken: authTokens.refresh_token,
+      expiryDate: authTokens.expires_at,
+    },
+  };
 };
 
-export default getAuthTokens;
+export default getAuthDetails;

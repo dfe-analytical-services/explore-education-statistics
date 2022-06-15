@@ -4,9 +4,7 @@ import { check, fail } from 'k6';
 import http from 'k6/http';
 import { Rate } from 'k6/metrics';
 import refreshAuthTokens from '../../auth/refreshAuthTokens';
-import { AuthTokens } from '../../auth/getAuthTokens';
-
-const BASE_URL = 'https://host.docker.internal:5021';
+import { AuthDetails } from '../../auth/getAuthDetails';
 
 export const options = {
   noConnectionReuse: true,
@@ -17,15 +15,16 @@ export const options = {
 export const errorRate = new Rate('errors');
 
 export function setup() {
-  const tokenJson = __ENV.AUTH_TOKENS_AS_JSON as string;
-  return JSON.parse(tokenJson) as AuthTokens;
+  const tokenJson = __ENV.AUTH_DETAILS_AS_JSON as string;
+  const authDetails = JSON.parse(tokenJson) as AuthDetails[];
+  return authDetails.find(details => details.userName === 'bau1');
 }
 
-export default function ({ access_token, refresh_token }: AuthTokens) {
-  const responseWithOriginalAccessToken = http.get(`${BASE_URL}/api/themes`, {
+export default function ({ userName, adminUrl, authTokens }: AuthDetails) {
+  const responseWithOriginalAccessToken = http.get(`${adminUrl}/api/themes`, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${access_token}`,
+      Authorization: `Bearer ${authTokens.accessToken}`,
     },
   });
 
@@ -34,14 +33,15 @@ export default function ({ access_token, refresh_token }: AuthTokens) {
       'response with original access token was 200': res => res.status === 200,
     })
   ) {
-    fail('Failed to successfully use original access_token');
+    fail('Failed to successfully use original accessToken');
   }
 
   const refreshedTokens1 = refreshAuthTokens({
-    baseUrl: BASE_URL,
+    userName,
+    adminUrl,
     clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
     clientSecret: '',
-    refreshToken: refresh_token,
+    refreshToken: authTokens.refreshToken,
   });
 
   if (
@@ -50,16 +50,16 @@ export default function ({ access_token, refresh_token }: AuthTokens) {
     })
   ) {
     fail(
-      'Failed to successfully refresh original access_token with first refresh_token',
+      'Failed to successfully refresh original accessToken with first refreshToken',
     );
   }
 
   if (
     !check(refreshedTokens1!, {
-      'response with refreshed tokens contained a new access_token': tokens =>
-        tokens.access_token.length > 0,
-      'response with refreshed tokens contained a new refresh_token': tokens =>
-        tokens.refresh_token.length > 0,
+      'response with refreshed tokens contained a new accessToken': tokens =>
+        tokens.authTokens.accessToken.length > 0,
+      'response with refreshed tokens contained a new refreshToken': tokens =>
+        tokens.authTokens.refreshToken.length > 0,
     })
   ) {
     fail(
@@ -67,10 +67,10 @@ export default function ({ access_token, refresh_token }: AuthTokens) {
     );
   }
 
-  const responseWithRefreshedAccessToken = http.get(`${BASE_URL}/api/themes`, {
+  const responseWithRefreshedAccessToken = http.get(`${adminUrl}/api/themes`, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${refreshedTokens1!.access_token}`, // or `Bearer ${clientAuthResp.access_token}`
+      Authorization: `Bearer ${refreshedTokens1!.authTokens.accessToken}`, // or `Bearer ${clientAuthResp.accessToken}`
     },
   });
 
@@ -79,14 +79,15 @@ export default function ({ access_token, refresh_token }: AuthTokens) {
       'response with refreshed access token was 200': res => res.status === 200,
     })
   ) {
-    fail('Failed to successfully use refreshed access_token');
+    fail('Failed to successfully use refreshed accessToken');
   }
 
   const refreshedTokens2 = refreshAuthTokens({
-    baseUrl: BASE_URL,
+    userName,
+    adminUrl,
     clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
     clientSecret: '',
-    refreshToken: refreshedTokens1!.refresh_token,
+    refreshToken: refreshedTokens1!.authTokens.refreshToken,
   });
 
   if (
@@ -95,16 +96,16 @@ export default function ({ access_token, refresh_token }: AuthTokens) {
     })
   ) {
     fail(
-      'Failed to successfully re-refresh access_token with second refresh_token',
+      'Failed to successfully re-refresh accessToken with second refreshToken',
     );
   }
 
   if (
     !check(refreshedTokens2!, {
-      'response with re-refreshed tokens contained a new access_token': tokens =>
-        tokens.access_token.length > 0,
-      'response with re-refreshed tokens contained a new refresh_token': tokens =>
-        tokens.refresh_token.length > 0,
+      'response with re-refreshed tokens contained a new accessToken': tokens =>
+        tokens.authTokens.accessToken.length > 0,
+      'response with re-refreshed tokens contained a new refreshToken': tokens =>
+        tokens.authTokens.refreshToken.length > 0,
     })
   ) {
     fail(
@@ -112,10 +113,10 @@ export default function ({ access_token, refresh_token }: AuthTokens) {
     );
   }
 
-  const responseWithRefreshedAccessToken2 = http.get(`${BASE_URL}/api/themes`, {
+  const responseWithRefreshedAccessToken2 = http.get(`${adminUrl}/api/themes`, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${refreshedTokens2!.access_token}`, // or `Bearer ${clientAuthResp.access_token}`
+      Authorization: `Bearer ${refreshedTokens2!.authTokens.accessToken}`, // or `Bearer ${clientAuthResp.accessToken}`
     },
   });
 
@@ -125,6 +126,6 @@ export default function ({ access_token, refresh_token }: AuthTokens) {
         res.status === 200,
     })
   ) {
-    fail('Failed to successfully use re-refreshed access_token');
+    fail('Failed to successfully use re-refreshed accessToken');
   }
 }

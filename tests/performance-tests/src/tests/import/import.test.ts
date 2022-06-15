@@ -3,9 +3,7 @@ import http from 'k6/http';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import refreshAuthTokens from '../../auth/refreshAuthTokens';
-import { AuthTokens } from '../../auth/getAuthTokens';
-
-const BASE_URL = 'https://host.docker.internal:5021';
+import { AuthDetails } from '../../auth/getAuthDetails';
 
 export const options: Options = {
   stages: [{ duration: '60s', target: 10 }],
@@ -25,13 +23,18 @@ const subjectMetaFile = open('import/assets/dates.meta.csv', 'b');
 /* eslint-enable no-restricted-globals */
 
 const performTest = () => {
-  const tokenJson = __ENV.AUTH_TOKENS_AS_JSON as string;
-  const originalTokens = JSON.parse(tokenJson) as AuthTokens;
-  const authTokens = refreshAuthTokens({
-    baseUrl: BASE_URL,
+  const tokenJson = __ENV.AUTH_DETAILS_AS_JSON as string;
+  const originalTokens = JSON.parse(tokenJson) as AuthDetails[];
+  const { adminUrl, userName, authTokens } = originalTokens.find(
+    details => details.userName === 'bau1',
+  ) as AuthDetails;
+
+  const refreshedTokens = refreshAuthTokens({
+    userName,
+    adminUrl,
     clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
     clientSecret: '',
-    refreshToken: originalTokens.refresh_token,
+    refreshToken: authTokens.refreshToken,
   });
 
   if (!authTokens) {
@@ -43,7 +46,7 @@ const performTest = () => {
 
   const params = {
     headers: {
-      Authorization: `Bearer ${authTokens.access_token}`,
+      Authorization: `Bearer ${refreshedTokens?.authTokens.accessToken}`,
     },
   };
 
@@ -54,7 +57,7 @@ const performTest = () => {
   };
 
   const uploadResponse = http.post(
-    `${BASE_URL}/api/release/618d7b90-2950-4eff-0f3f-08da49451279/data?title=${subjectName}`,
+    `${adminUrl}/api/release/618d7b90-2950-4eff-0f3f-08da49451279/data?title=${subjectName}`,
     data,
     params,
   );
@@ -75,7 +78,7 @@ const performTest = () => {
     sleep(1);
 
     const statusResponse = http.get(
-      `${BASE_URL}/api/release/618d7b90-2950-4eff-0f3f-08da49451279/data/${uploadResponse.json(
+      `${adminUrl}/api/release/618d7b90-2950-4eff-0f3f-08da49451279/data/${uploadResponse.json(
         'id',
       )}/import/status`,
       params,

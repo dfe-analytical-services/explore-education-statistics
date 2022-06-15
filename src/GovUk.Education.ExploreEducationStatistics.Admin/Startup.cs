@@ -244,19 +244,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             else
             {
                 identityServerConfig.AddSigningCredentials();
-
-                services.Configure<JwtBearerOptions>(
-                    IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
-                    options =>
-                    {
-                        options.TokenValidationParameters = new TokenValidationParameters
-                        {
-                            ValidateIssuerSigningKey = false,
-                            ValidateIssuer = false,
-                        };
-                    });
             }
 
+            // TODO This means that the site can be accessed from a different domain e.g. an alias in a hosts file????
+            // Might be better to list out ValidIssuers array instead
+            services.Configure<JwtBearerOptions>(
+                IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
+                options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = false,
+                        ValidateIssuer = false,
+                    };
+                });
+            
             services
                 .AddAuthentication()
                 .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))

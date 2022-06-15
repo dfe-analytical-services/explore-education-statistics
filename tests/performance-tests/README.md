@@ -66,7 +66,7 @@ As a usage example:
 
 ```bash
 cd tests/performance-tests
-export AUTH_TOKENS_AS_JSON=$(node dist/logAuthTokens.js <environment> <user name>)
+export AUTH_DETAILS_AS_JSON=$(node dist/logAuthTokens.js <environment> <user name>)
 ```
 
 This obtains an `access_token` and a `refresh_token` that can be used to access protected resources
@@ -81,7 +81,7 @@ As a concrete example:
 
 ```bash
 cd tests/performance-tests
-export AUTH_TOKENS_AS_JSON=$(node dist/logAuthTokens.js local bau1)
+export AUTH_DETAILS_AS_JSON=$(node dist/logAuthDetails.js local bau1)
 ```
 
 #### Run individual tests

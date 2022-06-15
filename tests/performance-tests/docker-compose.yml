@@ -32,17 +32,32 @@ services:
       - influxdb
       - grafana
     # Add the host IP address to the k6 container to allow it to connect to the host 
-    # when developing performance tests locally.
+    # when running and developing performance tests locally.
     extra_hosts:
-      - host.docker.internal:host-gateway
+      - ees.local:host-gateway
     networks: 
       - k6_performance_test_network
     environment:
       - K6_OUT=influxdb=http://influxdb:8086/k6
-      - AUTH_TOKENS_AS_JSON
+      - AUTH_DETAILS_AS_JSON
     volumes:
       - ./dist:/dist
     working_dir: /
+
+  node:
+    build:
+      dockerfile: Dockerfile-node-chromium
+      context: .
+    # Add the host IP address to the Node container to allow it to connect to the host 
+    # when running scripts that access the local environment.
+    extra_hosts:
+      - ees.local:host-gateway
+    networks:
+      - k6_performance_test_network
+    volumes:
+      - ./:/home/node/app
+    working_dir:
+      /home/node/app
   
 networks:
   k6_performance_test_network:
@@ -52,4 +67,4 @@ networks:
         # rules to this IP range. This is to allow the k6 container to connect to the 
         # host machine on specific ports after port access hass been allowed for this 
         # IP range.
-        - subnet: 172.30.0.0/16   
+        - subnet: 172.30.0.0/16

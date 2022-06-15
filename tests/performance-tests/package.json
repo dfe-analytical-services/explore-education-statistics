@@ -28,7 +28,9 @@
     "webpack-glob-entries": "^1.0.1"
   },
   "scripts": {
-    "webpack": "webpack"
+    "webpack": "webpack",
+    "logAuthTokenResponse": "docker-compose run node -r source-map-support/register dist/logAuthTokenResponse.js",
+    "logAuthDetails": "docker-compose run node -r source-map-support/register dist/logAuthDetails.js"
   },
   "dependencies": {
     "source-map-support": "^0.5.21"
