@@ -220,7 +220,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var result = await controller.ClearPublicCacheTrees(
                 new ClearPublicCacheTreePathsViewModel
                 {
-                    Paths = SetOf("publication-tree-any-data.json"),
+                    Paths = SetOf("publication-tree.json")
                 }
             );
 
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             Assert.Single(paths);
-            Assert.Equal("publication-tree-any-data.json", paths[0]);
+            Assert.Equal("publication-tree.json", paths[0]);
         }
 
         [Fact]
@@ -251,8 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     Paths = new HashSet<string>
                     {
                         "publication-tree.json",
-                        "publication-tree-any-data.json",
-                        "publication-tree-latest-data.json"
+                        "methodology-tree.json"
                     }
                 }
             );
@@ -261,10 +260,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             MockUtils.VerifyAllMocks(publicBlobStorageService);
 
-            Assert.Equal(3, paths.Count);
+            Assert.Equal(2, paths.Count);
             Assert.Equal("publication-tree.json", paths[0]);
-            Assert.Equal("publication-tree-any-data.json", paths[1]);
-            Assert.Equal("publication-tree-latest-data.json", paths[2]);
+            Assert.Equal("methodology-tree.json", paths[1]);
         }
 
         [Fact]
