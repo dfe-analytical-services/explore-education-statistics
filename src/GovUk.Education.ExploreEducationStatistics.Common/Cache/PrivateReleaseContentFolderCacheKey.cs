@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             ReleaseId = releaseId;
         }
 
-        public string Key => PrivateContentReleaseParentPath(ReleaseId);
+        public string Key => $"{ReleasesDirectory}/{ReleaseId}";
 
         public IBlobContainer Container => PrivateContent;
     }

@@ -11,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public const string DataBlocksDirectory = "data-blocks";
         [Obsolete("EES-2865 - Remove with other fast track code")]
         public const string FastTrackResultsDirectory = "fast-track-results";
+        public const string ReleasesDirectory = "releases";
         public const string SubjectMetaDirectory = "subject-meta";
 
         public static string PublicContentStagingPath()
@@ -38,21 +39,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return $"{PublicContentReleaseFastTrackPath(releaseId, prefix)}/{id}.json";
         }
 
-        public static string PrivateContentReleaseParentPath(Guid releaseId)
-        {
-            return $"releases/{releaseId}";
-        }
-
-        public static string PublicContentPublicationParentPath(string slug, string? prefix = null)
+        private static string PublicContentPublicationParentPath(string slug, string? prefix = null)
         {
             return $"{PublicContentPublicationsPath(prefix)}/{slug}";
         }
 
-        public static string PublicContentReleaseParentPath(string publicationSlug,
+        private static string PublicContentReleaseParentPath(string publicationSlug,
             string releaseSlug,
             string? prefix = null)
         {
-            return $"{PublicContentPublicationParentPath(publicationSlug, prefix)}/releases/{releaseSlug}";
+            return $"{PublicContentPublicationParentPath(publicationSlug, prefix)}/{ReleasesDirectory}/{releaseSlug}";
         }
 
         public static string PublicContentPublicationPath(string slug, string? prefix = null)
@@ -67,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public static string PublicContentReleasePath(string publicationSlug, string releaseSlug, string? prefix = null)
         {
-            return $"{PublicContentPublicationParentPath(publicationSlug, prefix)}/releases/{releaseSlug}.json";
+            return $"{PublicContentPublicationParentPath(publicationSlug, prefix)}/{ReleasesDirectory}/{releaseSlug}.json";
         }
 
         public static string PublicContentDataBlockParentPath(string publicationSlug, string releaseSlug)
@@ -77,14 +73,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
         public static string PrivateContentDataBlockPath(Guid releaseId, Guid dataBlockId)
         {
-            return
-                $"{PrivateContentReleaseParentPath(releaseId)}/{DataBlocksDirectory}/{dataBlockId}.json";
+            return $"{ReleasesDirectory}/{releaseId}/{DataBlocksDirectory}/{dataBlockId}.json";
         }
 
         public static string PrivateContentSubjectMetaPath(Guid releaseId, Guid subjectId)
         {
-            return
-                $"{PrivateContentReleaseParentPath(releaseId)}/{SubjectMetaDirectory}/{subjectId}.json";
+            return $"{ReleasesDirectory}/{releaseId}/{SubjectMetaDirectory}/{subjectId}.json";
         }
 
         public static string PublicContentDataBlockPath(
