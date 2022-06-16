@@ -266,6 +266,12 @@ export const testPublicationRelease: Release = {
     heading: '',
     content: [],
   },
+  relatedDashboardsSection: {
+    id: '',
+    order: 0,
+    heading: '',
+    content: [],
+  },
   publication: {
     id: '',
     slug: '',

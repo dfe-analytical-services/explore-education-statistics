@@ -12,6 +12,7 @@ export type ContentSectionKeys = keyof Pick<
   | 'keyStatisticsSection'
   | 'keyStatisticsSecondarySection'
   | 'headlinesSection'
+  | 'relatedDashboardsSection'
   | 'content'
 >;
 
