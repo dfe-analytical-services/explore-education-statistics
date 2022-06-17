@@ -34,6 +34,16 @@ const projects = {
     command: 'dotnet build && dotnet run',
     colour: chalk.green,
   },
+  adminKeycloak: {
+    path: path.join(
+      projectRoot,
+      'src/GovUk.Education.ExploreEducationStatistics.Admin',
+    ),
+    command:
+      'export IdpProviderConfiguration=Keycloak && dotnet build && dotnet run',
+
+    colour: chalk.green,
+  },
   frontend: {
     path: path.join(projectRoot, 'src/explore-education-statistics-frontend'),
     command: 'npm run start:local',

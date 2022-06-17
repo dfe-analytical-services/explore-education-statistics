@@ -163,27 +163,33 @@ If you wish use a different identity provider (e.g. working outside the team), y
 - Any OpenID Connect compatible identity provider e.g. Active Directory. It must have Implicit Flow 
   enabled and be using the OpenID Connect protocol. It must be set to issue ID Tokens.
 
-#### Using Keycloak identity provider
+#### Using Keycloak identity provider with seed data users
+
+All the standard seed data users can be supported with Keycloak, and use their standard email addresses and the 
+password `password` to log in.
+
+The [Keycloak Admin login](http://localhost:5030/auth/admin/) is available with username `admin` and password 
+`admin`.  From here, users and Open ID COnnect settings can be administered.
 
 1. To run the out-of-the-box Keycloak identity provider:
 
-   ```bash
-   cd src/
-   docker-compose up -d idp
-   ```
+  ```bash
+  cd useful-scripts/
+  ./run.js idp
+  ```
    
-   or
-   
-   ```bash
-   cd useful-scripts/
-   ./run.js idp
-   ```
-  
 2. To then get the other service components to use Keycloak, set the following environment variable:
 
    ```
    IdpProviderConfiguration=Keycloak
    ```
+   
+e.g. 
+
+  ```bash
+  cd useful-scripts/
+  ./run.js adminKeycloak # this sets the environment variable for us
+  ```
 
 Additionally, if wanting to set up a set of Keycloak users automatically in the service in order
 to start using the service against an empty set of databases, set the following environment variable:
