@@ -492,7 +492,7 @@
     "emailVerified" : true,
     "firstName" : "Prerelease1",
     "lastName" : "User1",
-    "email" : "ees-test.prerelease1@education.gov.uk",
+    "email" : "ees-prerelease1@education.gov.uk",
     "credentials" : [ {
       "id" : "aaeef1b2-0dff-443a-bf6b-6dad1be09fed",
       "type" : "password",
@@ -514,7 +514,7 @@
     "emailVerified" : true,
     "firstName" : "Prerelease2",
     "lastName" : "User2",
-    "email" : "ees-test.prerelease2@education.gov.uk",
+    "email" : "ees-prerelease2@education.gov.uk",
     "credentials" : [ {
       "id" : "7020a73e-a34a-41ec-b825-d4ccd648ecc9",
       "type" : "password",
