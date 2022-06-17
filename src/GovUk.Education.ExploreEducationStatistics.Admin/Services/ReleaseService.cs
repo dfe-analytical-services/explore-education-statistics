@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -19,6 +19,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -44,8 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ISubjectRepository _subjectRepository;
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleaseFileService _releaseFileService;
-        private readonly IDataImportService _dataImportService;
-	    private readonly IFootnoteService _footnoteService;
+        private readonly IDataImportService _dataImportService; 
+        private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
         private readonly IGuidGenerator _guidGenerator;
@@ -165,7 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanDeleteRelease)
                 .OnSuccessDo(async release => await _cacheService.DeleteCacheFolder(
-                    new ReleaseContentFolderCacheKey(release.PublicationId, release.Id)))
+                    new PrivateReleaseContentFolderCacheKey(release.Id)))
                 .OnSuccessDo(async () => await _releaseDataFileService.DeleteAll(releaseId))
                 .OnSuccessDo(async () => await _releaseFileService.DeleteAll(releaseId))
                 .OnSuccessVoid(async release =>
@@ -456,7 +457,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 })
                 .OnSuccess(_ => GetDeleteDataFilePlan(releaseId, fileId))
                 .OnSuccessDo(deletePlan => _dataBlockService.DeleteDataBlocks(deletePlan.DeleteDataBlockPlan))
-                .OnSuccessVoid(deletePlan => _releaseSubjectRepository.SoftDeleteReleaseSubject(releaseId, deletePlan.SubjectId))
+                .OnSuccessVoid(async deletePlan =>
+                {
+                    await _releaseSubjectRepository.SoftDeleteReleaseSubject(releaseId, deletePlan.SubjectId);
+                    await _cacheService.DeleteItem(new PrivateSubjectMetaCacheKey(releaseId, deletePlan.SubjectId));
+                })
                 .OnSuccess(() => _releaseDataFileService.Delete(releaseId, fileId));
         }
 

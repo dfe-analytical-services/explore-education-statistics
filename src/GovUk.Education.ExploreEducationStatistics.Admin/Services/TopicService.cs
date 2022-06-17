@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Metho
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Validators;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -240,7 +241,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return await _releaseDataFileService.DeleteAll(releaseId, forceDelete: true)
                 .OnSuccessDo(() => _releaseFileService.DeleteAll(releaseId, forceDelete: true))
-                .OnSuccessDo(() => DeleteCachedReleaseContent(releaseId, contentRelease.PublicationId))
+                .OnSuccessDo(() => DeleteCachedReleaseContent(releaseId))
                 .OnSuccessVoid(async () =>
                 {
                     _contentContext.Releases.Remove(contentRelease);
@@ -250,9 +251,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        private Task DeleteCachedReleaseContent(Guid releaseId, Guid publicationId)
+        private Task DeleteCachedReleaseContent(Guid releaseId)
         {
-            return _cacheService.DeleteCacheFolder(new ReleaseContentFolderCacheKey(publicationId, releaseId));
+            return _cacheService.DeleteCacheFolder(new PrivateReleaseContentFolderCacheKey(releaseId));
         }
 
         private async Task DeleteSoftDeletedContentDbRelease(Guid releaseId)

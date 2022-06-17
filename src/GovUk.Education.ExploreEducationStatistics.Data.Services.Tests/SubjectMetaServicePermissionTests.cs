@@ -3,6 +3,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
@@ -122,6 +123,7 @@ public class SubjectMetaServicePermissionTests
     private static SubjectMetaService SetupSubjectMetaService(
         StatisticsDbContext? statisticsDbContext = null,
         IPersistenceHelper<StatisticsDbContext>? statisticsPersistenceHelper = null,
+        IBlobCacheService? cacheService = null,
         IFilterRepository? filterRepository = null,
         IFilterItemRepository? filterItemRepository = null,
         IIndicatorGroupRepository? indicatorGroupRepository = null,
@@ -135,6 +137,7 @@ public class SubjectMetaServicePermissionTests
         return new(
             statisticsPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
             statisticsDbContext ?? Mock.Of<StatisticsDbContext>(Strict),
+            cacheService ?? Mock.Of<IBlobCacheService>(Strict), 
             filterRepository ?? Mock.Of<IFilterRepository>(Strict),
             filterItemRepository ?? Mock.Of<IFilterItemRepository>(Strict),
             indicatorGroupRepository ?? Mock.Of<IIndicatorGroupRepository>(Strict),

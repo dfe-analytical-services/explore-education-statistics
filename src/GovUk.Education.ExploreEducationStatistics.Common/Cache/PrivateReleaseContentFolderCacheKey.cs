@@ -1,25 +1,21 @@
 #nullable enable
 using System;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
-namespace GovUk.Education.ExploreEducationStatistics.Admin.Cache
+namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 {
-    public class ReleaseContentFolderCacheKey : IBlobCacheKey
+    public record PrivateReleaseContentFolderCacheKey : IBlobCacheKey
     {
-        private Guid PublicationId { get; }
-
         private Guid ReleaseId { get; }
 
-        public ReleaseContentFolderCacheKey(Guid publicationId, Guid releaseId)
+        public PrivateReleaseContentFolderCacheKey(Guid releaseId)
         {
-            PublicationId = publicationId;
             ReleaseId = releaseId;
         }
 
-        public string Key => PrivateContentReleaseParentPath(PublicationId, ReleaseId);
+        public string Key => $"{ReleasesDirectory}/{ReleaseId}";
 
         public IBlobContainer Container => PrivateContent;
     }

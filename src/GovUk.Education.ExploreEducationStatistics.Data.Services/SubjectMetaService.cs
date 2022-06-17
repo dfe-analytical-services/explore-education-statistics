@@ -8,11 +8,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels.Meta;
@@ -38,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         private readonly IPersistenceHelper<StatisticsDbContext> _persistenceHelper;
         private readonly StatisticsDbContext _statisticsDbContext;
+        private readonly IBlobCacheService _cacheService;
         private readonly IFilterRepository _filterRepository;
         private readonly IFilterItemRepository _filterItemRepository;
         private readonly IIndicatorGroupRepository _indicatorGroupRepository;
@@ -51,6 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
         public SubjectMetaService(IPersistenceHelper<StatisticsDbContext> persistenceHelper,
             StatisticsDbContext statisticsDbContext,
+            IBlobCacheService cacheService,
             IFilterRepository filterRepository,
             IFilterItemRepository filterItemRepository,
             IIndicatorGroupRepository indicatorGroupRepository,
@@ -64,6 +68,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         {
             _persistenceHelper = persistenceHelper;
             _statisticsDbContext = statisticsDbContext;
+            _cacheService = cacheService;
             _filterRepository = filterRepository;
             _filterItemRepository = filterItemRepository;
             _indicatorGroupRepository = indicatorGroupRepository;
@@ -121,6 +126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             ))
                         .ToList();
                     await _statisticsDbContext.SaveChangesAsync();
+                    await InvalidateCachedReleaseSubjectMetadata(releaseId, subjectId);
                 });
         }
 
@@ -142,6 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             ))
                         .ToList();
                     await _statisticsDbContext.SaveChangesAsync();
+                    await InvalidateCachedReleaseSubjectMetadata(releaseId, subjectId);
                 });
         }
 
@@ -290,6 +297,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 )
                 : await _releaseSubjectRepository.GetReleaseSubjectForLatestPublishedVersion(subjectId) ??
                   new Either<ActionResult, ReleaseSubject>(new NotFoundResult());
+        }
+
+        private Task InvalidateCachedReleaseSubjectMetadata(Guid releaseId, Guid subjectId)
+        {
+            return _cacheService.DeleteItem(new PrivateSubjectMetaCacheKey(releaseId, subjectId));
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateFiltersForSubject(

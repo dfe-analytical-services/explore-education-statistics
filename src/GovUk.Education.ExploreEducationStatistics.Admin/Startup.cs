@@ -153,6 +153,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
 
+            // Adds Brotli and Gzip compressing
+            services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+            });
+
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
@@ -588,6 +594,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     opts.Preload();
                 });
             }
+
+            app.UseResponseCompression();
 
             if (Configuration.GetValue<bool>("enableSwagger"))
             {
