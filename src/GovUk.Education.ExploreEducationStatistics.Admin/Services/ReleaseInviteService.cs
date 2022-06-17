@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
+        private readonly IUserRoleService _userRoleService;
         private readonly IUserInviteRepository _userInviteRepository;
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
@@ -37,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IUserRepository userRepository,
             IUserService userService,
+            IUserRoleService userRoleService,
             IUserInviteRepository userInviteRepository,
             IUserReleaseInviteRepository userReleaseInviteRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
@@ -48,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentPersistenceHelper = contentPersistenceHelper;
             _userRepository = userRepository;
             _userService = userService;
+            _userRoleService = userRoleService;
             _userInviteRepository = userInviteRepository;
             _userReleaseInviteRepository = userReleaseInviteRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
@@ -169,7 +172,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 createdById: _userService.GetUserId()
             );
 
-            return Unit.Instance;
+            var globalRoleNameToSet = _userRoleService
+                .GetAssociatedGlobalRoleNameForReleaseRole(Contributor);
+            return await _userRoleService.UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, userId);
         }
 
         private async Task<Either<ActionResult, Publication>> ValidateReleaseIds(Publication publication,

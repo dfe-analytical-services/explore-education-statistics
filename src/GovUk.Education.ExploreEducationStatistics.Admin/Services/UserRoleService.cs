@@ -157,6 +157,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             }
         }
 
+        public async Task<Either<ActionResult, Unit>> UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, Guid userId)
+        {
+            return await _usersAndRolesPersistenceHelper
+                .CheckEntityExists<ApplicationUser, string>(userId.ToString())
+                .OnSuccessVoid(user => UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, user));
+        }
+
         private async Task UpgradeToGlobalRoleIfRequired(string globalRoleNameToSet, ApplicationUser user)
         {
             var existingRoleNames = await _identityUserManager
@@ -216,7 +223,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return requiredGlobalRoleNames;
         }
 
-        private string GetAssociatedGlobalRoleNameForReleaseRole(ReleaseRole role)
+        public string GetAssociatedGlobalRoleNameForReleaseRole(ReleaseRole role)
         {
             switch (role)
             {
