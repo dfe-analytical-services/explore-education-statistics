@@ -15,6 +15,7 @@ const path = require('path');
 const chalk = require('chalk');
 const spawn = require('cross-spawn');
 const { StringStream } = require('scramjet');
+const os = require('os');
 
 const args = process.argv.slice(2);
 
@@ -24,6 +25,8 @@ if (!process.env.ASPNETCORE_ENVIRONMENT) {
 }
 
 const projectRoot = path.resolve(__dirname, '..');
+
+const isWindows = os.platform() === 'win32';
 
 const projects = {
   admin: {
@@ -39,9 +42,9 @@ const projects = {
       projectRoot,
       'src/GovUk.Education.ExploreEducationStatistics.Admin',
     ),
-    command:
-      'export IdpProviderConfiguration=Keycloak && dotnet build && dotnet run',
-
+    command: isWindows
+      ? 'SET "IdpProviderConfiguration=Keycloak" && dotnet build && dotnet run'
+      : 'export IdpProviderConfiguration=Keycloak && dotnet build && dotnet run',
     colour: chalk.green,
   },
   frontend: {
