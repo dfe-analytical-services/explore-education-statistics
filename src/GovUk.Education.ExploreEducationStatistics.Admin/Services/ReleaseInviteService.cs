@@ -174,9 +174,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             var globalRoleNameToSet = _userRoleService
                 .GetAssociatedGlobalRoleNameForReleaseRole(Contributor);
-            await _userRoleService.UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, userId);
-
-            return Unit.Instance;
+            return await _userRoleService.UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, userId);
         }
 
         private async Task<Either<ActionResult, Publication>> ValidateReleaseIds(Publication publication,

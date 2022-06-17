@@ -1317,14 +1317,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task UpgradeToGlobalRoleIfRequired_NoUser()
         {
-            var userAndRolesDbContextId = Guid.NewGuid().ToString();
-            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(userAndRolesDbContextId))
-            {
-                var service = SetupUserRoleService(usersAndRolesDbContext: userAndRolesDbContext);
+            var service = SetupUserRoleService();
 
-                var result = await service.UpgradeToGlobalRoleIfRequired(RoleNames.Analyst, Guid.NewGuid());
-                result.AssertNotFound();
-            }
+            var result = await service.UpgradeToGlobalRoleIfRequired(RoleNames.Analyst, Guid.NewGuid());
+            result.AssertNotFound();
         }
 
         [Fact]
