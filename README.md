@@ -169,7 +169,7 @@ All the standard seed data users can be supported with Keycloak, and use their s
 password `password` to log in.
 
 The [Keycloak Admin login](http://localhost:5030/auth/admin/) is available with username `admin` and password 
-`admin`.  From here, users and Open ID COnnect settings can be administered.
+`admin`.  From here, users and Open ID Connect settings can be administered.
 
 1. To run the out-of-the-box Keycloak identity provider:
 
