@@ -474,6 +474,10 @@ user clicks element
 user clicks link
     [Arguments]    ${text}    ${parent}=css:body
     user clicks element    xpath:.//a[text()="${text}"]    ${parent}
+    
+user clicks link by visible text
+    [Arguments]    ${text}    ${parent}=css:body
+    user clicks element    xpath:.//a[text()="${text}"]    ${parent}
 
 user clicks button
     [Arguments]    ${text}    ${parent}=css:body

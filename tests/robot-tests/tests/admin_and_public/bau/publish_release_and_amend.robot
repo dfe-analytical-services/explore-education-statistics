@@ -11,10 +11,12 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - publish release %{RUN_IDENTIFIER}
 ${RELEASE_NAME}=        Financial Year 3000-01
 ${DATABLOCK_NAME}=      Dates data block name
+
 
 *** Test Cases ***
 Create new publication for "UI tests topic" topic
@@ -263,7 +265,7 @@ Verify Dates data block accordion section
     user checks chart title contains    ${section}    Dates table title
     user checks infographic chart contains alt    ${section}    Sample alt text
 
-    user clicks link    Table    ${section}
+    user clicks link by visible text    Table    ${section}
     user waits until parent contains element    ${section}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Dates table title"]
     user waits until parent contains element    ${section}    xpath:.//*[.="Source: Dates source"]
@@ -607,7 +609,7 @@ Verify amendment Dates data block accordion section
     user checks chart title contains    ${section}    Updated sample title
     user checks infographic chart contains alt    ${section}    Updated sample alt text
 
-    user clicks link    Table    ${section}
+    user clicks link by visible text    Table    ${section}
     user waits until parent contains element    ${section}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
     user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]

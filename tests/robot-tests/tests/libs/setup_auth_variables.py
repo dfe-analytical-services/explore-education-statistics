@@ -6,7 +6,7 @@ import json
 from scripts.get_auth_tokens import get_identity_info
 
 
-def setup_auth_variables(user, email, password, clear_existing=False, driver=None) \
+def setup_auth_variables(user, email, password, identity_provider, clear_existing=False, driver=None) \
         -> Tuple[str, str]:
     assert user, 'user param must be set'
     assert email, 'email param must be set'
@@ -68,7 +68,8 @@ def setup_auth_variables(user, email, password, clear_existing=False, driver=Non
             url=admin_url,
             email=email,
             password=password,
-            driver=driver
+            driver=driver,
+            identity_provider=identity_provider
         )
 
         # Cache auth info to files for efficiency
