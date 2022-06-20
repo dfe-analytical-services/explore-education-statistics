@@ -3,20 +3,20 @@
 import getAuthDetails from './getAuthDetails';
 
 export interface User {
-  userName: string;
+  name: string;
   email: string;
   password: string;
 }
 
-interface Environment {
+export interface Environment {
   adminUrl: string;
   users: User[];
 }
 
 const logAuthDetails = async (users: User[]) => {
   const authTokens = await Promise.all(
-    users.map(async ({ userName, email, password }) => {
-      return getAuthDetails(userName, email, password, env.adminUrl);
+    users.map(async ({ name, email, password }) => {
+      return getAuthDetails(name, email, password, env.adminUrl);
     }),
   );
 
@@ -32,7 +32,7 @@ require('dotenv-json-complex')({ environment });
 const env = JSON.parse(process.env.environment as string) as Environment;
 
 const userDetails = userNames.length
-  ? env.users.filter(u => userNames.includes(u.userName))
+  ? env.users.filter(u => userNames.includes(u.name))
   : env.users;
 
 logAuthDetails(userDetails);

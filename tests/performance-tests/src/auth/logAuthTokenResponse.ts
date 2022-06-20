@@ -1,17 +1,7 @@
 #!/usr/bin/env node
 
 import { getAuthTokens } from './getAuthDetails';
-
-interface User {
-  name: string;
-  email: string;
-  password: string;
-}
-
-interface Environment {
-  adminUrl: string;
-  users: User[];
-}
+import { Environment, User } from './logAuthDetails';
 
 const logAuthTokenResponse = async (
   email: string,

@@ -27,10 +27,20 @@
     "webpack-cli": "^4.10.0",
     "webpack-glob-entries": "^1.0.1"
   },
+  "config": { 
+    "environment" : "local",
+    "users": "bau1"
+  },
   "scripts": {
     "webpack": "webpack",
-    "logAuthTokenResponse": "docker-compose run node -r source-map-support/register dist/logAuthTokenResponse.js",
-    "logAuthDetails": "docker-compose run node -r source-map-support/register dist/logAuthDetails.js"
+    "start": "docker-compose up -d influxdb grafana",
+    "stop": "docker-compose down influxdb grafana",
+    "stop-and-clear-data": "docker-compose -v down influxdb grafana",
+    "log-auth-token-response": "docker-compose run node -r source-map-support/register dist/logAuthTokenResponse.js $npm_package_config_environment $npm_package_config_users",
+    "log-auth-details": "docker-compose run node -r source-map-support/register dist/logAuthDetails.js ${npm_package_config_environment} ${npm_package_config_users}",
+    "get-auth-details": "export AUTH_DETAILS_AS_JSON=$(npm run log-auth-details ${npm_package_config_environment} ${npm_package_config_users})",
+    "env": "echo $npm_package_config_environment",
+    "test": "docker-compose run k6 run"
   },
   "dependencies": {
     "source-map-support": "^0.5.21"

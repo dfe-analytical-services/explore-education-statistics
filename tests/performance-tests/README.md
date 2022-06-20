@@ -20,6 +20,17 @@ You will need the following dependencies to run the tests successfully:
 
 ## Running the tests
 
+NOTE: All commands in this README are issued from the `tests/performance-tests` folder.
+
+### Add ees.local to hosts file (optional)
+
+This step is only necessary if running tests against the host machine. Add the following line to
+your hosts file:
+
+```
+127.0.0.1    ees.local
+```
+
 ### Start InfluxDB and Grafana (optional)
 
 Note that this step isn't strictly necessary if we're not wanting to record metrics whilst
@@ -27,10 +38,10 @@ generating load - the tests can run independently of these if we're just wanting
 some load, for example.
 
 ```bash
-cd tests/performance-tests
-docker-compose up influxdb grafana # use "docker-compose -d up influxdb grafana" instead if 
-                                   # wanting to run in daemon mode
+npm start
 ```
+
+To stop them later, run `npm stop`. Note that this will not destroy any data. To remove any data, run `npm run stop-and-clear-data`. 
 
 ### Compile the tests
 
@@ -38,7 +49,6 @@ The tests are written in Typescript so we need to transpile them to work in K6 (
 Go-based, not Node JS-based). We use Webpack and Babel for this.
 
 ```bash
-cd tests/performance-tests
 npm run webpack # use "npm run webpack watch" instead if wanting to continue running webpack 
                 # repeatedly during test development 
 ```
@@ -57,16 +67,29 @@ be any value that we can load test against. As an example, if doing load testing
 development against a local environment, we would create a file called
 `tests/performance-tests/.env.local.json` and supply the local user credentials within the file.
 
+#### Allow access to host ports from containers (optional) 
+
+This step is only required if running performance tests locally against the host machine.
+
+If running Ubuntu and running the tests against your local machine, ports under test from K6
+will be protected by default by `Ubuntu Firewall`.
+
+To grant access to these ports from containers on the 
+[K6 subnet as defined in docker-compose.yml](tests/performance-tests/docker-compose.yml), 
+run the following commands:
+
+```bash
+sudo ufw allow from 172.30.0.0/24 to any port 5021
+sudo ufw allow from 172.30.0.0/24 to any port 3000
+```
+
 #### Obtain auth tokens for Admin testing (optional)
 
 This step is only required if running performance tests that require access to the Admin API.
 It requires the above step of creating environment-specific .env.json files first.
 
-As a usage example:
-
 ```bash
-cd tests/performance-tests
-export AUTH_DETAILS_AS_JSON=$(node dist/logAuthTokens.js <environment> <user name>)
+npm run get-auth-details <environment> <user name>
 ```
 
 This obtains an `access_token` and a `refresh_token` that can be used to access protected resources
@@ -78,10 +101,8 @@ that user's credentials to log into Admin in order to obtain their auth tokens.
 
 As a concrete example:
 
-
 ```bash
-cd tests/performance-tests
-export AUTH_DETAILS_AS_JSON=$(node dist/logAuthDetails.js local bau1)
+npm run get-auth-details local bau1
 ```
 
 #### Run individual tests
