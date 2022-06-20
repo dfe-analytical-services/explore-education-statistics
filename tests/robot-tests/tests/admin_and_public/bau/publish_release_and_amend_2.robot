@@ -9,14 +9,12 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-
 *** Variables ***
 ${RELEASE_NAME}         Academic Year Q1 2020/21
 ${PUBLICATION_NAME}     UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}         Seven filters
 ${SECOND_SUBJECT}       upload file test
 ${THIRD_SUBJECT}        upload file test with filter subject
-
 
 *** Test Cases ***
 Create publication
@@ -112,8 +110,7 @@ Go to public Table Tool page
 Select "Test Topic" publication
     environment variable should be set    TEST_THEME_NAME
     environment variable should be set    TEST_TOPIC_NAME
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user clicks radio    %{TEST_THEME_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Choose a subject
@@ -373,8 +370,7 @@ Check the table has the same results as original table
 Check amended release doesn't contain deleted subject
     user navigates to public frontend    %{PUBLIC_URL}/data-tables
     user waits until h1 is visible    Create your own tables
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user clicks radio    %{TEST_THEME_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Choose a subject
@@ -434,8 +430,7 @@ Go to public Table Tool page for amendment
     user waits until h1 is visible    Create your own tables
 
 Select publication
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user clicks radio    %{TEST_THEME_NAME}
     user clicks radio    ${PUBLICATION_NAME}
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Choose a subject

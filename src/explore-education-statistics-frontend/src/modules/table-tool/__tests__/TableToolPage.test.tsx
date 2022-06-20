@@ -5,7 +5,7 @@ import {
   SubjectMeta,
 } from '@common/services/tableBuilderService';
 import { Theme } from '@common/services/themeService';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import preloadAll from 'jest-next-dynamic';
 import TableToolPage from '@frontend/modules/table-tool/TableToolPage';
@@ -362,14 +362,34 @@ describe('TableToolPage', () => {
       'aria-current',
       'step',
     );
-    expect(screen.getByLabelText('Test publication')).not.toBeVisible();
+    const themeRadios = within(
+      screen.getByRole('group', { name: 'Select a theme' }),
+    ).getAllByRole('radio');
+    expect(themeRadios).toHaveLength(1);
+    expect(themeRadios[0]).toEqual(
+      screen.getByRole('radio', { name: 'Pupils and schools' }),
+    );
 
-    userEvent.click(screen.getByRole('button', { name: 'Pupils and schools' }));
-    userEvent.click(screen.getByRole('button', { name: 'Admission appeals' }));
+    expect(
+      screen.queryByRole('radio', {
+        name: 'Test publication',
+      }),
+    ).not.toBeInTheDocument();
 
-    // Check there is only one radio for the publication
-    expect(screen.getAllByRole('radio', { hidden: true })).toHaveLength(1);
-    expect(screen.getByLabelText('Test publication')).toBeVisible();
+    userEvent.click(screen.getByRole('radio', { name: 'Pupils and schools' }));
+
+    // Check there is only one radio for the publication;
+    const publicationRadios = within(
+      screen.getByRole('group', {
+        name: /Select a publication/,
+      }),
+    ).queryAllByRole('radio');
+    expect(publicationRadios).toHaveLength(1);
+    expect(publicationRadios[0]).toEqual(
+      screen.getByRole('radio', {
+        name: 'Test publication',
+      }),
+    );
   });
 
   test('renders the page correctly with pre-selected publication', async () => {

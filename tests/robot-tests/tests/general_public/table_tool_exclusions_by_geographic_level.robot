@@ -7,14 +7,12 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev
 
-
 *** Test Cases ***
 Go to Table Tool page
     user navigates to data tables page on public frontend
 
 Select Exclusions publication
-    user opens details dropdown    Pupils and schools
-    user opens details dropdown    Exclusions
+    user clicks radio    Pupils and schools
     user clicks radio    Permanent and fixed-period exclusions in England
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Choose a subject

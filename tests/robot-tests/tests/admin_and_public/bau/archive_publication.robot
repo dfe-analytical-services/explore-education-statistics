@@ -9,7 +9,6 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
-
 *** Variables ***
 ${PUBLICATION_NAME_ARCHIVE}=        UI tests - archived publication %{RUN_IDENTIFIER}
 ${RELEASE_NAME_ARCHIVE}=            Financial Year 3000-01
@@ -18,7 +17,6 @@ ${SUBJECT_NAME_ARCHIVE}=            Subject for archived publication
 ${PUBLICATION_NAME_SUPERSEDE}=      UI tests - superseding publication %{RUN_IDENTIFIER}
 ${RELEASE_NAME_SUPERSEDE}=          Financial Year 2000-01
 ${SUBJECT_NAME_SUPERSEDE}=          Subject for superseding publication
-
 
 *** Test Cases ***
 Create new publication to be archived and release via API
@@ -87,8 +85,7 @@ Validate that archive-publication appears correctly on Find stats page
 Check that archive-publication subject appears correctly on Data tables page
     user navigates to data tables page on public frontend
 
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user clicks radio    %{TEST_THEME_NAME}
 
     user checks page does not contain    ${PUBLICATION_NAME_SUPERSEDE}
 
@@ -137,8 +134,7 @@ Generate permalink for archive-publication
 Check that archive-publication subject appears correctly on Data catalogue page
     user navigates to data catalogue page on public frontend
 
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user clicks radio    %{TEST_THEME_NAME}
 
     user checks page contains    ${PUBLICATION_NAME_ARCHIVE}
     user checks page does not contain    ${PUBLICATION_NAME_SUPERSEDE}
@@ -202,8 +198,7 @@ Check public archive-publication release page displays correctly
 Check public data tables page contains superseding-publication's subject
     user navigates to data tables page on public frontend
 
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user clicks radio    %{TEST_THEME_NAME}
 
     user checks page does not contain    ${PUBLICATION_NAME_ARCHIVE}
 
@@ -217,8 +212,7 @@ Check public data tables page contains superseding-publication's subject
 Check data catalogue page contains archive and superseding publication subjects
     user navigates to data catalogue page on public frontend
 
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user clicks radio    %{TEST_THEME_NAME}
 
     user checks page contains    ${PUBLICATION_NAME_ARCHIVE}
     user checks page contains    ${PUBLICATION_NAME_SUPERSEDE}
@@ -239,8 +233,9 @@ Check data catalogue page contains archive and superseding publication subjects
     user checks page contains    This is not the latest data
 
     user clicks button    Change publication
-    user waits until page contains    ${PUBLICATION_NAME_SUPERSEDE}
+    user waits until page contains    Choose a publication
 
+    user clicks radio    %{TEST_THEME_NAME}
     user clicks radio    ${PUBLICATION_NAME_SUPERSEDE}
     user clicks button    Next step
     user waits until page contains    Choose a release
@@ -308,8 +303,7 @@ Check public archive-publication release page displays correctly after being una
 Check public data tables page is correct after archive-publication has been unarchived
     user navigates to data tables page on public frontend
 
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user clicks radio    %{TEST_THEME_NAME}
 
     user checks page contains    ${PUBLICATION_NAME_ARCHIVE}
 
@@ -323,8 +317,7 @@ Check public data tables page is correct after archive-publication has been unar
 Check data catalogue page is correct after archive-publication has been unarchived
     user navigates to data catalogue page on public frontend
 
-    user opens details dropdown    %{TEST_THEME_NAME}
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+    user clicks radio    %{TEST_THEME_NAME}
 
     user checks page contains    ${PUBLICATION_NAME_ARCHIVE}
     user checks page contains    ${PUBLICATION_NAME_SUPERSEDE}
@@ -345,8 +338,9 @@ Check data catalogue page is correct after archive-publication has been unarchiv
     user checks page does not contain    This is not the latest data
 
     user clicks button    Change publication
-    user waits until page contains    ${PUBLICATION_NAME_SUPERSEDE}
+    user waits until page contains    Choose a publication
 
+    user clicks radio    %{TEST_THEME_NAME}
     user clicks radio    ${PUBLICATION_NAME_SUPERSEDE}
     user clicks button    Next step
     user waits until page contains    Choose a release
