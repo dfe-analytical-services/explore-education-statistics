@@ -1,8 +1,8 @@
 import { FormTextInputProps } from '@common/components/form/FormTextInput';
 import { FormTextInput } from '@common/components/form/index';
 import styles from '@common/components/form/FormTextSearchInput.module.scss';
+import useDebouncedCallback from '@common/hooks/useDebouncedCallback';
 import classNames from 'classnames';
-import debounce from 'lodash/debounce';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 
 interface Props extends FormTextInputProps {
@@ -21,11 +21,14 @@ const FormTextSearchInput = ({
     setValue(props.value ?? '');
   }, [props.value]);
 
-  const handleChange = debounce((event: ChangeEvent<HTMLInputElement>) => {
-    if (onChange) {
-      onChange(event);
-    }
-  }, debounceTime);
+  const [handleChange] = useDebouncedCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      if (onChange) {
+        onChange(event);
+      }
+    },
+    debounceTime,
+  );
 
   return (
     <FormTextInput

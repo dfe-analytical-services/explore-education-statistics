@@ -6,6 +6,7 @@ import {
   FormRadioGroup,
   FormTextSearchInput,
 } from '@common/components/form';
+import InsetText from '@common/components/InsetText';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
@@ -50,7 +51,6 @@ const PublicationForm = ({
 
   const publications = useMemo(() => {
     if (selectedThemeId) {
-      setSearchTerm('');
       return (
         themes
           .find(theme => theme.id === selectedThemeId)
@@ -58,7 +58,6 @@ const PublicationForm = ({
       );
     }
     if (searchTerm) {
-      setSelectedThemeId('');
       return themes
         .flatMap(theme => theme.topics.flatMap(topic => topic.publications))
         .filter(publication =>
@@ -143,8 +142,8 @@ const PublicationForm = ({
                   {searchTerm && publications.length > 0 && (
                     <p>
                       <a
-                        href="#publications"
-                        className="govuk-link govuk-!-margin-top-3 govuk-!-font-size-14"
+                        href={`${formId}-publications`}
+                        className="govuk-!-margin-top-3 govuk-!-font-size-14"
                       >
                         Skip to search results
                       </a>
@@ -175,7 +174,7 @@ const PublicationForm = ({
                     }}
                   />
 
-                  <div className={styles.publicationsList} id="publications">
+                  <div className={styles.publicationsList}>
                     <FormFieldRadioGroup
                       id={`${formId}-publications`}
                       legend={
@@ -186,8 +185,7 @@ const PublicationForm = ({
                             aria-live="polite"
                             aria-atomic="true"
                           >
-                            {' '}
-                            {`${publications.length} ${
+                            {` ${publications.length} ${
                               publications.length === 1
                                 ? `publication`
                                 : `publications`
@@ -201,11 +199,11 @@ const PublicationForm = ({
                       options={orderBy(publications, 'title').map(
                         publication => {
                           return {
-                            label: searchTerm
-                              ? `${publication.title} (${getThemeForPublication(
-                                  publication.id,
-                                )})`
-                              : publication.title,
+                            hint: searchTerm
+                              ? getThemeForPublication(publication.id)
+                              : '',
+                            hintSmall: true,
+                            label: publication.title,
                             value: publication.id,
                           };
                         },
@@ -216,9 +214,7 @@ const PublicationForm = ({
                       <>
                         <p>Search or select a theme to view publications</p>
                         {(searchTerm || selectedThemeId) && (
-                          <p>
-                            <em>No publications found</em>
-                          </p>
+                          <InsetText>No publications found</InsetText>
                         )}
                       </>
                     )}

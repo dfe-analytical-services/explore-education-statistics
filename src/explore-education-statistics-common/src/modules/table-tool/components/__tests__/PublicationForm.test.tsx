@@ -257,14 +257,48 @@ describe('PublicationForm', () => {
 
     expect(publicationRadios[0]).toEqual(
       screen.getByRole('radio', {
-        name: 'Publication 2 find me (Theme 1)',
+        name: 'Publication 2 find me',
       }),
     );
     expect(publicationRadios[1]).toEqual(
       screen.getByRole('radio', {
-        name: 'Publication 4 find me (Theme 3)',
+        name: 'Publication 4 find me',
       }),
     );
+  });
+
+  test('renders the theme as a hint on the publication options when using search field', async () => {
+    jest.useFakeTimers();
+
+    render(
+      <PublicationForm {...wizardProps} themes={testThemes} onSubmit={noop} />,
+    );
+
+    await userEvent.type(
+      screen.getByLabelText('Search publications'),
+      'find me',
+    );
+
+    jest.runOnlyPendingTimers();
+
+    const publicationRadios = within(
+      screen.getByRole('group', {
+        name: /Select a publication/,
+      }),
+    ).queryAllByRole('radio');
+    expect(publicationRadios).toHaveLength(2);
+
+    expect(
+      within(
+        screen.getByTestId('Radio item for Publication 2 find me'),
+      ).getByText('Theme 1'),
+    ).toBeInTheDocument();
+
+    expect(
+      within(
+        screen.getByTestId('Radio item for Publication 4 find me'),
+      ).getByText('Theme 3'),
+    ).toBeInTheDocument();
   });
 
   test('renders publication options filtered by case-insensitive title', async () => {
@@ -290,12 +324,12 @@ describe('PublicationForm', () => {
 
     expect(publicationRadios[0]).toEqual(
       screen.getByRole('radio', {
-        name: 'Publication 2 find me (Theme 1)',
+        name: 'Publication 2 find me',
       }),
     );
     expect(publicationRadios[1]).toEqual(
       screen.getByRole('radio', {
-        name: 'Publication 4 find me (Theme 3)',
+        name: 'Publication 4 find me',
       }),
     );
   });
