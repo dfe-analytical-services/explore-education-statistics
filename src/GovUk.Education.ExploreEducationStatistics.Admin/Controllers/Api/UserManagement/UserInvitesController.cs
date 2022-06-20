@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         }
 
         [HttpGet("user-management/invites")]
-        public async Task<ActionResult<List<UserViewModel>>> GetInvitedUsers()
+        public async Task<ActionResult<List<PendingInviteViewModel>>> GetInvitedUsers()
         {
             return await _userManagementService
                 .ListPendingInvites()

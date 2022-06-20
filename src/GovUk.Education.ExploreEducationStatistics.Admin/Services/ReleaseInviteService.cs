@@ -69,15 +69,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publication => ValidateReleaseIds(publication, releaseIds))
                 .OnSuccess(async publication =>
                 {
-                    email = email.Trim();
+                    var sanitisedEmail = email.Trim();
 
-                    var user = await _userRepository.FindByEmail(email);
+                    var user = await _userRepository.FindByEmail(sanitisedEmail);
                     if (user == null)
                     {
-                        return await CreateNewUserContributorInvite(releaseIds, email, publication.Title);
+                        return await CreateNewUserContributorInvite(releaseIds, sanitisedEmail, publication.Title);
                     }
 
-                    return await CreateExistingUserContributorInvite(releaseIds, user.Id, email, publication.Title);
+                    return await CreateExistingUserContributorInvite(releaseIds, user.Id, sanitisedEmail, publication.Title);
                 });
         }
 

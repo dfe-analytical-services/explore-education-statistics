@@ -206,7 +206,7 @@ Verify that the amended methodology is visible on the public methodologies page
     user waits until page contains accordion section    %{TEST_THEME_NAME}
     user opens accordion section    %{TEST_THEME_NAME}
     user opens details dropdown    %{TEST_TOPIC_NAME}
-    user scrolls down    400    # @MarkFix
+    user scrolls down    400
     user checks page contains methodology link
     ...    %{TEST_TOPIC_NAME}
     ...    ${PUBLICATION_NAME}

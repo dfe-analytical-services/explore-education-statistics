@@ -223,16 +223,35 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await usersAndRolesDbContext.SaveChangesAsync();
             }
 
-            var releaseId = Guid.NewGuid();
-            var publicationId = Guid.NewGuid();
+            var release = new Release
+            {
+                Publication = new Publication(),
+            };
+            var publication = new Publication();
 
             var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
 
             emailTemplateService.Setup(mock =>
-                    mock.SendInviteEmail("test@test.com"))
+                    mock.SendInviteEmail(
+                        "test@test.com",
+                        It.Is<List<UserReleaseInvite>>(invites =>
+                            invites.Count == 1
+                            && invites[0].ReleaseId == release.Id
+                            && invites[0].Role == Approver),
+                        It.Is<List<UserPublicationInvite>>(invites =>
+                            invites.Count == 1
+                            && invites[0].PublicationId == publication.Id
+                            && invites[0].Role == Owner)))
                 .Returns(Unit.Instance);
 
             var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(release);
+                await contentDbContext.Publications.AddRangeAsync(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -247,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         new ()
                         {
-                            ReleaseId = releaseId,
+                            ReleaseId = release.Id,
                             ReleaseRole = Approver,
                         },
                     },
@@ -255,7 +274,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         new ()
                         {
-                          PublicationId = publicationId,
+                          PublicationId = publication.Id,
                           PublicationRole = Owner,
                         },
                     });
@@ -284,7 +303,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToList();
                 var userReleaseInvite = Assert.Single(userReleaseInvites);
                 Assert.Equal("test@test.com", userReleaseInvite.Email);
-                Assert.Equal(releaseId, userReleaseInvite.ReleaseId);
+                Assert.Equal(release.Id, userReleaseInvite.ReleaseId);
                 Assert.Equal(Approver, userReleaseInvite.Role);
                 Assert.True(userReleaseInvite.EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvite.Created).Milliseconds, 0, 1500);
@@ -294,7 +313,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .ToList();
                 var userPublicationInvite = Assert.Single(userPublicationInvites);
                 Assert.Equal("test@test.com", userPublicationInvite.Email);
-                Assert.Equal(publicationId, userPublicationInvite.PublicationId);
+                Assert.Equal(publication.Id, userPublicationInvite.PublicationId);
                 Assert.Equal(Owner, userPublicationInvite.Role);
                 Assert.InRange(DateTime.UtcNow.Subtract(userPublicationInvite.Created).Milliseconds, 0, 1500);
                 Assert.Equal(_createdById, userPublicationInvite.CreatedById);
@@ -318,18 +337,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await usersAndRolesDbContext.SaveChangesAsync();
             }
 
-            var release1Id = Guid.NewGuid();
-            var release2Id = Guid.NewGuid();
-            var publication1Id = Guid.NewGuid();
-            var publication2Id = Guid.NewGuid();
+            var release1 = new Release
+            {
+                Publication = new Publication(),
+            };
+            var release2 = new Release
+            {
+                Publication = new Publication(),
+            };
+            var publication1 = new Publication();
+            var publication2 = new Publication();
 
             var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
 
             emailTemplateService.Setup(mock =>
-                    mock.SendInviteEmail("test@test.com"))
+                    mock.SendInviteEmail(
+                        "test@test.com",
+                        It.Is<List<UserReleaseInvite>>(invites =>
+                            invites.Count == 2
+                            && invites[0].ReleaseId == release1.Id
+                            && invites[0].Role == Approver
+                            && invites[1].ReleaseId == release2.Id
+                            && invites[1].Role == Contributor),
+                        It.Is<List<UserPublicationInvite>>(invites =>
+                            invites.Count == 2
+                            && invites[0].PublicationId == publication1.Id
+                            && invites[0].Role == Owner
+                            && invites[1].PublicationId == publication2.Id
+                            && invites[1].Role == ReleaseApprover)))
                 .Returns(Unit.Instance);
 
             var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(release1, release2);
+                await contentDbContext.Publications.AddRangeAsync(publication1, publication2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -344,12 +389,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         new ()
                         {
-                            ReleaseId = release1Id,
+                            ReleaseId = release1.Id,
                             ReleaseRole = Approver,
                         },
                         new ()
                         {
-                            ReleaseId = release2Id,
+                            ReleaseId = release2.Id,
                             ReleaseRole = Contributor,
                         }
                     },
@@ -357,12 +402,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         new ()
                         {
-                          PublicationId = publication1Id,
+                          PublicationId = publication1.Id,
                           PublicationRole = Owner,
                         },
                         new ()
                         {
-                          PublicationId = publication2Id,
+                          PublicationId = publication2.Id,
                           PublicationRole = ReleaseApprover,
                         },
                     });
@@ -393,14 +438,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, userReleaseInvites.Count);
 
                 Assert.Equal("test@test.com", userReleaseInvites[0].Email);
-                Assert.Equal(release1Id, userReleaseInvites[0].ReleaseId);
+                Assert.Equal(release1.Id, userReleaseInvites[0].ReleaseId);
                 Assert.Equal(Approver, userReleaseInvites[0].Role);
                 Assert.True(userReleaseInvites[0].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
                 Assert.Equal(_createdById, userReleaseInvites[0].CreatedById);
 
                 Assert.Equal("test@test.com", userReleaseInvites[1].Email);
-                Assert.Equal(release2Id, userReleaseInvites[1].ReleaseId);
+                Assert.Equal(release2.Id, userReleaseInvites[1].ReleaseId);
                 Assert.Equal(Contributor, userReleaseInvites[1].Role);
                 Assert.True(userReleaseInvites[1].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[1].Created).Milliseconds, 0, 1500);
@@ -411,13 +456,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, userPublicationInvites.Count);
 
                 Assert.Equal("test@test.com", userPublicationInvites[0].Email);
-                Assert.Equal(publication1Id, userPublicationInvites[0].PublicationId);
+                Assert.Equal(publication1.Id, userPublicationInvites[0].PublicationId);
                 Assert.Equal(Owner, userPublicationInvites[0].Role);
                 Assert.InRange(DateTime.UtcNow.Subtract(userPublicationInvites[0].Created).Milliseconds, 0, 1500);
                 Assert.Equal(_createdById, userPublicationInvites[0].CreatedById);
 
                 Assert.Equal("test@test.com", userPublicationInvites[1].Email);
-                Assert.Equal(publication2Id, userPublicationInvites[1].PublicationId);
+                Assert.Equal(publication2.Id, userPublicationInvites[1].PublicationId);
                 Assert.Equal(ReleaseApprover, userPublicationInvites[1].Role);
                 Assert.InRange(DateTime.UtcNow.Subtract(userPublicationInvites[1].Created).Milliseconds, 0, 1500);
                 Assert.Equal(_createdById, userPublicationInvites[1].CreatedById);
@@ -451,7 +496,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var emailTemplateService = new Mock<IEmailTemplateService>(Strict);
 
             emailTemplateService.Setup(mock =>
-                    mock.SendInviteEmail("test@test.com"))
+                    mock.SendInviteEmail(
+                        "test@test.com",
+                        new List<UserReleaseInvite>(),
+                        new List<UserPublicationInvite>()))
                 .Returns(Unit.Instance);
 
             await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))

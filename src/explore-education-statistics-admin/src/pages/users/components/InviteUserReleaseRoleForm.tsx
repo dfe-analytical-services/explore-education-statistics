@@ -95,7 +95,7 @@ const InviteUserReleaseRoleForm = ({
             {userReleaseRoles.length === 0 ? (
               <p>No user release roles added</p>
             ) : (
-              <table>
+              <table data-testid="release-role-table">
                 <thead>
                   <tr>
                     <th scope="col">Release Title</th>

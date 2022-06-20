@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<List<UserViewModel>> ListPreReleaseUsersAsync();
 
-        Task<Either<ActionResult, List<UserViewModel>>> ListPendingInvites();
+        Task<Either<ActionResult, List<PendingInviteViewModel>>> ListPendingInvites();
 
         Task<Either<ActionResult, UserInvite>> InviteUser(
             string email,

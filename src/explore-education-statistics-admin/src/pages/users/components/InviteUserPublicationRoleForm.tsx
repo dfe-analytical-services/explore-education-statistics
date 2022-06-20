@@ -104,7 +104,7 @@ const InviteUserPublicationRoleForm = ({
             {userPublicationRoles.length === 0 ? (
               <p>No user publication roles added</p>
             ) : (
-              <table>
+              <table data-testid="publication-role-table">
                 <thead>
                   <tr>
                     <th scope="col">Publication Title</th>

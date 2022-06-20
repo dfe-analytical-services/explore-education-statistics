@@ -520,7 +520,7 @@ user waits until h1 is visible
     user waits until element is visible    xpath://h1[text()="${text}"]    ${wait}
 
 user waits until h1 is not visible
-    [Arguments]    ${text}    ${wait}=${timeout}
+    [Arguments]    ${text}    ${wait}=%{WAIT_SMALL}
     user waits until element is not visible    xpath://h1[text()="${text}"]    ${wait}
 
 user waits until h2 is visible

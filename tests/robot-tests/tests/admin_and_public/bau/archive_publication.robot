@@ -58,7 +58,7 @@ Set archive-publication to be superseded by superseding-publication
     ${ARCHIVE_ACCORDION}=    user gets accordion section content element    ${PUBLICATION_NAME_ARCHIVE}
     user clicks link    Manage publication    ${ARCHIVE_ACCORDION}
 
-    user waits until h1 is visible    Manage publication    %{WAIT_SMALL}
+    user waits until h1 is visible    Manage publication
     user waits until page contains element    id:publicationForm-supersede
 
     user chooses select option    id:publicationForm-supersededById    ${PUBLICATION_NAME_SUPERSEDE}
@@ -271,7 +271,7 @@ Set archive-publication to be no longer be superseded
     ${ARCHIVE_ACCORDION}=    user gets accordion section content element    ${PUBLICATION_NAME_ARCHIVE}
     user clicks link    Manage publication    ${ARCHIVE_ACCORDION}
 
-    user waits until h1 is visible    Manage publication    %{WAIT_SMALL}
+    user waits until h1 is visible    Manage publication
     user waits until page contains element    id:publicationForm-supersede
 
     user chooses select option    id:publicationForm-supersededById    None selected
@@ -282,7 +282,7 @@ Set archive-publication to be no longer be superseded
     user waits until modal is not visible    Confirm publication changes
 
     # Otherwise gets to Find Stats page before cache is invalidated
-    user waits until h1 is visible    Dashboard    %{WAIT_SMALL}
+    user waits until h1 is visible    Dashboard
 
 Check public Find stats page and check archive-publication is no longer archived
     user navigates to find statistics page on public frontend
