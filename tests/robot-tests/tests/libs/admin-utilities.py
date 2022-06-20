@@ -19,7 +19,8 @@ def user_signs_in_as(user: str):
             user,
             email=os.getenv(f'{user}_EMAIL'),
             password=os.getenv(f'{user}_PASSWORD'),
-            driver=sl.driver
+            driver=sl.driver,
+            identity_provider=os.getenv('IDENTITY_PROVIDER')
         )
 
         admin_url = os.getenv('ADMIN_URL')
