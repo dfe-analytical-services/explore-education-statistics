@@ -6,7 +6,7 @@ import refreshAuthTokens from '../../auth/refreshAuthTokens';
 import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
 
 export const options: Options = {
-  stages: [{ duration: '60s', target: 10 }],
+  stages: [{ duration: '10m', target: 1 }],
   noConnectionReuse: true,
   vus: 1,
   insecureSkipTLSVerify: true,
@@ -222,7 +222,7 @@ const performTest = ({
     'response should contain the uploaded file id': res => !!res.json('id'),
   });
 
-  const maxImportWaitTimeMillis = 10 * 1000;
+  const maxImportWaitTimeMillis = 240 * 1000;
   const importStartTime = Date.now();
   const importExpireTime = importStartTime + maxImportWaitTimeMillis;
   let importComplete = false;
@@ -260,7 +260,7 @@ const performTest = ({
   }
 
   if (!importComplete) {
-    fail('Failed waiting for file to import');
+    errorRate.add(1);
   }
 };
 
