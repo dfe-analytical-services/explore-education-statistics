@@ -102,6 +102,16 @@ const projects = {
     command: 'docker-compose up idp',
     colour: chalk.gray,
   },
+  db: {
+    path: path.join(projectRoot, 'src'),
+    command: 'docker-compose up db',
+    colour: chalk.blue,
+  },
+  dataStorage: {
+    path: path.join(projectRoot, 'src'),
+    command: 'docker-compose up data-storage',
+    colour: chalk.green,
+  },
 };
 
 const labelStream = (stream, project, transform) =>

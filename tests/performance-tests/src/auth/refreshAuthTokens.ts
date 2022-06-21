@@ -28,22 +28,26 @@ export default function refreshAuthTokens({
   if (response.status !== 200) {
     /* eslint-disable-next-line no-console */
     console.log(
-      `Unable to refresh access token. Got response ${JSON.stringify(
-        response.json(),
-      )}`,
+      `Unable to refresh access token. Got response ${response.json()}`,
     );
     return undefined;
   }
 
-  const json = (response.json() as unknown) as AuthDetails;
+  /* eslint-disable camelcase */
+  const authTokens = (response.json() as unknown) as {
+    access_token: string;
+    refresh_token: string;
+    expires_in: Date;
+  };
+  /* eslint-enable camelcase */
 
   return {
     adminUrl,
     userName,
     authTokens: {
-      accessToken: json.authTokens.accessToken,
-      refreshToken: json.authTokens.refreshToken,
-      expiryDate: new Date(),
+      accessToken: authTokens.access_token,
+      refreshToken: authTokens.refresh_token,
+      expiryDate: authTokens.expires_in,
     },
   };
 }

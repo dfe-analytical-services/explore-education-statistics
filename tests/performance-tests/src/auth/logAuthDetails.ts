@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import getAuthDetails from './getAuthDetails';
+import getAuthDetails, { IdpOption } from './getAuthDetails';
 
 export interface User {
   name: string;
@@ -10,13 +10,14 @@ export interface User {
 
 export interface Environment {
   adminUrl: string;
+  idp: IdpOption;
   users: User[];
 }
 
 const logAuthDetails = async (users: User[]) => {
   const authTokens = await Promise.all(
     users.map(async ({ name, email, password }) => {
-      return getAuthDetails(name, email, password, env.adminUrl);
+      return getAuthDetails(name, email, password, env.adminUrl, env.idp);
     }),
   );
 

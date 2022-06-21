@@ -79,8 +79,11 @@ To grant access to these ports from containers on the
 run the following commands:
 
 ```bash
-sudo ufw allow from 172.30.0.0/24 to any port 5021
-sudo ufw allow from 172.30.0.0/24 to any port 3000
+sudo ufw allow from 172.30.0.0/24 to any port 3000 # Front end site
+sudo ufw allow from 172.30.0.0/24 to any port 3050 # Keycloak
+sudo ufw allow from 172.30.0.0/24 to any port 5000 # Data API
+sudo ufw allow from 172.30.0.0/24 to any port 5010 # Content API
+sudo ufw allow from 172.30.0.0/24 to any port 5021 # Admin site / Admin API
 ```
 
 #### Obtain auth tokens for Admin testing (optional)
@@ -89,7 +92,7 @@ This step is only required if running performance tests that require access to t
 It requires the above step of creating environment-specific .env.json files first.
 
 ```bash
-npm run get-auth-details <environment> <user name>
+export AUTH_DETAILS_AS_JSON=$(npm run log-auth-details --silent --environment=<environment> --users=<user name>)
 ```
 
 This obtains an `access_token` and a `refresh_token` that can be used to access protected resources
@@ -102,20 +105,19 @@ that user's credentials to log into Admin in order to obtain their auth tokens.
 As a concrete example:
 
 ```bash
-npm run get-auth-details local bau1
+export AUTH_DETAILS_AS_JSON=$(npm run log-auth-details --silent --environment=local --users=bau1)
 ```
 
 #### Run individual tests
 
 ```bash
-cd tests/performance-tests
-docker-compose run k6 run dist/some-test-script.test.js
+npm run test dist/some-test-script.test.js
 ```
 
 An example of running an actual script would be:
 
 ```bash
-docker-compose run k6 run dist/import.test.js
+npm run test dist/import.test.js
 ```
 
 TODO will this still be true???????????????
