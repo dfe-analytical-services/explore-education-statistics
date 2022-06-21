@@ -1735,6 +1735,7 @@
         "ASPNETCORE_DETAILEDERRORS": "[parameters('detailedErrors')]",
         "NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]",
         "NotifyInviteTemplateId": "[parameters('notifyInviteTemplateId')]",
+        "NotifyInviteWithRolesTemplateId": "[parameters('notifyInviteWithRolesTemplateId')]",
         "NotifyPublicationRoleTemplateId": "[parameters('notifyPublicationRoleTemplateId')]",
         "NotifyReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
         "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",
