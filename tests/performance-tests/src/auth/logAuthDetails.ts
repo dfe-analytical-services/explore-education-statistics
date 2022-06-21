@@ -12,12 +12,20 @@ export interface Environment {
   adminUrl: string;
   idp: IdpOption;
   users: User[];
+  supportsRefreshTokens: boolean;
 }
 
 const logAuthDetails = async (users: User[]) => {
   const authTokens = await Promise.all(
     users.map(async ({ name, email, password }) => {
-      return getAuthDetails(name, email, password, env.adminUrl, env.idp);
+      return getAuthDetails(
+        name,
+        email,
+        password,
+        env.adminUrl,
+        env.idp,
+        env.supportsRefreshTokens,
+      );
     }),
   );
 

@@ -147,6 +147,7 @@ const getAuthDetails = async (
   password: string,
   adminUrl: string,
   idp: IdpOption,
+  supportsRefreshTokens: boolean,
 ): Promise<AuthDetails> => {
   const authTokens = await getAuthTokens(email, password, adminUrl, idp);
 
@@ -158,6 +159,7 @@ const getAuthDetails = async (
       refreshToken: authTokens.refresh_token,
       expiryDate: authTokens.expires_at,
     },
+    supportsRefreshTokens,
   };
 };
 

@@ -7,6 +7,7 @@ interface RefreshTokenParams {
   clientId: string;
   clientSecret: string;
   refreshToken: string;
+  supportsRefreshTokens: boolean;
 }
 
 export default function refreshAuthTokens({
@@ -15,7 +16,12 @@ export default function refreshAuthTokens({
   clientId,
   clientSecret,
   refreshToken,
+  supportsRefreshTokens,
 }: RefreshTokenParams): AuthDetails | undefined {
+  if (!supportsRefreshTokens) {
+    throw new Error(`Environment ${adminUrl} does not support refresh tokens`);
+  }
+
   const requestBody = {
     client_id: clientId,
     client_secret: clientSecret,
@@ -49,5 +55,6 @@ export default function refreshAuthTokens({
       refreshToken: authTokens.refresh_token,
       expiryDate: authTokens.expires_in,
     },
+    supportsRefreshTokens,
   };
 }

@@ -170,6 +170,7 @@ function getOrRefreshAccessToken(
     clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
     clientSecret: '',
     refreshToken: authTokens.refreshToken,
+    supportsRefreshTokens,
   });
 
   if (!refreshedTokens) {
