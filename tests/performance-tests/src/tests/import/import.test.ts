@@ -1,9 +1,9 @@
 import { check, fail, sleep } from 'k6';
-import http from 'k6/http';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import refreshAuthTokens from '../../auth/refreshAuthTokens';
 import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
+import createDataService from '../../utils/dataService';
 
 export const options: Options = {
   stages: [{ duration: '10m', target: 1 }],
@@ -32,15 +32,6 @@ const subjectFile = open('import/assets/dates.csv', 'b');
 const subjectMetaFile = open('import/assets/dates.meta.csv', 'b');
 /* eslint-enable no-restricted-globals */
 
-function getHttpParamsWithAuthorization(accessToken: string) {
-  return {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-    },
-  };
-}
-
 export function setup(): SetupData {
   const tokenJson = __ENV.AUTH_DETAILS_AS_JSON as string;
   const authDetails = JSON.parse(tokenJson) as AuthDetails[];
@@ -52,96 +43,32 @@ export function setup(): SetupData {
   } = authDetails.find(details => details.userName === 'bau1') as AuthDetails;
 
   const uniqueId = Date.now();
-  const params = getHttpParamsWithAuthorization(authTokens.accessToken);
+  const dataService = createDataService(adminUrl, authTokens.accessToken);
 
-  const createThemeResponse = http.post(
-    `${adminUrl}/api/themes`,
-    JSON.stringify({
-      title: `UI test theme - "import.test.ts" performance test - ${uniqueId}`,
-      summary: '',
-    }),
-    params,
+  const { themeId } = dataService.createTheme({
+    title: `UI test theme - "import.test.ts" performance test - ${uniqueId}`,
+  });
+
+  const { topicId } = dataService.createTopic({
+    themeId,
+    title: `UI test topic - "import.test.ts" performance test - ${uniqueId}`,
+  });
+
+  const { publicationId } = dataService.createPublication({
+    topicId,
+    title: `UI test publication - "import.test.ts" performance test - ${uniqueId}`,
+  });
+
+  const { releaseId } = dataService.createRelease({
+    publicationId,
+    releaseName: '2022',
+    timePeriodCoverage: 'AY',
+  });
+
+  /* eslint-disable-next-line no-console */
+  console.log(
+    `Created Theme ${themeId}, Topic ${topicId}, Publication ${publicationId}, Release ${releaseId}`,
   );
-
-  if (createThemeResponse.status !== 200) {
-    throw new Error(
-      `Error creating Theme: ${JSON.stringify(createThemeResponse.json())}`,
-    );
-  }
-
-  const themeId = ((createThemeResponse.json() as unknown) as { id: string })
-    .id;
-
-  const createTopicResponse = http.post(
-    `${adminUrl}/api/topics`,
-    JSON.stringify({
-      themeId,
-      title: `UI test topic - "import.test.ts" performance test - ${uniqueId}`,
-      summary: '',
-    }),
-    params,
-  );
-
-  if (createTopicResponse.status !== 200) {
-    throw new Error(
-      `Error creating Topic: ${JSON.stringify(createTopicResponse.json())}`,
-    );
-  }
-
-  const topicId = ((createTopicResponse.json() as unknown) as { id: string })
-    .id;
-
-  const createPublicationResponse = http.post(
-    `${adminUrl}/api/publications`,
-    JSON.stringify({
-      topicId,
-      title: `UI test publication - "import" performance test - ${uniqueId}`,
-      contact: {
-        contactName: 'Team Contact',
-        contactTelNo: '12345',
-        teamEmail: 'team@example.com',
-        teamName: 'Team',
-      },
-    }),
-    params,
-  );
-
-  if (createPublicationResponse.status !== 200) {
-    throw new Error(
-      `Error creating Topic: ${JSON.stringify(
-        createPublicationResponse.json(),
-      )}`,
-    );
-  }
-
-  const publicationId = ((createPublicationResponse.json() as unknown) as {
-    id: string;
-  }).id;
-
-  const createReleaseResponse = http.post(
-    `${adminUrl}/api/publications/${publicationId}/releases`,
-    JSON.stringify({
-      publicationId,
-      releaseName: '2021',
-      timePeriodCoverage: {
-        value: 'AY',
-      },
-      type: 'NationalStatistics',
-    }),
-    params,
-  );
-
-  if (createReleaseResponse.status !== 200) {
-    throw new Error(
-      `Error creating Topic: ${JSON.stringify(createReleaseResponse.json())}`,
-    );
-  }
-
-  const releaseId = ((createReleaseResponse.json() as unknown) as {
-    id: string;
-  }).id;
-
-  console.log(`Created Theme ${themeId}, Topic ${topicId}`);
 
   return {
     themeId,
@@ -197,29 +124,30 @@ const performTest = ({
   const uniqueId = Date.now();
   const subjectName = `dates-${uniqueId}`;
 
-  const params = {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
+  const dataService = createDataService(adminUrl, accessToken, false);
+
+  const {
+    response: uploadResponse,
+    fileId,
+    importStatus: initialImportStatus,
+  } = dataService.importDataFile({
+    title: subjectName,
+    releaseId,
+    dataFile: {
+      file: subjectFile,
+      filename: `${subjectName}.csv`,
     },
-  };
-
-  const data = {
-    title: `dates-${uniqueId}`,
-    file: http.file(subjectFile, `${subjectName}.csv`),
-    metaFile: http.file(subjectMetaFile, `${subjectName}.meta.csv`),
-  };
-
-  const uploadResponse = http.post(
-    `${adminUrl}/api/release/${releaseId}/data?title=${subjectName}`,
-    data,
-    params,
-  );
+    metaFile: {
+      file: subjectMetaFile,
+      filename: `${subjectName}.meta.csv`,
+    },
+  });
 
   check(uploadResponse, {
     'response code was 200': res => res.status === 200,
-    'response should indicate that the uploaded file is queued': res =>
-      res.json('status') === 'QUEUED',
-    'response should contain the uploaded file id': res => !!res.json('id'),
+    'response should indicate that the uploaded file is queued': _ =>
+      initialImportStatus === 'QUEUED',
+    'response should contain the uploaded file id': _ => !!fileId,
   });
 
   const maxImportWaitTimeMillis = 240 * 1000;
@@ -230,20 +158,21 @@ const performTest = ({
   while (Date.now() < importExpireTime) {
     sleep(1);
 
-    const statusResponse = http.get(
-      `${adminUrl}/api/release/${releaseId}/data/${uploadResponse.json(
-        'id',
-      )}/import/status`,
-      params,
-    );
+    const {
+      response: statusResponse,
+      importStatus,
+    } = dataService.getImportStatus({
+      releaseId,
+      fileId,
+    });
 
     if (statusResponse.status !== 200) {
       fail(
-        `Failure checking on import status of uploaded subject file ${subjectName} - ${statusResponse.json()}`,
+        `Failure checking on import status of uploaded subject file ${subjectName} - ${JSON.stringify(
+          statusResponse.json(),
+        )}`,
       );
     }
-
-    const importStatus = statusResponse.json('status');
 
     if (importStatus === 'FAILED' || importStatus === 'CANCELLED') {
       fail(
@@ -278,28 +207,13 @@ export const teardown = ({
     adminUrl,
     authTokens,
   );
-  const params = getHttpParamsWithAuthorization(accessToken);
 
-  const deleteTopicResponse = http.del(
-    `${adminUrl}/api/topics/${topicId}`,
-    null,
-    params,
-  );
+  const dataService = createDataService(adminUrl, accessToken);
 
-  if (deleteTopicResponse.status !== 204) {
-    throw new Error(`Couldn't delete Topic ${topicId}`);
-  }
+  dataService.deleteTopic({ topicId });
+  dataService.deleteTheme({ themeId });
 
-  const deleteThemeResponse = http.del(
-    `${adminUrl}/api/themes/${themeId}`,
-    null,
-    params,
-  );
-
-  if (deleteThemeResponse.status !== 204) {
-    throw new Error(`Couldn't delete Theme ${topicId}`);
-  }
-
+  /* eslint-disable-next-line no-console */
   console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
 };
 
