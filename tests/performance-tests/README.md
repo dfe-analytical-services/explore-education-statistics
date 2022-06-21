@@ -124,6 +124,19 @@ TODO will this still be true???????????????
 The `src` directory contains tests based on environments (i.e. `dev` contains tests specific to the 
 dev environment etc.)
 
+
+### Monitor the test results
+
+View the results of real-time or historic test runs by visiting:
+
+```
+http://localhost:3005/d/k6/k6-load-testing-results?orgId=1&refresh=5s
+```
+
+This is a Grafana Dashboard that is configured for default K6-recorded information from an
+InfluxDB data source. Grafana and InfluxDB need to be running in order to use this.
+
+
 ## Transpiling and Bundling
 
 The tests are written in Typescript so we need to transpile them to work in K6 (which as an aside is

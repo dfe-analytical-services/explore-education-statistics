@@ -12,6 +12,7 @@ export interface AuthTokens {
 export interface AuthDetails {
   userName: string;
   adminUrl: string;
+  supportsRefreshTokens: boolean;
   authTokens: AuthTokens;
 }
 
