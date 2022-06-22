@@ -42,6 +42,7 @@ export default function ({ userName, adminUrl, authTokens }: AuthDetails) {
     clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
     clientSecret: '',
     refreshToken: authTokens.refreshToken,
+    supportsRefreshTokens: true,
   });
 
   if (
@@ -88,6 +89,7 @@ export default function ({ userName, adminUrl, authTokens }: AuthDetails) {
     clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
     clientSecret: '',
     refreshToken: refreshedTokens1!.authTokens.refreshToken,
+    supportsRefreshTokens: true,
   });
 
   if (

@@ -6,11 +6,20 @@ import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
 import createDataService, { SubjectMeta } from '../../utils/dataService';
 
 export const options: Options = {
-  stages: [{ duration: '10m', target: 1 }],
+  scenarios: {
+    constant_request_rate: {
+      executor: 'constant-arrival-rate',
+      rate: 1,
+      timeUnit: '0.5s',
+      duration: '100m',
+      preAllocatedVUs: 20,
+      maxVUs: 100,
+    },
+  },
   noConnectionReuse: true,
-  vus: 1,
   insecureSkipTLSVerify: true,
   linger: true,
+  setupTimeout: '5m',
 };
 
 interface SetupData {
@@ -25,9 +34,14 @@ interface SetupData {
   supportsRefreshTokens: boolean;
 }
 
-export const errorRate = new Rate('errors');
-export const importSpeedTrend = new Trend('import_speed', true);
-export const importCount = new Counter('import_count');
+export const errorRate = new Rate('ees_errors');
+export const tableQuerySpeedTrend = new Trend('ees_table_query_speed', true);
+export const tableQueryCompleteCount = new Counter(
+  'ees_table_query_complete_count',
+);
+export const tableQueryFailureCount = new Counter(
+  'ees_table_query_failure_count',
+);
 
 /* eslint-disable no-restricted-globals */
 const subjectFile = open('import/assets/dates.csv', 'b');
@@ -93,6 +107,7 @@ export function setup(): SetupData {
     });
 
     if (importStatus === 'FAILED' || importStatus === 'CANCELLED') {
+      errorRate.add(1);
       throw new Error(
         `Incorrect end state for import process of uploaded subject file - ${importStatus}`,
       );
@@ -197,6 +212,8 @@ const performTest = ({
     endCode: subjectMeta.timePeriod.options[1].code,
   };
 
+  const startTimeMillis = Date.now();
+
   const { response, results } = dataService.tableQuery({
     releaseId,
     subjectId,
@@ -206,10 +223,17 @@ const performTest = ({
     ...someTimePeriods,
   });
 
-  check(response, {
-    'response code was 200': res => res.status === 200,
-    'response should contain table builder results': _ => results.length > 0,
-  });
+  if (
+    check(response, {
+      'response code was 200': res => res.status === 200,
+      'response should contain table builder results': _ => results.length > 0,
+    })
+  ) {
+    tableQueryCompleteCount.add(1);
+    tableQuerySpeedTrend.add(Date.now() - startTimeMillis);
+  } else {
+    tableQueryFailureCount.add(1);
+  }
 };
 
 export const teardown = ({

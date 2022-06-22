@@ -6,11 +6,11 @@ import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
 import createDataService from '../../utils/dataService';
 
 export const options: Options = {
-  stages: [{ duration: '10m', target: 1 }],
+  // stages: [{ duration: '120m', target: 10 }],
   noConnectionReuse: true,
-  vus: 1,
   insecureSkipTLSVerify: true,
   linger: true,
+  vus: 1,
 };
 
 interface SetupData {
@@ -23,13 +23,46 @@ interface SetupData {
   supportsRefreshTokens: boolean;
 }
 
-export const errorRate = new Rate('errors');
-export const importSpeedTrend = new Trend('import_speed', true);
-export const importCount = new Counter('import_count');
+export const errorRate = new Rate('ees_errors');
+export const importFailureCount = new Counter('ees_import_failure_count');
+export const importTimeoutFailureCount = new Counter(
+  'ees_import_failure_timeout_count',
+);
+
+const processingStageLabels = [
+  'QUEUED',
+  'STAGE_1',
+  'STAGE_2',
+  'STAGE_3',
+  'STAGE_4',
+  'STAGE_4',
+  'COMPLETE',
+];
+
+const processingStages: {
+  [stage: string]: {
+    timingMetric: Trend;
+    countMetric: Counter;
+  };
+} = processingStageLabels.reduce(
+  (acc, stage) => ({
+    ...acc,
+    [stage]: {
+      timingMetric: new Trend(
+        `ees_import_${stage.toLowerCase()}_reached_speed`,
+        true,
+      ),
+      countMetric: new Counter(
+        `ees_import_${stage.toLowerCase()}_reached_count`,
+      ),
+    },
+  }),
+  {},
+);
 
 /* eslint-disable no-restricted-globals */
-const subjectFile = open('import/assets/dates.csv', 'b');
-const subjectMetaFile = open('import/assets/dates.meta.csv', 'b');
+const subjectFile = open('import/assets/big-files/nd01.csv.csv', 'b');
+const subjectMetaFile = open('import/assets/big-files/nd01.meta.csv.csv', 'b');
 /* eslint-enable no-restricted-globals */
 
 export function setup(): SetupData {
@@ -150,10 +183,15 @@ const performTest = ({
     'response should contain the uploaded file id': _ => !!fileId,
   });
 
-  const maxImportWaitTimeMillis = 240 * 1000;
+  const maxImportWaitTimeMillis = 6000 * 1000;
   const importStartTime = Date.now();
   const importExpireTime = importStartTime + maxImportWaitTimeMillis;
+
   let importComplete = false;
+
+  const processingStagesReported: { [stage: string]: boolean } = Object.keys(
+    processingStages,
+  ).reduce((acc, [stage]) => ({ ...acc, [stage]: false }), {});
 
   while (Date.now() < importExpireTime) {
     sleep(1);
@@ -167,6 +205,8 @@ const performTest = ({
     });
 
     if (statusResponse.status !== 200) {
+      errorRate.add(1);
+      importFailureCount.add(1);
       fail(
         `Failure checking on import status of uploaded subject file ${subjectName} - ${JSON.stringify(
           statusResponse.json(),
@@ -174,15 +214,32 @@ const performTest = ({
       );
     }
 
-    if (importStatus === 'FAILED' || importStatus === 'CANCELLED') {
-      fail(
-        `Incorrect end state for import process of uploaded subject file ${subjectName} - ${importStatus}`,
+    if (processingStageLabels.includes(importStatus)) {
+      const priorAndCurrentStages = processingStageLabels.slice(
+        0,
+        processingStageLabels.indexOf(importStatus),
       );
+
+      priorAndCurrentStages.forEach(stage => {
+        if (!processingStagesReported[stage]) {
+          const { timingMetric, countMetric } = processingStages[stage];
+          timingMetric.add(Date.now() - importStartTime);
+          countMetric.add(1);
+          processingStagesReported[stage] = true;
+        }
+      });
+    }
+
+    if (importStatus === 'FAILED' || importStatus === 'CANCELLED') {
+      errorRate.add(1);
+      importFailureCount.add(1);
+      fail(
+        `Failure end state for import process of uploaded subject file ${subjectName} - ${importStatus}`,
+      );
+      break;
     }
 
     if (importStatus === 'COMPLETE') {
-      importSpeedTrend.add(Date.now() - importStartTime);
-      importCount.add(1);
       importComplete = true;
       break;
     }
@@ -190,6 +247,7 @@ const performTest = ({
 
   if (!importComplete) {
     errorRate.add(1);
+    importTimeoutFailureCount.add(1);
   }
 };
 
