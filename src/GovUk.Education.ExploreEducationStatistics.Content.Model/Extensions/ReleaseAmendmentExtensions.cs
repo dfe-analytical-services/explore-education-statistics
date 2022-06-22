@@ -39,10 +39,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             {
                 amendment.Content!.Add(new ReleaseContentSection
                 {
+                    Release = amendment,
                     ReleaseId = amendment.Id,
                     ContentSection = new ContentSection
                     {
+                        Id = Guid.NewGuid(),
                         Type = ContentSectionType.RelatedDashboards,
+                        Content = new List<ContentBlock>(),
                     }
                 });
             }
