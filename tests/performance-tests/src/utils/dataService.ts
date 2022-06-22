@@ -5,6 +5,40 @@ const applicationJsonHeaders = {
   'Content-Type': 'application/json',
 };
 
+export interface SubjectMeta {
+  filters: {
+    [filter: string]: {
+      options: {
+        [filterGroup: string]: {
+          options: {
+            value: string;
+          }[];
+        };
+      };
+    };
+  };
+  indicators: {
+    [indicatorGroup: string]: {
+      options: {
+        value: string;
+      }[];
+    };
+  };
+  timePeriod: {
+    options: {
+      code: string;
+      year: number;
+    }[];
+  };
+  locations: {
+    [geographicLevel: string]: {
+      options: {
+        id: string;
+      }[];
+    };
+  };
+}
+
 export default function createDataService(
   adminUrl: string,
   accessToken: string,
@@ -138,7 +172,7 @@ export default function createDataService(
       };
 
       const { response, json } = client.post<{ id: string; status: string }>(
-        `/api/release/${releaseId}/data?title=${title}`,
+        `/api/release/${releaseId}/data?title=${encodeURI(title)}`,
         uploadBody,
       );
 
@@ -161,6 +195,79 @@ export default function createDataService(
       );
       return {
         importStatus: json.status,
+        response,
+      };
+    },
+
+    getSubjects: ({ releaseId }: { releaseId: string }) => {
+      const { response, json } = client.get<{ id: string; name: string }[]>(
+        `/api/data/releases/${releaseId}/subjects`,
+      );
+      return {
+        subjects: json.map(subject => ({
+          id: subject.id,
+          name: subject.name,
+        })),
+        response,
+      };
+    },
+
+    getSubjectMeta: ({
+      releaseId,
+      subjectId,
+    }: {
+      releaseId: string;
+      subjectId: string;
+    }) => {
+      const { response, json } = client.get<SubjectMeta>(
+        `/api/data/release/${releaseId}/meta/subject/${subjectId}`,
+      );
+      return {
+        subjectMeta: json,
+        response,
+      };
+    },
+
+    tableQuery: ({
+      releaseId,
+      subjectId,
+      filterIds,
+      indicatorIds,
+      locationIds,
+      startYear,
+      startCode,
+      endYear,
+      endCode,
+    }: {
+      releaseId: string;
+      subjectId: string;
+      filterIds: string[];
+      indicatorIds: string[];
+      locationIds: string[];
+      startYear: number;
+      startCode: string;
+      endYear: number;
+      endCode: string;
+    }) => {
+      const { response, json } = client.post<{ results: { id: string }[] }>(
+        `/api/data/tablebuilder/release/${releaseId}`,
+        JSON.stringify({
+          filters: filterIds,
+          includeGeoJson: false,
+          indicators: indicatorIds,
+          locationIds,
+          subjectId,
+          timePeriod: {
+            startYear,
+            startCode,
+            endYear,
+            endCode,
+          },
+        }),
+        applicationJsonHeaders,
+      );
+      return {
+        results: json.results,
         response,
       };
     },

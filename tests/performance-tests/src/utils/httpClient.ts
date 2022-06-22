@@ -16,14 +16,12 @@ export default function createClient(
       response: RefinedResponse<'text'>;
     } => {
       const response = http.get(
-        `${baseUrl}/${url}`,
+        `${baseUrl}${url}`,
         getHttpHeaders(accessToken, headers),
       );
 
       if (checkResponseStatus && response.status !== 200) {
-        throw new Error(
-          `Error with GET to url ${url}: ${JSON.stringify(response.json())}`,
-        );
+        throw new Error(`Error with GET to url ${url}: ${response.body}`);
       }
 
       return {
@@ -41,15 +39,13 @@ export default function createClient(
       response: RefinedResponse<'text'>;
     } => {
       const response = http.post(
-        `${baseUrl}/${url}`,
+        `${baseUrl}${url}`,
         data,
         getHttpHeaders(accessToken, headers),
       );
 
       if (checkResponseStatus && response.status !== 200) {
-        throw new Error(
-          `Error with POST to url ${url}: ${JSON.stringify(response.json())}`,
-        );
+        throw new Error(`Error with POST to url ${url}: ${response.body}`);
       }
 
       return {
@@ -64,15 +60,13 @@ export default function createClient(
       headers?: HttpHeaders,
     ): RefinedResponse<'text'> => {
       const response = http.del(
-        `${baseUrl}/${url}`,
+        `${baseUrl}${url}`,
         data,
         getHttpHeaders(accessToken, headers),
       );
 
       if (checkResponseStatus && response.status !== 204) {
-        throw new Error(
-          `Error with DELETE to url ${url}: ${JSON.stringify(response.json())}`,
-        );
+        throw new Error(`Error with DELETE to url ${url}: ${response.body}`);
       }
 
       return response;

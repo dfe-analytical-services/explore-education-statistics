@@ -1,9 +1,9 @@
-import { check, fail, sleep } from 'k6';
+import { check, sleep } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import refreshAuthTokens from '../../auth/refreshAuthTokens';
 import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
-import createDataService from '../../utils/dataService';
+import createDataService, { SubjectMeta } from '../../utils/dataService';
 
 export const options: Options = {
   stages: [{ duration: '10m', target: 1 }],
@@ -17,6 +17,8 @@ interface SetupData {
   themeId: string;
   topicId: string;
   releaseId: string;
+  subjectId: string;
+  subjectMeta: SubjectMeta;
   adminUrl: string;
   userName: string;
   authTokens: AuthTokens;
@@ -46,17 +48,17 @@ export function setup(): SetupData {
   const dataService = createDataService(adminUrl, authTokens.accessToken);
 
   const { themeId } = dataService.createTheme({
-    title: `UI test theme - Performance tests - "import.test.ts" - ${uniqueId}`,
+    title: `UI test theme - Performance tests - "tableBuilderQuery.test.ts" - ${uniqueId}`,
   });
 
   const { topicId } = dataService.createTopic({
     themeId,
-    title: `UI test topic - Performance tests - "import.test.ts" - ${uniqueId}`,
+    title: `UI test topic - Performance tests - "tableBuilderQuery.test.ts" - ${uniqueId}`,
   });
 
   const { publicationId } = dataService.createPublication({
     topicId,
-    title: `UI test publication - Performance tests - "import.test.ts" - ${uniqueId}`,
+    title: `UI test publication - Performance tests - "tableBuilderQuery.test.ts" - ${uniqueId}`,
   });
 
   const { releaseId } = dataService.createRelease({
@@ -65,15 +67,60 @@ export function setup(): SetupData {
     timePeriodCoverage: 'AY',
   });
 
+  const { fileId } = dataService.importDataFile({
+    title: 'Data file for querying',
+    releaseId,
+    dataFile: {
+      file: subjectFile,
+      filename: `subject.csv`,
+    },
+    metaFile: {
+      file: subjectMetaFile,
+      filename: `subject.meta.csv`,
+    },
+  });
+
+  const maxImportWaitTimeMillis = 240 * 1000;
+  const importStartTime = Date.now();
+  const importExpireTime = importStartTime + maxImportWaitTimeMillis;
+
+  while (Date.now() < importExpireTime) {
+    sleep(5);
+
+    const { importStatus } = dataService.getImportStatus({
+      releaseId,
+      fileId,
+    });
+
+    if (importStatus === 'FAILED' || importStatus === 'CANCELLED') {
+      throw new Error(
+        `Incorrect end state for import process of uploaded subject file - ${importStatus}`,
+      );
+    }
+
+    if (importStatus === 'COMPLETE') {
+      break;
+    }
+  }
+
+  const { subjects } = dataService.getSubjects({ releaseId });
+  const subjectId = subjects[0].id;
+  const { subjectMeta } = dataService.getSubjectMeta({ releaseId, subjectId });
+
   /* eslint-disable-next-line no-console */
   console.log(
     `Created Theme ${themeId}, Topic ${topicId}, Publication ${publicationId}, Release ${releaseId}`,
   );
 
+  /* eslint-disable-next-line no-console */
+  console.log(`Created Subject ${subjectId}`);
+
   return {
     themeId,
     topicId,
     releaseId,
+    subjectId,
+    subjectMeta,
     userName,
     adminUrl,
     authTokens,
@@ -109,9 +156,11 @@ function getOrRefreshAccessToken(
 
 const performTest = ({
   releaseId,
+  subjectId,
   userName,
   adminUrl,
   authTokens,
+  subjectMeta,
   supportsRefreshTokens,
 }: SetupData) => {
   const accessToken = getOrRefreshAccessToken(
@@ -121,76 +170,46 @@ const performTest = ({
     authTokens,
   );
 
-  const uniqueId = Date.now();
-  const subjectName = `dates-${uniqueId}`;
+  const dataService = createDataService(adminUrl, accessToken);
 
-  const dataService = createDataService(adminUrl, accessToken, false);
+  const allFilterIds = Object.values(subjectMeta.filters).flatMap(filter =>
+    Object.values(filter.options).flatMap(filterGroup =>
+      filterGroup.options.flatMap(filterItem => filterItem.value),
+    ),
+  );
 
-  const {
-    response: uploadResponse,
-    fileId,
-    importStatus: initialImportStatus,
-  } = dataService.importDataFile({
-    title: subjectName,
+  const allIndicationIds = Object.values(
+    subjectMeta.indicators,
+  ).flatMap(indicatorGroup =>
+    indicatorGroup.options.map(indicator => indicator.value),
+  );
+
+  const allLocationIds = Object.values(
+    subjectMeta.locations,
+  ).flatMap(geographicLevel =>
+    geographicLevel.options.map(location => location.id),
+  );
+
+  const someTimePeriods = {
+    startYear: subjectMeta.timePeriod.options[0].year,
+    startCode: subjectMeta.timePeriod.options[0].code,
+    endYear: subjectMeta.timePeriod.options[1].year,
+    endCode: subjectMeta.timePeriod.options[1].code,
+  };
+
+  const { response, results } = dataService.tableQuery({
     releaseId,
-    dataFile: {
-      file: subjectFile,
-      filename: `${subjectName}.csv`,
-    },
-    metaFile: {
-      file: subjectMetaFile,
-      filename: `${subjectName}.meta.csv`,
-    },
+    subjectId,
+    filterIds: allFilterIds,
+    indicatorIds: allIndicationIds,
+    locationIds: allLocationIds,
+    ...someTimePeriods,
   });
 
-  check(uploadResponse, {
+  check(response, {
     'response code was 200': res => res.status === 200,
-    'response should indicate that the uploaded file is queued': _ =>
-      initialImportStatus === 'QUEUED',
-    'response should contain the uploaded file id': _ => !!fileId,
+    'response should contain table builder results': _ => results.length > 0,
   });
-
-  const maxImportWaitTimeMillis = 240 * 1000;
-  const importStartTime = Date.now();
-  const importExpireTime = importStartTime + maxImportWaitTimeMillis;
-  let importComplete = false;
-
-  while (Date.now() < importExpireTime) {
-    sleep(1);
-
-    const {
-      response: statusResponse,
-      importStatus,
-    } = dataService.getImportStatus({
-      releaseId,
-      fileId,
-    });
-
-    if (statusResponse.status !== 200) {
-      fail(
-        `Failure checking on import status of uploaded subject file ${subjectName} - ${JSON.stringify(
-          statusResponse.json(),
-        )}`,
-      );
-    }
-
-    if (importStatus === 'FAILED' || importStatus === 'CANCELLED') {
-      fail(
-        `Incorrect end state for import process of uploaded subject file ${subjectName} - ${importStatus}`,
-      );
-    }
-
-    if (importStatus === 'COMPLETE') {
-      importSpeedTrend.add(Date.now() - importStartTime);
-      importCount.add(1);
-      importComplete = true;
-      break;
-    }
-  }
-
-  if (!importComplete) {
-    errorRate.add(1);
-  }
 };
 
 export const teardown = ({
