@@ -251,9 +251,14 @@ Verify public pre-release access list
 
 Verify accordions are correct
     user goes to release page via breadcrumb    ${PUBLICATION_NAME}    ${RELEASE_NAME}
+    user checks there are x accordion sections    1    id:additional-info-accordion
+    user checks accordion is in position    Explore data and files    1    id:additional-info-accordion
+
+    user checks there are x accordion sections    2    id:content
     user checks accordion is in position    Dates data block    1    id:content
     user checks accordion is in position    Test text    2    id:content
 
+    user checks there are x accordion sections    2    id:help-and-support
     user checks accordion is in position    National statistics    1    id:help-and-support
     user checks accordion is in position    Contact us    2    id:help-and-support
 

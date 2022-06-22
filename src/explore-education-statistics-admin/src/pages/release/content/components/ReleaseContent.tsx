@@ -189,7 +189,11 @@ const ReleaseContent = () => {
             <h2 className="govuk-heading-m" id="data-downloads">
               Data downloads
             </h2>
-            <nav role="navigation" aria-labelledby="data-downloads">
+            <nav
+              role="navigation"
+              aria-labelledby="data-downloads"
+              data-testid="data-downloads"
+            >
               <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
                 <li>
                   <a href="#dataDownloads-1">Explore data and files</a>

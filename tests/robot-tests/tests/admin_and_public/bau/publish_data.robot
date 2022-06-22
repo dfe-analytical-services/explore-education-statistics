@@ -9,6 +9,7 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${TOPIC_NAME}=                          %{TEST_TOPIC_NAME}
 ${PUBLICATION_NAME}=                    UI tests - publish data %{RUN_IDENTIFIER}
@@ -26,6 +27,7 @@ ${FOOTNOTE_SUBJECT_1_FILTER}=           Footnote for subject 1 - filter
 ${FOOTNOTE_SUBJECT_1_FILTER_GROUP}=     Footnote for subject 1 - filter group
 ${FOOTNOTE_SUBJECT_1_FILTER_ITEM}=      Footnote for subject 1 - filter item
 ${FOOTNOTE_SUBJECT_1_MIXTURE}=          Footnote for subject 1 - mixture of all
+
 
 *** Test Cases ***
 Create new publication and release via API

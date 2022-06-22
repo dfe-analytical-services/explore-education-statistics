@@ -27,35 +27,37 @@ Navigate to manage users page as bau1
     user checks table column heading contains    1    4    Actions
 
 Assert that test users are present in table
-    user checks results table row heading contains    1    1    Analyst1 User1
-    user checks results table row heading contains    2    1    Analyst2 User2
-    user checks results table row heading contains    3    1    Analyst3 User3
-    user checks results table row heading contains    4    1    Bau1 User1
-    user checks results table row heading contains    5    1    Bau2 User2
+    ${ROW}=    user gets table row with heading    Analyst1 User1
+    user checks row cell contains text    ${ROW}    1    EES-test.ANALYST1@education.gov.uk
+    user checks row cell contains text    ${ROW}    2    Analyst
+    user checks row cell contains text    ${ROW}    3    Manage
 
-    user checks results table cell contains    1    1    EES-test.ANALYST1@education.gov.uk
-    user checks results table cell contains    1    2    Analyst
-    user checks results table cell contains    1    3    Manage
+    ${ROW}=    user gets table row with heading    Analyst2 User2
+    user checks row cell contains text    ${ROW}    1    EES-test.ANALYST2@education.gov.uk
+    user checks row cell contains text    ${ROW}    2    Analyst
+    user checks row cell contains text    ${ROW}    3    Manage
 
-    user checks results table cell contains    2    1    EES-test.ANALYST2@education.gov.uk
-    user checks results table cell contains    2    2    Analyst
-    user checks results table cell contains    2    3    Manage
+    ${ROW}=    user gets table row with heading    Analyst3 User3
+    user checks row cell contains text    ${ROW}    1    EES-test.ANALYST3@education.gov.uk
+    user checks row cell contains text    ${ROW}    2    Analyst
+    user checks row cell contains text    ${ROW}    3    Manage
 
-    user checks results table cell contains    3    1    EES-test.ANALYST3@education.gov.uk
-    user checks results table cell contains    3    2    Analyst
-    user checks results table cell contains    3    3    Manage
+    ${ROW}=    user gets table row with heading    Bau1 User1
+    user checks row cell contains text    ${ROW}    1    EES-test.BAU1@education.gov.uk
+    user checks row cell contains text    ${ROW}    2    BAU User
+    user checks row cell contains text    ${ROW}    3    Manage
 
-    user checks results table cell contains    4    1    EES-test.BAU1@education.gov.uk
-    user checks results table cell contains    4    2    BAU User
-    user checks results table cell contains    4    3    Manage
+    ${ROW}=    user gets table row with heading    Bau2 User2
+    user checks row cell contains text    ${ROW}    1    EES-test.BAU2@education.gov.uk
+    user checks row cell contains text    ${ROW}    2    BAU User
+    user checks row cell contains text    ${ROW}    3    Manage
 
-    user checks results table cell contains    5    1    EES-test.BAU2@education.gov.uk
-    user checks results table cell contains    5    2    BAU User
-    user checks results table cell contains    5    3    Manage
+    ${ROW}=    user gets table row with heading    Prerelease3 User3
+    user checks row cell contains text    ${ROW}    1    ees-prerelease3@education.gov.uk
+    user checks row cell contains text    ${ROW}    2    No role
+    user checks row cell contains text    ${ROW}    3    Manage
 
-    user checks results table cell contains    6    1    ees-prerelease3@education.gov.uk
-    user checks results table cell contains    6    2    No role
-    user checks results table cell contains    6    3    Manage
+    set suite variable    ${PRERELEASE_USER_ROW}    ${ROW}
 
 Select a user to manage
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
@@ -64,7 +66,7 @@ Select a user to manage
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_2_NAME}
     user create test release via api    ${PUBLICATION_ID}    AY    2000
 
-    user clicks link in table cell    6    3    Manage
+    user clicks link    Manage    ${PRERELEASE_USER_ROW}
     user waits until page contains title    Manage user
 
 Check the initial manage user page
