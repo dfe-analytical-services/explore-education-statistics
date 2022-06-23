@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Mappings.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Migrations.Custom;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
@@ -151,6 +152,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 {
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
+
+            // Adds Brotli and Gzip compressing
+            services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+            });
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "wwwroot"; });
@@ -436,6 +443,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IUserPublicationRoleRepository, UserPublicationRoleRepository>();
             services.AddTransient<IUserReleaseRoleRepository, UserReleaseRoleRepository>();
             services.AddTransient<IUserReleaseInviteRepository, UserReleaseInviteRepository>();
+            services.AddTransient<IUserPublicationInviteRepository, UserPublicationInviteRepository>();
 
             services.AddTransient<INotificationClient>(s =>
             {
@@ -502,6 +510,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             AddPersistenceHelper<ContentDbContext>(services);
             AddPersistenceHelper<StatisticsDbContext>(services);
             AddPersistenceHelper<UsersAndRolesDbContext>(services);
+            services.AddTransient<AuthorizationHandlerResourceRoleService>();
 
             // This service handles the generation of the JWTs for users after they log in
             services.AddTransient<IProfileService, ApplicationUserProfileService>();
@@ -585,6 +594,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     opts.Preload();
                 });
             }
+
+            app.UseResponseCompression();
 
             if (Configuration.GetValue<bool>("enableSwagger"))
             {

@@ -31,6 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IUserRoleService _userRoleService;
         private readonly IUserService _userService;
         private readonly IUserInviteRepository _userInviteRepository;
+        private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
+        private readonly IUserPublicationInviteRepository _userPublicationInviteRepository;
 
         public UserManagementService(UsersAndRolesDbContext usersAndRolesDbContext,
             ContentDbContext contentDbContext,
@@ -38,7 +40,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IEmailTemplateService emailTemplateService,
             IUserRoleService userRoleService,
             IUserService userService,
-            IUserInviteRepository userInviteRepository)
+            IUserInviteRepository userInviteRepository,
+            IUserReleaseInviteRepository userReleaseInviteRepository,
+            IUserPublicationInviteRepository userPublicationInviteRepository)
         {
             _usersAndRolesDbContext = usersAndRolesDbContext;
             _contentDbContext = contentDbContext;
@@ -47,6 +51,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userRoleService = userRoleService;
             _userService = userService;
             _userInviteRepository = userInviteRepository;
+            _userReleaseInviteRepository = userReleaseInviteRepository;
+            _userPublicationInviteRepository = userPublicationInviteRepository;
         }
 
         public async Task<Either<ActionResult, List<UserViewModel>>> ListAllUsers()
@@ -194,26 +200,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<UserViewModel>>> ListPendingInvites()
+        public async Task<Either<ActionResult, List<PendingInviteViewModel>>> ListPendingInvites()
         {
             return await _userService
                 .CheckCanManageAllUsers()
                 .OnSuccess(async () =>
-                    await _usersAndRolesDbContext.UserInvites
-                        .AsQueryable()
-                        .Where(ui => !ui.Accepted)
-                        .OrderBy(ui => ui.Email)
-                        .Include(ui => ui.Role)
-                        .Select(ui => new UserViewModel
-                        {
-                            Email = ui.Email,
-                            Role = ui.Role.Name
-                        }).ToListAsync()
+                    {
+                        var pendingInvites = await _usersAndRolesDbContext.UserInvites
+                            .AsQueryable()
+                            .Where(ui => !ui.Accepted)
+                            .OrderBy(ui => ui.Email)
+                            .Include(ui => ui.Role)
+                            .ToListAsync();
+
+                        return await pendingInvites
+                            .ToAsyncEnumerable()
+                            .SelectAwait(async invite =>
+                            {
+                                var userReleaseInvites = await _contentDbContext
+                                    .UserReleaseInvites
+                                    .Include(userReleaseInvite =>
+                                        userReleaseInvite.Release.Publication)
+                                    .Where(userReleaseInvite =>
+                                        userReleaseInvite.Email.ToLower() == invite.Email.ToLower())
+                                    .ToListAsync();
+
+                                var userReleaseRoles = userReleaseInvites
+                                    .Select(userReleaseInvite =>
+                                        new UserReleaseRoleViewModel
+                                        {
+                                            Id = userReleaseInvite.Id,
+                                            Publication = userReleaseInvite.Release.Publication.Title,
+                                            Release = userReleaseInvite.Release.Title,
+                                            Role = userReleaseInvite.Role,
+                                        }
+                                    ).ToList();
+
+                                var userPublicationInvites = await _contentDbContext
+                                    .UserPublicationInvites
+                                    .Include(userPublicationInvite =>
+                                        userPublicationInvite.Publication)
+                                    .Where(userPublicationInvite =>
+                                        userPublicationInvite.Email.ToLower() == invite.Email.ToLower())
+                                    .ToListAsync();
+
+                                var userPublicationRoles = userPublicationInvites
+                                    .Select(userPublicationInvite =>
+                                        new UserPublicationRoleViewModel
+                                        {
+                                            Id = userPublicationInvite.Id,
+                                            Publication = userPublicationInvite.Publication.Title,
+                                            Role = userPublicationInvite.Role,
+                                        }
+                                    ).ToList();
+
+                                return new PendingInviteViewModel
+                                {
+                                    Email = invite.Email,
+                                    Role = invite.Role.Name,
+                                    UserPublicationRoles = userPublicationRoles,
+                                    UserReleaseRoles = userReleaseRoles,
+                                };
+                            }).ToListAsync();
+                    }
                 );
         }
 
-        public async Task<Either<ActionResult, UserInvite>> InviteUser(string email, string roleId)
+        public async Task<Either<ActionResult, UserInvite>> InviteUser(
+            string email,
+            string roleId,
+            List<UserReleaseRoleAddViewModel> userReleaseRoles,
+            List<UserPublicationRoleAddViewModel> userPublicationRoles)
         {
+            var sanitisedEmail = email.Trim().ToLower();
+
             return await _userService
                 .CheckCanManageAllUsers()
                 .OnSuccess(() => ValidateUserDoesNotExist(email))
@@ -228,16 +288,43 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(InvalidUserRole);
                     }
 
-                    return await _userInviteRepository.Create(
-                        email: email.ToLower(),
+                    var userInvite = await _userInviteRepository.Create(
+                        email: sanitisedEmail,
                         roleId: roleId,
                         createdById: _userService.GetUserId());
+
+                    foreach (var userReleaseRole in userReleaseRoles)
+                    {
+                        await _userReleaseInviteRepository.Create(
+                            releaseId: userReleaseRole.ReleaseId,
+                            email: sanitisedEmail,
+                            releaseRole: userReleaseRole.ReleaseRole,
+                            emailSent: true,
+                            createdById: _userService.GetUserId());
+                    }
+
+                    await _userPublicationInviteRepository.CreateManyIfNotExists(
+                        userPublicationRoles,
+                        sanitisedEmail,
+                        _userService.GetUserId());
+
+                    return userInvite;
                 })
-                .OnSuccess(invite =>
+                .OnSuccess(userInvite =>
                 {
+                    var userReleaseInvites = _contentDbContext.UserReleaseInvites
+                        .Include(invite => invite.Release.Publication)
+                        .Where(invite => invite.Email.ToLower() == sanitisedEmail)
+                        .ToList();
+
+                    var userPublicationInvites = _contentDbContext.UserPublicationInvites
+                        .Include(invite => invite.Publication)
+                        .Where(invite => invite.Email.ToLower() == sanitisedEmail)
+                        .ToList();
+
                     return _emailTemplateService
-                        .SendInviteEmail(email)
-                        .OnSuccess(() => invite);
+                        .SendInviteEmail(sanitisedEmail, userReleaseInvites, userPublicationInvites)
+                        .OnSuccess(() => userInvite);
                 });
         }
 
@@ -249,15 +336,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var invite = await _usersAndRolesDbContext.UserInvites
                         .AsQueryable()
-                        .FirstOrDefaultAsync(i => i.Email == email);
+                        .FirstOrDefaultAsync(i => i.Email.ToLower() == email.ToLower());
 
                     if (invite == null)
                     {
                         return ValidationActionResult(InviteNotFound);
                     }
 
+                    if (invite.Accepted)
+                    {
+                        return ValidationActionResult(InviteAlreadyAccepted);
+                    }
+
                     _usersAndRolesDbContext.UserInvites.Remove(invite);
                     await _usersAndRolesDbContext.SaveChangesAsync();
+
+                    return Unit.Instance;
+                })
+                .OnSuccess(async () =>
+                {
+                    var releaseInvites = await _contentDbContext.UserReleaseInvites
+                        .AsQueryable()
+                        .Where(i => i.Email.ToLower() == email.ToLower())
+                        .ToListAsync();
+                    _contentDbContext.UserReleaseInvites.RemoveRange(releaseInvites);
+
+                    var publicationInvites = await _contentDbContext.UserPublicationInvites
+                        .AsQueryable()
+                        .Where(i => i.Email.ToLower() == email.ToLower())
+                        .ToListAsync();
+                    _contentDbContext.UserPublicationInvites.RemoveRange(publicationInvites);
+
+                    await _contentDbContext.SaveChangesAsync();
 
                     return Unit.Instance;
                 });

@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
                 if (context.HasSucceeded)
                 {
-                    break;
+                    return;
                 }
             }
         }

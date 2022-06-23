@@ -231,6 +231,12 @@ const ReleaseContent = () => {
 
             {!!releaseCount && (
               <>
+                <h3
+                  className="govuk-heading-s govuk-!-margin-top-6"
+                  id="past-releases"
+                >
+                  Past releases
+                </h3>
                 <p className="govuk-!-margin-bottom-0">
                   {release.coverageTitle} <strong>{release.yearTitle}</strong>
                 </p>

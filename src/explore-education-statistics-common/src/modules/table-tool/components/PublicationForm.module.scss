@@ -1,0 +1,19 @@
+@import '~govuk-frontend/govuk/base';
+
+.optionsContainer {
+  @include govuk-media-query($from: desktop) {
+    display: flex;
+  }
+}
+
+.publicationsList {
+  @include govuk-media-query($from: desktop) {
+    border-left: 1px solid govuk-colour('mid-grey');
+    margin-left: govuk-spacing(7);
+    padding-left: govuk-spacing(7);
+  }
+
+  :global(.govuk-form-group) {
+    margin-bottom: 0;
+  }
+}

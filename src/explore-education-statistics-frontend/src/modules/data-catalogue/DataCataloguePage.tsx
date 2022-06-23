@@ -141,7 +141,7 @@ const DataCataloguePage: NextPage<Props> = ({
           publicationId: state.query.publication?.id ?? '',
         }}
         onSubmit={handlePublicationFormSubmit}
-        options={themes}
+        themes={themes}
       />
     );
   };

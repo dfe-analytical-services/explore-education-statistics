@@ -265,7 +265,7 @@ Verify Dates data block accordion section
     user checks chart title contains    ${section}    Dates table title
     user checks infographic chart contains alt    ${section}    Sample alt text
 
-    user clicks link    Table    ${section}
+    user clicks link by visible text    Table    ${section}
     user waits until parent contains element    ${section}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Dates table title"]
     user waits until parent contains element    ${section}    xpath:.//*[.="Source: Dates source"]
@@ -281,7 +281,6 @@ Verify Test text accordion section contains correct text
     ${section}=    user gets accordion section content element    Test text    id:content
     user waits until parent contains element    ${section}    xpath:.//p[text()="Some test text!"]
     user closes accordion section    Test text    id:content
-    user clicks link    Summary
 
 Return to Admin and Create amendment
     user navigates to admin dashboard    Bau1
@@ -610,7 +609,7 @@ Verify amendment Dates data block accordion section
     user checks chart title contains    ${section}    Updated sample title
     user checks infographic chart contains alt    ${section}    Updated sample alt text
 
-    user clicks link    Table    ${section}
+    user clicks link by visible text    Table    ${section}
     user waits until parent contains element    ${section}
     ...    xpath:.//*[@data-testid="dataTableCaption" and text()="Updated dates table title"]
     user waits until parent contains element    ${section}    xpath:.//*[.="Source: Updated dates source"]

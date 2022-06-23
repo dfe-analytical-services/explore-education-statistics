@@ -103,9 +103,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     .EnableSensitiveDataLogging(HostEnvironment.IsDevelopment())
             );
 
-            // ReSharper disable once CommentTypo
             // Adds Brotli and Gzip compressing
-            services.AddResponseCompression();
+            services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+            });
 
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>

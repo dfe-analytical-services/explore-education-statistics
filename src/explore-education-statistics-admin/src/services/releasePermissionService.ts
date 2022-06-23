@@ -16,13 +16,7 @@ const releasePermissionService = {
   },
   listReleaseContributorInvites(
     releaseId: string,
-    accepted: boolean | undefined = undefined,
   ): Promise<ContributorInvite[]> {
-    if (accepted !== undefined) {
-      return client.get(`/releases/${releaseId}/contributor-invites`, {
-        params: { accepted },
-      });
-    }
     return client.get(`/releases/${releaseId}/contributor-invites`);
   },
   listPublicationContributors(

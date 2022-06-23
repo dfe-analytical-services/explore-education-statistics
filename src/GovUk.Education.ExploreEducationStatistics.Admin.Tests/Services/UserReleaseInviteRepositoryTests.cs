@@ -44,7 +44,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(userReleaseInvite.EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvite.Created).Milliseconds, 0, 1500);
                 Assert.Equal(createdById, userReleaseInvite.CreatedById);
-                Assert.False(userReleaseInvite.Accepted);
             }
         }
 
@@ -61,7 +60,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Role = Contributor,
                 EmailSent = true,
                 CreatedById = createdById,
-                Accepted = true,
             };
 
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -98,7 +96,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(userReleaseInvites[0].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
                 Assert.Equal(createdById, userReleaseInvites[0].CreatedById);
-                Assert.True(userReleaseInvites[0].Accepted);
 
                 Assert.Equal(releaseId1, userReleaseInvites[1].ReleaseId);
                 Assert.Equal("test@test.com", userReleaseInvites[1].Email);
@@ -106,7 +103,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(userReleaseInvites[1].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[1].Created).Milliseconds, 0, 1500);
                 Assert.Equal(createdById, userReleaseInvites[1].CreatedById);
-                Assert.False(userReleaseInvites[1].Accepted);
 
                 Assert.Equal(releaseId2, userReleaseInvites[2].ReleaseId);
                 Assert.Equal("test@test.com", userReleaseInvites[2].Email);
@@ -114,7 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.False(userReleaseInvites[2].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[2].Created).Milliseconds, 0, 1500);
                 Assert.Equal(createdById, userReleaseInvites[2].CreatedById);
-                Assert.False(userReleaseInvites[2].Accepted);
             }
         }
 

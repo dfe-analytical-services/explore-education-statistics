@@ -35,10 +35,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("releases/{releaseId}/contributor-invites")]
         public async Task<ActionResult<List<ContributorInviteViewModel>>> ListReleaseContributorInvites(
-            Guid releaseId, [FromQuery] bool? accepted = null)
+            Guid releaseId)
         {
             return await _releasePermissionService
-                .ListReleaseContributorInvites(releaseId, accepted)
+                .ListReleaseContributorInvites(releaseId)
                 .HandleFailuresOrOk();
         }
 

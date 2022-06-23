@@ -1,6 +1,7 @@
 *** Settings ***
 Resource    ./common.robot
 
+
 *** Keywords ***
 user waits until table is visible
     [Arguments]    ${parent}=css:body    ${wait}=${timeout}
@@ -43,6 +44,11 @@ user checks table cell in offset row contains
 user gets table row with heading
     [Arguments]    ${heading}    ${parent}=css:table
     ${elem}=    get child element    ${parent}    xpath:.//tbody/tr/th[text()="${heading}"]/..
+    [Return]    ${elem}
+
+user gets table row
+    [Arguments]    ${row_cell_text}    ${parent}=css:table
+    ${elem}=    get child element    ${parent}    xpath:.//tbody/tr/td[text()="${row_cell_text}"]/..
     [Return]    ${elem}
 
 user checks table body has x rows

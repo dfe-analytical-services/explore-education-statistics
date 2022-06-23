@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
             var partialDate = (PartialDate)value;
-            if (partialDate == null || partialDate.IsValid())
+            if (partialDate == null || partialDate.IsEmpty() || partialDate.IsValid())
             {
                 return ValidationResult.Success;
             }

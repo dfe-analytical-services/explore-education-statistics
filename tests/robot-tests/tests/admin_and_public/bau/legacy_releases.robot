@@ -31,7 +31,7 @@ Go to manage publication page
     user opens accordion section    ${PUBLICATION_NAME}
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
     user waits until page contains title caption    ${PUBLICATION_NAME}
-    user waits until h1 is visible    Manage publication    %{WAIT_SMALL}
+    user waits until h1 is visible    Manage publication
 
 Create legacy release
     user scrolls to element    //*[button[contains(text(),'Create legacy release')]]
@@ -83,7 +83,7 @@ Navigate to publication to update legacy releases
     user opens accordion section    ${PUBLICATION_NAME}
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
     user waits until page contains title caption    ${PUBLICATION_NAME}
-    user waits until h1 is visible    Manage publication    %{WAIT_SMALL}
+    user waits until h1 is visible    Manage publication
 
 Update legacy release
     user clicks element    xpath://tr[1]//*[text()="Edit release"]
@@ -125,7 +125,7 @@ Navigate to publication to update legacy releases again
     user opens accordion section    ${PUBLICATION_NAME}
     user clicks element    testid:Edit publication link for ${PUBLICATION_NAME}
     user waits until page contains title caption    ${PUBLICATION_NAME}
-    user waits until h1 is visible    Manage publication    %{WAIT_SMALL}
+    user waits until h1 is visible    Manage publication
 
 Delete legacy release
     user clicks element    xpath://tr[1]//*[text()="Delete release"]

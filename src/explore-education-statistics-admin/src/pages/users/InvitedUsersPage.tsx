@@ -1,12 +1,12 @@
 import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
-import userService, { UserStatus } from '@admin/services/userService';
+import userService, { PendingInvite } from '@admin/services/userService';
 import ButtonText from '@common/components/ButtonText';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React, { useCallback, useEffect, useState } from 'react';
 
 interface Model {
-  users: UserStatus[];
+  pendingInvites: PendingInvite[];
 }
 
 const InvitedUsersPage = () => {
@@ -17,10 +17,10 @@ const InvitedUsersPage = () => {
   const getPendingInvites = useCallback(() => {
     setIsLoading(true);
     userService
-      .getInvitedUsers()
+      .getPendingInvites()
       .then(updatedInvites => {
         setModel({
-          users: updatedInvites,
+          pendingInvites: updatedInvites,
         });
       })
       .catch(error => {
@@ -41,42 +41,70 @@ const InvitedUsersPage = () => {
         { name: 'Pending invites' },
       ]}
       title="Pending invites"
+      caption="Manage invites to the service"
     >
-      <h1 className="govuk-heading-xl">
-        <span className="govuk-caption-xl">Manage access to the service</span>
-        Pending user invites
-      </h1>
-
       {errorStatus && errorStatus === 404 ? (
-        <p>There are currently no pending user invites</p>
+        'There are currently no pending user invites'
       ) : (
-        <table className="govuk-table">
-          <caption className="govuk-table__caption">Invited users</caption>
-          <thead className="govuk-table__head">
-            <tr className="govuk-table__row">
-              <th scope="col" className="govuk-table__header">
-                Email
-              </th>
-              <th scope="col" className="govuk-table__header">
-                Role
-              </th>
-              <th scope="col" className="govuk-table__header">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <LoadingSpinner loading={isLoading} text="Loading invited users">
+        <LoadingSpinner loading={isLoading} text="Loading invited users">
+          <table>
+            <caption className="govuk-table__caption">Invited users</caption>
+            <thead>
+              <tr>
+                <th scope="col">Email</th>
+                <th scope="col">Role</th>
+                <th scope="col">Release Roles</th>
+                <th scope="col">Publication Roles</th>
+                <th scope="col">Actions</th>
+              </tr>
+            </thead>
             {model && (
-              <tbody className="govuk-table__body">
-                {model.users.map(user => (
-                  <tr className="govuk-table__row" key={user.email}>
-                    <td className="govuk-table__cell">{user.email}</td>
-                    <td className="govuk-table__cell">{user.role}</td>
-                    <td className="govuk-table__cell">
+              <tbody>
+                {model.pendingInvites.map(pendingInvite => (
+                  <tr key={pendingInvite.email}>
+                    <td>{pendingInvite.email}</td>
+                    <td>{pendingInvite.role}</td>
+                    <td>
+                      {pendingInvite.userReleaseRoles.length === 0 ? (
+                        'No user release roles'
+                      ) : (
+                        <ul className="govuk-!-margin-0">
+                          {pendingInvite.userReleaseRoles.map(releaseRole => {
+                            return (
+                              <li key={releaseRole.id}>
+                                {releaseRole.publication}
+                                <ul>
+                                  <li>{releaseRole.release}</li>
+                                  <li>{releaseRole.role}</li>
+                                </ul>
+                              </li>
+                            );
+                          })}
+                        </ul>
+                      )}
+                    </td>
+                    <td>
+                      {pendingInvite.userPublicationRoles.length === 0 ? (
+                        'No user publication roles'
+                      ) : (
+                        <ul className="govuk-!-margin-0">
+                          {pendingInvite.userPublicationRoles.map(
+                            publicationRole => {
+                              return (
+                                <li key={publicationRole.id}>
+                                  {`${publicationRole.publication} - ${publicationRole.role}`}
+                                </li>
+                              );
+                            },
+                          )}
+                        </ul>
+                      )}
+                    </td>
+                    <td>
                       <ButtonText
                         onClick={() => {
                           userService
-                            .cancelInvite(user.email)
+                            .cancelInvite(pendingInvite.email)
                             .then(() => getPendingInvites());
                         }}
                       >
@@ -87,8 +115,8 @@ const InvitedUsersPage = () => {
                 ))}
               </tbody>
             )}
-          </LoadingSpinner>
-        </table>
+          </table>
+        </LoadingSpinner>
       )}
       <Link to="/administration/users/invites/create" className="govuk-button">
         Invite a new user

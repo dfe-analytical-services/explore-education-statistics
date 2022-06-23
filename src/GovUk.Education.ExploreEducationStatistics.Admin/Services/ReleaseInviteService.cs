@@ -27,6 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
         private readonly IUserRepository _userRepository;
         private readonly IUserService _userService;
+        private readonly IUserRoleService _userRoleService;
         private readonly IUserInviteRepository _userInviteRepository;
         private readonly IUserReleaseInviteRepository _userReleaseInviteRepository;
         private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
@@ -37,6 +38,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IUserRepository userRepository,
             IUserService userService,
+            IUserRoleService userRoleService,
             IUserInviteRepository userInviteRepository,
             IUserReleaseInviteRepository userReleaseInviteRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository,
@@ -48,6 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _contentPersistenceHelper = contentPersistenceHelper;
             _userRepository = userRepository;
             _userService = userService;
+            _userRoleService = userRoleService;
             _userInviteRepository = userInviteRepository;
             _userReleaseInviteRepository = userReleaseInviteRepository;
             _userReleaseRoleRepository = userReleaseRoleRepository;
@@ -66,15 +69,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publication => ValidateReleaseIds(publication, releaseIds))
                 .OnSuccess(async publication =>
                 {
-                    email = email.Trim();
+                    var sanitisedEmail = email.Trim();
 
-                    var user = await _userRepository.FindByEmail(email);
+                    var user = await _userRepository.FindByEmail(sanitisedEmail);
                     if (user == null)
                     {
-                        return await CreateNewUserContributorInvite(releaseIds, email, publication.Title);
+                        return await CreateNewUserContributorInvite(releaseIds, sanitisedEmail, publication.Title);
                     }
 
-                    return await CreateExistingUserContributorInvite(releaseIds, user.Id, email, publication.Title);
+                    return await CreateExistingUserContributorInvite(releaseIds, user.Id, sanitisedEmail, publication.Title);
                 });
         }
 
@@ -169,15 +172,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 createdById: _userService.GetUserId()
             );
 
-            await _userReleaseInviteRepository.CreateManyIfNotExists(
-                releaseIds: missingReleaseRoleReleaseIds,
-                email: email,
-                releaseRole: Contributor,
-                emailSent: true,
-                createdById: _userService.GetUserId(),
-                accepted: true);
-
-            return Unit.Instance;
+            var globalRoleNameToSet = _userRoleService
+                .GetAssociatedGlobalRoleNameForReleaseRole(Contributor);
+            return await _userRoleService.UpgradeToGlobalRoleIfRequired(globalRoleNameToSet, userId);
         }
 
         private async Task<Either<ActionResult, Publication>> ValidateReleaseIds(Publication publication,

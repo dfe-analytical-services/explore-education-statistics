@@ -8,6 +8,7 @@ Suite Setup         user opens the browser
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Test Cases ***
 Check permalink bd6a1e7e-445a-40be-9a26-82b3cb827efc
     Check permalink with id    bd6a1e7e-445a-40be-9a26-82b3cb827efc

@@ -1,15 +1,16 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.AuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Utils.ClaimsPrincipalUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 using static Moq.MockBehavior;
@@ -75,10 +76,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     if (!expectedToPassByClaimAlone)
                     {
-                        userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
-                            UserId,
-                            NonOwningLink.PublicationId,
-                            false);
+                        userPublicationRoleRepository
+                            .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
+                            .ReturnsAsync(new List<PublicationRole>());
                     }
 
                     var user = CreateClaimsPrincipal(UserId, claim);
@@ -126,14 +126,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await ForEachPublicationRoleAsync(async publicationRole =>
                 {
+                    // If the user has Publication Owner role on the publication they are allowed to drop methodology links
+                    var expectedToPassByPublicationRole = publicationRole == Owner;
+
                     var userPublicationRoleRepository = new Mock<IUserPublicationRoleRepository>(Strict);
 
                     var handler = SetupHandler(userPublicationRoleRepository.Object);
 
-                    userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
-                        UserId,
-                        NonOwningLink.PublicationId,
-                        publicationRole == Owner);
+                    userPublicationRoleRepository
+                        .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
+                        .ReturnsAsync(ListOf(publicationRole));
 
                     var user = CreateClaimsPrincipal(UserId);
                     var authContext =
@@ -145,8 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                     VerifyAllMocks(userPublicationRoleRepository);
 
-                    // If the user has Publication Owner role on the publication they are allowed to drop methodology links
-                    Assert.Equal(publicationRole == Owner, authContext.HasSucceeded);
+                    Assert.Equal(expectedToPassByPublicationRole, authContext.HasSucceeded);
                 });
             }
 
@@ -157,10 +158,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
 
                 var handler = SetupHandler(userPublicationRoleRepository.Object);
 
-                userPublicationRoleRepository.SetupPublicationOwnerRoleExpectations(
-                    UserId,
-                    NonOwningLink.PublicationId,
-                    false);
+                userPublicationRoleRepository
+                    .Setup(s => s.GetAllRolesByUserAndPublication(UserId, NonOwningLink.PublicationId))
+                    .ReturnsAsync(new List<PublicationRole>());
 
                 var user = CreateClaimsPrincipal(UserId);
                 var authContext =
@@ -182,8 +182,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         )
         {
             return new(
-                userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict)
-            );
+                new AuthorizationHandlerResourceRoleService(
+                    Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    userPublicationRoleRepository ?? Mock.Of<IUserPublicationRoleRepository>(Strict),
+                    Mock.Of<IPublicationRepository>(Strict)));
         }
     }
 }

@@ -210,7 +210,7 @@
                 "publication_heading": "NEET age 16 to 24"
               },
               {
-                "publication_heading": "Participation in education and training and employment"
+                "publication_heading": "Participation in education, training and employment age 16 to 18"
               }
             ]
           }
@@ -424,7 +424,7 @@
       {
         "publication_types": [
           {
-            "publication_type_heading": "Ad hoc statistics",
+            "publication_type_heading": "National and official statistics",
             "publications": [
               {
                 "publication_heading": "Higher Level Learners in England"
@@ -593,6 +593,14 @@
             "publications": [
               {
                 "publication_heading": "Secondary and primary school applications and offers"
+              }
+            ]
+          },
+          {
+            "publication_type_heading": "Management information",
+            "publications": [
+              {
+                "publication_heading": "School placements for children from outside of the UK"
               }
             ]
           }

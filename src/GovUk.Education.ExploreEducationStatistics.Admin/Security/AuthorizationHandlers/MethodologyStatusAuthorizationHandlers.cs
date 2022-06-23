@@ -1,11 +1,11 @@
 #nullable enable
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -21,15 +21,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
             private readonly IMethodologyVersionRepository _methodologyVersionRepository;
             private readonly IMethodologyRepository _methodologyRepository;
-            private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
+            private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-            public ApproveSpecificMethodologyAuthorizationHandler(IMethodologyVersionRepository methodologyVersionRepository,
+            public ApproveSpecificMethodologyAuthorizationHandler(
+                IMethodologyVersionRepository methodologyVersionRepository,
                 IMethodologyRepository methodologyRepository,
-                IUserReleaseRoleRepository userReleaseRoleRepository)
+                AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
             {
                 _methodologyVersionRepository = methodologyVersionRepository;
                 _methodologyRepository = methodologyRepository;
-                _userReleaseRoleRepository = userReleaseRoleRepository;
+                _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
             }
 
             protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -52,11 +53,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 var owningPublication =
                     await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
-                // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
-                // this Methodology, they can approve it.
-                if (await _userReleaseRoleRepository.IsUserApproverOnLatestRelease(
-                    context.User.GetUserId(),
-                    owningPublication.Id))
+                // If the user is a Publication Approver that owns this Methodology, they can approve it.
+                // Additionally, if they're an Approver for Releases on the owning Publication, they can approve it.
+                if (await _authorizationHandlerResourceRoleService
+                        .HasRolesOnPublicationOrLatestRelease(
+                            context.User.GetUserId(),
+                            owningPublication.Id,
+                            ListOf(PublicationRole.ReleaseApprover),
+                            ListOf(ReleaseRole.Approver)))
                 {
                     context.Succeed(requirement);
                 }
@@ -73,15 +77,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
         {
             private readonly IMethodologyVersionRepository _methodologyVersionRepository;
             private readonly IMethodologyRepository _methodologyRepository;
-            private readonly IUserReleaseRoleRepository _userReleaseRoleRepository;
+            private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
-            public MarkSpecificMethodologyAsDraftAuthorizationHandler(IMethodologyVersionRepository methodologyVersionRepository,
+            public MarkSpecificMethodologyAsDraftAuthorizationHandler(
+                IMethodologyVersionRepository methodologyVersionRepository,
                 IMethodologyRepository methodologyRepository,
-                IUserReleaseRoleRepository userReleaseRoleRepository)
+                AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
             {
                 _methodologyVersionRepository = methodologyVersionRepository;
                 _methodologyRepository = methodologyRepository;
-                _userReleaseRoleRepository = userReleaseRoleRepository;
+                _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
             }
 
             protected override async Task HandleRequirementAsync(AuthorizationHandlerContext context,
@@ -103,11 +108,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
                 var owningPublication =
                     await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
 
-                // If the user is an Approver of the latest (Live or non-Live) Release for the owning Publication of
-                // this Methodology, they can mark it as draft.
-                if (await _userReleaseRoleRepository.IsUserApproverOnLatestRelease(
-                    context.User.GetUserId(),
-                    owningPublication.Id))
+                // If the user is a Publication Approve of the Publication that owns this Methodology, they can
+                // mark it as draft.  Additionally, if they're an Approver for Releases on the owning Publication, they
+                // can mark it as draft.
+                if (await _authorizationHandlerResourceRoleService
+                        .HasRolesOnPublicationOrLatestRelease(
+                            context.User.GetUserId(),
+                            owningPublication.Id,
+                            ListOf(PublicationRole.ReleaseApprover),
+                            ListOf(ReleaseRole.Approver)))
                 {
                     context.Succeed(requirement);
                 }

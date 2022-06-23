@@ -400,7 +400,7 @@ const TableToolWizard = ({
                     initialValues={{
                       publicationId: state.query.publicationId ?? '',
                     }}
-                    options={themeMeta}
+                    themes={themeMeta}
                     onSubmit={handlePublicationFormSubmit}
                   />
                 )}

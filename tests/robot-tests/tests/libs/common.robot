@@ -477,6 +477,10 @@ user clicks link
     [Arguments]    ${text}    ${parent}=css:body
     user clicks element    link:${text}    ${parent}
 
+user clicks link by visible text
+    [Arguments]    ${text}    ${parent}=css:body
+    user clicks element    xpath:.//a[text()="${text}"]    ${parent}
+
 user clicks button
     [Arguments]    ${text}    ${parent}=css:body
     ${button}=    user gets button element    ${text}    ${parent}
@@ -522,7 +526,7 @@ user waits until h1 is visible
     user waits until element is visible    xpath://h1[text()="${text}"]    ${wait}
 
 user waits until h1 is not visible
-    [Arguments]    ${text}    ${wait}=${timeout}
+    [Arguments]    ${text}    ${wait}=%{WAIT_SMALL}
     user waits until element is not visible    xpath://h1[text()="${text}"]    ${wait}
 
 user waits until h2 is visible

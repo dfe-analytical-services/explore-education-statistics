@@ -20,17 +20,88 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
     public class BauCacheControllerTests
     {
         [Fact]
-        public async Task ClearPrivateCache()
+        public async Task ClearPrivateCache_SingleValidPath()
         {
             var privateBlobStorageService = new Mock<IBlobStorageService>(Strict);
 
+            DeleteBlobsOptions options = null!;
+            var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
+
             privateBlobStorageService
-                .Setup(s => s.DeleteBlobs(PrivateContent, default, default))
+                .Setup(
+                    s =>
+                        s.DeleteBlobs(PrivateContent, null, Capture.With(match)))
                 .Returns(Task.CompletedTask);
 
             var controller = BuildController(privateBlobStorageService: privateBlobStorageService.Object);
 
-            var result = await controller.ClearPrivateCache();
+            var result = await controller.ClearPrivateCache(
+                new ClearPrivateCachePathsViewModel
+                {
+                    Paths = SetOf("subject-meta")
+                }
+            );
+
+            result.AssertNoContent();
+
+            MockUtils.VerifyAllMocks(privateBlobStorageService);
+
+            var regex = Assert.IsType<Regex>(options.IncludeRegex);
+            Assert.Matches(regex, "releases/release-1/subject-meta/something");
+            Assert.DoesNotMatch(regex, "something/releases/release-1/subject-meta/something");
+            Assert.DoesNotMatch(regex, "releases/release-1/data-blocks/something");
+            Assert.DoesNotMatch(regex, "releases/release-1/invalid/something");
+            Assert.DoesNotMatch(regex, "releases/release-1/something");
+        }
+
+        [Fact]
+        public async Task ClearPrivateCacheReleases_AllValidPaths()
+        {
+            var privateBlobStorageService = new Mock<IBlobStorageService>(Strict);
+
+            DeleteBlobsOptions options = null!;
+            var match = new CaptureMatch<DeleteBlobsOptions>(param => options = param);
+
+            privateBlobStorageService
+                .Setup(
+                    s =>
+                        s.DeleteBlobs(PrivateContent, null, Capture.With(match)))
+                .Returns(Task.CompletedTask);
+
+            var controller = BuildController(privateBlobStorageService: privateBlobStorageService.Object);
+
+            var result = await controller.ClearPrivateCache(
+                new ClearPrivateCachePathsViewModel
+                {
+                    Paths = new HashSet<string>
+                    {
+                        "data-blocks",
+                        "subject-meta"
+                    }
+                }
+            );
+
+            result.AssertNoContent();
+
+            MockUtils.VerifyAllMocks(privateBlobStorageService);
+
+            var regex = Assert.IsType<Regex>(options.IncludeRegex);
+            Assert.Matches(regex, "releases/release-1/data-blocks/something");
+            Assert.Matches(regex, "releases/release-1/subject-meta/something");
+            Assert.DoesNotMatch(regex, "something/releases/release-1/data-blocks/something");
+            Assert.DoesNotMatch(regex, "something/releases/release-1/subject-meta/something");
+            Assert.DoesNotMatch(regex, "releases/release-1/invalid/something");
+            Assert.DoesNotMatch(regex, "releases/release-1/something");
+        }
+
+        [Fact]
+        public async Task ClearPrivateCache_Empty()
+        {
+            var privateBlobStorageService = new Mock<IBlobStorageService>(Strict);
+
+            var controller = BuildController(privateBlobStorageService: privateBlobStorageService.Object);
+
+            var result = await controller.ClearPrivateCache(new ClearPrivateCachePathsViewModel());
 
             result.AssertNoContent();
 
@@ -54,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = await controller.ClearPublicCacheReleases(
-                new ClearCacheReleasePathsViewModel
+                new ClearPublicCacheReleasePathsViewModel
                 {
                     Paths = SetOf("subject-meta")
                 }
@@ -66,6 +137,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
             Assert.Matches(regex, "publications/publication-1/releases/release-1/subject-meta/something");
+            Assert.DoesNotMatch(regex,
+                "something/publications/publication-1/releases/release-1/subject-meta/something");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/data-blocks/something");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/fast-track-results/something");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/invalid/something");
@@ -89,7 +162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = await controller.ClearPublicCacheReleases(
-                new ClearCacheReleasePathsViewModel
+                new ClearPublicCacheReleasePathsViewModel
                 {
                     Paths = new HashSet<string>
                     {
@@ -108,6 +181,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Assert.Matches(regex, "publications/publication-1/releases/release-1/data-blocks/something");
             Assert.Matches(regex, "publications/publication-1/releases/release-1/subject-meta/something");
             Assert.Matches(regex, "publications/publication-1/releases/release-1/fast-track-results/something");
+            Assert.DoesNotMatch(regex, "something/publications/publication-1/releases/release-1/data-blocks/something");
+            Assert.DoesNotMatch(regex,
+                "something/publications/publication-1/releases/release-1/subject-meta/something");
+            Assert.DoesNotMatch(regex,
+                "something/publications/publication-1/releases/release-1/fast-track-results/something");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/invalid/something");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/something");
         }
@@ -119,7 +197,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await controller.ClearPublicCacheReleases(new ClearCacheReleasePathsViewModel());
+            var result = await controller.ClearPublicCacheReleases(new ClearPublicCacheReleasePathsViewModel());
 
             result.AssertNoContent();
 
@@ -140,9 +218,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = await controller.ClearPublicCacheTrees(
-                new ClearCacheTreePathsViewModel
+                new ClearPublicCacheTreePathsViewModel
                 {
-                    Paths = SetOf("publication-tree-any-data.json"),
+                    Paths = SetOf("publication-tree.json")
                 }
             );
 
@@ -151,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             MockUtils.VerifyAllMocks(publicBlobStorageService);
 
             Assert.Single(paths);
-            Assert.Equal("publication-tree-any-data.json", paths[0]);
+            Assert.Equal("publication-tree.json", paths[0]);
         }
 
         [Fact]
@@ -168,13 +246,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
             var result = await controller.ClearPublicCacheTrees(
-                new ClearCacheTreePathsViewModel
+                new ClearPublicCacheTreePathsViewModel
                 {
                     Paths = new HashSet<string>
                     {
                         "publication-tree.json",
-                        "publication-tree-any-data.json",
-                        "publication-tree-latest-data.json"
+                        "methodology-tree.json"
                     }
                 }
             );
@@ -183,10 +260,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             MockUtils.VerifyAllMocks(publicBlobStorageService);
 
-            Assert.Equal(3, paths.Count);
+            Assert.Equal(2, paths.Count);
             Assert.Equal("publication-tree.json", paths[0]);
-            Assert.Equal("publication-tree-any-data.json", paths[1]);
-            Assert.Equal("publication-tree-latest-data.json", paths[2]);
+            Assert.Equal("methodology-tree.json", paths[1]);
         }
 
         [Fact]
@@ -196,7 +272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
 
             var controller = BuildController(publicBlobStorageService: publicBlobStorageService.Object);
 
-            var result = await controller.ClearPublicCacheTrees(new ClearCacheTreePathsViewModel());
+            var result = await controller.ClearPublicCacheTrees(new ClearPublicCacheTreePathsViewModel());
 
             result.AssertNoContent();
 

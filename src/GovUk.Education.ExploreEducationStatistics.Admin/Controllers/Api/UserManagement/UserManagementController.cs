@@ -54,7 +54,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 
         [HttpPost("users/{userId:guid}/publication-role")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<Unit>> AddPublicationRole(Guid userId, AddPublicationRoleViewModel request)
+        public async Task<ActionResult<Unit>> AddPublicationRole(Guid userId, UserPublicationRoleAddViewModel request)
         {
             return await _userRoleService
                 .AddPublicationRole(userId, request.PublicationId, request.PublicationRole)
@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
 
         [HttpPost("users/{userId:guid}/release-role")]
         [ProducesResponseType(200)]
-        public async Task<ActionResult<Unit>> AddReleaseRole(Guid userId, AddReleaseRoleViewModel request)
+        public async Task<ActionResult<Unit>> AddReleaseRole(Guid userId, UserReleaseRoleAddViewModel request)
         {
             return await _userRoleService
                 .AddReleaseRole(userId, request.ReleaseId, request.ReleaseRole)
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.UserM
         /// <summary>
         /// Provides a list of resource roles that are available within the service
         /// </summary>
-        /// <returns>Name and value representation of the release role</returns>
+        /// <returns>Name and value representation of the resource role</returns>
         [HttpGet("resource-roles")]
         [ProducesResponseType(200)]
         public Task<ActionResult<Dictionary<string, List<string>>>> GetResourceRoles()

@@ -32,25 +32,24 @@ Assert that test users are present in table
     user checks results table row heading contains    3    1    Analyst3 User3
     user checks results table row heading contains    4    1    Bau1 User1
     user checks results table row heading contains    5    1    Bau2 User2
-    user checks results table row heading contains    6    1    Prerelease3 User3
 
-    user checks results table cell contains    1    1    ees-analyst1@education.gov.uk
+    user checks results table cell contains    1    1    EES-test.ANALYST1@education.gov.uk
     user checks results table cell contains    1    2    Analyst
     user checks results table cell contains    1    3    Manage
 
-    user checks results table cell contains    2    1    ees-analyst2@education.gov.uk
+    user checks results table cell contains    2    1    EES-test.ANALYST2@education.gov.uk
     user checks results table cell contains    2    2    Analyst
     user checks results table cell contains    2    3    Manage
 
-    user checks results table cell contains    3    1    ees-analyst3@education.gov.uk
+    user checks results table cell contains    3    1    EES-test.ANALYST3@education.gov.uk
     user checks results table cell contains    3    2    Analyst
     user checks results table cell contains    3    3    Manage
 
-    user checks results table cell contains    4    1    ees-bau1@education.gov.uk
+    user checks results table cell contains    4    1    EES-test.BAU1@education.gov.uk
     user checks results table cell contains    4    2    BAU User
     user checks results table cell contains    4    3    Manage
 
-    user checks results table cell contains    5    1    ees-bau2@education.gov.uk
+    user checks results table cell contains    5    1    EES-test.BAU2@education.gov.uk
     user checks results table cell contains    5    2    BAU User
     user checks results table cell contains    5    3    Manage
 
@@ -88,8 +87,9 @@ Check the initial manage user page
 
     user checks select contains option    name:selectedPublicationId    ${PUBLICATION_NAME}
     user checks select contains option    name:selectedPublicationId    ${PUBLICATION_2_NAME}
-    user checks select contains x options    name:selectedPublicationRole    1
+    user checks select contains x options    name:selectedPublicationRole    2
     user checks select contains option    name:selectedPublicationRole    Owner
+    user checks select contains option    name:selectedPublicationRole    ReleaseApprover
     user checks table body has x rows    0    testid:publicationAccessTable
 
 Give the user prerelease access to a release

@@ -1,10 +1,10 @@
 ﻿#nullable enable
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -15,12 +15,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     public class DropMethodologyLinkAuthorizationHandler
         : AuthorizationHandler<DropMethodologyLinkRequirement, PublicationMethodology>
     {
-        private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
+        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
         public DropMethodologyLinkAuthorizationHandler(
-            IUserPublicationRoleRepository userPublicationRoleRepository)
+            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
-            _userPublicationRoleRepository = userPublicationRoleRepository;
+            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -35,16 +35,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             }
 
             // Allow users who can adopt methodologies to also drop them
-
             if (SecurityUtils.HasClaim(context.User, AdoptAnyMethodology))
             {
                 context.Succeed(requirement);
                 return;
             }
-
-            if (await _userPublicationRoleRepository.IsUserPublicationOwner(
-                context.User.GetUserId(),
-                link.PublicationId))
+            
+            if (await _authorizationHandlerResourceRoleService
+                    .HasRolesOnPublication(
+                        context.User.GetUserId(),
+                        link.PublicationId,
+                        Owner))
             {
                 context.Succeed(requirement);
             }

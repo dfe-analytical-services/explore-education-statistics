@@ -1,22 +1,24 @@
-import DetailsMenu from '@common/components/DetailsMenu';
 import {
   Form,
   FormFieldRadioGroup,
   FormFieldset,
   FormGroup,
+  FormRadioGroup,
   FormTextSearchInput,
 } from '@common/components/form';
+import InsetText from '@common/components/InsetText';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import WizardStepSummary from '@common/modules/table-tool/components/WizardStepSummary';
 import { PublicationSummary, Theme } from '@common/services/themeService';
-import createErrorHelper from '@common/validation/createErrorHelper';
 import Yup from '@common/validation/yup';
+import { InjectedWizardProps } from '@common/modules/table-tool/components/Wizard';
+import WizardStepFormActions from '@common/modules/table-tool/components/WizardStepFormActions';
+import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
+import styles from '@common/modules/table-tool/components/PublicationForm.module.scss';
+import { orderBy } from 'lodash';
 import { Formik } from 'formik';
-import React, { useState } from 'react';
-import { InjectedWizardProps } from './Wizard';
-import WizardStepFormActions from './WizardStepFormActions';
-import WizardStepHeading from './WizardStepHeading';
+import React, { useMemo, useState } from 'react';
 
 export interface PublicationFormValues {
   publicationId: string;
@@ -30,7 +32,7 @@ const formId = 'publicationForm';
 
 interface Props extends InjectedWizardProps {
   initialValues?: PublicationFormValues;
-  options: Theme[];
+  themes: Theme[];
   onSubmit: PublicationFormSubmitHandler;
 }
 
@@ -38,20 +40,57 @@ const PublicationForm = ({
   initialValues = {
     publicationId: '',
   },
-  options,
+  themes,
   onSubmit,
   ...stepProps
 }: Props) => {
   const { isActive, goToNextStep } = stepProps;
 
   const [searchTerm, setSearchTerm] = useState('');
-  const lowercaseSearchTerm = searchTerm.toLowerCase();
+  const [selectedThemeId, setSelectedThemeId] = useState<string>('');
+
+  const publications = useMemo(() => {
+    if (selectedThemeId) {
+      return (
+        themes
+          .find(theme => theme.id === selectedThemeId)
+          ?.topics.flatMap(topic => topic.publications) ?? []
+      );
+    }
+    if (searchTerm) {
+      return themes
+        .flatMap(theme => theme.topics.flatMap(topic => topic.publications))
+        .filter(publication =>
+          publication.title.toLowerCase().includes(searchTerm.toLowerCase()),
+        );
+    }
+
+    return [];
+  }, [themes, searchTerm, selectedThemeId]);
+
+  const getThemeForPublication = (publicationId: string) => {
+    return themes.find(theme =>
+      theme.topics
+        .flatMap(topic => topic.publications)
+        .find(pub => pub.id === publicationId),
+    )?.title;
+  };
+
+  const getSelectedPublication = (publicationId: string) =>
+    themes
+      .flatMap(theme => theme.topics)
+      .flatMap(topic => topic.publications)
+      .find(publication => publication.id === publicationId);
 
   const stepHeading = (
     <WizardStepHeading {...stepProps} fieldsetHeading>
       Choose a publication
     </WizardStepHeading>
   );
+
+  if (!themes.length) {
+    return <p>No publications found</p>;
+  }
 
   return (
     <Formik<PublicationFormValues>
@@ -63,9 +102,6 @@ const PublicationForm = ({
         publicationId: Yup.string().required('Choose publication'),
       })}
       onSubmit={async ({ publicationId }) => {
-        const publications = options.flatMap(theme =>
-          theme.topics.flatMap(topic => topic.publications),
-        );
         const publication = publications.find(p => p.id === publicationId);
 
         if (!publication) {
@@ -78,134 +114,120 @@ const PublicationForm = ({
       }}
     >
       {form => {
-        const { values } = form;
-        const { getError } = createErrorHelper(form);
-
-        const filteredOptions = options
-          .filter(theme =>
-            theme.topics.some(topic =>
-              topic.publications.some(
-                publication =>
-                  publication.id === values.publicationId ||
-                  publication.title.toLowerCase().includes(lowercaseSearchTerm),
-              ),
-            ),
-          )
-          .map(group => ({
-            ...group,
-            topics: group.topics
-              .filter(topic =>
-                topic.publications.some(
-                  publication =>
-                    publication.id === values.publicationId ||
-                    publication.title
-                      .toLowerCase()
-                      .includes(lowercaseSearchTerm),
-                ),
-              )
-              .map(topic => ({
-                ...topic,
-                publications: topic.publications.filter(
-                  publication =>
-                    publication.id === values.publicationId ||
-                    publication.title
-                      .toLowerCase()
-                      .includes(lowercaseSearchTerm),
-                ),
-              })),
-          }));
-
         if (isActive) {
           return (
             <Form {...form} id={formId} showSubmitError>
-              <FormFieldset
-                error={getError('publicationId')}
-                id="publicationId"
-                legend={stepHeading}
-              >
-                <FormGroup>
+              <FormFieldset id="publicationForm" legend={stepHeading}>
+                <p>Search or select a theme to find publications</p>
+                <FormGroup className="govuk-!-margin-bottom-3">
                   <FormTextSearchInput
                     id={`${formId}-publicationIdSearch`}
                     label="Search publications"
                     name="publicationSearch"
-                    onChange={event => setSearchTerm(event.target.value)}
+                    onChange={event => {
+                      setSearchTerm(event.target.value);
+                      setSelectedThemeId('');
+                      if (!event.target.value) {
+                        form.setFieldValue('publicationId', '');
+                      }
+                    }}
                     onKeyPress={event => {
                       if (event.key === 'Enter') {
                         event.preventDefault();
                       }
                     }}
+                    value={searchTerm}
                     width={20}
                   />
+                  {searchTerm && publications.length > 0 && (
+                    <p>
+                      <a
+                        href={`${formId}-publications`}
+                        className="govuk-!-margin-top-3 govuk-!-font-size-14"
+                      >
+                        Skip to search results
+                      </a>
+                    </p>
+                  )}
                 </FormGroup>
 
-                <FormGroup>
-                  <div aria-live="assertive">
-                    {filteredOptions.length > 0 ? (
-                      filteredOptions.map(theme => (
-                        <DetailsMenu
-                          jsRequired
-                          summary={theme.title}
-                          key={theme.id}
-                          id={`${formId}-theme-${theme.id}`}
-                          detailsId="theme"
-                          open={
-                            searchTerm !== '' ||
-                            theme.topics.some(topic =>
-                              topic.publications.some(
-                                publication =>
-                                  publication.id === values.publicationId,
-                              ),
-                            )
-                          }
-                        >
-                          {theme.topics.map(topic => (
-                            <DetailsMenu
-                              summary={topic.title}
-                              key={topic.id}
-                              id={`${formId}-topic-${topic.id}`}
-                              detailsId="topic"
-                              open={
-                                searchTerm !== '' ||
-                                topic.publications.some(
-                                  publication =>
-                                    publication.id === values.publicationId,
-                                )
-                              }
-                            >
-                              <FormFieldRadioGroup
-                                legend={`Choose option from ${topic.title}`}
-                                legendHidden
-                                small
-                                showError={false}
-                                name="publicationId"
-                                disabled={form.isSubmitting}
-                                options={topic.publications.map(
-                                  publication => ({
-                                    label: publication.title,
-                                    value: publication.id,
-                                  }),
-                                )}
-                              />
-                            </DetailsMenu>
-                          ))}
-                        </DetailsMenu>
-                      ))
-                    ) : (
-                      <p>No publications found</p>
+                <p>or</p>
+
+                <div className={styles.optionsContainer}>
+                  <FormRadioGroup
+                    id={`${formId}-themes`}
+                    legend="Select a theme"
+                    legendSize="s"
+                    name="themeId"
+                    small
+                    options={themes.map(theme => {
+                      return {
+                        label: theme.title,
+                        value: theme.id,
+                      };
+                    })}
+                    value={selectedThemeId}
+                    onChange={e => {
+                      setSelectedThemeId(e.target.value);
+                      form.setFieldValue('publicationId', '');
+                      setSearchTerm('');
+                    }}
+                  />
+
+                  <div className={styles.publicationsList}>
+                    <FormFieldRadioGroup
+                      id={`${formId}-publications`}
+                      legend={
+                        <>
+                          Select a publication
+                          <span
+                            className="govuk-visually-hidden"
+                            aria-live="polite"
+                            aria-atomic="true"
+                          >
+                            {` ${publications.length} ${
+                              publications.length === 1
+                                ? `publication`
+                                : `publications`
+                            } found`}
+                          </span>
+                        </>
+                      }
+                      legendSize="s"
+                      name="publicationId"
+                      small
+                      options={orderBy(publications, 'title').map(
+                        publication => {
+                          return {
+                            hint: searchTerm
+                              ? getThemeForPublication(publication.id)
+                              : '',
+                            hintSmall: true,
+                            label: publication.title,
+                            value: publication.id,
+                          };
+                        },
+                      )}
+                    />
+
+                    {!publications.length && (
+                      <>
+                        <p>Search or select a theme to view publications</p>
+                        {(searchTerm || selectedThemeId) && (
+                          <InsetText>No publications found</InsetText>
+                        )}
+                      </>
                     )}
-                  </div>
-                </FormGroup>
-              </FormFieldset>
 
-              <WizardStepFormActions {...stepProps} />
+                    <div className="govuk-!-margin-top-6">
+                      <WizardStepFormActions {...stepProps} />
+                    </div>
+                  </div>
+                </div>
+              </FormFieldset>
             </Form>
           );
         }
-
-        const publication = options
-          .flatMap(option => option.topics)
-          .flatMap(option => option.publications)
-          .find(option => option.id === form.values.publicationId);
 
         return (
           <WizardStepSummary {...stepProps} goToButtonText="Change publication">
@@ -213,7 +235,7 @@ const PublicationForm = ({
 
             <SummaryList noBorder>
               <SummaryListItem term="Publication">
-                {publication?.title}
+                {getSelectedPublication(form.values.publicationId)?.title}
               </SummaryListItem>
             </SummaryList>
           </WizardStepSummary>

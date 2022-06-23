@@ -3,7 +3,10 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
@@ -11,6 +14,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Aut
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
     PublicationAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -21,8 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         {
             await AssertHandlerSucceedsWithCorrectClaims
                 <Tuple<Publication, ReleaseRole>, UpdateReleaseRoleRequirement>(
-                    contentDbContext =>
-                        new UpdateReleaseRoleAuthorizationHandler(new UserPublicationRoleRepository(contentDbContext)),
+                    CreateHandler,
                     TupleOf(new Publication(), ReleaseRole.Lead),
                     ManageAnyUser
                 );
@@ -38,9 +41,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     publication.Id,
                     tuple,
                     contentDbContext => contentDbContext.Add(publication),
-                    contentDbContext =>
-                        new UpdateReleaseRoleAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext)),
+                    CreateHandler,
                     PublicationRole.Owner);
         }
 
@@ -54,9 +55,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                     publication.Id,
                     tuple,
                     contentDbContext => contentDbContext.Add(publication),
-                    contentDbContext =>
-                        new UpdateReleaseRoleAuthorizationHandler(
-                            new UserPublicationRoleRepository(contentDbContext)));
+                    CreateHandler);
+        }
+
+        private static UpdateReleaseRoleAuthorizationHandler CreateHandler(ContentDbContext contentDbContext)
+        {
+            return new UpdateReleaseRoleAuthorizationHandler(
+                new AuthorizationHandlerResourceRoleService(
+                    Mock.Of<IUserReleaseRoleRepository>(Strict),
+                    new UserPublicationRoleRepository(contentDbContext),
+                    Mock.Of<IPublicationRepository>(Strict)));
         }
     }
 }

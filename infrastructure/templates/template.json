@@ -310,15 +310,22 @@
     },
     "notifyInviteTemplateId": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "change-me"
+    },
+    "notifyInviteWithRolesTemplateId": {
+      "type": "securestring",
+      "defaultValue": "change-me",
+      "metadata": {
+        "description": "Gov UK Notify service template Id for new user invites"
+      }
     },
     "notifyPublicationRoleTemplateId": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "change-me"
     },
     "notifyReleaseRoleTemplateId": {
       "type": "securestring",
-      "defaultValue": ""
+      "defaultValue": "change-me"
     },
     "notifyPreReleaseTemplateId": {
       "type": "securestring",
@@ -1728,6 +1735,7 @@
         "ASPNETCORE_DETAILEDERRORS": "[parameters('detailedErrors')]",
         "NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]",
         "NotifyInviteTemplateId": "[parameters('notifyInviteTemplateId')]",
+        "NotifyInviteWithRolesTemplateId": "[parameters('notifyInviteWithRolesTemplateId')]",
         "NotifyPublicationRoleTemplateId": "[parameters('notifyPublicationRoleTemplateId')]",
         "NotifyReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",
         "NotifyPreReleaseTemplateId": "[parameters('notifyPreReleaseTemplateId')]",

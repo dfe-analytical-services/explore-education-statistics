@@ -6,17 +6,17 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.
-    ReleaseAuthorizationHandlersTestUtil;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils.ReleaseAuthorizationHandlersTestUtil;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers
 {
@@ -90,11 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         context.Add(release);
                                         context.SaveChanges();
 
-                                        return new MarkReleaseAsDraftAuthorizationHandler(
-                                            releaseStatusRepository.Object,
-                                            new UserPublicationRoleRepository(context),
-                                            new UserReleaseRoleRepository(context)
-                                        );
+                                        return CreateHandler(releaseStatusRepository, context);
                                     },
                                     release,
                                     ReleaseRole.Contributor,
@@ -113,11 +109,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         context.Add(release);
                                         context.SaveChanges();
 
-                                        return new MarkReleaseAsDraftAuthorizationHandler(
-                                            releaseStatusRepository.Object,
-                                            new UserPublicationRoleRepository(context),
-                                            new UserReleaseRoleRepository(context)
-                                        );
+                                        return CreateHandler(releaseStatusRepository, context);
                                     },
                                     release,
                                     ReleaseRole.Approver
@@ -145,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 ApprovalStatus = status
                             };
 
-                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>(Strict);
 
                             releaseStatusRepository.Setup(
                                     s => s.GetAllByOverallStage(
@@ -156,8 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 )
                                 .ReturnsAsync(new List<ReleasePublishingStatus>());
 
-                            // Assert that a User who has the Publication Owner role on a
-                            // Release can update its status if it is not Approved
+                            // Assert that a User who has the Publication Owner or Approver role
+                            // on a Release can mark its status as Draft if it is not yet Approved.
                             if (status != ReleaseApprovalStatus.Approved)
                             {
                                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
@@ -167,20 +159,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         context.Add(release);
                                         context.SaveChanges();
 
-                                        return new MarkReleaseAsDraftAuthorizationHandler(
-                                            releaseStatusRepository.Object,
-                                            new UserPublicationRoleRepository(context),
-                                            new UserReleaseRoleRepository(context)
-                                        );
+                                        return CreateHandler(releaseStatusRepository, context);
                                     },
                                     release,
-                                    Owner
+                                    Owner, ReleaseApprover
                                 );
                             }
                             else
                             {
-                                // Assert that a User who has the Publication Owner role on a
-                                // Release cannot update its status if it is not Approved
+                                // Assert that a User who has the Publication Approver role on a
+                                // Release can mark its status as draft if it is currently Approved
+                                // but not yet published, just as a Release Approver can.
                                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
                                     MarkReleaseAsDraftRequirement>(
                                     context =>
@@ -188,13 +177,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         context.Add(release);
                                         context.SaveChanges();
 
-                                        return new MarkReleaseAsDraftAuthorizationHandler(
-                                            releaseStatusRepository.Object,
-                                            new UserPublicationRoleRepository(context),
-                                            new UserReleaseRoleRepository(context)
-                                        );
+                                        return CreateHandler(releaseStatusRepository, context);
                                     },
-                                    release
+                                    release,
+                                    ReleaseApprover
                                 );
                             }
                         }
@@ -215,6 +201,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await AssertAllRolesFailWhenReleasePublished<MarkReleaseAsDraftRequirement>(
                     BuildMarkReleaseAsDraftHandler
                 );
+            }
+
+            private static MarkReleaseAsDraftAuthorizationHandler CreateHandler(
+                Mock<IReleasePublishingStatusRepository> releaseStatusRepository, 
+                ContentDbContext context)
+            {
+                return BuildMarkReleaseAsDraftHandler(
+                    releaseStatusRepository.Object,
+                    new UserPublicationRoleRepository(context),
+                    new UserReleaseRoleRepository(context));
             }
         }
 
@@ -285,11 +281,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         context.Add(release);
                                         context.SaveChanges();
 
-                                        return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
-                                            releaseStatusRepository.Object,
-                                            new UserPublicationRoleRepository(context),
-                                            new UserReleaseRoleRepository(context)
-                                        );
+                                        return CreateHandler(releaseStatusRepository, context);
                                     },
                                     release,
                                     ReleaseRole.Contributor,
@@ -308,11 +300,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         context.Add(release);
                                         context.SaveChanges();
 
-                                        return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
-                                            releaseStatusRepository.Object,
-                                            new UserPublicationRoleRepository(context),
-                                            new UserReleaseRoleRepository(context)
-                                        );
+                                        return CreateHandler(releaseStatusRepository, context);
                                     },
                                     release,
                                     ReleaseRole.Approver
@@ -351,8 +339,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                 )
                                 .ReturnsAsync(new List<ReleasePublishingStatus>());
 
-                            // Assert that a User who has the Publication Owner role on a
-                            // Release can update its status if it is not Approved
+                            // Assert that a User who has the Publication Owner or Approver role on a
+                            // Release can mark it for higher review if it is not Approved
                             if (status != ReleaseApprovalStatus.Approved)
                             {
                                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
@@ -362,20 +350,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         context.Add(release);
                                         context.SaveChanges();
 
-                                        return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
-                                            releaseStatusRepository.Object,
-                                            new UserPublicationRoleRepository(context),
-                                            new UserReleaseRoleRepository(context)
-                                        );
+                                        return CreateHandler(releaseStatusRepository, context);
                                     },
                                     release,
-                                    Owner
+                                    Owner, 
+                                    ReleaseApprover
                                 );
                             }
                             else
                             {
-                                // Assert that a User who has the Publication Owner role on a
-                                // Release cannot update its status if it is not Approved
+                                // Assert that a User who has the Publication Approver role on a
+                                // Release can mark it for higher review even if it is not Approved
                                 await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<
                                     MarkReleaseAsHigherLevelReviewRequirement>(
                                     context =>
@@ -383,13 +368,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                         context.Add(release);
                                         context.SaveChanges();
 
-                                        return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
-                                            releaseStatusRepository.Object,
-                                            new UserPublicationRoleRepository(context),
-                                            new UserReleaseRoleRepository(context)
-                                        );
+                                        return CreateHandler(releaseStatusRepository, context);
                                     },
-                                    release
+                                    release,
+                                    ReleaseApprover
                                 );
                             }
                         }
@@ -410,6 +392,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                 await AssertAllRolesFailWhenReleasePublished<MarkReleaseAsHigherLevelReviewRequirement>(
                     BuildMarkReleaseAsHigherLevelReviewHandler
                 );
+            }
+
+            private static MarkReleaseAsHigherLevelReviewAuthorizationHandler CreateHandler(
+                Mock<IReleasePublishingStatusRepository> releaseStatusRepository, 
+                ContentDbContext context)
+            {
+                return BuildMarkReleaseAsHigherLevelReviewHandler(
+                    releaseStatusRepository.Object,
+                    new UserPublicationRoleRepository(context),
+                    new UserReleaseRoleRepository(context));
             }
         }
 
@@ -477,14 +469,56 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
                                     context.Add(release);
                                     context.SaveChanges();
 
-                                    return new MarkReleaseAsApprovedAuthorizationHandler(
-                                        releaseStatusRepository.Object,
-                                        new UserPublicationRoleRepository(context),
-                                        new UserReleaseRoleRepository(context)
-                                    );
+                                    return CreateHandler(releaseStatusRepository, context);
                                 },
                                 release,
                                 ReleaseRole.Approver
+                            );
+                        }
+                    );
+            }
+
+            [Fact]
+            public async Task PublicationRoleSuccess_Approver_ReleaseUnpublished()
+            {
+                await GetEnumValues<ReleaseApprovalStatus>()
+                    .ToAsyncEnumerable()
+                    .ForEachAwaitAsync(
+                        async status =>
+                        {
+                            var release = new Release
+                            {
+                                Id = Guid.NewGuid(),
+                                Publication = new Publication
+                                {
+                                    Id = Guid.NewGuid()
+                                },
+                                ApprovalStatus = status
+                            };
+
+                            var releaseStatusRepository = new Mock<IReleasePublishingStatusRepository>();
+
+                            releaseStatusRepository.Setup(
+                                    s => s.GetAllByOverallStage(
+                                        release.Id,
+                                        ReleasePublishingStatusOverallStage.Started,
+                                        ReleasePublishingStatusOverallStage.Complete
+                                    )
+                                )
+                                .ReturnsAsync(new List<ReleasePublishingStatus>());
+
+                            // Assert that a user who has the "Approver" role on the
+                            // Publication for the Release can update its status
+                            await AssertReleaseHandlerSucceedsWithCorrectPublicationRoles<MarkReleaseAsApprovedRequirement>(
+                                context =>
+                                {
+                                    context.Add(release);
+                                    context.SaveChanges();
+
+                                    return CreateHandler(releaseStatusRepository, context);
+                                },
+                                release,
+                                ReleaseApprover
                             );
                         }
                     );
@@ -503,6 +537,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             {
                 await AssertAllRolesFailWhenReleasePublished<MarkReleaseAsApprovedRequirement>(
                     BuildMarkReleaseAsHigherLevelReviewHandler
+                );
+            }
+
+            private static MarkReleaseAsApprovedAuthorizationHandler CreateHandler(
+                Mock<IReleasePublishingStatusRepository> releaseStatusRepository, 
+                ContentDbContext context)
+            {
+                return BuildMarkReleaseAsApprovedHandler(
+                    releaseStatusRepository.Object,
+                    new UserPublicationRoleRepository(context),
+                    new UserReleaseRoleRepository(context)
                 );
             }
         }
@@ -776,8 +821,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
-            return new MarkReleaseAsDraftAuthorizationHandler(releasePublishingStatusRepository, userPublicationRoleRepository,
-                userReleaseRoleRepository);
+            return new MarkReleaseAsDraftAuthorizationHandler(
+                releasePublishingStatusRepository, 
+                new AuthorizationHandlerResourceRoleService(
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository,
+                    Mock.Of<IPublicationRepository>(Strict)));
         }
         
         private static MarkReleaseAsHigherLevelReviewAuthorizationHandler BuildMarkReleaseAsHigherLevelReviewHandler(
@@ -785,8 +834,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
-            return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(releasePublishingStatusRepository, userPublicationRoleRepository,
-                userReleaseRoleRepository);
+            return new MarkReleaseAsHigherLevelReviewAuthorizationHandler(
+                releasePublishingStatusRepository, 
+                new AuthorizationHandlerResourceRoleService(
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository,
+                    Mock.Of<IPublicationRepository>(Strict)));
         }
 
         private static MarkReleaseAsApprovedAuthorizationHandler BuildMarkReleaseAsApprovedHandler(
@@ -794,8 +847,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             IUserPublicationRoleRepository userPublicationRoleRepository,
             IUserReleaseRoleRepository userReleaseRoleRepository)
         {
-            return new MarkReleaseAsApprovedAuthorizationHandler(releasePublishingStatusRepository, userPublicationRoleRepository,
-                userReleaseRoleRepository);
+            return new MarkReleaseAsApprovedAuthorizationHandler(
+                releasePublishingStatusRepository, 
+                new AuthorizationHandlerResourceRoleService(
+                    userReleaseRoleRepository,
+                    userPublicationRoleRepository,
+                    Mock.Of<IPublicationRepository>(Strict)));
         }
     }
 }

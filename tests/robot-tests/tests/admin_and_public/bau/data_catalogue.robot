@@ -98,12 +98,11 @@ User navigates to /data-catalogue page
 
 User checks search filters publications properly
     user enters text into element    id:publicationForm-publicationIdSearch    Pupil
-    user waits until element is visible    testid:Expand Details Section Pupil absence    10
+    user waits until page contains    Pupil absence in schools in England    %{WAIT_SMALL}
     user clears element text    id:publicationForm-publicationIdSearch
 
-Choose publiction
-    user opens details dropdown    Test theme
-    user opens details dropdown    %{TEST_TOPIC_NAME}
+Choose publication
+    user clicks radio    Test theme
     user clicks radio    UI tests - data catalogue %{RUN_IDENTIFIER}
     user clicks button    Next step
 

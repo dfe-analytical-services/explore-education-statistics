@@ -1,5 +1,4 @@
 ﻿#nullable enable
-#nullable enable
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
@@ -11,7 +10,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Cache
 {
     public class DataBlockTableResultCacheKey : IBlobCacheKey
     {
-        private Guid PublicationId { get; }
         private Guid ReleaseId { get; }
         private Guid DataBlockId { get; }
 
@@ -25,7 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Cache
             }
 
             var release = releaseContentBlock.Release;
-            PublicationId = release.PublicationId;
             ReleaseId = release.Id;
             DataBlockId = releaseContentBlock.ContentBlockId;
         }
@@ -33,7 +30,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Cache
         public IBlobContainer Container => PrivateContent;
 
         public string Key => PrivateContentDataBlockPath(
-            PublicationId,
             ReleaseId,
             DataBlockId
         );

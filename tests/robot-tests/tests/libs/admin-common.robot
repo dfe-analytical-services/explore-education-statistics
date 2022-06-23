@@ -2,11 +2,9 @@
 Resource    ./common.robot
 Library     admin-utilities.py
 
-
 *** Variables ***
-${BAU1_BROWSER}         bau1
-${ANALYST1_BROWSER}     analyst1
-
+${BAU1_BROWSER}=        bau1
+${ANALYST1_BROWSER}=    analyst1
 
 *** Keywords ***
 user signs in as bau1
@@ -142,7 +140,7 @@ user opens release summary on the admin dashboard
 
 user creates publication
     [Arguments]    ${title}
-    user waits until h1 is visible    Create new publication    %{WAIT_SMALL}
+    user waits until h1 is visible    Create new publication
     user waits until page contains element    id:publicationForm-title    %{WAIT_SMALL}
     user enters text into element    id:publicationForm-title    ${title}
     user enters text into element    id:publicationForm-teamName    Attainment statistics team
@@ -154,13 +152,14 @@ user creates publication
 
 user creates release for publication
     [Arguments]    ${publication}    ${time_period_coverage}    ${start_year}
-    user waits until page contains title caption    ${publication}
-    user waits until h1 is visible    Create new release    %{WAIT_SMALL}
+    user waits until page contains title caption    ${publication}    %{WAIT_SMALL}
+    user waits until h1 is visible    Create new release
     user waits until page contains element    id:releaseSummaryForm-timePeriodCoverage    %{WAIT_SMALL}
     user chooses select option    id:releaseSummaryForm-timePeriodCoverageCode    ${time_period_coverage}
     user enters text into element    id:releaseSummaryForm-timePeriodCoverageStartYear    ${start_year}
     user clicks radio    National statistics
     user clicks radio if exists    Create new template
+    user waits until button is enabled    Create new release    %{WAIT_SMALL}
     user clicks button    Create new release
 
     user waits until page contains element    xpath://a[text()="Edit release summary"]    %{WAIT_SMALL}
@@ -433,7 +432,6 @@ user creates public prerelease access list
 
 user updates public prerelease access list
     [Arguments]    ${content}
-    user clicks link    Public access list
     user waits until h2 is visible    Public pre-release access list
     user clicks button    Edit public pre-release access list
     user presses keys    CTRL+a
@@ -583,6 +581,29 @@ user uploads subject
     ${section}=    user gets accordion section content element    ${SUBJECT_NAME}
     user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_LONG}
 
+user puts release into draft
+    [Arguments]
+    ...    ${release_note}=Moving back to draft
+    ...    ${next_release_date_month}=
+    ...    ${next_release_date_year}=
+    ...    ${expected_scheduled_release_date}=Not scheduled
+    ...    ${expected_next_release_date}=Not set
+
+    user clicks button    Edit release status
+    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
+    user clicks radio    In draft
+    user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    ${release_note}
+    IF    "${next_release_date_month}" != "${EMPTY}"
+        user enters text into element    id:releaseStatusForm-nextReleaseDate-month    ${next_release_date_month}
+    END
+    IF    "${next_release_date_year}" != "${EMPTY}"
+        user enters text into element    id:releaseStatusForm-nextReleaseDate-year    ${next_release_date_year}
+    END
+    user clicks button    Update status
+    user checks summary list contains    Current status    In Draft
+    user checks summary list contains    Scheduled release    ${expected_scheduled_release_date}
+    user checks summary list contains    Next release expected    ${expected_next_release_date}
+
 user puts release into higher level review
     user clicks link    Sign off
     user waits until page does not contain loading spinner
@@ -667,16 +688,47 @@ user changes methodology status to Draft
     user checks page contains tag    In Draft
 
 user gives analyst publication owner access
-    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    user gives publication access to analyst    ${PUBLICATION_NAME}    Owner    ${ANALYST_EMAIL}
+
+user gives analyst publication release approver access
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    user gives publication access to analyst    ${PUBLICATION_NAME}    ReleaseApprover    ${ANALYST_EMAIL}
+
+user removes publication owner access from analyst
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    user removes publication access from analyst    ${PUBLICATION_NAME}    Owner    ${ANALYST_EMAIL}
+
+user removes publication release approver access from analyst
+    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    user removes publication access from analyst    ${PUBLICATION_NAME}    ReleaseApprover    ${ANALYST_EMAIL}
+
+user gives publication access to analyst
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${ROLE}
+    ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     user chooses select option    css:[name="selectedPublicationId"]    ${PUBLICATION_NAME}
     user waits until element is enabled    css:[name="selectedPublicationRole"]
-    user chooses select option    css:[name="selectedPublicationRole"]    Owner
+    user chooses select option    css:[name="selectedPublicationRole"]    ${ROLE}
     user clicks button    Add publication access
     user waits until page does not contain loading spinner
 
+user removes publication access from analyst
+    [Arguments]
+    ...    ${PUBLICATION_NAME}
+    ...    ${ROLE}
+    ...    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
+    user goes to manage user    ${ANALYST_EMAIL}
+    ${table}=    user gets testid element    publicationAccessTable
+    ${row}=    get child element    ${table}
+    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Role"] and text()="${ROLE}"]]
+    user clicks button    Remove    ${row}
+    user waits until page does not contain loading spinner
+
 user gives release access to analyst
-    [Arguments]    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    [Arguments]    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     user scrolls to element    css:[name="selectedReleaseId"]
     user chooses select option    css:[name="selectedReleaseId"]    ${RELEASE_NAME}
@@ -685,17 +737,8 @@ user gives release access to analyst
     user clicks button    Add release access
     user waits until page does not contain loading spinner
 
-user removes publication owner access from analyst
-    [Arguments]    ${PUBLICATION_NAME}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
-    user goes to manage user    ${ANALYST_EMAIL}
-    ${table}=    user gets testid element    publicationAccessTable
-    ${row}=    get child element    ${table}
-    ...    xpath://tbody/tr[td[//th[text()="Publication"] and text()="${PUBLICATION_NAME}"] and td[//th[text()="Role"] and text()="Owner"]]
-    user clicks button    Remove    ${row}
-    user waits until page does not contain loading spinner
-
 user removes release access from analyst
-    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=ees-analyst1@education.gov.uk
+    [Arguments]    ${PUBLICATION_NAME}    ${RELEASE_NAME}    ${ROLE}    ${ANALYST_EMAIL}=EES-test.ANALYST1@education.gov.uk
     user goes to manage user    ${ANALYST_EMAIL}
     ${table}=    user gets testid element    releaseAccessTable
     ${row}=    get child element    ${table}
@@ -706,7 +749,7 @@ user removes release access from analyst
 user goes to manage user
     [Arguments]    ${EMAIL_ADDRESS}
     user navigates to admin frontend    %{ADMIN_URL}/administration/users
-    user waits until h1 is visible    Users    %{WAIT_SMALL}
+    user waits until h1 is visible    Users
     user waits until table is visible
     user clicks link    Manage    xpath://td[text()="${EMAIL_ADDRESS}"]/..
     # stale element exception if you don't wait until it's enabled

@@ -12,15 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             string email,
             ReleaseRole releaseRole,
             bool emailSent,
-            Guid createdById,
-            bool accepted = false);
+            Guid createdById);
 
         Task CreateManyIfNotExists(List<Guid> releaseIds,
             string email,
             ReleaseRole releaseRole,
             bool emailSent,
-            Guid createdById,
-            bool accepted = false);
+            Guid createdById);
 
         Task<bool> UserHasInvite(Guid releaseId, string email, ReleaseRole role);
 

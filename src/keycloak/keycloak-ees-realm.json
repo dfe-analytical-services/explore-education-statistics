@@ -382,7 +382,7 @@
     "emailVerified" : true,
     "firstName" : "Analyst1",
     "lastName" : "User1",
-    "email" : "ees-analyst1@education.gov.uk",
+    "email" : "ees-test.analyst1@education.gov.uk",
     "credentials" : [ {
       "id" : "a17ff735-8771-4327-89ea-5a4e2e249e1e",
       "type" : "password",
@@ -404,7 +404,7 @@
     "emailVerified" : true,
     "firstName" : "Analyst2",
     "lastName" : "User2",
-    "email" : "ees-analyst2@education.gov.uk",
+    "email" : "ees-test.analyst2@education.gov.uk",
     "credentials" : [ {
       "id" : "528097c3-c24c-44b4-bd77-49f52cf71151",
       "type" : "password",
@@ -426,7 +426,7 @@
     "emailVerified" : true,
     "firstName" : "Analyst3",
     "lastName" : "User3",
-    "email" : "ees-analyst3@education.gov.uk",
+    "email" : "ees-test.analyst3@education.gov.uk",
     "credentials" : [ {
       "id" : "550b1d13-ffe8-452f-b803-e2d0026a959f",
       "type" : "password",
@@ -448,7 +448,7 @@
     "emailVerified" : true,
     "firstName" : "Bau1",
     "lastName" : "User1",
-    "email" : "ees-bau1@education.gov.uk",
+    "email" : "ees-test.bau1@education.gov.uk",
     "credentials" : [ {
       "id" : "a0bcbb64-3112-4326-b3e9-1acb9eea4760",
       "type" : "password",
@@ -470,7 +470,7 @@
     "emailVerified" : true,
     "firstName" : "Bau2",
     "lastName" : "User2",
-    "email" : "ees-bau2@education.gov.uk",
+    "email" : "ees-test.bau2@education.gov.uk",
     "credentials" : [ {
       "id" : "c5f45483-85fc-41da-a3cd-bd8529846f37",
       "type" : "password",

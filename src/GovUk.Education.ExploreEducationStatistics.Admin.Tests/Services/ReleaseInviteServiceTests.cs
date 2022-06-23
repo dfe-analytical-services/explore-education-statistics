@@ -127,7 +127,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release1.Id, userReleaseInvites[0].ReleaseId);
                 Assert.Equal(Contributor, userReleaseInvites[0].Role);
                 Assert.Equal(CreatedById, userReleaseInvites[0].CreatedById);
-                Assert.False(userReleaseInvites[0].Accepted);
                 Assert.True(userReleaseInvites[0].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
 
@@ -135,7 +134,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release2.Id, userReleaseInvites[1].ReleaseId);
                 Assert.Equal(Contributor, userReleaseInvites[1].Role);
                 Assert.Equal(CreatedById, userReleaseInvites[1].CreatedById);
-                Assert.False(userReleaseInvites[1].Accepted);
                 Assert.True(userReleaseInvites[1].EmailSent);
                 Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[1].Created).Milliseconds, 0, 1500);
             }
@@ -191,6 +189,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ))
                 .Returns(Unit.Instance);
 
+            var userRoleService = new Mock<IUserRoleService>(Strict);
+            userRoleService
+                .Setup(mock =>
+                    mock.GetAssociatedGlobalRoleNameForReleaseRole(Contributor))
+                .Returns(RoleNames.Analyst);
+            userRoleService
+                .Setup(mock =>
+                    mock.UpgradeToGlobalRoleIfRequired(RoleNames.Analyst, user.Id))
+                .ReturnsAsync(Unit.Instance);
+
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -198,6 +206,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupReleaseInviteService(
                     contentDbContext: contentDbContext,
                     usersAndRolesDbContext: usersAndRolesDbContext,
+                    userRoleService: userRoleService.Object,
                     emailService: emailService.Object);
 
                 var result = await service.InviteContributor(
@@ -213,7 +222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ), Times.Once
                 );
 
-                VerifyAllMocks(emailService);
+                VerifyAllMocks(userRoleService, emailService);
 
                 result.AssertRight();
             }
@@ -250,15 +259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .AsQueryable()
                     .ToListAsync();
 
-                Assert.Single(userReleaseInvites); // only create release invite for missing UserReleaseRole
-
-                Assert.Equal("test@test.com", userReleaseInvites[0].Email);
-                Assert.Equal(release2.Id, userReleaseInvites[0].ReleaseId);
-                Assert.Equal(Contributor, userReleaseInvites[0].Role);
-                Assert.Equal(CreatedById, userReleaseInvites[0].CreatedById);
-                Assert.True(userReleaseInvites[0].Accepted);
-                Assert.True(userReleaseInvites[0].EmailSent);
-                Assert.InRange(DateTime.UtcNow.Subtract(userReleaseInvites[0].Created).Milliseconds, 0, 1500);
+                Assert.Empty(userReleaseInvites); // no release invite created as user already exists
             }
         }
 
@@ -879,6 +880,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
             IUserRepository? userRepository = null,
             IUserService? userService = null,
+            IUserRoleService? userRoleService = null,
             IUserInviteRepository? userInviteRepository = null,
             IUserReleaseInviteRepository? userReleaseInviteRepository = null,
             IUserReleaseRoleRepository? userReleaseRoleRepository = null,
@@ -893,6 +895,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 userRepository ?? new UserRepository(contentDbContext),
                 userService ?? AlwaysTrueUserService(CreatedById).Object,
+                userRoleService ?? Mock.Of<IUserRoleService>(Strict),
                 userInviteRepository ?? new UserInviteRepository(usersAndRolesDbContext),
                 userReleaseInviteRepository ?? new UserReleaseInviteRepository(contentDbContext),
                 userReleaseRoleRepository ?? new UserReleaseRoleRepository(contentDbContext),

@@ -125,6 +125,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
         public DbSet<ReleaseFootnote> ReleaseFootnote { get; set; } = null!;
         public DbSet<MatchedObservation> MatchedObservations => this.TempTableSet<MatchedObservation>();
 
+        private readonly EnumToEnumValueConverter<GeographicLevel> _geographicLevelConverter = new();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             ConfigureBoundaryLevel(modelBuilder);
@@ -151,20 +153,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
             ConfigureUnit(modelBuilder);
         }
 
-        private static void ConfigureBoundaryLevel(ModelBuilder modelBuilder)
+        private void ConfigureBoundaryLevel(ModelBuilder modelBuilder)
         {
-            var geographicLevelConverter = new EnumToEnumValueConverter<GeographicLevel>();
-
             modelBuilder.Entity<BoundaryLevel>()
                 .Property(boundaryLevel => boundaryLevel.Level)
-                .HasConversion(geographicLevelConverter);
-            
+                .HasConversion(_geographicLevelConverter);
+
             modelBuilder.Entity<BoundaryLevel>()
                 .Property(block => block.Created)
                 .HasConversion(
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
-            
+
             modelBuilder.Entity<BoundaryLevel>()
                 .Property(block => block.Published)
                 .HasConversion(
@@ -172,11 +172,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
         }
 
-        private static void ConfigureLocation(ModelBuilder modelBuilder)
+        private void ConfigureLocation(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Location>()
                 .Property(location => location.GeographicLevel)
-                .HasConversion(new EnumToEnumValueConverter<GeographicLevel>())
+                .HasConversion(_geographicLevelConverter)
                 .HasMaxLength(6);
 
             modelBuilder.Entity<Location>()
@@ -360,11 +360,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model.Database
 
         private static void ConfigureTimePeriod(ModelBuilder modelBuilder)
         {
-            var timeIdentifierConverter = new EnumToEnumValueConverter<TimeIdentifier>();
-
             modelBuilder.Entity<Observation>()
                 .Property(observation => observation.TimeIdentifier)
-                .HasConversion(timeIdentifierConverter)
+                .HasConversion(new EnumToEnumValueConverter<TimeIdentifier>())
                 .HasMaxLength(6);
 
             modelBuilder.Entity<Observation>()

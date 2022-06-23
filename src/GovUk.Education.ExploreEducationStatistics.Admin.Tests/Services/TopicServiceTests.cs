@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GovUk.Education.ExploreEducationStatistics.Admin.Cache;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -435,7 +435,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 cacheService
                     .Setup(s =>
                         s.DeleteCacheFolder(
-                            ItIs.DeepEqualTo(new ReleaseContentFolderCacheKey(publicationId, releaseId))))
+                            ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseId))))
                     .Returns(Task.CompletedTask);
 
                 var result = await service.DeleteTopic(topicId);
@@ -589,7 +589,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         .InSequence(releaseCacheInvalidationSequence)
                         .Setup(s =>
                             s.DeleteCacheFolder(
-                                ItIs.DeepEqualTo(new ReleaseContentFolderCacheKey(publicationId, releaseId))))
+                                ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseId))))
                         .Returns(Task.CompletedTask));
 
                 publishingService.Setup(s => s.TaxonomyChanged())
@@ -877,7 +877,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 cacheService
                     .Setup(s =>
                         s.DeleteCacheFolder(
-                            ItIs.DeepEqualTo(new ReleaseContentFolderCacheKey(publicationId, releaseId))))
+                            ItIs.DeepEqualTo(new PrivateReleaseContentFolderCacheKey(releaseId))))
                     .Returns(Task.CompletedTask);
 
                 var result = await service.DeleteTopic(topicId);

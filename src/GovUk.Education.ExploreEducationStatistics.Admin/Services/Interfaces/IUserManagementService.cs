@@ -19,9 +19,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<List<UserViewModel>> ListPreReleaseUsersAsync();
 
-        Task<Either<ActionResult, List<UserViewModel>>> ListPendingInvites();
+        Task<Either<ActionResult, List<PendingInviteViewModel>>> ListPendingInvites();
 
-        Task<Either<ActionResult, UserInvite>> InviteUser(string email, string roleId);
+        Task<Either<ActionResult, UserInvite>> InviteUser(
+            string email,
+            string roleId,
+            List<UserReleaseRoleAddViewModel> userReleaseRoles,
+            List<UserPublicationRoleAddViewModel> userPublicationRoles);
 
         Task<Either<ActionResult, Unit>> CancelInvite(string email);
 

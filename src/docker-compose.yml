@@ -37,7 +37,7 @@ services:
   idp:
     container_name: ees-idp
     build:
-      context: .
+      context: ./keycloak
       dockerfile: Dockerfile-Keycloak
     ports:
       - 5030:8080

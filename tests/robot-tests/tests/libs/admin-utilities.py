@@ -19,7 +19,8 @@ def user_signs_in_as(user: str):
             user,
             email=os.getenv(f'{user}_EMAIL'),
             password=os.getenv(f'{user}_PASSWORD'),
-            driver=sl.driver
+            driver=sl.driver,
+            identity_provider=os.getenv('IDENTITY_PROVIDER')
         )
 
         admin_url = os.getenv('ADMIN_URL')
@@ -78,7 +79,6 @@ def user_waits_for_release_process_status_to_be(status, timeout):
         try:
             sl.driver.find_element_by_css_selector(f'#release-process-status-Failed')
             raise_assertion_error('Release process status FAILED!')
-            return
         except BaseException:
             pass
         try:

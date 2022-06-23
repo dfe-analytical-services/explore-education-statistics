@@ -96,6 +96,7 @@ Add basic release content
 
 Add public prerelease access list
     user clicks link    Pre-release access
+    user waits until h2 is visible    Manage pre-release user access
     user creates public prerelease access list    Initial test public access list
 
 Update public prerelease access list
@@ -139,7 +140,7 @@ Navigate to prerelease page
     user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
 
 Validate prerelease has not started
-    user waits until h1 is visible    Pre-release access is not yet available    %{WAIT_SMALL}
+    user waits until h1 is visible    Pre-release access is not yet available
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
@@ -162,7 +163,7 @@ Validate the invite emails field is required
 
 Validate the invite emails field only accepts @education.gov.uk email addresses
     ${emails}=    Catenate    SEPARATOR=\n
-    ...    ees-analyst1@education.gov.uk
+    ...    EES-test.ANALYST1@education.gov.uk
     ...    test@test.com
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
@@ -172,7 +173,7 @@ Validate the invite emails field only accepts @education.gov.uk email addresses
 Invite users to the prerelease
     ${emails}=    Catenate    SEPARATOR=\n
     ...    simulate-delivered@notifications.service.gov.uk
-    ...    ees-analyst1@education.gov.uk
+    ...    EES-test.ANALYST1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     ${modal}=    user waits until modal is visible    Confirm pre-release invitations
@@ -181,16 +182,16 @@ Invite users to the prerelease
     user checks list has x items    testid:invitableList    2    ${modal}
     user checks list item contains    testid:invitableList    1    simulate-delivered@notifications.service.gov.uk
     ...    ${modal}
-    user checks list item contains    testid:invitableList    2    ees-analyst1@education.gov.uk    ${modal}
+    user checks list item contains    testid:invitableList    2    EES-test.ANALYST1@education.gov.uk    ${modal}
     user clicks button    Confirm
     user checks table column heading contains    1    1    User email
     user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
-    user checks results table cell contains    2    1    ees-analyst1@education.gov.uk
+    user checks results table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
 
 Validate the invite emails field is invalid for addresses that are all already invited or accepted
     ${emails}=    Catenate    SEPARATOR=\n
     ...    simulate-delivered@notifications.service.gov.uk
-    ...    ees-analyst1@education.gov.uk
+    ...    EES-test.ANALYST1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     user waits until element contains    id:preReleaseUserAccessForm-emails-error
@@ -201,7 +202,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
     ...    simulate-delivered@notifications.service.gov.uk
     ...    simulate-delivered-2@notifications.service.gov.uk
     ...    simulate-delivered-3@notifications.service.gov.uk
-    ...    ees-analyst1@education.gov.uk
+    ...    EES-test.ANALYST1@education.gov.uk
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     ${modal}=    user waits until modal is visible    Confirm pre-release invitations
@@ -214,7 +215,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
     ...    ${modal}
 
     user checks list has x items    testid:acceptedList    1    ${modal}
-    user checks list item contains    testid:acceptedList    1    ees-analyst1@education.gov.uk    ${modal}
+    user checks list item contains    testid:acceptedList    1    EES-test.ANALYST1@education.gov.uk    ${modal}
 
     user checks list has x items    testid:invitedList    1    ${modal}
     user checks list item contains    testid:invitedList    1    simulate-delivered@notifications.service.gov.uk
@@ -223,7 +224,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
     user clicks button    Confirm
     user checks table column heading contains    1    1    User email
     user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
-    user checks results table cell contains    2    1    ees-analyst1@education.gov.uk
+    user checks results table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
     user checks results table cell contains    3    1    simulate-delivered-2@notifications.service.gov.uk
     user checks results table cell contains    4    1    simulate-delivered-3@notifications.service.gov.uk
 
@@ -231,7 +232,7 @@ Validate prerelease has not started for Analyst user
     user changes to analyst1
     user navigates to admin frontend    ${RELEASE_URL}/prerelease/content
 
-    user waits until h1 is visible    Pre-release access is not yet available    %{WAIT_SMALL}
+    user waits until h1 is visible    Pre-release access is not yet available
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
@@ -273,7 +274,7 @@ Validate prerelease has started
     user checks nth breadcrumb contains    2    Pre-release access
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}
     ...    %{WAIT_SMALL}
@@ -286,7 +287,7 @@ Validate metadata guidance page
     user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
     user waits until page contains    Test metadata guidance content    %{WAIT_SMALL}
@@ -316,25 +317,25 @@ Go back to prerelease content page
     user checks nth breadcrumb contains    2    Pre-release access
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Validate public prerelease access list
     user clicks link    Pre-release access list
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
     user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
     user waits until page contains    Updated test public access list    %{WAIT_SMALL}
 
 Go back to prerelease content page again
     user clicks link    Back
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
     user checks breadcrumb count should be    2
     user checks nth breadcrumb contains    1    Home
     user checks nth breadcrumb contains    2    Pre-release access
 
 Go to prerelease table tool page
     user clicks link    Table tool
-    user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
+    user waits until h1 is visible    Create your own tables
     user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
 
 Validate featured tables
@@ -351,7 +352,7 @@ Go to featured table and validate table
 Create and validate custom table
     user clicks link    Table tool
 
-    user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
+    user waits until h1 is visible    Create your own tables
 
     user clicks link    Create your own table
     user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
@@ -363,21 +364,21 @@ Create and validate custom table
     user chooses location, time period and filters
     user validates table rows
 
- Go to prerelease methodology page
+Go to prerelease methodology page
     user clicks link    Methodologies
-    user waits until h1 is visible    Methodologies    %{WAIT_SMALL}
+    user waits until h1 is visible    Methodologies
 
- Validate no methodologies
+Validate no methodologies
     user waits until page contains    No methodologies available
 
- Create and validate methodology
+Create and validate methodology
     user creates methodology for publication    ${PUBLICATION_NAME}
     approve methodology from methodology view
     user navigates to admin frontend    ${RELEASE_URL}/prerelease/methodologies
-    user waits until h1 is visible    Methodologies    %{WAIT_SMALL}
+    user waits until h1 is visible    Methodologies
     user waits until page contains    ${PUBLICATION_NAME} (Owned)
     user clicks link    ${PUBLICATION_NAME} (Owned)
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Validate prerelease has started for Analyst user
     user changes to analyst1
@@ -388,7 +389,7 @@ Validate prerelease has started for Analyst user
     user checks nth breadcrumb contains    2    Pre-release access
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until element contains    id:releaseSummary    Test summary text for ${PUBLICATION_NAME}
     user waits until element contains    id:releaseHeadlines    Test headlines summary text for ${PUBLICATION_NAME}
@@ -399,7 +400,7 @@ Validate public metdata guidance for Analyst user
     user clicks link    Data guidance
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Data guidance    %{WAIT_SMALL}
     user waits until page contains    Test metadata guidance content    %{WAIT_SMALL}
@@ -429,13 +430,13 @@ Go back to prerelease content page as Analyst user
     user checks nth breadcrumb contains    2    Pre-release access
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Validate public prerelease access list as Analyst user
     user clicks link    Pre-release access list
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
     user waits until h2 is visible    Pre-release access list    %{WAIT_SMALL}
     user waits until page contains    Updated test public access list    %{WAIT_SMALL}
@@ -448,12 +449,12 @@ Go back to prerelease content page again as Analyst user
     user checks nth breadcrumb contains    2    Pre-release access
 
     user waits until page contains title caption    Calendar Year 2000    %{WAIT_SMALL}
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Go to prerelease table tool page as Analyst user
     user clicks link    Table tool
 
-    user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
+    user waits until h1 is visible    Create your own tables
     user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
 
 Validate featured tables as Analyst user
@@ -470,7 +471,7 @@ Go to featured table and validate table as Analyst user
 Create and validate custom table as Analyst user
     user clicks link    Table tool
 
-    user waits until h1 is visible    Create your own tables    %{WAIT_SMALL}
+    user waits until h1 is visible    Create your own tables
 
     user clicks link    Create your own table
     user waits until table tool wizard step is available    1    Choose a subject    %{WAIT_SMALL}
@@ -484,12 +485,12 @@ Create and validate custom table as Analyst user
 
 Go to prerelease methodology page as Analyst user
     user clicks link    Methodologies
-    user waits until h1 is visible    Methodologies    %{WAIT_SMALL}
+    user waits until h1 is visible    Methodologies
 
 Validate methodology as Analyst user
     user waits until page contains    ${PUBLICATION_NAME} (Owned)
     user clicks link    ${PUBLICATION_NAME} (Owned)
-    user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_SMALL}
+    user waits until h1 is visible    ${PUBLICATION_NAME}
 
 Unschedule release
     [Documentation]    EES-2826
@@ -497,11 +498,7 @@ Unschedule release
     # by test topic teardown. Unscheduling prevents an error when the scheduled publishing begins.
     user changes to bau1
     user navigates to admin frontend    ${RELEASE_URL}/status
-    user clicks button    Edit release status
-    user clicks radio    In draft
-    user clicks button    Update status
-
-    user checks summary list contains    Current status    In Draft
+    user puts release into draft    expected_next_release_date=January 2001
 
 
 *** Keywords ***

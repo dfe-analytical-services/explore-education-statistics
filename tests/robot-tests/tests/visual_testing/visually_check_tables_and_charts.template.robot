@@ -8,6 +8,7 @@ Suite Setup         do suite setup
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Test Cases ***
 {{test_case_template}}
 
@@ -16,6 +17,7 @@ Check release {{release_url}}
     Check release    ${release}
 
 {{/test_case_template}}
+
 
 *** Keywords ***
 do suite setup

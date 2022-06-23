@@ -7,14 +7,12 @@ Test Setup          fail test fast if required
 
 Force Tags          GeneralPublic    Local    Dev    Preprod
 
-
 *** Test Cases ***
 Go to Table Tool page
     user navigates to data tables page on public frontend
 
 Select "Pupil absence" publication
-    user opens details dropdown    Pupils and schools
-    user opens details dropdown    Pupil absence
+    user clicks radio    Pupils and schools
     user clicks radio    Pupil absence in schools in England
     user clicks element    id:publicationForm-submit
     user waits until table tool wizard step is available    2    Choose a subject

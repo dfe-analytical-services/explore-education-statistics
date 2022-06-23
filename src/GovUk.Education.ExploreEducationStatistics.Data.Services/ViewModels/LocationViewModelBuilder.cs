@@ -79,35 +79,23 @@ public class LocationViewModelBuilder
         // Find duplicates by label which also have the same value.
         // They are unique by some other attribute of location and appending the value of this attribute won't deduplicate them.
         // TODO EES-2954 enhance the deduplication to append other attributes of the location
-        var notDistinctByLabelAndValue = locations
+        var nonDistinctByLabelAndValue = locations
             .GroupBy(model => (model.Value, model.Label))
             .Where(grouping => grouping.Count() > 1)
             .SelectMany(grouping => grouping)
             .ToList();
 
         // Excluding those, find duplicates due to having the same label
-        var notDistinctByLabel = locations
-            .Except(notDistinctByLabelAndValue)
+        var nonDistinctByLabel = locations
+            .Except(nonDistinctByLabelAndValue)
             .GroupBy(model => model.Label.ToLower())
             .Where(grouping => grouping.Count() > 1)
             .SelectMany(grouping => grouping)
             .ToList();
 
-        if (!notDistinctByLabel.Any())
-        {
-            return locations;
-        }
+        nonDistinctByLabel.ForEach(location => location.Label += $" ({location.Value})");
 
-        return locations.Select(location =>
-        {
-            if (notDistinctByLabel.Contains(location))
-            {
-                // Append the value to make them differentiable by label
-                location.Label += $" ({location.Value})";
-            }
-
-            return location;
-        }).ToList();
+        return locations;
     }
 
     private static string OrderingKey(LocationAttributeNode node)

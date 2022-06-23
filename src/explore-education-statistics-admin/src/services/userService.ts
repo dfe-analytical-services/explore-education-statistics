@@ -43,6 +43,16 @@ export interface UserPublicationRoleSubmission {
 export interface UserInvite {
   email: string;
   roleId: string;
+  userReleaseRoles: { releaseId: string; releaseRole: string }[];
+  userPublicationRoles: { publicationId: string; publicationRole: string }[];
+}
+
+export interface PendingInvite {
+  email: string;
+  name: string;
+  role: string;
+  userPublicationRoles: UserPublicationRole[];
+  userReleaseRoles: UserReleaseRole[];
 }
 
 export interface UserUpdate {
@@ -82,7 +92,7 @@ export interface UsersService {
 
   getUsers(): Promise<UserStatus[]>;
   getPreReleaseUsers(): Promise<UserStatus[]>;
-  getInvitedUsers(): Promise<UserStatus[]>;
+  getPendingInvites(): Promise<PendingInvite[]>;
   inviteUser: (invite: UserInvite) => Promise<boolean>;
   inviteContributor: (
     email: string,
@@ -155,8 +165,8 @@ const userService: UsersService = {
     return client.get<UserStatus[]>('/user-management/pre-release');
   },
 
-  getInvitedUsers(): Promise<UserStatus[]> {
-    return client.get<UserStatus[]>('/user-management/invites');
+  getPendingInvites(): Promise<PendingInvite[]> {
+    return client.get<PendingInvite[]>('/user-management/invites');
   },
   inviteUser(invite: UserInvite): Promise<boolean> {
     return client.post(`/user-management/invites`, invite);

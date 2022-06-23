@@ -126,6 +126,7 @@ parser.add_argument("--custom-env",
                     dest="custom_env",
                     default=None,
                     help="load a custom .env file (must be in ~/robot-tests directory)")
+
 """
 NOTE(mark): The slack webhook url, and admin and analyst passwords to access to Admin app are
 stored in the CI pipeline as secret variables, which means they cannot be accessed as normal
@@ -162,7 +163,7 @@ assert os.getenv('WAIT_MEDIUM') is not None
 assert os.getenv('WAIT_LONG') is not None
 assert os.getenv('WAIT_SMALL') is not None
 assert os.getenv('FAIL_TEST_SUITES_FAST') is not None
-
+assert os.getenv('IDENTITY_PROVIDER') is not None
 
 if args.slack_webhook_url:
     os.environ['SLACK_WEBHOOK_URL'] = args.slack_webhook_url
@@ -210,13 +211,6 @@ if args.ci:
     robotArgs += ["--removekeywords", "name:operatingsystem.environment variable should be set"]
     robotArgs += ['--removekeywords',
                   'name:common.user goes to url']  # To hide basic auth credentials
-else:
-    if args.custom_env:
-        load_dotenv(args.custom_env)
-
-    else:
-        load_dotenv('.env.' + args.env)
-
 
 # seed Azure storage emulator release files
 if (args.env == 'local'):
@@ -318,7 +312,8 @@ def setup_authentication(clear_existing=False):
             user='ADMIN',
             email=os.getenv('ADMIN_EMAIL'),
             password=os.getenv('ADMIN_PASSWORD'),
-            clear_existing=clear_existing
+            clear_existing=clear_existing,
+            identity_provider=os.getenv('IDENTITY_PROVIDER')
         )
 
     # Don't need analyst user if running admin/bau or admin_and_public/bau tests
@@ -327,7 +322,8 @@ def setup_authentication(clear_existing=False):
             user='ANALYST',
             email=os.getenv('ANALYST_EMAIL'),
             password=os.getenv('ANALYST_PASSWORD'),
-            clear_existing=clear_existing
+            clear_existing=clear_existing,
+            identity_provider=os.getenv('IDENTITY_PROVIDER')
         )
 
 
@@ -406,7 +402,7 @@ try:
         if args.profile:
             # Python profiling
             cProfile.run('robot_run_cli(robotArgs)', 'profile-data')
-            stream = open('test-results/python-profiling-results.log', 'w')
+            stream = open('test-results/python-profiling-results.log', 'w', encoding='utf-8')
             p = pstats.Stats('profile-data', stream=stream)
             p.sort_stats('time')
             # p.sort_stats('cumulative')
@@ -416,18 +412,20 @@ try:
             # Keyword profiling
             kp.run_keyword_profile(f'test-results/{output_file}',
                                    printresults=False,
-                                   writepath='test-results/keyword-profiling-results.log')
-            print("\nProfiling logs created in test-results/", flush=True)
+                                   writepath=f'test-results/keyword-profiling-results.log')
+            print(
+                f'Keyword profiling results saved to {os.getcwd()}/test-results/keyword-profiling-results.log',
+                flush=True)
         else:
             robot_run_cli(robotArgs)
     elif args.interp == "pabot":
         if args.processes:
-            robotArgs = ["--processes", args.processes] + robotArgs
+            robotArgs = ["--processes", int(args.processes)] + robotArgs
 
         if args.profile:
             # Python profiling
             cProfile.run('pabot_run_cli(robotArgs)', 'profile-data')
-            stream = open('test-results/python-profiling-results.log', 'w')
+            stream = open(f'test-results{os.sep}python-profiling-results.log', 'w', encoding='utf-8', errors='ignore')
             p = pstats.Stats('profile-data', stream=stream)
             p.sort_stats('time')
             # p.sort_stats('cumulative')
@@ -435,12 +433,15 @@ try:
             os.remove('profile-data')
 
             # Keyword profiling
-            kp.run_keyword_profile(f'test-results/{output_file}',
+            kp.run_keyword_profile(f'test-results{os.sep}{output_file}',
                                    printresults=False,
-                                   writepath='test-results/keyword-profiling-results.log')
-            print("\nProfiling logs created in test-results/", flush=True)
+                                   writepath=f'test-results/keyword-profiling-results.log')
+            print(
+                f'Keyword profiling results saved to {os.getcwd()}/test-results/keyword-profiling-results.log',
+                flush=True)
         else:
             pabot_run_cli(robotArgs)
+
 finally:
     if not args.disable_teardown:
         print("Tearing down tests...", flush=True)

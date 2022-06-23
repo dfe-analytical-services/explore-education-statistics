@@ -46,7 +46,7 @@ Enter new publication title
 
 User redirects to the dashboard after saving publication
     user clicks button    Save publication
-    user waits until h1 is visible    Dashboard    %{WAIT_SMALL}
+    user waits until h1 is visible    Dashboard
 
 Verify that new publication has been created
     user opens publication on the admin dashboard    ${PUBLICATION_NAME} (created)

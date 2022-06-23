@@ -96,20 +96,11 @@ Verify release status is Approved
     user waits for release process status to be    Scheduled    %{WAIT_LONG}
 
 Move release status back to Draft
-    user edits release status
-    user clicks radio    In draft
-
-    user enters text into element    id:releaseStatusForm-latestInternalReleaseNote    Moved back to draft
-
-    user enters text into element    id:releaseStatusForm-nextReleaseDate-month    1
-    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    3001
-
-    user clicks button    Update status
-
-Verify release status is Draft
-    user checks summary list contains    Current status    Draft
-    user checks summary list contains    Scheduled release    Not scheduled
-    user checks summary list contains    Next release expected    January 3001
+    user puts release into draft
+    ...    release_note=Moved back to draft
+    ...    next_release_date_month=1
+    ...    next_release_date_year=3001
+    ...    expected_next_release_date=January 3001
 
 Check that having a Draft owned Methodology attached to this Release's Publication will show a checklist warning
     user creates methodology for publication    ${PUBLICATION_NAME}

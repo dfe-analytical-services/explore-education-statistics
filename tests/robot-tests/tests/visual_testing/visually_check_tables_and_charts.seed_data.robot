@@ -8,6 +8,7 @@ Suite Setup         do suite setup
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Test Cases ***
 Check release /find-statistics/permanent-and-fixed-period-exclusions-in-england/2016-17
     ${release}=    get release by url    /find-statistics/permanent-and-fixed-period-exclusions-in-england/2016-17
@@ -16,6 +17,7 @@ Check release /find-statistics/permanent-and-fixed-period-exclusions-in-england/
 Check release /find-statistics/pupil-absence-in-schools-in-england/2016-17
     ${release}=    get release by url    /find-statistics/pupil-absence-in-schools-in-england/2016-17
     Check release    ${release}
+
 
 *** Keywords ***
 do suite setup

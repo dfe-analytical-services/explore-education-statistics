@@ -6,7 +6,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Security.SecurityClaimTypes;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.PublicationRole;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.AuthorizationHandlers
 {
@@ -19,16 +21,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IMethodologyRepository _methodologyRepository;
-        private readonly IUserPublicationRoleRepository _userPublicationRoleRepository;
+        private readonly AuthorizationHandlerResourceRoleService _authorizationHandlerResourceRoleService;
 
         public DeleteSpecificMethodologyAuthorizationHandler(
             IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyRepository methodologyRepository,
-            IUserPublicationRoleRepository userPublicationRoleRepository)
+            AuthorizationHandlerResourceRoleService authorizationHandlerResourceRoleService)
         {
             _methodologyVersionRepository = methodologyVersionRepository;
             _methodologyRepository = methodologyRepository;
-            _userPublicationRoleRepository = userPublicationRoleRepository;
+            _authorizationHandlerResourceRoleService = authorizationHandlerResourceRoleService;
         }
 
         protected override async Task HandleRequirementAsync(
@@ -55,11 +57,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
 
             var owningPublication =
                 await _methodologyRepository.GetOwningPublication(methodologyVersion.MethodologyId);
-
-            // If the user is a Publication Owner of the Publication that owns this Methodology, they can delete it.
-            if (await _userPublicationRoleRepository.IsUserPublicationOwner(
-                context.User.GetUserId(),
-                owningPublication.Id))
+            
+            if (await _authorizationHandlerResourceRoleService
+                    .HasRolesOnPublication(
+                        context.User.GetUserId(),
+                        owningPublication.Id,
+                        Owner))
             {
                 context.Succeed(requirement);
             }

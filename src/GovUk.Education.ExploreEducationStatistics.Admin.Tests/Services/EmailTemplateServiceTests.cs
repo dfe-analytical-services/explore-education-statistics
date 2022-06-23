@@ -22,11 +22,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public void SendInviteEmail()
         {
-            const string expectedTemplateId = "invite-template-id";
+            const string expectedTemplateId = "invite-with-roles-template-id";
 
             var expectedValues = new Dictionary<string, dynamic>
             {
-                {"url", "https://admin-uri"}
+                {"url", "https://admin-uri"},
+                {"release role list", "* No release permissions granted"},
+                {"publication role list" , "* No publication permissions granted"},
             };
 
             var emailService = new Mock<IEmailService>(Strict);
@@ -41,7 +43,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var service = SetupEmailTemplateService(emailService: emailService.Object);
 
-            var result = service.SendInviteEmail("test@test.com");
+            var result = service.SendInviteEmail(
+                "test@test.com",
+                new List<UserReleaseInvite>(),
+                new List<UserPublicationInvite>());
 
             emailService.Verify(
                 s => s.SendEmail(
@@ -156,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static Mock<IConfiguration> ConfigurationMock()
         {
             return CreateMockConfiguration(
-                TupleOf("NotifyInviteTemplateId", "invite-template-id"),
+                TupleOf("NotifyInviteWithRolesTemplateId", "invite-with-roles-template-id"),
                 TupleOf("NotifyPublicationRoleTemplateId", "publication-role-template-id"),
                 TupleOf("NotifyReleaseRoleTemplateId", "release-role-template-id"),
                 TupleOf("AdminUri", "admin-uri"));

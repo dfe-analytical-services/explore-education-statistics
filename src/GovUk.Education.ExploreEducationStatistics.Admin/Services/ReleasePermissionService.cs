@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, List<ContributorInviteViewModel>>>
-            ListReleaseContributorInvites(Guid releaseId, bool? accepted = null)
+            ListReleaseContributorInvites(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId,
@@ -86,7 +86,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .ToListAsync();
 
                     return invites
-                        .Where(i => accepted == null || i.Accepted == accepted)
                         .Select(i => new ContributorInviteViewModel
                         {
                             Email = i.Email,
