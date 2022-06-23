@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels
 
         public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = null!;
 
-        public ContentSectionViewModel RelatedDashboardsSection { get; set; } = null;
+        public ContentSectionViewModel? RelatedDashboardsSection { get; set; }
 
         public List<FileInfo> DownloadFiles { get; set; } = new();
 

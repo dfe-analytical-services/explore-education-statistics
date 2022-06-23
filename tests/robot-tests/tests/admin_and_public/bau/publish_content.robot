@@ -31,7 +31,7 @@ Add Related dashboards section to release content
     user clicks button    Add dashboards section
     user waits until page contains accordion section    View related dashboard(s)
 
-    user opens accordion section    View related dashboard(s)    id:additional-info-accordion
+    user opens accordion section    View related dashboard(s)    id:data-accordion
     user starts editing text block    id:related-dashboards-section-content
     user presses keys    Related dashboards test text
     user clicks button    Save & close
@@ -86,8 +86,8 @@ Navigate to published release page
 
 Check latest release contains related dashboards
     user checks element contains link    testid:data-downloads    View data guidance
-    user checks there are x accordion sections    2    id:additional-info-accordion
-    user opens accordion section    View related dashboard(s)    id:additional-info-accordion
+    user checks there are x accordion sections    2    id:data-accordion
+    user opens accordion section    View related dashboard(s)    id:data-accordion
     user checks element contains    id:related-dashboards-section-content    Related dashboards test text
 
 Check latest release contains glossary info icon

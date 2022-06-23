@@ -7,7 +7,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
-import ReleaseDataAndFilesAccordionSection from '@common/modules/release/components/ReleaseDataAndFilesAccordionSection';
+import ReleaseDataFilesAccordion from '@common/modules/release/components/ReleaseDataFilesAccordion';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
@@ -33,7 +33,6 @@ import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
-import additionalInfoStyles from '@common/modules/release/components/ReleaseDataAndFilesAccordionSection.module.scss';
 import PublicationReleaseHeadlinesSection from './components/PublicationReleaseHeadlinesSection';
 import styles from './PublicationReleasePage.module.scss';
 
@@ -56,10 +55,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
       file.type === 'Data' ||
       (file.type === 'Ancillary' && file.name !== 'All files'),
   );
-
-  const hasRelatedDashboardsSection =
-    release.relatedDashboardsSection &&
-    release.relatedDashboardsSection.content?.length > 0;
 
   return (
     <Page
@@ -234,9 +229,9 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     View data guidance
                   </Link>
                 </li>
-                {hasRelatedDashboardsSection && (
+                {!!release.relatedDashboardsSection?.content.length && (
                   <li>
-                    <a href="#relatedDashboardsSection">
+                    <a href="#related-dashboards-section">
                       View related dashboard(s)
                     </a>
                   </li>
@@ -400,83 +395,71 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
       <PublicationReleaseHeadlinesSection release={release} />
 
-      {(release.downloadFiles || hasRelatedDashboardsSection) && (
-        <div className={additionalInfoStyles.additionalInfoContainer}>
-          <Accordion
-            id="additional-info-accordion"
-            showOpenAll={false}
-            onSectionOpen={accordionSection => {
-              logEvent({
-                category: `${release.publication.title} release page`,
-                action: `Additional info accordion opened`,
-                label: `${accordionSection.title}`,
-              });
-            }}
-          >
-            {release.downloadFiles && (
-              <ReleaseDataAndFilesAccordionSection
-                release={release}
-                renderAllFilesButton={
-                  <ButtonLink
-                    to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
-                    variant="secondary"
-                    onClick={() => {
-                      logEvent({
-                        category: 'Downloads',
-                        action: `Release page all files downloads.title}, Release: ${release.title}, File: All files`,
-                      });
-                    }}
-                  >
-                    Download all data
-                  </ButtonLink>
-                }
-                renderCreateTablesButton={
-                  <CreateTablesButton release={release} />
-                }
-                renderDataCatalogueLink={
-                  <ButtonLink
-                    to={`/data-catalogue/${release.publication.slug}/${release.slug}`}
-                    variant="secondary"
-                  >
-                    Browse data files
-                  </ButtonLink>
-                }
-                renderDownloadLink={file => {
-                  return (
-                    <Link
-                      to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files/${file.id}`}
-                      onClick={() => {
-                        logEvent({
-                          category: 'Downloads',
-                          action: 'Release page file downloaded',
-                          label: `Publication: ${release.publication.title}, Release: ${release.title}, File: ${file.fileName}`,
-                        });
-                      }}
-                    >
-                      {file.name}
-                    </Link>
-                  );
+      {(release.downloadFiles ||
+        !!release.relatedDashboardsSection?.content.length) && (
+        <ReleaseDataFilesAccordion
+          release={release}
+          renderAllFilesButton={
+            <ButtonLink
+              to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
+              variant="secondary"
+              onClick={() => {
+                logEvent({
+                  category: 'Downloads',
+                  action: `Release page all files downloads.title}, Release: ${release.title}, File: All files`,
+                });
+              }}
+            >
+              Download all data
+            </ButtonLink>
+          }
+          renderCreateTablesButton={<CreateTablesButton release={release} />}
+          renderDataCatalogueLink={
+            <ButtonLink
+              to={`/data-catalogue/${release.publication.slug}/${release.slug}`}
+              variant="secondary"
+            >
+              Browse data files
+            </ButtonLink>
+          }
+          renderDownloadLink={file => {
+            return (
+              <Link
+                to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files/${file.id}`}
+                onClick={() => {
+                  logEvent({
+                    category: 'Downloads',
+                    action: 'Release page file downloaded',
+                    label: `Publication: ${release.publication.title}, Release: ${release.title}, File: ${file.fileName}`,
+                  });
                 }}
-                renderDataGuidanceLink={
-                  <ButtonLink
-                    to={
-                      release.latestRelease
-                        ? `/find-statistics/${release.publication.slug}/data-guidance`
-                        : `/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`
-                    }
-                    variant="secondary"
-                  >
-                    Data guidance
-                  </ButtonLink>
-                }
-              />
-            )}
-            {hasRelatedDashboardsSection && (
-              <AccordionSection
-                id="related-dashboards-section"
-                heading="View related dashboard(s)"
               >
-                {release.relatedDashboardsSection!.content.map(block => (
+                {file.name}
+              </Link>
+            );
+          }}
+          renderDataGuidanceLink={
+            <ButtonLink
+              to={
+                release.latestRelease
+                  ? `/find-statistics/${release.publication.slug}/data-guidance`
+                  : `/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`
+              }
+              variant="secondary"
+            >
+              Data guidance
+            </ButtonLink>
+          }
+          onSectionOpen={accordionSection => {
+            logEvent({
+              category: `${release.publication.title} release page`,
+              action: `Data files accordion opened`,
+              label: `${accordionSection.title}`,
+            });
+          }}
+          renderRelatedDashboards={
+            release.relatedDashboardsSection?.content.length
+              ? release.relatedDashboardsSection.content.map(block => (
                   <ContentBlockRenderer
                     key={block.id}
                     block={block}
@@ -495,11 +478,10 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                       })
                     }
                   />
-                ))}
-              </AccordionSection>
-            )}
-          </Accordion>
-        </div>
+                ))
+              : null
+          }
+        />
       )}
 
       {release.content.length > 0 && (

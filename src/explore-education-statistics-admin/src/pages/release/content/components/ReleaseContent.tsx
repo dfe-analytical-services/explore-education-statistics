@@ -26,12 +26,9 @@ import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
-import ReleaseDataAndFilesAccordionSection from '@common/modules/release/components/ReleaseDataAndFilesAccordionSection';
+import ReleaseDataFilesAccordion from '@common/modules/release/components/ReleaseDataFilesAccordion';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
-import styles from '@common/modules/release/components/ReleaseDataAndFilesAccordionSection.module.scss';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 
 interface MethodologyLink {
   key: string;
@@ -88,11 +85,7 @@ const ReleaseContent = () => {
         },
       });
     }
-  }, [
-    addContentSectionBlock,
-    release.id,
-    release.relatedDashboardsSection?.id,
-  ]);
+  }, [addContentSectionBlock, release.id, release.relatedDashboardsSection]);
 
   const { publication } = release;
 
@@ -123,10 +116,6 @@ const ReleaseContent = () => {
   const releaseCount =
     release.publication.releases.length +
     release.publication.legacyReleases.length;
-
-  const hasRelatedDashboardsSection =
-    release.relatedDashboardsSection &&
-    release.relatedDashboardsSection.content?.length > 0;
 
   return (
     <>
@@ -216,9 +205,9 @@ const ReleaseContent = () => {
                     View data guidance
                   </Link>
                 </li>
-                {hasRelatedDashboardsSection && (
+                {!!release.relatedDashboardsSection?.content.length && (
                   <li>
-                    <a href="#relatedDashboardsSection">
+                    <a href="#related-dashboards-section">
                       View related dashboard(s)
                     </a>
                   </li>
@@ -336,104 +325,94 @@ const ReleaseContent = () => {
 
       {(release.downloadFiles ||
         release.hasPreReleaseAccessList ||
-        hasRelatedDashboardsSection) && (
-        <div className={styles.additionalInfoContainer}>
-          <Accordion id="additional-info-accordion" showOpenAll={false}>
-            {(release.downloadFiles || release.hasPreReleaseAccessList) && (
-              <ReleaseDataAndFilesAccordionSection
-                release={release}
-                renderAllFilesButton={
-                  <Button
-                    disableDoubleClick
-                    variant="secondary"
-                    onClick={() =>
-                      releaseFileService.downloadAllFilesZip(release.id)
-                    }
-                  >
-                    Download all data
-                  </Button>
-                }
-                renderDownloadLink={file => (
-                  <ButtonText
-                    onClick={() =>
-                      releaseDataFileService.downloadFile(
-                        release.id,
-                        file.id,
-                        file.fileName,
-                      )
-                    }
-                  >
-                    {file.name}
-                  </ButtonText>
-                )}
-                renderDataGuidanceLink={
-                  <ButtonLink
-                    to={{
-                      pathname: generatePath<ReleaseRouteParams>(
-                        releaseDataGuidanceRoute.path,
-                        {
-                          publicationId: release.publication.id,
-                          releaseId: release.id,
-                        },
-                      ),
-                      state: {
-                        backLink: location.pathname,
-                      },
-                    }}
-                    variant="secondary"
-                  >
-                    Data guidance
-                  </ButtonLink>
-                }
-                renderDataCatalogueLink={
-                  <Button disabled variant="secondary">
-                    Browse data files
-                    <br /> (public site only)
-                  </Button>
-                }
-                renderCreateTablesButton={
-                  <Button disabled>
-                    Create tables
-                    <br /> (public site only)
-                  </Button>
-                }
-                showDownloadFilesList
-              />
-            )}
-            {hasRelatedDashboardsSection && (
-              <AccordionSection
-                id="related-dashboards-section"
-                heading="View related dashboard(s)"
-              >
-                <EditableSectionBlocks
-                  blocks={release.relatedDashboardsSection!.content}
-                  sectionId={release.relatedDashboardsSection!.id}
-                  renderBlock={block => (
-                    <ReleaseBlock block={block} releaseId={release.id} />
-                  )}
-                  renderEditableBlock={block => (
-                    <ReleaseEditableBlock
-                      allowComments
-                      block={block}
-                      publicationId={release.publication.id}
-                      releaseId={release.id}
-                      sectionId={release.relatedDashboardsSection!.id}
-                      sectionKey="relatedDashboardsSection"
-                    />
-                  )}
-                />
-              </AccordionSection>
-            )}
-          </Accordion>
-          {editingMode === 'edit' && !hasRelatedDashboardsSection && (
-            <div className="govuk-!-margin-bottom-8 dfe-align--centre">
-              <Button onClick={addRelatedDashboardsBlock}>
-                Add dashboards section
-              </Button>
-            </div>
+        !!release.relatedDashboardsSection?.content.length) && (
+        <ReleaseDataFilesAccordion
+          release={release}
+          renderAllFilesButton={
+            <Button
+              disableDoubleClick
+              variant="secondary"
+              onClick={() => releaseFileService.downloadAllFilesZip(release.id)}
+            >
+              Download all data
+            </Button>
+          }
+          renderDownloadLink={file => (
+            <ButtonText
+              onClick={() =>
+                releaseDataFileService.downloadFile(
+                  release.id,
+                  file.id,
+                  file.fileName,
+                )
+              }
+            >
+              {file.name}
+            </ButtonText>
           )}
-        </div>
+          renderDataGuidanceLink={
+            <ButtonLink
+              to={{
+                pathname: generatePath<ReleaseRouteParams>(
+                  releaseDataGuidanceRoute.path,
+                  {
+                    publicationId: release.publication.id,
+                    releaseId: release.id,
+                  },
+                ),
+                state: {
+                  backLink: location.pathname,
+                },
+              }}
+              variant="secondary"
+            >
+              Data guidance
+            </ButtonLink>
+          }
+          renderDataCatalogueLink={
+            <Button disabled variant="secondary">
+              Browse data files
+              <br /> (public site only)
+            </Button>
+          }
+          renderCreateTablesButton={
+            <Button disabled>
+              Create tables
+              <br /> (public site only)
+            </Button>
+          }
+          showDownloadFilesList
+          renderRelatedDashboards={
+            release.relatedDashboardsSection?.content.length ? (
+              <EditableSectionBlocks
+                blocks={release.relatedDashboardsSection.content}
+                sectionId={release.relatedDashboardsSection.id}
+                renderBlock={block => (
+                  <ReleaseBlock block={block} releaseId={release.id} />
+                )}
+                renderEditableBlock={block => (
+                  <ReleaseEditableBlock
+                    allowComments
+                    block={block}
+                    publicationId={release.publication.id}
+                    releaseId={release.id}
+                    sectionId={release.relatedDashboardsSection!.id}
+                    sectionKey="relatedDashboardsSection"
+                  />
+                )}
+              />
+            ) : null
+          }
+        />
       )}
+      {editingMode === 'edit' &&
+        !release.relatedDashboardsSection?.content.length && (
+          <div className="govuk-!-margin-bottom-8 dfe-align--centre">
+            <Button onClick={addRelatedDashboardsBlock}>
+              Add dashboards section
+            </Button>
+          </div>
+        )}
 
       <ReleaseContentAccordion release={release} sectionName="Contents" />
 
