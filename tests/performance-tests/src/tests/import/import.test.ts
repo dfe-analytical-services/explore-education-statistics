@@ -1,9 +1,9 @@
 import { check, fail } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
-import refreshAuthTokens from '../../auth/refreshAuthTokens';
 import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
 import createDataService from '../../utils/dataService';
+import getOrRefreshAccessTokens from '../../utils/getOrRefreshAccessTokens';
 
 const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
 
@@ -138,32 +138,6 @@ export function setup(): SetupData {
   };
 }
 
-function getOrRefreshAccessToken(
-  supportsRefreshTokens: boolean,
-  userName: string,
-  adminUrl: string,
-  authTokens: AuthTokens,
-) {
-  if (!supportsRefreshTokens) {
-    return authTokens.accessToken;
-  }
-
-  const refreshedTokens = refreshAuthTokens({
-    userName,
-    adminUrl,
-    clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
-    clientSecret: '',
-    refreshToken: authTokens.refreshToken,
-    supportsRefreshTokens,
-  });
-
-  if (!refreshedTokens) {
-    throw new Error('Unable to obtain an accessToken - exiting test');
-  }
-
-  return refreshedTokens?.authTokens.accessToken;
-}
-
 const performTest = ({
   releaseId,
   userName,
@@ -171,7 +145,7 @@ const performTest = ({
   authTokens,
   supportsRefreshTokens,
 }: SetupData) => {
-  const accessToken = getOrRefreshAccessToken(
+  const accessToken = getOrRefreshAccessTokens(
     supportsRefreshTokens,
     userName,
     adminUrl,
@@ -291,7 +265,7 @@ export const teardown = ({
   topicId,
 }: SetupData) => {
   if (alwaysCreateNewDataPerTest) {
-    const accessToken = getOrRefreshAccessToken(
+    const accessToken = getOrRefreshAccessTokens(
       supportsRefreshTokens,
       userName,
       adminUrl,

@@ -1,10 +1,10 @@
 import { check } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
-import refreshAuthTokens from '../../auth/refreshAuthTokens';
 import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
 import createDataService, { SubjectMeta } from '../../utils/dataService';
 import testData from '../testData';
+import getOrRefreshAccessTokens from '../../utils/getOrRefreshAccessTokens';
 
 const PUBLICATION =
   'UI test publication - Performance tests - adminTableBuilderQuery.test.ts';
@@ -130,20 +130,11 @@ export function setup(): SetupData {
   const {
     themeId,
     topicId,
-    publicationId,
     releaseId,
     subjectId,
   } = getOrCreateReleaseWithSubject(adminUrl, authTokens.accessToken);
 
   const { subjectMeta } = dataService.getSubjectMeta({ releaseId, subjectId });
-
-  /* eslint-disable-next-line no-console */
-  console.log(
-    `Created Theme ${themeId}, Topic ${topicId}, Publication ${publicationId}, Release ${releaseId}`,
-  );
-
-  /* eslint-disable-next-line no-console */
-  console.log(`Created Subject ${subjectId}`);
 
   return {
     themeId,
@@ -158,32 +149,6 @@ export function setup(): SetupData {
   };
 }
 
-function getOrRefreshAccessToken(
-  supportsRefreshTokens: boolean,
-  userName: string,
-  adminUrl: string,
-  authTokens: AuthTokens,
-) {
-  if (!supportsRefreshTokens) {
-    return authTokens.accessToken;
-  }
-
-  const refreshedTokens = refreshAuthTokens({
-    userName,
-    adminUrl,
-    clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
-    clientSecret: '',
-    refreshToken: authTokens.refreshToken,
-    supportsRefreshTokens,
-  });
-
-  if (!refreshedTokens) {
-    throw new Error('Unable to obtain an accessToken - exiting test');
-  }
-
-  return refreshedTokens?.authTokens.accessToken;
-}
-
 const performTest = ({
   releaseId,
   subjectId,
@@ -193,7 +158,7 @@ const performTest = ({
   subjectMeta,
   supportsRefreshTokens,
 }: SetupData) => {
-  const accessToken = getOrRefreshAccessToken(
+  const accessToken = getOrRefreshAccessTokens(
     supportsRefreshTokens,
     userName,
     adminUrl,
@@ -260,7 +225,7 @@ export const teardown = ({
   topicId,
 }: SetupData) => {
   if (alwaysCreateNewDataPerTest) {
-    const accessToken = getOrRefreshAccessToken(
+    const accessToken = getOrRefreshAccessTokens(
       supportsRefreshTokens,
       userName,
       adminUrl,
