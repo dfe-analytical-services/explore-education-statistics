@@ -35,7 +35,40 @@ describe('ChartAxisConfiguration', () => {
   };
 
   const testAxisConfiguration: AxisConfiguration = {
-    dataSets: [],
+    dataSets: [
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+      },
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      },
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-primary'],
+      },
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-primary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
+      },
+    ],
     groupBy: 'timePeriod',
     min: 0,
     referenceLines: [],
@@ -141,7 +174,7 @@ describe('ChartAxisConfiguration', () => {
     const axisSection = within(
       screen.getByRole('group', { name: 'Axis range' }),
     );
-    expect(axisSection.getByLabelText('Minimum')).toHaveValue('');
+    expect(axisSection.getByLabelText('Minimum')).toHaveValue('0');
     expect(axisSection.getByLabelText('Maximum')).toHaveValue('');
 
     const referenceLinesSection = within(
@@ -304,7 +337,7 @@ describe('ChartAxisConfiguration', () => {
 
     await waitFor(() => {
       const formValues: AxisConfiguration = {
-        dataSets: [],
+        dataSets: testAxisConfiguration.dataSets,
         groupBy: 'timePeriod',
         min: 0,
         max: undefined,
@@ -353,7 +386,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: 'locations',
           groupByFilter: '',
           min: 0,
@@ -406,7 +439,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: 'filters',
           groupByFilter: 'school_type',
           min: 0,
@@ -572,7 +605,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
           min: 0,
           max: undefined,
@@ -692,7 +725,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
           min: 0,
           max: undefined,
@@ -750,7 +783,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
           min: 0,
           max: undefined,
@@ -808,7 +841,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: undefined,
           min: 0,
           max: undefined,

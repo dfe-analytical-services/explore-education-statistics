@@ -8,6 +8,7 @@ import {
   AxisType,
   ReferenceLine,
 } from '@common/modules/charts/types/chart';
+import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import Yup from '@common/validation/yup';
 import FormSelect, {
@@ -23,9 +24,8 @@ interface AddFormValues {
 
 export interface ChartReferenceLinesConfigurationProps {
   axisType: AxisType;
-  configuration: AxisConfiguration;
+  dataSetCategories: DataSetCategory[];
   id: string;
-  meta: FullTableMeta;
   lines: ReferenceLine[];
   onAddLine: (line: ReferenceLine) => void;
   onRemoveLine: (line: ReferenceLine) => void;
@@ -33,9 +33,8 @@ export interface ChartReferenceLinesConfigurationProps {
 
 export default function ChartReferenceLinesConfiguration({
   axisType,
-  configuration,
+  dataSetCategories,
   id,
-  meta,
   lines,
   onAddLine,
   onRemoveLine,
@@ -45,31 +44,11 @@ export default function ChartReferenceLinesConfiguration({
       return [];
     }
 
-    switch (configuration.groupBy) {
-      case 'filters':
-        return Object.values(meta.filters).flatMap(
-          filterGroup => filterGroup.options,
-        );
-      case 'indicators':
-        return meta.indicators;
-      case 'locations':
-        return meta.locations;
-      case 'timePeriod':
-        return meta.timePeriodRange.map(timePeriod => ({
-          value: `${timePeriod.year}_${timePeriod.code}`,
-          label: timePeriod.label,
-        }));
-      default:
-        return [];
-    }
-  }, [
-    axisType,
-    configuration.groupBy,
-    meta.filters,
-    meta.indicators,
-    meta.locations,
-    meta.timePeriodRange,
-  ]);
+    return dataSetCategories.map(({ filter }) => ({
+      label: filter.label,
+      value: filter.value,
+    }));
+  }, [axisType, dataSetCategories]);
 
   const filteredOptions = useMemo<SelectOption[]>(() => {
     return options.filter(option =>

@@ -510,9 +510,8 @@ const ChartAxisConfiguration = ({
           {validationSchema.fields.referenceLines && (
             <ChartReferenceLinesConfiguration
               axisType={type}
-              configuration={configuration}
+              dataSetCategories={dataSetCategories}
               id={id}
-              meta={meta}
               lines={form.values.referenceLines ?? []}
               onAddLine={line => {
                 form.setFieldValue('referenceLines', [
