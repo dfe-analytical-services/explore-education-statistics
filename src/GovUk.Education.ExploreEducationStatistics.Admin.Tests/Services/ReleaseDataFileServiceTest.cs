@@ -996,6 +996,181 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task ReorderDataFiles()
+        {
+            var release = new Release();
+            var releaseDataFile1 = new ReleaseFile
+            {
+                Release = release,
+                Order = 4,
+                File = new File
+                {
+                    Type = FileType.Data,
+                    SubjectId = Guid.NewGuid(),
+                },
+            };
+            var releaseDataFile2 = new ReleaseFile
+            {
+                Release = release,
+                Order = 3,
+                File = new File
+                {
+                    Type = FileType.Data,
+                    SubjectId = Guid.NewGuid(),
+                },
+            };
+            var releaseDataFile3 = new ReleaseFile
+            {
+                Release = release,
+                Order = 1,
+                File = new File
+                {
+                    Type = FileType.Data,
+                    SubjectId = Guid.NewGuid(),
+                },
+            };
+            var releaseDataFile4 = new ReleaseFile
+            {
+                Release = release,
+                Order = 2,
+                File = new File
+                {
+                    Type = FileType.Data,
+                    SubjectId = Guid.NewGuid(),
+                },
+            };
+            var releaseDataFile5 = new ReleaseFile
+            {
+                Release = release,
+                Order = 0,
+                File = new File
+                {
+                    Type = FileType.Data,
+                    SubjectId = Guid.NewGuid(),
+                },
+            };
+
+            var releaseMetaFile1 = new ReleaseFile
+            {
+                Release = releaseDataFile1.Release,
+                File = new File
+                {
+                    Type = FileType.Metadata,
+                    SubjectId = releaseDataFile1.File.SubjectId
+                }
+            };
+            var releaseMetaFile2 = new ReleaseFile
+            {
+                Release = releaseDataFile2.Release,
+                File = new File
+                {
+                    Type = FileType.Metadata,
+                    SubjectId = releaseDataFile2.File.SubjectId
+                }
+            };
+            var releaseMetaFile3 = new ReleaseFile
+            {
+                Release = releaseDataFile3.Release,
+                File = new File
+                {
+                    Type = FileType.Metadata,
+                    SubjectId = releaseDataFile3.File.SubjectId
+                }
+            };
+            var releaseMetaFile4 = new ReleaseFile
+            {
+                Release = releaseDataFile4.Release,
+                File = new File
+                {
+                    Type = FileType.Metadata,
+                    SubjectId = releaseDataFile4.File.SubjectId
+                }
+            };
+            var releaseMetaFile5 = new ReleaseFile
+            {
+                Release = releaseDataFile5.Release,
+                File = new File
+                {
+                    Type = FileType.Metadata,
+                    SubjectId = releaseDataFile5.File.SubjectId
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
+                    releaseDataFile1, releaseDataFile2, releaseDataFile3, releaseDataFile4, releaseDataFile5,
+                    releaseMetaFile1, releaseMetaFile2, releaseMetaFile3, releaseMetaFile4, releaseMetaFile5
+                    );
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext
+                );
+
+                var result = await service.ReorderDataFiles(
+                    release.Id,
+                    new Dictionary<Guid, int>
+                    {
+                        { releaseDataFile1.File.Id, 0 },
+                        { releaseDataFile2.File.Id, 1 },
+                        { releaseDataFile3.File.Id, 2 },
+                        { releaseDataFile4.File.Id, 3 },
+                        { releaseDataFile5.File.Id, 4 },
+                    });
+
+                var dataFiles = result.AssertRight().ToList();
+                Assert.Equal(5, dataFiles.Count);
+
+                Assert.Equal(releaseDataFile1.File.Id, dataFiles[0].Id);
+                Assert.Equal(releaseDataFile2.File.Id, dataFiles[1].Id);
+                Assert.Equal(releaseDataFile3.File.Id, dataFiles[2].Id);
+                Assert.Equal(releaseDataFile4.File.Id, dataFiles[3].Id);
+                Assert.Equal(releaseDataFile5.File.Id, dataFiles[4].Id);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var dbDataFiles = contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Where(rf => rf.ReleaseId == release.Id && rf.File.Type == FileType.Data)
+                    .ToList();
+
+                Assert.NotNull(dbDataFiles.Find(rf =>
+                    rf.Id == releaseDataFile1.Id && rf.Order == 0));
+                Assert.NotNull(dbDataFiles.Find(rf =>
+                    rf.Id == releaseDataFile2.Id && rf.Order == 1));
+                Assert.NotNull(dbDataFiles.Find(rf =>
+                    rf.Id == releaseDataFile3.Id && rf.Order == 2));
+                Assert.NotNull(dbDataFiles.Find(rf =>
+                    rf.Id == releaseDataFile4.Id && rf.Order == 3));
+                Assert.NotNull(dbDataFiles.Find(rf =>
+                    rf.Id == releaseDataFile5.Id && rf.Order == 4));
+
+                var dbMetaFiles = contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Where(rf => rf.ReleaseId == release.Id && rf.File.Type == FileType.Metadata)
+                    .ToList();
+
+                // Non-FileType.Data files should default to Order 0
+                Assert.NotNull(dbMetaFiles.Find(rf =>
+                    rf.Id == releaseMetaFile1.Id && rf.Order == 0));
+                Assert.NotNull(dbMetaFiles.Find(rf =>
+                    rf.Id == releaseMetaFile2.Id && rf.Order == 0));
+                Assert.NotNull(dbMetaFiles.Find(rf =>
+                    rf.Id == releaseMetaFile3.Id && rf.Order == 0));
+                Assert.NotNull(dbMetaFiles.Find(rf =>
+                    rf.Id == releaseMetaFile4.Id && rf.Order == 0));
+                Assert.NotNull(dbMetaFiles.Find(rf =>
+                    rf.Id == releaseMetaFile5.Id && rf.Order == 0));
+            }
+        }
+
+        [Fact]
         public async Task ListAll()
         {
             var release = new Release();

@@ -93,6 +93,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
+        [HttpPut("release/{releaseId}/data/order")]
+        [Produces("application/json")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(404)]
+        public async Task<ActionResult<IEnumerable<DataFileInfo>>> ReorderDataFiles(Guid releaseId,
+            Dictionary<Guid,int> newOrder)
+        {
+            return await _releaseDataFileService
+                .ReorderDataFiles(releaseId, newOrder)
+                .HandleFailuresOrOk();
+        }
+
+
         [HttpPost("release/{releaseId}/data")]
         [Produces("application/json")]
         [ProducesResponseType(200)]

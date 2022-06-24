@@ -176,6 +176,40 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
+        public async Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ReorderDataFiles(
+            Guid releaseId,
+            Dictionary<Guid, int> newOrder)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(release => _userService.CheckCanUpdateRelease(release))
+                .OnSuccess(async release =>
+                {
+                    var releaseFiles = await _contentDbContext.ReleaseFiles
+                        .Include(releaseFile => releaseFile.File)
+                        .Where(releaseFile =>
+                            releaseFile.File.Type == FileType.Data
+                            && releaseFile.ReleaseId == releaseId) // @MarkFix probably not, but exclude replacements?
+                        .ToListAsync();
+
+                    newOrder.ToList().ForEach(kvp =>
+                    {
+                        var (releaseFileId, order) = kvp;
+                        var matchingReleaseFile = releaseFiles
+                            .Find(releaseFile => releaseFile.Id == releaseFileId);
+                        if (matchingReleaseFile is not null)
+                        {
+                            matchingReleaseFile.Order = order;
+                        }
+                    });
+
+                    _contentDbContext.UpdateRange(releaseFiles);
+                    await _contentDbContext.SaveChangesAsync();
+
+                    return await ListAll(releaseId);
+                });
+        }
+
         public async Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,

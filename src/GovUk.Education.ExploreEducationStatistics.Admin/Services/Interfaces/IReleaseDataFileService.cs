@@ -21,6 +21,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseId);
 
+        Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ReorderDataFiles(
+            Guid releaseId,
+            Dictionary<Guid, int> newOrder);
+
         Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
