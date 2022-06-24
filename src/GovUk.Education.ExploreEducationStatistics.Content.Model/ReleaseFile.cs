@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public string? Summary { get; set; }
 
-        public int Order { get; set; } = 0;
+        public int Order { get; set; }
 
         public ReleaseFile CreateReleaseAmendment(Release amendment)
         {

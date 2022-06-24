@@ -170,13 +170,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var files = await _releaseFileRepository.GetByFileType(releaseId, FileType.Data);
 
                     // Exclude files that are replacements in progress
-                    var filesExcludingReplacements = files.Where(file => !file.File.ReplacingId.HasValue).ToList();
+                    var filesExcludingReplacements = files
+                        .Where(releaseFile => !releaseFile.File.ReplacingId.HasValue)
+                        .OrderBy(releaseFile => releaseFile.Order)
+                        .ThenBy(releaseFile => releaseFile.Name)
+                        .ToList();
 
                     return await BuildDataFileViewModels(filesExcludingReplacements);
                 });
         }
 
-        public async Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ReorderDataFiles(
+        public async Task<Either<ActionResult, List<DataFileInfo>>> ReorderDataFiles(
             Guid releaseId,
             Dictionary<Guid, int> newOrder)
         {

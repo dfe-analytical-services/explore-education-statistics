@@ -143,6 +143,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                           && rf.File.ReplacingId == null
                           && rf.File.SubjectId.HasValue
                 )
+                .OrderBy(rf => rf.Order)
+                .ThenBy(rf => rf.Name)
                 .Select(rf => rf.File);
         }
     }

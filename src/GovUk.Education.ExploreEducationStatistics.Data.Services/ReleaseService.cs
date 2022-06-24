@@ -83,29 +83,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                             return new SubjectViewModel(
                                 id: rs.SubjectId,
-                                name: await GetSubjectName(releaseId, rs.SubjectId),
-                                content: rs.DataGuidance,
+                                name: releaseFile.Name ?? string.Empty,
+                                order: releaseFile.Order,
+                                content: rs.DataGuidance ?? string.Empty,
                                 timePeriods: _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
                                 geographicLevels: await _dataGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
                                 file: releaseFile.ToFileInfo()
                             );
                         }
                     ))
-                .OrderBy(svm => svm.Name)
+                .OrderBy(svm => svm.Order)
+                .ThenBy(svm => svm.Name)
                 .ToList();
-        }
-
-        private async Task<string> GetSubjectName(Guid releaseId, Guid subjectId)
-        {
-            var rf = await _contentDbContext
-                .ReleaseFiles
-                .Include(rf => rf.File)
-                .SingleAsync(rf =>
-                    rf.ReleaseId == releaseId
-                    && rf.File.SubjectId == subjectId
-                    && rf.File.Type == FileType.Data);
-
-            return rf.Name ?? string.Empty;
         }
 
         public async Task<Either<ActionResult, List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)

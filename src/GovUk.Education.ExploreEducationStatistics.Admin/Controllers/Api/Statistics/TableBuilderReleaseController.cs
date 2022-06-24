@@ -10,7 +10,7 @@ using IReleaseService = GovUk.Education.ExploreEducationStatistics.Data.Services
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Statistics
 {
-    [Route("api/data")]
+    [Route("api")]
     [ApiController]
     [Authorize]
     public class TableBuilderReleaseController : ControllerBase
@@ -22,7 +22,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
             _releaseService = releaseService;
         }
 
-        [HttpGet("releases/{releaseId}/subjects")]
+        [HttpGet("data/releases/{releaseId}/subjects")]
         public async Task<ActionResult<List<SubjectViewModel>>> ListSubjects(Guid releaseId)
         {
             return await _releaseService
@@ -30,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Stati
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("releases/{releaseId}/featured-tables")]
+        [HttpGet("data/releases/{releaseId}/featured-tables")]
         public async Task<ActionResult<List<FeaturedTableViewModel>>> ListFeaturedTables(Guid releaseId)
         {
             return await _releaseService

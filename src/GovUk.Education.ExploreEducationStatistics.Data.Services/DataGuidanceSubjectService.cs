@@ -71,7 +71,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                             });
 
                     return result
-                        .OrderBy(viewModel => viewModel.Name)
+                        .OrderBy(viewModel => viewModel.Order)
+                        .ThenBy(viewModel => viewModel.Name)
                         .ToList();
                 })
                 // Currently we expect a failure checking the Release exists and succeed with an empty list.
@@ -148,6 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 Id = subject.Id,
                 Content = releaseSubject.DataGuidance ?? "",
                 Filename = releaseFile.File.Filename,
+                Order = releaseFile.Order,
                 Name = releaseFile.Name ?? "",
                 GeographicLevels = geographicLevels,
                 TimePeriods = timePeriods,

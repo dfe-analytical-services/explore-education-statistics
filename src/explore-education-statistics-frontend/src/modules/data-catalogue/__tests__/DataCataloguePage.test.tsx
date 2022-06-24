@@ -266,10 +266,10 @@ describe('DataCataloguePage', () => {
 
     expect(fileCheckboxes).toHaveLength(3);
     expect(fileCheckboxes[0]).toEqual(
-      step3.getByLabelText('Another Subject (csv, 20 Mb)'),
+      step3.getByLabelText('Subject 1 (csv, 10 Mb)'),
     );
     expect(fileCheckboxes[1]).toEqual(
-      step3.getByLabelText('Subject 1 (csv, 10 Mb)'),
+      step3.getByLabelText('Another Subject (csv, 20 Mb)'),
     );
     expect(fileCheckboxes[2]).toEqual(
       step3.getByLabelText('Subject 3 (csv, 30 Mb)'),
@@ -285,7 +285,7 @@ describe('DataCataloguePage', () => {
     await waitFor(() => {
       expect(downloadService.downloadFiles).toHaveBeenCalledWith<
         Parameters<typeof downloadService.downloadFiles>
-      >('release-3', ['file-1', 'file-3']);
+      >('release-3', ['file-2', 'file-3']);
     });
   });
 
@@ -386,10 +386,10 @@ describe('DataCataloguePage', () => {
 
     expect(fileCheckboxes).toHaveLength(3);
     expect(fileCheckboxes[0]).toEqual(
-      step3.getByLabelText('Another Subject (csv, 20 Mb)'),
+      step3.getByLabelText('Subject 1 (csv, 10 Mb)'),
     );
     expect(fileCheckboxes[1]).toEqual(
-      step3.getByLabelText('Subject 1 (csv, 10 Mb)'),
+      step3.getByLabelText('Another Subject (csv, 20 Mb)'),
     );
     expect(fileCheckboxes[2]).toEqual(
       step3.getByLabelText('Subject 3 (csv, 30 Mb)'),

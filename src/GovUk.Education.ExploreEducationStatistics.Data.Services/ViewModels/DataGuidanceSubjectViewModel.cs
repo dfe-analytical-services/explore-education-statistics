@@ -11,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
         public string Filename { get; set; } = string.Empty;
 
+        public int Order { get; set; }
+
         public string Name { get; set; } = string.Empty;
 
         public string Content { get; set; } = string.Empty;
