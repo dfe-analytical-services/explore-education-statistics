@@ -31,7 +31,7 @@ export type LineStyle = 'solid' | 'dashed' | 'dotted';
 export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
 export type AxisType = 'major' | 'minor';
 export type TickConfig = 'default' | 'startEnd' | 'custom';
-export type ReferenceLineStyle = 'dashed' | 'none';
+export type ReferenceLineStyle = 'dashed' | 'solid' | 'none';
 
 export interface ReferenceLine {
   label: string;

@@ -85,6 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     public enum AxisReferenceLineStyle
     {
         dashed,
+        solid,
         none
     }
 }

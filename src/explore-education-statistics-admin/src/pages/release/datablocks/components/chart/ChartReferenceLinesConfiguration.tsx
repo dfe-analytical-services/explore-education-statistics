@@ -125,7 +125,7 @@ export default function ChartReferenceLinesConfiguration({
               position: Yup.string().required('Enter position'),
               style: Yup.string()
                 .required('Enter style')
-                .oneOf<ReferenceLineStyle>(['dashed', 'none']),
+                .oneOf<ReferenceLineStyle>(['dashed', 'solid', 'none']),
             })}
             onSubmit={(values, helpers) => {
               onAddLine(values);
@@ -172,8 +172,10 @@ export default function ChartReferenceLinesConfiguration({
                     label="Style"
                     formGroup={false}
                     hideLabel
+                    order={FormSelect.unordered}
                     options={[
                       { label: 'Dashed', value: 'dashed' },
+                      { label: 'Solid', value: 'solid' },
                       { label: 'None', value: 'none' },
                     ]}
                   />

@@ -32,6 +32,11 @@ export default function createReferenceLine({
           stroke: 'transparent',
           strokeWidth: 0,
         };
+      case 'solid':
+        return {
+          stroke: '#b1b4b6',
+          strokeWidth: 3,
+        };
       default:
         return {};
     }
