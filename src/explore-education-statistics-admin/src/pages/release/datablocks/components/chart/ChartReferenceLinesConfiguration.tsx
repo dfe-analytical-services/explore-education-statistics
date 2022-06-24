@@ -4,27 +4,30 @@ import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import Tooltip from '@common/components/Tooltip';
 import {
-  AxisConfiguration,
   AxisType,
+  ChartDefinition,
   ReferenceLine,
+  ReferenceLineStyle,
 } from '@common/modules/charts/types/chart';
 import { DataSetCategory } from '@common/modules/charts/types/dataSet';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
 import Yup from '@common/validation/yup';
 import FormSelect, {
   SelectOption,
 } from 'explore-education-statistics-common/src/components/form/FormSelect';
 import { Formik } from 'formik';
+import upperFirst from 'lodash/upperFirst';
 import React, { useMemo } from 'react';
 
 interface AddFormValues {
   label: string;
-  position: string;
+  position: string | number;
+  style: ReferenceLineStyle;
 }
 
 export interface ChartReferenceLinesConfigurationProps {
   axisType: AxisType;
   dataSetCategories: DataSetCategory[];
+  definition: ChartDefinition;
   id: string;
   lines: ReferenceLine[];
   onAddLine: (line: ReferenceLine) => void;
@@ -34,6 +37,7 @@ export interface ChartReferenceLinesConfigurationProps {
 export default function ChartReferenceLinesConfiguration({
   axisType,
   dataSetCategories,
+  definition,
   id,
   lines,
   onAddLine,
@@ -76,6 +80,8 @@ export default function ChartReferenceLinesConfiguration({
     return position;
   };
 
+  const axisDefinition = definition.axes[axisType];
+
   return (
     <table className="govuk-table">
       <caption className="govuk-heading-s">Reference lines</caption>
@@ -83,7 +89,8 @@ export default function ChartReferenceLinesConfiguration({
         <tr>
           <th>Position</th>
           <th>Label</th>
-          <th>Actions</th>
+          <th>Style</th>
+          <th className="dfe-align--right">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -91,6 +98,7 @@ export default function ChartReferenceLinesConfiguration({
           <tr key={`${line.label}_${line.position}`}>
             <td>{getPositionLabel(line.position)}</td>
             <td>{line.label}</td>
+            <td>{upperFirst(line.style)}</td>
             <td>
               <Button
                 className="govuk-!-margin-bottom-0 dfe-float--right"
@@ -109,10 +117,15 @@ export default function ChartReferenceLinesConfiguration({
             initialValues={{
               label: '',
               position: '',
+              style: 'dashed',
+              ...(axisDefinition?.referenceLineDefaults ?? {}),
             }}
             validationSchema={Yup.object<AddFormValues>({
               label: Yup.string().required('Enter label'),
               position: Yup.string().required('Enter position'),
+              style: Yup.string()
+                .required('Enter style')
+                .oneOf<ReferenceLineStyle>(['dashed', 'none']),
             })}
             onSubmit={(values, helpers) => {
               onAddLine(values);
@@ -150,6 +163,19 @@ export default function ChartReferenceLinesConfiguration({
                     label="Label"
                     formGroup={false}
                     hideLabel
+                  />
+                </td>
+                <td className="dfe-vertical-align--bottom">
+                  <FormFieldSelect
+                    name="style"
+                    id={`${id}-referenceLines-style`}
+                    label="Style"
+                    formGroup={false}
+                    hideLabel
+                    options={[
+                      { label: 'Dashed', value: 'dashed' },
+                      { label: 'None', value: 'none' },
+                    ]}
                   />
                 </td>
                 <td className="dfe-vertical-align--bottom">

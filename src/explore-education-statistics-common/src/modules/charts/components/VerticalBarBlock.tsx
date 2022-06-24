@@ -172,6 +172,7 @@ const VerticalBarBlock = ({
               chartData,
               label: referenceLine.label,
               position: referenceLine.position,
+              style: referenceLine.style,
               x: referenceLine.position,
             }),
           )}
@@ -181,6 +182,7 @@ const VerticalBarBlock = ({
               chartData,
               label: referenceLine.label,
               position: referenceLine.position,
+              style: referenceLine.style,
               y: referenceLine.position,
             }),
           )}
@@ -234,6 +236,9 @@ export const verticalBarBlockDefinition: ChartDefinition = {
         tickSpacing: 1,
         unit: '',
       },
+      referenceLineDefaults: {
+        style: 'none',
+      },
     },
     minor: {
       id: 'minor',
@@ -251,6 +256,9 @@ export const verticalBarBlockDefinition: ChartDefinition = {
         label: {
           width: 100,
         },
+      },
+      referenceLineDefaults: {
+        style: 'none',
       },
     },
   },

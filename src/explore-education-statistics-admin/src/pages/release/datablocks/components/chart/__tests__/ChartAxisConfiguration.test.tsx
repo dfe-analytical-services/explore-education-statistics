@@ -183,6 +183,7 @@ describe('ChartAxisConfiguration', () => {
     expect(referenceLinesSection.getAllByRole('row')).toHaveLength(2);
     expect(referenceLinesSection.getByLabelText('Position')).toHaveValue('');
     expect(referenceLinesSection.getByLabelText('Label')).toHaveValue('');
+    expect(referenceLinesSection.getByLabelText('Style')).toHaveValue('none');
   });
 
   test('shows validation error if invalid custom tick spacing given', async () => {
@@ -597,6 +598,10 @@ describe('ChartAxisConfiguration', () => {
         'I am label',
       );
 
+      userEvent.selectOptions(referenceLinesSection.getByLabelText('Style'), [
+        'dashed',
+      ]);
+
       userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
       userEvent.click(
@@ -613,6 +618,7 @@ describe('ChartAxisConfiguration', () => {
             {
               label: 'I am label',
               position: '2014_AY',
+              style: 'dashed',
             },
           ],
           showGrid: true,

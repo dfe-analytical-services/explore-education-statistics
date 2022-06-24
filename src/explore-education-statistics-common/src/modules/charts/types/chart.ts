@@ -31,10 +31,12 @@ export type LineStyle = 'solid' | 'dashed' | 'dotted';
 export type AxisGroupBy = 'timePeriod' | 'locations' | 'filters' | 'indicators';
 export type AxisType = 'major' | 'minor';
 export type TickConfig = 'default' | 'startEnd' | 'custom';
+export type ReferenceLineStyle = 'dashed' | 'none';
 
 export interface ReferenceLine {
   label: string;
   position: number | string;
+  style?: ReferenceLineStyle;
 }
 
 export interface Label {
@@ -137,6 +139,7 @@ export interface ChartDefinitionAxis {
   constants?: {
     groupBy?: AxisGroupBy;
   };
+  referenceLineDefaults?: Partial<ReferenceLine>;
 }
 
 export const chartDefinitions: ChartDefinition[] = [

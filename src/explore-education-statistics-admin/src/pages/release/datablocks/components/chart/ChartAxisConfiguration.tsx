@@ -511,6 +511,7 @@ const ChartAxisConfiguration = ({
             <ChartReferenceLinesConfiguration
               axisType={type}
               dataSetCategories={dataSetCategories}
+              definition={definition}
               id={id}
               lines={form.values.referenceLines ?? []}
               onAddLine={line => {
