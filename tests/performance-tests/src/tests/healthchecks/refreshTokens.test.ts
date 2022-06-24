@@ -20,7 +20,11 @@ export function setup() {
   return authDetails.find(details => details.userName === 'bau1');
 }
 
-export default function ({ userName, adminUrl, authTokens }: AuthDetails) {
+export default function performTest({
+  userName,
+  adminUrl,
+  authTokens,
+}: AuthDetails) {
   const responseWithOriginalAccessToken = http.get(`${adminUrl}/api/themes`, {
     headers: {
       'Content-Type': 'application/json',
@@ -55,8 +59,12 @@ export default function ({ userName, adminUrl, authTokens }: AuthDetails) {
     );
   }
 
+  if (!refreshedTokens1) {
+    return;
+  }
+
   if (
-    !check(refreshedTokens1!, {
+    !check(refreshedTokens1, {
       'response with refreshed tokens contained a new accessToken': tokens =>
         tokens.authTokens.accessToken.length > 0,
       'response with refreshed tokens contained a new refreshToken': tokens =>
@@ -71,7 +79,7 @@ export default function ({ userName, adminUrl, authTokens }: AuthDetails) {
   const responseWithRefreshedAccessToken = http.get(`${adminUrl}/api/themes`, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${refreshedTokens1!.authTokens.accessToken}`, // or `Bearer ${clientAuthResp.accessToken}`
+      Authorization: `Bearer ${refreshedTokens1.authTokens.accessToken}`,
     },
   });
 
@@ -88,7 +96,7 @@ export default function ({ userName, adminUrl, authTokens }: AuthDetails) {
     adminUrl,
     clientId: 'GovUk.Education.ExploreEducationStatistics.Admin',
     clientSecret: '',
-    refreshToken: refreshedTokens1!.authTokens.refreshToken,
+    refreshToken: refreshedTokens1.authTokens.refreshToken,
     supportsRefreshTokens: true,
   });
 
@@ -102,8 +110,12 @@ export default function ({ userName, adminUrl, authTokens }: AuthDetails) {
     );
   }
 
+  if (!refreshedTokens2) {
+    return;
+  }
+
   if (
-    !check(refreshedTokens2!, {
+    !check(refreshedTokens2, {
       'response with re-refreshed tokens contained a new accessToken': tokens =>
         tokens.authTokens.accessToken.length > 0,
       'response with re-refreshed tokens contained a new refreshToken': tokens =>
@@ -118,7 +130,7 @@ export default function ({ userName, adminUrl, authTokens }: AuthDetails) {
   const responseWithRefreshedAccessToken2 = http.get(`${adminUrl}/api/themes`, {
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${refreshedTokens2!.authTokens.accessToken}`, // or `Bearer ${clientAuthResp.accessToken}`
+      Authorization: `Bearer ${refreshedTokens2.authTokens.accessToken}`, // or `Bearer ${clientAuthResp.accessToken}`
     },
   });
 

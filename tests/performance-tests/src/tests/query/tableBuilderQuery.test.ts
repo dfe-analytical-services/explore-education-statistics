@@ -1,19 +1,28 @@
-import { check, sleep } from 'k6';
+import { check } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import refreshAuthTokens from '../../auth/refreshAuthTokens';
 import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
 import createDataService, { SubjectMeta } from '../../utils/dataService';
+import testData from '../testData';
+
+const PUBLICATION =
+  'UI test publication - Performance tests - adminTableBuilderQuery.test.ts';
+const RELEASE = '2022';
+const SUBJECT =
+  'UI test subject - Performance tests - adminTableBuilderQuery.test.ts';
+
+const alwaysCreateNewDataPerTest = false;
 
 export const options: Options = {
   scenarios: {
     constant_request_rate: {
       executor: 'constant-arrival-rate',
       rate: 1,
-      timeUnit: '0.5s',
-      duration: '100m',
-      preAllocatedVUs: 20,
-      maxVUs: 100,
+      timeUnit: '5s',
+      duration: '120m',
+      preAllocatedVUs: 3,
+      maxVUs: 10,
     },
   },
   noConnectionReuse: true,
@@ -48,41 +57,39 @@ const subjectFile = open('import/assets/dates.csv', 'b');
 const subjectMetaFile = open('import/assets/dates.meta.csv', 'b');
 /* eslint-enable no-restricted-globals */
 
-export function setup(): SetupData {
-  const tokenJson = __ENV.AUTH_DETAILS_AS_JSON as string;
-  const authDetails = JSON.parse(tokenJson) as AuthDetails[];
-  const {
-    adminUrl,
-    authTokens,
-    userName,
-    supportsRefreshTokens,
-  } = authDetails.find(details => details.userName === 'bau1') as AuthDetails;
+function getOrCreateReleaseWithSubject(adminUrl: string, accessToken: string) {
+  const dataService = createDataService(adminUrl, accessToken);
 
-  const uniqueId = Date.now();
-  const dataService = createDataService(adminUrl, authTokens.accessToken);
+  const suffix = alwaysCreateNewDataPerTest
+    ? `-${Date.now()}-${Math.random()}`
+    : '';
 
-  const { themeId } = dataService.createTheme({
-    title: `UI test theme - Performance tests - "tableBuilderQuery.test.ts" - ${uniqueId}`,
+  const { id: themeId } = dataService.getOrCreateTheme({
+    title: `${testData.themeName}${suffix}`,
   });
 
-  const { topicId } = dataService.createTopic({
+  const { id: topicId } = dataService.getOrCreateTopic({
     themeId,
-    title: `UI test topic - Performance tests - "tableBuilderQuery.test.ts" - ${uniqueId}`,
+    title: `${testData.topicName}${suffix}`,
   });
 
-  const { publicationId } = dataService.createPublication({
+  const publicationTitle = `${PUBLICATION}${suffix}`;
+
+  const { id: publicationId } = dataService.getOrCreatePublication({
     topicId,
-    title: `UI test publication - Performance tests - "tableBuilderQuery.test.ts" - ${uniqueId}`,
+    title: publicationTitle,
   });
 
-  const { releaseId } = dataService.createRelease({
+  const { id: releaseId } = dataService.getOrCreateRelease({
     publicationId,
-    releaseName: '2022',
+    publicationTitle,
+    topicId,
+    releaseName: RELEASE,
     timePeriodCoverage: 'AY',
   });
 
-  const { fileId } = dataService.importDataFile({
-    title: 'Data file for querying',
+  const { id: fileId } = dataService.getOrImportDataFile({
+    title: `${SUBJECT}${suffix}`,
     releaseId,
     dataFile: {
       file: subjectFile,
@@ -94,32 +101,40 @@ export function setup(): SetupData {
     },
   });
 
-  const maxImportWaitTimeMillis = 240 * 1000;
-  const importStartTime = Date.now();
-  const importExpireTime = importStartTime + maxImportWaitTimeMillis;
-
-  while (Date.now() < importExpireTime) {
-    sleep(5);
-
-    const { importStatus } = dataService.getImportStatus({
-      releaseId,
-      fileId,
-    });
-
-    if (importStatus === 'FAILED' || importStatus === 'CANCELLED') {
-      errorRate.add(1);
-      throw new Error(
-        `Incorrect end state for import process of uploaded subject file - ${importStatus}`,
-      );
-    }
-
-    if (importStatus === 'COMPLETE') {
-      break;
-    }
-  }
+  dataService.waitForDataFileToImport({ releaseId, fileId });
 
   const { subjects } = dataService.getSubjects({ releaseId });
   const subjectId = subjects[0].id;
+
+  return {
+    themeId,
+    topicId,
+    publicationId,
+    releaseId,
+    subjectId,
+  };
+}
+
+export function setup(): SetupData {
+  const tokenJson = __ENV.AUTH_DETAILS_AS_JSON as string;
+  const authDetails = JSON.parse(tokenJson) as AuthDetails[];
+  const {
+    adminUrl,
+    authTokens,
+    userName,
+    supportsRefreshTokens,
+  } = authDetails.find(details => details.userName === 'bau1') as AuthDetails;
+
+  const dataService = createDataService(adminUrl, authTokens.accessToken);
+
+  const {
+    themeId,
+    topicId,
+    publicationId,
+    releaseId,
+    subjectId,
+  } = getOrCreateReleaseWithSubject(adminUrl, authTokens.accessToken);
+
   const { subjectMeta } = dataService.getSubjectMeta({ releaseId, subjectId });
 
   /* eslint-disable-next-line no-console */
@@ -244,20 +259,22 @@ export const teardown = ({
   themeId,
   topicId,
 }: SetupData) => {
-  const accessToken = getOrRefreshAccessToken(
-    supportsRefreshTokens,
-    userName,
-    adminUrl,
-    authTokens,
-  );
+  if (alwaysCreateNewDataPerTest) {
+    const accessToken = getOrRefreshAccessToken(
+      supportsRefreshTokens,
+      userName,
+      adminUrl,
+      authTokens,
+    );
 
-  const dataService = createDataService(adminUrl, accessToken);
+    const dataService = createDataService(adminUrl, accessToken);
 
-  dataService.deleteTopic({ topicId });
-  dataService.deleteTheme({ themeId });
+    dataService.deleteTopic({ topicId });
+    dataService.deleteTheme({ themeId });
 
-  /* eslint-disable-next-line no-console */
-  console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
+    /* eslint-disable-next-line no-console */
+    console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
+  }
 };
 
 export default performTest;

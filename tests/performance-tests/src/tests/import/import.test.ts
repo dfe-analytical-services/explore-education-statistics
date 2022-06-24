@@ -1,16 +1,34 @@
-import { check, fail, sleep } from 'k6';
+import { check, fail } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import refreshAuthTokens from '../../auth/refreshAuthTokens';
 import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
 import createDataService from '../../utils/dataService';
 
+const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
+
+const alwaysCreateNewDataPerTest = false;
+
 export const options: Options = {
-  // stages: [{ duration: '120m', target: 10 }],
+  stages: [
+    {
+      duration: '1s',
+      target: 2,
+    },
+    {
+      duration: '119m',
+      target: 2,
+    },
+    {
+      duration: '30s',
+      target: 0,
+    },
+  ],
   noConnectionReuse: true,
   insecureSkipTLSVerify: true,
   linger: true,
-  vus: 1,
+  // vus: 5,
+  // duration: '120m',
 };
 
 interface SetupData {
@@ -35,25 +53,24 @@ const processingStageLabels = [
   'STAGE_2',
   'STAGE_3',
   'STAGE_4',
-  'STAGE_4',
   'COMPLETE',
 ];
 
 const processingStages: {
-  [stage: string]: {
+  [processingStage: string]: {
     timingMetric: Trend;
     countMetric: Counter;
   };
 } = processingStageLabels.reduce(
-  (acc, stage) => ({
+  (acc, processingStage) => ({
     ...acc,
-    [stage]: {
+    [processingStage]: {
       timingMetric: new Trend(
-        `ees_import_${stage.toLowerCase()}_reached_speed`,
+        `ees_import_${processingStage.toLowerCase()}_reached_speed`,
         true,
       ),
       countMetric: new Counter(
-        `ees_import_${stage.toLowerCase()}_reached_count`,
+        `ees_import_${processingStage.toLowerCase()}_reached_count`,
       ),
     },
   }),
@@ -75,25 +92,32 @@ export function setup(): SetupData {
     supportsRefreshTokens,
   } = authDetails.find(details => details.userName === 'bau1') as AuthDetails;
 
-  const uniqueId = Date.now();
   const dataService = createDataService(adminUrl, authTokens.accessToken);
 
-  const { themeId } = dataService.createTheme({
-    title: `UI test theme - Performance tests - "import.test.ts" - ${uniqueId}`,
+  const suffix = alwaysCreateNewDataPerTest
+    ? `-${Date.now()}-${Math.random()}`
+    : '';
+
+  const { id: themeId } = dataService.getOrCreateTheme({
+    title: `UI test theme - Performance tests - "import.test.ts" - ${suffix}`,
   });
 
-  const { topicId } = dataService.createTopic({
+  const { id: topicId } = dataService.getOrCreateTopic({
     themeId,
-    title: `UI test topic - Performance tests - "import.test.ts" - ${uniqueId}`,
+    title: `UI test topic - Performance tests - "import.test.ts" - ${suffix}`,
   });
 
-  const { publicationId } = dataService.createPublication({
+  const publicationTitle = `UI test publication - Performance tests - "import.test.ts" - ${suffix}`;
+
+  const { id: publicationId } = dataService.getOrCreatePublication({
     topicId,
-    title: `UI test publication - Performance tests - "import.test.ts" - ${uniqueId}`,
+    title: publicationTitle,
   });
 
-  const { releaseId } = dataService.createRelease({
+  const { id: releaseId } = dataService.getOrCreateRelease({
+    topicId,
     publicationId,
+    publicationTitle,
     releaseName: '2022',
     timePeriodCoverage: 'AY',
   });
@@ -159,11 +183,10 @@ const performTest = ({
 
   const dataService = createDataService(adminUrl, accessToken, false);
 
-  const {
-    response: uploadResponse,
-    fileId,
-    importStatus: initialImportStatus,
-  } = dataService.importDataFile({
+  /* eslint-disable-next-line no-console */
+  console.log(`Uploading subject ${subjectName}`);
+
+  const { response: uploadResponse, id: fileId } = dataService.uploadDataFile({
     title: subjectName,
     releaseId,
     dataFile: {
@@ -176,79 +199,87 @@ const performTest = ({
     },
   });
 
-  check(uploadResponse, {
-    'response code was 200': res => res.status === 200,
-    'response should indicate that the uploaded file is queued': _ =>
-      initialImportStatus === 'QUEUED',
-    'response should contain the uploaded file id': _ => !!fileId,
-  });
+  /* eslint-disable-next-line no-console */
+  console.log(`Subject ${subjectName} finished uploading`);
 
-  const maxImportWaitTimeMillis = 6000 * 1000;
-  const importStartTime = Date.now();
-  const importExpireTime = importStartTime + maxImportWaitTimeMillis;
+  if (
+    check(uploadResponse, {
+      'response code was 200': res => res.status === 200,
+      'response should contain the uploaded file id': _ => !!fileId,
+    })
+  ) {
+    /* eslint-disable-next-line no-console */
+    console.log(`Subject ${subjectName} finished uploading`);
+  } else {
+    fail(
+      `Subject ${subjectName} failed to upload successfully - got response ${JSON.stringify(
+        uploadResponse.json(),
+      )}`,
+    );
+  }
 
-  let importComplete = false;
-
+  // Mark each processing stage as not having been reported yet.
   const processingStagesReported: { [stage: string]: boolean } = Object.keys(
     processingStages,
   ).reduce((acc, [stage]) => ({ ...acc, [stage]: false }), {});
 
-  while (Date.now() < importExpireTime) {
-    sleep(1);
+  const importStartTime = Date.now();
 
-    const {
-      response: statusResponse,
-      importStatus,
-    } = dataService.getImportStatus({
-      releaseId,
-      fileId,
-    });
-
-    if (statusResponse.status !== 200) {
+  dataService.waitForDataFileToImport({
+    releaseId,
+    fileId,
+    pollingDelaySeconds: IMPORT_STATUS_POLLING_DELAY_SECONDS,
+    onStatusCheckFailed: _ => {
       errorRate.add(1);
-      importFailureCount.add(1);
-      fail(
-        `Failure checking on import status of uploaded subject file ${subjectName} - ${JSON.stringify(
-          statusResponse.json(),
-        )}`,
-      );
-    }
+    },
+    onStatusReceived: importStatus => {
+      if (processingStageLabels.includes(importStatus)) {
+        const priorAndCurrentStages = processingStageLabels.slice(
+          0,
+          processingStageLabels.indexOf(importStatus) + 1,
+        );
 
-    if (processingStageLabels.includes(importStatus)) {
-      const priorAndCurrentStages = processingStageLabels.slice(
-        0,
-        processingStageLabels.indexOf(importStatus),
-      );
+        const unreportedStages = priorAndCurrentStages.filter(
+          stage => !processingStagesReported[stage],
+        );
 
-      priorAndCurrentStages.forEach(stage => {
-        if (!processingStagesReported[stage]) {
+        unreportedStages.forEach(stage => {
           const { timingMetric, countMetric } = processingStages[stage];
           timingMetric.add(Date.now() - importStartTime);
           countMetric.add(1);
           processingStagesReported[stage] = true;
-        }
-      });
-    }
+        });
 
-    if (importStatus === 'FAILED' || importStatus === 'CANCELLED') {
+        if (unreportedStages.length) {
+          /* eslint-disable-next-line no-console */
+          console.log(`Import "${fileId}" - stage ${importStatus} reached`);
+        }
+      }
+    },
+    onImportFailed: importStatus => {
+      /* eslint-disable-next-line no-console */
+      console.log(`Import "${fileId}" - FAILED with status ${importStatus}`);
       errorRate.add(1);
       importFailureCount.add(1);
-      fail(
-        `Failure end state for import process of uploaded subject file ${subjectName} - ${importStatus}`,
+    },
+    onImportCompleted: () => {
+      /* eslint-disable-next-line no-console */
+      console.log(
+        `Import "${fileId}" - COMPLETE after ${
+          (Date.now() - importStartTime) / 1000
+        } seconds`,
       );
-      break;
-    }
-
-    if (importStatus === 'COMPLETE') {
-      importComplete = true;
-      break;
-    }
-  }
-
-  if (!importComplete) {
-    errorRate.add(1);
-    importTimeoutFailureCount.add(1);
-  }
+    },
+    onImportExceededTimeout: () => {
+      /* eslint-disable-next-line no-console */
+      console.log(
+        `Import "${fileId}" -  EXCEEDED TEST TIMEOUT after ${
+          (Date.now() - importStartTime) / 1000
+        } seconds`,
+      );
+      importTimeoutFailureCount.add(1);
+    },
+  });
 };
 
 export const teardown = ({
@@ -259,20 +290,22 @@ export const teardown = ({
   themeId,
   topicId,
 }: SetupData) => {
-  const accessToken = getOrRefreshAccessToken(
-    supportsRefreshTokens,
-    userName,
-    adminUrl,
-    authTokens,
-  );
+  if (alwaysCreateNewDataPerTest) {
+    const accessToken = getOrRefreshAccessToken(
+      supportsRefreshTokens,
+      userName,
+      adminUrl,
+      authTokens,
+    );
 
-  const dataService = createDataService(adminUrl, accessToken);
+    const dataService = createDataService(adminUrl, accessToken);
 
-  dataService.deleteTopic({ topicId });
-  dataService.deleteTheme({ themeId });
+    dataService.deleteTopic({ topicId });
+    dataService.deleteTheme({ themeId });
 
-  /* eslint-disable-next-line no-console */
-  console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
+    /* eslint-disable-next-line no-console */
+    console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
+  }
 };
 
 export default performTest;

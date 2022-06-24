@@ -1,4 +1,4 @@
-import http, { RefinedResponse, RequestBody } from 'k6/http';
+import http, { RefinedParams, RefinedResponse, RequestBody } from 'k6/http';
 
 type HttpHeaders = { [name: string]: string };
 
@@ -15,10 +15,14 @@ export default function createClient(
       json: TJson;
       response: RefinedResponse<'text'>;
     } => {
-      const response = http.get(
-        `${baseUrl}${url}`,
-        getHttpHeaders(accessToken, headers),
-      );
+      const params = getDefaultParams(accessToken);
+      const response = http.get(`${baseUrl}${url}`, {
+        ...params,
+        headers: {
+          ...params.headers,
+          ...headers,
+        },
+      });
 
       if (checkResponseStatus && response.status !== 200) {
         throw new Error(`Error with GET to url ${url}: ${response.body}`);
@@ -38,11 +42,14 @@ export default function createClient(
       json: TJson;
       response: RefinedResponse<'text'>;
     } => {
-      const response = http.post(
-        `${baseUrl}${url}`,
-        data,
-        getHttpHeaders(accessToken, headers),
-      );
+      const params = getDefaultParams(accessToken);
+      const response = http.post(`${baseUrl}${url}`, data, {
+        ...params,
+        headers: {
+          ...params.headers,
+          ...headers,
+        },
+      });
 
       if (checkResponseStatus && response.status !== 200) {
         throw new Error(`Error with POST to url ${url}: ${response.body}`);
@@ -59,11 +66,14 @@ export default function createClient(
       data?: RequestBody | string,
       headers?: HttpHeaders,
     ): RefinedResponse<'text'> => {
-      const response = http.del(
-        `${baseUrl}${url}`,
-        data,
-        getHttpHeaders(accessToken, headers),
-      );
+      const params = getDefaultParams(accessToken);
+      const response = http.del(`${baseUrl}${url}`, data, {
+        ...params,
+        headers: {
+          ...params.headers,
+          ...headers,
+        },
+      });
 
       if (checkResponseStatus && response.status !== 204) {
         throw new Error(`Error with DELETE to url ${url}: ${response.body}`);
@@ -74,11 +84,11 @@ export default function createClient(
   };
 }
 
-export function getHttpHeaders(accessToken: string, headers?: HttpHeaders) {
+function getDefaultParams(accessToken: string): RefinedParams<'text'> {
   return {
+    timeout: '300s',
     headers: {
       Authorization: `Bearer ${accessToken}`,
-      ...headers,
     },
   };
 }
