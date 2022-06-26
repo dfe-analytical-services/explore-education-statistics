@@ -32,9 +32,9 @@
     "start": "docker-compose up -d influxdb grafana",
     "stop": "docker-compose down influxdb grafana",
     "stop-and-clear-data": "docker-compose -v down influxdb grafana",
-    "log-auth-token-response": "docker-compose run node -r source-map-support/register dist/logAuthTokenResponse.js ${npm_config_environment} ${npm_config_users}",
-    "log-auth-details": "docker-compose run node -r source-map-support/register dist/logAuthDetails.js ${npm_config_environment} ${npm_config_users}",
-    "test": "docker-compose run k6 run ${npm_config_environment} ${npm_config_users}"
+    "log-auth-token-response": "docker-compose run --rm node -r source-map-support/register dist/logAuthTokenResponse.js ${npm_config_environment} ${npm_config_users}",
+    "log-auth-details": "docker-compose run --rm node -r source-map-support/register dist/logAuthDetails.js ${npm_config_environment} ${npm_config_users}",
+    "test": "docker-compose run --rm k6 run ${npm_config_environment} ${npm_config_users}"
   },
   "dependencies": {
     "source-map-support": "^0.5.21"

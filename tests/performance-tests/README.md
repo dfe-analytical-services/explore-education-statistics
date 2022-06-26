@@ -40,7 +40,7 @@ your hosts file:
 127.0.0.1    ees.local
 ```
 
-### Start InfluxDB and Grafana (optional)
+### Start InfluxDB and Grafana
 
 Note that this step isn't strictly necessary if we're not wanting to record metrics whilst
 generating load - the tests can run independently of these if we're just wanting to generate
@@ -64,7 +64,7 @@ npm run webpack # use "npm run webpack watch" instead if wanting to continue run
 
 ### Run the tests
 
-#### Create environment-specific .env.json files (optional) 
+#### Create environment-specific .env.<environment>.json files 
 
 This step is only required if running performance tests that require access to the Admin API.
 These files will store environment-specific user credentials for accessing Admin.
@@ -76,7 +76,7 @@ be any value that we can load test against. As an example, if doing load testing
 development against a local environment, we would create a file called
 `tests/performance-tests/.env.local.json` and supply the local user credentials within the file.
 
-#### Allow access to host ports from containers (optional) 
+#### Allow access to host ports from containers 
 
 This step is only required if running performance tests locally against the host machine.
 
@@ -88,14 +88,14 @@ To grant access to these ports from containers on the
 run the following commands:
 
 ```bash
-sudo ufw allow from 172.30.0.0/24 to any port 3000 # Front end site
+sudo ufw allow from 172.30.0.0/24 to any port 3000 # Public site
 sudo ufw allow from 172.30.0.0/24 to any port 3050 # Keycloak
 sudo ufw allow from 172.30.0.0/24 to any port 5000 # Data API
 sudo ufw allow from 172.30.0.0/24 to any port 5010 # Content API
 sudo ufw allow from 172.30.0.0/24 to any port 5021 # Admin site / Admin API
 ```
 
-#### Obtain auth tokens for Admin testing (optional)
+#### Obtain auth tokens for Admin testing
 
 This step is only required if running performance tests that require access to the Admin API.
 It requires the above step of creating environment-specific .env.json files first.
@@ -113,8 +113,16 @@ that user's credentials to log into Admin in order to obtain their auth tokens.
 
 As a concrete example:
 
+In Linux:
+
 ```bash
 export AUTH_DETAILS_AS_JSON=$(npm run log-auth-details --silent --environment=local --users=bau1)
+```
+
+In Windows:
+
+```bash
+set AUTH_DETAILS_AS_JSON=(npm run log-auth-details --silent --environment=local --users=bau1)
 ```
 
 #### Run individual tests
@@ -129,10 +137,10 @@ An example of running an actual script would be:
 npm run test dist/import.test.js
 ```
 
-TODO will this still be true???????????????
-The `src` directory contains tests based on environments (i.e. `dev` contains tests specific to the 
-dev environment etc.)
-
+Each test script will be runnable against any environment. They will find existing or set up new
+dependent data before the test's VUs begin running, and will tear down any data that cannot be 
+reused in a subsequent run when the tests finish. This is achieved using K6's `setup()` and 
+`teardown()` lifecycles.
 
 ### Monitor the test results
 
