@@ -17,12 +17,21 @@ The performance test suite is built using [k6](https://k6.io/) and visualised us
 You will need the following dependencies to run the tests successfully:
 
 - [Docker and Docker Compose](https://docs.docker.com/)
+- [NodeJS v16+](https://nodejs.org/)
 
 ## Running the tests
 
 NOTE: All commands in this README are issued from the `tests/performance-tests` folder.
 
-### Add ees.local to hosts file (optional)
+### Install dependencies with NPM
+
+Run:
+
+```bash
+npm ci
+```
+
+### Add ees.local to your hosts file
 
 This step is only necessary if running tests against the host machine. Add the following line to
 your hosts file:
