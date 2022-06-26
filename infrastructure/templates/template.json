@@ -535,6 +535,29 @@
       "type": "bool",
       "defaultValue": false
     },
+    "openIdConnectSpaClientAllowOfflineAccess": {
+      "type": "bool",
+      "defaultValue": false,
+      "metadata": {
+        "description": "Whether or not this environment's Admin API supports refresh tokens"
+      }
+    },
+    "openIdConnectSpaClientRefreshTokenUsage": {
+      "type": "string",
+      "defaultValue": false,
+      "allowedValues": ["ReUse", "OneTimeOnly"],
+      "metadata": {
+        "description": "Whether or not this environment's Admin API supports reusable or one-time refresh tokens"
+      }
+    },
+    "openIdConnectSpaClientRefreshTokenExpiration": {
+      "type": "string",
+      "defaultValue": false,
+      "allowedValues": ["Absolute", "Sliding"],
+      "metadata": {
+        "description": "Whether or not this environment's Admin API has refresh tokens expiring at a fixed date or in a within a sliding window that extends with each use of a refresh token"
+      }
+    },
     "requestTimeoutsTableBuilderQuery": {
       "type": "int",
       "defaultValue": 210000,
@@ -1748,6 +1771,9 @@
         "OpenIdConnect:Authority": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-authority'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnect:ClientId": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientid'), '2018-02-14').secretUriWithVersion, ')')]",
         "OpenIdConnect:ClientSecret": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-openidconnect-clientsecret'), '2018-02-14').secretUriWithVersion, ')')]",
+        "OpenIdConnectSpaClient:AllowOfflineAccess": "[parameters('openIdConnectSpaClientAllowOfflineAccess')]",
+        "OpenIdConnectSpaClient:RefreshTokenUsage": "[parameters('openIdConnectSpaClientRefreshTokenUsage')]",
+        "OpenIdConnectSpaClient:RefreshTokenExpiration": "[parameters('openIdConnectSpaClientRefreshTokenExpiration')]",
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core'), '2018-02-14').secretUriWithVersion, ')')]",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",
