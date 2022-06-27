@@ -57,6 +57,23 @@ const LocationFiltersForm = ({
 
   const formOptions = useMemo(() => Object.entries(options), [options]);
 
+  // For school options flatten the location hierarchy and include the URN and LA as a hint.
+  // If we use search only for other location types later then may need to change this.
+  const getFlattenedOptions = (opts: LocationOption[]) => {
+    return opts.flatMap(group => {
+      return (
+        group.options?.map(opt => {
+          return {
+            label: opt.label,
+            value: opt.id ?? '',
+            hint: `URN: ${opt.value}; Local authority: ${group.label}`,
+            hintSmall: true,
+          };
+        }) ?? []
+      );
+    });
+  };
+
   // Key options by level and then by id to make future lookups faster/easier.
   const keyedOptions = useMemo(
     () =>
@@ -139,8 +156,9 @@ const LocationFiltersForm = ({
                       const hasSubGroups = level.options.some(
                         option => option.options,
                       );
+                      const searchOnly = levelKey === 'school';
 
-                      return hasSubGroups ? (
+                      return hasSubGroups && !searchOnly ? (
                         <FormFieldCheckboxGroupsMenu
                           key={levelKey}
                           name={`locations.${levelKey}`}
@@ -165,12 +183,18 @@ const LocationFiltersForm = ({
                           disabled={form.isSubmitting}
                           legend={level.legend}
                           legendHidden
-                          open={hasSingleOption}
-                          order={[]}
-                          options={level.options.map(option => ({
-                            label: option.label,
-                            value: option.id ?? '',
-                          }))}
+                          open={hasSingleOption || searchOnly}
+                          order={searchOnly ? 'label' : []}
+                          options={
+                            searchOnly
+                              ? getFlattenedOptions(level.options)
+                              : level.options.map(option => ({
+                                  label: option.label,
+                                  value: option.id ?? '',
+                                }))
+                          }
+                          searchOnly={searchOnly}
+                          searchHelpText="Search by school name or unique reference number (URN), and select at least one option before continuing to the next step."
                         />
                       );
                     })}

@@ -120,6 +120,29 @@ describe('LocationFiltersForm', () => {
     },
   };
 
+  const testSchools: SubjectMeta['locations'] = {
+    school: {
+      legend: 'Schools',
+      options: [
+        {
+          label: 'LA 1',
+          level: 'localAuthority',
+          options: [
+            { id: 'school-id-1', label: 'School 1', value: '000001' },
+            { id: 'school-id-2', label: 'School 2', value: '000002' },
+          ],
+          value: 'la1',
+        },
+        {
+          label: 'LA 2',
+          level: 'localAuthority',
+          options: [{ id: 'school-id-3', label: 'School 3', value: '000003' }],
+          value: 'la2',
+        },
+      ],
+    },
+  };
+
   test('renders flat location group options correctly', () => {
     render(
       <LocationFiltersForm
@@ -273,6 +296,82 @@ describe('LocationFiltersForm', () => {
     expect(region2Checkboxes[1]).toEqual(
       region2Group.getByLabelText('Local authority 4'),
     );
+  });
+
+  test('does not render school location group options by default', () => {
+    render(
+      <LocationFiltersForm
+        {...testWizardStepProps}
+        options={testSchools}
+        onSubmit={noop}
+      />,
+    );
+
+    const schoolCheckboxes = screen.queryAllByRole('checkbox', {});
+    expect(schoolCheckboxes).toHaveLength(0);
+
+    expect(
+      screen.getByText(
+        'Search by school name or unique reference number (URN), and select at least one option before continuing to the next step.',
+      ),
+    ).toBeInTheDocument();
+  });
+
+  test('renders school location group options as a flat list with urn and LA when there are search results', async () => {
+    render(
+      <LocationFiltersForm
+        {...testWizardStepProps}
+        options={testSchools}
+        onSubmit={noop}
+      />,
+    );
+
+    const searchInput = screen.getByLabelText('Search options');
+
+    userEvent.type(searchInput, 'school');
+
+    await waitFor(() => {
+      expect(screen.getByText('Select all 3 options')).toBeInTheDocument();
+    });
+
+    const schoolGroup = within(
+      screen.getByRole('group', {
+        name: 'Schools',
+      }),
+    );
+
+    const schoolCheckboxes = schoolGroup.getAllByRole('checkbox');
+    expect(schoolCheckboxes).toHaveLength(3);
+
+    expect(schoolCheckboxes[0]).toHaveAttribute('value', 'school-id-1');
+    expect(schoolCheckboxes[0]).toEqual(schoolGroup.getByLabelText('School 1'));
+    expect(
+      schoolGroup.getByText('URN: 000001; Local authority: LA 1'),
+    ).toHaveAttribute(
+      'id',
+      'locationFiltersForm-locations-school-options-school-id-1-item-hint',
+    );
+    expect(schoolCheckboxes[0]).not.toBeChecked();
+
+    expect(schoolCheckboxes[1]).toHaveAttribute('value', 'school-id-2');
+    expect(schoolCheckboxes[1]).toEqual(schoolGroup.getByLabelText('School 2'));
+    expect(
+      schoolGroup.getByText('URN: 000002; Local authority: LA 1'),
+    ).toHaveAttribute(
+      'id',
+      'locationFiltersForm-locations-school-options-school-id-2-item-hint',
+    );
+    expect(schoolCheckboxes[1]).not.toBeChecked();
+
+    expect(schoolCheckboxes[2]).toHaveAttribute('value', 'school-id-3');
+    expect(schoolCheckboxes[2]).toEqual(schoolGroup.getByLabelText('School 3'));
+    expect(
+      schoolGroup.getByText('URN: 000003; Local authority: LA 2'),
+    ).toHaveAttribute(
+      'id',
+      'locationFiltersForm-locations-school-options-school-id-3-item-hint',
+    );
+    expect(schoolCheckboxes[2]).not.toBeChecked();
   });
 
   test('selecting options shows the number of selected options for each location group', () => {
