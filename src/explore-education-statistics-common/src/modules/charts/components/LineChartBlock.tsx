@@ -207,6 +207,7 @@ const LineChartBlock = ({
               chartData,
               label: referenceLine.label,
               position: referenceLine.position,
+              style: referenceLine.style,
               x: referenceLine.position,
             }),
           )}
@@ -216,6 +217,7 @@ const LineChartBlock = ({
               chartData,
               label: referenceLine.label,
               position: referenceLine.position,
+              style: referenceLine.style,
               y: referenceLine.position,
             }),
           )}

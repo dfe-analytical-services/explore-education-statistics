@@ -68,6 +68,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
     {
         public string Label = null!;
         public string Position = null!;
+        
+        [JsonConverter(typeof(StringEnumConverter))]
+        public AxisReferenceLineStyle? Style;
     }
 
     [SuppressMessage("ReSharper", "InconsistentNaming")]
@@ -76,5 +79,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model.Chart
         [EnumMember(Value = "default")] Default,
         startEnd,
         custom
+    }
+
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
+    public enum AxisReferenceLineStyle
+    {
+        dashed,
+        solid,
+        none
     }
 }
