@@ -25,8 +25,8 @@ using Moq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
+using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using MapperUtils = GovUk.Education.ExploreEducationStatistics.Common.Services.MapperUtils;
 using Release = GovUk.Education.ExploreEducationStatistics.Data.Model.Release;
 
@@ -142,7 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .ReturnsAsync(tableResult);
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
                     contentRelease,
@@ -159,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
@@ -235,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 .ReturnsAsync(tableResult);
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
                     release,
@@ -252,7 +252,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
@@ -307,7 +307,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 blobText: JsonConvert.SerializeObject(permalink));
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
                     release,
@@ -324,7 +324,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
@@ -402,7 +402,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 blobText: permalinkJsonObject.ToString(Formatting.None));
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
                     new Content.Model.Release
@@ -429,7 +429,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
@@ -506,7 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 blobText: JsonConvert.SerializeObject(permalink));
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
@@ -570,7 +570,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 blobText: JsonConvert.SerializeObject(permalink));
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddRangeAsync(previousVersion, latestVersion);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
@@ -596,7 +596,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
@@ -657,7 +657,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 blobText: JsonConvert.SerializeObject(permalink));
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddRangeAsync(release, latestRelease);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
@@ -674,7 +674,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
@@ -735,7 +735,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 blobText: JsonConvert.SerializeObject(permalink));
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddRangeAsync(release, latestRelease);
                 await contentDbContext.ReleaseFiles.AddRangeAsync(
@@ -752,7 +752,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
@@ -816,7 +816,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 blobText: JsonConvert.SerializeObject(permalink));
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.Releases.AddRangeAsync(previousVersion, latestVersion);
                 await contentDbContext.AddRangeAsync(
@@ -835,7 +835,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,
@@ -876,7 +876,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 blobText: JsonConvert.SerializeObject(permalink));
 
             var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddRangeAsync(
                     new Content.Model.Release
@@ -915,7 +915,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 var service = BuildService(
                     contentDbContext: contentDbContext,

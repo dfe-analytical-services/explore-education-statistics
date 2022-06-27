@@ -6,13 +6,8 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Data.Model;
-using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
-using static Moq.MockBehavior;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
@@ -20,49 +15,41 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
     public class CacheKeyServiceTests
     {
         [Fact]
-        public async Task CreateCacheKeyForFastTrackResults()
+        public async Task CreateCacheKeyForReleaseSubjects()
         {
-            var fastTrackId = Guid.NewGuid();
-            var owningPublication = new Publication
+            var release = new Release
             {
-                Id = Guid.NewGuid(),
-                Slug = "the-publication-slug"
-            };
-            var owningRelease = new Release
-            {
-                Id = Guid.NewGuid(),
-                Publication = owningPublication,
-                Slug = "the-release-slug"
+                Publication = new Publication
+                {
+                    Slug = "publication-slug"
+                },
+                Slug = "release-slug"
             };
 
-            await using var contentDbContext = InMemoryContentDbContext();
-            await contentDbContext.Releases.AddAsync(owningRelease);
-            await contentDbContext.SaveChangesAsync();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            var (service, fastTrackService) = BuildServiceAndMocks(contentDbContext);
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(release);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            fastTrackService
-                .Setup(s => s.GetReleaseFastTrack(fastTrackId))
-                .ReturnsAsync(new ReleaseFastTrack(owningRelease.Id, fastTrackId, ""));
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = BuildService(contentDbContext);
 
-            var result = await service.CreateCacheKeyForFastTrackResults(fastTrackId);
-            VerifyAllMocks(fastTrackService);
+                var result = await service.CreateCacheKeyForReleaseSubjects(release.Id);
 
-            var cacheKey = result.AssertRight();
-            Assert.Equal(BlobContainers.PublicContent, cacheKey.Container);
-            var expectedCacheKeyPath =
-                $"publications/{owningPublication.Slug}/releases/{owningRelease.Slug}/fast-track-results/{fastTrackId}.json";
-            Assert.Equal(expectedCacheKeyPath, cacheKey.Key);
+                var cacheKey = result.AssertRight();
+                Assert.Equal(BlobContainers.PublicContent, cacheKey.Container);
+                Assert.Equal(release.Id, cacheKey.ReleaseId);
+                Assert.Equal("publications/publication-slug/releases/release-slug/subjects.json", cacheKey.Key);
+            }
         }
 
-        private static (
-            CacheKeyService service,
-            Mock<IFastTrackService> fastTrackService)
-            BuildServiceAndMocks(ContentDbContext contentDbContext)
+        private static CacheKeyService BuildService(ContentDbContext contentDbContext)
         {
-            var fastTrackService = new Mock<IFastTrackService>(Strict);
-            var controller = new CacheKeyService(contentDbContext, fastTrackService.Object);
-            return (controller, (fastTrackService));
+            return new CacheKeyService(contentDbContext);
         }
     }
 }

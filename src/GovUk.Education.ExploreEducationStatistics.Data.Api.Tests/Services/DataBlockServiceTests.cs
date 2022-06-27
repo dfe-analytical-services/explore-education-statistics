@@ -1,16 +1,12 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
@@ -22,12 +18,8 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 {
-    [Collection(BlobCacheServiceTests)]
-    public class DataBlockServiceTests : BlobCacheServiceTestFixture
+    public class DataBlockServiceTests
     {
-        private readonly Guid _releaseId = Guid.NewGuid();
-        private readonly Guid _dataBlockId = Guid.NewGuid();
-
         [Fact]
         public async Task GetDataBlockTableResult()
         {
@@ -35,35 +27,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
 
             var releaseContentBlock = new ReleaseContentBlock
             {
-                ReleaseId = _releaseId,
-                Release = new Release
-                {
-                    Id = _releaseId,
-                    Slug = "release-slug",
-                    Publication = new Publication
-                    {
-                        Slug = "publication-slug"
-                    }
-                },
-                ContentBlockId = _dataBlockId,
+                Release = new Release(),
                 ContentBlock = new DataBlock
                 {
-                    Id = _dataBlockId,
                     Query = new ObservationQueryContext
                     {
-                        SubjectId = subjectId,
-                    },
-                    Charts = new List<IChart>
-                    {
-                        new LineChart()
+                        SubjectId = subjectId
                     }
                 }
             };
 
-            await using var contentDbContext = InMemoryContentDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            await contentDbContext.AddAsync(releaseContentBlock);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(releaseContentBlock);
+                await contentDbContext.SaveChangesAsync();
+            }
 
             var tableBuilderResults = new TableBuilderResultViewModel
             {
@@ -73,34 +53,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
                 }
             };
 
-            var (service, mocks) = BuildServiceAndDependencies(contentDbContext);
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var (service, tableBuilderService) = BuildServiceAndDependencies(contentDbContext);
 
-            CacheService
-                .Setup(s => s.GetItem(
-                    It.IsAny<DataBlockTableResultCacheKey>(), typeof(TableBuilderResultViewModel)))
-                .ReturnsAsync(null);
-            
-            mocks.tableBuilderService
-                .Setup(
-                    s =>
-                        s.Query(
-                            _releaseId,
-                            It.Is<ObservationQueryContext>(q => q.SubjectId == subjectId),
-                            default
-                        )
-                )
-                .ReturnsAsync(tableBuilderResults);
+                tableBuilderService
+                    .Setup(
+                        s =>
+                            s.Query(
+                                releaseContentBlock.ReleaseId,
+                                It.Is<ObservationQueryContext>(q => q.SubjectId == subjectId),
+                                default
+                            )
+                    )
+                    .ReturnsAsync(tableBuilderResults);
 
-            CacheService
-                .Setup(s => s.SetItem<object>(
-                    It.IsAny<DataBlockTableResultCacheKey>(),
-                    tableBuilderResults))
-                .Returns(Task.CompletedTask);
-            
-            var result = await service.GetDataBlockTableResult(releaseContentBlock);
-            VerifyAllMocks(mocks);
+                var result = (await service.GetDataBlockTableResult(
+                    releaseContentBlock.ReleaseId,
+                    releaseContentBlock.ContentBlockId)).AssertRight();
 
-            result.AssertRight(tableBuilderResults);
+                VerifyAllMocks(tableBuilderService);
+
+                Assert.Equal(tableBuilderResults, result);
+            }
         }
 
         [Fact]
@@ -108,51 +83,46 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Services
         {
             var releaseContentBlock = new ReleaseContentBlock
             {
-                ReleaseId = _releaseId,
-                Release = new Release
-                {
-                    Id = _releaseId,
-                    Slug = "release-slug",
-                    Publication = new Publication
-                    {
-                        Slug = "publication-slug"
-                    }
-                },
-                ContentBlockId = _dataBlockId,
-                ContentBlock = new HtmlBlock(),
+                Release = new Release(),
+                ContentBlock = new HtmlBlock()
             };
 
-            await using var contentDbContext = InMemoryContentDbContext();
+            var contentDbContextId = Guid.NewGuid().ToString();
 
-            await contentDbContext.AddAsync(releaseContentBlock);
-            await contentDbContext.SaveChangesAsync();
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseContentBlocks.AddRangeAsync(releaseContentBlock);
+                await contentDbContext.SaveChangesAsync();
+            }
 
-            var (service, _) = BuildServiceAndDependencies(contentDbContext);
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var (service, _) = BuildServiceAndDependencies(contentDbContext);
 
-            // Assert the ArgumentException that should be thrown constructing DataBlockTableResultCacheKey
-            var exception = await Assert.ThrowsAsync<TargetInvocationException>(() => 
-                service.GetDataBlockTableResult(releaseContentBlock));
+                var result = await service.GetDataBlockTableResult(
+                    releaseContentBlock.ReleaseId,
+                    releaseContentBlock.ContentBlockId);
 
-            Assert.IsType<ArgumentException>(exception.InnerException);
+                result.AssertNotFound();
+            }
         }
 
         private static (
-            DataBlockService service, 
-            (
-                Mock<ITableBuilderService> tableBuilderService,
-                Mock<IBlobCacheService> cacheService) mocks) 
+            DataBlockService service,
+            Mock<ITableBuilderService> tableBuilderService)
             BuildServiceAndDependencies(ContentDbContext contentDbContext)
         {
             var tableBuilderService = new Mock<ITableBuilderService>(Strict);
             var userService = AlwaysTrueUserService();
-            
+
             var controller = new DataBlockService(
                 contentDbContext,
+                new PersistenceHelper<ContentDbContext>(contentDbContext),
                 tableBuilderService.Object,
                 userService.Object
             );
 
-            return (controller, (tableBuilderService, CacheService));
+            return (controller, tableBuilderService);
         }
     }
 }

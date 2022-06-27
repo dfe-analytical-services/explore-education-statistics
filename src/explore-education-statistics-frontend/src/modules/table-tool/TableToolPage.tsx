@@ -5,9 +5,9 @@ import WizardStep from '@common/modules/table-tool/components/WizardStep';
 import WizardStepHeading from '@common/modules/table-tool/components/WizardStepHeading';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import mapTableHeadersConfig from '@common/modules/table-tool/utils/mapTableHeadersConfig';
-import { FastTrackTable } from '@common/services/fastTrackService';
 import publicationService from '@common/services/publicationService';
 import tableBuilderService, {
+  FastTrackTable,
   FeaturedTable,
   SelectedPublication,
   Subject,

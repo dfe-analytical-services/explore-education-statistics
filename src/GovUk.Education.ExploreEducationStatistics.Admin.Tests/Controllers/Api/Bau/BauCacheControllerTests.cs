@@ -140,7 +140,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             Assert.DoesNotMatch(regex,
                 "something/publications/publication-1/releases/release-1/subject-meta/something");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/data-blocks/something");
-            Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/fast-track-results/something");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/invalid/something");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/something");
         }
@@ -167,8 +166,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                     Paths = new HashSet<string>
                     {
                         "data-blocks",
-                        "subject-meta",
-                        "fast-track-results"
+                        "subject-meta"
                     }
                 }
             );
@@ -180,12 +178,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             var regex = Assert.IsType<Regex>(options.IncludeRegex);
             Assert.Matches(regex, "publications/publication-1/releases/release-1/data-blocks/something");
             Assert.Matches(regex, "publications/publication-1/releases/release-1/subject-meta/something");
-            Assert.Matches(regex, "publications/publication-1/releases/release-1/fast-track-results/something");
             Assert.DoesNotMatch(regex, "something/publications/publication-1/releases/release-1/data-blocks/something");
             Assert.DoesNotMatch(regex,
                 "something/publications/publication-1/releases/release-1/subject-meta/something");
-            Assert.DoesNotMatch(regex,
-                "something/publications/publication-1/releases/release-1/fast-track-results/something");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/invalid/something");
             Assert.DoesNotMatch(regex, "publications/publication-1/releases/release-1/something");
         }

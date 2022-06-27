@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
@@ -9,7 +10,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +22,7 @@ using static GovUk.Education.ExploreEducationStatistics.Data.Api.Cancellation.Re
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class TableBuilderController : ControllerBase
     {
@@ -26,24 +30,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         // that requires cache invalidation.
         public const string ApiVersion = "1";
 
-        private readonly ITableBuilderService _tableBuilderService;
-        private readonly IDataBlockService _dataBlockService;
         private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
+        private readonly IDataBlockService _dataBlockService;
+        private readonly IReleaseRepository _releaseRepository;
+        private readonly ITableBuilderService _tableBuilderService;
 
-        public TableBuilderController(
-            ITableBuilderService tableBuilderService,
+        public TableBuilderController(IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
             IDataBlockService dataBlockService,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper)
+            IReleaseRepository releaseRepository,
+            ITableBuilderService tableBuilderService)
         {
-            _tableBuilderService = tableBuilderService;
-            _dataBlockService = dataBlockService;
             _contentPersistenceHelper = contentPersistenceHelper;
+            _dataBlockService = dataBlockService;
+            _releaseRepository = releaseRepository;
+            _tableBuilderService = tableBuilderService;
         }
 
         [HttpPost]
         [CancellationTokenTimeout(TableBuilderQuery)]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
-            [FromBody] ObservationQueryContext query, 
+            [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken = default)
         {
             return _tableBuilderService
@@ -51,11 +57,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("release/{releaseId}")]
+        [HttpPost("tablebuilder/release/{releaseId}")]
         [CancellationTokenTimeout(TableBuilderQuery)]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             Guid releaseId,
-            [FromBody] ObservationQueryContext query, 
+            [FromBody] ObservationQueryContext query,
             CancellationToken cancellationToken = default)
         {
             return _tableBuilderService
@@ -64,23 +70,78 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
         }
 
         [ResponseCache(Duration = 300)]
-        [HttpGet("release/{releaseId}/data-block/{dataBlockId}")]
+        [HttpGet("tablebuilder/release/{releaseId:guid}/data-block/{dataBlockId:guid}")]
         public async Task<ActionResult<TableBuilderResultViewModel>> QueryForDataBlock(
             Guid releaseId,
             Guid dataBlockId)
         {
-            return await _contentPersistenceHelper.CheckEntityExists<ReleaseContentBlock>(
-                    query => query
-                        .Include(rcb => rcb.ContentBlock)
-                        .Include(rcb => rcb.Release)
-                        .Where(
-                            rcb => rcb.ReleaseId == releaseId
-                                   && rcb.ContentBlockId == dataBlockId
-                        )
-                )
-                .OnSuccessDo(block => this.CacheWithLastModifiedAndETag(block.Release.Published, ApiVersion))
-                .OnSuccess(block => _dataBlockService.GetDataBlockTableResult(block))
+            return await GetCacheableDataBlock(releaseId: releaseId,
+                    dataBlockId: dataBlockId)
+                .OnSuccessDo(cacheable => this.CacheWithLastModifiedAndETag(cacheable.LastModified, ApiVersion))
+                .OnSuccess(GetDataBlockTableResult)
                 .HandleFailuresOrOk();
+        }
+
+        [HttpGet("tablebuilder/fast-track/{dataBlockId:guid}")]
+        public async Task<ActionResult<FastTrackViewModel>> QueryForFastTrack(Guid dataBlockId)
+        {
+            return await _contentPersistenceHelper
+                .CheckEntityExists<ReleaseContentBlock>(q =>
+                    q.Include(block => block.Release)
+                        .ThenInclude(release => release.Publication)
+                        .Include(block => block.ContentBlock)
+                        .Where(block => block.ContentBlockId == dataBlockId))
+                .OnSuccessCombineWith(block => GetDataBlockTableResult(new CacheableDataBlock(block)))
+                .OnSuccess(BuildFastTrackViewModel)
+                .HandleFailuresOrOk();
+        }
+
+        [BlobCache(typeof(DataBlockTableResultCacheKey))]
+        private Task<Either<ActionResult, TableBuilderResultViewModel>> GetDataBlockTableResult(
+            CacheableDataBlock cacheable)
+        {
+            // TODO EES-3363 The CacheableDataBlock parameter type exists to provide the Release and Publication slugs
+            // required in the cache key.
+            // In future we should change the storage path for public cached items to use a directory structure
+            // of Release id's so that we don't need to lookup the Release and Publication to use the slugs.
+            return _dataBlockService.GetDataBlockTableResult(releaseId: cacheable.ReleaseId,
+                dataBlockId: cacheable.DataBlockId);
+        }
+
+        private FastTrackViewModel BuildFastTrackViewModel(
+            Tuple<ReleaseContentBlock, TableBuilderResultViewModel> blockAndTableResult)
+        {
+            var (releaseContentBlock, tableResult) = blockAndTableResult;
+
+            if (releaseContentBlock.ContentBlock is not DataBlock dataBlock)
+            {
+                throw new ArgumentException(
+                    $"ContentBlock must be of type DataBlock. Found {releaseContentBlock.ContentBlock?.GetType().Name ?? "null"}.");
+            }
+
+            var release = releaseContentBlock.Release;
+            var latestRelease = _releaseRepository.GetLatestPublishedRelease(release.PublicationId) ??
+                                throw new InvalidOperationException("Latest Release not found for Publication");
+
+            return new FastTrackViewModel
+            {
+                Id = dataBlock.Id,
+                Configuration = dataBlock.Table,
+                FullTable = tableResult,
+                Query = new TableBuilderQueryViewModel(release.PublicationId, dataBlock.Query),
+                ReleaseId = release.Id,
+                ReleaseSlug = release.Slug,
+                LatestData = latestRelease.Id == release.Id,
+                LatestReleaseTitle = latestRelease.Title
+            };
+        }
+
+        private async Task<Either<ActionResult, CacheableDataBlock>> GetCacheableDataBlock(Guid releaseId,
+            Guid dataBlockId)
+        {
+            return await _contentPersistenceHelper.CheckEntityExists<Release>(releaseId,
+                    q => q.Include(release => release.Publication))
+                .OnSuccess(release => new CacheableDataBlock(dataBlockId, release));
         }
     }
 }

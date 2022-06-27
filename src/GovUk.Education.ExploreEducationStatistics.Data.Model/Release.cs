@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using GovUk.Education.ExploreEducationStatistics.Common.Database;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using static System.DateTime;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Model
@@ -16,6 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Model
         public ICollection<ReleaseFootnote> Footnotes { get; set; }
         public bool Live => Published.HasValue && UtcNow >= Published.Value;
         public Guid? PreviousVersionId { get; set; }
+
+        public string Title =>
+            TimePeriodLabelFormatter.Format(Year, TimeIdentifier, TimePeriodLabelFormat.FullLabelBeforeYear);
 
         public Release CreateReleaseAmendment(Guid contentAmendmentId, Guid? amendmentPreviousVersionId)
         {
