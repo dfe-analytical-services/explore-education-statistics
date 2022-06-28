@@ -3,7 +3,6 @@ import json
 import argparse
 import requests
 from bs4 import BeautifulSoup
-from get_webdriver import get_webdriver
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
@@ -74,7 +73,7 @@ def create_find_statistics_snapshot(public_url: str) -> str:
     return json.dumps(result, sort_keys=True, indent=2)
 
 
-def create_table_tool_snapshot(public_url: str) -> str:
+def create_table_tool_snapshot(public_url: str, driver: webdriver) -> str:
     table_tool_url = f"{public_url.rstrip('/')}/data-tables"
     driver.get(table_tool_url)
 
@@ -98,7 +97,7 @@ def create_table_tool_snapshot(public_url: str) -> str:
     return json.dumps(result, sort_keys=True, indent=2)
 
 
-def create_data_catalogue_snapshot(public_url: str) -> str:
+def create_data_catalogue_snapshot(public_url: str, driver: webdriver) -> str:
     data_catalogue_url = f"{public_url.rstrip('/')}/data-catalogue"
     driver.get(data_catalogue_url)
 
@@ -170,6 +169,8 @@ def _write_to_file(file_name: str, snapshot: str):
 
 
 if __name__ == "__main__":
+    from get_webdriver import get_webdriver
+
     parser = argparse.ArgumentParser(prog=f"python {os.path.basename(__file__)}",
                                      description="To create snapshots of specific public frontend pages")
     parser.add_argument(dest="public_url",
@@ -188,10 +189,10 @@ if __name__ == "__main__":
     find_stats_snapshot = create_find_statistics_snapshot(args.public_url)
     _write_to_file('find_stats_snapshot.json', find_stats_snapshot)
 
-    table_tool_snapshot = create_table_tool_snapshot(args.public_url)
+    table_tool_snapshot = create_table_tool_snapshot(args.public_url, driver)
     _write_to_file('table_tool_snapshot.json', table_tool_snapshot)
 
-    data_catalogue_snapshot = create_data_catalogue_snapshot(args.public_url)
+    data_catalogue_snapshot = create_data_catalogue_snapshot(args.public_url, driver)
     _write_to_file('data_catalogue_snapshot.json', data_catalogue_snapshot)
 
     all_methodologies_snapshot = create_all_methodologies_snapshot(args.public_url)
