@@ -147,12 +147,21 @@ reused in a subsequent run when the tests finish. This is achieved using K6's `s
 View the results of real-time or historic test runs by visiting:
 
 ```
+http://localhost:3005/d/ees-dashboard/ees-dashboard?orgId=1&refresh=5s
+```
+
+This Dashboard shows EES-specific custom metrics, such as the length of time it takes to 
+complete table tool queries, the stages of progress that importing data files have reached
+so far, and so on.
+
+Also we can visit:
+
+```
 http://localhost:3005/d/k6/k6-load-testing-results?orgId=1&refresh=5s
 ```
 
-This is a Grafana Dashboard that is configured for default K6-recorded information from an
-InfluxDB data source. Grafana and InfluxDB need to be running in order to use this.
-
+This is an out-of-the-box Grafana / K6 Dashboard that captures general low-level performance
+statistics.
 
 ## Transpiling and Bundling
 
@@ -163,10 +172,8 @@ set up a bundler that converts TypeScript to JavaScript code.
 If you want to learn more, check out 
 [Bundling node modules in k6](https://k6.io/docs/using-k6/modules#bundling-node-modules).
 
-We also have some Typescript Node scripts that are used directly by Node.js that require budling and 
-transpiling in the same fashion
-
-TODO Assets!!!!!!!!!!!!!!!!!
+We also have some Typescript Node scripts that are used directly by Node.js that require bundling and 
+transpiling in the same fashion.
 
 ## Troubleshooting
 
@@ -186,4 +193,31 @@ node -r source-map-support/register dist/logAuthTokens.js local bau1
 would result in stacktraces that point back to the original `src/auth/logAuthTokens.ts` Typescript 
 file.
 
-TODO Healthchecks!!!!!!!!!!!!!!!!!
+### Healthcheck tests
+
+We have some test scripts that ascertain that the infrastructure of the environment we're testing 
+against and our own utils and helper scripts are behaving themselves.
+
+#### Refresh token support
+
+Run the following to test that the environment under test supports refresh tokens (as specified
+in your `.env.<environment>.json file).
+
+```bash
+export AUTH_DETAILS_AS_JSON=$(npm run log-auth-details --silent --environment=<environment> --users=bau1)
+npm run test dist/refreshTokens.test.js
+```
+
+The output should look like:
+
+```text
+     ✓ response with original access token was 200
+     ✓ response with refreshed tokens was successful
+     ✓ response with refreshed tokens contained a new accessToken
+     ✓ response with refreshed tokens contained a new refreshToken
+     ✓ response with refreshed access token was 200
+     ✓ response with re-refreshed tokens was successful
+     ✓ response with re-refreshed tokens contained a new accessToken
+     ✓ response with re-refreshed tokens contained a new refreshToken
+     ✓ response with re-refreshed access token was 200
+```

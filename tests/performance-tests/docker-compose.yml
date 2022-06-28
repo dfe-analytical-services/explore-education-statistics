@@ -65,6 +65,6 @@ networks:
       config:
         # Restrict containers to this subnet to allow predictable setting of firewall 
         # rules to this IP range. This is to allow the k6 container to connect to the 
-        # host machine on specific ports after port access hass been allowed for this 
+        # host machine on specific ports after port access has been allowed for this 
         # IP range.
         - subnet: 172.30.0.0/16
