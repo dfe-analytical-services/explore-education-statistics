@@ -1,6 +1,6 @@
 import { sleep } from 'k6';
 import http, { RefinedResponse } from 'k6/http';
-import createClient from './httpClient';
+import HttpClient from './httpClient';
 import TestData from '../tests/testData';
 
 const applicationJsonHeaders = {
@@ -41,39 +41,43 @@ export interface SubjectMeta {
   };
 }
 
-type Topic = {
+interface Topic {
   id: string;
   title: string;
   themeId: string;
-};
+}
 
-type ThemeAndTopics = {
+interface ThemeAndTopics {
   id: string;
   title: string;
   topics: Topic[];
-};
+}
 
-type Release = {
+interface Release {
   id: string;
   releaseName: string;
-};
+}
 
-type PublicationAndReleases = {
+interface PublicationAndReleases {
   id: string;
   topicId: string;
   title: string;
   releases: Release[];
-};
+}
 
 class DataService {
-  client;
+  private client: HttpClient;
 
   constructor(
     adminUrl: string,
     accessToken: string,
     checkResponseStatus = true,
   ) {
-    this.client = createClient(adminUrl, accessToken, checkResponseStatus);
+    this.client = new HttpClient({
+      baseUrl: adminUrl,
+      accessToken,
+      checkResponseStatus,
+    });
   }
 
   getThemes() {

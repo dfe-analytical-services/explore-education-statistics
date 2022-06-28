@@ -2,6 +2,7 @@
 
 /* eslint-disable camelcase */
 import puppeteer, { Page } from 'puppeteer';
+import getChromePath from './getChromePath';
 
 export interface AuthTokens {
   accessToken: string;
@@ -33,7 +34,7 @@ export const getAuthTokens = async (
     headless: true,
     ignoreHTTPSErrors: true,
     product: 'chrome',
-    executablePath: '/usr/bin/google-chrome',
+    executablePath: getChromePath(),
     args: ['--no-sandbox', '--disable-setuid-sandbox'],
   });
 
@@ -60,8 +61,7 @@ export const getAuthTokens = async (
     }
 
     return await page.evaluate(() => {
-      /* eslint-disable-next-line no-plusplus */
-      for (let i = 0; i < localStorage.length; i++) {
+      for (let i = 0; i < localStorage.length; i += 1) {
         const key = localStorage.key(i) as string;
         const value = localStorage.getItem(key) as string;
         const json = JSON.parse(value);
