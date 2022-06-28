@@ -41,7 +41,7 @@ const FormCheckboxSearchGroup = ({
     ...groupProps
   } = props;
 
-  const minSearchCharacters = searchOnly ? 2 : 0;
+  const minSearchCharacters = searchOnly ? 3 : 0;
 
   const fieldsetProps: FormFieldsetProps = {
     id,
@@ -55,7 +55,7 @@ const FormCheckboxSearchGroup = ({
   };
 
   let filteredOptions = searchOnly
-    ? options.filter(option => value.indexOf(option.value) > -1)
+    ? options.filter(option => value.includes(option.value))
     : options;
 
   if (searchTerm) {
@@ -86,7 +86,7 @@ const FormCheckboxSearchGroup = ({
         width={20}
         onChange={event => {
           if (
-            event.target.value.length > minSearchCharacters ||
+            event.target.value.length >= minSearchCharacters ||
             !event.target.value.length
           ) {
             setSearchTerm(event.target.value);

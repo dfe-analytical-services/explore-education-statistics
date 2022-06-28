@@ -5,6 +5,7 @@ import naturalOrderBy, {
   OrderDirection,
   OrderKeys,
 } from '@common/utils/array/naturalOrderBy';
+import numberWithCommas from '@common/utils/number/numberWithCommas';
 import classNames from 'classnames';
 import React, {
   FocusEventHandler,
@@ -126,8 +127,8 @@ export const BaseFormCheckboxGroup = ({
       if (numResults > maxResults) {
         return (
           <p>
-            {numResults} results found. Please refine your search to view
-            options.
+            {numberWithCommas(numResults)} results found. Please refine your
+            search to view options.
           </p>
         );
       }
