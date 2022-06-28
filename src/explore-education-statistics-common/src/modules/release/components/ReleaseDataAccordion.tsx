@@ -7,7 +7,7 @@ import { FileInfo } from '@common/services/types/file';
 import classNames from 'classnames';
 import orderBy from 'lodash/orderBy';
 import React, { ReactNode } from 'react';
-import styles from './ReleaseDataFilesAccordion.module.scss';
+import styles from './ReleaseDataAccordion.module.scss';
 
 interface Props {
   release: Release;
@@ -21,7 +21,7 @@ interface Props {
   showDownloadFilesList?: boolean;
 }
 
-const ReleaseDataFilesAccordion = ({
+const ReleaseDataAccordion = ({
   release,
   renderAllFilesButton,
   renderCreateTablesButton,
@@ -56,7 +56,7 @@ const ReleaseDataFilesAccordion = ({
       >
         {release.downloadFiles && (
           <AccordionSection
-            id="explore-data-and-files-section"
+            id="explore-data-and-files"
             heading="Explore data and files"
           >
             <div
@@ -189,7 +189,7 @@ const ReleaseDataFilesAccordion = ({
         )}
         {renderRelatedDashboards && (
           <AccordionSection
-            id="related-dashboards-section"
+            id="related-dashboards"
             heading="View related dashboard(s)"
           >
             {renderRelatedDashboards}
@@ -200,4 +200,4 @@ const ReleaseDataFilesAccordion = ({
   );
 };
 
-export default ReleaseDataFilesAccordion;
+export default ReleaseDataAccordion;

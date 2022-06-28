@@ -26,7 +26,7 @@ import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
-import ReleaseDataFilesAccordion from '@common/modules/release/components/ReleaseDataFilesAccordion';
+import ReleaseDataAccordion from '@common/modules/release/components/ReleaseDataAccordion';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
 
@@ -207,9 +207,7 @@ const ReleaseContent = () => {
                 </li>
                 {!!release.relatedDashboardsSection?.content.length && (
                   <li>
-                    <a href="#related-dashboards-section">
-                      View related dashboard(s)
-                    </a>
+                    <a href="#related-dashboards">View related dashboard(s)</a>
                   </li>
                 )}
                 {hasAllFilesButton && (
@@ -326,7 +324,7 @@ const ReleaseContent = () => {
       {(release.downloadFiles ||
         release.hasPreReleaseAccessList ||
         !!release.relatedDashboardsSection?.content.length) && (
-        <ReleaseDataFilesAccordion
+        <ReleaseDataAccordion
           release={release}
           renderAllFilesButton={
             <Button

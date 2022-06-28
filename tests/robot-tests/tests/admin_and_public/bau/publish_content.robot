@@ -32,10 +32,10 @@ Add Related dashboards section to release content
     user waits until page contains accordion section    View related dashboard(s)
 
     user opens accordion section    View related dashboard(s)    id:data-accordion
-    user starts editing text block    id:related-dashboards-section-content
+    user starts editing text block    id:related-dashboards-content
     user presses keys    Related dashboards test text
     user clicks button    Save & close
-    user waits until element contains    id:related-dashboards-section-content    Edit block
+    user waits until element contains    id:related-dashboards-content    Edit block
 
 Add an accordion section to release content
     user clicks button    Add new section
@@ -88,7 +88,7 @@ Check latest release contains related dashboards
     user checks element contains link    testid:data-downloads    View data guidance
     user checks there are x accordion sections    2    id:data-accordion
     user opens accordion section    View related dashboard(s)    id:data-accordion
-    user checks element contains    id:related-dashboards-section-content    Related dashboards test text
+    user checks element contains    id:related-dashboards-content    Related dashboards test text
 
 Check latest release contains glossary info icon
     user opens accordion section    Test section    css:#content

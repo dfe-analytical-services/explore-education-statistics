@@ -7,7 +7,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
-import ReleaseDataFilesAccordion from '@common/modules/release/components/ReleaseDataFilesAccordion';
+import ReleaseDataAccordion from '@common/modules/release/components/ReleaseDataAccordion';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
@@ -397,7 +397,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
       {(release.downloadFiles ||
         !!release.relatedDashboardsSection?.content.length) && (
-        <ReleaseDataFilesAccordion
+        <ReleaseDataAccordion
           release={release}
           renderAllFilesButton={
             <ButtonLink
@@ -453,8 +453,8 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
           onSectionOpen={accordionSection => {
             logEvent({
               category: `${release.publication.title} release page`,
-              action: `Data files accordion opened`,
-              label: `${accordionSection.title}`,
+              action: `Data accordion opened`,
+              label: accordionSection.title,
             });
           }}
           renderRelatedDashboards={

@@ -916,12 +916,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var relatedDashboardsSection = result.RelatedDashboardsSection;
                 Assert.NotNull(relatedDashboardsSection);
-                Assert.Equal(Release2RelatedDashboardsSection.Id, relatedDashboardsSection.Id);
+                Assert.Equal(Release2RelatedDashboardsSection.Id, relatedDashboardsSection!.Id);
                 Assert.Single(relatedDashboardsSection.Content);
 
 
                 var content = result.Content;
-
                 Assert.NotNull(content);
                 Assert.Equal(3, content.Count);
 
@@ -1009,7 +1008,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 new()
                 {
                   Release = release,
-                  ContentSection = new ()
+                  ContentSection = new ContentSection
                   {
                       Type = ContentSectionType.RelatedDashboards,
                       Content = new List<ContentBlock>
@@ -1097,7 +1096,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(expectedContent, (headlines.Content[0] as HtmlBlockViewModel)?.Body);
 
                 var relatedDashboardsSection = result.RelatedDashboardsSection;
-                Assert.Single(relatedDashboardsSection.Content);
+                Assert.NotNull(relatedDashboardsSection);
+                Assert.Single(relatedDashboardsSection!.Content);
                 Assert.Equal("Related dashboard html block body",
                     (relatedDashboardsSection.Content[0] as HtmlBlockViewModel)?.Body);
 
@@ -1162,7 +1162,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var relatedDashboardsSection = result.RelatedDashboardsSection;
                 Assert.NotNull(relatedDashboardsSection);
-                Assert.Equal(Release1RelatedDashboardsSection.Id, relatedDashboardsSection.Id);
+                Assert.Equal(Release1RelatedDashboardsSection.Id, relatedDashboardsSection!.Id);
                 Assert.Empty(relatedDashboardsSection.Content);
 
                 var content = result.Content;
@@ -1332,7 +1332,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(expectedContent, (headlines.Content[0] as HtmlBlockViewModel)?.Body);
 
                 var relatedDashboardsSection = result.RelatedDashboardsSection;
-                Assert.Single(relatedDashboardsSection.Content);
+                Assert.NotNull(relatedDashboardsSection);
+                Assert.Single(relatedDashboardsSection!.Content);
                 Assert.Equal(expectedContent, (relatedDashboardsSection.Content[0] as HtmlBlockViewModel)?.Body);
 
                 var content = result.Content;
