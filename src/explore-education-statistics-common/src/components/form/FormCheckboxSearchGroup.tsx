@@ -64,7 +64,7 @@ const FormCheckboxSearchGroup = ({
       filteredOptions = options.filter(
         option =>
           option.hint?.toString().includes(searchTerm) ||
-          value.indexOf(option.value) > -1,
+          value.includes(option.value),
       );
     } else {
       filteredOptions = options.filter(
@@ -72,7 +72,7 @@ const FormCheckboxSearchGroup = ({
           option.label
             .toLowerCase()
             .includes(searchTerm.trim().toLowerCase()) ||
-          value.indexOf(option.value) > -1,
+          value.includes(option.value),
       );
     }
   }
