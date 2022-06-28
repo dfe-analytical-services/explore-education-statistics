@@ -59,17 +59,30 @@ const LocationFiltersForm = ({
 
   // For school options flatten the location hierarchy and include the URN and LA as a hint.
   // If we use search only for other location types later then may need to change this.
-  const getFlattenedOptions = (opts: LocationOption[]) => {
+  const getSearchOnlyOptions = (
+    opts: LocationOption[],
+    hasSubGroups: boolean,
+  ) => {
+    if (!hasSubGroups) {
+      return opts.map(opt => ({
+        label: opt.label,
+        value: opt.id ?? '',
+        hint: `URN: ${opt.value}`,
+        hintSmall: true,
+      }));
+    }
     return opts.flatMap(group => {
+      const level =
+        group.level && group.label
+          ? `${locationLevelsMap[group.level].label}: ${group.label}`
+          : '';
       return (
-        group.options?.map(opt => {
-          return {
-            label: opt.label,
-            value: opt.id ?? '',
-            hint: `URN: ${opt.value}; Local authority: ${group.label}`,
-            hintSmall: true,
-          };
-        }) ?? []
+        group.options?.map(opt => ({
+          label: opt.label,
+          value: opt.id ?? '',
+          hint: `URN: ${opt.value}; ${level}`,
+          hintSmall: true,
+        })) ?? []
       );
     });
   };
@@ -187,7 +200,10 @@ const LocationFiltersForm = ({
                           order={searchOnly ? 'label' : []}
                           options={
                             searchOnly
-                              ? getFlattenedOptions(level.options)
+                              ? getSearchOnlyOptions(
+                                  level.options,
+                                  hasSubGroups,
+                                )
                               : level.options.map(option => ({
                                   label: option.label,
                                   value: option.id ?? '',

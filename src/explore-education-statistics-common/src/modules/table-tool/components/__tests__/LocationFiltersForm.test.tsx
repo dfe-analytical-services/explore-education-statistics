@@ -346,7 +346,7 @@ describe('LocationFiltersForm', () => {
     expect(schoolCheckboxes[0]).toHaveAttribute('value', 'school-id-1');
     expect(schoolCheckboxes[0]).toEqual(schoolGroup.getByLabelText('School 1'));
     expect(
-      schoolGroup.getByText('URN: 000001; Local authority: LA 1'),
+      schoolGroup.getByText('URN: 000001; Local Authority: LA 1'),
     ).toHaveAttribute(
       'id',
       'locationFiltersForm-locations-school-options-school-id-1-item-hint',
@@ -356,7 +356,7 @@ describe('LocationFiltersForm', () => {
     expect(schoolCheckboxes[1]).toHaveAttribute('value', 'school-id-2');
     expect(schoolCheckboxes[1]).toEqual(schoolGroup.getByLabelText('School 2'));
     expect(
-      schoolGroup.getByText('URN: 000002; Local authority: LA 1'),
+      schoolGroup.getByText('URN: 000002; Local Authority: LA 1'),
     ).toHaveAttribute(
       'id',
       'locationFiltersForm-locations-school-options-school-id-2-item-hint',
@@ -366,7 +366,7 @@ describe('LocationFiltersForm', () => {
     expect(schoolCheckboxes[2]).toHaveAttribute('value', 'school-id-3');
     expect(schoolCheckboxes[2]).toEqual(schoolGroup.getByLabelText('School 3'));
     expect(
-      schoolGroup.getByText('URN: 000003; Local authority: LA 2'),
+      schoolGroup.getByText('URN: 000003; Local Authority: LA 2'),
     ).toHaveAttribute(
       'id',
       'locationFiltersForm-locations-school-options-school-id-3-item-hint',
