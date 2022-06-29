@@ -276,6 +276,12 @@ export const testEditableRelease: EditableRelease = {
       },
     ],
   },
+  relatedDashboardsSection: {
+    id: 'related-dashboards-section-id',
+    order: 0,
+    content: [],
+    heading: '',
+  },
   downloadFiles: [
     {
       id: 'download-1',

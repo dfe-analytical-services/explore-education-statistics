@@ -43,6 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var release = new Release
             {
                 Id = Guid.NewGuid(),
+                ReleaseName = "2000",
             };
 
             var section1Id = Guid.NewGuid();
@@ -105,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
             var amendment = release.CreateAmendment(createdDate, createdById);
 
-            Assert.Equal(2, amendment.Content.Count);
+            Assert.Equal(3, amendment.Content.Count);
 
             var section1 = amendment.Content[0];
             Assert.Equal(amendment, section1.Release);
@@ -145,6 +146,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             Assert.NotEqual(release.Content[1].ContentSection.Content[0].Id, block3.Id);
             Assert.Equal(1, block3.Order);
             Assert.Equal("Block 3 body", block3.Body);
+
+            // NOTE: If a RelatedDashboards ContentSection doesn't exist, one gets created on amendments
+            // because older releases may not have one.
+            var section3 = amendment.Content[2];
+
+            Assert.Equal(amendment, section3.Release);
+            Assert.Equal(amendment.Id, section3.ReleaseId);
+
+            Assert.Equal(ContentSectionType.RelatedDashboards, section3.ContentSection.Type);
+            Assert.Empty(section3.ContentSection.Content);
         }
 
         [Fact]
@@ -153,6 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
             var release = new Release
             {
                 Id = Guid.NewGuid(),
+                ReleaseName = "2000",
             };
 
             var section1Id = Guid.NewGuid();
@@ -221,16 +233,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
 
             var amendment = release.CreateAmendment(createdDate, createdById);
 
-            Assert.Equal(2, amendment.Content.Count);
+            Assert.Equal(3, amendment.Content.Count);
 
             var section1 = amendment.Content[0];
             var section2 = amendment.Content[1];
+            var section3 = amendment.Content[2];
 
             var block1 = Assert.IsType<HtmlBlock>(section1.ContentSection.Content[0]);
             Assert.Empty(block1.Comments);
 
             var block2 = Assert.IsType<HtmlBlock>(section2.ContentSection.Content[0]);
             Assert.Empty(block2.Comments);
+
+            // NOTE: Some older releases do not have a RelatedDashboards ContentSection, so it is created
+            // on amendments.
+            Assert.Equal(ContentSectionType.RelatedDashboards, section3.ContentSection.Type);
+            Assert.Empty(section3.ContentSection.Content);
         }
 
         [Fact]

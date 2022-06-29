@@ -312,6 +312,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             Order = 1,
         };
 
+        private static readonly ContentBlock Release2RelatedDashboardsSectionHtmlContentBlock1 = new HtmlBlock
+        {
+            Id = Guid.NewGuid(),
+            Body = "<p>Release 2 related dashboards 1 order 1</p>",
+            Order = 0,
+        };
+
         private static readonly ContentBlock Release1Section1HtmlContentBlock1 = new HtmlBlock
         {
             Id = Guid.NewGuid(),
@@ -379,6 +386,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         };
 
+        private static readonly ContentSection Release1RelatedDashboardsSection = new()
+        {
+            Id = Guid.NewGuid(),
+            Order = 0,
+            Heading = "Release 1 related dashboards section",
+            Caption = "",
+            Type = ContentSectionType.RelatedDashboards,
+            Content = new List<ContentBlock>(),
+        };
+
+
         private static readonly ContentSection Release1Section1 = new()
         {
             Id = Guid.NewGuid(),
@@ -440,6 +458,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             }
         };
 
+        private static readonly ContentSection Release2RelatedDashboardsSection = new ()
+        {
+            Id = Guid.NewGuid(),
+            Order = 0,
+            Type = ContentSectionType.RelatedDashboards,
+            Content = new List<ContentBlock>()
+            {
+                Release2RelatedDashboardsSectionHtmlContentBlock1,
+            }
+        };
+
         private static readonly ContentSection Release2Section1 = new()
         {
             Id = Guid.NewGuid(),
@@ -496,6 +525,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             new ReleaseContentSection
             {
                 Release = PublicationARelease1V1,
+                ContentSection = Release1RelatedDashboardsSection,
+            },
+            new ReleaseContentSection
+            {
+                Release = PublicationARelease1V1,
                 ContentSection = Release1Section1
             },
             new ReleaseContentSection
@@ -517,6 +551,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             {
                 Release = PublicationARelease2,
                 ContentSection = Release2SummarySection
+            },
+            new ReleaseContentSection
+            {
+                Release = PublicationARelease2,
+                ContentSection = Release2RelatedDashboardsSection,
             },
             new ReleaseContentSection
             {
@@ -875,8 +914,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal("<p>Release 2 summary 1 order 2</p>",
                     (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
 
-                var content = result.Content;
+                var relatedDashboardsSection = result.RelatedDashboardsSection;
+                Assert.NotNull(relatedDashboardsSection);
+                Assert.Equal(Release2RelatedDashboardsSection.Id, relatedDashboardsSection!.Id);
+                Assert.Single(relatedDashboardsSection.Content);
 
+
+                var content = result.Content;
                 Assert.NotNull(content);
                 Assert.Equal(3, content.Count);
 
@@ -963,6 +1007,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 },
                 new()
                 {
+                  Release = release,
+                  ContentSection = new ContentSection
+                  {
+                      Type = ContentSectionType.RelatedDashboards,
+                      Content = new List<ContentBlock>
+                      {
+                          new HtmlBlock
+                          {
+                              Body = "Related dashboard html block body"
+                          },
+                      },
+                  },
+                },
+                new()
+                {
                     Release = release,
                     ContentSection = new ContentSection
                     {
@@ -1030,18 +1089,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var summarySection = result.SummarySection;
                 Assert.Single(summarySection.Content);
-
                 Assert.Equal(expectedContent, (summarySection.Content[0] as HtmlBlockViewModel)?.Body);
 
                 var headlines = result.HeadlinesSection;
                 Assert.Single(headlines.Content);
-
                 Assert.Equal(expectedContent, (headlines.Content[0] as HtmlBlockViewModel)?.Body);
+
+                var relatedDashboardsSection = result.RelatedDashboardsSection;
+                Assert.NotNull(relatedDashboardsSection);
+                Assert.Single(relatedDashboardsSection!.Content);
+                Assert.Equal("Related dashboard html block body",
+                    (relatedDashboardsSection.Content[0] as HtmlBlockViewModel)?.Body);
 
                 var content = result.Content;
                 Assert.Single(content);
                 Assert.Single(content[0].Content);
-
                 Assert.Equal(expectedContent, (content[0].Content[0] as HtmlBlockViewModel)?.Body);
             }
         }
@@ -1097,6 +1159,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(Release1SummarySectionHtmlContentBlock1.Id, summarySectionContent[2].Id);
                 Assert.Equal("<p>Release 1 summary 1 order 2</p>",
                     (summarySectionContent[2] as HtmlBlockViewModel)?.Body);
+
+                var relatedDashboardsSection = result.RelatedDashboardsSection;
+                Assert.NotNull(relatedDashboardsSection);
+                Assert.Equal(Release1RelatedDashboardsSection.Id, relatedDashboardsSection!.Id);
+                Assert.Empty(relatedDashboardsSection.Content);
 
                 var content = result.Content;
                 Assert.NotNull(content);
@@ -1180,6 +1247,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                     Release = release,
                     ContentSection = new ContentSection
                     {
+                        Type = ContentSectionType.RelatedDashboards,
+                        Content = new List<ContentBlock>
+                        {
+                            new HtmlBlock
+                            {
+                                Body = originalContent
+                            }
+                        }
+                    }
+                },
+                new()
+                {
+                    Release = release,
+                    ContentSection = new ContentSection
+                    {
                         Type = ContentSectionType.Headlines,
                         Content = new List<ContentBlock>
                         {
@@ -1247,8 +1329,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
 
                 var headlines = result.HeadlinesSection;
                 Assert.Single(headlines.Content);
-
                 Assert.Equal(expectedContent, (headlines.Content[0] as HtmlBlockViewModel)?.Body);
+
+                var relatedDashboardsSection = result.RelatedDashboardsSection;
+                Assert.NotNull(relatedDashboardsSection);
+                Assert.Single(relatedDashboardsSection!.Content);
+                Assert.Equal(expectedContent, (relatedDashboardsSection.Content[0] as HtmlBlockViewModel)?.Body);
 
                 var content = result.Content;
                 Assert.Single(content);
@@ -1290,6 +1376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(context.Published, result.Published);
                 Assert.Null(result.KeyStatisticsSection);
                 Assert.Null(result.SummarySection);
+                Assert.Null(result.RelatedDashboardsSection);
                 Assert.Empty(result.Content);
 
                 Assert.Empty(result.DownloadFiles);
@@ -1332,6 +1419,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
                 Assert.Equal(PublicationARelease1V1.Published, result.Published);
                 Assert.Null(result.KeyStatisticsSection);
                 Assert.Null(result.SummarySection);
+                Assert.Null(result.RelatedDashboardsSection);
                 Assert.Empty(result.Content);
 
                 Assert.Empty(result.DownloadFiles);

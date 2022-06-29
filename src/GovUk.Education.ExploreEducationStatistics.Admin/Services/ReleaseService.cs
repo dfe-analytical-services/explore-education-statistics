@@ -121,16 +121,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     release.SummarySection = new ContentSection
                     {
-                        Type = ContentSectionType.ReleaseSummary
+                        Type = ContentSectionType.ReleaseSummary,
                     };
-                    release.KeyStatisticsSection = new ContentSection{
-                        Type = ContentSectionType.KeyStatistics
+                    release.KeyStatisticsSection = new ContentSection
+                    {
+                        Type = ContentSectionType.KeyStatistics,
                     };
-                    release.KeyStatisticsSecondarySection = new ContentSection{
-                        Type = ContentSectionType.KeyStatisticsSecondary
+                    release.KeyStatisticsSecondarySection = new ContentSection
+                    {
+                        Type = ContentSectionType.KeyStatisticsSecondary,
                     };
-                    release.HeadlinesSection = new ContentSection{
-                        Type = ContentSectionType.Headlines
+                    release.HeadlinesSection = new ContentSection
+                    {
+                        Type = ContentSectionType.Headlines,
+                    };
+                    release.RelatedDashboardsSection = new ContentSection
+                    {
+                        Type = ContentSectionType.RelatedDashboards,
                     };
                     release.Created = DateTime.UtcNow;
                     release.CreatedById = _userService.GetUserId();

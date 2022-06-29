@@ -114,6 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             releaseViewModel.SummarySection?.Content.ForEach(FilterContentBlock);
             releaseViewModel.KeyStatisticsSection?.Content.ForEach(FilterContentBlock);
             releaseViewModel.KeyStatisticsSecondarySection?.Content.ForEach(FilterContentBlock);
+            releaseViewModel.RelatedDashboardsSection?.Content.ForEach(FilterContentBlock);
             releaseViewModel.Content.ForEach(section => section.Content.ForEach(FilterContentBlock));
 
             releaseViewModel.DownloadFiles = await GetDownloadFiles(release);

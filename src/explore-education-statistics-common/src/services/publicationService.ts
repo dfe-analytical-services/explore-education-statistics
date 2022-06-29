@@ -98,6 +98,7 @@ export interface Release<
   keyStatisticsSection: ContentSection<DataBlockType>;
   keyStatisticsSecondarySection: ContentSection<DataBlockType>;
   headlinesSection: ContentSection<ContentBlockType>;
+  relatedDashboardsSection?: ContentSection<ContentBlockType>; // optional because older releases may not have this section
   publication: PublicationType;
   latestRelease: boolean;
   nextReleaseDate?: PartialDate;

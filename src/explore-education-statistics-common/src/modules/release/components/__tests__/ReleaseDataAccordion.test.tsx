@@ -1,4 +1,4 @@
-import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
+import ReleaseDataAccordion from '@common/modules/release/components/ReleaseDataAccordion';
 import { Release } from '@common/services/publicationService';
 import { FileInfo } from '@common/services/types/file';
 import { within } from '@testing-library/dom';
@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 
-describe('ReleaseDataAndFilesAccordion', () => {
+describe('ReleaseDataAccordion', () => {
   const testRelease = {
     id: 'r1',
     downloadFiles: [
@@ -64,7 +64,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
   test('renders the download all data button if files are available', () => {
     render(
-      <ReleaseDataAndFilesAccordion
+      <ReleaseDataAccordion
         release={testRelease}
         renderAllFilesButton={mockAllFilesButton}
         renderCreateTablesButton={mockCreateTablesButton}
@@ -87,7 +87,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
   test('does not render the download all data button if no files are available', () => {
     render(
-      <ReleaseDataAndFilesAccordion
+      <ReleaseDataAccordion
         release={{
           ...testRelease,
           downloadFiles: [],
@@ -113,7 +113,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
   test('renders the open data section', () => {
     render(
-      <ReleaseDataAndFilesAccordion
+      <ReleaseDataAccordion
         release={testRelease}
         renderAllFilesButton={mockAllFilesButton}
         renderCreateTablesButton={mockCreateTablesButton}
@@ -138,7 +138,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
   test('renders the download files list if showDataFileList is true', () => {
     render(
-      <ReleaseDataAndFilesAccordion
+      <ReleaseDataAccordion
         release={testRelease}
         renderAllFilesButton={mockAllFilesButton}
         renderCreateTablesButton={mockCreateTablesButton}
@@ -178,7 +178,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
   test('renders the data guidance section if guidance is available', () => {
     render(
-      <ReleaseDataAndFilesAccordion
+      <ReleaseDataAccordion
         release={testRelease}
         renderAllFilesButton={mockAllFilesButton}
         renderCreateTablesButton={mockCreateTablesButton}
@@ -203,7 +203,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
   test('does not render the data guidance section if guidance is not available', () => {
     render(
-      <ReleaseDataAndFilesAccordion
+      <ReleaseDataAccordion
         release={{
           ...testRelease,
           hasDataGuidance: false,
@@ -231,7 +231,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
   test('renders the create tables section', () => {
     render(
-      <ReleaseDataAndFilesAccordion
+      <ReleaseDataAccordion
         release={testRelease}
         renderAllFilesButton={mockAllFilesButton}
         renderCreateTablesButton={mockCreateTablesButton}
@@ -256,7 +256,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
   test('renders the ancillary files section if ancillary files are available', () => {
     render(
-      <ReleaseDataAndFilesAccordion
+      <ReleaseDataAccordion
         release={testRelease}
         renderAllFilesButton={mockAllFilesButton}
         renderCreateTablesButton={mockCreateTablesButton}
@@ -308,7 +308,7 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
   test('does not render the ancillary files section if no ancillary files are available', () => {
     render(
-      <ReleaseDataAndFilesAccordion
+      <ReleaseDataAccordion
         release={{ ...testRelease, downloadFiles: [] }}
         renderAllFilesButton={mockAllFilesButton}
         renderCreateTablesButton={mockCreateTablesButton}
@@ -330,6 +330,41 @@ describe('ReleaseDataAndFilesAccordion', () => {
 
     expect(
       screen.queryByText('List of all supporting files'),
+    ).not.toBeInTheDocument();
+  });
+
+  test('renders related dashboards', () => {
+    render(
+      <ReleaseDataAccordion
+        release={testRelease}
+        renderAllFilesButton={mockAllFilesButton}
+        renderCreateTablesButton={mockCreateTablesButton}
+        renderDataCatalogueLink={mockDataCatalogueLink}
+        renderDownloadLink={mockDownloadLink}
+        renderDataGuidanceLink={mockDataGuidanceLink}
+        renderRelatedDashboards={<p>Related dashboard content</p>}
+      />,
+    );
+
+    expect(screen.getByText('View related dashboard(s)')).toBeInTheDocument();
+
+    expect(screen.getByText('Related dashboard content')).toBeInTheDocument();
+  });
+
+  test('does not render related dashboards', () => {
+    render(
+      <ReleaseDataAccordion
+        release={testRelease}
+        renderAllFilesButton={mockAllFilesButton}
+        renderCreateTablesButton={mockCreateTablesButton}
+        renderDataCatalogueLink={mockDataCatalogueLink}
+        renderDownloadLink={mockDownloadLink}
+        renderDataGuidanceLink={mockDataGuidanceLink}
+      />,
+    );
+
+    expect(
+      screen.queryByText('View related dashboard(s)'),
     ).not.toBeInTheDocument();
   });
 });

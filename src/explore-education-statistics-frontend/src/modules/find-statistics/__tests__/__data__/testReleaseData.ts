@@ -198,6 +198,20 @@ export const testRelease: Release = {
     caption: '',
     content: [],
   },
+  relatedDashboardsSection: {
+    id: 'related-dashboards-id',
+    order: 0,
+    heading: '',
+    caption: '',
+    content: [
+      {
+        id: 'related-dashboards-content-block-id',
+        order: 0,
+        body: 'Related dashboards test text',
+        type: 'HtmlBlock',
+      },
+    ],
+  },
   downloadFiles: [],
   relatedInformation: [],
 };
