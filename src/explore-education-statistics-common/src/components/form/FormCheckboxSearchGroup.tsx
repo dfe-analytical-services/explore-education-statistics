@@ -36,9 +36,12 @@ const FormCheckboxSearchGroup = ({
     onFieldsetFocus,
     onFieldsetBlur,
     options = [],
+    searchOnly = false,
     value = [],
     ...groupProps
   } = props;
+
+  const minSearchCharacters = searchOnly ? 3 : 0;
 
   const fieldsetProps: FormFieldsetProps = {
     id,
@@ -51,14 +54,27 @@ const FormCheckboxSearchGroup = ({
     onBlur: onFieldsetBlur,
   };
 
-  let filteredOptions = options;
+  let filteredOptions = searchOnly
+    ? options.filter(option => value.includes(option.value))
+    : options;
 
   if (searchTerm) {
-    filteredOptions = options.filter(
-      option =>
-        option.label.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        value.indexOf(option.value) > -1,
-    );
+    // Search for URN in the hint field if search term is a number.
+    if (searchOnly && !Number.isNaN(Number(searchTerm))) {
+      filteredOptions = options.filter(
+        option =>
+          option.hint?.toString().includes(searchTerm) ||
+          value.includes(option.value),
+      );
+    } else {
+      filteredOptions = options.filter(
+        option =>
+          option.label
+            .toLowerCase()
+            .includes(searchTerm.trim().toLowerCase()) ||
+          value.includes(option.value),
+      );
+    }
   }
 
   return (
@@ -68,7 +84,14 @@ const FormCheckboxSearchGroup = ({
         name={`${name}-search`}
         label={searchLabel}
         width={20}
-        onChange={event => setSearchTerm(event.target.value)}
+        onChange={event => {
+          if (
+            event.target.value.length >= minSearchCharacters ||
+            !event.target.value.length
+          ) {
+            setSearchTerm(event.target.value);
+          }
+        }}
         onKeyPress={event => {
           if (event.key === 'Enter') {
             event.preventDefault();
@@ -76,13 +99,25 @@ const FormCheckboxSearchGroup = ({
         }}
       />
 
-      <div aria-live="assertive" className={styles.optionsContainer}>
+      <div className={styles.optionsContainer}>
+        {filteredOptions.length > 0 && (
+          <span
+            aria-live="polite"
+            aria-atomic
+            className="govuk-visually-hidden"
+          >
+            {`${filteredOptions.length} option${
+              filteredOptions.length > 1 ? 's' : ''
+            } found`}
+          </span>
+        )}
         <BaseFormCheckboxGroup
           {...groupProps}
           id={`${id}-options`}
           value={value}
           name={name}
           options={filteredOptions}
+          searchOnly
           small
         />
       </div>

@@ -290,4 +290,62 @@ describe('FormCheckboxGroup', () => {
       'test-checkboxes-opt-4-is---here',
     );
   });
+
+  test('renders the no options message when there are no options', () => {
+    render(
+      <FormCheckboxGroup
+        value={[]}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        selectAll
+        options={[]}
+      />,
+    );
+
+    expect(screen.getByText('No options available.')).toBeInTheDocument();
+  });
+
+  test('renders the search help text there are no options and searchOnly is true', () => {
+    render(
+      <FormCheckboxGroup
+        value={[]}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        searchOnly
+        searchHelpText="This is the help text"
+        selectAll
+        options={[]}
+      />,
+    );
+
+    expect(screen.getByText('This is the help text')).toBeInTheDocument();
+  });
+
+  test('renders the too many results message when searchOnly is true and there are more than the maximum results', () => {
+    render(
+      <FormCheckboxGroup
+        value={[]}
+        id="test-checkboxes"
+        name="test-checkboxes"
+        legend="Test checkboxes"
+        maxResults={2}
+        searchOnly
+        searchHelpText="This is the help text"
+        selectAll
+        options={[
+          { id: 'checkbox-1', label: 'Test checkbox 1', value: '1' },
+          { id: 'checkbox-2', label: 'Test checkbox 2', value: '2' },
+          { id: 'checkbox-3', label: 'Test checkbox 3', value: '3' },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        '3 results found. Please refine your search to view options.',
+      ),
+    ).toBeInTheDocument();
+  });
 });

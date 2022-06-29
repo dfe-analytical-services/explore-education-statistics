@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import FormCheckboxSearchGroup from '../FormCheckboxSearchGroup';
@@ -6,6 +6,9 @@ import FormCheckboxSearchGroup from '../FormCheckboxSearchGroup';
 jest.mock('lodash/debounce');
 
 describe('FormCheckboxSearchGroup', () => {
+  afterEach(() => {
+    jest.useRealTimers();
+  });
   test('renders list of checkboxes in correct order', () => {
     const { container } = render(
       <FormCheckboxSearchGroup
@@ -129,5 +132,149 @@ describe('FormCheckboxSearchGroup', () => {
     expect(checkboxes).toHaveLength(2);
     expect(checkboxes[0]).toHaveAttribute('value', '1');
     expect(checkboxes[1]).toHaveAttribute('value', '2');
+  });
+
+  describe('with searchOnly', () => {
+    const testSearchOnlyOptions = [
+      {
+        label: 'Test checkbox 1',
+        value: '1',
+        hint: 'URN: 000001; Local authority: LA 1',
+      },
+      {
+        label: 'Test checkbox 2',
+        value: '2',
+        hint: 'URN: 000002; Local authority: LA 1',
+      },
+      {
+        label: 'Test checkbox 3',
+        value: '3',
+        hint: 'URN: 000003; Local authority: LA 1',
+      },
+      {
+        label: 'Test 4',
+        value: '4',
+        hint: 'URN: 000004; Local authority: LA 1',
+      },
+    ];
+    test('does not render the checkboxes by default', () => {
+      render(
+        <FormCheckboxSearchGroup
+          name="testCheckboxes"
+          id="test-checkboxes"
+          legend="Choose options"
+          searchLabel="Search options"
+          searchOnly
+          value={[]}
+          options={testSearchOnlyOptions}
+        />,
+      );
+
+      expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    });
+
+    test('renders checkboxes for selected options', () => {
+      render(
+        <FormCheckboxSearchGroup
+          name="testCheckboxes"
+          id="test-checkboxes"
+          legend="Choose options"
+          searchLabel="Search options"
+          searchOnly
+          value={['2']}
+          options={testSearchOnlyOptions}
+        />,
+      );
+
+      const checkboxes = screen.getAllByRole('checkbox');
+      expect(checkboxes).toHaveLength(1);
+      expect(checkboxes[0]).toHaveAttribute('value', '2');
+      expect(checkboxes[0]).toEqual(screen.getByLabelText('Test checkbox 2'));
+      expect(checkboxes[0]).toBeChecked();
+    });
+
+    test('renders checkboxes that match the search term', async () => {
+      render(
+        <FormCheckboxSearchGroup
+          name="testCheckboxes"
+          id="test-checkboxes"
+          legend="Choose options"
+          searchLabel="Search options"
+          searchOnly
+          value={[]}
+          options={testSearchOnlyOptions}
+        />,
+      );
+
+      const searchInput = screen.getByLabelText('Search options');
+      userEvent.type(searchInput, 'checkbox');
+
+      await waitFor(() => {
+        expect(screen.getByText('3 options found')).toBeInTheDocument();
+      });
+
+      const checkboxes = screen.getAllByRole('checkbox');
+      expect(checkboxes).toHaveLength(3);
+      expect(checkboxes[0]).toHaveAttribute('value', '1');
+      expect(checkboxes[0]).toEqual(screen.getByLabelText('Test checkbox 1'));
+      expect(checkboxes[0]).not.toBeChecked();
+
+      expect(checkboxes[1]).toHaveAttribute('value', '2');
+      expect(checkboxes[1]).toEqual(screen.getByLabelText('Test checkbox 2'));
+      expect(checkboxes[1]).not.toBeChecked();
+
+      expect(checkboxes[2]).toHaveAttribute('value', '3');
+      expect(checkboxes[2]).toEqual(screen.getByLabelText('Test checkbox 3'));
+      expect(checkboxes[1]).not.toBeChecked();
+    });
+
+    test('renders checkboxes where the URN in the hint matches the search term', async () => {
+      render(
+        <FormCheckboxSearchGroup
+          name="testCheckboxes"
+          id="test-checkboxes"
+          legend="Choose options"
+          searchLabel="Search options"
+          searchOnly
+          value={[]}
+          options={testSearchOnlyOptions}
+        />,
+      );
+
+      const searchInput = screen.getByLabelText('Search options');
+      userEvent.type(searchInput, '000002');
+
+      await waitFor(() => {
+        expect(screen.getByText('1 option found')).toBeInTheDocument();
+      });
+
+      const checkboxes = screen.getAllByRole('checkbox');
+
+      expect(checkboxes[0]).toHaveAttribute('value', '2');
+      expect(checkboxes[0]).toEqual(screen.getByLabelText('Test checkbox 2'));
+      expect(checkboxes[0]).not.toBeChecked();
+    });
+
+    test('does not search when the search term has fewer than 3 characters', async () => {
+      jest.useFakeTimers();
+      render(
+        <FormCheckboxSearchGroup
+          name="testCheckboxes"
+          id="test-checkboxes"
+          legend="Choose options"
+          searchLabel="Search options"
+          searchOnly
+          value={[]}
+          options={testSearchOnlyOptions}
+        />,
+      );
+
+      const searchInput = screen.getByLabelText('Search options');
+      await userEvent.type(searchInput, 'ch');
+
+      jest.runAllTimers();
+
+      expect(screen.queryAllByRole('checkbox')).toHaveLength(0);
+    });
   });
 });
