@@ -115,6 +115,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             {
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "Explore education statistics - Data API", Version = "v1"});
             });
+            
+            //
+            // Services
+            //
+
+            var storageSupportsBatchDeletes =
+                Configuration.GetValue<bool>("StorageSupportsBatchDeletes", defaultValue: true);
+            var publicStorageConnectionString = Configuration.GetValue<string>("PublicStorage");
+
 
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
@@ -129,19 +138,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IResultSubjectMetaService, ResultSubjectMetaService>();
             services.AddTransient<ISubjectMetaService, SubjectMetaService>();
             services.AddSingleton<IBlobStorageService, BlobStorageService>(provider =>
-                {
-                    var connectionString = Configuration.GetValue<string>("PublicStorage");
-
-                    return new BlobStorageService(
-                        connectionString,
-                        new BlobServiceClient(connectionString),
-                        provider.GetRequiredService<ILogger<BlobStorageService>>(),
+                new BlobStorageService(
+                        publicStorageConnectionString,
+                        new BlobServiceClient(publicStorageConnectionString),
+                        provider.GetRequiredService<ILogger<BlobStorageService>>()),
                         new StorageInstanceCreationUtil()
-                    );
-                }
             );
             services.AddTransient<IFilterItemRepository, FilterItemRepository>();
-            services.AddTransient<IFilterRepository, FilterRepository>();
+            ser            services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IFootnoteRepository, FootnoteRepository>();
             services.AddTransient<IGeoJsonRepository, GeoJsonRepository>();
             services.AddTransient<IIndicatorGroupRepository, IndicatorGroupRepository>();
@@ -155,8 +159,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IDataGuidanceSubjectService, DataGuidanceSubjectService>();
             services.AddTransient<ITimePeriodService, TimePeriodService>();
             services.AddTransient<IPermalinkService, PermalinkService>();
-            services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
-            services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
+            services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoungeService>(_ =>
+                new TableStorageService(publicStorageConnectionString, storageSupportsBatchDeletes));
+ publicStorageConnectionStringce>(_ =>
+                new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
 

@@ -403,6 +403,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
              * Services
              */
 
+            var storageSupportsBatchDeletes =
+                Configuration.GetValue<bool>("StorageSupportsBatchDeletes", defaultValue: true);
+            var coreStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
+            var publisherStorageConnectionString = Configuration.GetValue<string>("PublisherStorage");
+
+
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             
             // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.
@@ -437,7 +443,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 new PublishingService(
                     provider.GetService<IPersistenceHelper<ContentDbContext>>(),
                     new StorageQueueService(
-                        Configuration.GetValue<string>("PublisherStorage"),
+                        publisherStorageConnectionString,
                         new StorageInstanceCreationUtil()),
                     provider.GetService<IUserService>(),
                     provider.GetRequiredService<ILogger<PublishingService>>()));
@@ -447,12 +453,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     s.GetService<IUserService>(),
                     s.GetService<IPersistenceHelper<ContentDbContext>>(),
                     new TableStorageService(
-                        Configuration.GetValue<string>("PublisherStorage"),
-                        new StorageInstanceCreationUtil())));
+                        publisherStorageConnectionString,
+                        new StorageInstanceCreationUtil());
             services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>(s =>
                 new ReleasePublishingStatusRepository(
                     new TableStorageService(
-                        Configuration.GetValue<string>("PublisherStorage"),
+                        publisherStorageConnectionString,
                         new StorageInstanceCreationUtil())
                 )
             );
@@ -581,11 +587,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient(provider => GetBlobStorageService(provider, "CoreStorage"));
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
                 new TableStorageService(
-                    Configuration.GetValue<string>("CoreStorage"),
+                    coreStorageConnectionString,
                     new StorageInstanceCreationUtil()));
             services.AddTransient<IStorageQueueService, StorageQueueService>(s =>
                 new StorageQueueService(
-                    Configuration.GetValue<string>("CoreStorage"),
+                    coreStorageConnectionString,
                     new StorageInstanceCreationUtil()));
             services.AddTransient<IDataBlockMigrationService, DataBlockMigrationService>();
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
