@@ -1,4 +1,9 @@
-export default {
+const testData = {
+  themeName: 'UI test theme - Performance tests',
+  topicName: 'UI test topic - Performance tests',
+  maxImportWaitTimeMillis: 2 * 60 * 60 * 1000,
+};
+export default testData;
   themeName: 'UI test theme - Performance tests',
   topicName: 'UI test topic - Performance tests',
   maxImportWaitTimeMillis: 2 * 60 * 60 * 1000,
