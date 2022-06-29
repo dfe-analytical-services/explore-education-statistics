@@ -145,7 +145,9 @@ These are already bootstrapped with seed data to run tests and start the project
 This data will need to be loaded into SQL Server:
 
 - Using Docker - copy the `ees-mssql` directory into the project's `data` directory. You **must** 
-  give all OS users full access to this directory i.e. in Linux, set the directory to `777` permissions.
+  give all OS users appropriate access to this directory i.e. in Linux, run 
+ `sudo chown -R 10001 /path/to/ees-mssql` to give the default Docker user (with id 10001) appropriate 
+  permissions.
   
   This is necessary to give the Docker container the right permissions to modify the directory contents.
   
@@ -154,8 +156,15 @@ This data will need to be loaded into SQL Server:
 #### Use a bare database
 
 The service can be started against a set of non-existent database. If no pre-existing `content` or 
-`statistics` databases yet exist on the target SQL Server instance, starting up the service will 
-create them and provide the basic starting data to get up and running.
+`statistics` databases yet exist on the target SQL Server instance:
+
+1. Create empty `content` and `statistics` databases.
+2. Create the users necessary to access the databases using the 
+[Create Database Users script](useful-scripts/sql/database-users/create-new-database-users.sql).
+3. Assign permissions to the correct users to the Content database using the 
+[Content database permissions script](useful-scripts/sql/database-users/assign-permissions-for-content-db.sql).
+4. Assign permissions to the correct users to the Content database using the
+[Content database permissions script](useful-scripts/sql/database-users/assign-permissions-for-statistics-db.sql).
 
 ### Running a different identity provider (optional)
 

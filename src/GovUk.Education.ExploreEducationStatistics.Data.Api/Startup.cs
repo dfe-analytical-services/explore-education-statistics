@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics.CodeAnalysis;
 using AutoMapper;
 using Azure.Storage.Blobs;
@@ -193,12 +193,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
         {
             // Enable caching and register any caching services.
             CacheAspect.Enabled = true;
-            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
+            BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>()!);
             // Enable cancellation aspects and register request timeout configuration.
             CancellationTokenTimeoutAspect.Enabled = true;
             CancellationTokenTimeoutAttribute.SetTimeoutConfiguration(Configuration.GetSection("RequestTimeouts"));
-
-            UpdateDatabase(app);
 
             if (env.IsDevelopment())
             {
@@ -239,19 +237,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
 
             app.UseMvc();
             app.UseHealthChecks("/api/health");
-        }
-
-        private static void UpdateDatabase(IApplicationBuilder app)
-        {
-            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>()
-                .CreateScope())
-            {
-                using (var context = serviceScope.ServiceProvider.GetService<StatisticsDbContext>())
-                {
-                    context.Database.SetCommandTimeout(int.MaxValue);
-                    context.Database.Migrate();
-                }
-            }
         }
     }
 }
