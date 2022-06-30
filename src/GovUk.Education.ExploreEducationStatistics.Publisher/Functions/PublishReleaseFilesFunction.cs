@@ -75,11 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             try
             {
-                if (immediate)
-                {
-                    await _queueService.QueuePublishReleaseDataMessagesAsync(published);
-                }
-                else
+                if (!immediate)
                 {
                     await _queueService.QueueGenerateReleaseContentMessageAsync(published);
                 }

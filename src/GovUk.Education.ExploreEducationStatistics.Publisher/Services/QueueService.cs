@@ -50,24 +50,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 ReleasePublishingStatusContentStage.Queued);
         }
 
-        public Task QueuePublishReleaseDataMessageAsync(Guid releaseId, Guid releaseStatusId)
-        {
-            return QueuePublishReleaseDataMessagesAsync(new[] {(releaseId, releaseStatusId)});
-        }
-
-        public async Task QueuePublishReleaseDataMessagesAsync(
-            IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
-        {
-            foreach (var (releaseId, releaseStatusId) in releases)
-            {
-                _logger.LogInformation("Queuing data message for release: {0}", releaseId);
-                await _storageQueueService.AddMessageAsync(
-                    PublishReleaseDataQueue, new PublishReleaseDataMessage(releaseId, releaseStatusId));
-                await _releasePublishingStatusService.UpdateDataStageAsync(releaseId, releaseStatusId,
-                    ReleasePublishingStatusDataStage.Queued);
-            }
-        }
-
         public Task QueuePublishReleaseFilesMessageAsync(Guid releaseId, Guid releaseStatusId)
         {
             return QueuePublishReleaseFilesMessageAsync(new[] {(releaseId, releaseStatusId)});

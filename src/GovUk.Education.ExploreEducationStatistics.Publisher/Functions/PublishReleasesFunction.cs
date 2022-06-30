@@ -59,10 +59,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 {
                     await _releasePublishingStatusService.UpdateStateAsync(releaseId, releaseStatusId,
                         ScheduledReleaseStartedState);
+                    
+                    // TODO DW - EES-3369 - remove ReleasePublishingStatusDataStage completely
+                    await _releasePublishingStatusService.UpdateDataStageAsync(releaseId, releaseStatusId, 
+                        ReleasePublishingStatusDataStage.Complete);
                 }
 
                 await _queueService.QueuePublishReleaseFilesMessageAsync(scheduled);
-                await _queueService.QueuePublishReleaseDataMessagesAsync(scheduled);
             }
         }
 

@@ -450,14 +450,6 @@
       }
     },
 
-    "publishReleaseDataFunctionDisabled": {
-      "type": "string",
-      "defaultValue": "false",
-      "metadata": {
-        "description": "Disable the Publish Release Data Function in the Publisher App which triggers the Datafactory pipeline"
-      }
-    },
-
     "preReleaseMinutesBeforeStart": {
       "type": "int",
       "defaultValue": 870,
@@ -484,14 +476,6 @@
       "type": "string",
       "metadata": {
         "description": "Publisher Active Directory Application Client secret used to prove its identity during authentication requests"
-      }
-    },
-
-    "publisherPipelineName": {
-      "type": "string",
-      "defaultValue": "pl_release_statistics",
-      "metadata": {
-        "description": "Name of pipeline used by the Datafactory in the Publish Release Data Function in the Publisher App"
       }
     },
     "blobDeleteRetentionEnabled": {
@@ -660,12 +644,7 @@
       "metadata": {
         "description": "Slack webhook URI for alerts"
       }
-    },
-    "dataFactoryConcurrency": {
-      "type": "int",
-      "defaultValue": 1
     }
-  },
   "variables": {
     "dataAppName": "[concat(parameters('subscription'), '-as-', parameters('environment'), '-data')]",
     "dataPlanName": "[concat(parameters('subscription'), '-asp-', parameters('environment'), '-data')]",
@@ -705,50 +684,6 @@
     "logicAppSlackAlerts": "[concat(parameters('subscription'), '-la-', parameters('environment'), '-slackwebhook')]",
     "actionGroupAlerts": "[concat(parameters('subscription'), '-ag-', parameters('environment'), '-alertedusers')]",
     "metricAlerts": [
-      //{
-      //  "name": "[concat(parameters('subscription'),'AdminAppServiceHttpServiceErrors')]",
-      //  "description": "Admin App Service - Http Service Errors",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('adminAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "Http5xx",
-      //  "threshold": 0,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Total",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'DataAppServiceHttpServiceErrors')]",
-      //  "description": "Data App Service - Http Service Errors",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('dataAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "Http5xx",
-      //  "threshold": 5,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Total",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'ContentAppServiceHttpServiceErrors')]",
-      //  "description": "Content App Service - Http Service Errors",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('contentAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "Http5xx",
-      //  "threshold": 2,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Total",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
-      //{
-      //  "name": "[concat(parameters('subscription'),'PublicAppServiceHttpServiceErrors')]",
-      //  "description": "Public App Service - Http Service Errors",
-      //  "resourceId": "[resourceId('Microsoft.Web/sites', variables('publicAppName'))]",
-      //  "resourceType": "Microsoft.Web/sites",
-      //  "metricName": "Http5xx",
-      //  "threshold": 15,
-      //  "operator": "GreaterThan",
-      //  "timeAggregation": "Total",
-      //  "criterionType": "StaticThresholdCriterion"
-      //},
       {
         "name": "[concat(parameters('subscription'),'ImporterAppServiceHttpServiceErrors')]",
         "description": "Importer App Service - Http Service Errors",
@@ -1187,7 +1122,6 @@
       }
     ],
 
-    "dataFactoryName": "[concat(parameters('subscription'), '-df-', parameters('environment'), '-release')]",
     "keyVaultName": "[concat(parameters('subscription'), '-kv-', parameters('environment'), '-01')]",
 
     "ees-notify-apikey": "[resourceId('Microsoft.KeyVault/vaults/secrets', variables('keyVaultName'), 'ees-notify-apikey')]",
@@ -3225,13 +3159,10 @@
       "properties": {
         "AzureWebJobsDashboard": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
         "AzureWebJobsStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher')).secretUriWithVersion, ')')]",
-        "AzureWebJobs.PublishReleaseData.Disabled": "[parameters('publishReleaseDataFunctionDisabled')]",
         "PublishReleasesCronSchedule": "[parameters('publishReleasesCronSchedule')]",
         "PublishReleaseContentCronSchedule": "[parameters('publishReleaseContentCronSchedule')]",
         "ClientId": "[parameters('publisherClientId')]",
         "ClientSecret": "[parameters('publisherClientSecret')]",
-        "DataFactoryName": "[variables('dataFactoryName')]",
-        "PipelineName": "[parameters('publisherPipelineName')]",
         "ResourceGroupName": "[resourceGroup().name]",
         "SubscriptionId": "[subscription().subscriptionId]",
         "TenantId": "[subscription().tenantId]",
@@ -3526,54 +3457,6 @@
       }
     },
     {
-      "name": "datafactory",
-      "type": "Microsoft.Resources/deployments",
-      "apiVersion": "2017-05-10",
-      "properties": {
-        "mode": "incremental",
-        "templateLink": {
-          "uri": "[concat(variables('templateBaseUrl'), 'datafactory/template.json')]",
-          "contentVersion": "1.0.0.0"
-        },
-        "parameters": {
-          "subscription": {
-            "value": "[parameters('subscription')]"
-          },
-          "environment": {
-            "value": "[parameters('environment')]"
-          },
-          "publisherAppName": {
-            "value": "[variables('publisherAppName')]"
-          },
-          "dataFactoryName": {
-            "value": "[variables('dataFactoryName')]"
-          },
-          "dataFactoryConcurrency": {
-            "value": "[parameters('dataFactoryConcurrency')]"
-          },
-          "keyVaultName": {
-            "value": "[variables('keyVaultName')]"
-          },
-          "branch": {
-            "value": "[parameters('branch')]"
-          },
-          "actionGroupAlerts": {
-            "value": "[variables('actionGroupAlerts')]"
-          },
-          "enableAlerts": {
-            "value": "[parameters('enableAlerts')]"
-          }
-        }
-      },
-      "dependsOn": [
-        "[resourceId('Microsoft.Sql/servers', variables('sqlserverName'))]",
-        "[resourceId('Microsoft.Sql/servers', variables('publicSqlServerName'))]",
-        "[resourceId('Microsoft.Web/sites', variables('publisherAppName'))]",
-        "[resourceId('Microsoft.KeyVault/vaults/', variables('keyVaultName'))]",
-        "[resourceId('microsoft.insights/actionGroups', variables('actionGroupAlerts'))]"
-      ]
-    },
-    {
       "name": "[variables('keyVaultName')]",
       "type": "Microsoft.KeyVault/vaults",
       "apiVersion": "2016-10-01",
@@ -3602,20 +3485,6 @@
         "enabledForTemplateDeployment": true,
         "enableSoftDelete": true,
         "accessPolicies": [
-          {
-            "tenantId": "[subscription().tenantId]",
-            "objectId": "[reference(concat('Microsoft.DataFactory/factories/', variables('dataFactoryName')), '2018-06-01', 'Full').identity.principalId]",
-            "permissions": {
-              "keys": [
-              ],
-              "secrets": [
-                "Get",
-                "List"
-              ],
-              "certificates": [
-              ]
-            }
-          },
           {
             "tenantId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').tenantId]",
             "objectId": "[reference(concat('Microsoft.Web/sites/', variables('adminAppName'), '/providers/Microsoft.ManagedIdentity/Identities/default'), '2015-08-31-PREVIEW').principalId]",

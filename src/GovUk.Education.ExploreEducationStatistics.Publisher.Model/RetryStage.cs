@@ -23,6 +23,5 @@
     public enum RetryStage
     {
         ContentAndPublishing,
-        StatisticsData
     }
 }

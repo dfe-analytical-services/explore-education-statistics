@@ -68,14 +68,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }
                 else
                 {
+                    // TODO DW - EES-3369 - remove switch and enum completely
                     switch (message.Stage)
                     {
                         case ContentAndPublishing:
                             await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId,
-                                releaseStatus.Id);
-                            break;
-                        case StatisticsData:
-                            await _queueService.QueuePublishReleaseDataMessageAsync(message.ReleaseId,
                                 releaseStatus.Id);
                             break;
                         default:

@@ -155,9 +155,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         Cancelled,
         Complete,
         Failed,
-        Queued,
         NotStarted,
-        Started
     }
 
     public enum ReleasePublishingStatusFilesStage
