@@ -16,8 +16,6 @@ import releaseDataFileService, {
   DataFileImportStatus,
   DeleteDataFilePlan,
 } from '@admin/services/releaseDataFileService';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import ButtonText from '@common/components/ButtonText';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import InsetText from '@common/components/InsetText';
@@ -29,9 +27,12 @@ import logger from '@common/services/logger';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
-import orderBy from 'lodash/orderBy';
 import React, { useCallback, useState } from 'react';
 import { generatePath } from 'react-router';
+import EditableAccordion from '@admin/components/editable/EditableAccordion';
+import EditableAccordionSection from '@admin/components/editable/EditableAccordionSection';
+import { EditingContextProvider } from '@admin/contexts/EditingContext';
+import { Dictionary } from '@common/types';
 
 interface FormValues extends DataFileUploadFormValues {
   subjectTitle: string;
@@ -144,7 +145,7 @@ const ReleaseDataUploadsSection = ({
         });
       }
       setActiveFileId(file.id);
-      setDataFiles(orderBy([...dataFiles, file], dataFile => dataFile.title));
+      setDataFiles([...dataFiles, file]);
     },
     [dataFiles, releaseId, setDataFiles],
   );
@@ -233,84 +234,115 @@ const ReleaseDataUploadsSection = ({
 
       <LoadingSpinner loading={isLoading}>
         {dataFiles.length > 0 ? (
-          <Accordion id="uploadedDataFiles">
-            {dataFiles.map(dataFile => (
-              <AccordionSection
-                id={dataFile.id}
-                key={dataFile.title}
-                heading={dataFile.title}
-                headingTag="h3"
-                open={dataFile.id === activeFileId}
-              >
-                <div style={{ position: 'relative' }}>
-                  {dataFile.isDeleting && (
-                    <LoadingSpinner text="Deleting files" overlay />
-                  )}
-                  <DataFileDetailsTable
-                    dataFile={dataFile}
-                    releaseId={releaseId}
-                    onStatusChange={handleStatusChange}
-                  >
-                    {canUpdateRelease &&
-                      terminalImportStatuses.includes(dataFile.status) && (
-                        <>
-                          {dataFile.status === 'COMPLETE' && (
-                            <>
-                              <Link
-                                className="govuk-!-margin-right-4"
-                                to={generatePath<ReleaseDataFileRouteParams>(
-                                  releaseDataFileRoute.path,
-                                  {
+          <EditingContextProvider editingMode="edit">
+            <EditableAccordion
+              id="uploadedDataFiles"
+              onReorder={async (fileIds: string[]) => {
+                const order = fileIds.reduce<Dictionary<number>>(
+                  (acc, fileId, newIndex) => {
+                    acc[fileId] = newIndex;
+                    return acc;
+                  },
+                  {},
+                );
+                await releaseDataFileService.updateDataFilesOrder(
+                  releaseId,
+                  order,
+                );
+
+                // @MarkFix Doesn't like it if we pass the result of the PUT to setDataFiles so we do this
+                const dataFilesReordered: DataFile[] = dataFiles.sort(
+                  (a, b) => {
+                    if (fileIds.indexOf(a.id) > fileIds.indexOf(b.id)) {
+                      return 1;
+                    }
+                    if (fileIds.indexOf(a.id) < fileIds.indexOf(b.id)) {
+                      return -1;
+                    }
+                    return 0;
+                  },
+                );
+                setDataFiles(dataFilesReordered);
+              }}
+            >
+              {dataFiles.map(dataFile => (
+                <EditableAccordionSection
+                  id={dataFile.id}
+                  key={dataFile.title}
+                  heading={dataFile.title}
+                  headingTag="h3"
+                  open={dataFile.id === activeFileId}
+                >
+                  <div style={{ position: 'relative' }}>
+                    {dataFile.isDeleting && (
+                      <LoadingSpinner text="Deleting files" overlay />
+                    )}
+                    <DataFileDetailsTable
+                      dataFile={dataFile}
+                      releaseId={releaseId}
+                      onStatusChange={handleStatusChange}
+                    >
+                      {canUpdateRelease &&
+                        terminalImportStatuses.includes(dataFile.status) && (
+                          <>
+                            {dataFile.status === 'COMPLETE' && (
+                              <>
+                                <Link
+                                  className="govuk-!-margin-right-4"
+                                  to={generatePath<ReleaseDataFileRouteParams>(
+                                    releaseDataFileRoute.path,
+                                    {
+                                      publicationId,
+                                      releaseId,
+                                      fileId: dataFile.id,
+                                    },
+                                  )}
+                                >
+                                  Edit title
+                                </Link>
+                                <Link
+                                  className="govuk-!-margin-right-4"
+                                  to={generatePath<
+                                    ReleaseDataFileReplaceRouteParams
+                                  >(releaseDataFileReplaceRoute.path, {
                                     publicationId,
                                     releaseId,
                                     fileId: dataFile.id,
-                                  },
-                                )}
-                              >
-                                Edit title
-                              </Link>
-                              <Link
-                                className="govuk-!-margin-right-4"
-                                to={generatePath<
-                                  ReleaseDataFileReplaceRouteParams
-                                >(releaseDataFileReplaceRoute.path, {
-                                  publicationId,
-                                  releaseId,
-                                  fileId: dataFile.id,
-                                })}
-                              >
-                                Replace data
-                              </Link>
-                            </>
-                          )}
+                                  })}
+                                >
+                                  Replace data
+                                </Link>
+                              </>
+                            )}
 
-                          <ButtonText
-                            onClick={() =>
-                              releaseDataFileService
-                                .getDeleteDataFilePlan(releaseId, dataFile)
-                                .then(plan => {
-                                  setDeleteDataFile({
-                                    plan,
-                                    file: dataFile,
-                                  });
-                                })
-                            }
-                          >
-                            Delete files
-                          </ButtonText>
-                        </>
+                            <ButtonText
+                              onClick={() =>
+                                releaseDataFileService
+                                  .getDeleteDataFilePlan(releaseId, dataFile)
+                                  .then(plan => {
+                                    setDeleteDataFile({
+                                      plan,
+                                      file: dataFile,
+                                    });
+                                  })
+                              }
+                            >
+                              Delete files
+                            </ButtonText>
+                          </>
+                        )}
+                      {dataFile.permissions.canCancelImport && (
+                        <DataUploadCancelButton
+                          releaseId={releaseId}
+                          fileId={dataFile.id}
+                        />
                       )}
-                    {dataFile.permissions.canCancelImport && (
-                      <DataUploadCancelButton
-                        releaseId={releaseId}
-                        fileId={dataFile.id}
-                      />
-                    )}
-                  </DataFileDetailsTable>
-                </div>
-              </AccordionSection>
-            ))}
-          </Accordion>
+                    </DataFileDetailsTable>
+                  </div>
+                </EditableAccordionSection>
+              ))}
+            </EditableAccordion>
+          </EditingContextProvider>
         ) : (
           <InsetText>No data files have been uploaded.</InsetText>
         )}

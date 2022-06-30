@@ -24,7 +24,7 @@ import {
 export interface EditableAccordionProps
   extends OmitStrict<AccordionProps, 'openAll'> {
   sectionName?: string;
-  onAddSection: () => void;
+  onAddSection?: () => void;
   onReorder: (sectionIds: string[]) => void;
 }
 
@@ -129,15 +129,17 @@ const EditableAccordion = (props: EditableAccordionProps) => {
         </Droppable>
       </DragDropContext>
 
-      <div>
-        <Button
-          onClick={onAddSection}
-          className={styles.addSectionButton}
-          disabled={isReordering}
-        >
-          Add new section
-        </Button>
-      </div>
+      {onAddSection && (
+        <div>
+          <Button
+            onClick={onAddSection}
+            className={styles.addSectionButton}
+            disabled={isReordering}
+          >
+            Add new section
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

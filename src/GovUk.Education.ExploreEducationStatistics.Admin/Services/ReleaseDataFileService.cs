@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(release => _userService.CheckCanUpdateRelease(release))
-                .OnSuccess(async release =>
+                .OnSuccess(async _ =>
                 {
                     var releaseFiles = await _contentDbContext.ReleaseFiles
                         .Include(releaseFile => releaseFile.File)
@@ -198,9 +198,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     newOrder.ToList().ForEach(kvp =>
                     {
-                        var (releaseFileId, order) = kvp;
+                        var (fileId, order) = kvp;
                         var matchingReleaseFile = releaseFiles
-                            .Find(releaseFile => releaseFile.Id == releaseFileId);
+                            .Find(releaseFile => releaseFile.FileId == fileId);
                         if (matchingReleaseFile is not null)
                         {
                             matchingReleaseFile.Order = order;
