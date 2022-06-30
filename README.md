@@ -145,13 +145,16 @@ These are already bootstrapped with seed data to run tests and start the project
 This data will need to be loaded into SQL Server:
 
 - Using Docker - copy the `ees-mssql` directory into the project's `data` directory. You **must** 
-  give all OS users appropriate access to this directory i.e. in Linux, run 
- `sudo chown -R 10001 /path/to/ees-mssql` to give the default Docker user (with id 10001) appropriate 
-  permissions.
-  
-  This is necessary to give the Docker container the right permissions to modify the directory contents.
-  
-- Using Windows - attach the database using SQL Management Studio.
+  give all OS users appropriate access to this directory.
+  - In Linux:
+    - The ees-mssql folder needs to be present in an unencrypted folder / partition. The 
+      `ees-mssql` folder in the uneencrypted location can then be symlinked in to the `data` folder
+      using `ln -s /path/to/unencrypted/ees-mssql /path/to/ees/data/ees-mssql`.
+    - The Docker container user needs ownership fo the ees-mssql folder. Run  
+    `sudo chown -R 10001 /path/to/ees-mssql` to give this Docker user (with id 10001) appropriate 
+     permissions.
+  - In Windows
+    - Attach the database using SQL Management Studio.
 
 #### Use a bare database
 
@@ -161,9 +164,19 @@ The service can be started against a set of non-existent database. If no pre-exi
 1. Create empty `content` and `statistics` databases.
 2. Create the users necessary to access the databases using the 
 [Create Database Users script](useful-scripts/sql/database-users/create-new-database-users.sql).
-3. Assign permissions to the correct users to the Content database using the 
+3. Assign permissions for the `adminapp` user to allow the database migrations to run against the
+empty `content` database by running the
+[Admin app Content database permissions script](useful-scripts/sql/database-users/assign-adminapp-permissions-for-content-db.sql)
+against the `content` database.
+4. Assign permissions for the `adminapp` user to allow the database migrations to run against the
+   empty `statistics` database by running the
+[Admin app Statistics database permissions script](useful-scripts/sql/database-users/assign-adminapp-permissions-for-statistics-db.sql)
+against the `statistics` database.
+5. Start up the Admin API alone, to allow database migrations to run and schema to be updated to the
+latest version.
+6. Assign permissions to the correct users to the Content database using the 
 [Content database permissions script](useful-scripts/sql/database-users/assign-permissions-for-content-db.sql).
-4. Assign permissions to the correct users to the Content database using the
+7. Assign permissions to the correct users to the Content database using the
 [Content database permissions script](useful-scripts/sql/database-users/assign-permissions-for-statistics-db.sql).
 
 ### Running a different identity provider (optional)

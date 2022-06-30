@@ -1,20 +1,12 @@
 --
 -- User permissions for the STATISTICS database
 --
-CREATE USER [adminapp] FROM LOGIN [adminapp];
-ALTER ROLE [db_ddladmin] ADD MEMBER [adminapp];
-ALTER ROLE [db_datareader] ADD MEMBER [adminapp];
-ALTER ROLE [db_datawriter] ADD MEMBER [adminapp];
-GRANT EXECUTE ON TYPE::IdListGuidType TO [adminapp];
-GRANT EXECUTE ON OBJECT::FilteredFootnotes TO [adminapp];
-
 CREATE USER [importer] FROM LOGIN [importer];
 ALTER ROLE [db_ddladmin] ADD MEMBER [importer];
 ALTER ROLE [db_datareader] ADD MEMBER [importer];
 ALTER ROLE [db_datawriter] ADD MEMBER [importer];
 GRANT EXECUTE ON TYPE::ObservationType TO [importer];
-GRANT EXECUTE ON TYPE::ObservationFilterItemType TO [importer]; (edit
-                                                                                                                                                                                                                                GRANT EXECUTE ON OBJECT::InsertObservations TO [importer];
+GRANT EXECUTE ON TYPE::ObservationFilterItemType TO [importer];
 GRANT EXECUTE ON OBJECT::InsertObservationFilterItems TO [importer];
 
 CREATE USER [publisher] FROM LOGIN [publisher];
