@@ -2,7 +2,12 @@ import { testTableData } from '@admin/pages/release/datablocks/components/chart/
 import ChartReferenceLinesConfiguration, {
   ChartReferenceLinesConfigurationProps,
 } from '@admin/pages/release/datablocks/components/chart/ChartReferenceLinesConfiguration';
-import { AxisConfiguration } from '@common/modules/charts/types/chart';
+import createDataSetCategories from '@common/modules/charts/util/createDataSetCategories';
+import { lineChartBlockDefinition } from '@common/modules/charts/components/LineChartBlock';
+import {
+  AxisConfiguration,
+  ChartDefinitionAxis,
+} from '@common/modules/charts/types/chart';
 import mapFullTable from '@common/modules/table-tool/utils/mapFullTable';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -11,7 +16,40 @@ import React from 'react';
 
 describe('ChartReferenceLinesConfiguration', () => {
   const testAxisConfiguration: AxisConfiguration = {
-    dataSets: [],
+    dataSets: [
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+      },
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      },
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-primary'],
+      },
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-primary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
+      },
+    ],
     groupBy: 'timePeriod',
     min: 0,
     referenceLines: [],
@@ -30,14 +68,22 @@ describe('ChartReferenceLinesConfiguration', () => {
   };
 
   const testTable = mapFullTable(testTableData);
+  const testTimePeriodDataSetCategories = createDataSetCategories(
+    {
+      ...testAxisConfiguration,
+      groupBy: 'timePeriod',
+    },
+    testTable.results,
+    testTable.subjectMeta,
+  );
 
   test('renders correctly with existing lines when grouped by time periods', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={testAxisConfiguration}
+        dataSetCategories={testTimePeriodDataSetCategories}
+        definition={lineChartBlockDefinition}
         id="test-form"
-        meta={testTable.subjectMeta}
         lines={[{ position: '2014_AY', label: 'Test label 1' }]}
         onAddLine={noop}
         onRemoveLine={noop}
@@ -67,12 +113,16 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={{
-          ...testAxisConfiguration,
-          groupBy: 'filters',
-        }}
+        dataSetCategories={createDataSetCategories(
+          {
+            ...testAxisConfiguration,
+            groupBy: 'filters',
+          },
+          testTable.results,
+          testTable.subjectMeta,
+        )}
+        definition={lineChartBlockDefinition}
         id="test-form"
-        meta={testTable.subjectMeta}
         lines={[
           { position: 'ethnicity-major-chinese', label: 'Test label 1' },
           { position: 'state-funded-secondary', label: 'Test label 2' },
@@ -114,12 +164,16 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={{
-          ...testAxisConfiguration,
-          groupBy: 'locations',
-        }}
+        dataSetCategories={createDataSetCategories(
+          {
+            ...testAxisConfiguration,
+            groupBy: 'locations',
+          },
+          testTable.results,
+          testTable.subjectMeta,
+        )}
+        definition={lineChartBlockDefinition}
         id="test-form"
-        meta={testTable.subjectMeta}
         lines={[{ position: 'barnet', label: 'Test label 1' }]}
         onAddLine={noop}
         onRemoveLine={noop}
@@ -150,12 +204,16 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={{
-          ...testAxisConfiguration,
-          groupBy: 'indicators',
-        }}
+        dataSetCategories={createDataSetCategories(
+          {
+            ...testAxisConfiguration,
+            groupBy: 'indicators',
+          },
+          testTable.results,
+          testTable.subjectMeta,
+        )}
+        definition={lineChartBlockDefinition}
         id="test-form"
-        meta={testTable.subjectMeta}
         lines={[
           { position: 'overall-absence-sessions', label: 'Test label 1' },
         ]}
@@ -192,13 +250,9 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="minor"
-        configuration={{
-          ...testAxisConfiguration,
-          type: 'minor',
-          groupBy: undefined,
-        }}
+        dataSetCategories={[]}
+        definition={lineChartBlockDefinition}
         id="test-form"
-        meta={testTable.subjectMeta}
         lines={[
           { position: 2000, label: 'Test label 1' },
           { position: 4000, label: 'Test label 2' },
@@ -225,10 +279,10 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={testAxisConfiguration}
+        dataSetCategories={testTimePeriodDataSetCategories}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[]}
-        meta={testTable.subjectMeta}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -254,10 +308,10 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={testAxisConfiguration}
+        dataSetCategories={testTimePeriodDataSetCategories}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[]}
-        meta={testTable.subjectMeta}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -281,10 +335,10 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={testAxisConfiguration}
+        dataSetCategories={testTimePeriodDataSetCategories}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[]}
-        meta={testTable.subjectMeta}
         onAddLine={noop}
         onRemoveLine={noop}
       />,
@@ -311,16 +365,69 @@ describe('ChartReferenceLinesConfiguration', () => {
     ).toHaveTextContent('Cannot add invalid reference line');
   });
 
+  test('default value for `Style` field is dashed', async () => {
+    render(
+      <ChartReferenceLinesConfiguration
+        axisType="major"
+        dataSetCategories={testTimePeriodDataSetCategories}
+        definition={lineChartBlockDefinition}
+        id="test-form"
+        lines={[]}
+        onAddLine={noop}
+        onRemoveLine={noop}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+    expect(referenceLines.getAllByRole('row')).toHaveLength(2);
+
+    expect(referenceLines.getByLabelText('Style')).toHaveValue('dashed');
+  });
+
+  test('can set default value for reference line `Style` field via chart definition', async () => {
+    render(
+      <ChartReferenceLinesConfiguration
+        axisType="major"
+        dataSetCategories={testTimePeriodDataSetCategories}
+        definition={{
+          ...lineChartBlockDefinition,
+          axes: {
+            major: {
+              ...lineChartBlockDefinition.axes?.major,
+              referenceLineDefaults: {
+                style: 'none',
+              },
+            } as ChartDefinitionAxis,
+            minor: lineChartBlockDefinition.axes.minor,
+          },
+        }}
+        id="test-form"
+        lines={[]}
+        onAddLine={noop}
+        onRemoveLine={noop}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+    expect(referenceLines.getAllByRole('row')).toHaveLength(2);
+
+    expect(referenceLines.getByLabelText('Style')).toHaveValue('none');
+  });
+
   test('adding reference line when grouped by time periods', async () => {
     const handleAddLine = jest.fn();
 
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={testAxisConfiguration}
+        dataSetCategories={testTimePeriodDataSetCategories}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[]}
-        meta={testTable.subjectMeta}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -348,6 +455,7 @@ describe('ChartReferenceLinesConfiguration', () => {
       >({
         label: 'Test label',
         position: '2014_AY',
+        style: 'dashed',
       });
     });
   });
@@ -358,13 +466,17 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={{
-          ...testAxisConfiguration,
-          groupBy: 'filters',
-        }}
+        dataSetCategories={createDataSetCategories(
+          {
+            ...testAxisConfiguration,
+            groupBy: 'filters',
+          },
+          testTable.results,
+          testTable.subjectMeta,
+        )}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[]}
-        meta={testTable.subjectMeta}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -390,6 +502,7 @@ describe('ChartReferenceLinesConfiguration', () => {
       >({
         label: 'Test label',
         position: 'state-funded-primary',
+        style: 'dashed',
       });
     });
   });
@@ -400,13 +513,17 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={{
-          ...testAxisConfiguration,
-          groupBy: 'locations',
-        }}
+        dataSetCategories={createDataSetCategories(
+          {
+            ...testAxisConfiguration,
+            groupBy: 'locations',
+          },
+          testTable.results,
+          testTable.subjectMeta,
+        )}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[]}
-        meta={testTable.subjectMeta}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -432,6 +549,7 @@ describe('ChartReferenceLinesConfiguration', () => {
       >({
         label: 'Test label',
         position: 'barnsley',
+        style: 'dashed',
       });
     });
   });
@@ -442,13 +560,17 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={{
-          ...testAxisConfiguration,
-          groupBy: 'indicators',
-        }}
+        dataSetCategories={createDataSetCategories(
+          {
+            ...testAxisConfiguration,
+            groupBy: 'indicators',
+          },
+          testTable.results,
+          testTable.subjectMeta,
+        )}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[]}
-        meta={testTable.subjectMeta}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -474,6 +596,7 @@ describe('ChartReferenceLinesConfiguration', () => {
       >({
         label: 'Test label',
         position: 'authorised-absence-sessions',
+        style: 'dashed',
       });
     });
   });
@@ -484,14 +607,10 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="minor"
-        configuration={{
-          ...testAxisConfiguration,
-          type: 'minor',
-          groupBy: 'indicators',
-        }}
+        dataSetCategories={[]}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[]}
-        meta={testTable.subjectMeta}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -514,6 +633,52 @@ describe('ChartReferenceLinesConfiguration', () => {
       >({
         label: 'Test label',
         position: 3000,
+        style: 'dashed',
+      });
+    });
+  });
+
+  test('adding reference line with non-default style', async () => {
+    const handleAddLine = jest.fn();
+
+    render(
+      <ChartReferenceLinesConfiguration
+        axisType="major"
+        dataSetCategories={testTimePeriodDataSetCategories}
+        definition={lineChartBlockDefinition}
+        id="test-form"
+        lines={[]}
+        onAddLine={handleAddLine}
+        onRemoveLine={noop}
+      />,
+    );
+
+    const referenceLines = within(
+      screen.getByRole('table', { name: 'Reference lines' }),
+    );
+    expect(referenceLines.getAllByRole('row')).toHaveLength(2);
+
+    userEvent.selectOptions(referenceLines.getByLabelText('Position'), [
+      '2014_AY',
+    ]);
+    await userEvent.type(referenceLines.getByLabelText('Label'), 'Test label');
+
+    expect(referenceLines.getByLabelText('Style')).toHaveValue('dashed');
+
+    userEvent.selectOptions(referenceLines.getByLabelText('Style'), ['none']);
+
+    expect(handleAddLine).not.toHaveBeenCalled();
+
+    userEvent.click(screen.getByRole('button', { name: 'Add line' }));
+
+    await waitFor(() => {
+      expect(handleAddLine).toHaveBeenCalledTimes(1);
+      expect(handleAddLine).toHaveBeenCalledWith<
+        Parameters<ChartReferenceLinesConfigurationProps['onAddLine']>
+      >({
+        label: 'Test label',
+        position: '2014_AY',
+        style: 'none',
       });
     });
   });
@@ -524,13 +689,13 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={testAxisConfiguration}
+        dataSetCategories={testTimePeriodDataSetCategories}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[
           { position: '2014_AY', label: 'Test label 1' },
           { position: '2015_AY', label: 'Test label 1' },
         ]}
-        meta={testTable.subjectMeta}
         onAddLine={handleAddLine}
         onRemoveLine={noop}
       />,
@@ -554,16 +719,13 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={{
-          ...testAxisConfiguration,
-          groupBy: 'timePeriod',
-        }}
+        dataSetCategories={testTimePeriodDataSetCategories}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[
           { position: '2014_AY', label: 'Test label 1' },
           { position: '2015_AY', label: 'Test label 2' },
         ]}
-        meta={testTable.subjectMeta}
         onAddLine={noop}
         onRemoveLine={handleRemoveLine}
       />,
@@ -596,17 +758,21 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={{
-          ...testAxisConfiguration,
-          groupBy: 'filters',
-        }}
+        dataSetCategories={createDataSetCategories(
+          {
+            ...testAxisConfiguration,
+            groupBy: 'filters',
+          },
+          testTable.results,
+          testTable.subjectMeta,
+        )}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[
           { position: 'state-funded-primary', label: 'Test label 1' },
           { position: 'state-funded-secondary', label: 'Test label 2' },
           { position: 'ethnicity-major-chinese', label: 'Test label 3' },
         ]}
-        meta={testTable.subjectMeta}
         onAddLine={noop}
         onRemoveLine={handleRemoveLine}
       />,
@@ -639,16 +805,20 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={{
-          ...testAxisConfiguration,
-          groupBy: 'locations',
-        }}
+        dataSetCategories={createDataSetCategories(
+          {
+            ...testAxisConfiguration,
+            groupBy: 'locations',
+          },
+          testTable.results,
+          testTable.subjectMeta,
+        )}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[
           { position: 'barnet', label: 'Test label 1' },
           { position: 'barnsley', label: 'Test label 2' },
         ]}
-        meta={testTable.subjectMeta}
         onAddLine={noop}
         onRemoveLine={handleRemoveLine}
       />,
@@ -681,16 +851,20 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="major"
-        configuration={{
-          ...testAxisConfiguration,
-          groupBy: 'indicators',
-        }}
+        dataSetCategories={createDataSetCategories(
+          {
+            ...testAxisConfiguration,
+            groupBy: 'indicators',
+          },
+          testTable.results,
+          testTable.subjectMeta,
+        )}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[
           { position: 'authorised-absence-sessions', label: 'Test label 1' },
           { position: 'overall-absence-sessions', label: 'Test label 2' },
         ]}
-        meta={testTable.subjectMeta}
         onAddLine={noop}
         onRemoveLine={handleRemoveLine}
       />,
@@ -723,18 +897,14 @@ describe('ChartReferenceLinesConfiguration', () => {
     render(
       <ChartReferenceLinesConfiguration
         axisType="minor"
-        configuration={{
-          ...testAxisConfiguration,
-          type: 'minor',
-          groupBy: 'indicators',
-        }}
+        dataSetCategories={[]}
+        definition={lineChartBlockDefinition}
         id="test-form"
         lines={[
           { position: 1000, label: 'Test label 1' },
           { position: 2000, label: 'Test label 2' },
           { position: 3000, label: 'Test label 2' },
         ]}
-        meta={testTable.subjectMeta}
         onAddLine={noop}
         onRemoveLine={handleRemoveLine}
       />,

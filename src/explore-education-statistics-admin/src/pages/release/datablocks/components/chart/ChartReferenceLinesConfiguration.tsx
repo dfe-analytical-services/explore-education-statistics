@@ -4,28 +4,31 @@ import FormFieldSelect from '@common/components/form/FormFieldSelect';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import Tooltip from '@common/components/Tooltip';
 import {
-  AxisConfiguration,
   AxisType,
+  ChartDefinition,
   ReferenceLine,
+  ReferenceLineStyle,
 } from '@common/modules/charts/types/chart';
-import { FullTableMeta } from '@common/modules/table-tool/types/fullTable';
+import { DataSetCategory } from '@common/modules/charts/types/dataSet';
 import Yup from '@common/validation/yup';
 import FormSelect, {
   SelectOption,
 } from 'explore-education-statistics-common/src/components/form/FormSelect';
 import { Formik } from 'formik';
+import upperFirst from 'lodash/upperFirst';
 import React, { useMemo } from 'react';
 
 interface AddFormValues {
   label: string;
-  position: string;
+  position: string | number;
+  style: ReferenceLineStyle;
 }
 
 export interface ChartReferenceLinesConfigurationProps {
   axisType: AxisType;
-  configuration: AxisConfiguration;
+  dataSetCategories: DataSetCategory[];
+  definition: ChartDefinition;
   id: string;
-  meta: FullTableMeta;
   lines: ReferenceLine[];
   onAddLine: (line: ReferenceLine) => void;
   onRemoveLine: (line: ReferenceLine) => void;
@@ -33,9 +36,9 @@ export interface ChartReferenceLinesConfigurationProps {
 
 export default function ChartReferenceLinesConfiguration({
   axisType,
-  configuration,
+  dataSetCategories,
+  definition,
   id,
-  meta,
   lines,
   onAddLine,
   onRemoveLine,
@@ -45,31 +48,11 @@ export default function ChartReferenceLinesConfiguration({
       return [];
     }
 
-    switch (configuration.groupBy) {
-      case 'filters':
-        return Object.values(meta.filters).flatMap(
-          filterGroup => filterGroup.options,
-        );
-      case 'indicators':
-        return meta.indicators;
-      case 'locations':
-        return meta.locations;
-      case 'timePeriod':
-        return meta.timePeriodRange.map(timePeriod => ({
-          value: `${timePeriod.year}_${timePeriod.code}`,
-          label: timePeriod.label,
-        }));
-      default:
-        return [];
-    }
-  }, [
-    axisType,
-    configuration.groupBy,
-    meta.filters,
-    meta.indicators,
-    meta.locations,
-    meta.timePeriodRange,
-  ]);
+    return dataSetCategories.map(({ filter }) => ({
+      label: filter.label,
+      value: filter.value,
+    }));
+  }, [axisType, dataSetCategories]);
 
   const filteredOptions = useMemo<SelectOption[]>(() => {
     return options.filter(option =>
@@ -97,6 +80,8 @@ export default function ChartReferenceLinesConfiguration({
     return position;
   };
 
+  const axisDefinition = definition.axes[axisType];
+
   return (
     <table className="govuk-table">
       <caption className="govuk-heading-s">Reference lines</caption>
@@ -104,7 +89,8 @@ export default function ChartReferenceLinesConfiguration({
         <tr>
           <th>Position</th>
           <th>Label</th>
-          <th>Actions</th>
+          <th>Style</th>
+          <th className="dfe-align--right">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -112,6 +98,7 @@ export default function ChartReferenceLinesConfiguration({
           <tr key={`${line.label}_${line.position}`}>
             <td>{getPositionLabel(line.position)}</td>
             <td>{line.label}</td>
+            <td>{upperFirst(line.style)}</td>
             <td>
               <Button
                 className="govuk-!-margin-bottom-0 dfe-float--right"
@@ -130,10 +117,15 @@ export default function ChartReferenceLinesConfiguration({
             initialValues={{
               label: '',
               position: '',
+              style: 'dashed',
+              ...(axisDefinition?.referenceLineDefaults ?? {}),
             }}
             validationSchema={Yup.object<AddFormValues>({
               label: Yup.string().required('Enter label'),
               position: Yup.string().required('Enter position'),
+              style: Yup.string()
+                .required('Enter style')
+                .oneOf<ReferenceLineStyle>(['dashed', 'solid', 'none']),
             })}
             onSubmit={(values, helpers) => {
               onAddLine(values);
@@ -171,6 +163,21 @@ export default function ChartReferenceLinesConfiguration({
                     label="Label"
                     formGroup={false}
                     hideLabel
+                  />
+                </td>
+                <td className="dfe-vertical-align--bottom">
+                  <FormFieldSelect
+                    name="style"
+                    id={`${id}-referenceLines-style`}
+                    label="Style"
+                    formGroup={false}
+                    hideLabel
+                    order={FormSelect.unordered}
+                    options={[
+                      { label: 'Dashed', value: 'dashed' },
+                      { label: 'Solid', value: 'solid' },
+                      { label: 'None', value: 'none' },
+                    ]}
                   />
                 </td>
                 <td className="dfe-vertical-align--bottom">

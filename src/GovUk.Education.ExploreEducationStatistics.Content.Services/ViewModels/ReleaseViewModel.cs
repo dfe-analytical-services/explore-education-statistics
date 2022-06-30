@@ -45,6 +45,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
 
         public ContentSectionViewModel? KeyStatisticsSecondarySection { get; }
 
+        public ContentSectionViewModel? RelatedDashboardsSection { get; }
+
         public List<FileInfo> DownloadFiles { get; }
 
         public bool HasPreReleaseAccessList { get; }
@@ -74,6 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels
             HeadlinesSection = release.HeadlinesSection;
             KeyStatisticsSection = release.KeyStatisticsSection;
             KeyStatisticsSecondarySection = release.KeyStatisticsSecondarySection;
+            RelatedDashboardsSection = release.RelatedDashboardsSection;
             DownloadFiles = release.DownloadFiles;
             HasPreReleaseAccessList = !release.PreReleaseAccessList.IsNullOrEmpty();
             RelatedInformation = release.RelatedInformation;

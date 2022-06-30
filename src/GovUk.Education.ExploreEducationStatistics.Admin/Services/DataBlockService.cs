@@ -238,6 +238,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ContentSectionType.Headlines => "Headlines",
                 ContentSectionType.KeyStatistics => "Key Statistics",
                 ContentSectionType.KeyStatisticsSecondary => "Key Statistics",
+                ContentSectionType.RelatedDashboards => "Related Dashboards",
                 _ => section.Type.ToString()
             };
         }

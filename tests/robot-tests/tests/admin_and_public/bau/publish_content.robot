@@ -24,7 +24,18 @@ Navigate to release content
     user navigates to editable release summary from admin dashboard    ${PUBLICATION_NAME}
     ...    ${RELEASE_NAME} (not Live)
     user clicks link    Content
+    user waits until page contains button    Add dashboards section
     user waits until page contains button    Add new section
+
+Add Related dashboards section to release content
+    user clicks button    Add dashboards section
+    user waits until page contains accordion section    View related dashboard(s)
+
+    user opens accordion section    View related dashboard(s)    id:data-accordion
+    user starts editing text block    id:related-dashboards-content
+    user presses keys    Related dashboards test text
+    user clicks button    Save & close
+    user waits until element contains    id:related-dashboards-content    Edit block
 
 Add an accordion section to release content
     user clicks button    Add new section
@@ -70,9 +81,16 @@ Navigate to published release page
     user clicks element    testid:View stats link for ${PUBLICATION_NAME}
     user waits until h1 is visible    ${PUBLICATION_NAME}    %{WAIT_MEDIUM}
 
-Check latest release contains glossary info icon
     user waits until page contains title caption    ${RELEASE_NAME}    %{WAIT_MEDIUM}
     user checks page contains    This is the latest data
+
+Check latest release contains related dashboards
+    user checks element contains link    testid:data-downloads    View data guidance
+    user checks there are x accordion sections    2    id:data-accordion
+    user opens accordion section    View related dashboard(s)    id:data-accordion
+    user checks element contains    id:related-dashboards-content    Related dashboards test text
+
+Check latest release contains glossary info icon
     user opens accordion section    Test section    css:#content
     user waits until page contains button    Absence
 

@@ -43,17 +43,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ManageCont
             [JsonConverter(typeof(StringEnumConverter))]
             public ReleaseType Type { get; set; }
 
-            public List<ReleaseNoteViewModel> Updates { get; set; } = new List<ReleaseNoteViewModel>();
+            public List<ReleaseNoteViewModel> Updates { get; set; } = new();
 
-            public List<ContentSectionViewModel> Content { get; set; } = new List<ContentSectionViewModel>();
+            public List<ContentSectionViewModel> Content { get; set; } = new();
 
-            public ContentSectionViewModel SummarySection { get; set; } = new ContentSectionViewModel();
+            public ContentSectionViewModel SummarySection { get; set; } = new();
 
-            public ContentSectionViewModel HeadlinesSection { get; set; } = new ContentSectionViewModel();
+            public ContentSectionViewModel HeadlinesSection { get; set; } = new();
 
-            public ContentSectionViewModel KeyStatisticsSection { get; set; } = new ContentSectionViewModel();
+            public ContentSectionViewModel KeyStatisticsSection { get; set; } = new();
 
-            public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = new ContentSectionViewModel();
+            public ContentSectionViewModel KeyStatisticsSecondarySection { get; set; } = new();
+
+            public ContentSectionViewModel RelatedDashboardsSection { get; set; } = new();
 
             public IEnumerable<FileInfo> DownloadFiles { get; set; }
 

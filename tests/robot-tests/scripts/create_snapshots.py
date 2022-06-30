@@ -3,6 +3,9 @@ import json
 import argparse
 import requests
 from bs4 import BeautifulSoup
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.chrome.options import Options
 
 """
 Script to check find statistics, table tool, methodologies and data catalogue snapshots.
@@ -70,62 +73,48 @@ def create_find_statistics_snapshot(public_url: str) -> str:
     return json.dumps(result, sort_keys=True, indent=2)
 
 
-def create_table_tool_snapshot(public_url: str) -> str:
+def create_table_tool_snapshot(public_url: str, driver: webdriver) -> str:
     table_tool_url = f"{public_url.rstrip('/')}/data-tables"
-    parsed_html = _gets_parsed_html_from_page(table_tool_url)
+    driver.get(table_tool_url)
 
-    themes = parsed_html.select('[id^="theme-details-"]') or []
+    theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
 
     result = []
-    for theme_html in themes:
+    for theme_label in theme_labels:
+        theme_label.click()
         theme = {
-            'theme_heading': theme_html.select_one('[id^="theme-heading-"]').string,
-            'topics': [],
+            'theme_heading': theme_label.text,
+            'publications': [],
         }
 
-        topics = theme_html.select('[id^="topic-details-"]') or []
-        for topic_html in topics:
-            topic = {
-                'topic_heading': topic_html.select_one('[id^="topic-heading-"]').string,
-                'publications': [],
-            }
-
-            publications = topic_html.select('label') or []
-            for publication_label in publications:
-                topic['publications'].append(publication_label.string)
-
-            theme['topics'].append(topic)
+        publication_labels = driver.find_elements(By.CSS_SELECTOR,
+                                                  'label[for^="publicationForm-publicationForm-publications-"]')
+        for publication_label in publication_labels:
+            theme['publications'].append(publication_label.text)
 
         result.append(theme)
 
     return json.dumps(result, sort_keys=True, indent=2)
 
 
-def create_data_catalogue_snapshot(public_url: str) -> str:
+def create_data_catalogue_snapshot(public_url: str, driver: webdriver) -> str:
     data_catalogue_url = f"{public_url.rstrip('/')}/data-catalogue"
-    parsed_html = _gets_parsed_html_from_page(data_catalogue_url)
+    driver.get(data_catalogue_url)
 
-    themes = parsed_html.select('[id^="theme-details-"]') or []
+    theme_labels = driver.find_elements(By.CSS_SELECTOR, 'label[for^="publicationForm-themes-"]')
 
     result = []
-    for theme_html in themes:
+    for theme_label in theme_labels:
+        theme_label.click()
         theme = {
-            'theme_heading': theme_html.select_one('[id^="theme-heading-"]').string,
-            'topics': [],
+            'theme_heading': theme_label.text,
+            'publications': [],
         }
 
-        topics = theme_html.select('[id^="topic-details-"]') or []
-        for topic_html in topics:
-            topic = {
-                'topic_heading': topic_html.select_one('[id^="topic-heading-"]').string,
-                'publications': [],
-            }
-
-            publications = topic_html.select('label') or []
-            for publication_label in publications:
-                topic['publications'].append(publication_label.string)
-
-            theme['topics'].append(topic)
+        publication_labels = driver.find_elements(By.CSS_SELECTOR,
+                                                  'label[for^="publicationForm-publicationForm-publications-"]')
+        for publication_label in publication_labels:
+            theme['publications'].append(publication_label.text)
 
         result.append(theme)
 
@@ -180,6 +169,8 @@ def _write_to_file(file_name: str, snapshot: str):
 
 
 if __name__ == "__main__":
+    from get_webdriver import get_webdriver
+
     parser = argparse.ArgumentParser(prog=f"python {os.path.basename(__file__)}",
                                      description="To create snapshots of specific public frontend pages")
     parser.add_argument(dest="public_url",
@@ -190,13 +181,18 @@ if __name__ == "__main__":
 
     assert os.path.basename(os.getcwd()) == 'robot-tests', 'Must run from the robot-tests directory!'
 
+    get_webdriver("latest")
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    driver = webdriver.Chrome(options=chrome_options)
+
     find_stats_snapshot = create_find_statistics_snapshot(args.public_url)
     _write_to_file('find_stats_snapshot.json', find_stats_snapshot)
 
-    table_tool_snapshot = create_table_tool_snapshot(args.public_url)
+    table_tool_snapshot = create_table_tool_snapshot(args.public_url, driver)
     _write_to_file('table_tool_snapshot.json', table_tool_snapshot)
 
-    data_catalogue_snapshot = create_data_catalogue_snapshot(args.public_url)
+    data_catalogue_snapshot = create_data_catalogue_snapshot(args.public_url, driver)
     _write_to_file('data_catalogue_snapshot.json', data_catalogue_snapshot)
 
     all_methodologies_snapshot = create_all_methodologies_snapshot(args.public_url)

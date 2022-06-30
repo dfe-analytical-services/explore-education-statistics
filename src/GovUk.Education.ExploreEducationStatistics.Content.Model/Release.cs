@@ -179,6 +179,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             set => ReplaceContentSectionsOfType(ContentSectionType.ReleaseSummary, new List<ContentSection> { value });
         }
 
+        [NotMapped]
+        public ContentSection RelatedDashboardsSection
+        {
+            get => FindSingleSectionByType(ContentSectionType.RelatedDashboards);
+            set => ReplaceContentSectionsOfType(ContentSectionType.RelatedDashboards, new List<ContentSection> { value });
+        }
+
         private ContentSection FindSingleSectionByType(ContentSectionType type)
         {
             if (Content == null)

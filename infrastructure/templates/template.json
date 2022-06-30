@@ -308,10 +308,6 @@
         "description": "Gov UK Notify service template Id for subscription confirmation"
       }
     },
-    "notifyInviteTemplateId": {
-      "type": "securestring",
-      "defaultValue": "change-me"
-    },
     "notifyInviteWithRolesTemplateId": {
       "type": "securestring",
       "defaultValue": "change-me",
@@ -1734,7 +1730,6 @@
         "WEBSITE_LOAD_CERTIFICATES": "*",
         "ASPNETCORE_DETAILEDERRORS": "[parameters('detailedErrors')]",
         "NotifyApiKey": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-notify-apikey-admin'), '2018-02-14').secretUriWithVersion, ')')]",
-        "NotifyInviteTemplateId": "[parameters('notifyInviteTemplateId')]",
         "NotifyInviteWithRolesTemplateId": "[parameters('notifyInviteWithRolesTemplateId')]",
         "NotifyPublicationRoleTemplateId": "[parameters('notifyPublicationRoleTemplateId')]",
         "NotifyReleaseRoleTemplateId": "[parameters('notifyReleaseRoleTemplateId')]",

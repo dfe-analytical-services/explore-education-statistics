@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     new ReleaseContentSection
                     {
                         Release = release,
-                        ContentSection = new ContentSection
+                        ContentSection = new ()
                         {
                             Type = ContentSectionType.Headlines
                         }
@@ -172,7 +172,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     new ReleaseContentSection
                     {
                         Release = release,
-                        ContentSection = new ContentSection
+                        ContentSection = new ()
                         {
                             Type = ContentSectionType.KeyStatistics
                         }
@@ -180,7 +180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     new ReleaseContentSection
                     {
                         Release = release,
-                        ContentSection = new ContentSection
+                        ContentSection = new ()
                         {
                             Type = ContentSectionType.KeyStatisticsSecondary
                         }
@@ -188,9 +188,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                     new ReleaseContentSection
                     {
                         Release = release,
-                        ContentSection = new ContentSection
+                        ContentSection = new ()
                         {
                             Type = ContentSectionType.ReleaseSummary
+                        }
+                    },
+                    new ()
+                    {
+                        Release = release,
+                        ContentSection = new ()
+                        {
+                            Type = ContentSectionType.RelatedDashboards
                         }
                     },
                     new ReleaseContentSection
@@ -244,9 +252,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Manage
                 Assert.NotNull(contentRelease.DataLastPublished);
                 Assert.True(contentRelease.HasDataGuidance);
                 Assert.True(contentRelease.HasPreReleaseAccessList);
-                Assert.Equal(release.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
                 Assert.Equal(release.KeyStatisticsSection.Id, contentRelease.KeyStatisticsSection.Id);
-                Assert.Equal(release.KeyStatisticsSecondarySection.Id, contentRelease.KeyStatisticsSecondarySection.Id);
+                Assert.Equal(release.KeyStatisticsSecondarySection.Id,
+                    contentRelease.KeyStatisticsSecondarySection.Id);
+                Assert.Equal(release.HeadlinesSection.Id, contentRelease.HeadlinesSection.Id);
+                Assert.Equal(release.RelatedDashboardsSection.Id,
+                    contentRelease.RelatedDashboardsSection.Id);
                 Assert.False(contentRelease.LatestRelease);
                 Assert.Equal("9", contentRelease.NextReleaseDate.Day);
                 Assert.Equal("9", contentRelease.NextReleaseDate.Month);

@@ -26,7 +26,7 @@ import ButtonText from '@common/components/ButtonText';
 import Details from '@common/components/Details';
 import PageSearchForm from '@common/components/PageSearchForm';
 import RelatedAside from '@common/components/RelatedAside';
-import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
+import ReleaseDataAccordion from '@common/modules/release/components/ReleaseDataAccordion';
 import React, { useCallback, useMemo } from 'react';
 import { generatePath, useLocation } from 'react-router';
 
@@ -59,7 +59,7 @@ const ReleaseContent = () => {
     return blocksWithCommentDeletions.length > 0;
   }, [unsavedBlocks, unsavedCommentDeletions]);
 
-  const addBlock = useCallback(async () => {
+  const addSummaryBlock = useCallback(async () => {
     await addContentSectionBlock({
       releaseId: release.id,
       sectionId: release.summarySection.id,
@@ -71,6 +71,21 @@ const ReleaseContent = () => {
       },
     });
   }, [addContentSectionBlock, release.id, release.summarySection.id]);
+
+  const addRelatedDashboardsBlock = useCallback(async () => {
+    if (release.relatedDashboardsSection) {
+      await addContentSectionBlock({
+        releaseId: release.id,
+        sectionId: release.relatedDashboardsSection.id,
+        sectionKey: 'relatedDashboardsSection',
+        block: {
+          type: 'HtmlBlock',
+          order: 0,
+          body: '',
+        },
+      });
+    }
+  }, [addContentSectionBlock, release.id, release.relatedDashboardsSection]);
 
   const { publication } = release;
 
@@ -140,7 +155,7 @@ const ReleaseContent = () => {
                 {editingMode === 'edit' &&
                   release.summarySection.content?.length === 0 && (
                     <div className="govuk-!-margin-bottom-8 dfe-align--centre">
-                      <Button variant="secondary" onClick={addBlock}>
+                      <Button variant="secondary" onClick={addSummaryBlock}>
                         Add a summary text block
                       </Button>
                     </div>
@@ -163,7 +178,11 @@ const ReleaseContent = () => {
             <h2 className="govuk-heading-m" id="data-downloads">
               Data downloads
             </h2>
-            <nav role="navigation" aria-labelledby="data-downloads">
+            <nav
+              role="navigation"
+              aria-labelledby="data-downloads"
+              data-testid="data-downloads"
+            >
               <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
                 <li>
                   <a href="#dataDownloads-1">Explore data and files</a>
@@ -183,9 +202,14 @@ const ReleaseContent = () => {
                       },
                     }}
                   >
-                    Data guidance
+                    View data guidance
                   </Link>
                 </li>
+                {!!release.relatedDashboardsSection?.content.length && (
+                  <li>
+                    <a href="#related-dashboards">View related dashboard(s)</a>
+                  </li>
+                )}
                 {hasAllFilesButton && (
                   <li>
                     <Button
@@ -297,8 +321,10 @@ const ReleaseContent = () => {
 
       <ReleaseHeadlines release={release} />
 
-      {(release.downloadFiles || release.hasPreReleaseAccessList) && (
-        <ReleaseDataAndFilesAccordion
+      {(release.downloadFiles ||
+        release.hasPreReleaseAccessList ||
+        !!release.relatedDashboardsSection?.content.length) && (
+        <ReleaseDataAccordion
           release={release}
           renderAllFilesButton={
             <Button
@@ -354,8 +380,37 @@ const ReleaseContent = () => {
             </Button>
           }
           showDownloadFilesList
+          renderRelatedDashboards={
+            release.relatedDashboardsSection?.content.length ? (
+              <EditableSectionBlocks
+                blocks={release.relatedDashboardsSection.content}
+                sectionId={release.relatedDashboardsSection.id}
+                renderBlock={block => (
+                  <ReleaseBlock block={block} releaseId={release.id} />
+                )}
+                renderEditableBlock={block => (
+                  <ReleaseEditableBlock
+                    allowComments
+                    block={block}
+                    publicationId={release.publication.id}
+                    releaseId={release.id}
+                    sectionId={release.relatedDashboardsSection!.id}
+                    sectionKey="relatedDashboardsSection"
+                  />
+                )}
+              />
+            ) : null
+          }
         />
       )}
+      {editingMode === 'edit' &&
+        !release.relatedDashboardsSection?.content.length && (
+          <div className="govuk-!-margin-bottom-8 dfe-align--centre">
+            <Button onClick={addRelatedDashboardsBlock}>
+              Add dashboards section
+            </Button>
+          </div>
+        )}
 
       <ReleaseContentAccordion release={release} sectionName="Contents" />
 

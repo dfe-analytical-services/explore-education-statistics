@@ -11,7 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         ReleaseSummary,
         KeyStatistics,
         KeyStatisticsSecondary,
-        Headlines
+        Headlines,
+        RelatedDashboards,
     }
 
     public class ContentSection

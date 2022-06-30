@@ -7,7 +7,7 @@ import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
 import Tag from '@common/components/Tag';
 import ContentBlockRenderer from '@common/modules/find-statistics/components/ContentBlockRenderer';
-import ReleaseDataAndFilesAccordion from '@common/modules/release/components/ReleaseDataAndFilesAccordion';
+import ReleaseDataAccordion from '@common/modules/release/components/ReleaseDataAccordion';
 import publicationService, {
   Release,
 } from '@common/services/publicationService';
@@ -198,7 +198,11 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             <h2 className="govuk-heading-m" id="data-downloads">
               Data downloads
             </h2>
-            <nav role="navigation" aria-labelledby="data-downloads">
+            <nav
+              role="navigation"
+              aria-labelledby="data-downloads"
+              data-testid="data-downloads"
+            >
               <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
                 <li>
                   <a
@@ -222,9 +226,16 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                         : `/find-statistics/${release.publication.slug}/${release.slug}/data-guidance`
                     }
                   >
-                    Data guidance
+                    View data guidance
                   </Link>
                 </li>
+                {!!release.relatedDashboardsSection?.content.length && (
+                  <li>
+                    <a href="#related-dashboards-section">
+                      View related dashboard(s)
+                    </a>
+                  </li>
+                )}
                 {showAllFilesButton && (
                   <li>
                     <ButtonLink
@@ -244,7 +255,6 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 )}
               </ul>
             </nav>
-
             <h2 className="govuk-heading-m">Supporting information</h2>
             <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
               {release.hasPreReleaseAccessList && (
@@ -385,16 +395,10 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
 
       <PublicationReleaseHeadlinesSection release={release} />
 
-      {release.downloadFiles && (
-        <ReleaseDataAndFilesAccordion
+      {(release.downloadFiles ||
+        !!release.relatedDashboardsSection?.content.length) && (
+        <ReleaseDataAccordion
           release={release}
-          onSectionOpen={accordionSection => {
-            logEvent({
-              category: `${release.publication.title} release page`,
-              action: `Content accordion opened`,
-              label: `${accordionSection.title}`,
-            });
-          }}
           renderAllFilesButton={
             <ButtonLink
               to={`${process.env.CONTENT_API_BASE_URL}/releases/${release.id}/files`}
@@ -445,6 +449,37 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
             >
               Data guidance
             </ButtonLink>
+          }
+          onSectionOpen={accordionSection => {
+            logEvent({
+              category: `${release.publication.title} release page`,
+              action: `Data accordion opened`,
+              label: accordionSection.title,
+            });
+          }}
+          renderRelatedDashboards={
+            release.relatedDashboardsSection?.content.length
+              ? release.relatedDashboardsSection.content.map(block => (
+                  <ContentBlockRenderer
+                    key={block.id}
+                    block={block}
+                    getGlossaryEntry={glossaryService.getEntry}
+                    trackContentLinks={url =>
+                      logOutboundLink(
+                        `Publication release related dashboards link: ${url}`,
+                        url,
+                      )
+                    }
+                    trackGlossaryLinks={glossaryEntrySlug =>
+                      logEvent({
+                        category: `Publication Release Related Dashboards Glossary Link`,
+                        action: `Glossary link clicked`,
+                        label: glossaryEntrySlug,
+                      })
+                    }
+                  />
+                ))
+              : null
           }
         />
       )}

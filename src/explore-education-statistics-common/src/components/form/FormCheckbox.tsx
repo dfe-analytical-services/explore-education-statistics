@@ -15,6 +15,7 @@ export interface FormCheckboxProps {
   conditional?: ReactNode;
   id: string;
   hint?: string | ReactNode;
+  hintSmall?: boolean;
   label: string;
   boldLabel?: boolean;
   name: string;
@@ -31,6 +32,7 @@ const FormCheckbox = ({
   conditional,
   id,
   hint,
+  hintSmall = false,
   label,
   boldLabel = false,
   name,
@@ -62,6 +64,7 @@ const FormCheckbox = ({
         <label
           className={classNames('govuk-label govuk-checkboxes__label', {
             'govuk-!-font-weight-bold': boldLabel,
+            'govuk-!-padding-bottom-1': hintSmall,
           })}
           htmlFor={id}
         >
@@ -70,7 +73,9 @@ const FormCheckbox = ({
         {hint && (
           <span
             id={`${id}-item-hint`}
-            className="govuk-hint govuk-checkboxes__hint"
+            className={classNames('govuk-hint govuk-checkboxes__hint', {
+              'govuk-!-font-size-14 govuk-!-margin-bottom-1': hintSmall,
+            })}
           >
             {hint}
           </span>

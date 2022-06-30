@@ -234,6 +234,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                                 }
                             }
                         }
+                    },
+                    new ()
+                    {
+                        ReleaseId = Guid.NewGuid(),
+                        ContentSection = new ContentSection
+                        {
+                            Id = Guid.NewGuid(),
+                            Type = ContentSectionType.RelatedDashboards,
+                            Order = 0,
+                            Content = new List<ContentBlock>
+                            {
+                                new HtmlBlock
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Body = "RelatedDashboards text",
+                                    Comments = new List<Comment>
+                                    {
+                                        new()
+                                        {
+                                            Id = Guid.NewGuid(),
+                                            Content = "RelatedDashboards comment"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 },
 

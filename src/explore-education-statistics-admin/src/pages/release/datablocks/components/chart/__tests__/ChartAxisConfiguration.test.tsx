@@ -35,7 +35,40 @@ describe('ChartAxisConfiguration', () => {
   };
 
   const testAxisConfiguration: AxisConfiguration = {
-    dataSets: [],
+    dataSets: [
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+      },
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      },
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-primary'],
+      },
+      {
+        indicator: 'authorised-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-primary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-chinese', 'state-funded-secondary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-primary'],
+      },
+      {
+        indicator: 'overall-absence-sessions',
+        filters: ['ethnicity-major-black-total', 'state-funded-secondary'],
+      },
+    ],
     groupBy: 'timePeriod',
     min: 0,
     referenceLines: [],
@@ -141,7 +174,7 @@ describe('ChartAxisConfiguration', () => {
     const axisSection = within(
       screen.getByRole('group', { name: 'Axis range' }),
     );
-    expect(axisSection.getByLabelText('Minimum')).toHaveValue('');
+    expect(axisSection.getByLabelText('Minimum')).toHaveValue('0');
     expect(axisSection.getByLabelText('Maximum')).toHaveValue('');
 
     const referenceLinesSection = within(
@@ -150,6 +183,7 @@ describe('ChartAxisConfiguration', () => {
     expect(referenceLinesSection.getAllByRole('row')).toHaveLength(2);
     expect(referenceLinesSection.getByLabelText('Position')).toHaveValue('');
     expect(referenceLinesSection.getByLabelText('Label')).toHaveValue('');
+    expect(referenceLinesSection.getByLabelText('Style')).toHaveValue('none');
   });
 
   test('shows validation error if invalid custom tick spacing given', async () => {
@@ -304,7 +338,7 @@ describe('ChartAxisConfiguration', () => {
 
     await waitFor(() => {
       const formValues: AxisConfiguration = {
-        dataSets: [],
+        dataSets: testAxisConfiguration.dataSets,
         groupBy: 'timePeriod',
         min: 0,
         max: undefined,
@@ -353,7 +387,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: 'locations',
           groupByFilter: '',
           min: 0,
@@ -406,7 +440,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: 'filters',
           groupByFilter: 'school_type',
           min: 0,
@@ -564,6 +598,10 @@ describe('ChartAxisConfiguration', () => {
         'I am label',
       );
 
+      userEvent.selectOptions(referenceLinesSection.getByLabelText('Style'), [
+        'dashed',
+      ]);
+
       userEvent.click(screen.getByRole('button', { name: 'Add line' }));
 
       userEvent.click(
@@ -572,7 +610,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
           min: 0,
           max: undefined,
@@ -580,6 +618,7 @@ describe('ChartAxisConfiguration', () => {
             {
               label: 'I am label',
               position: '2014_AY',
+              style: 'dashed',
             },
           ],
           showGrid: true,
@@ -692,7 +731,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
           min: 0,
           max: undefined,
@@ -750,7 +789,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: 'timePeriod',
           min: 0,
           max: undefined,
@@ -808,7 +847,7 @@ describe('ChartAxisConfiguration', () => {
 
       await waitFor(() => {
         const formValues: AxisConfiguration = {
-          dataSets: [],
+          dataSets: testAxisConfiguration.dataSets,
           groupBy: undefined,
           min: 0,
           max: undefined,
