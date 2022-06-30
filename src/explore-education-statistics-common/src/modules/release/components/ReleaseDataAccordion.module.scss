@@ -8,11 +8,13 @@
     margin-top: 0;
   }
 
-  @include govuk-media-query($from: tablet) {
+  /* stylelint-disable max-nesting-depth */
+  :global(.govuk-accordion__section:is(:first-child)) {
     :global(.govuk-accordion__section-header) {
       border-top: 0;
     }
   }
+  /* stylelint-enable */
 }
 
 .section {
