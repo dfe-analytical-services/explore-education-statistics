@@ -555,8 +555,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(ReleaseRole.PrereleaseViewer, savedUserReleaseRole.Role);
                 Assert.Equal(user.Id, savedUserReleaseRole.UserId);
 
-                // Accepted UserReleaseInvites are removed
-                Assert.Empty(context.UserReleaseInvites);
+                var userReleaseInvite = Assert.Single(context.UserReleaseInvites);
+                Assert.Equal("test@test.com", userReleaseInvite.Email);
+                Assert.Equal(release.Id, userReleaseInvite.ReleaseId);
+                Assert.Equal(ReleaseRole.PrereleaseViewer, userReleaseInvite.Role);
             }
         }
 
@@ -691,7 +693,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(user.Id, savedUserReleaseRole.UserId);
 
                 // Release invite isn't created for an existing user
-                Assert.Empty(context.UserReleaseInvites);
+                var userReleaseInvite = Assert.Single(context.UserReleaseInvites);
+                Assert.Equal("test@test.com", userReleaseInvite.Email);
+                Assert.Equal(release.Id, userReleaseInvite.ReleaseId);
+                Assert.Equal(ReleaseRole.PrereleaseViewer, userReleaseInvite.Role);
+
             }
         }
 
@@ -1073,22 +1079,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                // Four new release invites should have been created
                 var releaseInvites = await context.UserReleaseInvites.AsQueryable().ToListAsync();
-                Assert.Equal(4, releaseInvites.Count);
+                Assert.Equal(6, releaseInvites.Count);
 
                 Assert.True(releaseInvites.All(invite => invite.ReleaseId == release.Id));
                 Assert.True(releaseInvites.All(invite => invite.Role == ReleaseRole.PrereleaseViewer));
                 Assert.True(releaseInvites.All(invite =>
                     invite.EmailSent)); // Emails sent immediately for approved releases
 
-                // Existing release invites
                 Assert.Equal("invited.prerelease.1@test.com", releaseInvites[0].Email);
                 Assert.Equal("invited.prerelease.2@test.com", releaseInvites[1].Email);
 
-                // New release invites
                 Assert.Equal("new.user.1@test.com", releaseInvites[2].Email);
                 Assert.Equal("new.user.2@test.com", releaseInvites[3].Email);
+
+                Assert.Equal("existing.user.1@test.com", releaseInvites[4].Email);
+                Assert.Equal("existing.user.2@test.com", releaseInvites[5].Email);
 
                 // Two new role assignments should have been created corresponding with the two accepted invites
                 var roles = await context.UserReleaseRoles.AsQueryable().ToListAsync();
@@ -1233,22 +1239,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                // Four new release invites should have been created
                 var releaseInvites = await context.UserReleaseInvites.AsQueryable().ToListAsync();
-                Assert.Equal(4, releaseInvites.Count);
+                Assert.Equal(6, releaseInvites.Count);
 
                 Assert.True(releaseInvites.All(invite => invite.ReleaseId == release.Id));
                 Assert.True(releaseInvites.All(invite => invite.Role == ReleaseRole.PrereleaseViewer));
                 Assert.True(releaseInvites.All(invite =>
                     !invite.EmailSent)); // Emails are not sent for unapproved releases
 
-                // Existing release invites
                 Assert.Equal("invited.prerelease.1@test.com", releaseInvites[0].Email);
                 Assert.Equal("invited.prerelease.2@test.com", releaseInvites[1].Email);
 
-                // New release invites
                 Assert.Equal("new.user.1@test.com", releaseInvites[2].Email);
                 Assert.Equal("new.user.2@test.com", releaseInvites[3].Email);
+
+                Assert.Equal("existing.user.1@test.com", releaseInvites[4].Email);
+                Assert.Equal("existing.user.2@test.com", releaseInvites[5].Email);
 
                 // Two new role assignments should have been created corresponding with the two accepted invites
                 var roles = await context.UserReleaseRoles.AsQueryable().ToListAsync();

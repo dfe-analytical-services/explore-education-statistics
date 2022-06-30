@@ -342,6 +342,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
                 }
 
+                await _userReleaseInviteRepository.Create(
+                    releaseId: release.Id,
+                    email: email,
+                    releaseRole: PrereleaseViewer,
+                    emailSent: sendEmail,
+                    createdById: _userService.GetUserId());
+
                 await _userReleaseRoleRepository.CreateIfNotExists(
                     userId: user.Id,
                     releaseId: release.Id,
