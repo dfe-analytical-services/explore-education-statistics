@@ -346,21 +346,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     .AsQueryable()
                     .SingleAsync(invite => invite.Email == email);
                 Assert.True(newUsersInvite.Accepted);
-                
-                // Assert that the other user's invites have all been left alone.
-                var otherUsersInvite = await usersDbContext
-                    .UserInvites
-                    .AsQueryable()
-                    .SingleAsync(invite => invite.Email != email);
-                Assert.False(otherUsersInvite.Accepted);
-                
-                // Assert that the new user's release role invites have all been removed.
-                var newUsersReleaseRoleInvites = await contentDbContext
-                    .UserReleaseInvites
-                    .AsQueryable()
-                    .Where(invite => invite.Email == email)
-                    .ToListAsync();
-                Assert.Empty(newUsersReleaseRoleInvites);
 
                 // Assert that the other user's release role invites have all been left alone.
                 var otherUsersReleaseRoleInvites = await contentDbContext
