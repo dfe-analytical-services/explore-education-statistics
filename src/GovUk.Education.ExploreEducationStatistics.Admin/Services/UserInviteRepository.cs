@@ -19,12 +19,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _usersAndRolesDbContext = usersAndRolesDbContext;
         }
 
-        public async Task<UserInvite> Create(string email, Role role, Guid createdById)
+        public async Task<UserInvite> CreateIfNotExists(string email, Role role, Guid createdById)
         {
-            return await Create(email, role.GetEnumValue(), createdById);
+            return await CreateIfNotExists(email, role.GetEnumValue(), createdById);
         }
 
-        public async Task<UserInvite> Create(string email, string roleId, Guid createdById)
+        public async Task<UserInvite> CreateIfNotExists(string email, string roleId, Guid createdById)
         {
             var existingInvite = await _usersAndRolesDbContext
                 .UserInvites
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Created = DateTime.UtcNow,
                 CreatedById = createdById.ToString(),
             };
-            _usersAndRolesDbContext.Add(newInvite);
+            await _usersAndRolesDbContext.AddAsync(newInvite);
             await _usersAndRolesDbContext.SaveChangesAsync();
             return newInvite;
         }
