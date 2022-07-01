@@ -242,6 +242,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     {
                         Email = "anotheruser@example.com",
                     });
+
+                await contentDbContext.UserPublicationInvites.AddRangeAsync(
+                    new UserPublicationInvite
+                    {
+                        Email = email,
+                        Role = PublicationRole.Owner
+                    },
+                    new UserPublicationInvite
+                    {
+                        Email = email,
+                        Role = PublicationRole.ReleaseApprover
+                    },
+                    new UserPublicationInvite
+                    {
+                        Email = "anotheruser@example.com"
+                    }
+                );
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -362,6 +379,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                 Assert.Equal(
                     ListOf(ReleaseRole.Approver, ReleaseRole.Lead),
                     newUsersReleaseRoles.Select(r => r.Role));
+
+                // Assert that the user has been assigned the new publication roles.
+                var newUserPublicationRoles = await contentDbContext
+                    .UserPublicationRoles
+                    .AsQueryable()
+                    .ToListAsync();
+                Assert.Equal(2, newUserPublicationRoles.Count);
+                Assert.Equal(
+                    ListOf(PublicationRole.Owner, PublicationRole.ReleaseApprover),
+                    newUserPublicationRoles.Select(r => r.Role));
             }
         }
 
