@@ -544,7 +544,7 @@
     },
     "openIdConnectSpaClientRefreshTokenUsage": {
       "type": "string",
-      "defaultValue": false,
+      "defaultValue": "OneTimeOnly",
       "allowedValues": ["ReUse", "OneTimeOnly"],
       "metadata": {
         "description": "Whether or not this environment's Admin API supports reusable or one-time refresh tokens"
@@ -552,7 +552,7 @@
     },
     "openIdConnectSpaClientRefreshTokenExpiration": {
       "type": "string",
-      "defaultValue": false,
+      "defaultValue": "Absolute",
       "allowedValues": ["Absolute", "Sliding"],
       "metadata": {
         "description": "Whether or not this environment's Admin API has refresh tokens expiring at a fixed date or in a within a sliding window that extends with each use of a refresh token"
