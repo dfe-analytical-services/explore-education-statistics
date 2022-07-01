@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers
             _tableBuilderService = tableBuilderService;
         }
 
-        [HttpPost]
+        [HttpPost("tablebuilder")]
         [CancellationTokenTimeout(TableBuilderQuery)]
         public Task<ActionResult<TableBuilderResultViewModel>> Query(
             [FromBody] ObservationQueryContext query,
