@@ -408,7 +408,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             var coreStorageConnectionString = Configuration.GetValue<string>("CoreStorage");
             var publisherStorageConnectionString = Configuration.GetValue<string>("PublisherStorage");
 
-
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             
             // TODO EES-3510 These services from the Content.Services namespace are used to update cached resources.

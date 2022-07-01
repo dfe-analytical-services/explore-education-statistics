@@ -7,6 +7,7 @@ ALTER ROLE [db_datareader] ADD MEMBER [importer];
 ALTER ROLE [db_datawriter] ADD MEMBER [importer];
 GRANT EXECUTE ON TYPE::ObservationType TO [importer];
 GRANT EXECUTE ON TYPE::ObservationFilterItemType TO [importer];
+GRANT EXECUTE ON OBJECT::InsertObservations TO [importer];
 GRANT EXECUTE ON OBJECT::InsertObservationFilterItems TO [importer];
 
 CREATE USER [publisher] FROM LOGIN [publisher];

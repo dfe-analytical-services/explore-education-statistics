@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation("{0} triggered: {1}",
+            logger.LogInformation("{FunctionName} triggered: {Message}",
                 executionContext.FunctionName,
                 message);
             var lease = await _fileStorageService.AcquireLease(message.ReleaseId.ToString());
@@ -67,11 +67,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                                     await CreateReleaseStatusAsync(message, ImmediateReleaseStartedState);
                                 await _queueService.QueuePublishReleaseFilesMessageAsync(releaseStatus.ReleaseId,
                                     releaseStatus.Id);
+                                // TODO DW - EES-3369 - this was originally triggered by DF notifying that the 
+                                // Data Stage was complete
+                                await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId,
+                                    message.ReleaseStatusId);
                             }
                             else
                             {
                                 await CreateReleaseStatusAsync(message, ScheduledState);
                             }
+                            
+                            // TODO DW - EES-3369 - remove needing to mark this stage complete
+                            await _releasePublishingStatusService.UpdateDataStageAsync(message.ReleaseId,
+                                message.ReleaseStatusId, ReleasePublishingStatusDataStage.Complete);
                         })
                         .OnFailureDo(async logMessages =>
                         {
@@ -84,8 +92,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await lease.Release();
             }
 
-            logger.LogInformation("{0} completed",
-                executionContext.FunctionName);
+            logger.LogInformation("{FunctionName} completed", executionContext.FunctionName);
         }
 
         private async Task<ReleasePublishingStatus> CreateReleaseStatusAsync(NotifyChangeMessage message,

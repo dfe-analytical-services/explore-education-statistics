@@ -115,11 +115,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
                     var releaseIds = publishedReleases.Select(status => status.ReleaseId).ToArray();
 
-                    if (!EnvironmentUtils.IsLocalEnvironment())
-                    {
-                        await _releaseService.DeletePreviousVersionsStatisticalData(releaseIds);
-                    }
-
                     await _contentService.DeletePreviousVersionsDownloadFiles(releaseIds);
                     await _contentService.DeletePreviousVersionsContent(releaseIds);
 

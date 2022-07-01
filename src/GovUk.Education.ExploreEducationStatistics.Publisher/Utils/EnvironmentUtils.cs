@@ -16,10 +16,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Utils
         /// 'Production' unless altered.
         /// </remarks>
         /// <returns>True if the function is running on a local computer otherwise false</returns>
-        public static bool IsLocalEnvironment()
-        {
-            var environment = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT");
-            return environment?.Equals(EnvironmentName.Development) ?? false;
-        }
+        // TODO DW - OK to remove this?
+        // public static bool IsLocalEnvironment()
+        // {
+        //     var environment = Environment.GetEnvironmentVariable("AZURE_FUNCTIONS_ENVIRONMENT");
+        //     return environment?.Equals(EnvironmentName.Development) ?? false;
+        // }
     }
 }

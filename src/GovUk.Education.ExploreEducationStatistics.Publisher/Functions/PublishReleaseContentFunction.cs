@@ -60,7 +60,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation("{0} triggered at: {1}",
+            logger.LogInformation("{FunctionName} triggered at: {DateTime}",
                 executionContext.FunctionName,
                 DateTime.UtcNow);
 
@@ -73,10 +73,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await _contentService.UpdateContent(context, message.ReleaseId);
                 await _releaseService.SetPublishedDates(message.ReleaseId, context.Published);
 
-                if (!EnvironmentUtils.IsLocalEnvironment())
-                {
-                    await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
-                }
+                // TODO DW - OK to remove this?
+                // if (!EnvironmentUtils.IsLocalEnvironment())
+                // {
+                //     await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
+                // }
 
                 var release = await _releaseService.Get(message.ReleaseId);
 

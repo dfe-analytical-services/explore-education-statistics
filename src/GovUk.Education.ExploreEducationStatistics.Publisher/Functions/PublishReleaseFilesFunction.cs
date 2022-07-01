@@ -75,6 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             try
             {
+                // TODO DW - EES-3369 - do we need this still?  Yeah probably, as this'll be triggered at midnight
                 if (!immediate)
                 {
                     await _queueService.QueueGenerateReleaseContentMessageAsync(published);

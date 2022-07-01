@@ -124,7 +124,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                 Configuration.GetValue<bool>("StorageSupportsBatchDeletes", defaultValue: true);
             var publicStorageConnectionString = Configuration.GetValue<string>("PublicStorage");
 
-
             services.Configure<LocationsOptions>(Configuration.GetSection(LocationsOptions.Locations));
             services.Configure<TableBuilderOptions>(Configuration.GetSection(TableBuilderOptions.TableBuilder));
 
