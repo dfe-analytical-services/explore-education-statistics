@@ -1,15 +1,42 @@
 {
   "name": "performance-tests",
-  "version": "0.1.0",
-  "main": "index.js",
-  "scripts": {
-    "install:k6": "node scripts/install-k6.js"
-  },
+  "version": "1.0.0",
+  "description": "Performance testing suite using k6 and Grafana.",
+  "author": "",
+  "license": "MIT",
   "devDependencies": {
-    "@types/k6": "~0.37.0",
-    "execa": "^6.1.0"
+    "@babel/core": "^7.18.5",
+    "@babel/plugin-proposal-class-properties": "^7.17.12",
+    "@babel/plugin-proposal-object-rest-spread": "^7.18.0",
+    "@babel/plugin-transform-runtime": "^7.18.5",
+    "@babel/preset-env": "^7.18.2",
+    "@babel/preset-typescript": "^7.17.12",
+    "@types/k6": "^0.37.0",
+    "@types/webpack": "^5.28.0",
+    "babel-loader": "^8.2.5",
+    "bufferutil": "^4.0.6",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^11.0.0",
+    "dotenv": "^16.0.1",
+    "dotenv-json-complex": "^1.0.4",
+    "k6": "^0.0.0",
+    "puppeteer": "^14.4.0",
+    "typescript": "^4.7.3",
+    "utf-8-validate": "^5.0.9",
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-glob-entries": "^1.0.1"
+  },
+  "scripts": {
+    "webpack": "webpack",
+    "start": "docker-compose up -d influxdb grafana",
+    "stop": "docker-compose down influxdb grafana",
+    "stop-and-clear-data": "docker-compose -v down influxdb grafana",
+    "log-auth-token-response": "docker-compose run --rm node -r source-map-support/register dist/logAuthTokenResponse.js ${npm_config_environment} ${npm_config_users}",
+    "log-auth-details": "docker-compose run --rm node -r source-map-support/register dist/logAuthDetails.js ${npm_config_environment} ${npm_config_users}",
+    "test": "docker-compose run --rm k6 run ${npm_config_environment} ${npm_config_users}"
   },
   "dependencies": {
-    "rimraf": "^3.0.2"
+    "source-map-support": "^0.5.21"
   }
 }

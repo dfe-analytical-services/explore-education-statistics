@@ -99,6 +99,14 @@ You will need the following groups of dependencies to run the project successful
 
    See [bug raised with the library](https://github.com/hey-red/Mime/issues/36) for more info.
 
+### Adding the local site domain to hosts file
+
+Add the following to your `hosts` file:
+
+```
+127.0.0.1    ees.local
+```
+
 ### Setting up the database and storage emulator
 
 1. Start the database and storage emulator:
@@ -168,7 +176,7 @@ If you wish use a different identity provider (e.g. working outside the team), y
 All the standard seed data users can be supported with Keycloak, and use their standard email addresses and the 
 password `password` to log in.
 
-The [Keycloak Admin login](http://localhost:5030/auth/admin/) is available with username `admin` and password 
+The [Keycloak Admin login](http://ees.local:5030/auth/admin/) is available with username `admin` and password 
 `admin`.  From here, users and Open ID Connect settings can be administered.
 
 1. To run the out-of-the-box Keycloak identity provider:
@@ -272,7 +280,7 @@ Examples:
      cd useful-scripts
           
      # Admin frontend
-     ./run.js admin
+     ./run.js admin   # or ./run.js adminKeycloak if using the Keycloak IdP
      
      # Public frontend
      ./run.js frontend

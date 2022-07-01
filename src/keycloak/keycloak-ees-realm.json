@@ -659,7 +659,7 @@
   }, {
     "id" : "5f526bbb-a07d-4504-8e68-e0ae83b16370",
     "clientId" : "ees-admin-client",
-    "rootUrl" : "https://localhost:5021",
+    "rootUrl" : "",
     "adminUrl" : "",
     "baseUrl" : "/",
     "surrogateAuthRequired" : false,
@@ -667,7 +667,12 @@
     "alwaysDisplayInConsole" : false,
     "clientAuthenticatorType" : "client-secret",
     "secret" : "eaa4cc70-e80b-4a7e-a20f-2856d97f470d",
-    "redirectUris" : [ "/signin-oidc", "/signed-out" ],
+    "redirectUris" : [ 
+      "https://localhost:5021/signed-out",
+      "https://localhost:5021/signin-oidc",
+      "https://ees.local:5021/signin-oidc",
+      "https://ees.local:5021/signed-out"
+    ],
     "webOrigins" : [ "*" ],
     "notBefore" : 0,
     "bearerOnly" : false,

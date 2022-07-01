@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using AutoMapper;
 using Azure.Storage.Blobs;
@@ -45,6 +46,7 @@ using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interface
 using GovUk.Education.ExploreEducationStatistics.Data.Services;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
+using IdentityServer4.Models;
 using IdentityServer4.Services;
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.AspNetCore.Authentication;
@@ -64,30 +66,27 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json;
 using Notify.Client;
 using Notify.Interfaces;
 using Thinktecture;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
-using FootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.FootnoteService;
-using IFootnoteService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IFootnoteService;
+using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
+using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
-using IMethodologyImageService =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
-using IMethodologyService =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
+using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
+using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
+using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyService;
 using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using IReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseFileService;
 using IReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseRepository;
 using IReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IReleaseService;
 using IThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IThemeService;
-using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
-using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
-using IGlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IGlossaryService;
-using MethodologyImageService =
-    GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
+using MethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyImageService;
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies.MethodologyService;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.PublicationService;
 using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseFileService;
@@ -99,6 +98,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
     public class Startup
     {
+        private const string OpenIdConnectSpaClientId = "GovUk.Education.ExploreEducationStatistics.Admin";
+            
         private IConfiguration Configuration { get; }
         private IHostEnvironment HostEnvironment { get; }
 
@@ -206,47 +207,73 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 .AddEntityFrameworkStores<UsersAndRolesDbContext>()
                 .AddDefaultTokenProviders();
 
+            var identityServerConfig = services
+                .AddIdentityServer(options =>
+                {
+                    options.Events.RaiseErrorEvents = true;
+                    options.Events.RaiseInformationEvents = true;
+                    options.Events.RaiseFailureEvents = true;
+                    options.Events.RaiseSuccessEvents = true;
+                })
+                .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>(options =>
+                {
+                    var spaClient = options
+                        .Clients
+                        .First(client => client.ClientId == OpenIdConnectSpaClientId);
+
+                    var clientConfig = Configuration.GetSection("OpenIdConnectSpaClient");
+
+                    var allowRefreshTokens = clientConfig.GetValue<bool>("AllowOfflineAccess");
+
+                    if (allowRefreshTokens)
+                    {
+                        // Allow the use of refresh tokens to add persistent access to the service and enable the silent
+                        // login flow.
+                        spaClient.AllowOfflineAccess = true;
+                        spaClient.AllowedScopes = spaClient
+                            .AllowedScopes
+                            .Append(OpenIdConnectScope.OfflineAccess)
+                            .ToList();
+                        spaClient.UpdateAccessTokenClaimsOnRefresh = true;
+                        
+                        var tokenUsage = clientConfig.GetValue<string>("RefreshTokenUsage");
+                        
+                        spaClient.RefreshTokenUsage = tokenUsage != null 
+                            ? EnumUtil.GetFromString<TokenUsage>(tokenUsage) 
+                            : TokenUsage.OneTimeOnly;
+
+                        var tokenExpiration = clientConfig.GetValue<string>("RefreshTokenExpiration");
+                        
+                        spaClient.RefreshTokenExpiration = tokenExpiration != null 
+                            ? EnumUtil.GetFromString<TokenExpiration>(tokenExpiration)
+                            : TokenExpiration.Absolute;
+                    }
+                })
+                .AddProfileService<ApplicationUserProfileService>();
+                
             if (HostEnvironment.IsDevelopment())
             {
-                services
-                    .AddIdentityServer(options =>
-                    {
-                        options.Events.RaiseErrorEvents = true;
-                        options.Events.RaiseInformationEvents = true;
-                        options.Events.RaiseFailureEvents = true;
-                        options.Events.RaiseSuccessEvents = true;
-                    })
-                    .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>()
-                    .AddProfileService<ApplicationUserProfileService>()
-                    .AddDeveloperSigningCredential();
+                identityServerConfig.AddDeveloperSigningCredential();
             }
             else
             {
-                services
-                    .AddIdentityServer(options =>
-                    {
-                        options.Events.RaiseErrorEvents = true;
-                        options.Events.RaiseInformationEvents = true;
-                        options.Events.RaiseFailureEvents = true;
-                        options.Events.RaiseSuccessEvents = true;
-                    })
-                    .AddApiAuthorization<ApplicationUser, UsersAndRolesDbContext>()
-                    .AddProfileService<ApplicationUserProfileService>()
-                    // TODO DW - this should be conditional based upon whether or not we're in dev mode
-                    .AddSigningCredentials();
+                identityServerConfig.AddSigningCredentials();
+            }
 
-                services.Configure<JwtBearerOptions>(
-                    IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
-                    options =>
+            services.Configure<JwtBearerOptions>(
+                IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
+                options =>
+                {
+                    // If running locally, allow IdP tokens to be issued from host names other than just localhost.
+                    if (HostEnvironment.IsDevelopment())
                     {
                         options.TokenValidationParameters = new TokenValidationParameters
                         {
-                            ValidateIssuerSigningKey = false,
-                            ValidateIssuer = false,
+                            ValidateIssuer = false
                         };
-                    });
-            }
-
+                    }
+                });
+            
             services
                 .AddAuthentication()
                 .AddOpenIdConnect(options => Configuration.GetSection("OpenIdConnect").Bind(options))
