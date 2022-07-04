@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -15,17 +14,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
     public class PublishReleaseFilesFunction
     {
         private readonly IPublishingService _publishingService;
+        // TODO DW - should we be completing the "all stages complete" step via a queue message?
         private readonly IQueueService _queueService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
+        private readonly IPublishingCompletionService _publishingCompletionService;
 
         public PublishReleaseFilesFunction(
             IPublishingService publishingService,
             IQueueService queueService,
-            IReleasePublishingStatusService releasePublishingStatusService)
+            IReleasePublishingStatusService releasePublishingStatusService, IPublishingCompletionService publishingCompletionService)
         {
             _publishingService = publishingService;
             _queueService = queueService;
             _releasePublishingStatusService = releasePublishingStatusService;
+            _publishingCompletionService = publishingCompletionService;
         }
 
         /// <summary>
@@ -47,11 +49,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             ExecutionContext executionContext,
             ILogger logger)
         {
-            logger.LogInformation("{0} triggered: {1}",
+            logger.LogInformation("{FunctionName} triggered: {Message}",
                 executionContext.FunctionName,
                 message);
 
-            var immediate = await IsImmediate(message);
             var published = new List<(Guid ReleaseId, Guid ReleaseStatusId)>();
             foreach (var (releaseId, releaseStatusId) in message.Releases)
             {
@@ -64,7 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 }
                 catch (Exception e)
                 {
-                    logger.LogError(e, "Exception occured while executing {0}",
+                    logger.LogError(e, "Exception occured while executing {FunctionName}",
                         executionContext.FunctionName);
                     logger.LogError("{StackTrace}", e.StackTrace);
 
@@ -75,38 +76,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
 
             try
             {
-                // TODO DW - EES-3369 - do we need this still?  Yeah probably, as this'll be triggered at midnight
-                if (!immediate)
-                {
-                    await _queueService.QueueGenerateReleaseContentMessageAsync(published);
-                }
-
                 foreach (var (releaseId, releaseStatusId) in published)
                 {
                     await UpdateStage(releaseId, releaseStatusId, Complete);
-                }
+                    await _publishingCompletionService.CompletePublishingIfAllStagesComplete(releaseId, releaseStatusId);
+                }St
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Exception occured while executing {0}",
+                logger.LogError(e, "Exception occured while executing {FunctionName}",
                     executionContext.FunctionName);
-                logger.LogError("{0}", e.StackTrace);
+                logger.LogError("{StackTrace}", e.StackTrace);
             }
 
-            logger.LogInformation("{0} completed",
+            logger.LogInformation("{FunctionName} completed",
                 executionContext.FunctionName);
-        }
-
-        private async Task<bool> IsImmediate(PublishReleaseFilesMessage message)
-        {
-            if (message.Releases.Count() > 1)
-            {
-                // If there's more than one Release this invocation couldn't have been triggered for immediate publishing
-                return false;
-            }
-
-            var (releaseId, releaseStatusId) = message.Releases.Single();
-            return await _releasePublishingStatusService.IsImmediate(releaseId, releaseStatusId);
         }
 
         private async Task UpdateStage(Guid releaseId, Guid releaseStatusId, ReleasePublishingStatusFilesStage stage,

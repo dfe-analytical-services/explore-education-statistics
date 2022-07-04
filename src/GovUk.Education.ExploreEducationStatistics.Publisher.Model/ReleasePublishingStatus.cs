@@ -115,5 +115,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 
             OverallStage = _state.Overall.ToString();
         }
+
+        public bool AllStagesPriorToPublishingComplete()
+        {
+            var states = State;
+
+            return states.Content == ReleasePublishingStatusContentStage.Complete &&
+                   // TODO DW - remove this status, or reuse for when synced to read replica?
+                   states.Data == ReleasePublishingStatusDataStage.Complete &&
+                   states.Files == ReleasePublishingStatusFilesStage.Complete &&
+                   states.Content == ReleasePublishingStatusContentStage.Complete;
+        }
     }
 }

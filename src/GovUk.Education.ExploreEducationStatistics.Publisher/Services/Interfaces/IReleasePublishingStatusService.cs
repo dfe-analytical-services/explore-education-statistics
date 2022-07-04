@@ -14,8 +14,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
             bool immediate,
             IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null);
 
-        Task<ReleasePublishingStatus> GetAsync(Guid releaseId, Guid releaseStatusId);
-
         Task<IEnumerable<ReleasePublishingStatus>> GetWherePublishingDueTodayWithStages(
             ReleasePublishingStatusContentStage? content = null,
             ReleasePublishingStatusDataStage? data = null,

@@ -5,6 +5,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusOverallStage;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.ReleasePublishingStatusStates;
@@ -69,12 +70,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                                     releaseStatus.Id);
                                 // TODO DW - EES-3369 - this was originally triggered by DF notifying that the 
                                 // Data Stage was complete
+                                // Now we need to add a final stage to both "PublishReleaseFilesMessage" and
+                                // "PublishReleaseContent" to check that when both are Complete, the Published
+                                // dates can be set
                                 await _queueService.QueuePublishReleaseContentMessageAsync(message.ReleaseId,
                                     message.ReleaseStatusId);
                             }
                             else
                             {
-                                await CreateReleaseStatusAsync(message, ScheduledState);
+                                // Create a Release Status entry here for the midnight job to pick up.
+                                // Stage the Release Content ahead of time.
+                                var releaseStatus = await CreateReleaseStatusAsync(message, ScheduledState);
+                                await _queueService.QueueGenerateStagedReleaseContentMessageAsync(
+                                    ListOf((message.ReleaseId, releaseStatus.Id)));
                             }
                             
                             // TODO DW - EES-3369 - remove needing to mark this stage complete

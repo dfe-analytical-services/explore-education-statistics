@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             _logger = logger;
         }
 
-        public async Task QueueGenerateReleaseContentMessageAsync(
+        public async Task QueueGenerateStagedReleaseContentMessageAsync(
             IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
         {
             var releasesList = releases.ToList();
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 "Queuing generate content message for releases: {0}",
                 string.Join(", ", releasesList.Select(tuple => tuple.ReleaseId)));
             await _storageQueueService.AddMessageAsync(
-                GenerateReleaseContentQueue, new GenerateReleaseContentMessage(releasesList));
+                GenerateStagedReleaseContentQueue, new GenerateStagedReleaseContentMessage(releasesList));
             foreach (var (releaseId, releaseStatusId) in releasesList)
             {
                 await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,

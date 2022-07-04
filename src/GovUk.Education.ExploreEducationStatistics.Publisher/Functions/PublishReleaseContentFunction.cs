@@ -71,41 +71,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
             try
             {
                 await _contentService.UpdateContent(context, message.ReleaseId);
-                await _releaseService.SetPublishedDates(message.ReleaseId, context.Published);
 
-                // TODO DW - OK to remove this?
-                // if (!EnvironmentUtils.IsLocalEnvironment())
-                // {
-                //     await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
-                // }
+                var releaseStatus = await _releasePublishingStatusService.GetLatestAsync(releaseId);
 
-                var release = await _releaseService.Get(message.ReleaseId);
+		 if (releaseStatus.AllStagesPriorToPublishingComplete())
+		 {
 
-                // Update the cached publication and any cached superseded publications.
-                // If this is the first live release of the publication, the superseding is now enforced
-                var publicationsToUpdate = await _contentDbContext.Publications
-                    .Where(p => p.Id == release.PublicationId || p.SupersededById == release.PublicationId)
-                    .Select(p => p.Slug)
-                    .ToListAsync();
+                    await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Complete);
+                    await _releaseService.SetPublishedDates(message.ReleaseId, context.Published);
 
-                await publicationsToUpdate
-                    .ToAsyncEnumerable()
-                    .ForEachAwaitAsync(_publicationCacheService.UpdatePublication);
+		    var release = await _contentDbContext.Releases
+		        .SingleAsync(r => r.Id == message.ReleaseId);
 
-                await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
-                await _contentService.DeletePreviousVersionsContent(message.ReleaseId);
+		    // Update the cached publication and any cached superseded publications.
+                   // If this is the first live release of the publication, the superseding is now enforced
+		    var publicationsToUpdate = await _contentDbContext.Publications
+		        .Where(p => p.Id == release.PublicationId || p.SupersededById == release.PublicationId)
+		        .ToListAsync();
 
-                await _notificationsService.NotifySubscribersIfApplicable(message.ReleaseId);
+		    await publicationsToUpdate
+		        .ToAsyncEnumerable()
+		        .ForEachAwaitAsync(
+		            publication => _publicationCacheService.UpdatePublication(publication.Slug));
 
-                // Update the cached trees in case any methodologies/publications
-                // are now accessible for the first time after publishing these releases
-                await _contentService.UpdateCachedTaxonomyBlobs();
+                   await _contentService.DeletePreviousVersionsDownloadFiles(message.ReleaseId);
+		    await _contentService.DeletePreviousVersionsContent(message.ReleaseId);
 
-                await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Complete);
+		    await _notificationsService.NotifySubscribersIfApplicable(message.ReleaseId);
+
+		    // Update the cached trees in case any methodologies/publications
+		    // are now accessible for the first time after publishing these releases
+		    await _contentService.UpdateCachedTaxonomyBlobs();
+                }
             }
             catch (Exception e)
             {
-                logger.LogError(e, "Exception occured while executing {0}",
+                logger.LogError(e, "Exception occured while executing {FunctionName}",
                     executionContext.FunctionName);
                 logger.LogError("{StackTrace}", e.StackTrace);
 

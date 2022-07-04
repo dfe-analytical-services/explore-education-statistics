@@ -3,11 +3,11 @@ using System.Collections.Generic;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
 {
-    public class GenerateReleaseContentMessage
+    public class GenerateStagedReleaseContentMessage
     {
         public IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> Releases;
 
-        public GenerateReleaseContentMessage(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
+        public GenerateStagedReleaseContentMessage(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
         {
             Releases = releases;
         }
