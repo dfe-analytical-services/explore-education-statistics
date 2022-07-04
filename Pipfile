@@ -22,4 +22,4 @@ azure-storage-blob = "~=12.9.0"
 autopep8 = "~=1.6.0"
 
 [requires]
-python_version = "3.10"
+python_version = "3.10.5"
