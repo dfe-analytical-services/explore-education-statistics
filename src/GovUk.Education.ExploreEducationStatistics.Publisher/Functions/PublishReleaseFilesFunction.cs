@@ -80,7 +80,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 {
                     await UpdateStage(releaseId, releaseStatusId, Complete);
                     await _publishingCompletionService.CompletePublishingIfAllStagesComplete(releaseId, releaseStatusId);
-                }St
+                }
             }
             catch (Exception e)
             {

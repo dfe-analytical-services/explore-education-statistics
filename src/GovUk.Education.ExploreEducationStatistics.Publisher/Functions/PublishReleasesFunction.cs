@@ -65,8 +65,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                         ReleasePublishingStatusDataStage.Complete);
                 }
 
-                // TODO DW - kick off the QueuePublishReleaseContentMessageAsync here too???
                 await _queueService.QueuePublishReleaseFilesMessageAsync(scheduled);
+                await _queueService.QueuePublishReleaseContentMessageAsync(scheduled);
             }
         }
 

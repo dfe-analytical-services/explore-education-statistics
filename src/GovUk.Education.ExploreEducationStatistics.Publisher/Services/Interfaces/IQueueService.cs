@@ -9,6 +9,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfac
         Task QueueGenerateStagedReleaseContentMessageAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases);
 
         Task QueuePublishReleaseContentMessageAsync(Guid releaseId, Guid releaseStatusId);
+        
+        Task QueuePublishReleaseContentMessageAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases);
 
         Task QueuePublishReleaseFilesMessageAsync(Guid releaseId, Guid releaseStatusId);
 

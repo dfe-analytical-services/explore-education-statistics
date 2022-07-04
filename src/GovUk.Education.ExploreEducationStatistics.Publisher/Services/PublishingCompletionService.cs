@@ -6,35 +6,39 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
 public class PublishingCompletionService : IPublishingCompletionService
 {
     private readonly ContentDbContext _contentDbContext;
-    private readonly IBlobCacheService _blobCacheService;
+    private readonly IBlobCacheService _publicBlobCacheService;
     private readonly IContentService _contentService;
     private readonly INotificationsService _notificationsService;
     private readonly IReleaseService _releaseService;
     private readonly IReleasePublishingStatusService _releasePublishingStatusService;
     private readonly IPublishingService _publishingService;
+    private readonly ILogger<PublishingCompletionService> _logger;
 
     public PublishingCompletionService(
         ContentDbContext contentDbContext,
-        IBlobCacheService blobCacheService,
+        IBlobCacheService publicBlobCacheService,
         IContentService contentService,
         INotificationsService notificationsService,
         IReleaseService releaseService,
         IReleasePublishingStatusService releasePublishingStatusService, 
-        IPublishingService publishingService)
+        IPublishingService publishingService, 
+        ILogger<PublishingCompletionService> logger)
     {
         _contentDbContext = contentDbContext;
-        _blobCacheService = blobCacheService;
+        _publicBlobCacheService = publicBlobCacheService;
         _contentService = contentService;
         _notificationsService = notificationsService;
         _releaseService = releaseService;
         _releasePublishingStatusService = releasePublishingStatusService;
         _publishingService = publishingService;
+        _logger = logger;
     }
     
     
@@ -53,7 +57,7 @@ public class PublishingCompletionService : IPublishingCompletionService
                 .Include(r => r.Publication)
                 .Where(r => r.Id == releaseId)
                 .SingleAsync();
-            await _blobCacheService.DeleteItem(new PublicationCacheKey(release.Publication.Slug));
+            await _publicBlobCacheService.DeleteItem(new PublicationCacheKey(release.Publication.Slug));
 
             // Invalidate publication cache for superseded publications, as potentially affected. If newly
             // published release is first Live release for the publication, the superseding is now enforced
@@ -61,7 +65,7 @@ public class PublishingCompletionService : IPublishingCompletionService
                 .Where(p => p.SupersededById == release.Publication.Id)
                 .ToAsyncEnumerable()
                 .ForEachAwaitAsync(publication =>
-                    _blobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug)));
+                    _publicBlobCacheService.DeleteItem(new PublicationCacheKey(publication.Slug)));
 
             await _contentService.DeletePreviousVersionsDownloadFiles(releaseId);
             await _contentService.DeletePreviousVersionsContent(releaseId);
@@ -69,6 +73,7 @@ public class PublishingCompletionService : IPublishingCompletionService
             await _releaseService.SetPublishedDates(releaseId, DateTime.UtcNow);
             await _notificationsService.NotifySubscribersIfApplicable(releaseId);
 
+            _logger.LogInformation("Publishing of Release {0} complete", releaseId);
         }
     }
 }

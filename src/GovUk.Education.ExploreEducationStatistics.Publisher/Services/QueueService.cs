@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
@@ -43,11 +44,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task QueuePublishReleaseContentMessageAsync(Guid releaseId, Guid releaseStatusId)
         {
-            _logger.LogInformation("Queuing publish content message for release: {0}", releaseId);
-            await _storageQueueService.AddMessageAsync(
-                PublishReleaseContentQueue, new PublishReleaseContentMessage(releaseId, releaseStatusId));
-            await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
-                ReleasePublishingStatusContentStage.Queued);
+            await QueuePublishReleaseContentMessageAsync(new[] {(releaseId, releaseStatusId)});
+        }
+        
+        public async Task QueuePublishReleaseContentMessageAsync(IEnumerable<(Guid ReleaseId, Guid ReleaseStatusId)> releases)
+        {
+            await releases
+                .ToAsyncEnumerable()
+                .ForEachAwaitAsync(async ids =>
+                {
+                    var (releaseId, releaseStatusId) = ids;
+                    _logger.LogInformation("Queuing publish content message for release: {0}", releaseId);
+                    await _storageQueueService.AddMessageAsync(
+                        PublishReleaseContentQueue, new PublishReleaseContentMessage(releaseId, releaseStatusId));
+                    await _releasePublishingStatusService.UpdateContentStageAsync(releaseId, releaseStatusId,
+                        ReleasePublishingStatusContentStage.Queued);
+                });
         }
 
         public Task QueuePublishReleaseFilesMessageAsync(Guid releaseId, Guid releaseStatusId)
