@@ -9,6 +9,7 @@ export interface User {
 }
 
 export interface Environment {
+  publicUrl: string;
   adminUrl: string;
   idp: IdpOption;
   users: User[];

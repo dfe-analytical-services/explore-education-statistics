@@ -1,9 +1,9 @@
-import { check, fail } from 'k6';
-import { Counter, Rate, Trend } from 'k6/metrics';
-import { Options } from 'k6/options';
-import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
-import createDataService from '../../utils/dataService';
-import getOrRefreshAccessTokens from '../../utils/getOrRefreshAccessTokens';
+import {check, fail} from 'k6';
+import {Counter, Rate, Trend} from 'k6/metrics';
+import {Options} from 'k6/options';
+import {AuthDetails, AuthTokens} from '../../../auth/getAuthDetails';
+import createDataService from '../../../utils/dataService';
+import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 
 const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
 

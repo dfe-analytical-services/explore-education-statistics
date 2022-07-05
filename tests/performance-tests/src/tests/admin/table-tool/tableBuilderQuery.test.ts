@@ -1,10 +1,10 @@
 import { check } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
-import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
-import createDataService, { SubjectMeta } from '../../utils/dataService';
-import testData from '../testData';
-import getOrRefreshAccessTokens from '../../utils/getOrRefreshAccessTokens';
+import { AuthDetails, AuthTokens } from '../../../auth/getAuthDetails';
+import createDataService, { SubjectMeta } from '../../../utils/dataService';
+import testData from '../../testData';
+import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
 
 const PUBLICATION =
   'UI test publication - Performance tests - adminTableBuilderQuery.test.ts';
