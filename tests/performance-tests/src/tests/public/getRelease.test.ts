@@ -8,11 +8,11 @@ export const options: Options = {
   stages: [
     {
       duration: '0.1s',
-      target: 500,
+      target: 200,
     },
     {
       duration: '10m',
-      target: 500,
+      target: 200,
     },
   ],
   noConnectionReuse: true,
@@ -49,7 +49,7 @@ const performTest = () => {
         'response code was 200': ({ status }) => status === 200,
         'response should have contained body': ({ body }) => body != null,
         'response contains expected text': res =>
-          res.html().text().includes('Admission appeals in England'),
+          res.html().text().includes('Release cache blob test 3 publication'),
       })
     ) {
       console.log('SUCCESS!');
