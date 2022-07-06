@@ -40,6 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private readonly string _connectionString;
         private readonly BlobServiceClient _client;
         private readonly ILogger<IBlobStorageService> _logger;
+        private static readonly HashSet<string> createdContainers = new();
 
         public BlobStorageService(string connectionString, BlobServiceClient client, ILogger<IBlobStorageService> logger)
         {
@@ -362,7 +363,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             try
             {
-                await blob.CreateIfNotExistsAsync();
+                if (!createdContainers.Contains($"{containerName.Name}{_connectionString}"))
+                {
+                    await blob.CreateIfNotExistsAsync();
+                    createdContainers.Add($"{containerName.Name}{_connectionString}");
+                }
+
                 return true;
             }
             catch (StorageException e)
@@ -640,7 +646,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var container = blobClient.GetContainerReference(
                 IsDevelopmentStorageAccount(blobClient) ? containerName.EmulatedName : containerName.Name);
 
-            await container.CreateIfNotExistsAsync();
+            if (!createdContainers.Contains($"{containerName.Name}{_connectionString}"))
+            {
+                await container.CreateIfNotExistsAsync();
+                createdContainers.Add($"{containerName.Name}{_connectionString}");
+            }
 
             return container;
         }
@@ -650,7 +660,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var container = _client.GetBlobContainerClient(
                 IsDevelopmentStorageAccount(_client) ? containerName.EmulatedName : containerName.Name);
 
-            await container.CreateIfNotExistsAsync();
+            if (!createdContainers.Contains($"{containerName.Name}{_connectionString}"))
+            {
+                await container.CreateIfNotExistsAsync();
+                createdContainers.Add($"{containerName.Name}{_connectionString}");
+            }
+
 
             return container;
         }

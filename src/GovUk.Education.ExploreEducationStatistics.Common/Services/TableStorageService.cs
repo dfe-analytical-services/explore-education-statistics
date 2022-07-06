@@ -9,6 +9,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     public class TableStorageService : ITableStorageService
     {
         private readonly CloudTableClient _client;
+        private static readonly HashSet<string> createdTables = new();
 
         public TableStorageService(string connectionString)
         {
@@ -22,13 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         /// <param name="tableName">The name of the table to get.</param>
         /// <param name="createIfNotExists">Creates the table if it does not already exist, defaults to true.</param>
         /// <returns>The table</returns>
-        public async Task<CloudTable> GetTableAsync(string tableName, bool createIfNotExists = true)
+        public async Task<CloudTable> GetTableAsync(string tableName)
         {
             var table = _client.GetTableReference(tableName);
 
-            if (createIfNotExists)
+            if (!createdTables.Contains($"{tableName}{_client.StorageUri}"))
             {
                 await table.CreateIfNotExistsAsync();
+                createdTables.Add($"{tableName}{_client.StorageUri}");
             }
 
             return table;

@@ -12,6 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     public class StorageQueueService : IStorageQueueService
     {
         private readonly string _storageConnectionString;
+        private static readonly HashSet<string> createdQueues = new();
 
         public StorageQueueService(string storageConnectionString)
         {
@@ -56,7 +57,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
             var queue = client.GetQueueReference(queueName);
-            queue.CreateIfNotExists();
+
+            if (!createdQueues.Contains($"{queueName}{_storageConnectionString}"))
+            {
+                queue.CreateIfNotExists();
+                createdQueues.Add($"{queueName}{_storageConnectionString}");
+            }
+
             return queue;
         }
 
@@ -65,7 +72,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
             var queue = client.GetQueueReference(queueName);
-            await queue.CreateIfNotExistsAsync();
+
+            if (!createdQueues.Contains($"{queueName}{_storageConnectionString}"))
+            {
+                queue.CreateIfNotExists();
+                createdQueues.Add($"{queueName}{_storageConnectionString}");
+            }
+
             return queue;
         }
 
