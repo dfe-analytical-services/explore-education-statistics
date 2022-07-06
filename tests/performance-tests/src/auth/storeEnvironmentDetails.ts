@@ -30,9 +30,7 @@ const getEnvironmentAndUsers = async (
     process.env.environment as string,
   ) as Environment;
 
-  const users = userNames.length
-    ? environment.users.filter(u => userNames.includes(u.name))
-    : environment.users;
+  const users = environment.users.filter(u => userNames.includes(u.name));
 
   const authTokens = await Promise.all(
     users.map(async ({ name, email, password }) => {
