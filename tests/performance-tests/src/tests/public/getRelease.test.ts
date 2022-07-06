@@ -25,7 +25,7 @@ export const options: Options = {
 export const errorRate = new Rate('ees_errors');
 export const getReleaseSuccessCount = new Counter('ees_get_release_success');
 export const getReleaseFailureCount = new Counter('ees_get_release_failure');
-export const getReleaseSuccessDuration = new Trend(
+export const getReleaseRequestDuration = new Trend(
   'ees_get_release_duration',
   true,
 );
@@ -48,17 +48,21 @@ const performTest = () => {
       check(response, {
         'response code was 200': ({ status }) => status === 200,
         'response should have contained body': ({ body }) => body != null,
+      }) &&
+      check(response, {
         'response contains expected text': res =>
           res.html().text().includes('Release cache blob test 3 publication'),
       })
     ) {
       console.log('SUCCESS!');
       getReleaseSuccessCount.add(1);
-      getReleaseSuccessDuration.add(Date.now() - startTime);
+      getReleaseRequestDuration.add(Date.now() - startTime);
     } else {
       console.log('FAILURE!');
       getReleaseFailureCount.add(1);
+      getReleaseRequestDuration.add(Date.now() - startTime);
       errorRate.add(1);
+      fail('Failure to Get Release page');
     }
   } catch (e) {
     fail(`Failure to get Release page - ${e}`);
