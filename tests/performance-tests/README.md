@@ -101,8 +101,8 @@ This step is only required if running performance tests that require access to t
 It requires the above step of creating environment-specific .env.json files first.
 
 ```bash
-export AUTH_DETAILS_AS_JSON=$(npm run log-auth-details --silent --environment=<environment> --users=<user name>)
-```
+npm run store-environment-details --environment=<environment> --users=<user names>
+``` 
 
 This obtains an `access_token` and a `refresh_token` that can be used to access protected resources
 in the Admin API.  The `refresh_token` allows long-running tests to refresh their access token if
@@ -111,35 +111,31 @@ it's going to expire mid-test.
 This will look in the `.env.<environment>.json` file for a user with `"name": "<user name>"` and use 
 that user's credentials to log into Admin in order to obtain their auth tokens.
 
+Details of the environment and the users' access tokens can then be found in a generated file
+named `dist/.environment-details.<environment>.json`. This file is then used by the tests 
+themselves to run against the same environment.
+
 As a concrete example:
 
-In Linux:
-
 ```bash
-export AUTH_DETAILS_AS_JSON=$(npm run log-auth-details --silent --environment=local --users=bau1)
-```
-
-In Windows:
-
-```bash
-set AUTH_DETAILS_AS_JSON=(npm run log-auth-details --silent --environment=local --users=bau1)
+npm run store-environment-details --environment=local --users=bau1
 ```
 
 #### Run individual tests
 
 ```bash
-npm run test dist/some-test-script.test.js
+npm run test dist/some-test-script.test.js --environment=<environment>
 ```
 
 An example of running an actual script would be:
 
 ```bash
-npm run test dist/import.test.js
+npm run test dist/import.test.js --environment=local
 ```
 
-Each test script will be runnable against any environment. They will find existing or set up new
+Each test script is runnable against any environment. They will find existing or set up new
 dependent data before the test's VUs begin running, and will tear down any data that cannot be 
-reused in a subsequent run when the tests finish. This is achieved using K6's `setup()` and 
+reused by a subsequent run when the tests finish. This is achieved using K6's `setup()` and 
 `teardown()` lifecycles.
 
 ### Monitor the test results
@@ -204,8 +200,8 @@ Run the following to test that the environment under test supports refresh token
 in your `.env.<environment>.json file).
 
 ```bash
-export AUTH_DETAILS_AS_JSON=$(npm run log-auth-details --silent --environment=<environment> --users=bau1)
-npm run test dist/refreshTokens.test.js
+npm run store-environment-details --environment=<environment> --users=bau1)
+npm run test dist/refreshTokens.test.js --environment=local
 ```
 
 The output should look like:

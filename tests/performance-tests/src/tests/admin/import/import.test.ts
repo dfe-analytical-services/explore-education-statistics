@@ -1,9 +1,9 @@
-import {check, fail} from 'k6';
-import {Counter, Rate, Trend} from 'k6/metrics';
-import {Options} from 'k6/options';
-import {AuthDetails, AuthTokens} from '../../../auth/getAuthDetails';
+import { check, fail } from 'k6';
+import { Counter, Rate, Trend } from 'k6/metrics';
+import { Options } from 'k6/options';
 import createDataService from '../../../utils/dataService';
 import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
+import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 
 const IMPORT_STATUS_POLLING_DELAY_SECONDS = 5;
 
@@ -35,10 +35,6 @@ interface SetupData {
   themeId: string;
   topicId: string;
   releaseId: string;
-  adminUrl: string;
-  userName: string;
-  authTokens: AuthTokens;
-  supportsRefreshTokens: boolean;
 }
 
 export const errorRate = new Rate('ees_errors');
@@ -77,21 +73,22 @@ const processingStages: {
   {},
 );
 
+// TODO - use SharedArray instead of `open` here
 /* eslint-disable no-restricted-globals */
-const subjectFile = open('import/assets/big-files/nd01.csv.csv', 'b');
-const subjectMetaFile = open('import/assets/big-files/nd01.meta.csv.csv', 'b');
+const subjectFile = open('admin/import/assets/dates.csv', 'b');
+const subjectMetaFile = open('admin/import/assets/dates.meta.csv', 'b');
 /* eslint-enable no-restricted-globals */
 
-export function setup(): SetupData {
-  const tokenJson = __ENV.AUTH_DETAILS_AS_JSON as string;
-  const authDetails = JSON.parse(tokenJson) as AuthDetails[];
-  const {
-    adminUrl,
-    authTokens,
-    userName,
-    supportsRefreshTokens,
-  } = authDetails.find(details => details.userName === 'bau1') as AuthDetails;
+const environmentAndUsers = getEnvironmentAndUsersFromFile(
+  __ENV.TEST_ENVIRONMENT as string,
+);
+const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
 
+const { authTokens, userName } = environmentAndUsers.users.find(
+  user => user.userName === 'bau1',
+)!;
+
+export function setup(): SetupData {
   const dataService = createDataService(adminUrl, authTokens.accessToken);
 
   const suffix = alwaysCreateNewDataPerTest
@@ -131,20 +128,10 @@ export function setup(): SetupData {
     themeId,
     topicId,
     releaseId,
-    userName,
-    adminUrl,
-    authTokens,
-    supportsRefreshTokens,
   };
 }
 
-const performTest = ({
-  releaseId,
-  userName,
-  adminUrl,
-  authTokens,
-  supportsRefreshTokens,
-}: SetupData) => {
+const performTest = ({ releaseId }: SetupData) => {
   const accessToken = getOrRefreshAccessTokens(
     supportsRefreshTokens,
     userName,
@@ -256,14 +243,7 @@ const performTest = ({
   });
 };
 
-export const teardown = ({
-  supportsRefreshTokens,
-  userName,
-  adminUrl,
-  authTokens,
-  themeId,
-  topicId,
-}: SetupData) => {
+export const teardown = ({ themeId, topicId }: SetupData) => {
   if (alwaysCreateNewDataPerTest) {
     const accessToken = getOrRefreshAccessTokens(
       supportsRefreshTokens,

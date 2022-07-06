@@ -39,10 +39,10 @@ services:
       - k6_performance_test_network
     environment:
       - K6_OUT=influxdb=http://influxdb:8086/k6
-      - AUTH_DETAILS_AS_JSON
+      - TEST_ENVIRONMENT
     volumes:
-      - ./dist:/dist
-    working_dir: /
+      - ./:/home/k6/app
+    working_dir: /home/k6/app
 
   node:
     build:
