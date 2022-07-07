@@ -716,15 +716,10 @@
             "publication_type_heading": "National and official statistics",
             "publications": [
               {
-                "publication_heading": "Multi-academy trust performance measures at key stage 2"
-              }
-            ]
-          },
-          {
-            "publication_type_heading": "Not yet on this service",
-            "publications": [
-              {
                 "publication_heading": "Key stage 2 attainment: National headlines"
+              },
+              {
+                "publication_heading": "Multi-academy trust performance measures at key stage 2"
               }
             ]
           }
