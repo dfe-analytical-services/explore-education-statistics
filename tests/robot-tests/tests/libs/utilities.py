@@ -8,6 +8,7 @@ from SeleniumLibrary.utils import is_noney
 from robot.libraries.BuiltIn import BuiltIn
 from SeleniumLibrary.keywords.waiting import WaitingKeywords
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.common.by import By
 from typing import Union
 import utilities_init
 import os
@@ -265,11 +266,11 @@ def user_gets_row_number_with_heading(heading: str, table_locator: str = 'css:ta
 def user_gets_row_with_group_and_indicator(group: str, indicator: str,
                                            table_selector: str = 'css:table'):
     table_elem = sl.get_webelement(table_selector)
-    elems = table_elem.find_elements_by_xpath(
-        f'.//tbody/tr/th[text()="{group}"]/../self::tr | .//tbody/tr/th[text()="{group}"]/../following-sibling::tr')
+    elems = table_elem.find_elements(
+        By.XPATH, f'.//tbody/tr/th[text()="{group}"]/../self::tr | .//tbody/tr/th[text()="{group}"]/../following-sibling::tr')
     for elem in elems:
         try:
-            elem.find_element_by_xpath(f'.//th[text()="{indicator}"]/..')
+            elem.find_element(By.XPATH, f'.//th[text()="{indicator}"]/..')
             return elem
         except BaseException:
             continue
