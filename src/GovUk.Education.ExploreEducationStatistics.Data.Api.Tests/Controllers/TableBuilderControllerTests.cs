@@ -1,15 +1,20 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Model.Chart;
+using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data.Query;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
+using GovUk.Education.ExploreEducationStatistics.Data.Api.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Data.Api.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Http;
@@ -17,38 +22,73 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Model.TimeIdentifier;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
-    public class TableBuilderControllerTests
+    [Collection(BlobCacheServiceTests)]
+    public class TableBuilderControllerTests : BlobCacheServiceTestFixture
     {
         private static readonly ObservationQueryContext ObservationQueryContext = new()
         {
             SubjectId = Guid.NewGuid(),
+            Filters = new List<Guid>(),
+            Indicators = new List<Guid>(),
+            LocationIds = new List<Guid>(),
+            TimePeriod = new TimePeriodQuery
+            {
+                StartYear = 2021,
+                StartCode = CalendarYear,
+                EndYear = 2022,
+                EndCode = CalendarYear
+            }
         };
 
+        private static readonly Guid PublicationId = Guid.NewGuid();
+
         private static readonly Guid ReleaseId = Guid.NewGuid();
-        
-        private static readonly Guid DataBlockId = Guid.NewGuid();            
-        
-        private readonly ReleaseContentBlock _releaseContentBlock = new()
+
+        private static readonly Guid DataBlockId = Guid.NewGuid();
+
+        private static readonly Release Release = new()
+        {
+            Id = ReleaseId,
+            PublicationId = PublicationId,
+            Publication = new Publication
+            {
+                Id = PublicationId,
+                Slug = "publication-slug"
+            },
+            Published = DateTime.Parse("2020-11-11T12:00:00Z"),
+            Slug = "2020-21"
+        };
+
+        private static readonly TableBuilderConfiguration TableConfiguration = new()
+        {
+            TableHeaders = new TableHeaders
+            {
+                Rows = new List<TableHeader>
+                {
+                    new("table header 1", TableHeaderType.Filter)
+                }
+            }
+        };
+
+        private static readonly ReleaseContentBlock ReleaseContentBlock = new()
         {
             ReleaseId = ReleaseId,
-            Release = new Release
-            {
-                Id = ReleaseId,
-            },
+            Release = Release,
             ContentBlockId = DataBlockId,
             ContentBlock = new DataBlock
             {
                 Id = DataBlockId,
                 Query = ObservationQueryContext,
-                Charts = new List<IChart>()
+                Table = TableConfiguration
             }
         };
-        
+
         private readonly TableBuilderResultViewModel _tableBuilderResults = new()
         {
             Results = new List<ObservationViewModel>
@@ -63,7 +103,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var cancellationToken = new CancellationToken();
 
             var (controller, mocks) = BuildControllerAndDependencies();
-            
+
             mocks.tableBuilderService
                 .Setup(s => s.Query(ObservationQueryContext, cancellationToken))
                 .ReturnsAsync(_tableBuilderResults);
@@ -73,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             result.AssertOkResult(_tableBuilderResults);
         }
-        
+
         [Fact]
         public async Task Query_ReleaseId()
         {
@@ -90,21 +130,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             result.AssertOkResult(_tableBuilderResults);
         }
-        
+
         [Fact]
         public async Task QueryForDataBlock()
         {
+            var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
+
             var (controller, mocks) = BuildControllerAndDependencies();
 
+            SetupCall(mocks.persistenceHelper, ReleaseId, Release);
+
+            mocks.cacheService
+                .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
+                .ReturnsAsync(null);
+
+            mocks.cacheService
+                .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
+                .Returns(Task.CompletedTask);
+
             mocks.dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(_releaseContentBlock))
+                .Setup(s => s.GetDataBlockTableResult(ReleaseId, DataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
 
-            SetupCall(mocks.persistenceHelper, _releaseContentBlock);
-            
             var result = await controller.QueryForDataBlock(ReleaseId, DataBlockId);
             VerifyAllMocks(mocks);
-            
+
             result.AssertOkResult(_tableBuilderResults);
         }
 
@@ -113,37 +163,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         {
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            SetupCall<ContentDbContext, ReleaseContentBlock>(mocks.persistenceHelper, null);
-            
+            SetupCall<ContentDbContext, Release>(mocks.persistenceHelper, ReleaseId, null);
+
             var result = await controller.QueryForDataBlock(ReleaseId, DataBlockId);
             VerifyAllMocks(mocks);
-            
+
             result.AssertNotFoundResult();
         }
 
         [Fact]
         public async Task QueryForDataBlock_NotModified()
         {
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                ReleaseId = ReleaseId,
-                Release = new Release
-                {
-                    Id = ReleaseId,
-                    Published = DateTime.Parse("2019-11-11T12:00:00Z")
-                },
-                ContentBlockId = DataBlockId,
-                ContentBlock = new DataBlock
-                {
-                    Id = DataBlockId,
-                    Query = ObservationQueryContext
-                }
-            };
-            
             var (controller, mocks) = BuildControllerAndDependencies();
 
-            SetupCall(mocks.persistenceHelper, releaseContentBlock);
-                
+            SetupCall(mocks.persistenceHelper, ReleaseId, Release);
+
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext
@@ -154,7 +188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                         {
                             {
                                 HeaderNames.IfModifiedSince,
-                                DateTime.Parse("2019-11-11T12:00:00Z").ToUniversalTime().ToString("R")
+                                DateTime.Parse("2020-11-11T12:00:00Z").ToUniversalTime().ToString("R")
                             },
                             {
                                 HeaderNames.IfNoneMatch,
@@ -174,30 +208,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForDataBlock_ETagChanged()
         {
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                ReleaseId = ReleaseId,
-                Release = new Release
-                {
-                    Id = ReleaseId,
-                    Published = DateTime.Parse("2020-11-11T12:00:00Z")
-                },
-                ContentBlockId = DataBlockId,
-                ContentBlock = new DataBlock
-                {
-                    Id = DataBlockId,
-                    Query = ObservationQueryContext,
-                    Charts = new List<IChart>()
-                }
-            };
-            
+            var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
+
             var (controller, mocks) = BuildControllerAndDependencies();
 
+            SetupCall(mocks.persistenceHelper, ReleaseId, Release);
+
+            mocks.cacheService
+                .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
+                .ReturnsAsync(null);
+
+            mocks.cacheService
+                .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
+                .Returns(Task.CompletedTask);
+
             mocks.dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseContentBlock))
+                .Setup(s => s.GetDataBlockTableResult(ReleaseId, DataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
-            
-            SetupCall(mocks.persistenceHelper, releaseContentBlock);
 
             controller.ControllerContext = new ControllerContext
             {
@@ -229,30 +256,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
         [Fact]
         public async Task QueryForDataBlock_LastModifiedChanged()
         {
-            var releaseContentBlock = new ReleaseContentBlock
-            {
-                ReleaseId = ReleaseId,
-                Release = new Release
-                {
-                    Id = ReleaseId,
-                    Published = DateTime.Parse("2020-11-11T12:00:00Z")
-                },
-                ContentBlockId = DataBlockId,
-                ContentBlock = new DataBlock
-                {
-                    Id = DataBlockId,
-                    Query = ObservationQueryContext,
-                    Charts = new List<IChart>()
-                }
-            };
+            var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
 
             var (controller, mocks) = BuildControllerAndDependencies();
 
+            SetupCall(mocks.persistenceHelper, ReleaseId, Release);
+
+            mocks.cacheService
+                .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
+                .ReturnsAsync(null);
+
+            mocks.cacheService
+                .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
+                .Returns(Task.CompletedTask);
+
             mocks.dataBlockService
-                .Setup(s => s.GetDataBlockTableResult(releaseContentBlock))
+                .Setup(s => s.GetDataBlockTableResult(ReleaseId, DataBlockId))
                 .ReturnsAsync(_tableBuilderResults);
-            
-            SetupCall(mocks.persistenceHelper, releaseContentBlock);
 
             controller.ControllerContext = new ControllerContext
             {
@@ -280,22 +300,126 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 
             result.AssertOkResult(_tableBuilderResults);
         }
-        
-        private (
-            TableBuilderController controller, 
-            (
-                Mock<ITableBuilderService> tableBuilderService,
-                Mock<IDataBlockService> dataBlockService,
-                Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper) mocks) BuildControllerAndDependencies()
+
+        [Fact]
+        public async Task QueryForFastTrack()
         {
-            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
-            var dataBlockService = new Mock<IDataBlockService>(Strict);
+            var latestRelease = new Data.Model.Release
+            {
+                Id = ReleaseId,
+                Year = 2020,
+                Slug = "2020-21",
+                TimeIdentifier = AcademicYear
+            };
+
+            var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
+
+            var (controller, mocks) = BuildControllerAndDependencies();
+
+            SetupCall(mocks.persistenceHelper, ReleaseContentBlock);
+
+            mocks.cacheService
+                .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
+                .ReturnsAsync(null);
+
+            mocks.cacheService
+                .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
+                .Returns(Task.CompletedTask);
+
+            mocks.dataBlockService
+                .Setup(s => s.GetDataBlockTableResult(ReleaseId, DataBlockId))
+                .ReturnsAsync(_tableBuilderResults);
+
+            mocks.releaseRepository
+                .Setup(s => s.GetLatestPublishedRelease(PublicationId))
+                .Returns(latestRelease);
+
+            var result = await controller.QueryForFastTrack(DataBlockId);
+
+            VerifyAllMocks(mocks);
+
+            var viewModel = result.AssertOkResult();
+            Assert.Equal(DataBlockId, viewModel.Id);
+            Assert.Equal(ReleaseId, viewModel.ReleaseId);
+            Assert.Equal("2020-21", viewModel.ReleaseSlug);
+            Assert.Equal(TableConfiguration, viewModel.Configuration);
+            Assert.Equal(_tableBuilderResults, viewModel.FullTable);
+            Assert.True(viewModel.LatestData);
+            Assert.Equal("Academic Year 2020/21", viewModel.LatestReleaseTitle);
+
+            var queryViewModel = viewModel.Query;
+            Assert.NotNull(queryViewModel);
+            Assert.Equal(PublicationId, queryViewModel.PublicationId);
+            Assert.Equal(ObservationQueryContext.SubjectId, viewModel.Query.SubjectId);
+            Assert.Equal(ObservationQueryContext.TimePeriod, viewModel.Query.TimePeriod);
+            Assert.Equal(ObservationQueryContext.Filters, viewModel.Query.Filters);
+            Assert.Equal(ObservationQueryContext.Indicators, viewModel.Query.Indicators);
+            Assert.Equal(ObservationQueryContext.LocationIds, viewModel.Query.LocationIds);
+        }
+
+        [Fact]
+        public async Task QueryForFastTrack_NotLatestRelease()
+        {
+            var latestRelease = new Data.Model.Release
+            {
+                Id = Guid.NewGuid(),
+                Slug = "2021-22",
+                Year = 2021,
+                TimeIdentifier = AcademicYear
+            };
+
+            var cacheKey = new DataBlockTableResultCacheKey(Release.Publication.Slug, Release.Slug, DataBlockId);
+
+            var (controller, mocks) = BuildControllerAndDependencies();
+
+            SetupCall(mocks.persistenceHelper, ReleaseContentBlock);
+
+            mocks.cacheService
+                .Setup(s => s.GetItem(cacheKey, typeof(TableBuilderResultViewModel)))
+                .ReturnsAsync(null);
+
+            mocks.cacheService
+                .Setup(s => s.SetItem<object>(cacheKey, _tableBuilderResults))
+                .Returns(Task.CompletedTask);
+
+            mocks.dataBlockService
+                .Setup(s => s.GetDataBlockTableResult(ReleaseId, DataBlockId))
+                .ReturnsAsync(_tableBuilderResults);
+
+            mocks.releaseRepository
+                .Setup(s => s.GetLatestPublishedRelease(PublicationId))
+                .Returns(latestRelease);
+
+            var result = await controller.QueryForFastTrack(DataBlockId);
+
+            VerifyAllMocks(mocks);
+
+            var viewModel = result.AssertOkResult();
+            Assert.Equal(DataBlockId, viewModel.Id);
+            Assert.Equal(ReleaseId, viewModel.ReleaseId);
+            Assert.Equal("2020-21", viewModel.ReleaseSlug);
+            Assert.False(viewModel.LatestData);
+            Assert.Equal("Academic Year 2021/22", viewModel.LatestReleaseTitle);
+        }
+
+        private static (
+            TableBuilderController controller,
+            (Mock<IPersistenceHelper<ContentDbContext>> persistenceHelper,
+            Mock<IBlobCacheService> cacheService,
+            Mock<IDataBlockService> dataBlockService,
+            Mock<IReleaseRepository> releaseRepository,
+            Mock<ITableBuilderService> tableBuilderService) mocks) BuildControllerAndDependencies()
+        {
             var persistenceHelper = MockPersistenceHelper<ContentDbContext>();
+            var dataBlockService = new Mock<IDataBlockService>(Strict);
+            var releaseRepository = new Mock<IReleaseRepository>(Strict);
+            var tableBuilderService = new Mock<ITableBuilderService>(Strict);
 
             var controller = new TableBuilderController(
-                tableBuilderService.Object,
+                persistenceHelper.Object,
                 dataBlockService.Object,
-                persistenceHelper.Object
+                releaseRepository.Object,
+                tableBuilderService.Object
             )
             {
                 ControllerContext = new ControllerContext
@@ -304,7 +428,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 }
             };
 
-            return (controller, (tableBuilderService, dataBlockService, persistenceHelper));
+            return (controller,
+                (persistenceHelper, CacheService, dataBlockService, releaseRepository, tableBuilderService));
         }
     }
 }

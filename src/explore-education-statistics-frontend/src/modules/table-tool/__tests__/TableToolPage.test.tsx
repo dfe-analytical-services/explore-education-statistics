@@ -1,5 +1,5 @@
-import { FastTrackTable } from '@common/services/fastTrackService';
 import {
+  FastTrackTable,
   SelectedPublication,
   Subject,
   SubjectMeta,
@@ -16,7 +16,6 @@ describe('TableToolPage', () => {
 
   const testFastTrack: FastTrackTable = {
     id: 'a08bd50a-7814-4e43-b152-2f7464d566ff',
-    created: '2021-04-27T15:17:05.7530941Z',
     configuration: {
       tableHeaders: {
         columnGroups: [],

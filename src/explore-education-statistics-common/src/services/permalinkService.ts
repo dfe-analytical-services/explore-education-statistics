@@ -4,6 +4,7 @@ import { ConfiguredTable } from '@common/services/types/table';
 import deduplicatePermalinkLocations from '@common/services/util/permalinkServiceUtils';
 
 export type Permalink = ConfiguredTable & {
+  created: string;
   status?:
     | 'Current'
     | 'SubjectRemoved'

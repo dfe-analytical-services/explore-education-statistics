@@ -106,8 +106,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
             private static readonly HashSet<string> AllowedPaths = new()
             {
                 FileStoragePathUtils.DataBlocksDirectory,
-                // TODO: EES-2865 Remove with other fast track code
-                FileStoragePathUtils.FastTrackResultsDirectory,
                 FileStoragePathUtils.SubjectMetaDirectory
             };
 

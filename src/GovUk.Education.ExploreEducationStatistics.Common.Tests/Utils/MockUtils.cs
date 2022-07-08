@@ -50,7 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         public static void SetupCall<TDbContext, TEntity>(
             Mock<IPersistenceHelper<TDbContext>> helper,
             Guid id,
-            TEntity entity)
+            TEntity? entity)
             where TDbContext : DbContext
             where TEntity : class
         {

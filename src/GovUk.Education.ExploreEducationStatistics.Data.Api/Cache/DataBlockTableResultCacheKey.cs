@@ -2,7 +2,6 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache
@@ -13,19 +12,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Cache
         private string ReleaseSlug { get; }
         private Guid DataBlockId { get; }
 
-        public DataBlockTableResultCacheKey(ReleaseContentBlock releaseContentBlock)
+        public DataBlockTableResultCacheKey(CacheableDataBlock cacheable)
         {
-            if (releaseContentBlock.ContentBlock is not DataBlock)
-            {
-                throw new ArgumentException(
-                    $"Attempting to build key with incorrect type of content block - " +
-                    $"{releaseContentBlock.ContentBlock.GetType()}");            
-            }
+            PublicationSlug = cacheable.PublicationSlug;
+            ReleaseSlug = cacheable.ReleaseSlug;
+            DataBlockId = cacheable.DataBlockId;
+        }
 
-            var release = releaseContentBlock.Release;
-            PublicationSlug = release.Publication.Slug;
-            ReleaseSlug = release.Slug;
-            DataBlockId = releaseContentBlock.ContentBlockId;
+        public DataBlockTableResultCacheKey(string publicationSlug, string releaseSlug, Guid dataBlockId)
+        {
+            PublicationSlug = publicationSlug;
+            ReleaseSlug = releaseSlug;
+            DataBlockId = dataBlockId;
         }
 
         public IBlobContainer Container => BlobContainers.PublicContent;

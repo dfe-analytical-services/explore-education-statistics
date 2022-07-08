@@ -1,5 +1,6 @@
 import { dataApi } from '@common/services/api';
 import { FileInfo } from '@common/services/types/file';
+import { ConfiguredTable } from '@common/services/types/table';
 import { Dictionary } from '@common/types';
 import { Feature, Geometry } from 'geojson';
 
@@ -200,6 +201,19 @@ export interface SelectedPublication {
   };
 }
 
+export interface FastTrackTable extends ConfiguredTable {
+  query: TableDataQuery & {
+    publicationId: string;
+  };
+}
+
+export interface FastTrackTableAndReleaseMeta extends FastTrackTable {
+  releaseId: string;
+  releaseSlug: string;
+  latestData: boolean;
+  latestReleaseTitle: string;
+}
+
 const tableBuilderService = {
   listLatestReleaseSubjects(publicationId: string): Promise<Subject[]> {
     return dataApi.get(`/publications/${publicationId}/subjects`);
@@ -246,6 +260,11 @@ const tableBuilderService = {
     return dataApi.get(
       `/tablebuilder/release/${releaseId}/data-block/${dataBlockId}`,
     );
+  },
+  getFastTrackTableAndReleaseMeta(
+    dataBlockId: string,
+  ): Promise<FastTrackTableAndReleaseMeta> {
+    return dataApi.get(`/tablebuilder/fast-track/${dataBlockId}`);
   },
 };
 
