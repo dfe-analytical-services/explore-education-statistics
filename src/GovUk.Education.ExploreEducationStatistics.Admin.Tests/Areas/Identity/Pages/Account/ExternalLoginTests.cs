@@ -51,21 +51,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
             Assert.Null(loginService.ErrorMessage);
             Assert.Empty(loginService.ModelState);
         }
-        
+
         [Fact]
         public async Task Login_ExistingUser_Failed()
         {
             var (result, loginService) = await DoExistingUserLogin(SignInResult.Failed);
             AssertRedirectedToLoginPageUponFailure(result, loginService);
         }
-        
+
         [Fact]
         public async Task Login_ExistingUser_NotAllowed()
         {
             var (result, loginService) = await DoExistingUserLogin(SignInResult.NotAllowed);
             AssertRedirectedToLoginPageUponFailure(result, loginService);
         }
-        
+
         [Fact]
         public async Task Login_ExistingUser_LockedOut()
         {
@@ -76,13 +76,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
             Assert.Equal(ExpectedLoginErrorMessage, loginService.ErrorMessage);
             Assert.Empty(loginService.ModelState);
         }
-        
+
         [Fact]
         public async Task Login_ExistingUser_NewProviderDetails_Success()
         {
             var (result, loginService) = await DoLoginExistingUserWithNewProviderKey(
                 ListOf(_providerDetails),
-                IdentityResult.Success, 
+                IdentityResult.Success,
                 SignInResult.Success);
 
             AssertSuccessfulLogin(result, loginService);
@@ -104,7 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                         Code = "502",
                         Description = "Error 2"
                     }));
-            
+
             AssertRedirectedToLoginPageUponFailure(
                 result,
                 loginService,
@@ -116,7 +116,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
         {
             var (result, loginService) = await DoLoginExistingUserWithNewProviderKey(
                 new List<IdentityUserLogin<string>>());
-            
+
             AssertRedirectedToLoginPageUponFailure(result, loginService);
         }
 
@@ -141,7 +141,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
 
             var result = await loginService.OnGetCallbackAsync(ReturnUrl);
             VerifyAllMocks(signInManager);
-            
+
             AssertRedirectedToLoginPageUponFailure(result, loginService);
         }
 
@@ -152,7 +152,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                 Guid.NewGuid(),
                 new Claim(ClaimTypes.GivenName, "FirstName"),
                 new Claim(ClaimTypes.Surname, "LastName"));
-            
+
             var signInManager = new Mock<ISignInManagerDelegate>(Strict);
 
             signInManager
@@ -165,7 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
 
             await using var usersDbContext = InMemoryUserAndRolesDbContext();
             await using var contentDbContext = InMemoryApplicationDbContext();
-            
+
             var loginService = BuildService(
                 signInManager.Object,
                 usersDbContext: usersDbContext,
@@ -173,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
 
             var result = await loginService.OnGetCallbackAsync(ReturnUrl);
             VerifyAllMocks(signInManager);
-            
+
             AssertRedirectedToLoginPageUponFailure(result, loginService);
         }
 
@@ -190,7 +190,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
 
             await using var usersDbContext = InMemoryUserAndRolesDbContext();
             await using var contentDbContext = InMemoryApplicationDbContext();
-            
+
             var loginService = BuildService(
                 signInManager.Object,
                 userManager.Object,
@@ -207,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
 
             var result = await loginService.OnGetCallbackAsync(ReturnUrl);
             VerifyAllMocks(userManager, signInManager);
-                
+
             AssertRedirectedToLoginPageUponFailure(result, loginService);
         }
 
@@ -219,12 +219,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
             const string email = "inviteduser@example.com";
             const string firstName = "FirstName";
             const string lastName = "LastName";
-            
+
             var claimsPrincipal = CreateClaimsPrincipal(email, firstName, lastName);
 
             var userManager = new Mock<IUserManagerDelegate>(Strict);
             var signInManager = new Mock<ISignInManagerDelegate>(Strict);
-            
+
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 await contentDbContext.UserReleaseInvites.AddRangeAsync(
@@ -311,16 +311,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                         It.Is<ApplicationUser>(u =>
                             u.Email == email &&
                             u.FirstName == firstName &&
-                            u.LastName == lastName), 
+                            u.LastName == lastName),
                         "Role A"))
                     .ReturnsAsync(IdentityResult.Success);
-                
+
                 userManager
                     .Setup(s => s.AddLoginAsync(
                         It.Is<ApplicationUser>(u =>
                             u.Email == email &&
                             u.FirstName == firstName &&
-                            u.LastName == lastName), 
+                            u.LastName == lastName),
                         It.Is<UserLoginInfo>(l =>
                             l.ProviderKey == ProviderKey
                             && l.LoginProvider == LoginProvider
@@ -333,7 +333,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
 
                 var result = await loginService.OnGetCallbackAsync(ReturnUrl);
                 VerifyAllMocks(userManager, signInManager);
-                
+
                 AssertSuccessfulLogin(result, loginService);
             }
 
@@ -347,6 +347,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     .SingleAsync(invite => invite.Email == email);
                 Assert.True(newUsersInvite.Accepted);
 
+                // Assert that the other user's invites have all been left alone.
+                var otherUsersInvite = await usersDbContext
+                    .UserInvites
+                    .AsQueryable()
+                    .SingleAsync(invite => invite.Email != email);
+                Assert.False(otherUsersInvite.Accepted);
+
+                // Assert that the new user's release role invites have all been left alone.
+                var newUsersReleaseRoleInvites = await contentDbContext
+                    .UserReleaseInvites
+                    .AsQueryable()
+                    .Where(invite => invite.Email == email)
+                    .ToListAsync();
+                Assert.Equal(2, newUsersReleaseRoleInvites.Count);
+
                 // Assert that the other user's release role invites have all been left alone.
                 var otherUsersReleaseRoleInvites = await contentDbContext
                     .UserReleaseInvites
@@ -354,6 +369,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     .Where(invite => invite.Email != email)
                     .ToListAsync();
                 Assert.Single(otherUsersReleaseRoleInvites);
+
+                // Assert that the new user's publication role invites have all been left alone.
+                var newUsersPublicationRoleInvites = await contentDbContext
+                    .UserPublicationInvites
+                    .AsQueryable()
+                    .Where(invite => invite.Email == email)
+                    .ToListAsync();
+                Assert.Equal(2, newUsersPublicationRoleInvites.Count);
+
+                // Assert that the other user's publication role invites have all been left alone.
+                var otherUsersPublicationRoleInvites = await contentDbContext
+                    .UserPublicationInvites
+                    .AsQueryable()
+                    .Where(invite => invite.Email != email)
+                    .ToListAsync();
+                Assert.Single(otherUsersPublicationRoleInvites);
 
                 // Assert that the user has been assigned the new release roles.
                 var newUsersReleaseRoles = await contentDbContext
@@ -423,7 +454,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
 
                 var result = await loginService.OnGetCallbackAsync(ReturnUrl);
                 VerifyAllMocks(userManager, signInManager);
-                
+
                 return (result, loginService);
             }
         }
@@ -459,7 +490,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                 {
                     await usersDbContext.UserLogins.AddRangeAsync(existingProviderKeys);
                 }
-                
+
                 await usersDbContext.SaveChangesAsync();
             }
 
@@ -555,8 +586,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
                     .Errors
                     .Select(e => e.ErrorMessage))
                 .ToList());
-        }        
-        
+        }
+
         private static void AssertSuccessfulLogin(IActionResult? result, ExternalLoginModel loginService)
         {
             var redirectPage = Assert.IsType<LocalRedirectResult>(result);
@@ -567,9 +598,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Areas.Identity.
         }
 
         private static ExternalLoginModel BuildService(
-            ISignInManagerDelegate? signInManager = null, 
-            IUserManagerDelegate? userManager = null, 
-            ContentDbContext? contentDbContext = null, 
+            ISignInManagerDelegate? signInManager = null,
+            IUserManagerDelegate? userManager = null,
+            ContentDbContext? contentDbContext = null,
             UsersAndRolesDbContext? usersDbContext = null)
         {
             return new ExternalLoginModel(
