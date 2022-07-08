@@ -48,13 +48,11 @@ export default function refreshAuthTokens({
   /* eslint-enable camelcase */
 
   return {
-    adminUrl,
     userName,
     authTokens: {
       accessToken: authTokens.access_token,
       refreshToken: authTokens.refresh_token,
       expiryDate: authTokens.expires_in,
     },
-    supportsRefreshTokens,
   };
 }

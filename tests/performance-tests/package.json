@@ -17,6 +17,7 @@
     "bufferutil": "^4.0.6",
     "clean-webpack-plugin": "^4.0.0",
     "copy-webpack-plugin": "^11.0.0",
+    "cross-env": "^7.0.3",
     "dotenv": "^16.0.1",
     "dotenv-json-complex": "^1.0.4",
     "k6": "^0.0.0",

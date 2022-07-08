@@ -8,11 +8,11 @@ export const options: Options = {
   stages: [
     {
       duration: '0.1s',
-      target: 200,
+      target: 80,
     },
     {
       duration: '10m',
-      target: 200,
+      target: 80,
     },
   ],
   noConnectionReuse: true,
@@ -35,39 +35,45 @@ const environmentAndUsers = getEnvironmentAndUsersFromFile(
 );
 
 const performTest = () => {
+  const startTime = Date.now();
+  let response;
   try {
-    const startTime = Date.now();
-    const response = http.get(
+    response = http.get(
       `${environmentAndUsers.environment.publicUrl}/find-statistics/release-cache-blob-test-3-publication/2001-02`,
       {
         timeout: '120s',
       },
     );
-
-    if (
-      check(response, {
-        'response code was 200': ({ status }) => status === 200,
-        'response should have contained body': ({ body }) => body != null,
-      }) &&
-      check(response, {
-        'response contains expected text': res =>
-          res.html().text().includes('Release cache blob test 3 publication'),
-      })
-    ) {
-      console.log('SUCCESS!');
-      getReleaseSuccessCount.add(1);
-      getReleaseRequestDuration.add(Date.now() - startTime);
-    } else {
-      console.log('FAILURE!');
-      getReleaseFailureCount.add(1);
-      getReleaseRequestDuration.add(Date.now() - startTime);
-      errorRate.add(1);
-      fail('Failure to Get Release page');
-    }
   } catch (e) {
-    fail(`Failure to get Release page - ${e}`);
     getReleaseFailureCount.add(1);
     errorRate.add(1);
+    fail(`Failure to get Release page - ${JSON.stringify(e)}`);
+    return;
+  }
+
+  if (
+    check(response, {
+      'response code was 200': ({ status }) => status === 200,
+      'response should have contained body': ({ body }) => body != null,
+    }) &&
+    check(response, {
+      'response contains expected text': res =>
+        res.html().text().includes('Release cache blob test 3 publication'),
+    })
+  ) {
+    console.log('SUCCESS!');
+    getReleaseSuccessCount.add(1);
+    getReleaseRequestDuration.add(Date.now() - startTime);
+  } else {
+    console.log(
+      `FAILURE!  Got ${response.status} response code - ${JSON.stringify(
+        response.body,
+      )}`,
+    );
+    getReleaseFailureCount.add(1);
+    getReleaseRequestDuration.add(Date.now() - startTime);
+    errorRate.add(1);
+    fail('Failure to Get Release page');
   }
 };
 
