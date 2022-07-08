@@ -615,7 +615,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             return new BlobStorageService(
                 connectionString: "",
                 blobServiceClient ?? new Mock<BlobServiceClient>().Object,
-                new Mock<ILogger<BlobStorageService>>().Object
+                new Mock<ILogger<BlobStorageService>>().Object,
+                resetCreatedContainers: true
             );
         }
 

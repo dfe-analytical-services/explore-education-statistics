@@ -42,8 +42,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private readonly ILogger<IBlobStorageService> _logger;
         private static readonly HashSet<string> createdContainers = new();
 
-        public BlobStorageService(string connectionString, BlobServiceClient client, ILogger<IBlobStorageService> logger)
+        public BlobStorageService(string connectionString, BlobServiceClient client, ILogger<IBlobStorageService> logger, bool resetCreatedContainers = false)
         {
+            if (resetCreatedContainers)
+            {
+                createdContainers.Clear();
+            }
             _connectionString = connectionString;
             _client = client;
             _logger = logger;
