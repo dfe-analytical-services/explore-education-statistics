@@ -301,43 +301,33 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Areas.Identity.Pages.
 
                 await _contentDbContext.Users.AddAsync(newInternalUser);
 
-                var releaseInvites = _contentDbContext
+                var rolesToCreate = await _contentDbContext
                     .UserReleaseInvites
-                    .AsQueryable()
-                    .Where(i => i.Email.ToLower() == newAspNetUser.Email.ToLower());
-
-                await releaseInvites.ForEachAsync(invite =>
-                {
-                    _contentDbContext.Add(new UserReleaseRole
+                    .Where(invite => invite.Email.ToLower().Equals(newAspNetUser.Email.ToLower()))
+                    .Select(invite => new UserReleaseRole
                     {
                         ReleaseId = invite.ReleaseId,
                         Role = invite.Role,
                         UserId = newInternalUser.Id,
                         Created = DateTime.UtcNow,
                         CreatedById = invite.CreatedById,
-                    });
+                    })
+                    .ToListAsync();
+                await _contentDbContext.UserReleaseRoles.AddRangeAsync(rolesToCreate);
 
-                    _contentDbContext.Remove(invite);
-                });
-
-                var publicationInvites = _contentDbContext
+                var publicationRolesToCreate = await _contentDbContext
                     .UserPublicationInvites
-                    .AsQueryable()
-                    .Where(i => i.Email.ToLower() == newAspNetUser.Email.ToLower());
-
-                await publicationInvites.ForEachAsync(invite =>
-                {
-                    _contentDbContext.Add(new UserPublicationRole
+                    .Where(invite => invite.Email.ToLower().Equals(newAspNetUser.Email.ToLower()))
+                    .Select(invite => new UserPublicationRole
                     {
                         PublicationId = invite.PublicationId,
                         Role = invite.Role,
                         UserId = newInternalUser.Id,
                         Created = DateTime.UtcNow,
                         CreatedById = invite.CreatedById,
-                    });
-
-                    _contentDbContext.Remove(invite);
-                });
+                    })
+                    .ToListAsync();
+                await _contentDbContext.AddRangeAsync(publicationRolesToCreate);
             }
 
             await _contentDbContext.SaveChangesAsync();
