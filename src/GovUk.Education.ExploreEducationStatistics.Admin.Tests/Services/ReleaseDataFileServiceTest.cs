@@ -20,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -1865,6 +1866,186 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     rf.ReleaseId == release.Id && rf.FileId == dataFile.Id));
                 Assert.NotNull(releaseFiles.SingleOrDefault(rf =>
                     rf.ReleaseId == release.Id && rf.FileId == metaFile.Id));
+            }
+        }
+
+        [Fact]
+        public async Task Upload_Order()
+        {
+            const string subjectName = "Test Subject";
+            const string dataFileName = "test-data.csv";
+            const string metaFileName = "test-data.meta.csv";
+
+            var release = new Release
+            {
+                ReleaseName = "2000",
+                Publication = new Publication
+                {
+                    Title = "Test publication",
+                    Topic = new Topic
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Test topic",
+                        Theme = new Theme
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = "Test theme"
+                        }
+                    }
+                },
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                new ()
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Data },
+                    Order = 0,
+                },
+                new ()
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Data },
+                    Order = 1,
+                },
+                new ()
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Data },
+                    Order = 3,
+
+                },
+                new ()
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Ancillary },
+                    Order = 5,
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataFormFile = CreateFormFileMock(dataFileName).Object;
+            var metaFormFile = CreateFormFileMock(metaFileName).Object;
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
+            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                fileUploadsValidatorService
+                    .Setup(s => s.ValidateSubjectName(release.Id, subjectName))
+                    .ReturnsAsync(Unit.Instance);
+
+                fileUploadsValidatorService
+                    .Setup(s => s.ValidateDataFilesForUpload(
+                        release.Id,
+                        dataFormFile,
+                        metaFormFile,
+                        null))
+                    .ReturnsAsync(Unit.Instance);
+
+                dataImportService
+                    .Setup(s => s.Import(
+                        It.IsAny<Guid>(),
+                        It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
+                        dataFormFile))
+                    .Returns(Task.CompletedTask);
+
+                blobStorageService.Setup(mock =>
+                    mock.UploadFile(PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
+                        dataFormFile,
+                        It.Is<IDictionary<string, string>>(metadata =>
+                            metadata[BlobInfoExtensions.MetaFileKey] == metaFileName
+                            && metadata[BlobInfoExtensions.NumberOfRowsKey] == "2")
+                    )).Returns(Task.CompletedTask);
+
+                blobStorageService.Setup(mock =>
+                    mock.UploadFile(PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
+                        metaFormFile,
+                        null
+                    )).Returns(Task.CompletedTask);
+
+                blobStorageService
+                    .Setup(s => s.GetBlob(PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(release.Id, FileType.Data)))))
+                    .ReturnsAsync(
+                        new BlobInfo(
+                            path: "data/file/path",
+                            size: "1 Mb",
+                            contentType: "application/zip",
+                            contentLength: 1000L,
+                            meta: GetDataFileMetaValues(
+                                metaFileName: metaFileName,
+                                numberOfRows: 0
+                            )
+                        )
+                    );
+
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    dataImportService: dataImportService.Object,
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object
+                );
+
+                var result = await service.Upload(
+                    releaseId: release.Id,
+                    dataFormFile: dataFormFile,
+                    metaFormFile: metaFormFile,
+                    userName: _user.Email,
+                    subjectName: subjectName);
+
+                var dataFileInfo = result.AssertRight();
+
+                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService, dataImportService);
+
+                Assert.True(dataFileInfo.Id.HasValue);
+                Assert.Equal(dataFileName, dataFileInfo.FileName);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var files = contentDbContext.Files.ToList();
+                Assert.Equal(6, files.Count);
+
+                var dbDataReleaseFiles = contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Where(rf => rf.File.Type == FileType.Data)
+                    .ToList();
+                Assert.Equal(4, dbDataReleaseFiles.Count);
+
+                Assert.Equal(0, dbDataReleaseFiles[0].Order);
+                Assert.Equal(1, dbDataReleaseFiles[1].Order);
+                Assert.Equal(3, dbDataReleaseFiles[2].Order);
+                Assert.Equal(4, dbDataReleaseFiles[3].Order); // Highest Order of existing releaseFiles is 3 then + 1
+
+
+                var dbMetaReleaseFiles = contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Where(rf => rf.File.Type == FileType.Metadata)
+                    .ToList();
+                var dbMetaReleaseFile = Assert.Single(dbMetaReleaseFiles);
+
+                Assert.Equal(metaFileName, dbMetaReleaseFile.File.Filename);
+                Assert.Equal(0, dbMetaReleaseFile.Order); // Files that aren't FileType.Data have Order set to 0
             }
         }
 

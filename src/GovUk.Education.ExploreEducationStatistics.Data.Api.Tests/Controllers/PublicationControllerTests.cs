@@ -105,6 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var original = new SubjectViewModel(
                 Guid.NewGuid(),
                 "Name",
+                0,
                 "Content",
                 new TimePeriodLabels
                 {

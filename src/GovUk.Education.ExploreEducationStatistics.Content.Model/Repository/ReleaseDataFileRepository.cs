@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -15,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
     {
         private readonly ContentDbContext _contentDbContext;
 
-        private static readonly List<FileType> SupportedFileTypes = new()
+        public static readonly List<FileType> SupportedFileTypes = new()
         {
             Data,
             Metadata
@@ -47,10 +48,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 throw new ArgumentException("replacingFile only used with Files of type Data, not Metadata.");
             }
 
+            var existingReleaseFilesOrders = new List<int>();
+            if (type == Data)
+            {
+                existingReleaseFilesOrders = _contentDbContext.ReleaseFiles
+                    .Include(releaseFile => releaseFile.File)
+                    .Where(releaseFile => releaseFile.ReleaseId == releaseId && releaseFile.File.Type == Data)
+                    .Select(releaseFile => releaseFile.Order)
+                    .ToList();
+            }
             var releaseFile = new ReleaseFile
             {
                 ReleaseId = releaseId,
                 Name = name,
+                Order = existingReleaseFilesOrders.IsNullOrEmpty()
+                    ? 0
+                    // NOTE: Max + 1 to guarantee is last, even if existing files "order" has gaps (i.e. 0, 1, 3, 4)
+                    : existingReleaseFilesOrders.Max() + 1,
                 File = new File
                 {
                     CreatedById = createdById,
@@ -62,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                     Type = type,
                     Replacing = replacingFile,
                     Source = source
-                }
+                },
             };
             var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
             if (replacingFile != null)

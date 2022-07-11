@@ -250,7 +250,7 @@ const ReleaseDataUploadsSection = ({
                   order,
                 );
 
-                // @MarkFix Doesn't like it if we pass the result of the PUT to setDataFiles so we do this
+                // NOTE: Doesn't like it if we pass the result of the PUT to setDataFiles so we do this
                 const dataFilesReordered: DataFile[] = dataFiles.sort(
                   (a, b) => {
                     if (fileIds.indexOf(a.id) > fileIds.indexOf(b.id)) {
