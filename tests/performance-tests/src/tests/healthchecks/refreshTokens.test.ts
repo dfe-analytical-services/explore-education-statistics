@@ -4,7 +4,7 @@ import { check, fail } from 'k6';
 import http from 'k6/http';
 import { Rate } from 'k6/metrics';
 import refreshAuthTokens from '../../auth/refreshAuthTokens';
-import { AuthDetails } from '../../auth/getAuthDetails';
+import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
 
 export const options = {
   noConnectionReuse: true,
@@ -14,17 +14,16 @@ export const options = {
 
 export const errorRate = new Rate('errors');
 
-export function setup() {
-  const tokenJson = __ENV.AUTH_DETAILS_AS_JSON as string;
-  const authDetails = JSON.parse(tokenJson) as AuthDetails[];
-  return authDetails.find(details => details.userName === 'bau1');
-}
+const environmentAndUsers = getEnvironmentAndUsersFromFile(
+  __ENV.TEST_ENVIRONMENT as string,
+);
+const { adminUrl } = environmentAndUsers.environment;
 
-export default function performTest({
-  userName,
-  adminUrl,
-  authTokens,
-}: AuthDetails) {
+const { authTokens, userName } = environmentAndUsers.users.find(
+  user => user.userName === 'bau1',
+)!;
+
+export default function performTest() {
   const responseWithOriginalAccessToken = http.get(`${adminUrl}/api/themes`, {
     headers: {
       'Content-Type': 'application/json',

@@ -24,17 +24,388 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 4,
+  "id": 5,
+  "iteration": 1657113573461,
   "links": [],
   "liveNow": false,
   "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 36,
+      "panels": [],
+      "title": "Get Release (Public Site)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P76A45B24F43298D1"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 1
+      },
+      "id": 34,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P76A45B24F43298D1"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "1s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "previous"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "ees_get_release_duration",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Get Release response speed ",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P76A45B24F43298D1"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 1
+      },
+      "id": 30,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P76A45B24F43298D1"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "1s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "ees_get_release_success",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Get Release Pages per second",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "P76A45B24F43298D1"
+      },
+      "description": "",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 9
+      },
+      "id": 32,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "P76A45B24F43298D1"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "1s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "ees_get_release_success",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT count(\"value\") FROM \"ees_get_release_failure\" WHERE $timeFilter GROUP BY time(1s) fill(null)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "count"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Get Release Page failures per second",
+      "type": "timeseries"
+    },
     {
       "collapsed": true,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 17
       },
       "id": 12,
       "panels": [],
@@ -101,7 +472,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 1
+        "y": 18
       },
       "id": 9,
       "options": {
@@ -136,7 +507,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 9
+        "y": 26
       },
       "id": 14,
       "panels": [],
@@ -186,8 +557,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -202,7 +572,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 10
+        "y": 27
       },
       "id": 17,
       "options": {
@@ -309,8 +679,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -325,7 +694,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 10
+        "y": 27
       },
       "id": 16,
       "options": {
@@ -393,7 +762,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 36
       },
       "id": 6,
       "panels": [],
@@ -443,8 +812,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -459,7 +827,7 @@
         "h": 8,
         "w": 4,
         "x": 0,
-        "y": 20
+        "y": 37
       },
       "id": 19,
       "options": {
@@ -532,8 +900,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -548,7 +915,7 @@
         "h": 8,
         "w": 4,
         "x": 4,
-        "y": 20
+        "y": 37
       },
       "id": 20,
       "options": {
@@ -654,8 +1021,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -670,7 +1036,7 @@
         "h": 8,
         "w": 4,
         "x": 8,
-        "y": 20
+        "y": 37
       },
       "id": 21,
       "options": {
@@ -775,8 +1141,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -791,7 +1156,7 @@
         "h": 8,
         "w": 4,
         "x": 12,
-        "y": 20
+        "y": 37
       },
       "id": 22,
       "options": {
@@ -865,8 +1230,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -881,7 +1245,7 @@
         "h": 8,
         "w": 4,
         "x": 16,
-        "y": 20
+        "y": 37
       },
       "id": 23,
       "options": {
@@ -955,8 +1319,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -971,7 +1334,7 @@
         "h": 8,
         "w": 4,
         "x": 20,
-        "y": 20
+        "y": 37
       },
       "id": 4,
       "options": {
@@ -1047,8 +1410,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1063,7 +1425,7 @@
         "h": 7,
         "w": 4,
         "x": 0,
-        "y": 28
+        "y": 45
       },
       "id": 24,
       "options": {
@@ -1145,8 +1507,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1161,7 +1522,7 @@
         "h": 7,
         "w": 4,
         "x": 4,
-        "y": 28
+        "y": 45
       },
       "id": 25,
       "options": {
@@ -1243,8 +1604,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1259,7 +1619,7 @@
         "h": 7,
         "w": 4,
         "x": 8,
-        "y": 28
+        "y": 45
       },
       "id": 26,
       "options": {
@@ -1341,8 +1701,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1357,7 +1716,7 @@
         "h": 7,
         "w": 4,
         "x": 12,
-        "y": 28
+        "y": 45
       },
       "id": 28,
       "options": {
@@ -1439,8 +1798,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1455,7 +1813,7 @@
         "h": 7,
         "w": 4,
         "x": 16,
-        "y": 28
+        "y": 45
       },
       "id": 27,
       "options": {
@@ -1536,8 +1894,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1552,7 +1909,7 @@
         "h": 7,
         "w": 4,
         "x": 20,
-        "y": 28
+        "y": 45
       },
       "id": 2,
       "options": {
@@ -1661,8 +2018,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "super-light-red",
-                "value": null
+                "color": "super-light-red"
               },
               {
                 "color": "red",
@@ -1677,7 +2033,7 @@
         "h": 9,
         "w": 12,
         "x": 0,
-        "y": 35
+        "y": 52
       },
       "id": 7,
       "options": {
@@ -1783,8 +2139,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1799,7 +2154,7 @@
         "h": 9,
         "w": 12,
         "x": 12,
-        "y": 35
+        "y": 52
       },
       "id": 10,
       "options": {
@@ -1900,6 +2255,6 @@
   "timezone": "",
   "title": "EES dashboard",
   "uid": "ees-dashboard",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

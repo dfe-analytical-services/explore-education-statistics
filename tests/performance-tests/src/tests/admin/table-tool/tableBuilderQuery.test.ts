@@ -1,10 +1,10 @@
 import { check } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
-import { AuthDetails, AuthTokens } from '../../auth/getAuthDetails';
-import createDataService, { SubjectMeta } from '../../utils/dataService';
-import testData from '../testData';
-import getOrRefreshAccessTokens from '../../utils/getOrRefreshAccessTokens';
+import createDataService, { SubjectMeta } from '../../../utils/dataService';
+import testData from '../../testData';
+import getOrRefreshAccessTokens from '../../../utils/getOrRefreshAccessTokens';
+import getEnvironmentAndUsersFromFile from '../../../utils/environmentAndUsers';
 
 const PUBLICATION =
   'UI test publication - Performance tests - adminTableBuilderQuery.test.ts';
@@ -37,10 +37,6 @@ interface SetupData {
   releaseId: string;
   subjectId: string;
   subjectMeta: SubjectMeta;
-  adminUrl: string;
-  userName: string;
-  authTokens: AuthTokens;
-  supportsRefreshTokens: boolean;
 }
 
 export const errorRate = new Rate('ees_errors');
@@ -53,12 +49,21 @@ export const tableQueryFailureCount = new Counter(
 );
 
 /* eslint-disable no-restricted-globals */
-const subjectFile = open('import/assets/dates.csv', 'b');
-const subjectMetaFile = open('import/assets/dates.meta.csv', 'b');
+const subjectFile = open('admin/import/assets/dates.csv', 'b');
+const subjectMetaFile = open('admin/import/assets/dates.meta.csv', 'b');
 /* eslint-enable no-restricted-globals */
 
-function getOrCreateReleaseWithSubject(adminUrl: string, accessToken: string) {
-  const dataService = createDataService(adminUrl, accessToken);
+const environmentAndUsers = getEnvironmentAndUsersFromFile(
+  __ENV.TEST_ENVIRONMENT as string,
+);
+const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
+
+const { authTokens, userName } = environmentAndUsers.users.find(
+  user => user.userName === 'bau1',
+)!;
+
+function getOrCreateReleaseWithSubject() {
+  const dataService = createDataService(adminUrl, authTokens.accessToken);
 
   const suffix = alwaysCreateNewDataPerTest
     ? `-${Date.now()}-${Math.random()}`
@@ -116,15 +121,6 @@ function getOrCreateReleaseWithSubject(adminUrl: string, accessToken: string) {
 }
 
 export function setup(): SetupData {
-  const tokenJson = __ENV.AUTH_DETAILS_AS_JSON as string;
-  const authDetails = JSON.parse(tokenJson) as AuthDetails[];
-  const {
-    adminUrl,
-    authTokens,
-    userName,
-    supportsRefreshTokens,
-  } = authDetails.find(details => details.userName === 'bau1') as AuthDetails;
-
   const dataService = createDataService(adminUrl, authTokens.accessToken);
 
   const {
@@ -132,7 +128,7 @@ export function setup(): SetupData {
     topicId,
     releaseId,
     subjectId,
-  } = getOrCreateReleaseWithSubject(adminUrl, authTokens.accessToken);
+  } = getOrCreateReleaseWithSubject();
 
   const { subjectMeta } = dataService.getSubjectMeta({ releaseId, subjectId });
 
@@ -142,22 +138,10 @@ export function setup(): SetupData {
     releaseId,
     subjectId,
     subjectMeta,
-    userName,
-    adminUrl,
-    authTokens,
-    supportsRefreshTokens,
   };
 }
 
-const performTest = ({
-  releaseId,
-  subjectId,
-  userName,
-  adminUrl,
-  authTokens,
-  subjectMeta,
-  supportsRefreshTokens,
-}: SetupData) => {
+const performTest = ({ releaseId, subjectId, subjectMeta }: SetupData) => {
   const accessToken = getOrRefreshAccessTokens(
     supportsRefreshTokens,
     userName,
@@ -216,14 +200,7 @@ const performTest = ({
   }
 };
 
-export const teardown = ({
-  supportsRefreshTokens,
-  userName,
-  adminUrl,
-  authTokens,
-  themeId,
-  topicId,
-}: SetupData) => {
+export const teardown = ({ themeId, topicId }: SetupData) => {
   if (alwaysCreateNewDataPerTest) {
     const accessToken = getOrRefreshAccessTokens(
       supportsRefreshTokens,

@@ -12,8 +12,6 @@ export interface AuthTokens {
 
 export interface AuthDetails {
   userName: string;
-  adminUrl: string;
-  supportsRefreshTokens: boolean;
   authTokens: AuthTokens;
 }
 
@@ -147,19 +145,16 @@ const getAuthDetails = async (
   password: string,
   adminUrl: string,
   idp: IdpOption,
-  supportsRefreshTokens: boolean,
 ): Promise<AuthDetails> => {
   const authTokens = await getAuthTokens(email, password, adminUrl, idp);
 
   return {
     userName,
-    adminUrl,
     authTokens: {
       accessToken: authTokens.access_token,
       refreshToken: authTokens.refresh_token,
       expiryDate: authTokens.expires_at,
     },
-    supportsRefreshTokens,
   };
 };
 
