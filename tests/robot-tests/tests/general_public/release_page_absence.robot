@@ -63,8 +63,12 @@ Validate "About these statistics" -- "Last updated"
     user checks release update    2    22 March 2018    First published.
     user closes details dropdown    See all updates (2)
 
-Validate "Useful information"
-    user checks page contains element    link:Download all data
+Check data downloads navigation contains links
+    user checks element contains link    testid:data-downloads    Explore data and files
+    user checks element contains link    testid:data-downloads    View data guidance
+    user checks element contains link    testid:data-downloads    Download all data
+
+Check supporting information contains methodology link
     user checks page contains link with text and url    Pupil absence statistics: methodology
     ...    /methodology/pupil-absence-in-schools-in-england
 
@@ -196,6 +200,10 @@ Validate Key Statistics data block -- Data tables tab
     user checks row cell contains text    ${row}    5    4.7
 
 Validate accordion sections order
+    user checks accordion is in position    Explore data and files    1    id:data-accordion
+
+    user checks there are x accordion sections    1    id:data-accordion
+
     user checks accordion is in position    About these statistics    1    id:content
     user checks accordion is in position    Pupil absence rates    2    id:content
     user checks accordion is in position    Persistent absence    3    id:content
@@ -206,12 +214,19 @@ Validate accordion sections order
     user checks accordion is in position    Pupil referral unit absence    8    id:content
     user checks accordion is in position    Regional and local authority (LA) breakdown    9    id:content
 
-    user scrolls to element    id:help-and-support
+    user checks there are x accordion sections    9    id:content
+
     user checks accordion is in position    Methodology    1    id:help-and-support
     user checks accordion is in position    Official statistics    2    id:help-and-support
     user checks accordion is in position    Contact us    3    id:help-and-support
 
     user checks there are x accordion sections    3    id:help-and-support
+
+Check explore data and files link opens accordion section
+    user verifies accordion is closed    Explore data and files
+    user clicks link    Explore data and files    testid:data-downloads
+    user verifies accordion is open    Explore data and files
+    user closes accordion section    Explore data and files    id:data-accordion
 
 Validate Regional and local authority (LA) breakdown table
     [Documentation]    BAU-540

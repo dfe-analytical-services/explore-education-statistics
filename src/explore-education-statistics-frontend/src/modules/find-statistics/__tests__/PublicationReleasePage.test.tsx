@@ -35,6 +35,96 @@ describe('PublicationReleasePage', () => {
     ).not.toBeInTheDocument();
   });
 
+  test('renders data downloads links', async () => {
+    render(
+      <PublicationReleasePage
+        release={{
+          ...testRelease,
+          relatedDashboardsSection: undefined,
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole('navigation', { name: 'Data downloads' }),
+    ).toBeInTheDocument();
+
+    const dataDownloadsNav = screen.getByRole('navigation', {
+      name: 'Data downloads',
+    });
+
+    const dataDownloadsLinks = within(dataDownloadsNav).getAllByRole('link');
+
+    expect(dataDownloadsLinks).toHaveLength(2);
+
+    expect(dataDownloadsLinks[0]).toHaveTextContent('Explore data and files');
+    expect(dataDownloadsLinks[0]).toHaveAttribute(
+      'href',
+      '#explore-data-and-files',
+    );
+
+    expect(dataDownloadsLinks[1]).toHaveTextContent('View data guidance');
+    expect(dataDownloadsLinks[1]).toHaveAttribute(
+      'href',
+      '/find-statistics/pupil-absence-in-schools-in-england/data-guidance',
+    );
+  });
+
+  test(`renders data download link to view related dashboard(s) when section exists`, async () => {
+    render(
+      <PublicationReleasePage
+        release={{
+          ...testRelease,
+          relatedDashboardsSection: {
+            id: 'related-dashboards-id',
+            order: 0,
+            heading: '',
+            content: [
+              {
+                id: 'related-dashboards-content-block-id',
+                order: 0,
+                body: '',
+                type: 'HtmlBlock',
+              },
+            ],
+          },
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByRole('navigation', { name: 'Data downloads' }),
+    ).toBeInTheDocument();
+
+    const dataDownloadsNav = screen.getByRole('navigation', {
+      name: 'Data downloads',
+    });
+
+    const dataDownloadsLinks = within(dataDownloadsNav).getAllByRole('link');
+
+    expect(dataDownloadsLinks).toHaveLength(3);
+
+    expect(dataDownloadsLinks[0]).toHaveTextContent('Explore data and files');
+    expect(dataDownloadsLinks[0]).toHaveAttribute(
+      'href',
+      '#explore-data-and-files',
+    );
+
+    expect(dataDownloadsLinks[1]).toHaveTextContent('View data guidance');
+    expect(dataDownloadsLinks[1]).toHaveAttribute(
+      'href',
+      '/find-statistics/pupil-absence-in-schools-in-england/data-guidance',
+    );
+
+    expect(dataDownloadsLinks[2]).toHaveTextContent(
+      'View related dashboard(s)',
+    );
+    expect(dataDownloadsLinks[2]).toHaveAttribute(
+      'href',
+      '#related-dashboards',
+    );
+  });
+
   test('renders national statistics section', () => {
     render(<PublicationReleasePage release={testRelease} />);
 
