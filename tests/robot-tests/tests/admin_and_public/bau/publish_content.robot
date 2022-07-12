@@ -84,11 +84,20 @@ Navigate to published release page
     user waits until page contains title caption    ${RELEASE_NAME}    %{WAIT_MEDIUM}
     user checks page contains    This is the latest data
 
-Check latest release contains related dashboards
-    user checks element contains link    testid:data-downloads    View data guidance
+Check latest release contains related dashboards section
     user checks there are x accordion sections    2    id:data-accordion
-    user opens accordion section    View related dashboard(s)    id:data-accordion
+    user checks accordion is in position    Explore data and files    1    id:data-accordion
+    user checks accordion is in position    View related dashboard(s)    2    id:data-accordion
     user checks element contains    id:related-dashboards-content    Related dashboards test text
+
+Check data downloads navigation contains link to related dashboards
+    user checks element contains link    testid:data-downloads    View related dashboard(s)
+
+Check related dashboard link opens accordion section
+    user verifies accordion is closed    View related dashboard(s)
+    user clicks link    View related dashboard(s)    testid:data-downloads
+    user verifies accordion is open    View related dashboard(s)
+    user closes accordion section    View related dashboard(s)    id:data-accordion
 
 Check latest release contains glossary info icon
     user opens accordion section    Test section    css:#content
