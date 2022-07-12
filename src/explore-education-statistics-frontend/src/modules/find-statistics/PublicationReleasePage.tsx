@@ -206,7 +206,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
                 <li>
                   <a
-                    href="#dataDownloads-1"
+                    href="#explore-data-and-files"
                     onClick={() => {
                       logEvent({
                         category: `${release.publication.title} release page`,
