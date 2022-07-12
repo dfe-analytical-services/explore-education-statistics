@@ -231,9 +231,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 </li>
                 {!!release.relatedDashboardsSection?.content.length && (
                   <li>
-                    <a href="#related-dashboards-section">
-                      View related dashboard(s)
-                    </a>
+                    <a href="#related-dashboards">View related dashboard(s)</a>
                   </li>
                 )}
                 {showAllFilesButton && (
