@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
@@ -99,14 +100,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
     public class Startup
     {
         private const string OpenIdConnectSpaClientId = "GovUk.Education.ExploreEducationStatistics.Admin";
-            
+
+        private static readonly List<string> DevelopmentAdminUrlAliases = ListOf("https://ees.local:5021"); 
+
         private IConfiguration Configuration { get; }
         private IHostEnvironment HostEnvironment { get; }
+
+        private readonly List<string> _adminUrlAndAliases; 
 
         public Startup(IConfiguration configuration, IHostEnvironment hostEnvironment)
         {
             Configuration = configuration;
             HostEnvironment = hostEnvironment;
+            
+            _adminUrlAndAliases = ListOf($"https://{Configuration.GetValue<string>("AdminUri")}");
+            if (hostEnvironment.IsDevelopment())
+            {
+                _adminUrlAndAliases.AddRange(DevelopmentAdminUrlAliases);
+            }
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
@@ -234,7 +245,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             .AllowedScopes
                             .Append(OpenIdConnectScope.OfflineAccess)
                             .ToList();
-                        spaClient.UpdateAccessTokenClaimsOnRefresh = true;
+                        
+                        // spaClient.UpdateAccessTokenClaimsOnRefresh = true;
                         
                         var tokenUsage = clientConfig.GetValue<string>("RefreshTokenUsage");
                         
@@ -264,14 +276,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 IdentityServerJwtConstants.IdentityServerJwtBearerScheme,
                 options =>
                 {
-                    // If running locally, allow IdP tokens to be issued from host names other than just localhost.
-                    if (HostEnvironment.IsDevelopment())
+                    options.TokenValidationParameters = new TokenValidationParameters
                     {
-                        options.TokenValidationParameters = new TokenValidationParameters
-                        {
-                            ValidateIssuer = false
-                        };
-                    }
+                        // When the user returns from logging into the Identity Provider (e.g. Azure AD, Keycloak etc)
+                        // the external login portion of the Open ID Connect flow is completed, and then the Admin
+                        // SPA and Identity Server (the locally running implementation of an Open ID Connect IdP) enter
+                        // into a conversation, effectively swapping the access token issued from Azure or Keycloak
+                        // for a new access token issued from Identity Server itself specifically for the SPA's use.
+                        //
+                        // The "Issuer" of this access token is by default whatever URL that the SPA used to initiate
+                        // the conversation with Identity Server.  So if the external IdP returns the user to
+                        // https://localhost:5021, then the SPA will use https://localhost:5021 as a basis for
+                        // negotiating with Identity Server, and thus Identity Server will issue its access tokens with
+                        // the "Issuer" set to "https://localhost:5021".
+                        //
+                        // As locally it's possible to access the service under an alternative URL like
+                        // "https://ees.local:5021", then we need to ensure that both "https://localhost:5021" and
+                        // "https://ees.local:5021" are *both* valid "Issuer" values on the access token provided by
+                        // Identity Server.
+                        ValidIssuers = _adminUrlAndAliases
+                    };
                 });
             
             services
