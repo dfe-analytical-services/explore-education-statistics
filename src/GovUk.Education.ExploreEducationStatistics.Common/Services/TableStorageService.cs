@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
@@ -9,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     public class TableStorageService : ITableStorageService
     {
         private readonly CloudTableClient _client;
-        private static readonly HashSet<string> createdTables = new();
+        private readonly StorageInstanceCreationUtil _storageInstanceCreationUtil = new StorageInstanceCreationUtil();
 
         public TableStorageService(string connectionString)
         {
@@ -27,11 +28,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             var table = _client.GetTableReference(tableName);
 
-            if (!createdTables.Contains($"{tableName}{_client.StorageUri}"))
-            {
-                await table.CreateIfNotExistsAsync();
-                createdTables.Add($"{tableName}{_client.StorageUri}");
-            }
+            _storageInstanceCreationUtil.CreateInstanceIfNotExists(
+                _client.StorageUri.ToString(),
+                AzureStorageType.Table,
+                tableName,
+                () => table.CreateIfNotExists());
 
             return table;
         }

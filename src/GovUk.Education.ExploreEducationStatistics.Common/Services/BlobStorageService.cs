@@ -12,6 +12,8 @@ using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
@@ -40,17 +42,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private readonly string _connectionString;
         private readonly BlobServiceClient _client;
         private readonly ILogger<IBlobStorageService> _logger;
-        private static readonly HashSet<string> createdContainers = new();
+        private readonly IStorageInstanceCreationUtil _storageInstanceCreationUtil = new StorageInstanceCreationUtil();
 
-        public BlobStorageService(string connectionString, BlobServiceClient client, ILogger<IBlobStorageService> logger, bool resetCreatedContainers = false)
+        public BlobStorageService(
+            string connectionString,
+            BlobServiceClient client,
+            ILogger<IBlobStorageService> logger,
+            IStorageInstanceCreationUtil? storageInstanceCreationUtil = null)
         {
-            if (resetCreatedContainers)
-            {
-                createdContainers.Clear();
-            }
             _connectionString = connectionString;
             _client = client;
             _logger = logger;
+
+            if (storageInstanceCreationUtil != null)
+            {
+                _storageInstanceCreationUtil = storageInstanceCreationUtil;
+            }
         }
 
         public async Task<List<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path)
@@ -367,11 +374,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             try
             {
-                if (!createdContainers.Contains($"{containerName.Name}{_connectionString}"))
-                {
-                    await blob.CreateIfNotExistsAsync();
-                    createdContainers.Add($"{containerName.Name}{_connectionString}");
-                }
+                await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
+                    _connectionString,
+                    AzureStorageType.Blob,
+                    containerName.Name,
+                    () => blob.CreateIfNotExistsAsync());
 
                 return true;
             }
@@ -650,11 +657,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var container = blobClient.GetContainerReference(
                 IsDevelopmentStorageAccount(blobClient) ? containerName.EmulatedName : containerName.Name);
 
-            if (!createdContainers.Contains($"{containerName.Name}{_connectionString}"))
-            {
-                await container.CreateIfNotExistsAsync();
-                createdContainers.Add($"{containerName.Name}{_connectionString}");
-            }
+            await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
+                _connectionString,
+                AzureStorageType.Blob,
+                containerName.Name,
+                () => container.CreateIfNotExistsAsync());
 
             return container;
         }
@@ -664,12 +671,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var container = _client.GetBlobContainerClient(
                 IsDevelopmentStorageAccount(_client) ? containerName.EmulatedName : containerName.Name);
 
-            if (!createdContainers.Contains($"{containerName.Name}{_connectionString}"))
-            {
-                await container.CreateIfNotExistsAsync();
-                createdContainers.Add($"{containerName.Name}{_connectionString}");
-            }
-
+            await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
+                _connectionString,
+                AzureStorageType.Blob,
+                containerName.Name,
+                () => container.CreateIfNotExistsAsync());
 
             return container;
         }
