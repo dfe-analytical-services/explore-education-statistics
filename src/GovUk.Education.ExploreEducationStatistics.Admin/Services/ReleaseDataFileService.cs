@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -81,7 +82,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release => await _userService.CheckCanUpdateRelease(release, ignoreCheck: forceDelete))
-                .OnSuccess(async release =>
+                .OnSuccess(async _ =>
                     await ids.Select(id => _releaseFileRepository.CheckFileExists(releaseId, id, FileType.Data))
                         .OnSuccessAll())
                 .OnSuccessVoid(async files =>
@@ -193,7 +194,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .Include(releaseFile => releaseFile.File)
                         .Where(releaseFile =>
                             releaseFile.File.Type == FileType.Data
-                            && releaseFile.ReleaseId == releaseId) // @MarkFix probably not, but exclude replacements?
+                            && releaseFile.ReleaseId == releaseId
+                            && !releaseFile.File.ReplacingId.HasValue)
                         .ToListAsync();
 
                     newOrder.ToList().ForEach(kvp =>
@@ -204,6 +206,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         if (matchingReleaseFile is not null)
                         {
                             matchingReleaseFile.Order = order;
+
+                            if (matchingReleaseFile.File.ReplacedById != null)
+                            {
+                                var replacingReleaseFile = _contentDbContext.ReleaseFiles
+                                    .Single(releaseFile => releaseFile.FileId == matchingReleaseFile.File.ReplacedById);
+                                replacingReleaseFile.Order = order;
+                            }
                         }
                     });
 
@@ -223,7 +232,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .OnSuccess(async _ =>
                 {
                     return await _persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
@@ -241,6 +250,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 await _releaseRepository
                                     .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseId);
 
+                            int releaseDataFileOrder = GetReleaseDataFileOrder(replacingFile, releaseId);
+
                             var dataFile = await _releaseDataFileRepository.Create(
                                 releaseId: releaseId,
                                 subjectId: subjectId,
@@ -249,7 +260,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 type: FileType.Data,
                                 createdById: _userService.GetUserId(),
                                 name: validSubjectName,
-                                replacingFile: replacingFile);
+                                replacingFile: replacingFile,
+                                order: releaseDataFileOrder);
 
                             var metaFile = await _releaseDataFileRepository.Create(
                                 releaseId: releaseId,
@@ -287,7 +299,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .OnSuccess(async _ =>
                 {
                     return await _persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile =>
@@ -311,6 +323,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         releaseId: releaseId,
                                                         createdById: _userService.GetUserId());
 
+                                                    var releaseDataFileOrder = GetReleaseDataFileOrder(replacingFile, releaseId);
+
                                                     var dataFile = await _releaseDataFileRepository.Create(
                                                         releaseId: releaseId,
                                                         subjectId: subjectId,
@@ -320,7 +334,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         createdById: _userService.GetUserId(),
                                                         name: validSubjectName,
                                                         replacingFile: replacingFile,
-                                                        source: zipFile);
+                                                        source: zipFile,
+                                                        order: releaseDataFileOrder);
 
                                                     var metaFile = await _releaseDataFileRepository.Create(
                                                         releaseId: releaseId,
@@ -430,8 +445,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<string> GetSubjectName(Guid releaseId, File file)
+        private async Task<string> GetSubjectName(Guid releaseId, File? file)
         {
+            if (file == null)
+            {
+                throw new ArgumentException("file should not be null");
+            }
+
             if (file.Type != FileType.Data)
             {
                 throw new ArgumentException("file.Type should equal FileType.Data");
@@ -441,10 +461,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, string>> ValidateSubjectName(Guid releaseId,
-            string subjectName,
+            string? subjectName,
             File? replacingFile)
         {
-            if (replacingFile == null)
+            if (replacingFile == null && subjectName != null)
             {
                 return await _fileUploadsValidatorService.ValidateSubjectName(releaseId, subjectName)
                     .OnSuccess(async () => await Task.FromResult(subjectName));
@@ -478,6 +498,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task DeleteBatchFiles(File dataFile)
         {
             await _blobStorageService.DeleteBlobs(PrivateReleaseFiles, dataFile.BatchesPath());
+        }
+
+        private int GetReleaseDataFileOrder(File? replacingFile, Guid releaseId)
+        {
+            if (replacingFile != null)
+            {
+                var replacedReleaseDataFile = _contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Single(rf =>
+                        rf.ReleaseId == releaseId
+                        && rf.File.Type == FileType.Data
+                        && rf.File.Id == replacingFile.Id);
+                return replacedReleaseDataFile.Order;
+            }
+
+            var existingReleaseFilesOrders = _contentDbContext.ReleaseFiles
+                .Include(releaseFile => releaseFile.File)
+                .Where(releaseFile => releaseFile.ReleaseId == releaseId
+                                      && releaseFile.File.Type == FileType.Data
+                                      && releaseFile.File.ReplacingId == null)
+                .Select(releaseFile => releaseFile.Order)
+                .ToList();
+
+            if (existingReleaseFilesOrders.IsNullOrEmpty())
+            {
+                return 0;
+            }
+
+            // NOTE: Max + 1 to guarantee is last, even if existing files "order" has gaps (i.e. 0, 1, 3, 4)
+            return existingReleaseFilesOrders.Max() + 1;
         }
     }
 }

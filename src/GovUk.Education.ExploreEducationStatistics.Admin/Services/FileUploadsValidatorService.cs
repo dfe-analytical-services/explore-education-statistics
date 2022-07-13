@@ -74,8 +74,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        public async Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseId, string name)
+        public async Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseId, string? name)
         {
+            if (name == null)
+            {
+                throw new Exception("Subject name must be specified.");
+            }
+
             if (FileContainsSpecialChars(name))
             {
                 return ValidationActionResult(SubjectTitleCannotContainSpecialCharacters);

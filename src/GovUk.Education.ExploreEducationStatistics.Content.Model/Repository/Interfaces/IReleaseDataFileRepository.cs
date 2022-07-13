@@ -17,7 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
             Guid createdById,
             string? name = null,
             File? replacingFile = null,
-            File? source = null);
+            File? source = null,
+            int order = 0);
 
         public Task<File> CreateZip(
             Guid releaseId,
