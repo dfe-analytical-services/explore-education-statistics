@@ -234,7 +234,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             .AllowedScopes
                             .Append(OpenIdConnectScope.OfflineAccess)
                             .ToList();
-                        spaClient.UpdateAccessTokenClaimsOnRefresh = true;
                         
                         var tokenUsage = clientConfig.GetValue<string>("RefreshTokenUsage");
                         
@@ -265,6 +264,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 options =>
                 {
                     // If running locally, allow IdP tokens to be issued from host names other than just localhost.
+                    // Typically this would allow tokens to be issued from Identity Server running at
+                    // https://localhost:5021 or https://ees.local:5021, or indeed any other domain alias.
+                    // Identity Server will add the "Issuer" field to the access tokens it provides based upon whichever
+                    // URL the SPA first made contact with it on, so if the user was accessing Admin on
+                    // https://ees.local:5021 (and thus Identity Server on its https://ees.local:5021/<openidconnect>
+                    // routes), the "Issuer" of the access tokens would become "https://ees.local:5021".  If accessed on
+                    // localhost, "Issuer" would be "https://localhost:5021.
+                    //
+                    // To support potentially 2 or more alternative domains for the same site, we can either:
+                    //
+                    // * set TokenValidationParameters.ValidateIssuer to false to ignore the issuer when running locally
+                    // * set TokenValidationParameters.ValidIssuers to an exhaustive list of possible issuers e.g. 
+                    //       ListOf("https://localhost:5021", "https://ees.local:5021") 
+                    //
+                    // Alternatively we could set the TokenValidationParameters.ValidIssuers and provide an exhaustive
+                    // list
                     if (HostEnvironment.IsDevelopment())
                     {
                         options.TokenValidationParameters = new TokenValidationParameters
