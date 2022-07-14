@@ -52,6 +52,9 @@ Assert that test users are present in table
     user checks row cell contains text    ${ROW}    2    BAU User
     user checks row cell contains text    ${ROW}    3    Manage
 
+Assert prerelease users are present in table
+    [Tags]    NotAgainstDev
+    # Failing against dev because this user doesn't exist on dev. see https://dfedigital.atlassian.net/browse/EES-3546
     ${ROW}=    user gets table row with heading    Prerelease3 User3
     user checks row cell contains text    ${ROW}    1    ees-prerelease3@education.gov.uk
     user checks row cell contains text    ${ROW}    2    No role
