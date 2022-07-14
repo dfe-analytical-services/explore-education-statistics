@@ -1,7 +1,5 @@
 ﻿#nullable enable
 using System;
-using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -20,7 +18,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     Id = Guid.NewGuid(),
                     RootPath = Guid.NewGuid(),
                     Filename = "data.csv",
-                    Type = FileType.Data
+                    Type = Data
                 }
             };
 
@@ -80,6 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     Id = Guid.NewGuid(),
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
+                    Size = 10240,
                     Type = Ancillary,
                     Created = new DateTime(),
                     CreatedBy = new User
@@ -89,21 +88,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                 }
             };
 
-            var info = releaseFile.ToFileInfo(new BlobInfo
-            (
-                path: "Ignored",
-                size: "400 B",
-                contentType: "Ignored",
-                contentLength: -1L,
-                meta: new Dictionary<string, string>()
-            ));
+            var info = releaseFile.ToFileInfo();
 
             Assert.Equal(releaseFile.FileId, info.Id);
             Assert.Equal("pdf", info.Extension);
             Assert.Equal("ancillary.pdf", info.FileName);
             Assert.Equal("Test ancillary file", info.Name);
             Assert.Equal("Test summary", info.Summary);
-            Assert.Equal("400 B", info.Size);
+            Assert.Equal("10 Kb", info.Size);
             Assert.Equal(Ancillary, info.Type);
             Assert.Equal(releaseFile.File.Created, info.Created);
             Assert.Equal("test@test.com", info.UserName);
@@ -121,18 +113,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     Id = Guid.NewGuid(),
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
+                    Size = 10240,
                     Type = Ancillary,
                 }
             };
 
-            var info = releaseFile.ToFileInfo(new BlobInfo
-            (
-                path: "Ignored",
-                size: "400 B",
-                contentType: "Ignored",
-                contentLength: -1L,
-                meta: new Dictionary<string, string>()
-            ));
+            var info = releaseFile.ToFileInfo();
 
             Assert.Null(info.Created);
             Assert.Null(info.UserName);

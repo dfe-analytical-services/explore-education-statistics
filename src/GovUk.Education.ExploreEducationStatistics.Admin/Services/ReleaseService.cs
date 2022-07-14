@@ -45,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly ISubjectRepository _subjectRepository;
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleaseFileService _releaseFileService;
-        private readonly IDataImportService _dataImportService; 
+        private readonly IDataImportService _dataImportService;
         private readonly IFootnoteService _footnoteService;
         private readonly IDataBlockService _dataBlockService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
@@ -472,7 +472,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(() => _releaseDataFileService.Delete(releaseId, fileId));
         }
 
-        public async Task<Either<ActionResult, DataImportViewModel>> GetDataFileImportStatus(Guid releaseId, Guid fileId)
+        public async Task<Either<ActionResult, DataImportStatusViewModel>> GetDataFileImportStatus(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -483,10 +483,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var releaseFile = await _releaseFileRepository.Find(releaseId, fileId);
                     if (releaseFile == null || releaseFile.File.Type != FileType.Data)
                     {
-                        return DataImportViewModel.NotFound();
+                        return DataImportStatusViewModel.NotFound();
                     }
 
-                    return await _dataImportService.GetImport(fileId);
+                    return await _dataImportService.GetImportStatus(fileId);
                 });
         }
 
@@ -498,7 +498,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task<Either<ActionResult, Unit>> CheckCanDeleteDataFiles(Guid releaseId, File file)
         {
-            var importStatus = await _dataImportService.GetStatus(file.Id);
+            var import = await _dataImportService.GetImport(file.Id);
+            var importStatus = import?.Status ?? DataImportStatus.NOT_FOUND;
 
             if (!importStatus.IsFinished())
             {

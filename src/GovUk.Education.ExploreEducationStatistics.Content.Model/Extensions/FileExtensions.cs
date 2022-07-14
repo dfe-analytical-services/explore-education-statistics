@@ -1,6 +1,7 @@
 ﻿#nullable enable
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -10,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 {
     public static class FileExtensions
     {
-        public static readonly List<FileType> PublicFileTypes = new List<FileType>
+        public static readonly List<FileType> PublicFileTypes = new()
         {
             Ancillary,
             Chart,
@@ -18,6 +19,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
             Image,
             DataGuidance
         };
+
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
+        private enum FileSizeUnit : byte
+        {
+            B,
+            Kb,
+            Mb,
+            Gb,
+            Tb
+        }
+
+        public static string DisplaySize(this File file)
+        {
+            var fileSize = file.Size ?? 0;
+            var unit = FileSizeUnit.B;
+            while (fileSize >= 1024 && unit < FileSizeUnit.Tb)
+            {
+                fileSize /= 1024;
+                unit++;
+            }
+
+            return $"{fileSize:0.##} {unit}";
+        }
 
         public static string Path(this File file)
         {
@@ -57,19 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
         public static string ZipFileEntryName(this File file)
         {
             return file.Type.GetEnumLabel() + "/" + file.Filename;
-        }
-
-        // TODO: Remove after completion of EES-2343
-        public static FileInfo ToFileInfoNotFound(this File file)
-        {
-            return new FileInfo
-            {
-                Id = file.Id,
-                FileName = file.Filename,
-                Name = FileInfo.UnknownName,
-                Size = FileInfo.UnknownSize,
-                Type = file.Type
-            };
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,9 +15,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
     {
         private readonly ContentDbContext _contentDbContext;
 
-        public static readonly List<FileType> SupportedFileTypes = new List<FileType>
+        private static readonly List<FileType> SupportedFileTypes = new()
         {
-            FileType.Data,
+            Data,
             Metadata
         };
 
@@ -29,11 +30,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             Guid releaseId,
             Guid subjectId,
             string filename,
+            string? contentType,
+            long size,
             FileType type,
             Guid createdById,
-            string name = null,
-            File replacingFile = null,
-            File source = null)
+            string? name = null,
+            File? replacingFile = null,
+            File? source = null)
         {
             if (!SupportedFileTypes.Contains(type))
             {
@@ -51,11 +54,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 Name = name,
                 File = new File
                 {
-                    Created = DateTime.UtcNow,
                     CreatedById = createdById,
                     RootPath = releaseId,
                     SubjectId = subjectId,
                     Filename = filename,
+                    ContentType = contentType,
+                    Size = size,
                     Type = type,
                     Replacing = replacingFile,
                     Source = source
@@ -74,14 +78,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
         public async Task<File> CreateZip(Guid releaseId,
             string filename,
+            string contentType,
+            long size,
             Guid createdById)
         {
             var file = (await _contentDbContext.Files.AddAsync(new File
             {
-                Created = DateTime.UtcNow,
                 CreatedById = createdById,
                 RootPath = releaseId,
                 Filename = filename,
+                ContentType = contentType,
+                Size = size,
                 Type = DataZip
             })).Entity;
 
@@ -123,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .SingleAsync(rf =>
                     rf.ReleaseId == releaseId
                     && rf.File.SubjectId == subjectId
-                    && rf.File.Type == FileType.Data);
+                    && rf.File.Type == Data);
         }
 
         private IQueryable<File> ListDataFilesQuery(Guid releaseId)
@@ -133,7 +140,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 .Include(rf => rf.File)
                 .Where(
                     rf => rf.ReleaseId == releaseId
-                          && rf.File.Type == FileType.Data
+                          && rf.File.Type == Data
                           && rf.File.ReplacingId == null
                           && rf.File.SubjectId.HasValue
                 )

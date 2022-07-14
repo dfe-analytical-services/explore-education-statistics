@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class DataImportViewModel
+    public class DataImportStatusViewModel
     {
         public List<string> Errors { get; set; }
         public int PercentageComplete { get; set; }
@@ -14,9 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(StringEnumConverter))]
         public DataImportStatus Status { get; set; }
 
-        public static DataImportViewModel NotFound()
+        public static DataImportStatusViewModel NotFound()
         {
-            return new DataImportViewModel
+            return new DataImportStatusViewModel
             {
                 Status = DataImportStatus.NOT_FOUND
             };

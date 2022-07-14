@@ -16,7 +16,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 
         public string MetaFileName { get; set; } = string.Empty;
 
-        public int Rows { get; set; }
+        public int? Rows { get; set; }
 
         public Guid? ReplacedBy { get; set; }
 

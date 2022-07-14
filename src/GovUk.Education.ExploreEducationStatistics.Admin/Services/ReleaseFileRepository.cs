@@ -19,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
     {
         private readonly ContentDbContext _contentDbContext;
 
-        private static readonly List<FileType> SupportedFileTypes = new List<FileType>
+        private static readonly List<FileType> SupportedFileTypes = new()
         {
             Ancillary,
             Chart,
@@ -53,6 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<ReleaseFile> Create(
             Guid releaseId,
             string filename,
+            string contentType,
+            long size,
             FileType type,
             Guid createdById,
             string? name = null,
@@ -70,10 +72,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Summary = summary,
                 File = new File
                 {
-                    Created = DateTime.UtcNow,
                     CreatedById = createdById,
                     RootPath = releaseId,
                     Filename = filename,
+                    ContentType = contentType,
+                    Size = size,
                     Type = type
                 }
             };

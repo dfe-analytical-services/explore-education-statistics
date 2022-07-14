@@ -11,16 +11,17 @@ using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Azure.Storage.Blobs.Specialized;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Blob;
 using Microsoft.Azure.Storage.DataMovement;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using BlobInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.BlobInfo;
 using BlobProperties = Azure.Storage.Blobs.Models.BlobProperties;
 using CopyStatus = Azure.Storage.Blobs.Models.CopyStatus;
@@ -80,7 +81,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                         blobInfos.Add(
                             new BlobInfo(
                                 path: blob.Name,
-                                size: GetSize(blob.Properties.ContentLength ?? 0),
                                 contentType: blob.Properties.ContentType,
                                 contentLength: blob.Properties.ContentLength ?? 0,
                                 meta: blob.Metadata,
@@ -110,7 +110,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             return new BlobInfo(
                 path: blob.Name,
-                size: GetSize(properties.ContentLength),
                 contentType: properties.ContentType,
                 contentLength: properties.ContentLength,
                 meta: properties.Metadata,
@@ -197,8 +196,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public async Task UploadFile(
             IBlobContainer containerName,
             string path,
-            IFormFile file,
-            IDictionary<string, string>? metadata = null)
+            IFormFile file)
         {
             var blob = await GetBlobClient(containerName, path);
 
@@ -211,8 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 httpHeaders: new BlobHttpHeaders
                 {
                     ContentType = file.ContentType
-                },
-                metadata: metadata
+                }
             );
         }
 
@@ -291,8 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             IBlobContainer containerName,
             string path,
             Stream stream,
-            string contentType,
-            IDictionary<string, string>? metadata = null)
+            string contentType)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobClient(path);
@@ -309,8 +305,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 httpHeaders: new BlobHttpHeaders
                 {
                     ContentType = contentType,
-                },
-                metadata: metadata
+                }
             );
         }
 
@@ -330,7 +325,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
-        public async Task<Stream> DownloadToStream(
+        public async Task<Either<ActionResult, Stream>> DownloadToStream(
             IBlobContainer containerName,
             string path,
             Stream targetStream,
@@ -341,7 +336,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 
             if (!await blob.ExistsAsync())
             {
-                throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
+                _logger.LogWarning($"Could not find file at {containerName}/{path}");
+                return new NotFoundResult();
             }
 
             await blob.DownloadToAsync(targetStream, cancellationToken ?? CancellationToken.None);
@@ -496,8 +492,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             IBlobContainer containerName,
             string path,
             string content,
-            string contentType,
-            IDictionary<string, string>? metadata = null)
+            string contentType)
         {
             var blobContainer = await GetBlobContainer(containerName);
             var blob = blobContainer.GetBlockBlobClient(path);
@@ -511,8 +506,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 httpHeaders: new BlobHttpHeaders
                 {
                     ContentType = contentType,
-                },
-                metadata: metadata
+                }
             );
         }
 
@@ -527,7 +521,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             allFilesStream.Add(
                 new BlobInfo(
                     path: destination.Name,
-                    size: GetSize(source.Properties.Length),
                     contentType: source.Properties.ContentType,
                     contentLength: source.Properties.Length,
                     meta: source.Metadata,

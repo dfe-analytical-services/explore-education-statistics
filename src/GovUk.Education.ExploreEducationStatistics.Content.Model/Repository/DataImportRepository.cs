@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -33,18 +34,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             }
         }
 
-        public async Task<DataImport> GetByFileId(Guid fileId)
+        public async Task<DataImport?> GetByFileId(Guid fileId)
         {
             return await _contentDbContext.DataImports
-                .Include(i => i.Errors)
                 .SingleOrDefaultAsync(i => i.FileId == fileId);
         }
 
         public async Task<DataImportStatus> GetStatusByFileId(Guid fileId)
         {
-            var import = await _contentDbContext.DataImports
-                .SingleOrDefaultAsync(i => i.FileId == fileId);
-
+            var import = await GetByFileId(fileId);
             return import?.Status ?? DataImportStatus.NOT_FOUND;
         }
     }

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -10,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IDataImportService
     {
-        Task<DataImportStatus> GetStatus(Guid fileId);
+        Task<DataImport?> GetImport(Guid fileId);
 
         Task<Either<ActionResult, Unit>> CancelImport(Guid releaseId, Guid fileId);
 
@@ -18,9 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<bool> HasIncompleteImports(Guid releaseId);
 
-        Task<DataImportViewModel> GetImport(Guid fileId);
+        Task<DataImportStatusViewModel> GetImportStatus(Guid fileId);
 
-        Task Import(Guid subjectId, File dataFile, File metaFile, IFormFile formFile);
+        Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile, IFormFile formFile);
 
         Task ImportZip(Guid subjectId, File dataFile, File metaFile, File zipFile);
     }

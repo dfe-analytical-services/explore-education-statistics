@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -11,15 +12,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
             Guid releaseId,
             Guid subjectId,
             string filename,
+            string? contentType,
+            long size,
             FileType type,
             Guid createdById,
-            string name = null,
-            File replacingFile = null,
-            File source = null);
+            string? name = null,
+            File? replacingFile = null,
+            File? source = null);
 
         public Task<File> CreateZip(
             Guid releaseId,
             string filename,
+            string contentType,
+            long size,
             Guid createdById);
 
         public Task<IList<File>> ListDataFiles(Guid releaseId);

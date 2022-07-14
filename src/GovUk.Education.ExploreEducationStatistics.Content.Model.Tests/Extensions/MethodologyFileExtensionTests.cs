@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
+﻿#nullable enable
+using System;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
@@ -37,23 +36,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     Id = Guid.NewGuid(),
                     RootPath = Guid.NewGuid(),
                     Filename = "image.png",
+                    Size = 10240,
                     Type = Image
                 }
             };
 
-            var result = methodologyFile.ToFileInfo(new BlobInfo
-            (
-                path: "Ignored",
-                size: "500 B",
-                contentType: "Ignored",
-                contentLength: -1L,
-                meta: new Dictionary<string, string>()
-            ));
+            var result = methodologyFile.ToFileInfo();
 
             Assert.Equal(methodologyFile.File.Id, result.Id);
             Assert.Equal("png", result.Extension);
             Assert.Equal("image.png", result.FileName);
-            Assert.Equal("500 B", result.Size);
+            Assert.Equal("10 Kb", result.Size);
             Assert.Equal(Image, result.Type);
         }
     }

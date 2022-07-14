@@ -1,4 +1,4 @@
-using System;
+#nullable enable
 using System.Collections.Generic;
 using System.IO.Compression;
 using System.Text.RegularExpressions;
@@ -20,7 +20,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IFileTypeService _fileTypeService;
 
         private static readonly Dictionary<FileType, IEnumerable<Regex>> AllowedMimeTypesByFileType =
-            new Dictionary<FileType, IEnumerable<Regex>>
+            new()
             {
                 {DataZip, AllowedArchiveMimeTypes}
             };
@@ -30,9 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _fileTypeService = fileTypeService;
         }
 
-        public async Task<Either<ActionResult, IDataArchiveFile>> ValidateDataArchiveFile(
-            Guid releaseId,
-            IFormFile zipFile)
+        public async Task<Either<ActionResult, IDataArchiveFile>> ValidateDataArchiveFile(IFormFile zipFile)
         {
             if (!await IsZipFile(zipFile))
             {

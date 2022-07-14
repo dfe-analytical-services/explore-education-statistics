@@ -1,6 +1,5 @@
 #nullable enable
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -557,6 +556,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "image.png",
+                    ContentType = "image/png",
                     Type = Image
                 }
             };
@@ -572,18 +572,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            var blob = new BlobInfo(
-                path: methodologyFile.Path(),
-                size: "1 Mb",
-                contentType: "image/png",
-                contentLength: 0L,
-                meta: null,
-                created: null);
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateMethodologyFiles, methodologyFile.Path()))
-                .ReturnsAsync(blob);
-
             blobStorageService.Setup(mock =>
                     mock.DownloadToStream(PrivateMethodologyFiles, methodologyFile.Path(),
                         It.IsAny<MemoryStream>(), null))
@@ -596,11 +584,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
 
-                var image = result.AssertRight();
+                MockUtils.VerifyAllMocks(blobStorageService);
 
-                blobStorageService.Verify(
-                    mock => mock.GetBlob(PrivateMethodologyFiles, methodologyFile.Path()),
-                    Times.Once());
+                var image = result.AssertRight();
 
                 blobStorageService.Verify(
                     mock =>
@@ -612,8 +598,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 Assert.Equal("image.png", image.FileDownloadName);
                 Assert.IsType<MemoryStream>(image.FileStream);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -638,19 +622,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            await using (var contentDbContext = InMemoryApplicationDbContext())
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupMethodologyImageService(contentDbContext: contentDbContext);
 
                 var result = await service.Stream(Guid.NewGuid(), methodologyFile.File.Id);
 
                 result.AssertNotFound();
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -666,19 +645,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            await using (var contentDbContext = InMemoryApplicationDbContext())
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
-                var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupMethodologyImageService(contentDbContext: contentDbContext);
 
                 var result = await service.Stream(methodologyVersion.Id, Guid.NewGuid());
 
                 result.AssertNotFound();
             }
+        }
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+        [Fact]
+        public async Task Stream_BlobDoesNotExist()
+        {
+            var methodologyVersion = new MethodologyVersion();
+
+            var methodologyFile = new MethodologyFile
+            {
+                MethodologyVersion = methodologyVersion,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "image.png",
+                    ContentType = "image/png",
+                    Type = Image
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
+                await contentDbContext.AddAsync(methodologyFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+
+            blobStorageService.SetupDownloadToStreamNotFound(PrivateMethodologyFiles, methodologyFile.Path());
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = await service.Stream(methodologyVersion.Id, methodologyFile.File.Id);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
+
+                result.AssertNotFound();
+            }
         }
 
         [Fact]
@@ -696,7 +713,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var formFile = CreateFormFileMock(filename).Object;
+            var formFile = CreateFormFileMock(filename, "image/png").Object;
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
 
@@ -704,21 +721,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                 mock.UploadFile(PrivateMethodologyFiles,
                     It.Is<string>(path =>
                         path.Contains(FilesPath(methodologyVersion.Id, Image))),
-                    formFile,
-                    null
+                    formFile
                 )).Returns(Task.CompletedTask);
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateMethodologyFiles,
-                        It.Is<string>(path =>
-                            path.Contains(FilesPath(methodologyVersion.Id, Image)))))
-                .ReturnsAsync(new BlobInfo(
-                    path: "image/file/path",
-                    size: "20 Kb",
-                    contentType: "image/png",
-                    contentLength: 0L,
-                    meta: new Dictionary<string, string>(),
-                    created: null));
 
             fileUploadsValidatorService.Setup(mock =>
                     mock.ValidateFileForUpload(formFile, Image))
@@ -732,6 +736,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                 var result = await service.Upload(methodologyVersion.Id, formFile);
 
+                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+
                 var upload = result.AssertRight();
 
                 fileUploadsValidatorService.Verify(mock =>
@@ -741,15 +747,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     mock.UploadFile(PrivateMethodologyFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(methodologyVersion.Id, Image))),
-                        formFile,
-                        null
+                        formFile
                     ), Times.Once);
-
-                blobStorageService.Verify(mock =>
-                        mock.GetBlob(PrivateMethodologyFiles,
-                            It.Is<string>(path =>
-                                path.Contains(FilesPath(methodologyVersion.Id, Image)))),
-                    Times.Once);
 
                 Assert.True(upload.ContainsKey("default"));
                 Assert.Contains($"/api/methodologies/{methodologyVersion.Id}/images/", upload["default"]);
@@ -766,34 +765,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     );
 
                 Assert.NotNull(methodologyFile);
-                Assert.InRange(DateTime.UtcNow.Subtract(methodologyFile.File.Created.Value).Milliseconds, 0, 1500);
-                Assert.Equal(_user.Id, methodologyFile.File.CreatedById);
-            }
+                var file = methodologyFile!.File;
 
-            MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+                Assert.Equal("image/png", file.ContentType);
+                Assert.Equal(10240, file.Size);
+                Assert.InRange(DateTime.UtcNow.Subtract(file.Created!.Value).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, file.CreatedById);
+            }
         }
 
         [Fact]
         public async Task Upload_MethodologyVersionNotFound()
         {
-            const string filename = "image.png";
+            var formFile = CreateFormFileMock("image.png", "image/png").Object;
 
-            var formFile = CreateFormFileMock(filename).Object;
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
+            await using var contentDbContext = InMemoryApplicationDbContext();
 
-            await using (var contentDbContext = InMemoryApplicationDbContext())
-            {
-                var service = SetupMethodologyImageService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object,
-                    fileUploadsValidatorService: fileUploadsValidatorService.Object);
+            var service = SetupMethodologyImageService(contentDbContext: contentDbContext);
 
-                var result = await service.Upload(Guid.NewGuid(), formFile);
-
-                result.AssertNotFound();
-            }
-
-            MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+            var result = await service.Upload(Guid.NewGuid(), formFile);
+            result.AssertNotFound();
         }
 
         private MethodologyImageService SetupMethodologyImageService(

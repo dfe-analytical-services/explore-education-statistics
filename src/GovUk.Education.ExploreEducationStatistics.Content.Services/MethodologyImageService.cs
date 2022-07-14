@@ -3,7 +3,6 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -42,39 +41,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     .Include(mf => mf.MethodologyVersion)
                     .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
                 .OnSuccessDo(mf => _userService.CheckCanViewMethodologyVersion(mf.MethodologyVersion))
-                .OnSuccess(async mf =>
+                .OnSuccessCombineWith(mf =>
+                    _blobStorageService.DownloadToStream(PublicMethodologyFiles, mf.Path(), new MemoryStream()))
+                .OnSuccess(methodologyFileAndStream =>
                 {
-                    return await GetBlob(mf.Path())
-                        .OnSuccess(blob => DownloadToStream(blob, mf.File.Filename));
+                    var (methodologyFile, stream) = methodologyFileAndStream;
+                    return new FileStreamResult(stream, methodologyFile.File.ContentType)
+                    {
+                        FileDownloadName = methodologyFile.File.Filename
+                    };
                 });
-        }
-
-        private async Task<FileStreamResult> DownloadToStream(BlobInfo blob, string filename)
-        {
-            var stream = new MemoryStream();
-            await _blobStorageService.DownloadToStream(PublicMethodologyFiles, blob.Path, stream);
-
-            return new FileStreamResult(stream, blob.ContentType)
-            {
-                FileDownloadName = filename
-            };
-        }
-
-        private async Task<Either<ActionResult, BlobInfo>> GetBlob(string path)
-        {
-            if (!await _blobStorageService.CheckBlobExists(PublicMethodologyFiles, path))
-            {
-                return new NotFoundResult();
-            }
-
-            var blob = await _blobStorageService.GetBlob(PublicMethodologyFiles, path);
-
-            if (!blob.IsReleased())
-            {
-                return new NotFoundResult();
-            }
-
-            return blob;
         }
     }
 }

@@ -1,5 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿#nullable enable
+using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,7 +18,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -52,15 +51,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<ReleaseFile>(q => q
                     .Include(rf => rf.File)
                     .Where(rf => rf.ReleaseId == releaseId && rf.FileId == fileId))
-                .OnSuccess(async releaseFile =>
+                .OnSuccessCombineWith(rf =>
+                    _blobStorageService.DownloadToStream(PrivateReleaseFiles, rf.Path(), new MemoryStream()))
+                .OnSuccess(releaseFileAndStream =>
                 {
-                    var path = releaseFile.Path();
-                    var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, path);
-
-                    var stream = new MemoryStream();
-                    await _blobStorageService.DownloadToStream(PrivateReleaseFiles, path, stream);
-
-                    return new FileStreamResult(stream, blob.ContentType)
+                    var (releaseFile, stream) = releaseFileAndStream;
+                    return new FileStreamResult(stream, releaseFile.File.ContentType)
                     {
                         FileDownloadName = releaseFile.File.Filename
                     };
@@ -77,20 +73,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     releaseId,
                     Image,
                     formFile))
-                .OnSuccess(fileInfo => new ImageFileViewModel($"/api/releases/{releaseId}/images/{fileInfo.Id}")
+                .OnSuccess(releaseFile => new ImageFileViewModel($"/api/releases/{releaseId}/images/{releaseFile.File.Id}")
                 {
                     // TODO EES-1922 Add support for resizing the image
                 });
         }
 
-        private async Task<Either<ActionResult, FileInfo>> Upload(Guid releaseId,
+        private async Task<Either<ActionResult, ReleaseFile>> Upload(Guid releaseId,
             FileType type,
-            IFormFile formFile,
-            IDictionary<string, string> metadata = null)
+            IFormFile formFile)
         {
             var releaseFile = await _releaseFileRepository.Create(
                 releaseId: releaseId,
                 filename: formFile.FileName,
+                contentType: formFile.ContentType,
+                size: formFile.Length,
                 type: type,
                 createdById: _userService.GetUserId());
 
@@ -99,14 +96,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             await _blobStorageService.UploadFile(
                 containerName: PrivateReleaseFiles,
                 path: releaseFile.Path(),
-                file: formFile,
-                metadata: metadata);
+                file: formFile);
 
-            var blob = await _blobStorageService.GetBlob(
-                PrivateReleaseFiles,
-                releaseFile.Path());
-
-            return releaseFile.ToFileInfo(blob);
+            return releaseFile;
         }
     }
 }

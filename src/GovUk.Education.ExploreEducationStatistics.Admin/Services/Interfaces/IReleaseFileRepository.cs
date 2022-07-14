@@ -17,6 +17,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         public Task<ReleaseFile> Create(
             Guid releaseId,
             string filename,
+            string contentType,
+            long size,
             FileType type,
             Guid createdById,
             string? name = null,

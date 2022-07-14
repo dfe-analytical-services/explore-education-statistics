@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage;
 using Moq;
 using Moq.Language.Flow;
@@ -66,6 +67,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
                     }
                 )
                 .ReturnsAsync(blobText.ToStream());
+        }
+
+        public static IReturnsResult<IBlobStorageService> SetupDownloadToStreamNotFound(
+            this Mock<IBlobStorageService> service,
+            IBlobContainer container,
+            string path,
+            CancellationToken? cancellationToken = null)
+        {
+            return service.Setup(
+                    s =>
+                        s.DownloadToStream(container, path, It.IsAny<Stream>(), cancellationToken)
+                )
+                .ReturnsAsync(new NotFoundResult());
         }
 
         public static IReturnsResult<IBlobStorageService> SetupDownloadBlobText(

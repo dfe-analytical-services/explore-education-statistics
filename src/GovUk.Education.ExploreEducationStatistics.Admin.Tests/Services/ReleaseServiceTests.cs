@@ -340,8 +340,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
                 .ReturnsAsync(Unit.Instance);
 
-            dataImportService.Setup(service => service.GetStatus(file.Id))
-                .ReturnsAsync(DataImportStatus.COMPLETE);
+            dataImportService.Setup(service => service.GetImport(file.Id))
+                .ReturnsAsync(new DataImport
+                {
+                    Status = DataImportStatus.COMPLETE
+                });
 
             footnoteService.Setup(service => service.GetFootnotes(release.Id, subject.Id))
                 .Returns(new List<Footnote>());
@@ -412,9 +415,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataImportService = new Mock<IDataImportService>(Strict);
 
-            dataImportService.Setup(service =>
-                    service.GetStatus(file.Id))
-                .ReturnsAsync(DataImportStatus.STAGE_1);
+            dataImportService.Setup(service => service.GetImport(file.Id))
+                .ReturnsAsync(new DataImport
+                {
+                    Status = DataImportStatus.STAGE_1
+                });
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -493,9 +498,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataBlockService.Setup(service => service.DeleteDataBlocks(It.IsAny<DeleteDataBlockPlan>()))
                 .ReturnsAsync(Unit.Instance);
 
-            dataImportService.Setup(service =>
-                    service.GetStatus(It.IsIn(file.Id, replacementFile.Id)))
-                .ReturnsAsync(DataImportStatus.COMPLETE);
+            dataImportService.Setup(service => service.GetImport(It.IsIn(file.Id, replacementFile.Id)))
+                .ReturnsAsync(new DataImport
+                {
+                    Status = DataImportStatus.COMPLETE
+                });
 
             footnoteService.Setup(service =>
                     service.GetFootnotes(release.Id, It.IsIn(subject.Id, replacementSubject.Id)))
@@ -598,10 +605,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var dataImportService = new Mock<IDataImportService>(Strict);
 
-            dataImportService.Setup(service => service.GetStatus(file.Id))
-                .ReturnsAsync(DataImportStatus.COMPLETE);
-            dataImportService.Setup(service => service.GetStatus(replacementFile.Id))
-                .ReturnsAsync(DataImportStatus.STAGE_1);
+            dataImportService.Setup(service => service.GetImport(file.Id))
+                .ReturnsAsync(new DataImport
+                {
+                    Status = DataImportStatus.COMPLETE
+                });
+            dataImportService.Setup(service => service.GetImport(replacementFile.Id))
+                .ReturnsAsync(new DataImport
+                {
+                    Status = DataImportStatus.STAGE_1
+                });
 
             await using (var context = InMemoryApplicationDbContext(contentDbContextId))
             {
