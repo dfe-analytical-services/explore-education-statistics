@@ -251,7 +251,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                             .Append(OpenIdConnectScope.OfflineAccess)
                             .ToList();
                         
-                        // spaClient.UpdateAccessTokenClaimsOnRefresh = true;
+                        spaClient.UpdateAccessTokenClaimsOnRefresh = true;
                         
                         var tokenUsage = clientConfig.GetValue<string>("RefreshTokenUsage");
                         
