@@ -20,10 +20,14 @@ export const options: Options = {
 };
 
 export const errorRate = new Rate('ees_errors');
-export const getReleaseSuccessCount = new Counter('ees_get_release_success');
-export const getReleaseFailureCount = new Counter('ees_get_release_failure');
+export const getReleaseSuccessCount = new Counter(
+  'ees_find_statistics_success',
+);
+export const getReleaseFailureCount = new Counter(
+  'ees_find_statistics_failure',
+);
 export const getReleaseRequestDuration = new Trend(
-  'ees_get_release_duration',
+  'ees_find_statistics_duration',
   true,
 );
 
@@ -36,7 +40,7 @@ const performTest = () => {
   let response;
   try {
     response = http.get(
-      `${environmentAndUsers.environment.publicUrl}/find-statistics/pupil-absence-in-schools-in-england/2016-17`,
+      `${environmentAndUsers.environment.publicUrl}/find-statistics`,
       {
         timeout: '120s',
       },
@@ -44,7 +48,7 @@ const performTest = () => {
   } catch (e) {
     getReleaseFailureCount.add(1);
     errorRate.add(1);
-    fail(`Failure to get Release page - ${JSON.stringify(e)}`);
+    fail(`Failure to get Find Statistics page - ${JSON.stringify(e)}`);
     return;
   }
 
@@ -54,10 +58,8 @@ const performTest = () => {
       'response should have contained body': ({ body }) => body != null,
     }) &&
     check(response, {
-      'response contains expected title': res =>
-        res.html().text().includes('Pupil absence in schools in England'),
-      'response contains expected content': res =>
-        res.html().text().includes('pupils missed on average 8.2 school days'),
+      'response contains expected text': res =>
+        res.html().text().includes('Browse to find the statistics and data'),
     })
   ) {
     console.log('SUCCESS!');
@@ -72,7 +74,7 @@ const performTest = () => {
     getReleaseFailureCount.add(1);
     getReleaseRequestDuration.add(Date.now() - startTime);
     errorRate.add(1);
-    fail('Failure to Get Release page');
+    fail('Failure to Find Statistics page');
   }
 };
 
