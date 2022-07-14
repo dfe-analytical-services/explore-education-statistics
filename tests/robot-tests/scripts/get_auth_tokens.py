@@ -3,6 +3,7 @@ import argparse
 import json
 import traceback
 from selenium import webdriver
+from selenium.webdriver.common.by import By
 from typing import Union
 from .get_webdriver import get_webdriver
 
@@ -13,7 +14,7 @@ def wait_until_page_contains_xpath(context, selector):
     elem = None
     while time.time() < max_time:
         try:
-            elem = context.find_element_by_xpath(selector)
+            elem = context.find_element(By.XPATH, selector)
         except BaseException:
             pass
         if elem is not None:
@@ -26,14 +27,14 @@ def login_with_keycloak(url, email, password, driver):
         driver.get(url)
         try:
             wait_until_page_contains_xpath(driver, '//button[contains(text(), "Sign in")]')
-            driver.find_element_by_xpath('//button[contains(text(), "Sign in")]').click()
+            driver.find_element(By.XPATH, '//button[contains(text(), "Sign in")]').click()
             time.sleep(1)
         except BaseException:
             raise AssertionError("Sign in page didn't appear")
 
-        driver.find_element_by_id('username').send_keys(email)
-        driver.find_element_by_id('password').send_keys(password)
-        driver.find_element_by_id('kc-login').click()
+        driver.find_element(By.ID, 'username').send_keys(email)
+        driver.find_element(By.ID, 'password').send_keys(password)
+        driver.find_element(By.ID, 'kc-login').click()
         try:
             wait_until_page_contains_xpath(driver, '//h1[text()="Dashboard"]')  # Should be Admin dashboard for user
         except BaseException:
@@ -50,7 +51,7 @@ def login_with_azure(url, email, password, first_name, last_name, driver):
     driver.get(url)
 
     wait_until_page_contains_xpath(driver, '//button[contains(text(), "Sign in")]')
-    driver.find_element_by_xpath('//button[contains(text(), "Sign in")]').click()
+    driver.find_element(By.XPATH, '//button[contains(text(), "Sign in")]').click()
 
     try:
         wait_until_page_contains_xpath(driver, '//div[text()="Sign in"]')
@@ -59,9 +60,9 @@ def login_with_azure(url, email, password, first_name, last_name, driver):
         raise AssertionError('Sign in page didn\'t appear?')
 
     try:
-        driver.find_element_by_xpath('//input[@type="email"]').send_keys(email)
+        driver.find_element(By.XPATH, '//input[@type="email"]').send_keys(email)
         time.sleep(1)
-        driver.find_element_by_xpath('//input[@value="Next"]').click()
+        driver.find_element(By.XPATH, '//input[@value="Next"]').click()
 
         wait_until_page_contains_xpath(driver, '//div[text()="Enter password"]')
         time.sleep(1)
@@ -70,9 +71,9 @@ def login_with_azure(url, email, password, first_name, last_name, driver):
         raise AssertionError('Error when entering/submitting email!')
 
     try:
-        driver.find_element_by_xpath('//input[@type="password"]').send_keys(password)
+        driver.find_element(By.XPATH, '//input[@type="password"]').send_keys(password)
         time.sleep(1)
-        driver.find_element_by_xpath('//input[@value="Sign in"]').click()
+        driver.find_element(By.XPATH, '//input[@value="Sign in"]').click()
 
         wait_until_page_contains_xpath(driver, '//div[text()="Stay signed in?"]')
         wait_until_page_contains_xpath(driver, '//input[@value="No"]')
@@ -80,18 +81,18 @@ def login_with_azure(url, email, password, first_name, last_name, driver):
         raise AssertionError('Error when entering/submitting password')
 
     time.sleep(1)
-    driver.find_element_by_xpath('//input[@value="No"]').click()
+    driver.find_element(By.XPATH, '//input[@value="No"]').click()
 
     # Register user if necessary
     try:
         wait_until_page_contains_xpath(driver, '//span[contains(text(),"Register")]')
-        driver.find_element_by_css_selector('#Input_FirstName').clear()
-        driver.find_element_by_css_selector('#Input_FirstName').send_keys(first_name)
-        driver.find_element_by_css_selector('#Input_LastName').clear()
-        driver.find_element_by_css_selector('#Input_LastName').send_keys(last_name)
-        driver.find_element_by_css_selector('#Input_Email').clear()
-        driver.find_element_by_css_selector('#Input_Email').send_keys(email)
-        driver.find_element_by_xpath('//button[contains(text(), "Register")]').click()
+        driver.find_element(By.CSS_SELECTOR, '#Input_FirstName').clear()
+        driver.find_element(By.CSS_SELECTOR, '#Input_FirstName').send_keys(first_name)
+        driver.find_element(By.CSS_SELECTOR, '#Input_LastName').clear()
+        driver.find_element(By.CSS_SELECTOR, '#Input_LastName').send_keys(last_name)
+        driver.find_element(By.CSS_SELECTOR, '#Input_Email').clear()
+        driver.find_element(By.CSS_SELECTOR, '#Input_Email').send_keys(email)
+        driver.find_element(By.XPATH, '//button[contains(text(), "Register")]').click()
     except Exception:
         pass
 

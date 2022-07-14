@@ -2,6 +2,7 @@ import re
 import os
 from robot.libraries.BuiltIn import BuiltIn
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
 
 sl = BuiltIn().get_library_instance('SeleniumLibrary')
 
@@ -36,21 +37,21 @@ def cookie_names_should_be_on_page():
 
 
 def user_checks_number_of_other_releases_is_correct(number):
-    elems = sl.driver.find_elements_by_xpath('(.//*[@data-testid="other-release-item"])')
+    elems = sl.driver.find_elements(By.XPATH, '(.//*[@data-testid="other-release-item"])')
     if len(elems) != int(number):
         raise_assertion_error(f'Found "{len(elems)}" other releases, not "{int(number)}"')
 
 
 def user_checks_other_release_is_shown_in_position(release_name, position):
     try:
-        sl.driver.find_element_by_xpath(
-            f'.//*[@data-testid="other-release-item" and a/text()="{release_name}"]')
+        sl.driver.find_element(By.XPATH,
+                               f'.//*[@data-testid="other-release-item" and a/text()="{release_name}"]')
     except BaseException:
         raise_assertion_error(f'No other release "{release_name}" found')
 
     try:
-        elem = sl.driver.find_element_by_xpath(
-            f'(.//a[../@data-testid="other-release-item"])[{position}]')
+        elem = sl.driver.find_element(By.XPATH,
+                                      f'(.//a[../@data-testid="other-release-item"])[{position}]')
     except BaseException:
         raise_assertion_error(f"There are less than {position} other releases listed!")
 
@@ -75,19 +76,19 @@ def user_clicks_methodology_link(topic, publication, methodology):
 
 def get_methodology_link(topic, publication, methodology):
     try:
-        sl.driver.find_element_by_xpath(f'//summary/span[text()="{topic}"]')
+        sl.driver.find_element(By.XPATH, f'//summary/span[text()="{topic}"]')
     except BaseException:
         raise_assertion_error(f'Cannot find theme "{topic}" on page')
 
     try:
-        sl.driver.find_element_by_xpath(
-            f'//summary/span[text()="{topic}"]/../..//h3[text()="{publication}"]')
+        sl.driver.find_element(By.XPATH,
+                               f'//summary/span[text()="{topic}"]/../..//h3[text()="{publication}"]')
     except BaseException:
         raise_assertion_error(f'Topic "{topic}" doesn\'t contain publication "{publication}"!')
 
     try:
-        return sl.driver.find_element_by_xpath(
-            f'//h3[text()="{publication}"]/..//a[text()="{methodology}"]')
+        return sl.driver.find_element(By.XPATH,
+                                      f'//h3[text()="{publication}"]/..//a[text()="{methodology}"]')
     except BaseException:
         raise_assertion_error(
             f'Could not find methodology link with title "{methodology}""!')
@@ -95,7 +96,7 @@ def get_methodology_link(topic, publication, methodology):
 
 # Table tool
 def user_checks_generated_permalink_is_valid():
-    elem = sl.driver.find_element_by_css_selector('[data-testid="permalink-generated-url"]')
+    elem = sl.driver.find_element(By.CSS_SELECTOR, '[data-testid="permalink-generated-url"]')
     url_without_basic_auth = re.sub(r'.*@', '', os.environ['PUBLIC_URL'])
     url_without_http = re.sub(r'^https?:\/\/', '', url_without_basic_auth)
     current_url_without_http = re.sub(r'^https?:\/\/', '', elem.get_attribute("value"))
@@ -110,19 +111,19 @@ def user_reorders_table_headers(drag_selector, drop_selector):
     if drag_selector.startswith('css:'):
         drag_selector = drag_selector[4:]
         sl.wait_until_page_contains_element(f'css:{drag_selector}')
-        drag_elem = sl.driver.find_element_by_css_selector(drag_selector)
+        drag_elem = sl.driver.find_element(By.CSS_SELECTOR, drag_selector)
     if drop_selector.startswith('css:'):
         drop_selector = drop_selector[4:]
         sl.wait_until_page_contains_element(f'css:{drop_selector}')
-        drop_elem = sl.driver.find_element_by_css_selector(drop_selector)
+        drop_elem = sl.driver.find_element(By.CSS_SELECTOR, drop_selector)
     if drag_selector.startswith('xpath:'):
         drag_selector = drag_selector[6:]
         sl.wait_until_page_contains_element(f'xpath:{drag_selector}')
-        drag_elem = sl.driver.find_element_by_xpath(drag_selector)
+        drag_elem = sl.driver.find_element(By.XPATH, drag_selector)
     if drop_selector.startswith('xpath:'):
         drop_selector = drop_selector[6:]
         sl.wait_until_page_contains_element(f'xpath:{drop_selector}')
-        drop_elem = sl.driver.find_element_by_xpath(drop_selector)
+        drop_elem = sl.driver.find_element(By.XPATH, drop_selector)
 
     # https://github.com/react-dnd/react-dnd/issues/1195#issuecomment-456370983
     action = ActionChains(sl.driver)
