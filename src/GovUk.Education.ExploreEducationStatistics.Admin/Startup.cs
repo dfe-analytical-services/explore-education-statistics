@@ -234,7 +234,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
                     var clientConfig = Configuration.GetSection("OpenIdConnectSpaClient");
 
-                    var allowRefreshTokens = clientConfig.GetValue<bool>("AllowOfflineAccess");
+                    if (clientConfig == null)
+                    {
+                        return;
+                    }
+                    
+                    var allowRefreshTokens = clientConfig.GetValue<bool>("AllowOfflineAccess", false);
 
                     if (allowRefreshTokens)
                     {
@@ -289,6 +294,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         // https://localhost:5021, then the SPA will use https://localhost:5021 as a basis for
                         // negotiating with Identity Server, and thus Identity Server will issue its access tokens with
                         // the "Issuer" set to "https://localhost:5021".
+                        //
+                        // However, by default Identity Server will set its "TokenValidationParameters.ValidIssuer"
+                        // property to the "applicationUrl" value in "launchSettings.json" - locally for instance,
+                        // this would be "https://0.0.0.0:5021".  This complicates matters further as access tokens 
+                        // that it issues would otherwise be immediately invalidated by this setting, regardless of what 
+                        // URL the user was hitting the site on.  The answer is to manually let Identity Server know
+                        // which URLs are appropriate for each environment.
                         //
                         // As locally it's possible to access the service under an alternative URL like
                         // "https://ees.local:5021", then we need to ensure that both "https://localhost:5021" and
