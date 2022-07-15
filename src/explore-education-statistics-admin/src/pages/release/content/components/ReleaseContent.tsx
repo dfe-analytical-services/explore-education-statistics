@@ -185,7 +185,7 @@ const ReleaseContent = () => {
             >
               <ul className="govuk-list govuk-list--spaced govuk-!-margin-bottom-0">
                 <li>
-                  <a href="#dataDownloads-1">Explore data and files</a>
+                  <a href="#explore-data-and-files">Explore data and files</a>
                 </li>
                 <li>
                   <Link

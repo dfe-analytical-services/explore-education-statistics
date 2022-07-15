@@ -120,10 +120,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return emailResult;
             }
 
-            await _userInviteRepository.Create(
+            await _userInviteRepository.CreateIfNotExists(
                 email: email,
                 role: Role.Analyst,
                 createdById: _userService.GetUserId());
+
             await _userReleaseInviteRepository.CreateManyIfNotExists(
                 releaseIds: releaseIds,
                 email: email,

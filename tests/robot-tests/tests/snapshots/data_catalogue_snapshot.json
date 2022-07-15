@@ -6,6 +6,7 @@
       "Children looked after in England including adoptions",
       "Children's social work workforce",
       "Children's social work workforce: attrition, caseload, and agency workforce",
+      "Looked after children aged 16 to 17 in independent or semi-independent placements",
       "Outcomes for children in need, including children looked after by local authorities in England",
       "Outcomes of children in need, including looked after children",
       "Serious incident notifications"
@@ -104,6 +105,7 @@
   {
     "publications": [
       "A level and other 16 to 18 results",
+      "Key stage 2 attainment: National headlines",
       "Key stage 4 performance",
       "Level 2 and 3 attainment age 16 to 25",
       "Multi-academy trust performance measures at key stage 2"
@@ -115,7 +117,8 @@
       "Initial Teacher Training Census",
       "Initial teacher training performance profiles",
       "Postgraduate initial teacher training targets",
-      "School workforce in England"
+      "School workforce in England",
+      "Teacher and Leader development: ECF and NPQs"
     ],
     "theme_heading": "Teachers and school workforce"
   },

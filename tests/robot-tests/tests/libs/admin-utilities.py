@@ -1,6 +1,7 @@
 from robot.libraries.BuiltIn import BuiltIn
 import time
 import os
+from selenium.webdriver.common.by import By
 from tests.libs.setup_auth_variables import setup_auth_variables
 from tests.libs.utilities import set_to_local_storage
 from tests.libs.utilities import set_cookie_from_json
@@ -53,22 +54,22 @@ def get_release_guid_from_release_status_page_url(url):
 
 def data_csv_number_contains_xpath(num, xpath):
     try:
-        elem = sl.driver.find_element_by_xpath(f'//*[@id="dataFileUploadForm"]/dl[{num}]')
+        elem = sl.driver.find_element(By.XPATH, f'//*[@id="dataFileUploadForm"]/dl[{num}]')
     except BaseException:
         raise_assertion_error(f'Cannot find data file number "{num}"')
     try:
-        elem.find_element_by_xpath(xpath)
+        elem.find_element(By.XPATH, xpath)
     except BaseException:
         raise_assertion_error(f'Cannot find data file number "{num} with xpath {xpath}')
 
 
 def data_file_number_contains_xpath(num, xpath):
     try:
-        elem = sl.driver.find_element_by_xpath(f'//*[@id="fileUploadForm"]/dl[{num}]')
+        elem = sl.driver.find_element(By.XPATH, f'//*[@id="fileUploadForm"]/dl[{num}]')
     except BaseException:
         raise_assertion_error(f'Cannot find data file number "{num}"')
     try:
-        elem.find_element_by_xpath(xpath)
+        elem.find_element(By.XPATH, xpath)
     except BaseException:
         raise_assertion_error(f'Cannot find data file number "{num} with xpath {xpath}')
 
@@ -77,12 +78,12 @@ def user_waits_for_release_process_status_to_be(status, timeout):
     max_time = time.time() + int(timeout)
     while time.time() < max_time:
         try:
-            sl.driver.find_element_by_css_selector(f'#release-process-status-Failed')
+            sl.driver.find_element(By.ID, f'release-process-status-Failed')
             raise_assertion_error('Release process status FAILED!')
         except BaseException:
             pass
         try:
-            sl.driver.find_element_by_css_selector(f'#release-process-status-{status}')
+            sl.driver.find_element(By.ID, f'release-process-status-{status}')
             return
         except BaseException:
             sl.reload_page()  # Necessary if release previously scheduled

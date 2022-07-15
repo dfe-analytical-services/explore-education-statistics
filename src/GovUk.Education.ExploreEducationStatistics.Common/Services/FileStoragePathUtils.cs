@@ -9,8 +9,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     public static class FileStoragePathUtils
     {
         public const string DataBlocksDirectory = "data-blocks";
-        [Obsolete("EES-2865 - Remove with other fast track code")]
-        public const string FastTrackResultsDirectory = "fast-track-results";
         public const string ReleasesDirectory = "releases";
         public const string SubjectMetaDirectory = "subject-meta";
 
@@ -19,24 +17,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return "staging";
         }
 
-        private static string PublicContentFastTrackPath(string? prefix = null)
-        {
-            return $"{AppendPathSeparator(prefix)}fast-track";
-        }
-
         private static string PublicContentPublicationsPath(string? prefix = null)
         {
             return $"{AppendPathSeparator(prefix)}publications";
-        }
-
-        public static string PublicContentReleaseFastTrackPath(string releaseId, string? prefix = null)
-        {
-            return $"{PublicContentFastTrackPath(prefix)}/{releaseId}";
-        }
-
-        public static string PublicContentFastTrackPath(string releaseId, string id, string? prefix = null)
-        {
-            return $"{PublicContentReleaseFastTrackPath(releaseId, prefix)}/{id}.json";
         }
 
         private static string PublicContentPublicationParentPath(string slug, string? prefix = null)
@@ -97,17 +80,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         public static string PublicContentSubjectMetaPath(string publicationSlug, string releaseSlug, Guid subjectId)
         {
             return $"{PublicContentSubjectMetaParentPath(publicationSlug, releaseSlug)}/{subjectId}.json";
-        }
-
-        public static string PublicContentFastTrackResultsParentPath(string publicationSlug, string releaseSlug)
-        {
-            return $"{PublicContentReleaseParentPath(publicationSlug, releaseSlug)}/{FastTrackResultsDirectory}";
-        }
-
-        public static string PublicContentFastTrackResultsPath(string publicationSlug, string releaseSlug,
-            Guid fastTrackId)
-        {
-            return $"{PublicContentFastTrackResultsParentPath(publicationSlug, releaseSlug)}/{fastTrackId}.json";
         }
 
         public static string PublicContentReleaseSubjectsPath(string publicationSlug, string releaseSlug)

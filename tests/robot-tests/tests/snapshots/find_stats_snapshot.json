@@ -24,6 +24,14 @@
                 "publication_heading": "Children looked after in England including adoptions"
               }
             ]
+          },
+          {
+            "publication_type_heading": "Ad hoc statistics",
+            "publications": [
+              {
+                "publication_heading": "Looked after children aged 16 to 17 in independent or semi-independent placements"
+              }
+            ]
           }
         ],
         "topic_heading": "Children looked after"
@@ -716,15 +724,10 @@
             "publication_type_heading": "National and official statistics",
             "publications": [
               {
-                "publication_heading": "Multi-academy trust performance measures at key stage 2"
-              }
-            ]
-          },
-          {
-            "publication_type_heading": "Not yet on this service",
-            "publications": [
-              {
                 "publication_heading": "Key stage 2 attainment: National headlines"
+              },
+              {
+                "publication_heading": "Multi-academy trust performance measures at key stage 2"
               }
             ]
           }
@@ -770,6 +773,14 @@
             "publications": [
               {
                 "publication_heading": "School workforce in England"
+              }
+            ]
+          },
+          {
+            "publication_type_heading": "Experimental statistics",
+            "publications": [
+              {
+                "publication_heading": "Teacher and Leader development: ECF and NPQs"
               }
             ]
           }

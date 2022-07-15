@@ -68,6 +68,15 @@
     "enableThemeDeletion": {
       "value": true
     },
+    "openIdConnectSpaClientAllowOfflineAccess": {
+      "value": true
+    },
+    "openIdConnectSpaClientRefreshTokenUsage": {
+      "value": "ReUse"
+    },
+    "openIdConnectSpaClientRefreshTokenExpiration": {
+      "value": "Sliding"
+    },
     "branch": {
        "value": "dev"
     },

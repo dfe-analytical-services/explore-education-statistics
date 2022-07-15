@@ -68,7 +68,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
                         privateBlobCacheService: GetBlobCacheService(provider, "CoreStorage"),
                         publicBlobCacheService: GetBlobCacheService(provider, "PublicStorage"),
-                        fastTrackService: provider.GetService<IFastTrackService>(),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>()
                     ))
@@ -86,11 +85,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<ITableStorageService, TableStorageService>(provider =>
                     new TableStorageService(GetConfigurationValue(provider, "PublisherStorage")))
                 .AddScoped<IPublicationService, PublicationService>()
-                .AddScoped<IFastTrackService, FastTrackService>(provider =>
-                    new FastTrackService(
-                        contentDbContext: provider.GetService<ContentDbContext>(),
-                        publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                        tableStorageService: new TableStorageService(GetConfigurationValue(provider, "PublicStorage"))))
                 .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()
                 .AddScoped<IMethodologyRepository, MethodologyRepository>()
                 .AddScoped<IMethodologyService, MethodologyService>()

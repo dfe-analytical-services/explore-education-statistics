@@ -290,7 +290,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (user == null)
             {
                 return await CreateUserReleaseInvite(release, email)
-                    .OnSuccessDo(() => _userInviteRepository.Create(
+                    .OnSuccessDo(() => _userInviteRepository.CreateIfNotExists(
                         email: email,
                         role: Role.PrereleaseUser,
                         createdById: _userService.GetUserId()))
@@ -341,13 +341,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return emailResult;
                     }
                 }
-
-                await _userReleaseInviteRepository.Create(
-                    releaseId: release.Id,
-                    email: email,
-                    releaseRole: PrereleaseViewer,
-                    emailSent: sendEmail,
-                    createdById: _userService.GetUserId());
+                else
+                {
+                    // Create an invite. The e-mail is sent if an invite exists when the release is approved
+                    await _userReleaseInviteRepository.Create(
+                        releaseId: release.Id,
+                        email: email,
+                        releaseRole: PrereleaseViewer,
+                        emailSent: false,
+                        createdById: _userService.GetUserId());
+                }
 
                 await _userReleaseRoleRepository.CreateIfNotExists(
                     userId: user.Id,

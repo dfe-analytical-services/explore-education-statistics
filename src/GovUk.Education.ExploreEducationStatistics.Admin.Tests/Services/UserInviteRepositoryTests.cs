@@ -9,7 +9,6 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 
-
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class UserInviteRepositoryTests
@@ -17,13 +16,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         private static readonly Guid CreatedById = Guid.NewGuid();
 
         [Fact]
-        public async Task Create_RoleArgument()
+        public async Task CreateIfNotExists_RoleArgument()
         {
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var repository = new UserInviteRepository(usersAndRolesDbContext);
-                var userInvite = await repository.Create("test@test.com", Role.Analyst, CreatedById);
+                var userInvite = await repository.CreateIfNotExists("test@test.com", Role.Analyst, CreatedById);
 
                 Assert.Equal("test@test.com", userInvite.Email);
                 Assert.Equal(Role.Analyst.GetEnumValue(), userInvite.RoleId);
@@ -46,7 +45,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
 
         [Fact]
-        public async Task Create_RoleArgument_ExistingInvite()
+        public async Task CreateIfNotExists_RoleArgument_ExistingInvite()
         {
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
@@ -64,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var repository = new UserInviteRepository(usersAndRolesDbContext);
-                var userInvite = await repository.Create("test@test.com", Role.Analyst, CreatedById);
+                var userInvite = await repository.CreateIfNotExists("test@test.com", Role.Analyst, CreatedById);
 
                 Assert.Equal("test@test.com", userInvite.Email);
                 Assert.Equal(Role.BauUser.GetEnumValue(), userInvite.RoleId);
@@ -86,13 +85,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task Create_RoleIdStringArgument()
+        public async Task CreateIfNotExists_RoleIdStringArgument()
         {
             var usersAndRolesDbContextId = Guid.NewGuid().ToString();
             await using (var usersAndRolesDbContext = InMemoryUserAndRolesDbContext(usersAndRolesDbContextId))
             {
                 var repository = new UserInviteRepository(usersAndRolesDbContext);
-                var userInvite = await repository.Create("test@test.com", Role.Analyst.GetEnumValue(), CreatedById);
+                var userInvite =
+                    await repository.CreateIfNotExists("test@test.com", Role.Analyst.GetEnumValue(), CreatedById);
 
                 Assert.Equal("test@test.com", userInvite.Email);
                 Assert.Equal(Role.Analyst.GetEnumValue(), userInvite.RoleId);

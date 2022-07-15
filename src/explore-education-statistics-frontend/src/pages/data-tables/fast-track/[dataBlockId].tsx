@@ -1,4 +1,3 @@
-import fastTrackService from '@common/services/fastTrackService';
 import tableBuilderService from '@common/services/tableBuilderService';
 import themeService from '@common/services/themeService';
 import { Dictionary } from '@common/types';
@@ -12,10 +11,10 @@ export default TableToolPage;
 export const getServerSideProps: GetServerSideProps<TableToolPageProps> = async ({
   query,
 }) => {
-  const { fastTrackId } = query as Dictionary<string>;
+  const { dataBlockId } = query as Dictionary<string>;
 
   const [fastTrack, themeMeta] = await Promise.all([
-    fastTrackService.getFastTrackTableAndReleaseMeta(fastTrackId),
+    tableBuilderService.getFastTrackTableAndReleaseMeta(dataBlockId),
     themeService.listThemes({
       publicationFilter: 'FastTrack',
     }),

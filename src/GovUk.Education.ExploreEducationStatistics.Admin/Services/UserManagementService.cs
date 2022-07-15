@@ -288,7 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         return ValidationActionResult(InvalidUserRole);
                     }
 
-                    var userInvite = await _userInviteRepository.Create(
+                    var userInvite = await _userInviteRepository.CreateIfNotExists(
                         email: sanitisedEmail,
                         roleId: roleId,
                         createdById: _userService.GetUserId());

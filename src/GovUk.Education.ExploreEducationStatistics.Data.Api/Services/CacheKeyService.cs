@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -12,30 +13,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Services
     public class CacheKeyService : ICacheKeyService
     {
         private readonly ContentDbContext _contentDbContext;
-        private readonly IFastTrackService _fastTrackService;
 
-        public CacheKeyService(
-            ContentDbContext contentDbContext,
-            IFastTrackService fastTrackService)
+        public CacheKeyService(ContentDbContext contentDbContext)
         {
             _contentDbContext = contentDbContext;
-            _fastTrackService = fastTrackService;
-        }
-
-        public Task<Either<ActionResult, FastTrackResultsCacheKey>> CreateCacheKeyForFastTrackResults(Guid fastTrackId)
-        {
-            return _fastTrackService
-                .GetReleaseFastTrack(fastTrackId)
-                .OnSuccess(async fastTrack =>
-                {
-                    var owningRelease = await _contentDbContext
-                        .Releases
-                        .Include(release => release.Publication)
-                        .SingleAsync(release => release.Id == fastTrack.ReleaseId);
-
-                    return new FastTrackResultsCacheKey(owningRelease.Publication.Slug, owningRelease.Slug,
-                        fastTrackId);
-                });
         }
 
         public async Task<Either<ActionResult, ReleaseSubjectsCacheKey>> CreateCacheKeyForReleaseSubjects(
