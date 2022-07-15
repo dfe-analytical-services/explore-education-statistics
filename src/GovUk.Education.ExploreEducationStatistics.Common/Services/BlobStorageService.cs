@@ -449,12 +449,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 throw new FileNotFoundException($"Could not find file at {containerName}/{path}");
             }
 
-            var properties = await blob.GetPropertiesAsync();
-            if (properties.Value.ContentLength == 0)
-            {
-                return string.Empty;
-            }
-
             await using var stream = await blob.OpenReadAsync();
 
             var streamReader = new StreamReader(stream);
