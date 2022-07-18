@@ -7,7 +7,7 @@
 
     <ItemGroup>
         <PackageReference Include="AngleSharp" Version="1.0.0-alpha-844" />
-        <PackageReference Include="AspectInjector" Version="2.5.0" />
+        <PackageReference Include="AspectInjector" Version="2.7.3" />
         <PackageReference Include="AutoMapper" Version="9.0.0" />
         <PackageReference Include="Azure.Storage.Blobs" Version="12.10.0" />
         <PackageReference Include="IsExternalInit" Version="1.0.2" PrivateAssets="all" />
