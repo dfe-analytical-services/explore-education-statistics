@@ -10,12 +10,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     public class TableStorageService : ITableStorageService
     {
         private readonly CloudTableClient _client;
-        private readonly StorageInstanceCreationUtil _storageInstanceCreationUtil = new StorageInstanceCreationUtil();
+        private readonly StorageInstanceCreationUtil _storageInstanceCreationUtil;
 
-        public TableStorageService(string connectionString)
+        public TableStorageService(
+            string connectionString, 
+            StorageInstanceCreationUtil storageInstanceCreationUtil)
         {
             var account = CloudStorageAccount.Parse(connectionString);
             _client = account.CreateCloudTableClient();
+            _storageInstanceCreationUtil = storageInstanceCreationUtil;
         }
 
         /// <summary>

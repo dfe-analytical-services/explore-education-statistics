@@ -384,7 +384,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IPublishingService, PublishingService>(provider =>
                 new PublishingService(
                     provider.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    new StorageQueueService(Configuration.GetValue<string>("PublisherStorage")),
+                    new StorageQueueService(
+                        Configuration.GetValue<string>("PublisherStorage"),
+                        new StorageInstanceCreationUtil()),
                     provider.GetService<IUserService>(),
                     provider.GetRequiredService<ILogger<PublishingService>>()));
             services.AddTransient<IReleasePublishingStatusService, ReleasePublishingStatusService>(s =>
@@ -392,10 +394,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     s.GetService<IMapper>(),
                     s.GetService<IUserService>(),
                     s.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))));
+                    new TableStorageService(
+                        Configuration.GetValue<string>("PublisherStorage"),
+                        new StorageInstanceCreationUtil())));
             services.AddTransient<IReleasePublishingStatusRepository, ReleasePublishingStatusRepository>(s =>
                 new ReleasePublishingStatusRepository(
-                    new TableStorageService(Configuration.GetValue<string>("PublisherStorage"))
+                    new TableStorageService(
+                        Configuration.GetValue<string>("PublisherStorage"),
+                        new StorageInstanceCreationUtil())
                 )
             );
             services.AddTransient<IThemeService, ThemeService>();
@@ -529,9 +535,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileUploadsValidatorService, FileUploadsValidatorService>();
             services.AddTransient(provider => GetBlobStorageService(provider, "CoreStorage"));
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
-                new TableStorageService(Configuration.GetValue<string>("CoreStorage")));
+                new TableStorageService(
+                    Configuration.GetValue<string>("CoreStorage"),
+                    new StorageInstanceCreationUtil()));
             services.AddTransient<IStorageQueueService, StorageQueueService>(s =>
-                new StorageQueueService(Configuration.GetValue<string>("CoreStorage")));
+                new StorageQueueService(
+                    Configuration.GetValue<string>("CoreStorage"),
+                    new StorageInstanceCreationUtil()));
             services.AddTransient<IDataBlockMigrationService, DataBlockMigrationService>();
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
             AddPersistenceHelper<ContentDbContext>(services);
@@ -748,7 +758,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             return new BlobStorageService(
                 connectionString,
                 new BlobServiceClient(connectionString),
-                provider.GetRequiredService<ILogger<BlobStorageService>>());
+                provider.GetRequiredService<ILogger<BlobStorageService>>(),
+                new StorageInstanceCreationUtil());
         }
 
         private static void ApplyCustomMigrations(params ICustomMigration[] migrations)

@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -117,7 +118,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                     return new BlobStorageService(
                         connectionString,
                         new BlobServiceClient(connectionString),
-                        provider.GetRequiredService<ILogger<BlobStorageService>>()
+                        provider.GetRequiredService<ILogger<BlobStorageService>>(),
+                        new StorageInstanceCreationUtil()
                     );
                 }
             );
@@ -220,7 +222,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             try
             {
                 var publisherConnectionString = Configuration.GetValue<string>("PublisherStorage");
-                var storageQueueService = new StorageQueueService(publisherConnectionString);
+                var storageQueueService = new StorageQueueService(
+                    publisherConnectionString,
+                    new StorageInstanceCreationUtil());
                 storageQueueService.AddMessage(queueName, new PublishAllContentMessage());
 
                 logger.LogInformation($"Message added to {queueName} queue");

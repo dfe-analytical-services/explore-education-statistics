@@ -42,22 +42,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         private readonly string _connectionString;
         private readonly BlobServiceClient _client;
         private readonly ILogger<IBlobStorageService> _logger;
-        private readonly IStorageInstanceCreationUtil _storageInstanceCreationUtil = new StorageInstanceCreationUtil();
+        private readonly IStorageInstanceCreationUtil _storageInstanceCreationUtil;
 
         public BlobStorageService(
             string connectionString,
             BlobServiceClient client,
-            ILogger<IBlobStorageService> logger,
-            IStorageInstanceCreationUtil? storageInstanceCreationUtil = null)
+            ILogger<BlobStorageService> logger,
+            IStorageInstanceCreationUtil storageInstanceCreationUtil)
         {
             _connectionString = connectionString;
             _client = client;
             _logger = logger;
-
-            if (storageInstanceCreationUtil != null)
-            {
-                _storageInstanceCreationUtil = storageInstanceCreationUtil;
-            }
+            _storageInstanceCreationUtil = storageInstanceCreationUtil;
         }
 
         public async Task<List<BlobInfo>> ListBlobs(IBlobContainer containerName, string? path)

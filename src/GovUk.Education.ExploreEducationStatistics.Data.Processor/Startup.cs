@@ -3,6 +3,7 @@ using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
@@ -34,12 +35,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor
                         var blobStorageService = new BlobStorageService(
                             connectionString,
                             new BlobServiceClient(connectionString),
-                            provider.GetRequiredService<ILogger<IBlobStorageService>>()
+                            provider.GetRequiredService<ILogger<BlobStorageService>>(),
+                            new StorageInstanceCreationUtil()
                         );
                         return blobStorageService;
                     })
                 .AddSingleton<IStorageQueueService, StorageQueueService>(provider =>
-                    new StorageQueueService(GetConfigurationValue(provider, "CoreStorage")))
+                    new StorageQueueService(
+                        GetConfigurationValue(provider, "CoreStorage"),
+                        new StorageInstanceCreationUtil()))
                 .AddTransient<IFileImportService, FileImportService>()
                 .AddTransient<IImporterService, ImporterService>()
                 .AddTransient<ISplitFileService, SplitFileService>()

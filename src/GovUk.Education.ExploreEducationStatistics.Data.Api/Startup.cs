@@ -11,6 +11,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Secu
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Cancellation;
 using GovUk.Education.ExploreEducationStatistics.Common.Config;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -136,7 +137,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
                     return new BlobStorageService(
                         connectionString,
                         new BlobServiceClient(connectionString),
-                        provider.GetRequiredService<ILogger<BlobStorageService>>()
+                        provider.GetRequiredService<ILogger<BlobStorageService>>(),
+                        new StorageInstanceCreationUtil()
                     );
                 }
             );
@@ -158,7 +160,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
             services.AddTransient<ITableStorageService, TableStorageService>(s =>
-                new TableStorageService(Configuration.GetValue<string>("PublicStorage")));
+                new TableStorageService(
+                    Configuration.GetValue<string>("PublicStorage"),
+                    new StorageInstanceCreationUtil()));
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
 
