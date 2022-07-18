@@ -5,6 +5,7 @@ using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -109,7 +110,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     ))
                 .AddScoped<IFilterRepository, FilterRepository>()
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
-                .AddScoped<IIndicatorRepository, IndicatorRepository>();
+                .AddScoped<IIndicatorRepository, IndicatorRepository>()
+
+                // Service temporarily added to migrate files in EES-3547
+                // TODO Remove in EES-3552
+                .AddScoped<IFileMigrationService, FileMigrationService>(provider =>
+                    new FileMigrationService(
+                        contentDbContext: provider.GetService<ContentDbContext>(),
+                        provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                        privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage")
+                    ));
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
