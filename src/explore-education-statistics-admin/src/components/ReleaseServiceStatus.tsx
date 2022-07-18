@@ -12,6 +12,7 @@ interface Props {
   refreshPeriod?: number;
   exclude?: 'status' | 'details';
   isApproved?: boolean;
+  newAdminStyle?: boolean; // EES-3217 CLEANUP
 }
 
 const ReleaseServiceStatus = ({
@@ -19,12 +20,16 @@ const ReleaseServiceStatus = ({
   refreshPeriod = 10000,
   exclude,
   isApproved = false,
+  newAdminStyle = false,
 }: Props) => {
   const [currentStatus, setCurrentStatus] = useState<ReleaseStageStatuses>();
   const [statusColor, setStatusColor] = useState<StatusBlockProps['color']>(
     'blue',
   );
   const timeoutRef = useRef<NodeJS.Timeout>();
+  const notStartedStatuses = newAdminStyle
+    ? ['Validating', 'Invalid']
+    : ['Validating', 'Scheduled', 'Invalid'];
 
   const fetchReleaseServiceStatus = useCallback(() => {
     return releaseService
@@ -129,14 +134,16 @@ const ReleaseServiceStatus = ({
       )}
 
       {currentStatus &&
-        !['Validating', 'Scheduled', 'Invalid'].includes(
-          currentStatus.overallStage,
-        ) &&
+        !notStartedStatuses.includes(currentStatus.overallStage) &&
         exclude !== 'details' && (
           <Details
             className="govuk-!-margin-bottom-0 govuk-!-margin-top-1"
             summary="View stages"
           >
+            {newAdminStyle &&
+              !['Validating', 'Scheduled', 'Invalid'].includes(
+                currentStatus.overallStage,
+              ) && <p>Release process started</p>}
             <ul className="govuk-list">
               {Object.entries(currentStatus).map(([key, val]) => {
                 if (['overallStage', 'releaseId', 'lastUpdated'].includes(key))
@@ -150,8 +157,14 @@ const ReleaseServiceStatus = ({
                 return (
                   <li key={key}>
                     <StatusBlock
+                      checklistStyle
                       color={color}
-                      text={`${key.replace('Stage', '')} - ${text}`}
+                      text={
+                        newAdminStyle
+                          ? `${key.replace('Stage', '')} ${text}`
+                          : `${key.replace('Stage', '')} - ${text}`
+                      }
+                      newAdminStyle={newAdminStyle}
                     />
                   </li>
                 );
