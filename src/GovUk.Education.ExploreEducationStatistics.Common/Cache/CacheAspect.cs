@@ -349,7 +349,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             {
                 score += 1;
             }
-            else if (constructorParam.Name == cacheKeyParamInfo.Name)
+            else if (constructorParam.Name is not null 
+                     && constructorParam.Name.Equals(cacheKeyParamInfo.Name, StringComparison.OrdinalIgnoreCase))
             {
                 score += 1;
             }
@@ -363,7 +364,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         {
             var score = 0;
 
-            if (constructorParam.Name == methodParam.Name)
+            if (constructorParam.Name is not null 
+                && constructorParam.Name.Equals(methodParam.Name, StringComparison.OrdinalIgnoreCase))
             {
                 score += 1;
             }
