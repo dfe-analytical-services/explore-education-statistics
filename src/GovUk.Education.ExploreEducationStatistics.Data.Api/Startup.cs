@@ -159,10 +159,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api
             services.AddTransient<IPermalinkService, PermalinkService>();
             services.AddSingleton<DataServiceMemoryCache<BoundaryLevel>, DataServiceMemoryCache<BoundaryLevel>>();
             services.AddSingleton<DataServiceMemoryCache<GeoJson>, DataServiceMemoryCache<GeoJson>>();
-            services.AddTransient<ITableStorageService, TableStorageService>(s =>
-                new TableStorageService(
-                    Configuration.GetValue<string>("PublicStorage"),
-                    new StorageInstanceCreationUtil()));
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<ICacheKeyService, CacheKeyService>();
 

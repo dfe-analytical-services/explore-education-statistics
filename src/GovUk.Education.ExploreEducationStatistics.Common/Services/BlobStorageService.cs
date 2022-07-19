@@ -314,30 +314,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             );
         }
 
-        public async Task UploadText(
-            IBlobContainer containerName,
-            string path,
-            string content,
-            string contentType,
-            IDictionary<string, string>? metadata = null)
-        {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetBlockBlobClient(path);
-
-            _logger.LogInformation($"Uploading text to blob {containerName}/{path}");
-
-            await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-
-            await blob.UploadAsync(
-                content: stream,
-                httpHeaders: new BlobHttpHeaders
-                {
-                    ContentType = contentType,
-                },
-                metadata: metadata
-            );
-        }
-
         public async Task UploadAsJson<T>(
             IBlobContainer containerName,
             string path,
@@ -352,52 +328,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 content: json,
                 contentType: MediaTypeNames.Application.Json
             );
-        }
-
-        /**
-         * Storage Emulator doesn't support AppendBlob. This method checks if AppendBlob can be used by either checking
-         * for its presence or creating a new one.
-         */
-        public async Task<bool> IsAppendSupported(IBlobContainer containerName, string path)
-        {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetAppendBlobClient(path);
-
-            if (await blob.ExistsAsync())
-            {
-                return true;
-            }
-
-            try
-            {
-                await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
-                    _connectionString,
-                    AzureStorageType.Blob,
-                    containerName.Name,
-                    () => blob.CreateIfNotExistsAsync());
-
-                return true;
-            }
-            catch (StorageException e)
-            {
-                if (e.Message.Contains("Storage Emulator"))
-                {
-                    // Storage Emulator doesn't support AppendBlob
-                    return false;
-                }
-
-                throw;
-            }
-        }
-
-
-        public async Task AppendText(IBlobContainer containerName, string path, string content)
-        {
-            var blobContainer = await GetBlobContainer(containerName);
-            var blob = blobContainer.GetAppendBlobClient(path);
-
-            await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
-            await blob.AppendBlockAsync(stream);
         }
 
         public async Task<Stream> DownloadToStream(
@@ -422,12 +352,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             }
 
             return targetStream;
-        }
-
-        public async Task SetMetadata(IBlobContainer containerName, string path, IDictionary<string, string> metadata)
-        {
-            var blob = await GetBlobClient(containerName, path);
-            await blob.SetMetadataAsync(metadata);
         }
 
         public async Task<Stream> StreamBlob(IBlobContainer containerName, string path, int? bufferSize = null)
@@ -572,6 +496,30 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
                 }
             );
             await DeleteBlobs(sourceContainerName, sourceDirectoryPath);
+        }
+
+        private async Task UploadText(
+            IBlobContainer containerName,
+            string path,
+            string content,
+            string contentType,
+            IDictionary<string, string>? metadata = null)
+        {
+            var blobContainer = await GetBlobContainer(containerName);
+            var blob = blobContainer.GetBlockBlobClient(path);
+
+            _logger.LogInformation($"Uploading text to blob {containerName}/{path}");
+
+            await using var stream = new MemoryStream(Encoding.UTF8.GetBytes(content));
+
+            await blob.UploadAsync(
+                content: stream,
+                httpHeaders: new BlobHttpHeaders
+                {
+                    ContentType = contentType,
+                },
+                metadata: metadata
+            );
         }
 
         private void FileTransferredCallback(

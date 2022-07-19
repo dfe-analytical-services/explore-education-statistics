@@ -25,9 +25,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         /// Gets a table by name, will create the table if it does not exist
         /// </summary>
         /// <param name="tableName">The name of the table to get.</param>
-        /// <param name="createIfNotExists">Creates the table if it does not already exist, defaults to true.</param>
         /// <returns>The table</returns>
-        public async Task<CloudTable> GetTableAsync(string tableName)
+        public CloudTable GetTable(string tableName)
         {
             var table = _client.GetTableReference(tableName);
 
@@ -71,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             TableQuery<TElement> query) where TElement : ITableEntity, new()
         {
             var results = new List<TElement>();
-            var table = await GetTableAsync(tableName);
+            var table = GetTable(tableName);
             TableContinuationToken? token = null;
             do
             {

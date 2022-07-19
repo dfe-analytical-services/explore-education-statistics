@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         Task<IEnumerable<TElement>> ExecuteQueryAsync<TElement>(string tableName, TableQuery<TElement> query)
             where TElement : ITableEntity, new();
 
-        Task<CloudTable> GetTableAsync(string tableName);
+        CloudTable GetTable(string tableName);
 
         Task<bool> DeleteEntityAsync(string tableName, ITableEntity entity);
 

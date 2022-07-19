@@ -25,15 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 {
     public class BlobStorageServiceTests
     {
-        private record TestClass
-        {
-            public string Value { get; }
-
-            public TestClass(string value)
-            {
-                Value = value;
-            }
-        }
+        private record TestClass(string Value);
 
         [Fact]
         public async Task CheckBlobExists_BlobExists()
