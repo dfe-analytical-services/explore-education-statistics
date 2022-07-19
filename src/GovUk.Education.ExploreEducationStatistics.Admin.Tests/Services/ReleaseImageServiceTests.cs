@@ -257,8 +257,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(releaseFile);
                 var file = releaseFile!.File;
 
+                Assert.Equal(10240, file.ContentLength);
                 Assert.Equal("image/png", file.ContentType);
-                Assert.Equal(10240, file.Size);
                 Assert.InRange(DateTime.UtcNow.Subtract(file.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, file.CreatedById);
             }

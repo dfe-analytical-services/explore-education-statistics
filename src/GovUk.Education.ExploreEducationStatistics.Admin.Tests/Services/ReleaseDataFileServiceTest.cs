@@ -761,7 +761,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "test-data.csv",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = FileType.Data,
                     SubjectId = subject.Id,
                     Created = DateTime.UtcNow,
@@ -938,7 +938,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "test-data.csv",
-                Size = 10240,
+                ContentLength = 10240,
                 Type = FileType.Data,
                 SubjectId = subject.Id,
                 Created = DateTime.UtcNow,
@@ -1053,7 +1053,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "test-data-1.csv",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = FileType.Data,
                     SubjectId = subject1.Id,
                     Created = DateTime.UtcNow,
@@ -1079,7 +1079,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "Test data 2.csv",
-                    Size = 20480,
+                    ContentLength = 20480,
                     Type = FileType.Data,
                     SubjectId = subject2.Id,
                     Created = DateTime.UtcNow,
@@ -1195,7 +1195,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "test-data-1.csv",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = FileType.Data,
                     SubjectId = subject.Id,
                     Created = DateTime.UtcNow,
@@ -1222,7 +1222,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "test-data-2.csv",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = FileType.Data,
                     CreatedById = _user.Id
                 }
@@ -1245,7 +1245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary-file.pdf",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = Ancillary
                 }
             };
@@ -1330,7 +1330,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "test-data-1.csv",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = FileType.Data,
                     SubjectId = subject1.Id,
                     Created = DateTime.UtcNow.AddDays(-1),
@@ -1353,7 +1353,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 RootPath = Guid.NewGuid(),
                 Filename = "test-data-2.csv",
-                Size = 20480,
+                ContentLength = 20480,
                 Type = FileType.Data,
                 SubjectId = subject2.Id,
                 Created = DateTime.UtcNow,
@@ -1571,12 +1571,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var metaFile = files
                     .Single(f => f.Filename == metaFileName);
 
+                Assert.Equal(10240, dataFile.ContentLength);
                 Assert.Equal("text/csv", dataFile.ContentType);
-                Assert.Equal(10240, dataFile.Size);
                 Assert.Equal(FileType.Data, dataFile.Type);
 
+                Assert.Equal(10240, metaFile.ContentLength);
                 Assert.Equal("text/csv", metaFile.ContentType);
-                Assert.Equal(10240, metaFile.Size);
                 Assert.Equal(Metadata, metaFile.Type);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();
@@ -1765,13 +1765,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(FileType.Data, originalDataFile.Type);
                 Assert.Equal(dataFile.Id, originalDataFile.ReplacedById);
 
+                Assert.Equal(10240, dataFile.ContentLength);
                 Assert.Equal("text/csv", dataFile.ContentType);
-                Assert.Equal(10240, dataFile.Size);
                 Assert.Equal(FileType.Data, dataFile.Type);
                 Assert.Equal(originalDataFile.Id, dataFile.ReplacingId);
 
+                Assert.Equal(10240, metaFile.ContentLength);
                 Assert.Equal("text/csv", metaFile.ContentType);
-                Assert.Equal(10240, metaFile.Size);
                 Assert.Equal(Metadata, metaFile.Type);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();
@@ -1908,17 +1908,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var zipFile = files
                     .Single(f => f.Filename == zipFileName);
 
+                Assert.Equal(1048576, dataFile.ContentLength);
                 Assert.Null(dataFile.ContentType);
-                Assert.Equal(1048576, dataFile.Size);
                 Assert.Equal(FileType.Data, dataFile.Type);
                 Assert.Equal(zipFile.Id, dataFile.SourceId);
-                
+
+                Assert.Equal(1024, metaFile.ContentLength);
                 Assert.Null(metaFile.ContentType);
-                Assert.Equal(1024, metaFile.Size);
                 Assert.Equal(Metadata, metaFile.Type);
 
+                Assert.Equal(10240, zipFile.ContentLength);
                 Assert.Equal("application/zip", zipFile.ContentType);
-                Assert.Equal(10240, zipFile.Size);
                 Assert.Equal(DataZip, zipFile.Type);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();
@@ -2103,18 +2103,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataFile.Id, originalDataFile.ReplacedById);
                 Assert.Null(originalDataFile.SourceId);
 
+                Assert.Equal(1048576, dataFile.ContentLength);
                 Assert.Null(dataFile.ContentType);
-                Assert.Equal(1048576, dataFile.Size);
                 Assert.Equal(FileType.Data, dataFile.Type);
                 Assert.Equal(originalDataFile.Id, dataFile.ReplacingId);
                 Assert.Equal(zipFile.Id, dataFile.SourceId);
-                
+
+                Assert.Equal(1024, metaFile.ContentLength);
                 Assert.Null(metaFile.ContentType);
-                Assert.Equal(1024, metaFile.Size);
                 Assert.Equal(Metadata, metaFile.Type);
 
+                Assert.Equal(10240, zipFile.ContentLength);
                 Assert.Equal("application/zip", zipFile.ContentType);
-                Assert.Equal(10240, zipFile.Size);
                 Assert.Equal(DataZip, zipFile.Type);
 
                 var releaseFiles = contentDbContext.ReleaseFiles.ToList();

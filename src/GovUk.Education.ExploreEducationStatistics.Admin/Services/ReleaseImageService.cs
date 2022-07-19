@@ -86,8 +86,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var releaseFile = await _releaseFileRepository.Create(
                 releaseId: releaseId,
                 filename: formFile.FileName,
+                contentLength: formFile.Length,
                 contentType: formFile.ContentType,
-                size: formFile.Length,
                 type: type,
                 createdById: _userService.GetUserId());
 

@@ -301,8 +301,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var releaseFile = await _releaseFileRepository.Create(
                         releaseId: releaseId,
                         filename: upload.File.FileName,
+                        contentLength: upload.File.Length,
                         contentType: upload.File.ContentType,
-                        size: upload.File.Length,
                         type: Ancillary,
                         createdById: _userService.GetUserId(),
                         name: upload.Title,
@@ -337,8 +337,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         : await _releaseFileRepository.Create(
                             releaseId: releaseId,
                             filename: formFile.FileName,
+                            contentLength: formFile.Length,
                             contentType: formFile.ContentType,
-                            size: formFile.Length,
                             type: Chart,
                             createdById: _userService.GetUserId());
 

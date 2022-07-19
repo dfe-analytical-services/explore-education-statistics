@@ -31,8 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         public async Task<MethodologyFile> Create(Guid methodologyVersionId,
             string filename,
+            long contentLength,
             string contentType,
-            long size,
             FileType type,
             Guid createdById)
         {
@@ -49,8 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     CreatedById = createdById,
                     RootPath = methodologyVersionId,
                     Filename = filename,
+                    ContentLength = contentLength,
                     ContentType = contentType,
-                    Size = size,
                     Type = type
                 }
             };

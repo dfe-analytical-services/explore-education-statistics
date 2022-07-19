@@ -1037,7 +1037,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary_1.pdf",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = Ancillary,
                     CreatedBy = new User
                     {
@@ -1055,7 +1055,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "Ancillary 2.pdf",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = Ancillary,
                     CreatedBy = new User
                     {
@@ -1072,7 +1072,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
-                    Size = 20480,
+                    ContentLength = 20480,
                     Type = Chart,
                     CreatedBy = new User
                     {
@@ -1106,7 +1106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "image.png",
-                    Size = 30720,
+                    ContentLength = 30720,
                     Type = Image,
                     CreatedBy = new User
                     {
@@ -1180,7 +1180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary_1.pdf",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = Ancillary,
                     CreatedBy = new User
                     {
@@ -1198,7 +1198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "Ancillary 2.pdf",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = Ancillary,
                     CreatedBy = new User
                     {
@@ -1309,7 +1309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = Ancillary
                 }
             };
@@ -2613,8 +2613,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(releaseFile);
                 var file = releaseFile!.File;
 
+                Assert.Equal(10240, file.ContentLength);
                 Assert.Equal("application/pdf", file.ContentType);
-                Assert.Equal(10240, file.Size);
                 Assert.InRange(DateTime.UtcNow.Subtract(file.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, file.CreatedById);
             }
@@ -2693,8 +2693,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(releaseFile);
                 var file = releaseFile!.File;
 
+                Assert.Equal(10240, file.ContentLength);
                 Assert.Equal("image/png", file.ContentType);
-                Assert.Equal(10240, file.Size);
                 Assert.InRange(DateTime.UtcNow.Subtract(file.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(_user.Id, file.CreatedById);
             }

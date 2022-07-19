@@ -12,8 +12,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
             Guid releaseId,
             Guid subjectId,
             string filename,
+            long contentLength,
             string? contentType,
-            long size,
             FileType type,
             Guid createdById,
             string? name = null,
@@ -23,8 +23,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
         public Task<File> CreateZip(
             Guid releaseId,
             string filename,
+            long contentLength,
             string contentType,
-            long size,
             Guid createdById);
 
         public Task<IList<File>> ListDataFiles(Guid releaseId);

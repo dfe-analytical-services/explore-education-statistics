@@ -220,8 +220,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 releaseId: releaseId,
                                 subjectId: subjectId,
                                 filename: dataFormFile.FileName.ToLower(),
+                                contentLength: dataFormFile.Length,
                                 contentType: dataFormFile.ContentType,
-                                size: dataFormFile.Length,
                                 type: FileType.Data,
                                 createdById: _userService.GetUserId(),
                                 name: validSubjectName,
@@ -231,8 +231,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 releaseId: releaseId,
                                 subjectId: subjectId,
                                 filename: metaFormFile.FileName.ToLower(),
+                                contentLength: metaFormFile.Length,
                                 contentType: metaFormFile.ContentType,
-                                size: metaFormFile.Length,
                                 type: Metadata,
                                 createdById: _userService.GetUserId());
 
@@ -294,8 +294,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                                                     var zipFile = await _releaseDataFileRepository.CreateZip(
                                                         filename: zipFormFile.FileName.ToLower(),
+                                                        contentLength: zipFormFile.Length,
                                                         contentType: zipFormFile.ContentType,
-                                                        size: zipFormFile.Length,
                                                         releaseId: releaseId,
                                                         createdById: _userService.GetUserId());
 
@@ -303,8 +303,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         releaseId: releaseId,
                                                         subjectId: subjectId,
                                                         filename: archiveFile.DataFileName,
+                                                        contentLength: archiveFile.DataFileSize,
                                                         contentType: null,
-                                                        size: archiveFile.DataFileSize,
                                                         type: FileType.Data,
                                                         createdById: _userService.GetUserId(),
                                                         name: validSubjectName,
@@ -315,8 +315,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         releaseId: releaseId,
                                                         subjectId: subjectId,
                                                         filename: archiveFile.MetaFileName,
+                                                        contentLength: archiveFile.MetaFileSize,
                                                         contentType: null,
-                                                        size: archiveFile.MetaFileSize,
                                                         type: Metadata,
                                                         createdById: _userService.GetUserId(),
                                                         source: zipFile);

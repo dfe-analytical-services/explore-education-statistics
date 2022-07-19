@@ -30,8 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             Guid releaseId,
             Guid subjectId,
             string filename,
+            long contentLength,
             string? contentType,
-            long size,
             FileType type,
             Guid createdById,
             string? name = null,
@@ -58,8 +58,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                     RootPath = releaseId,
                     SubjectId = subjectId,
                     Filename = filename,
+                    ContentLength = contentLength,
                     ContentType = contentType,
-                    Size = size,
                     Type = type,
                     Replacing = replacingFile,
                     Source = source
@@ -78,8 +78,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
 
         public async Task<File> CreateZip(Guid releaseId,
             string filename,
+            long contentLength,
             string contentType,
-            long size,
             Guid createdById)
         {
             var file = (await _contentDbContext.Files.AddAsync(new File
@@ -87,8 +87,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                 CreatedById = createdById,
                 RootPath = releaseId,
                 Filename = filename,
+                ContentLength = contentLength,
                 ContentType = contentType,
-                Size = size,
                 Type = DataZip
             })).Entity;
 

@@ -582,7 +582,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             File = new File
             {
                 Filename = "ancillary.pdf",
-                Size = 10240,
+                ContentLength = 10240,
                 Type = Ancillary
             }
         };
@@ -604,7 +604,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Tests.Services
             File = new File
             {
                 Filename = "data.csv",
-                Size = 20480,
+                ContentLength = 20480,
                 Type = FileType.Data
             }
         };

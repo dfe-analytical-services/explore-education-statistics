@@ -32,15 +32,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
         public static string DisplaySize(this File file)
         {
-            var fileSize = file.Size ?? 0;
+            var contentLength = file.ContentLength ?? 0;
             var unit = FileSizeUnit.B;
-            while (fileSize >= 1024 && unit < FileSizeUnit.Tb)
+            while (contentLength >= 1024 && unit < FileSizeUnit.Tb)
             {
-                fileSize /= 1024;
+                contentLength /= 1024;
                 unit++;
             }
 
-            return $"{fileSize:0.##} {unit}";
+            return $"{contentLength:0.##} {unit}";
         }
 
         public static string Path(this File file)

@@ -63,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 File = new File
                 {
                     Filename = "data1.csv",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
                 },
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 File = new File
                 {
                     Filename = "data2.csv",
-                    Size = 20480,
+                    ContentLength = 20480,
                     Type = FileType.Data,
                     SubjectId = releaseSubject2.Subject.Id,
                 }

@@ -13,8 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         public Task<MethodologyFile> Create(
             Guid methodologyVersionId,
             string filename,
+            long contentLength,
             string contentType,
-            long size,
             FileType type,
             Guid createdById);
 

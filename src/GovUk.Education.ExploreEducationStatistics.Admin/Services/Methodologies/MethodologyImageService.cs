@@ -134,8 +134,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             var methodologyFile = await _methodologyFileRepository.Create(
                 methodologyVersionId: methodologyVersionId,
                 filename: formFile.FileName,
+                contentLength: formFile.Length,
                 contentType: formFile.ContentType,
-                size: formFile.Length,
                 type: type,
                 createdById: _userService.GetUserId());
 

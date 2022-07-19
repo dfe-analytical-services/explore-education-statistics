@@ -192,7 +192,6 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
             file.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
                 contentType: "application/pdf",
                 contentLength: 1024));
 
@@ -246,7 +245,6 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
             releaseFile.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
                 contentType: "image/png",
                 contentLength: 1024));
 
@@ -300,7 +298,6 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateMethodologyFiles,
             methodologyFile.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
                 contentType: "image/png",
                 contentLength: 1024));
 

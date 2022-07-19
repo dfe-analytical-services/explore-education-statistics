@@ -36,7 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     Id = Guid.NewGuid(),
                     RootPath = Guid.NewGuid(),
                     Filename = "image.png",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = Image
                 }
             };

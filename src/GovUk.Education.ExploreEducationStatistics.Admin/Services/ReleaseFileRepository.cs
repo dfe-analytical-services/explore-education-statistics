@@ -53,8 +53,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<ReleaseFile> Create(
             Guid releaseId,
             string filename,
+            long contentLength,
             string contentType,
-            long size,
             FileType type,
             Guid createdById,
             string? name = null,
@@ -75,8 +75,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     CreatedById = createdById,
                     RootPath = releaseId,
                     Filename = filename,
+                    ContentLength = contentLength,
                     ContentType = contentType,
-                    Size = size,
                     Type = type
                 }
             };

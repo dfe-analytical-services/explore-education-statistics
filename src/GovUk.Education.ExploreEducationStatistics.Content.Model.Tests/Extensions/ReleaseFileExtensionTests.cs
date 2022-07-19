@@ -78,7 +78,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     Id = Guid.NewGuid(),
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = Ancillary,
                     Created = new DateTime(),
                     CreatedBy = new User
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Extensi
                     Id = Guid.NewGuid(),
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
-                    Size = 10240,
+                    ContentLength = 10240,
                     Type = Ancillary,
                 }
             };
