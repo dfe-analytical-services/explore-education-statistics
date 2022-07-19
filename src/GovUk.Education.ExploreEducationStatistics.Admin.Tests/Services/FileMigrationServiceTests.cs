@@ -9,10 +9,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
@@ -34,8 +34,7 @@ public class FileMigrationServiceTests
 
         VerifyAllMocks(storageQueueService);
 
-        var left = result.AssertLeft();
-        Assert.IsAssignableFrom<BadRequestObjectResult>(left);
+        result.AssertBadRequest(NullMessageCountForFileMigrationQueue);
     }
 
     [Fact]
@@ -51,8 +50,7 @@ public class FileMigrationServiceTests
 
         VerifyAllMocks(storageQueueService);
 
-        var left = result.AssertLeft();
-        Assert.IsAssignableFrom<BadRequestObjectResult>(left);
+        result.AssertBadRequest(NonEmptyFileMigrationQueue);
     }
 
     [Fact]
@@ -90,10 +88,6 @@ public class FileMigrationServiceTests
         }
 
         var storageQueueService = MockStorageQueueService(messageCount: 0);
-
-        storageQueueService.Setup(mock =>
-                mock.GetApproximateMessageCount(MigrateFilesQueue))
-            .ReturnsAsync(0);
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
         {

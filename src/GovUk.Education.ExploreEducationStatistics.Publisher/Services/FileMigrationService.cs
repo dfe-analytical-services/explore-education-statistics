@@ -64,17 +64,22 @@ public class FileMigrationService : IFileMigrationService
 
     private async Task<IBlobContainer> GetPrivateContainer(File file)
     {
-        return file.Type switch
+        switch (file.Type)
         {
-            FileType.Ancillary => BlobContainers.PrivateReleaseFiles,
-            FileType.Chart => BlobContainers.PrivateReleaseFiles,
-            FileType.Data => BlobContainers.PrivateReleaseFiles,
-            FileType.DataGuidance => BlobContainers.PrivateReleaseFiles,
-            FileType.DataZip => BlobContainers.PrivateReleaseFiles,
-            FileType.Image => await GetPrivateImageFileContainer(file),
-            FileType.Metadata => BlobContainers.PrivateReleaseFiles,
-            _ => throw new ArgumentOutOfRangeException(nameof(file), $"Unexpected file type '{file.Type}'.")
-        };
+            case FileType.Ancillary:
+            case FileType.Chart:
+            case FileType.Data:
+            case FileType.DataGuidance:
+            case FileType.DataZip:
+            case FileType.Metadata:
+                return BlobContainers.PrivateReleaseFiles;
+            case FileType.Image:
+                return await GetPrivateImageFileContainer(file);
+            case FileType.AllFilesZip:
+                // Not expecting any 'AllFilesZip' database entries
+            default:
+                throw new ArgumentOutOfRangeException(nameof(file), $"Unexpected file type '{file.Type}'.");
+        }
     }
 
     private async Task<IBlobContainer> GetPrivateImageFileContainer(File file)

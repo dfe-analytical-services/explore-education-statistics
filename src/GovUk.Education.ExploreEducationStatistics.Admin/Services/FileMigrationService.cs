@@ -11,6 +11,8 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Model.PublisherQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -47,14 +49,12 @@ public class FileMigrationService : IFileMigrationService
                 switch (messageCount)
                 {
                     case null:
-                        return new BadRequestObjectResult(
-                            $"Unexpected null message count for queue {MigrateFilesQueue}");
+                        return ValidationActionResult(NullMessageCountForFileMigrationQueue);
                     case > 0:
-                        return new BadRequestObjectResult(
-                            $"Found non-empty queue {MigrateFilesQueue}. Message count: {messageCount}");
+                        return ValidationActionResult(NonEmptyFileMigrationQueue);
                 }
 
-                // Queue one message per file for all files that don't have the new content type and size values
+                // Queue one message per file for all files that don't have the new content type and length values
                 var files = await _contentDbContext.Files
                     .AsNoTracking()
                     .Where(file => file.ContentType == null && file.Size == null)
