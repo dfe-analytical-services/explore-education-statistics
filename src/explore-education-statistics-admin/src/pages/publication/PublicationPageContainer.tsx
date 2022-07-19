@@ -4,6 +4,7 @@ import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import {
+  publicationContactRoute,
   publicationDetailsRoute,
   publicationReleasesRoute,
   PublicationRouteParams,
@@ -16,7 +17,11 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 
-const navRoutes = [publicationReleasesRoute, publicationDetailsRoute];
+const navRoutes = [
+  publicationReleasesRoute,
+  publicationDetailsRoute,
+  publicationContactRoute,
+];
 
 const routes = [...navRoutes];
 
