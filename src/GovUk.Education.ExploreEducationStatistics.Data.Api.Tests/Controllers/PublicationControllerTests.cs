@@ -20,8 +20,8 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
-    [Collection(BlobCacheServiceTests)]
-    public class PublicationControllerTests : BlobCacheServiceTestFixture
+    [Collection(CacheServiceTests)]
+    public class PublicationControllerTests : CacheServiceTestFixture
     {
         [Fact]
         public async Task ListLatestReleaseSubjects()
@@ -145,7 +145,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             var controller = new PublicationController(
                 publicationService.Object, releaseService.Object, cacheKeyService.Object);
             
-            return (controller, (publicationService, releaseService, cacheKeyService, CacheService));
+            return (controller, (publicationService, releaseService, cacheKeyService, BlobCacheService));
         }
     }
 }

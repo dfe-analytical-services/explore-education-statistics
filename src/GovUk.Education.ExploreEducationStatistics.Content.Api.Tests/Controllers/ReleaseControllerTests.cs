@@ -1,6 +1,9 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
@@ -13,8 +16,25 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
-    public class ReleaseControllerTests
+    [Collection(CacheServiceTests)]
+    public class ReleaseControllerTests : CacheServiceTestFixture
     {
+        public ReleaseControllerTests()
+        {
+            InMemoryCacheService
+                .Setup(s => s.GetItem(
+                    It.IsAny<IInMemoryCacheKey>(), typeof(ReleaseViewModel)))
+                .ReturnsAsync(null);
+
+            InMemoryCacheService
+                .Setup(s => s.SetItem<object>(
+                    It.IsAny<IInMemoryCacheKey>(), 
+                    It.IsAny<ReleaseViewModel>(), 
+                    It.IsAny<InMemoryCacheConfiguration>(),
+                    null))
+                .Returns(Task.CompletedTask);
+        }
+
         [Fact]
         public async Task GetLatestRelease()
         {
