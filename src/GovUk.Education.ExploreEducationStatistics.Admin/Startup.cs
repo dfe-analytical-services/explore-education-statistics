@@ -582,7 +582,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IFileMigrationService, FileMigrationService>(provider =>
                 new FileMigrationService(
                     contentDbContext: provider.GetRequiredService<ContentDbContext>(),
-                    storageQueueService: new StorageQueueService(Configuration.GetValue<string>("PublisherStorage")),
+                    storageQueueService: new StorageQueueService(
+                        Configuration.GetValue<string>("PublisherStorage"),
+                        new StorageInstanceCreationUtil()),
                     userService: provider.GetRequiredService<IUserService>(),
                     logger: provider.GetRequiredService<ILogger<FileMigrationService>>()));
             services.AddSingleton<IGuidGenerator, SequentialGuidGenerator>();
