@@ -35,18 +35,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IEnumerable<ReleasePublishingStatusLogMessage> logMessages = null)
         {
             var release = await GetReleaseAsync(releaseId);
-            var table = await GetTableAsync();
             var publish = immediate ? null : release.PublishScheduled;
             var releaseStatus = new ReleasePublishingStatus(release.Publication.Slug, publish, release.Id,
                 releaseStatusId, release.Slug, state, immediate, logMessages);
-            var tableResult = await table.ExecuteAsync(TableOperation.Insert(releaseStatus));
+            var tableResult = await GetTable().ExecuteAsync(TableOperation.Insert(releaseStatus));
             return tableResult.Result as ReleasePublishingStatus;
         }
 
         public async Task<ReleasePublishingStatus> GetAsync(Guid releaseId, Guid releaseStatusId)
         {
-            var table = await GetTableAsync();
-            var tableResult = await table.ExecuteAsync(
+            var tableResult = await GetTable().ExecuteAsync(
                 TableOperation.Retrieve<ReleasePublishingStatus>(releaseId.ToString(), releaseStatusId.ToString(),
                     new List<string>
                     {
@@ -241,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private async Task UpdateRowAsync(Guid releaseId, Guid releaseStatusId,
             Func<ReleasePublishingStatus, ReleasePublishingStatus> updateFunction, int retry = 0)
         {
-            var table = await GetTableAsync();
+            var table = GetTable();
             var releaseStatus = await GetAsync(releaseId, releaseStatusId);
 
             try
@@ -277,9 +275,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
                 .SingleAsync(release => release.Id == releaseId);
         }
 
-        private async Task<CloudTable> GetTableAsync()
+        private CloudTable GetTable()
         {
-            return await _tableStorageService.GetTableAsync(PublisherReleaseStatusTableName);
+            return _tableStorageService.GetTable(PublisherReleaseStatusTableName);
         }
 
         /// <summary>

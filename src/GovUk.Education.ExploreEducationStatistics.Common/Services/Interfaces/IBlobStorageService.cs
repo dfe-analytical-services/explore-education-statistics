@@ -50,22 +50,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             string contentType,
             IDictionary<string, string>? metadata = null);
 
-        public Task UploadText(
-            IBlobContainer containerName,
-            string path,
-            string content,
-            string contentType,
-            IDictionary<string, string>? metadata = null);
-
         public Task UploadAsJson<T>(
             IBlobContainer containerName,
             string path,
             T content,
             JsonSerializerSettings? settings = null);
-
-        public Task<bool> IsAppendSupported(IBlobContainer containerName, string path);
-
-        public Task AppendText(IBlobContainer containerName, string path, string content);
 
         /// <summary>
         /// Download the entirety of a blob to a target stream.
@@ -80,8 +69,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
             string path,
             Stream stream,
             CancellationToken? cancellationToken = null);
-
-        public Task SetMetadata(IBlobContainer containerName, string path, IDictionary<string, string> metadata);
 
         /// <summary>
         /// Stream a blob in chunks.
