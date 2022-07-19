@@ -63,19 +63,19 @@ public class FileMigrationServiceTests
             {
                 Id = Guid.NewGuid(),
                 ContentType = "application/pdf",
-                Size = null
+                ContentLength = null
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 ContentType = null,
-                Size = 1024
+                ContentLength = 1024
             },
             new()
             {
                 Id = Guid.NewGuid(),
                 ContentType = "application/pdf",
-                Size = 1024
+                ContentLength = 1024
             }
         };
 
@@ -119,7 +119,7 @@ public class FileMigrationServiceTests
             {
                 Id = Guid.NewGuid(),
                 ContentType = "application/pdf",
-                Size = 1024
+                ContentLength = 1024
             },
             new()
             {

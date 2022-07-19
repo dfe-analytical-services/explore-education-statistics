@@ -240,8 +240,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<long?>("ContentLength")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("ContentType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("Created")
                         .HasColumnType("datetime2");
@@ -261,9 +265,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<Guid>("RootPath")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<long?>("Size")
-                        .HasColumnType("bigint");
 
                     b.Property<Guid?>("SourceId")
                         .HasColumnType("uniqueidentifier");

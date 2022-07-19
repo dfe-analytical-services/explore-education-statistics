@@ -4,7 +4,7 @@
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
-    public partial class EES3529_AddFileContentTypeAndSize : Migration
+    public partial class ES3547_ChangesToFile : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -18,27 +18,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
+            migrationBuilder.AddColumn<long>(
+                name: "ContentLength",
+                table: "Files",
+                type: "bigint",
+                nullable: true);
+
             migrationBuilder.AddColumn<string>(
                 name: "ContentType",
                 table: "Files",
-                type: "nvarchar(max)",
-                nullable: true);
-
-            migrationBuilder.AddColumn<long>(
-                name: "Size",
-                table: "Files",
-                type: "bigint",
+                type: "nvarchar(255)",
+                maxLength: 255,
                 nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "ContentType",
+                name: "ContentLength",
                 table: "Files");
 
             migrationBuilder.DropColumn(
-                name: "Size",
+                name: "ContentType",
                 table: "Files");
 
             migrationBuilder.AlterColumn<string>(

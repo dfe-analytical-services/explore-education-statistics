@@ -291,6 +291,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<File>()
+                .Property(f => f.ContentType)
+                .HasMaxLength(255);
+
+            modelBuilder.Entity<File>()
                 .Property(b => b.Type)
                 .HasConversion(new EnumToStringConverter<FileType>());
 

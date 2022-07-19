@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    [Migration("20220713144101_EES3529_AddFileContentTypeAndSize")]
-    partial class EES3529_AddFileContentTypeAndSize
+    [Migration("20220719145319_ES3547_ChangesToFile")]
+    partial class ES3547_ChangesToFile
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -242,8 +242,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<long?>("ContentLength")
+                        .HasColumnType("bigint");
+
                     b.Property<string>("ContentType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("Created")
                         .HasColumnType("datetime2");
@@ -263,9 +267,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
 
                     b.Property<Guid>("RootPath")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<long?>("Size")
-                        .HasColumnType("bigint");
 
                     b.Property<Guid?>("SourceId")
                         .HasColumnType("uniqueidentifier");

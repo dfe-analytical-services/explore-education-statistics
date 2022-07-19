@@ -39,7 +39,7 @@ public class FileMigrationServiceTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             ContentType = null,
-            Size = null,
+            ContentLength = null,
             Type = FileType.Ancillary
         };
 
@@ -74,7 +74,7 @@ public class FileMigrationServiceTests
             var after = await contentDbContext.Files.SingleAsync(f => f.Id == file.Id);
 
             Assert.Null(after.ContentType);
-            Assert.Null(after.Size);
+            Assert.Null(after.ContentLength);
         }
     }
 
@@ -86,7 +86,7 @@ public class FileMigrationServiceTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             ContentType = null,
-            Size = null,
+            ContentLength = null,
             Type = FileType.Image
         };
 
@@ -111,7 +111,7 @@ public class FileMigrationServiceTests
             var after = await contentDbContext.Files.SingleAsync(f => f.Id == file.Id);
 
             Assert.Null(after.ContentType);
-            Assert.Null(after.Size);
+            Assert.Null(after.ContentLength);
         }
     }
 
@@ -123,7 +123,7 @@ public class FileMigrationServiceTests
             Id = Guid.NewGuid(),
             RootPath = Guid.NewGuid(),
             ContentType = null,
-            Size = null,
+            ContentLength = null,
             Type = FileType.Ancillary
         };
 
@@ -161,7 +161,7 @@ public class FileMigrationServiceTests
             var after = await contentDbContext.Files.SingleAsync(f => f.Id == file.Id);
 
             Assert.Equal("application/pdf", after.ContentType);
-            Assert.Equal(1024, after.Size);
+            Assert.Equal(1024, after.ContentLength);
         }
     }
 
@@ -176,7 +176,7 @@ public class FileMigrationServiceTests
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 ContentType = null,
-                Size = null,
+                ContentLength = null,
                 Type = FileType.Image
             }
         };
@@ -215,7 +215,7 @@ public class FileMigrationServiceTests
             var after = await contentDbContext.Files.SingleAsync(f => f.Id == releaseFile.File.Id);
 
             Assert.Equal("image/png", after.ContentType);
-            Assert.Equal(1024, after.Size);
+            Assert.Equal(1024, after.ContentLength);
         }
     }
 
@@ -230,7 +230,7 @@ public class FileMigrationServiceTests
                 Id = Guid.NewGuid(),
                 RootPath = Guid.NewGuid(),
                 ContentType = null,
-                Size = null,
+                ContentLength = null,
                 Type = FileType.Image
             }
         };
@@ -269,7 +269,7 @@ public class FileMigrationServiceTests
             var after = await contentDbContext.Files.SingleAsync(f => f.Id == methodologyFile.File.Id);
 
             Assert.Equal("image/png", after.ContentType);
-            Assert.Equal(1024, after.Size);
+            Assert.Equal(1024, after.ContentLength);
         }
     }
 

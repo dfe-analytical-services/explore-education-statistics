@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
         public File? Source { get; set; }
 
         // TODO EES-3552 Remove nullable and migrate db column to be not-null
-        public long? Size { get; set; }
+        public long? ContentLength { get; set; }
 
         public DateTime? Created { get; set; }
 

@@ -55,7 +55,7 @@ public class FileMigrationService : IFileMigrationService
 
                 _contentDbContext.Files.Update(file);
                 file.ContentType = blob.ContentType;
-                file.Size = blob.ContentLength;
+                file.ContentLength = blob.ContentLength;
                 await _contentDbContext.SaveChangesAsync();
 
                 return new Either<ActionResult, Unit>(Unit.Instance);
