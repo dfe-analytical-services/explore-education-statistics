@@ -54,10 +54,11 @@ public class FileMigrationService : IFileMigrationService
                         return ValidationActionResult(NonEmptyFileMigrationQueue);
                 }
 
-                // Queue one message per file for all files that don't have the new content type and length values
+                // Queue one message per file for all files that don't have values
+                // for the new ContentLength or ContentType properties
                 var files = await _contentDbContext.Files
                     .AsNoTracking()
-                    .Where(file => file.ContentType == null && file.ContentLength == null)
+                    .Where(file => file.ContentLength == null || file.ContentType == null)
                     .Select(file => new MigrateFileMessage(file.Id))
                     .ToListAsync();
 
