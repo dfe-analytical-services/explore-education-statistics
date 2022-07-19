@@ -6,6 +6,7 @@ import { PublicationContextProvider } from '@admin/pages/publication/contexts/Pu
 import {
   publicationContactRoute,
   publicationDetailsRoute,
+  publicationMethodologyRoute,
   publicationReleasesRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
@@ -19,8 +20,10 @@ import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 
 const navRoutes = [
   publicationReleasesRoute,
+  publicationMethodologyRoute,
   publicationDetailsRoute,
   publicationContactRoute,
+  publicationDetailsRoute,
 ];
 
 const routes = [...navRoutes];
@@ -40,7 +43,7 @@ const PublicationPageContainer = ({
 
   return (
     <LoadingSpinner loading={loadingPublication}>
-      {publication && (
+      {publication ? (
         <Page wide breadcrumbs={[{ name: 'Manage publication' }]}>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
@@ -98,6 +101,10 @@ const PublicationPageContainer = ({
             </Switch>
           </PublicationContextProvider>
         </Page>
+      ) : (
+        <WarningMessage>
+          There was a problem loading this publication.
+        </WarningMessage>
       )}
     </LoadingSpinner>
   );

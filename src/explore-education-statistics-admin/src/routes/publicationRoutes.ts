@@ -1,5 +1,6 @@
 import PublicationContactPage from '@admin/pages/publication/PublicationContactPage';
 import PublicationDetailsPage from '@admin/pages/publication/PublicationDetailsPage';
+import PublicationMethodologyPage from '@admin/pages/publication/PublicationMethodologyPage';
 import PublicationReleasesPage from '@admin/pages/publication/PublicationReleasesPage';
 import { RouteProps } from 'react-router';
 
@@ -16,6 +17,12 @@ export const publicationReleasesRoute: PublicationRouteProps = {
   path: '/publication/:publicationId/releases',
   title: 'Releases',
   component: PublicationReleasesPage,
+};
+
+export const publicationMethodologyRoute: PublicationRouteProps = {
+  path: '/publication/:publicationId/methodology',
+  title: 'Methodology',
+  component: PublicationMethodologyPage,
 };
 
 export const publicationDetailsRoute: PublicationRouteProps = {
