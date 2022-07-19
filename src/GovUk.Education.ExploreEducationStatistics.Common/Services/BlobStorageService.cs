@@ -592,36 +592,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
          * updated to work with Azure SDK 12 yet.
          */
         private async Task<CloudBlobContainer> GetCloudBlobContainer(
-            IBlobContainer containerName,
+            IBlobContainer container,
             string? connectionString = null)
         {
             var storageAccount = CloudStorageAccount.Parse(connectionString ?? _connectionString);
             var blobClient = storageAccount.CreateCloudBlobClient();
 
-            var container = blobClient.GetContainerReference(
-                IsDevelopmentStorageAccount(blobClient) ? containerName.EmulatedName : containerName.Name);
+            var containerName = IsDevelopmentStorageAccount(blobClient) ? container.EmulatedName : container.Name;
+            
+            var containerClient = blobClient.GetContainerReference(containerName);
 
             await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
                 _connectionString,
                 AzureStorageType.Blob,
-                containerName.Name,
-                () => container.CreateIfNotExistsAsync());
+                containerName,
+                () => containerClient.CreateIfNotExistsAsync());
 
-            return container;
+            return containerClient;
         }
 
-        private async Task<BlobContainerClient> GetBlobContainer(IBlobContainer containerName)
+        private async Task<BlobContainerClient> GetBlobContainer(IBlobContainer container)
         {
-            var container = _client.GetBlobContainerClient(
-                IsDevelopmentStorageAccount(_client) ? containerName.EmulatedName : containerName.Name);
+            var containerName = IsDevelopmentStorageAccount(_client) ? container.EmulatedName : container.Name;
+            
+            var containerClient = _client.GetBlobContainerClient(containerName);
 
             await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
                 _connectionString,
                 AzureStorageType.Blob,
-                containerName.Name,
-                () => container.CreateIfNotExistsAsync());
+                containerName,
+                () => containerClient.CreateIfNotExistsAsync());
 
-            return container;
+            return containerClient;
         }
 
         private static bool IsDevelopmentStorageAccount(BlobServiceClient client)
