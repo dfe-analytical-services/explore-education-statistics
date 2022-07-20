@@ -115,7 +115,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     ))
                 .AddScoped<IFilterRepository, FilterRepository>()
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
-                .AddScoped<IIndicatorRepository, IndicatorRepository>();
+                .AddScoped<IIndicatorRepository, IndicatorRepository>()
+
+                // Service temporarily added to migrate files in EES-3547
+                // TODO Remove in EES-3552
+                .AddScoped<IFileMigrationService, FileMigrationService>(provider =>
+                    new FileMigrationService(
+                        contentDbContext: provider.GetService<ContentDbContext>(),
+                        provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                        privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage")
+                    ));
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
