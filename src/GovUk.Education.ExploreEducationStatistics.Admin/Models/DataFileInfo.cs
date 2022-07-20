@@ -9,8 +9,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
 {
     public class DataFileInfo : FileInfo
     {
-        [JsonConverter(typeof(EnumToEnumValueJsonConverter<FileType>))]
-        public new const FileType Type = FileType.Data;
+        public DataFileInfo()
+        {
+            Type = FileType.Data;
+        }
 
         public Guid? MetaFileId { get; set; }
 
@@ -23,6 +25,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Models
         [JsonConverter(typeof(EnumToEnumValueJsonConverter<DataImportStatus>))]
         public DataImportStatus Status { get; set; }
 
-        public DataFilePermissions Permissions { get; set; } = new DataFilePermissions();
+        public DataFilePermissions Permissions { get; set; } = new();
     }
 }

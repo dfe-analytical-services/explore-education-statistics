@@ -89,7 +89,7 @@ describe('ReleaseDataUploadsSection', () => {
     fileName: 'test-data.zip',
     metaFileId: 'file-1-meta',
     metaFileName: 'test-data.meta.zip',
-    rows: 300,
+    rows: undefined,
     fileSize: {
       size: 150,
       unit: 'Kb',
@@ -843,7 +843,9 @@ describe('ReleaseDataUploadsSection', () => {
       expect(section3.getByTestId('Metadata file')).toHaveTextContent(
         'test-data.meta.zip',
       );
-      expect(section3.getByTestId('Data file size')).toHaveTextContent('');
+      expect(section3.getByTestId('Data file size')).toHaveTextContent(
+        '150 Kb',
+      );
       expect(section3.getByTestId('Number of rows')).toHaveTextContent('');
       expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
       expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
@@ -861,6 +863,7 @@ describe('ReleaseDataUploadsSection', () => {
 
       const testUpdatedZipFile: DataFile = {
         ...testUploadedZipFile,
+        rows: 300,
         status: 'STAGE_1',
       };
       releaseDataFileService.getDataFile
@@ -923,9 +926,6 @@ describe('ReleaseDataUploadsSection', () => {
         ),
       );
       await waitFor(() => {
-        expect(section3.getByTestId('Data file size')).toHaveTextContent(
-          '150 Kb',
-        );
         expect(section3.getByTestId('Number of rows')).toHaveTextContent('300');
       });
     });

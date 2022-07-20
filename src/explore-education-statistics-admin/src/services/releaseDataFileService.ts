@@ -29,7 +29,7 @@ export interface DataFile {
     size: number;
     unit: string;
   };
-  rows: number;
+  rows?: number;
   metaFileId: string;
   metaFileName: string;
   userName: string;

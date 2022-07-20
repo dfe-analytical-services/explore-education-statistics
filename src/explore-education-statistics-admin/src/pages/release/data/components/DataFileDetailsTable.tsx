@@ -113,33 +113,28 @@ const DataFileDetailsTable = ({
         <tr>
           <th scope="row">Data file size</th>
           <td data-testid="Data file size">
-            {!dataFile.isQueuedZipUpload && (
-              <>
-                {dataFile.fileSize.size.toLocaleString()}{' '}
-                {dataFile.fileSize.unit}
-              </>
-            )}
+            <>
+              {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
+            </>
           </td>
           {replacementDataFile && (
             <td data-testid="Replacement Data file size">
-              {!replacementDataFile.isQueuedZipUpload && (
-                <>
-                  {replacementDataFile.fileSize.size.toLocaleString()}{' '}
-                  {replacementDataFile.fileSize.unit}
-                </>
-              )}
+              <>
+                {replacementDataFile.fileSize.size.toLocaleString()}{' '}
+                {replacementDataFile.fileSize.unit}
+              </>
             </td>
           )}
         </tr>
         <tr>
           <th scope="row">Number of rows</th>
           <td data-testid="Number of rows">
-            {!dataFile.isQueuedZipUpload && dataFile.rows.toLocaleString()}
+            {!dataFile.isQueuedZipUpload && dataFile.rows?.toLocaleString()}
           </td>
           {replacementDataFile && (
             <td data-testid="Replacement Number of rows">
               {!replacementDataFile.isQueuedZipUpload &&
-                replacementDataFile.rows.toLocaleString()}
+                replacementDataFile.rows?.toLocaleString()}
             </td>
           )}
         </tr>
