@@ -4,17 +4,19 @@ import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import {
+  publicationDetailsRoute,
   publicationReleasesRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
 import publicationService from '@admin/services/publicationService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import RelatedInformation from '@common/components/RelatedInformation';
+import WarningMessage from '@common/components/WarningMessage';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 
-const navRoutes = [publicationReleasesRoute];
+const navRoutes = [publicationReleasesRoute, publicationDetailsRoute];
 
 const routes = [...navRoutes];
 
@@ -41,6 +43,17 @@ const PublicationPageContainer = ({
                 title={publication.title}
                 caption="Manage publication"
               />
+              {publication.isSuperseded && (
+                <WarningMessage className="govuk-!-margin-bottom-0">
+                  This publication is archived.
+                </WarningMessage>
+              )}
+              {publication.supersededById && !publication.isSuperseded && (
+                <WarningMessage className="govuk-!-margin-bottom-0">
+                  This publication will be archived when its superseding
+                  publication has a live release published.
+                </WarningMessage>
+              )}
             </div>
 
             <div className="govuk-grid-column-one-third">
