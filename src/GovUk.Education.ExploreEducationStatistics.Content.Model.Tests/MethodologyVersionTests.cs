@@ -249,36 +249,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             var originalVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                Annexes = new List<ContentSection>
-                {
-                    new()
+                MethodologyContent = new MethodologyVersionContent {
+                    Annexes = new List<ContentSection>
                     {
-                        Id = Guid.NewGuid(),
-                        Caption = "Annex caption",
-                        Heading = "Annex heading",
-                        Order = 2,
-                        Type = ContentSectionType.Generic,
-                        Content = ListOf<ContentBlock>(new HtmlBlock
+                        new()
                         {
                             Id = Guid.NewGuid(),
-                            Body = "Annex body",
-                            Created = DateTime.Today.AddDays(-13),
-                            Order = 5,
-                            ContentSection = new ContentSection(),
-                            ContentSectionId = Guid.NewGuid(),
-                            Comments = new List<Comment>
+                            Caption = "Annex caption",
+                            Heading = "Annex heading",
+                            Order = 2,
+                            Type = ContentSectionType.Generic,
+                            Content = ListOf<ContentBlock>(new HtmlBlock
                             {
-                                new()
+                                Id = Guid.NewGuid(),
+                                Body = "Annex body",
+                                Created = DateTime.Today.AddDays(-13),
+                                Order = 5,
+                                ContentSection = new ContentSection(),
+                                ContentSectionId = Guid.NewGuid(),
+                                Comments = new List<Comment>
                                 {
-                                    Id = Guid.NewGuid(),
-                                    Content = "Annex comment",
-                                    Created = DateTime.Today.AddDays(-4),
-                                    CreatedById = Guid.NewGuid(),
-                                    Updated = DateTime.Today.AddDays(-3),
-                                    CreatedBy = new User()
+                                    new()
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Content = "Annex comment",
+                                        Created = DateTime.Today.AddDays(-4),
+                                        CreatedById = Guid.NewGuid(),
+                                        Updated = DateTime.Today.AddDays(-3),
+                                        CreatedBy = new User()
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
                     }
                 }
             };
@@ -286,7 +288,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 
             var createdDate = DateTime.Today.AddMinutes(-2);
             var amendment = originalVersion.CreateMethodologyAmendment(createdDate, Guid.NewGuid());
-            AssertContentSectionAmendedCorrectly(amendment.Annexes[0], originalVersion.Annexes[0], createdDate);
+            AssertContentSectionAmendedCorrectly(
+                amendment.MethodologyContent.Annexes[0], 
+                originalVersion.MethodologyContent.Annexes[0], 
+                createdDate);
         }
 
         [Fact]
@@ -295,32 +300,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
             var originalVersion = new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                Content = new List<ContentSection>
-                {
-                    new()
+                MethodologyContent = new MethodologyVersionContent {
+                    Content = new List<ContentSection>
                     {
-                        Id = Guid.NewGuid(),
-                        Caption = "Content caption",
-                        Heading = "Content heading",
-                        Order = 2,
-                        Type = ContentSectionType.Generic,
-                        Content = ListOf<ContentBlock>(new HtmlBlock
+                        new()
                         {
                             Id = Guid.NewGuid(),
-                            Body = "Content body",
-                            Comments = new List<Comment>
+                            Caption = "Content caption",
+                            Heading = "Content heading",
+                            Order = 2,
+                            Type = ContentSectionType.Generic,
+                            Content = ListOf<ContentBlock>(new HtmlBlock
                             {
-                                new()
+                                Id = Guid.NewGuid(),
+                                Body = "Content body",
+                                Comments = new List<Comment>
                                 {
-                                    Id = Guid.NewGuid(),
-                                    Content = "Content comment",
-                                    Created = DateTime.Today.AddDays(-4),
-                                    CreatedById = Guid.NewGuid(),
-                                    Updated = DateTime.Today.AddDays(-3),
-                                    CreatedBy = new User()
+                                    new()
+                                    {
+                                        Id = Guid.NewGuid(),
+                                        Content = "Content comment",
+                                        Created = DateTime.Today.AddDays(-4),
+                                        CreatedById = Guid.NewGuid(),
+                                        Updated = DateTime.Today.AddDays(-3),
+                                        CreatedBy = new User()
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
                     }
                 }
             };
@@ -328,7 +335,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Tests
 
             var createdDate = DateTime.Today.AddMinutes(-2);
             var amendment = originalVersion.CreateMethodologyAmendment(createdDate, Guid.NewGuid());
-            AssertContentSectionAmendedCorrectly(amendment.Content[0], originalVersion.Content[0], createdDate);
+            AssertContentSectionAmendedCorrectly(
+                amendment.MethodologyContent.Content[0], 
+                originalVersion.MethodologyContent.Content[0], 
+                createdDate);
         }
 
         private static void AssertContentSectionAmendedCorrectly(ContentSection amendmentContentSection,

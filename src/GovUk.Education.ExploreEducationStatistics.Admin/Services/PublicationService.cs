@@ -346,7 +346,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public static IQueryable<Publication> HydratePublicationForPublicationViewModel(IQueryable<Publication> values)
         {
-            return values.Include(p => p.Contact)
+            return values
+                .AsSplitQuery()
+                .Include(p => p.Contact)
                 .Include(p => p.Releases)
                 .ThenInclude(r => r.ReleaseStatuses)
                 .Include(p => p.LegacyReleases)

@@ -81,9 +81,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Content = new List<ContentSection>
-                {
-                    new ContentSection()
+                MethodologyContent = new MethodologyVersionContent {
+                    Content = new List<ContentSection>
+                    {
+                        new()
+                    }
                 }
             };
             var contentDbContextId = Guid.NewGuid().ToString();
@@ -104,7 +106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                             var methodologyContentService = SetupMethodologyContentService(contentDbContext, userService: userService.Object);
 
                             return methodologyContentService.GetContentSection(methodologyVersion.Id,
-                                methodologyVersion.Content.First().Id);
+                                methodologyVersion.MethodologyContent.Content.First().Id);
                         });
             }
         }
@@ -170,11 +172,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Content = new List<ContentSection>
-                {
-                    new()
+                MethodologyContent = new MethodologyVersionContent {
+                    Content = new List<ContentSection>
+                    {
+                        new()
+                    }
                 }
-
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -195,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                             return methodologyContentService.UpdateContentSectionHeading(
                                 methodologyVersion.Id,
-                                methodologyVersion.Content.First().Id,
+                                methodologyVersion.MethodologyContent.Content.First().Id,
                                 "New heading");
                         });
             }
@@ -206,11 +209,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Content = new List<ContentSection>
-                {
-                    new()
+                MethodologyContent = new MethodologyVersionContent {
+                    Content = new List<ContentSection>
+                    {
+                        new()
+                    }
                 }
-
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -231,7 +235,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                             return methodologyContentService.RemoveContentSection(
                                 methodologyVersion.Id,
-                                methodologyVersion.Content.First().Id);
+                                methodologyVersion.MethodologyContent.Content.First().Id);
                         });
             }
         }
@@ -241,11 +245,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Content = new List<ContentSection>
-                {
-                    new()
+                MethodologyContent = new MethodologyVersionContent {
+                    Content = new List<ContentSection>
+                    {
+                        new()
+                    }
                 }
-
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -266,7 +271,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                             return methodologyContentService.ReorderContentBlocks(
                                 methodologyVersion.Id,
-                                methodologyVersion.Content.First().Id,
+                                methodologyVersion.MethodologyContent.Content.First().Id,
                                 new Dictionary<Guid, int>()
                             );
                         });
@@ -278,14 +283,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Content = new List<ContentSection>
-                {
-                    new()
+                MethodologyContent = new MethodologyVersionContent {
+                    Content = new List<ContentSection>
                     {
-                        Id = Guid.NewGuid()
+                        new()
+                        {
+                            Id = Guid.NewGuid()
+                        }
                     }
-                }
-
+                }   
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -306,7 +312,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                             return methodologyContentService.AddContentBlock(
                                 methodologyVersion.Id,
-                                methodologyVersion.Content.First().Id,
+                                methodologyVersion.MethodologyContent.Content.First().Id,
                                 new ContentBlockAddRequest()
                             );
                         });
@@ -318,17 +324,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Content = new List<ContentSection>
-                {
-                    new()
+                MethodologyContent = new MethodologyVersionContent {
+                    Content = new List<ContentSection>
                     {
-                        Content = new List<ContentBlock>
+                        new()
                         {
-                            new HtmlBlock()
+                            Content = new List<ContentBlock>
+                            {
+                                new HtmlBlock()
+                            }
                         }
                     }
                 }
-
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -349,8 +356,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                             return methodologyContentService.RemoveContentBlock(
                                 methodologyVersion.Id,
-                                methodologyVersion.Content.First().Id,
-                                methodologyVersion.Content.First().Content.First().Id
+                                methodologyVersion.MethodologyContent.Content.First().Id,
+                                methodologyVersion.MethodologyContent.Content.First().Content.First().Id
                             );
                         });
             }
@@ -361,17 +368,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodologyVersion = new MethodologyVersion
             {
-                Content = new List<ContentSection>
-                {
-                    new()
+                MethodologyContent = new MethodologyVersionContent {
+                    Content = new List<ContentSection>
                     {
-                        Content = new List<ContentBlock>
+                        new()
                         {
-                            new HtmlBlock()
+                            Content = new List<ContentBlock>
+                            {
+                                new HtmlBlock()
+                            }
                         }
                     }
                 }
-
             };
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -392,8 +400,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
                             return methodologyContentService.UpdateTextBasedContentBlock(
                                 methodologyVersion.Id,
-                                methodologyVersion.Content.First().Id,
-                                methodologyVersion.Content.First().Content.First().Id,
+                                methodologyVersion.MethodologyContent.Content.First().Id,
+                                methodologyVersion.MethodologyContent.Content.First().Content.First().Id,
                                 new ContentBlockUpdateRequest()
                             );
                         });

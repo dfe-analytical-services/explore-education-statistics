@@ -44,6 +44,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
         public DbSet<Methodology> Methodologies { get; set; }
         public DbSet<MethodologyVersion> MethodologyVersions { get; set; }
+        public DbSet<MethodologyVersionContent> MethodologyContent { get; set; }
         public DbSet<PublicationMethodology> PublicationMethodologies { get; set; }
         public DbSet<MethodologyFile> MethodologyFiles { get; set; }
         public DbSet<Theme> Themes { get; set; }
@@ -119,17 +120,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                     v => v,
                     v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
 
-            modelBuilder.Entity<MethodologyVersion>()
+            modelBuilder.Entity<MethodologyVersionContent>().ToTable("MethodologyVersions");
+            modelBuilder.Entity<MethodologyVersionContent>().Property<Guid>("MethodologyVersionId");
+            modelBuilder.Entity<MethodologyVersionContent>().HasKey("MethodologyVersionId");
+            
+            modelBuilder.Entity<MethodologyVersionContent>()
                 .Property(m => m.Content)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
 
-            modelBuilder.Entity<MethodologyVersion>()
+            modelBuilder.Entity<MethodologyVersionContent>()
                 .Property(m => m.Annexes)
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<ContentSection>>(v));
+
+            modelBuilder.Entity<MethodologyVersion>()
+                .HasOne(m => m.MethodologyContent)
+                .WithOne()
+                .HasForeignKey<MethodologyVersionContent>(m => m.MethodologyVersionId);
 
             modelBuilder.Entity<MethodologyVersion>()
                 .Property(m => m.Status)

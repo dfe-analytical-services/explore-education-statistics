@@ -88,6 +88,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .Reference(m => m.Methodology)
                 .LoadAsync();
 
+            await _context
+                .Entry(methodologyVersion)
+                .Reference(m => m.MethodologyContent)
+                .LoadAsync();
+
             return methodologyVersion;
         }
     }
