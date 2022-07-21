@@ -1909,12 +1909,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Single(f => f.Filename == zipFileName);
 
                 Assert.Equal(1048576, dataFile.ContentLength);
-                Assert.Null(dataFile.ContentType);
+                Assert.Equal("text/csv", dataFile.ContentType);
                 Assert.Equal(FileType.Data, dataFile.Type);
                 Assert.Equal(zipFile.Id, dataFile.SourceId);
 
                 Assert.Equal(1024, metaFile.ContentLength);
-                Assert.Null(metaFile.ContentType);
+                Assert.Equal("text/csv", metaFile.ContentType);
                 Assert.Equal(Metadata, metaFile.Type);
 
                 Assert.Equal(10240, zipFile.ContentLength);
@@ -2104,13 +2104,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(originalDataFile.SourceId);
 
                 Assert.Equal(1048576, dataFile.ContentLength);
-                Assert.Null(dataFile.ContentType);
+                Assert.Equal("text/csv", dataFile.ContentType);
                 Assert.Equal(FileType.Data, dataFile.Type);
                 Assert.Equal(originalDataFile.Id, dataFile.ReplacingId);
                 Assert.Equal(zipFile.Id, dataFile.SourceId);
 
                 Assert.Equal(1024, metaFile.ContentLength);
-                Assert.Null(metaFile.ContentType);
+                Assert.Equal("text/csv", metaFile.ContentType);
                 Assert.Equal(Metadata, metaFile.Type);
 
                 Assert.Equal(10240, zipFile.ContentLength);

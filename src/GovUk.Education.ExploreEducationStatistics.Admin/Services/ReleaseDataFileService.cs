@@ -304,7 +304,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         subjectId: subjectId,
                                                         filename: archiveFile.DataFileName,
                                                         contentLength: archiveFile.DataFileSize,
-                                                        contentType: null,
+                                                        contentType: "text/csv",
                                                         type: FileType.Data,
                                                         createdById: _userService.GetUserId(),
                                                         name: validSubjectName,
@@ -316,7 +316,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         subjectId: subjectId,
                                                         filename: archiveFile.MetaFileName,
                                                         contentLength: archiveFile.MetaFileSize,
-                                                        contentType: null,
+                                                        contentType: "text/csv",
                                                         type: Metadata,
                                                         createdById: _userService.GetUserId(),
                                                         source: zipFile);
