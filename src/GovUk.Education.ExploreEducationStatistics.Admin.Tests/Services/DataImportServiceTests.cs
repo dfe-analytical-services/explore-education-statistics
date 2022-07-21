@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -327,11 +326,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.Files.AddRangeAsync(dataFile, metaFile);
             }
 
-            var formFile = MockFormTestUtils.CreateFormFileMock("data.csv", "text/csv");
-
-            formFile.Setup(f => f.OpenReadStream())
-                .Returns(() => "line1\nline2\nline3".ToStream());
-
             var queueService = new Mock<IStorageQueueService>(Strict);
 
             queueService.Setup(mock => mock.AddMessageAsync(ImportsPendingQueue, It.IsAny<ImportMessage>()))
@@ -342,14 +336,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = BuildDataImportService(contentDbContext: contentDbContext,
                     queueService: queueService.Object);
 
-                var result = await service.Import(subjectId, dataFile, metaFile, formFile.Object);
+                var result = await service.Import(subjectId, dataFile, metaFile);
 
                 MockUtils.VerifyAllMocks(queueService);
 
                 Assert.Equal(dataFile.Id, result.FileId);
                 Assert.Equal(metaFile.Id, result.MetaFileId);
                 Assert.Equal(subjectId, result.SubjectId);
-                Assert.Equal(3, result.Rows);
+                Assert.Equal(0, result.TotalRows);
                 Assert.Equal(DataImportStatus.QUEUED, result.Status);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
             }

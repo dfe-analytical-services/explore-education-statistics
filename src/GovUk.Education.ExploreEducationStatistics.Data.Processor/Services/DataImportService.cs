@@ -79,6 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
         public async Task Update(Guid id,
             int rowsPerBatch,
             int importedRows,
+            int totalRows,
             int numBatches,
             HashSet<GeographicLevel> geographicLevels)
         {
@@ -88,6 +89,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             import.RowsPerBatch = rowsPerBatch;
             import.ImportedRows = importedRows;
+            import.TotalRows = totalRows;
             import.NumBatches = numBatches;
             import.GeographicLevels = geographicLevels;
 

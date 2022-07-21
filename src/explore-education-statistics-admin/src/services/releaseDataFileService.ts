@@ -8,7 +8,7 @@ interface DataFileInfo extends FileInfo {
   type: 'Data';
   metaFileId: string;
   metaFileName: string;
-  rows: number;
+  rows?: number;
   userName: string;
   created: string;
   status: ImportStatusCode;
@@ -38,8 +38,6 @@ export interface DataFile {
   created?: string;
   isDeleting?: boolean;
   isCancelling?: boolean;
-  isQueuedZipUpload?: boolean;
-  isReplacedByZipFile?: boolean;
   permissions: DataFilePermissions;
 }
 
@@ -97,7 +95,6 @@ function mapFile({ name, ...file }: DataFileInfo): DataFile {
   return {
     ...file,
     title: name,
-    rows: file.rows || 0,
     fileSize: {
       size: parseInt(size, 10),
       unit,

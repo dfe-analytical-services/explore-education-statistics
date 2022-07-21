@@ -1,3 +1,4 @@
+#nullable enable
 using System.IO.Compression;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;

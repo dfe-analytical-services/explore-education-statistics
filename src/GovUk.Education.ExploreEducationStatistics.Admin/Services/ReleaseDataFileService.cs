@@ -242,8 +242,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             var dataImport = await _dataImportService.Import(
                                 subjectId: subjectId,
                                 dataFile: dataFile,
-                                metaFile: metaFile,
-                                formFile: dataFormFile);
+                                metaFile: metaFile);
 
                             await _contentDbContext.Entry(dataFile)
                                 .Reference(f => f.CreatedBy)
@@ -257,7 +256,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 Size = dataFile.DisplaySize(),
                                 MetaFileId = metaFile.Id,
                                 MetaFileName = metaFile.Filename,
-                                Rows = dataImport.Rows,
                                 UserName = dataFile.CreatedBy.Email,
                                 Status = dataImport.Status,
                                 Created = dataFile.Created,
@@ -341,7 +339,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         Size = dataFile.DisplaySize(),
                                                         MetaFileId = metaFile.Id,
                                                         MetaFileName = metaFile.Filename,
-                                                        Rows = null,
                                                         UserName = dataFile.CreatedBy.Email,
                                                         Status = DataImportStatus.QUEUED,
                                                         Created = dataFile.Created,
@@ -373,7 +370,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileId = metaFile.Id,
                 MetaFileName = metaFile.Filename,
                 ReplacedBy = dataFile.ReplacedById,
-                Rows = dataImport?.Rows ?? 0,
+                Rows = dataImport?.TotalRows > 0 ? dataImport.TotalRows : null,
                 UserName = dataFile.CreatedBy?.Email ?? "",
                 Status = dataImport?.Status ?? DataImportStatus.NOT_FOUND,
                 Created = dataFile.Created,

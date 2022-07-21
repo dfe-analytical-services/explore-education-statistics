@@ -303,10 +303,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return new ProcessorStatistics
             (
-                importableRowCount: GetImportableRowCount(rowCountByGeographicLevel),
-                rowsPerBatch: rowsPerBatch,
-                numBatches: GetNumBatches(totalRowCount, rowsPerBatch),
-                geographicLevels: rowCountByGeographicLevel.Keys.ToHashSet()
+                TotalRowCount: totalRowCount,
+                ImportableRowCount: GetImportableRowCount(rowCountByGeographicLevel),
+                RowsPerBatch: rowsPerBatch,
+                NumBatches: GetNumBatches(totalRowCount, rowsPerBatch),
+                GeographicLevels: rowCountByGeographicLevel.Keys.ToHashSet()
             );
         }
 

@@ -796,7 +796,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.GetImport(dataReleaseFile.File.Id))
                     .ReturnsAsync(new DataImport
                     {
-                        Rows = 200,
+                        TotalRows = 200,
                         Status = COMPLETE
                     });
 
@@ -996,7 +996,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.GetImport(dataFile.Id))
                     .ReturnsAsync(new DataImport
                     {
-                        Rows = 200,
+                        TotalRows = 200,
                         Status = COMPLETE
                     });
 
@@ -1118,7 +1118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.GetImport(dataReleaseFile1.File.Id))
                     .ReturnsAsync(new DataImport
                     {
-                        Rows = 200,
+                        TotalRows = 200,
                         Status = COMPLETE
                     });
 
@@ -1126,7 +1126,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.GetImport(dataReleaseFile2.File.Id))
                     .ReturnsAsync(new DataImport
                     {
-                        Rows = 400,
+                        TotalRows = 400,
                         Status = STAGE_2
                     });
 
@@ -1272,7 +1272,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.GetImport(dataRelease1File.File.Id))
                     .ReturnsAsync(new DataImport
                     {
-                        Rows = 200,
+                        TotalRows = 200,
                         Status = COMPLETE
                     });
 
@@ -1413,7 +1413,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.GetImport(dataFile2.Id))
                     .ReturnsAsync(new DataImport
                     {
-                        Rows = 200,
+                        TotalRows = 200,
                         Status = COMPLETE
                     });
 
@@ -1507,11 +1507,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
-                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
-                        dataFormFile))
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName)))
                     .ReturnsAsync(new DataImport
                     {
-                        Rows = 100,
                         Status = QUEUED
                     });
 
@@ -1554,7 +1552,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
                 Assert.Equal(_user.Email, result.Right.UserName);
-                Assert.Equal(100, result.Right.Rows);
+                Assert.Null(result.Right.Rows);
                 Assert.Equal("10 Kb", result.Right.Size);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created.Value).Milliseconds, 0, 1500);
                 Assert.Equal(QUEUED, result.Right.Status);
@@ -1675,11 +1673,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     .Setup(s => s.Import(
                         It.IsAny<Guid>(),
                         It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
-                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
-                        dataFormFile))
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName)))
                     .ReturnsAsync(new DataImport
                     {
-                        Rows = 100,
                         Status = QUEUED
                     });
 
@@ -1722,7 +1718,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.True(result.Right.MetaFileId.HasValue);
                 Assert.Equal(metaFileName, result.Right.MetaFileName);
                 Assert.Equal(_user.Email, result.Right.UserName);
-                Assert.Equal(100, result.Right.Rows);
+                Assert.Null(result.Right.Rows);
                 Assert.Equal("10 Kb", result.Right.Size);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created.Value).Milliseconds, 0, 1500);
                 Assert.Equal(QUEUED, result.Right.Status);

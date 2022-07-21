@@ -10,7 +10,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public List<string> Errors { get; set; }
         public int PercentageComplete { get; set; }
         public int StagePercentageComplete { get; set; }
-        public int TotalRows { get; set; }
+        public int? TotalRows { get; set; }
         [JsonConverter(typeof(StringEnumConverter))]
         public DataImportStatus Status { get; set; }
 

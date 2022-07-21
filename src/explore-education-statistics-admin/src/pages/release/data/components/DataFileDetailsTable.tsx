@@ -129,12 +129,11 @@ const DataFileDetailsTable = ({
         <tr>
           <th scope="row">Number of rows</th>
           <td data-testid="Number of rows">
-            {!dataFile.isQueuedZipUpload && dataFile.rows?.toLocaleString()}
+            {dataFile.rows?.toLocaleString()}
           </td>
           {replacementDataFile && (
             <td data-testid="Replacement Number of rows">
-              {!replacementDataFile.isQueuedZipUpload &&
-                replacementDataFile.rows?.toLocaleString()}
+              {replacementDataFile.rows?.toLocaleString()}
             </td>
           )}
         </tr>

@@ -12,10 +12,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -96,12 +94,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Errors = import.Errors.Select(error => error.Message).ToList(),
                 PercentageComplete = import.PercentageComplete(),
                 StagePercentageComplete = import.StagePercentageComplete,
-                TotalRows = import.TotalRows,
+                TotalRows = import.TotalRows > 0 ? import.TotalRows : null,
                 Status = import.Status
             };
         }
 
-        public async Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile, IFormFile formFile)
+        public async Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile)
         {
             var import = await _dataImportRepository.Add(new DataImport
             {
@@ -109,7 +107,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FileId = dataFile.Id,
                 MetaFileId = metaFile.Id,
                 SubjectId = subjectId,
-                TotalRows = CalculateNumberOfRows(formFile.OpenReadStream()),
                 Status = DataImportStatus.QUEUED
             });
 

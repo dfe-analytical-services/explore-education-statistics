@@ -1,9 +1,11 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model.Data;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
@@ -135,7 +137,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await service.Update(import.Id,
                 rowsPerBatch: 1000,
-                importedRows: 10000,
+                importedRows: 5000,
+                totalRows: 10000,
                 numBatches: 10,
                 geographicLevels: new HashSet<GeographicLevel>
                 {
@@ -145,10 +148,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var updated = await contentDbContext.DataImports.FindAsync(import.Id);
-                Assert.NotNull(updated);
+                var updated = await contentDbContext.DataImports.SingleAsync(i => i.Id == import.Id);
+
                 Assert.Equal(1000, updated.RowsPerBatch);
-                Assert.Equal(10000, updated.ImportedRows);
+                Assert.Equal(5000, updated.ImportedRows);
+                Assert.Equal(10000, updated.TotalRows);
                 Assert.Equal(10, updated.NumBatches);
 
                 Assert.Equal(2, updated.GeographicLevels.Count);
@@ -157,7 +161,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             }
         }
 
-        private static DataImportService BuildDataImportService(string contentDbContextId = null)
+        private static DataImportService BuildDataImportService(string? contentDbContextId = null)
         {
             return new DataImportService(
                 contentDbContextId == null
