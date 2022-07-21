@@ -1,4 +1,7 @@
-import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
+import ReleaseServiceStatus, {
+  CurrentStatusBlock,
+} from '@admin/components/ReleaseServiceStatus';
+import useReleaseServiceStatus from '@admin/hooks/useReleaseServiceStatus';
 import publicationSummaryStyles from '@admin/pages/admin-dashboard/components/PublicationSummary.module.scss';
 import {
   getReleaseApprovalStatusLabel,
@@ -33,6 +36,9 @@ const ReleaseSummary = ({
   open = false,
   children,
 }: Props) => {
+  const { currentStatus, currentStatusDetail } = useReleaseServiceStatus({
+    releaseId: release.id,
+  });
   return (
     <Details
       open={open}
@@ -55,9 +61,9 @@ const ReleaseSummary = ({
             >
               <>
                 {' '}
-                <ReleaseServiceStatus
-                  exclude="details"
-                  releaseId={release.id}
+                <CurrentStatusBlock
+                  currentStatus={currentStatus}
+                  color={currentStatusDetail.color}
                   isApproved
                 />
               </>

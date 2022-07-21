@@ -18,13 +18,9 @@ const navRoutes = [publicationReleasesRoute];
 
 const routes = [...navRoutes];
 
-interface MatchProps {
-  publicationId: string;
-}
-
 const PublicationPageContainer = ({
   match,
-}: RouteComponentProps<MatchProps>) => {
+}: RouteComponentProps<PublicationRouteParams>) => {
   const { publicationId } = match.params;
   const {
     value: publication,

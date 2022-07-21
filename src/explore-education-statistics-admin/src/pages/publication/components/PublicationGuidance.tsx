@@ -63,10 +63,6 @@ export const IssuesGuidanceModal = ({
         These are things you may have forgotten, but do not need to resolve to
         publish the release
       </SummaryListItem>
-      <SummaryListItem term="Unresolved comments">
-        These are unresolved comments that you may wish to check before
-        publishing the release
-      </SummaryListItem>
     </SummaryList>
     <Button className="govuk-!-margin-bottom-0" onClick={onClose}>
       Close
@@ -89,10 +85,10 @@ export const PublishedStatusGuidanceModal = ({
   >
     <SummaryList>
       <SummaryListItem term={<Tag colour="green">Published</Tag>}>
-        This is a published release that is current live and is availble for
+        This is a published release that is current live and is available for
         public view. If you need to make any changes to the text or data in a
-        live a release you can select the 'Amend' option, this will allow you to
-        re-publish the chosen release with the new amendments
+        published release you can select the 'Amend' option, this will allow you
+        to re-publish the chosen release with the new amendments
       </SummaryListItem>
     </SummaryList>
     <Button className="govuk-!-margin-bottom-0" onClick={onClose}>
@@ -118,12 +114,12 @@ export const ScheduledStagesGuidanceModal = ({
       For <Tag colour="red">Failed</Tag>, <Tag colour="orange">Started</Tag> or{' '}
       <Tag colour="green">Complete</Tag> releases clicking 'View stages' will
       show a summary of the publication status. There are 4 steps of the process
-      (Data, content, files and final publishing). For each of these steps there
+      (data, content, files and final publishing). For each of these steps there
       are different stages as described below:
     </p>
     <SummaryList>
       <SummaryListItem term={<Tag colour="blue">Not started</Tag>}>
-        This step has yet to start publishing
+        The release has not started the publication process
       </SummaryListItem>
       <SummaryListItem term={<Tag colour="orange">Started</Tag>}>
         This step has now started the publication process
@@ -191,13 +187,13 @@ export const ScheduledStatusGuidanceModal = ({
         </a>{' '}
         for further assistance
       </SummaryListItem>
-      <SummaryListItem term="View stages">
-        For <Tag colour="red">Failed</Tag>, <Tag colour="orange">Started</Tag>{' '}
-        or <Tag colour="green">Complete</Tag> releases clicking 'View stages'
-        will show a summary of the publication status, highlighting all the
-        publication steps and whether they have succeeded or failed
-      </SummaryListItem>
     </SummaryList>
+    <p>
+      For <Tag colour="red">Failed</Tag>, <Tag colour="orange">Started</Tag> or{' '}
+      <Tag colour="green">Complete</Tag> releases clicking 'View stages' will
+      show a summary of the publication status, highlighting all the publication
+      steps and whether they have succeeded or failed
+    </p>
     <Button className="govuk-!-margin-bottom-0" onClick={onClose}>
       Close
     </Button>

@@ -1,177 +1,161 @@
-import StatusBlock, { StatusBlockProps } from '@admin/components/StatusBlock';
-import releaseService, {
-  ReleaseStageStatuses,
-} from '@admin/services/releaseService';
+import StatusBlock, { StatusBlockColors } from '@admin/components/StatusBlock';
+import useReleaseServiceStatus, {
+  StatusDetail,
+} from '@admin/hooks/useReleaseServiceStatus';
+import { ReleaseStageStatuses } from '@admin/services/releaseService';
 import Details from '@common/components/Details';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React from 'react';
 import Tag from '@common/components/Tag';
-import { forceCheck } from 'react-lazyload';
 
-interface Props {
-  releaseId: string;
-  refreshPeriod?: number;
-  exclude?: 'status' | 'details';
+const approvedStatuses = ['Complete', 'Scheduled'];
+const notStartedStatuses = ['Validating', 'Invalid'];
+
+export const getStatusDetail = (status: string): StatusDetail => {
+  if (!status) {
+    return { color: 'orange', text: 'Requesting status' };
+  }
+  switch (status) {
+    case 'NotStarted':
+      return { color: 'blue', text: 'Not Started' };
+    case 'Scheduled':
+      return { color: 'blue', text: status };
+    case 'Failed':
+    case 'Cancelled':
+    case 'Superseded':
+      return { color: 'red', text: status };
+    case 'Validating':
+    case 'Queued':
+    case 'Started':
+      return { color: 'orange', text: status };
+    case 'Complete':
+      return { color: 'green', text: status };
+    default:
+      return { color: 'red', text: 'Error' };
+  }
+};
+
+interface CurrentStatusBlockProps {
+  color?: StatusBlockColors;
+  currentStatus?: ReleaseStageStatuses;
   isApproved?: boolean;
-  newAdminStyle?: boolean; // EES-3217 CLEANUP
 }
 
-const ReleaseServiceStatus = ({
-  releaseId,
-  refreshPeriod = 10000,
-  exclude,
+export const CurrentStatusBlock = ({
+  color,
+  currentStatus,
   isApproved = false,
-  newAdminStyle = false,
-}: Props) => {
-  const [currentStatus, setCurrentStatus] = useState<ReleaseStageStatuses>();
-  const [statusColor, setStatusColor] = useState<StatusBlockProps['color']>(
-    'blue',
-  );
-  const timeoutRef = useRef<NodeJS.Timeout>();
-  const notStartedStatuses = newAdminStyle
-    ? ['Validating', 'Invalid']
-    : ['Validating', 'Scheduled', 'Invalid'];
-
-  const fetchReleaseServiceStatus = useCallback(() => {
-    return releaseService
-      .getReleaseStatus(releaseId)
-      .then(status => {
-        if (!status) {
-          // 204 response waiting for status
-          setCurrentStatus({ overallStage: 'Validating' });
-          timeoutRef.current = setTimeout(
-            fetchReleaseServiceStatus,
-            refreshPeriod,
-          );
-        } else {
-          setCurrentStatus(status);
-          if (status && status.overallStage === 'Started') {
-            timeoutRef.current = setTimeout(
-              fetchReleaseServiceStatus,
-              refreshPeriod,
-            );
-          }
-        }
-      })
-      .then(forceCheck);
-  }, [releaseId, refreshPeriod]);
-
-  function cancelTimer() {
-    if (timeoutRef.current) clearInterval(timeoutRef.current);
+}: CurrentStatusBlockProps) => {
+  if (!currentStatus) {
+    return null;
   }
-
-  useEffect(() => {
-    fetchReleaseServiceStatus();
-    return () => {
-      // cleans up the timeout
-      cancelTimer();
-    };
-  }, [fetchReleaseServiceStatus]);
-
-  const statusDetailColor = useCallback(
-    (status: string): { color: StatusBlockProps['color']; text: string } => {
-      if (currentStatus) {
-        switch (status) {
-          case 'NotStarted':
-            return { color: 'blue', text: 'Not Started' };
-          case 'Scheduled':
-            return { color: 'blue', text: status };
-          case 'Failed':
-          case 'Cancelled':
-          case 'Superseded':
-            return { color: 'red', text: status };
-          case 'Validating':
-          case 'Queued':
-          case 'Started':
-            return { color: 'orange', text: status };
-          case 'Complete':
-            return { color: 'green', text: status };
-          default:
-            return { color: 'red', text: 'Error' };
-        }
-      }
-      return { color: 'orange', text: 'Requesting status' };
-    },
-    [currentStatus],
-  );
-
-  useEffect(() => {
-    if (currentStatus && currentStatus.overallStage) {
-      const { color } = statusDetailColor(currentStatus.overallStage);
-      if (color === 'red' || color === 'green') {
-        cancelTimer();
-      }
-      setStatusColor(color);
-    }
-  }, [currentStatus, statusDetailColor]);
-
-  if (!currentStatus) return null;
 
   return (
     <>
-      {exclude !== 'status' && (
-        <>
-          {isApproved &&
-            !['Complete', 'Scheduled'].includes(currentStatus.overallStage) && (
-              <Tag>Approved</Tag>
-            )}
-          <StatusBlock
-            color={statusColor}
-            text={
-              currentStatus
-                ? (currentStatus.overallStage === 'Complete' &&
-                    isApproved &&
-                    'Published') ||
-                  currentStatus.overallStage
-                : 'Waiting to be scheduled...'
-            }
-            id={
-              currentStatus
-                ? `release-process-status-${currentStatus.overallStage}`
-                : 'release-process-status-WaitingToBeScheduled'
-            }
-          />
-        </>
+      {isApproved && !approvedStatuses.includes(currentStatus.overallStage) && (
+        <Tag>Approved</Tag>
       )}
+      <StatusBlock
+        color={color}
+        text={
+          currentStatus
+            ? (currentStatus.overallStage === 'Complete' &&
+                isApproved &&
+                'Published') ||
+              currentStatus.overallStage
+            : 'Waiting to be scheduled...'
+        }
+        id={
+          currentStatus
+            ? `release-process-status-${currentStatus.overallStage}`
+            : 'release-process-status-WaitingToBeScheduled'
+        }
+      />
+    </>
+  );
+};
 
-      {currentStatus &&
-        !notStartedStatuses.includes(currentStatus.overallStage) &&
-        exclude !== 'details' && (
-          <Details
-            className="govuk-!-margin-bottom-0 govuk-!-margin-top-1"
-            summary="View stages"
-          >
-            {newAdminStyle &&
-              !['Validating', 'Scheduled', 'Invalid'].includes(
-                currentStatus.overallStage,
-              ) && <p>Release process started</p>}
-            <ul className="govuk-list">
-              {Object.entries(currentStatus).map(([key, val]) => {
-                if (['overallStage', 'releaseId', 'lastUpdated'].includes(key))
-                  return null;
-                const { color, text } = statusDetailColor(val);
+interface ReleaseStagesProps {
+  checklistStyle?: boolean;
+  currentStatus?: ReleaseStageStatuses;
+  includeScheduled?: boolean;
+}
 
-                if (!color) {
-                  return null;
-                }
-
-                return (
-                  <li key={key}>
-                    <StatusBlock
-                      checklistStyle
-                      color={color}
-                      text={
-                        newAdminStyle
-                          ? `${key.replace('Stage', '')} ${text}`
-                          : `${key.replace('Stage', '')} - ${text}`
-                      }
-                      newAdminStyle={newAdminStyle}
-                    />
-                  </li>
-                );
-              })}
-            </ul>
-          </Details>
+export const ReleaseStages = ({
+  checklistStyle = false,
+  currentStatus,
+  includeScheduled = false,
+}: ReleaseStagesProps) => {
+  if (
+    !currentStatus ||
+    (includeScheduled
+      ? notStartedStatuses.includes(currentStatus.overallStage)
+      : [...notStartedStatuses, 'Scheduled'].includes(
+          currentStatus.overallStage,
+        ))
+  ) {
+    return null;
+  }
+  return (
+    <Details
+      className="govuk-!-margin-bottom-0 govuk-!-margin-top-1"
+      summary="View stages"
+    >
+      {checklistStyle &&
+        ![...notStartedStatuses, 'Scheduled'].includes(
+          currentStatus.overallStage,
+        ) && (
+          <p className="govuk-!-font-weight-bold">Release process started</p>
         )}
+      <ul className="govuk-list">
+        {Object.entries(currentStatus).map(([key, val]) => {
+          if (['overallStage', 'releaseId', 'lastUpdated'].includes(key)) {
+            return null;
+          }
+          const { color, text } = getStatusDetail(val);
+
+          if (!color) {
+            return null;
+          }
+
+          return (
+            <li key={key}>
+              <StatusBlock
+                checklistStyle={checklistStyle}
+                color={color}
+                text={
+                  checklistStyle
+                    ? `${key.replace('Stage', '')} ${text}`
+                    : `${key.replace('Stage', '')} - ${text}`
+                }
+              />
+            </li>
+          );
+        })}
+      </ul>
+    </Details>
+  );
+};
+
+interface ReleaseServiceStatusProps {
+  isApproved?: boolean;
+  releaseId: string;
+}
+
+const ReleaseServiceStatus = ({
+  isApproved = false,
+  releaseId,
+}: ReleaseServiceStatusProps) => {
+  const { currentStatus, currentStatusDetail } = useReleaseServiceStatus({
+    releaseId,
+  });
+  return (
+    <>
+      <CurrentStatusBlock
+        currentStatus={currentStatus}
+        color={currentStatusDetail.color}
+        isApproved={isApproved}
+      />
+      <ReleaseStages currentStatus={currentStatus} />
     </>
   );
 };

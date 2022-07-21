@@ -1,15 +1,14 @@
 import PublicationScheduledReleases from '@admin/pages/publication/components/PublicationScheduledReleases';
-import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import {
-  MyPublication,
-  PublicationContactDetails,
-} from '@admin/services/publicationService';
+import { PublicationContactDetails } from '@admin/services/publicationService';
 import _releaseService, { MyRelease } from '@admin/services/releaseService';
-import { render, screen, waitFor, within } from '@testing-library/react';
-import React from 'react';
+import {
+  render as baseRender,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
+import React, { ReactElement } from 'react';
 import { MemoryRouter } from 'react-router-dom';
-import noop from 'lodash/noop';
-import produce from 'immer';
 
 jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
@@ -63,25 +62,7 @@ describe('PublicationScheduledReleases', () => {
     title: 'Release 2',
   };
 
-  const testPublication: MyPublication = {
-    id: 'publication-1',
-    title: 'Publication 1',
-    contact: testContact,
-    releases: [testRelease1, testRelease2],
-    legacyReleases: [],
-    methodologies: [],
-    themeId: 'theme-1',
-    topicId: 'topic-1',
-    permissions: {
-      canAdoptMethodologies: true,
-      canCreateReleases: true,
-      canUpdatePublication: true,
-      canUpdatePublicationTitle: true,
-      canUpdatePublicationSupersededBy: true,
-      canCreateMethodologies: true,
-      canManageExternalMethodology: true,
-    },
-  };
+  const testReleases = [testRelease1, testRelease2];
 
   beforeEach(() => {
     releaseService.getReleaseStatus.mockResolvedValue({
@@ -90,7 +71,7 @@ describe('PublicationScheduledReleases', () => {
   });
 
   test('renders the scheduled releases table correctly', async () => {
-    setUp(testPublication);
+    render(<PublicationScheduledReleases releases={testReleases} />);
 
     expect(screen.getByText('Scheduled releases')).toBeInTheDocument();
 
@@ -135,10 +116,19 @@ describe('PublicationScheduledReleases', () => {
   });
 
   test('shows a view instead of edit link if you do not have permission to edit the release', () => {
-    setUp(
-      produce(testPublication, draft => {
-        draft.releases[0].permissions.canUpdateRelease = false;
-      }),
+    render(
+      <PublicationScheduledReleases
+        releases={[
+          {
+            ...testRelease1,
+            permissions: {
+              ...testRelease1.permissions,
+              canUpdateRelease: false,
+            },
+          },
+          testRelease2,
+        ]}
+      />,
     );
 
     const rows = screen.getAllByRole('row');
@@ -155,16 +145,6 @@ describe('PublicationScheduledReleases', () => {
   });
 });
 
-function setUp(publication: MyPublication) {
-  render(
-    <MemoryRouter>
-      <PublicationContextProvider
-        publication={publication}
-        onPublicationChange={noop}
-        onReload={noop}
-      >
-        <PublicationScheduledReleases />
-      </PublicationContextProvider>
-    </MemoryRouter>,
-  );
+function render(element: ReactElement) {
+  baseRender(<MemoryRouter>{element}</MemoryRouter>);
 }

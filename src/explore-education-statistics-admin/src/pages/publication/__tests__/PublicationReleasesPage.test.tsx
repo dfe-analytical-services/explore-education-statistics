@@ -1,31 +1,28 @@
 import PublicationReleasesPage from '@admin/pages/publication/PublicationReleasesPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import {
+import _publicationService, {
   MyPublication,
   PublicationContactDetails,
 } from '@admin/services/publicationService';
-import _releaseContentService, {
-  EditableRelease,
-} from '@admin/services/releaseContentService';
 import _releaseService, { MyRelease } from '@admin/services/releaseService';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
-import produce from 'immer';
 
 jest.mock('@admin/services/releaseService');
-jest.mock('@admin/services/releaseContentService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
-const releaseContentService = _releaseContentService as jest.Mocked<
-  typeof _releaseContentService
+
+jest.mock('@admin/services/publicationService');
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
 >;
 
 describe('PublicationReleasesPage', () => {
   const testContact: PublicationContactDetails = {
-    id: 'contact-1',
     contactName: 'John Smith',
     contactTelNo: '0777777777',
+    id: 'contact-id-1',
     teamEmail: 'john.smith@test.com',
     teamName: 'Team Smith',
   };
@@ -109,71 +106,6 @@ describe('PublicationReleasesPage', () => {
     },
   };
 
-  const testEditableRelease: EditableRelease = {
-    approvalStatus: 'Draft',
-    id: 'release-1',
-    latestRelease: false,
-
-    publicationId: 'publication-1',
-    published: '2022-01-01T00:00:00',
-    releaseName: 'Release name',
-    slug: 'release-1-slug',
-    title: 'Release 1',
-
-    type: 'AdHocStatistics',
-    content: [],
-    coverageTitle: '',
-    dataLastPublished: '',
-    downloadFiles: [],
-    hasDataGuidance: false,
-    hasPreReleaseAccessList: false,
-    headlinesSection: {
-      id: '',
-      order: 0,
-      content: [],
-      heading: '',
-    },
-    keyStatisticsSection: {
-      id: '',
-      order: 0,
-      content: [],
-      heading: '',
-    },
-    keyStatisticsSecondarySection: {
-      id: '',
-      order: 0,
-      content: [],
-      heading: '',
-    },
-    publication: {
-      ...testPublication,
-      contact: {
-        teamName: 'Explore Education Statistics',
-        teamEmail: 'explore.statistics@education.gov.uk',
-        contactName: 'Cameron Race',
-        contactTelNo: '07780991976',
-      },
-      methodologies: [],
-      slug: '',
-      topic: { theme: { title: '' } },
-    },
-    relatedDashboardsSection: {
-      id: '',
-      order: 0,
-      content: [],
-      heading: '',
-    },
-    relatedInformation: [],
-    summarySection: {
-      id: '',
-      order: 0,
-      content: [],
-      heading: '',
-    },
-    updates: [],
-    yearTitle: '',
-  };
-
   beforeEach(() => {
     releaseService.getReleaseStatus.mockResolvedValue({
       overallStage: 'Scheduled',
@@ -183,23 +115,20 @@ describe('PublicationReleasesPage', () => {
       valid: true,
       warnings: [],
     });
-
-    releaseContentService.getContent.mockResolvedValue({
-      release: testEditableRelease,
-      availableDataBlocks: [],
-    });
   });
 
   test('renders the releases page correctly', async () => {
-    setUp(testPublication);
+    publicationService.getMyPublication.mockResolvedValue(testPublication);
+    renderPage(testPublication);
 
     expect(screen.getByText('Manage releases')).toBeInTheDocument();
 
+    await waitFor(() => {
+      expect(screen.getByText('Scheduled releases')).toBeInTheDocument();
+    });
     expect(
       screen.getByRole('link', { name: 'Create new release' }),
     ).toBeInTheDocument();
-
-    expect(screen.getByText('Scheduled releases')).toBeInTheDocument();
     const scheduledTable = screen.getByTestId('publication-scheduled-releases');
     const scheduledRows = within(scheduledTable).getAllByRole('row');
     expect(scheduledRows).toHaveLength(2);
@@ -232,25 +161,35 @@ describe('PublicationReleasesPage', () => {
   });
 
   test('does not show the create release button if you do not have permission', () => {
-    setUp(
-      produce(testPublication, draft => {
-        draft.permissions.canCreateReleases = false;
-      }),
-    );
+    const publication = {
+      ...testPublication,
+      permissions: {
+        ...testPublication.permissions,
+        canCreateReleases: false,
+      },
+    };
+    publicationService.getMyPublication.mockResolvedValue(publication);
+
+    renderPage(publication);
 
     expect(
       screen.queryByRole('link', { name: 'Create new release' }),
     ).not.toBeInTheDocument();
   });
 
-  test('show a message if there are no releases', () => {
-    setUp(
-      produce(testPublication, draft => {
-        draft.releases = [];
-      }),
-    );
+  test('show a message if there are no releases', async () => {
+    const publication = {
+      ...testPublication,
+      releases: [],
+    };
+    publicationService.getMyPublication.mockResolvedValue(publication);
+    renderPage(publication);
 
-    expect(screen.getByText('There are no releases for this publication yet.'));
+    await waitFor(() => {
+      expect(
+        screen.getByText('There are no releases for this publication yet.'),
+      );
+    });
 
     expect(
       screen.queryByTestId('publication-scheduled-releases'),
@@ -264,7 +203,7 @@ describe('PublicationReleasesPage', () => {
   });
 });
 
-function setUp(publication: MyPublication) {
+function renderPage(publication: MyPublication) {
   render(
     <MemoryRouter>
       <PublicationContextProvider

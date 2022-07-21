@@ -1,25 +1,20 @@
-import Link from '@admin/components/Link';
-import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
+import styles from '@admin/pages/publication//PublicationReleasesPage.module.scss';
+import ScheduledReleaseRow from '@admin/pages/publication/components/ScheduledReleaseRow';
 import {
   ScheduledStagesGuidanceModal,
   ScheduledStatusGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
-import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
-import {
-  ReleaseRouteParams,
-  releaseSummaryRoute,
-} from '@admin/routes/releaseRoutes';
+import { MyRelease } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
-import FormattedDate from '@common/components/FormattedDate';
 import InfoIcon from '@common/components/InfoIcon';
-import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';
-import { generatePath } from 'react-router';
 
-const PublicationScheduledReleases = () => {
-  const { scheduledReleases } = usePublicationContext();
+interface Props {
+  releases: MyRelease[];
+}
 
+const PublicationScheduledReleases = ({ releases }: Props) => {
   const [
     showScheduledStatusGuidance,
     toggleScheduledStatusGuidance,
@@ -40,8 +35,8 @@ const PublicationScheduledReleases = () => {
         </caption>
         <thead>
           <tr>
-            <th className="govuk-!-width-one-quarter">Release period</th>
-            <th>
+            <th className="govuk-!-width-one-third">Release period</th>
+            <th className={styles.statusColumn}>
               State{' '}
               <ButtonText onClick={toggleScheduledStatusGuidance.on}>
                 <InfoIcon description="Guidance on scheduled states" />
@@ -54,46 +49,13 @@ const PublicationScheduledReleases = () => {
               </ButtonText>
             </th>
             <th>Publish date</th>
-            <th className="dfe-align--right">Actions</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {scheduledReleases.map(release => (
-            <tr key={release.id}>
-              <td className="govuk-!-width-one-quarter">{release.title}</td>
-              <td>
-                <ReleaseServiceStatus
-                  exclude="details"
-                  releaseId={release.id}
-                />
-              </td>
-              <td>
-                {' '}
-                <ReleaseServiceStatus
-                  exclude="status"
-                  releaseId={release.id}
-                  newAdminStyle
-                />
-              </td>
-              <td>
-                <FormattedDate>{release.publishScheduled || ''}</FormattedDate>
-              </td>
-              <td className="dfe-align--right">
-                <Link
-                  to={generatePath<ReleaseRouteParams>(
-                    releaseSummaryRoute.path,
-                    {
-                      publicationId: release.publicationId,
-                      releaseId: release.id,
-                    },
-                  )}
-                >
-                  {release.permissions.canUpdateRelease ? 'Edit' : 'View'}
-                  <VisuallyHidden> {release.title}</VisuallyHidden>
-                </Link>
-              </td>
-            </tr>
-          ))}
+          {releases.map(release => {
+            return <ScheduledReleaseRow key={release.id} release={release} />;
+          })}
         </tbody>
       </table>
 

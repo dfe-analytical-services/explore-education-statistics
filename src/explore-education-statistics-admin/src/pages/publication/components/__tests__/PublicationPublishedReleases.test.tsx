@@ -1,25 +1,26 @@
 import PublicationPublishedReleases from '@admin/pages/publication/components/PublicationPublishedReleases';
-import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import {
-  MyPublication,
-  PublicationContactDetails,
-} from '@admin/services/publicationService';
+import { PublicationContactDetails } from '@admin/services/publicationService';
 import _releaseService, {
   MyRelease,
   ReleaseSummary,
 } from '@admin/services/releaseService';
-import { render, screen, waitFor, within } from '@testing-library/react';
+import {
+  render as baseRender,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryHistory } from 'history';
-import React from 'react';
+import React, { ReactElement } from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
-import noop from 'lodash/noop';
-import produce from 'immer';
 
 jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('PublicationPublishedReleases', () => {
+  const testPublicationId = 'publication-1';
+
   const testContact: PublicationContactDetails = {
     id: 'contact-1',
     contactName: 'John Smith',
@@ -105,36 +106,23 @@ describe('PublicationPublishedReleases', () => {
     title: 'Release 7',
   };
 
-  const testPublication: MyPublication = {
-    id: 'publication-1',
-    title: 'Publication 1',
-    contact: testContact,
-    releases: [
-      testRelease1,
-      testRelease2,
-      testRelease3,
-      testRelease4,
-      testRelease5,
-      testRelease6,
-      testRelease7,
-    ],
-    legacyReleases: [],
-    methodologies: [],
-    themeId: 'theme-1',
-    topicId: 'topic-1',
-    permissions: {
-      canAdoptMethodologies: true,
-      canCreateReleases: true,
-      canUpdatePublication: true,
-      canUpdatePublicationTitle: true,
-      canUpdatePublicationSupersededBy: true,
-      canCreateMethodologies: true,
-      canManageExternalMethodology: true,
-    },
-  };
+  const testReleases = [
+    testRelease1,
+    testRelease2,
+    testRelease3,
+    testRelease4,
+    testRelease5,
+    testRelease6,
+    testRelease7,
+  ];
 
   test('renders the published releases table correctly', () => {
-    setUp(testPublication);
+    render(
+      <PublicationPublishedReleases
+        publicationId={testPublicationId}
+        releases={testReleases}
+      />,
+    );
 
     expect(screen.getByText('Published releases (5 of 7)')).toBeInTheDocument();
     expect(
@@ -154,7 +142,7 @@ describe('PublicationPublishedReleases', () => {
       within(row1cells[3]).getByRole('button', { name: 'Amend Release 1' }),
     ).toBeInTheDocument();
     expect(
-      within(row1cells[3]).getByRole('link', { name: 'View Release 1' }),
+      within(row1cells[4]).getByRole('link', { name: 'View Release 1' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/summary',
@@ -170,7 +158,7 @@ describe('PublicationPublishedReleases', () => {
       within(row2cells[3]).getByRole('button', { name: 'Amend Release 2' }),
     ).toBeInTheDocument();
     expect(
-      within(row2cells[3]).getByRole('link', { name: 'View Release 2' }),
+      within(row2cells[4]).getByRole('link', { name: 'View Release 2' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-2/summary',
@@ -186,7 +174,7 @@ describe('PublicationPublishedReleases', () => {
       within(row3cells[3]).getByRole('button', { name: 'Amend Release 3' }),
     ).toBeInTheDocument();
     expect(
-      within(row3cells[3]).getByRole('link', { name: 'View Release 3' }),
+      within(row3cells[4]).getByRole('link', { name: 'View Release 3' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-3/summary',
@@ -202,7 +190,7 @@ describe('PublicationPublishedReleases', () => {
       within(row4cells[3]).getByRole('button', { name: 'Amend Release 4' }),
     ).toBeInTheDocument();
     expect(
-      within(row4cells[3]).getByRole('link', { name: 'View Release 4' }),
+      within(row4cells[4]).getByRole('link', { name: 'View Release 4' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-4/summary',
@@ -218,7 +206,7 @@ describe('PublicationPublishedReleases', () => {
       within(row5cells[3]).getByRole('button', { name: 'Amend Release 5' }),
     ).toBeInTheDocument();
     expect(
-      within(row5cells[3]).getByRole('link', { name: 'View Release 5' }),
+      within(row5cells[4]).getByRole('link', { name: 'View Release 5' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-5/summary',
@@ -226,7 +214,12 @@ describe('PublicationPublishedReleases', () => {
   });
 
   test('displays more releases when the show more button is clicked', () => {
-    setUp(testPublication);
+    render(
+      <PublicationPublishedReleases
+        publicationId={testPublicationId}
+        releases={testReleases}
+      />,
+    );
 
     expect(screen.getAllByRole('row')).toHaveLength(6);
 
@@ -247,7 +240,7 @@ describe('PublicationPublishedReleases', () => {
       within(row6cells[3]).getByRole('button', { name: 'Amend Release 6' }),
     ).toBeInTheDocument();
     expect(
-      within(row6cells[3]).getByRole('link', { name: 'View Release 6' }),
+      within(row6cells[4]).getByRole('link', { name: 'View Release 6' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-6/summary',
@@ -263,7 +256,7 @@ describe('PublicationPublishedReleases', () => {
       within(row7cells[3]).getByRole('button', { name: 'Amend Release 7' }),
     ).toBeInTheDocument();
     expect(
-      within(row7cells[3]).getByRole('link', { name: 'View Release 7' }),
+      within(row7cells[4]).getByRole('link', { name: 'View Release 7' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-7/summary',
@@ -281,15 +274,13 @@ describe('PublicationPublishedReleases', () => {
       id: 'release-amendment-id',
     } as ReleaseSummary);
 
-    render(
+    baseRender(
       <Router history={history}>
-        <PublicationContextProvider
-          publication={testPublication}
-          onPublicationChange={noop}
-          onReload={noop}
-        >
-          <PublicationPublishedReleases />
-        </PublicationContextProvider>
+        <PublicationPublishedReleases
+          publicationId={testPublicationId}
+          releases={testReleases}
+        />
+        ,
       </Router>,
     );
 
@@ -301,13 +292,13 @@ describe('PublicationPublishedReleases', () => {
     );
 
     expect(
-      screen.getByText('Confirm you want to amend this live release'),
+      screen.getByText('Confirm you want to amend this published release'),
     ).toBeInTheDocument();
 
     const modal = within(screen.getByRole('dialog'));
 
     expect(
-      modal.getByText('Confirm you want to amend this live release'),
+      modal.getByText('Confirm you want to amend this published release'),
     ).toBeInTheDocument();
 
     userEvent.click(
@@ -328,10 +319,25 @@ describe('PublicationPublishedReleases', () => {
   });
 
   test('does not show the amendment button if you do not have the correct permissions', () => {
-    setUp(
-      produce(testPublication, draft => {
-        draft.releases[0].permissions.canMakeAmendmentOfRelease = false;
-      }),
+    render(
+      <PublicationPublishedReleases
+        publicationId={testPublicationId}
+        releases={[
+          {
+            ...testRelease1,
+            permissions: {
+              ...testRelease1.permissions,
+              canMakeAmendmentOfRelease: false,
+            },
+          },
+          testRelease2,
+          testRelease3,
+          testRelease4,
+          testRelease5,
+          testRelease6,
+          testRelease7,
+        ]}
+      />,
     );
 
     const rows = screen.getAllByRole('row');
@@ -342,16 +348,6 @@ describe('PublicationPublishedReleases', () => {
   });
 });
 
-function setUp(publication: MyPublication) {
-  render(
-    <MemoryRouter>
-      <PublicationContextProvider
-        publication={publication}
-        onPublicationChange={noop}
-        onReload={noop}
-      >
-        <PublicationPublishedReleases />
-      </PublicationContextProvider>
-    </MemoryRouter>,
-  );
+function render(element: ReactElement) {
+  baseRender(<MemoryRouter>{element}</MemoryRouter>);
 }

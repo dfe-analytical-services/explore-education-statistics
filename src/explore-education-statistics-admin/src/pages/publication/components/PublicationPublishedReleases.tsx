@@ -1,8 +1,7 @@
 import Link from '@admin/components/Link';
 import { PublishedStatusGuidanceModal } from '@admin/pages/publication/components/PublicationGuidance';
-import styles from '@admin/pages/publication/components/PublicationPublishedReleases.module.scss';
-import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
-import releaseService from '@admin/services/releaseService';
+import styles from '@admin/pages/publication//PublicationReleasesPage.module.scss';
+import releaseService, { MyRelease } from '@admin/services/releaseService';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -12,18 +11,22 @@ import FormattedDate from '@common/components/FormattedDate';
 import InfoIcon from '@common/components/InfoIcon';
 import ModalConfirm from '@common/components/ModalConfirm';
 import Tag from '@common/components/Tag';
-import TagGroup from '@common/components/TagGroup';
 import VisuallyHidden from '@common/components/VisuallyHidden';
 import useToggle from '@common/hooks/useToggle';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { generatePath, useHistory } from 'react-router';
 
-const PublicationPublishedReleases = () => {
+const pageSize = 5;
+
+interface Props {
+  publicationId: string;
+  releases: MyRelease[];
+}
+
+const PublicationPublishedReleases = ({ publicationId, releases }: Props) => {
   const history = useHistory();
 
   const focusRef = useRef<HTMLTableRowElement>(null);
-
-  const { publicationId, publishedReleases } = usePublicationContext();
 
   const [amendReleaseId, setAmendReleaseId] = useState<string>();
 
@@ -34,18 +37,16 @@ const PublicationPublishedReleases = () => {
     togglePublishedStatusGuidance,
   ] = useToggle(false);
 
-  const [currentChunk, setCurrentChunk] = useState<number>(1);
-
-  const chunkSize = 5;
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const currentReleases = useMemo(() => {
-    return publishedReleases.slice(0, chunkSize * currentChunk);
-  }, [publishedReleases, chunkSize, currentChunk]);
+    return releases.slice(0, pageSize * currentPage);
+  }, [releases, currentPage]);
 
   const showMoreNumber =
-    chunkSize < publishedReleases.length - currentReleases.length
-      ? chunkSize
-      : publishedReleases.length - currentReleases.length;
+    pageSize < releases.length - currentReleases.length
+      ? pageSize
+      : releases.length - currentReleases.length;
 
   useEffect(() => {
     if (focusIndex) {
@@ -55,26 +56,28 @@ const PublicationPublishedReleases = () => {
 
   return (
     <>
-      <table data-testid="publication-published-releases">
+      <table
+        className="dfe-hide-empty-cells"
+        data-testid="publication-published-releases"
+      >
         <caption
           aria-live="polite"
           aria-atomic
           className="govuk-table__caption--m"
         >
-          Published releases ({currentReleases.length} of{' '}
-          {publishedReleases.length})
+          {`Published releases (${currentReleases.length} of ${releases.length})`}
         </caption>
         <thead>
           <tr>
-            <th className="govuk-!-width-one-quarter">Release period</th>
-            <th>
+            <th className="govuk-!-width-one-third">Release period</th>
+            <th className={styles.statusColumn}>
               State{' '}
               <ButtonText onClick={togglePublishedStatusGuidance.on}>
-                <InfoIcon description="Guidance on draft release issues" />
+                <InfoIcon description="Guidance on states" />
               </ButtonText>
             </th>
             <th>Published date</th>
-            <th className="dfe-align--right">Actions</th>
+            <th colSpan={2}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -85,23 +88,24 @@ const PublicationPublishedReleases = () => {
               ref={focusIndex === index + 1 ? focusRef : undefined}
               tabIndex={focusIndex === index + 1 ? -1 : undefined}
             >
-              <td className="govuk-!-width-one-quarter">{release.title}</td>
+              <td>{release.title}</td>
               <td>
-                <TagGroup>
-                  <Tag colour="green">Published</Tag>
-                </TagGroup>
+                <Tag colour="green">Published</Tag>
               </td>
               <td>
-                <FormattedDate>{release.published || ''}</FormattedDate>
+                {release.published && (
+                  <FormattedDate>{release.published}</FormattedDate>
+                )}
               </td>
-              <td className="dfe-align--right">
+              <td>
                 {release.permissions.canMakeAmendmentOfRelease && (
                   <ButtonText onClick={() => setAmendReleaseId(release.id)}>
                     Amend<VisuallyHidden> {release.title}</VisuallyHidden>
                   </ButtonText>
                 )}
+              </td>
+              <td>
                 <Link
-                  className="govuk-!-margin-left-4"
                   to={generatePath<ReleaseRouteParams>(
                     releaseSummaryRoute.path,
                     {
@@ -117,15 +121,16 @@ const PublicationPublishedReleases = () => {
           ))}
         </tbody>
       </table>
-      {currentReleases.length < publishedReleases.length && (
+      {currentReleases.length < releases.length && (
         <ButtonText
           onClick={() => {
-            setFocusIndex(chunkSize * currentChunk + 1);
-            setCurrentChunk(currentChunk + 1);
+            setFocusIndex(pageSize * currentPage + 1);
+            setCurrentPage(currentPage + 1);
           }}
         >
-          Show next {showMoreNumber} published release
-          {showMoreNumber > 1 && 's'}
+          {`Show next ${showMoreNumber} published release${
+            showMoreNumber > 1 && 's'
+          }`}
         </ButtonText>
       )}
 
@@ -137,7 +142,7 @@ const PublicationPublishedReleases = () => {
       {amendReleaseId && (
         <ModalConfirm
           open={!!amendReleaseId}
-          title="Confirm you want to amend this live release"
+          title="Confirm you want to amend this published release"
           onCancel={() => setAmendReleaseId(undefined)}
           onConfirm={async () => {
             const amendment = await releaseService.createReleaseAmendment(
@@ -154,8 +159,8 @@ const PublicationPublishedReleases = () => {
           onExit={() => setAmendReleaseId(undefined)}
         >
           <p>
-            Please note, any changes made to this live release must be approved
-            before updates can be published.
+            Please note, any changes made to this published release must be
+            approved before updates can be published.
           </p>
         </ModalConfirm>
       )}
