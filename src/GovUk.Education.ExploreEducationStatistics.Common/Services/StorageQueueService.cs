@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
 using Microsoft.Azure.Storage;
 using Microsoft.Azure.Storage.Queue;
 using Newtonsoft.Json;
@@ -12,10 +14,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     public class StorageQueueService : IStorageQueueService
     {
         private readonly string _storageConnectionString;
+        private readonly IStorageInstanceCreationUtil _storageInstanceCreationUtil;
 
-        public StorageQueueService(string storageConnectionString)
+        public StorageQueueService(
+            string storageConnectionString,
+            IStorageInstanceCreationUtil storageInstanceCreationUtil)
         {
             _storageConnectionString = storageConnectionString;
+            _storageInstanceCreationUtil = storageInstanceCreationUtil;
         }
 
         public void AddMessage(string queueName, object value)
@@ -56,7 +62,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
             var queue = client.GetQueueReference(queueName);
-            queue.CreateIfNotExists();
+
+            _storageInstanceCreationUtil.CreateInstanceIfNotExists(
+                _storageConnectionString,
+                AzureStorageType.Queue,
+                queueName,
+                () => queue.CreateIfNotExists());
+
             return queue;
         }
 
@@ -65,7 +77,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             var storageAccount = CloudStorageAccount.Parse(_storageConnectionString);
             var client = storageAccount.CreateCloudQueueClient();
             var queue = client.GetQueueReference(queueName);
-            await queue.CreateIfNotExistsAsync();
+
+            await _storageInstanceCreationUtil.CreateInstanceIfNotExistsAsync(
+                _storageConnectionString,
+                AzureStorageType.Queue,
+                queueName,
+                () => queue.CreateIfNotExistsAsync());
+
             return queue;
         }
 

@@ -5,6 +5,7 @@ using Azure.Storage.Blobs;
 using GovUk.Education.ExploreEducationStatistics.Common.Functions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -83,7 +84,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         mapper: provider.GetRequiredService<IMapper>()
                     ))
                 .AddScoped<ITableStorageService, TableStorageService>(provider =>
-                    new TableStorageService(GetConfigurationValue(provider, "PublisherStorage")))
+                    new TableStorageService(
+                        GetConfigurationValue(provider, "PublisherStorage"),
+                        new StorageInstanceCreationUtil()))
                 .AddScoped<IPublicationService, PublicationService>()
                 .AddScoped<IMethodologyVersionRepository, MethodologyVersionRepository>()
                 .AddScoped<IMethodologyRepository, MethodologyRepository>()
@@ -91,12 +94,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddScoped<INotificationsService, NotificationsService>(provider =>
                     new NotificationsService(
                         context: provider.GetService<ContentDbContext>(),
-                        storageQueueService: new StorageQueueService(GetConfigurationValue(provider,
-                            "NotificationStorage"))))
+                        storageQueueService: new StorageQueueService(
+                            GetConfigurationValue(provider,
+                            "NotificationStorage"),
+                            new StorageInstanceCreationUtil())))
                 .AddScoped<IQueueService, QueueService>(provider =>
                     new QueueService(
                         storageQueueService: new StorageQueueService(
-                            storageConnectionString: GetConfigurationValue(provider, "PublisherStorage")
+                            GetConfigurationValue(provider, "PublisherStorage"),
+                            new StorageInstanceCreationUtil()
                         ),
                         releasePublishingStatusService: provider.GetService<IReleasePublishingStatusService>(),
                         logger: provider.GetRequiredService<ILogger<QueueService>>()))
@@ -109,7 +115,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     ))
                 .AddScoped<IFilterRepository, FilterRepository>()
                 .AddScoped<IFootnoteRepository, FootnoteRepository>()
-                .AddScoped<IIndicatorRepository, IndicatorRepository>();
+                .AddScoped<IIndicatorRepository, IndicatorRepository>()
+
+                // Service temporarily added to migrate files in EES-3547
+                // TODO Remove in EES-3552
+                .AddScoped<IFileMigrationService, FileMigrationService>(provider =>
+                    new FileMigrationService(
+                        contentDbContext: provider.GetService<ContentDbContext>(),
+                        provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                        privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage")
+                    ));
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
             AddPersistenceHelper<StatisticsDbContext>(builder.Services);
@@ -129,7 +144,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
             return new BlobStorageService(
                 connectionString,
                 new BlobServiceClient(connectionString),
-                provider.GetRequiredService<ILogger<BlobStorageService>>());
+                provider.GetRequiredService<ILogger<BlobStorageService>>(),
+                new StorageInstanceCreationUtil());
         }
 
         private static string GetConfigurationValue(IServiceProvider provider, string key)
