@@ -37,18 +37,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Slug = "methodology-slug",
                     OwningPublicationTitle = "Owning Publication Title"
                 },
-                Content = new List<ContentSection>
-                {
-                    new()
+                MethodologyContent = new MethodologyVersionContent {
+                    Content = new List<ContentSection>
                     {
-                        Content = new List<ContentBlock>
+                        new()
                         {
-                            new HtmlBlock
+                            Content = new List<ContentBlock>
                             {
-                                Body = "Content!"
+                                new HtmlBlock
+                                {
+                                    Body = "Content!"
+                                }
                             }
                         }
-                    }
+                    },
                 },
                 Notes = new List<MethodologyNote>
                 {
@@ -99,11 +101,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             {
                 var amendment = await context.MethodologyVersions
                     .Include(m => m.Notes)
+                    .Include(m => m.MethodologyContent)
                     .SingleAsync(m => m.Id == amendmentId);
 
                 Assert.Equal(originalVersion.Id, amendment.PreviousVersionId);
 
-                var contentSection = Assert.Single(amendment.Content);
+                var contentSection = Assert.Single(amendment.MethodologyContent.Content);
                 Assert.NotNull(contentSection);
 
                 var contentBlock = Assert.Single(contentSection.Content) as HtmlBlock;
@@ -129,13 +132,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     Slug = "methodology-slug",
                     OwningPublicationTitle = "Owning Publication Title"
                 },
-                Content = AsList(new ContentSection
-                {
-                    Content = AsList<ContentBlock>(new HtmlBlock
+                MethodologyContent = new MethodologyVersionContent {
+                    Content = AsList(new ContentSection
                     {
-                        Body = "Content!"
+                        Content = AsList<ContentBlock>(new HtmlBlock
+                        {
+                            Body = "Content!"
+                        })
                     })
-                })
+                }
             };
 
             var originalMethodologyFile1 = new MethodologyFile

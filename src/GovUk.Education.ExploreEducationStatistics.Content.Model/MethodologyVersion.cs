@@ -36,9 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public DateTime? Updated { get; set; }
 
-        public List<ContentSection> Content { get; set; } = new();
-
-        public List<ContentSection> Annexes { get; set; } = new();
+        public MethodologyVersionContent MethodologyContent { get; set; } = new();
 
         public List<MethodologyNote> Notes { get; set; } = new();
 
@@ -112,13 +110,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             copy.Methodology = null!;
             copy.InternalReleaseNote = null;
 
-            copy.Annexes = Annexes
-                .Select(c => c.Clone(createdDate))
-                .ToList();
-
-            copy.Content = Content
-                .Select(c => c.Clone(createdDate))
-                .ToList();
+            copy.MethodologyContent = MethodologyContent.Clone(createdDate);
 
             copy.Notes = copy
                 .Notes
@@ -128,4 +120,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
             return copy;
         }
     }
+
+    public class MethodologyVersionContent
+    {
+        public Guid MethodologyVersionId { get; set; }
+            
+        public List<ContentSection> Content { get; set; } = new();
+
+        public List<ContentSection> Annexes { get; set; } = new();
+
+        public MethodologyVersionContent Clone(DateTime createdDate)
+        {
+            return new MethodologyVersionContent
+            {
+                Annexes = Annexes
+                    .Select(c => c.Clone(createdDate))
+                    .ToList(),
+
+                Content = Content
+                    .Select(c => c.Clone(createdDate))
+                    .ToList()
+            };
+        }
+    }
 }
+
+

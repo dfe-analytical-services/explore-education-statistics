@@ -46,16 +46,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                 {
                     var latestPublishedVersion =
                         await _methodologyVersionRepository.GetLatestPublishedVersion(methodology.Id);
+                    
                     if (latestPublishedVersion == null)
                     {
                         return new NotFoundResult();
                     }
 
-                    await _contentDbContext.Entry(latestPublishedVersion)
+                    await _contentDbContext
+                        .Entry(latestPublishedVersion)
                         .Collection(m => m.Notes)
+                        .LoadAsync();
+                    
+                    await _contentDbContext
+                        .Entry(latestPublishedVersion)
+                        .Reference(m => m.MethodologyContent)
                         .LoadAsync();
 
                     var viewModel = _mapper.Map<MethodologyVersionViewModel>(latestPublishedVersion);
+                    
                     viewModel.Publications =
                         await GetPublishedPublicationsForMethodology(latestPublishedVersion.MethodologyId);
 
