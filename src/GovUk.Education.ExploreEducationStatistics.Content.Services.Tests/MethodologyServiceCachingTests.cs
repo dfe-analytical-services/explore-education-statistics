@@ -318,8 +318,10 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
             new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                Annexes = new List<ContentSection>(),
-                Content = new List<ContentSection>(),
+                MethodologyContent = new MethodologyVersionContent {
+                    Annexes = new List<ContentSection>(),
+                    Content = new List<ContentSection>(),
+                },
                 PreviousVersionId = null,
                 PublishingStrategy = Immediately,
                 Status = Approved,
@@ -333,8 +335,10 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
             new MethodologyVersion
             {
                 Id = Guid.NewGuid(),
-                Annexes = new List<ContentSection>(),
-                Content = new List<ContentSection>(),
+                MethodologyContent = new MethodologyVersionContent {
+                    Annexes = new List<ContentSection>(),
+                    Content = new List<ContentSection>(),
+                },
                 PreviousVersionId = null,
                 PublishingStrategy = Immediately,
                 Status = Approved,

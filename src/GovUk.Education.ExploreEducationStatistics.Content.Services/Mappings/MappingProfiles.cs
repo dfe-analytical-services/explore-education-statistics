@@ -29,10 +29,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Mappings
             CreateMap<MethodologyVersion, MethodologyVersionViewModel>()
                 .ForMember(dest => dest.Annexes,
                     m => m.MapFrom(methodologyVersion =>
-                        methodologyVersion.Annexes.OrderBy(annexSection => annexSection.Order)))
+                        methodologyVersion.MethodologyContent.Annexes.OrderBy(annexSection => annexSection.Order)))
                 .ForMember(dest => dest.Content,
                     m => m.MapFrom(methodologyVersion =>
-                        methodologyVersion.Content.OrderBy(contentSection => contentSection.Order)))
+                        methodologyVersion.MethodologyContent.Content.OrderBy(contentSection => contentSection.Order)))
                 .ForMember(dest => dest.Notes,
                     m => m.MapFrom(methodologyVersion =>
                         methodologyVersion.Notes.OrderByDescending(note => note.DisplayDate)));

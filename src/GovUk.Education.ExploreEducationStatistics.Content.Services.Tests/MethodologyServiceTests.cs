@@ -249,53 +249,55 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        Annexes = new List<ContentSection>
-                        {
-                            new()
+                        MethodologyContent = new MethodologyVersionContent {
+                            Annexes = new List<ContentSection>
                             {
-                                Id = Guid.NewGuid(),
-                                Order = 2,
-                                Heading = "Annex 3 heading",
-                                Caption = "Annex 3 caption"
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Order = 2,
+                                    Heading = "Annex 3 heading",
+                                    Caption = "Annex 3 caption"
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Order = 0,
+                                    Heading = "Annex 1 heading",
+                                    Caption = "Annex 1 caption"
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Order = 1,
+                                    Heading = "Annex 2 heading",
+                                    Caption = "Annex 2 caption"
+                                }
                             },
-                            new()
+                            Content = new List<ContentSection>
                             {
-                                Id = Guid.NewGuid(),
-                                Order = 0,
-                                Heading = "Annex 1 heading",
-                                Caption = "Annex 1 caption"
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Order = 2,
+                                    Heading = "Section 3 heading",
+                                    Caption = "Section 3 caption"
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Order = 0,
+                                    Heading = "Section 1 heading",
+                                    Caption = "Section 1 caption"
+                                },
+                                new()
+                                {
+                                    Id = Guid.NewGuid(),
+                                    Order = 1,
+                                    Heading = "Section 2 heading",
+                                    Caption = "Section 2 caption"
+                                }
                             },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Order = 1,
-                                Heading = "Annex 2 heading",
-                                Caption = "Annex 2 caption"
-                            }
-                        },
-                        Content = new List<ContentSection>
-                        {
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Order = 2,
-                                Heading = "Section 3 heading",
-                                Caption = "Section 3 caption"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Order = 0,
-                                Heading = "Section 1 heading",
-                                Caption = "Section 1 caption"
-                            },
-                            new()
-                            {
-                                Id = Guid.NewGuid(),
-                                Order = 1,
-                                Heading = "Section 2 heading",
-                                Caption = "Section 2 caption"
-                            }
                         },
                         PublishingStrategy = Immediately,
                         Status = Approved,
@@ -332,17 +334,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 Assert.Equal(3, result.Annexes.Count);
                 Assert.Equal(3, result.Content.Count);
 
-                var expectedAnnex1 = methodologyVersion.Annexes.Single(section => section.Order == 0);
-                var expectedAnnex2 = methodologyVersion.Annexes.Single(section => section.Order == 1);
-                var expectedAnnex3 = methodologyVersion.Annexes.Single(section => section.Order == 2);
+                var expectedAnnex1 = methodologyVersion.MethodologyContent.Annexes.Single(section => section.Order == 0);
+                var expectedAnnex2 = methodologyVersion.MethodologyContent.Annexes.Single(section => section.Order == 1);
+                var expectedAnnex3 = methodologyVersion.MethodologyContent.Annexes.Single(section => section.Order == 2);
 
                 AssertContentSectionAndViewModelEqual(expectedAnnex1, result.Annexes[0]);
                 AssertContentSectionAndViewModelEqual(expectedAnnex2, result.Annexes[1]);
                 AssertContentSectionAndViewModelEqual(expectedAnnex3, result.Annexes[2]);
 
-                var expectedContent1 = methodologyVersion.Content.Single(section => section.Order == 0);
-                var expectedContent2 = methodologyVersion.Content.Single(section => section.Order == 1);
-                var expectedContent3 = methodologyVersion.Content.Single(section => section.Order == 2);
+                var expectedContent1 = methodologyVersion.MethodologyContent.Content.Single(section => section.Order == 0);
+                var expectedContent2 = methodologyVersion.MethodologyContent.Content.Single(section => section.Order == 1);
+                var expectedContent3 = methodologyVersion.MethodologyContent.Content.Single(section => section.Order == 2);
 
                 AssertContentSectionAndViewModelEqual(expectedContent1, result.Content[0]);
                 AssertContentSectionAndViewModelEqual(expectedContent2, result.Content[1]);
