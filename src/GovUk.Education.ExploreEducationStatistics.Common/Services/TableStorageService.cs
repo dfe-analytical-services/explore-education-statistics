@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using Microsoft.Azure.Cosmos.Table;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
@@ -9,27 +10,31 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
     public class TableStorageService : ITableStorageService
     {
         private readonly CloudTableClient _client;
+        private readonly StorageInstanceCreationUtil _storageInstanceCreationUtil;
 
-        public TableStorageService(string connectionString)
+        public TableStorageService(
+            string connectionString, 
+            StorageInstanceCreationUtil storageInstanceCreationUtil)
         {
             var account = CloudStorageAccount.Parse(connectionString);
             _client = account.CreateCloudTableClient();
+            _storageInstanceCreationUtil = storageInstanceCreationUtil;
         }
 
         /// <summary>
         /// Gets a table by name, will create the table if it does not exist
         /// </summary>
         /// <param name="tableName">The name of the table to get.</param>
-        /// <param name="createIfNotExists">Creates the table if it does not already exist, defaults to true.</param>
         /// <returns>The table</returns>
-        public async Task<CloudTable> GetTableAsync(string tableName, bool createIfNotExists = true)
+        public CloudTable GetTable(string tableName)
         {
             var table = _client.GetTableReference(tableName);
 
-            if (createIfNotExists)
-            {
-                await table.CreateIfNotExistsAsync();
-            }
+            _storageInstanceCreationUtil.CreateInstanceIfNotExists(
+                _client.StorageUri.ToString(),
+                AzureStorageType.Table,
+                tableName,
+                () => table.CreateIfNotExists());
 
             return table;
         }
@@ -65,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             TableQuery<TElement> query) where TElement : ITableEntity, new()
         {
             var results = new List<TElement>();
-            var table = await GetTableAsync(tableName);
+            var table = GetTable(tableName);
             TableContinuationToken? token = null;
             do
             {

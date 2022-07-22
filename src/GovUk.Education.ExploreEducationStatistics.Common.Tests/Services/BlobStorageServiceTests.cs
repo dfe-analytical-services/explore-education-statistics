@@ -11,6 +11,7 @@ using Azure.Storage.Blobs.Models;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.Utils.Interfaces;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Newtonsoft.Json;
@@ -24,15 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
 {
     public class BlobStorageServiceTests
     {
-        private record TestClass
-        {
-            public string Value { get; }
-
-            public TestClass(string value)
-            {
-                Value = value;
-            }
-        }
+        private record TestClass(string Value);
 
         [Fact]
         public async Task CheckBlobExists_BlobExists()
@@ -565,12 +558,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
                 .SetupGet(client => client.Name)
                 .Returns(containerName);
 
-            blobContainerClient
-                .Setup(s =>
-                    s.CreateIfNotExistsAsync(PublicAccessType.None, default, default,default))
-                .ReturnsAsync(Response.FromValue(
-                    BlobContainerInfo(ETag.All, DateTimeOffset.UtcNow), null!));
-
             foreach (var blobClient in blobClients)
             {
                 blobContainerClient.Setup(client => client.GetBlobClient(blobClient.Object.Name))
@@ -615,7 +602,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             return new BlobStorageService(
                 connectionString: "",
                 blobServiceClient ?? new Mock<BlobServiceClient>().Object,
-                new Mock<ILogger<BlobStorageService>>().Object
+                Mock.Of<ILogger<BlobStorageService>>(),
+                Mock.Of<IStorageInstanceCreationUtil>()
             );
         }
 

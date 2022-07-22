@@ -243,6 +243,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
 
             modelBuilder.Entity<Release>()
                 .Property<List<Link>>("RelatedInformation")
+                .IsRequired()
                 .HasConversion(
                     v => JsonConvert.SerializeObject(v),
                     v => JsonConvert.DeserializeObject<List<Link>>(v));
@@ -299,6 +300,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
                 .HasOne(rf => rf.File)
                 .WithMany()
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<File>()
+                .Property(f => f.ContentType)
+                .HasMaxLength(255);
 
             modelBuilder.Entity<File>()
                 .Property(b => b.Type)
