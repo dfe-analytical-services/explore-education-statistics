@@ -119,7 +119,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
             var import = new DataImport
             {
                 RowsPerBatch = 1,
-                TotalRows = 1,
+                ImportedRows = 1,
                 NumBatches = 1
             };
 
@@ -135,7 +135,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             await service.Update(import.Id,
                 rowsPerBatch: 1000,
-                totalRows: 10000,
+                importedRows: 10000,
                 numBatches: 10,
                 geographicLevels: new HashSet<GeographicLevel>
                 {
@@ -148,7 +148,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 var updated = await contentDbContext.DataImports.FindAsync(import.Id);
                 Assert.NotNull(updated);
                 Assert.Equal(1000, updated.RowsPerBatch);
-                Assert.Equal(10000, updated.TotalRows);
+                Assert.Equal(10000, updated.ImportedRows);
                 Assert.Equal(10, updated.NumBatches);
 
                 Assert.Equal(2, updated.GeographicLevels.Count);

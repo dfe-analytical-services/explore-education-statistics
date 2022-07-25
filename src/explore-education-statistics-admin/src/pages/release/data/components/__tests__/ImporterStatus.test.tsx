@@ -46,7 +46,7 @@ describe('ImporterStatus', () => {
       status: 'COMPLETE',
       percentageComplete: 100,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
 
     render(<ImporterStatus releaseId="release-1" dataFile={testDataFile} />);
@@ -61,7 +61,7 @@ describe('ImporterStatus', () => {
       status: 'STAGE_1',
       percentageComplete: 100,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
 
     render(
@@ -92,7 +92,7 @@ describe('ImporterStatus', () => {
       status: 'STAGE_1',
       percentageComplete: 10,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
 
     render(
@@ -124,7 +124,7 @@ describe('ImporterStatus', () => {
       status: 'STAGE_2',
       percentageComplete: 50,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
 
     jest.advanceTimersByTime(5000);
@@ -146,7 +146,7 @@ describe('ImporterStatus', () => {
       status: 'COMPLETE',
       percentageComplete: 100,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
 
     jest.advanceTimersByTime(5000);
@@ -169,7 +169,7 @@ describe('ImporterStatus', () => {
       status: 'FAILED',
       percentageComplete: 0,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
       errors: ['Some error 1', 'Some error 2'],
     });
 

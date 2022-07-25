@@ -76,7 +76,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             return import.Status;
         }
 
-        public async Task Update(Guid id, int rowsPerBatch, int totalRows, int numBatches,
+        public async Task Update(Guid id,
+            int rowsPerBatch,
+            int importedRows,
+            int numBatches,
             HashSet<GeographicLevel> geographicLevels)
         {
             await using var contentDbContext = new ContentDbContext(_contentDbContextOptions);
@@ -84,7 +87,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             contentDbContext.Update(import);
 
             import.RowsPerBatch = rowsPerBatch;
-            import.TotalRows = totalRows;
+            import.ImportedRows = importedRows;
             import.NumBatches = numBatches;
             import.GeographicLevels = geographicLevels;
 
