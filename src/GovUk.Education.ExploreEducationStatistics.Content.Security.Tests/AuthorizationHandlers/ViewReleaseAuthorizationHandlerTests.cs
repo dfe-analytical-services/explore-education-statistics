@@ -3,8 +3,8 @@ using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
-using Microsoft.AspNetCore.Authorization;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlerContextFactory;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 
@@ -37,11 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
             {
                 var handler = new ViewReleaseAuthorizationHandler(contentDbContext);
 
-                var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewReleaseRequirement>() },
-                    null,
-                    release
-                );
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(release);
 
                 await handler.HandleAsync(authContext);
 
@@ -79,11 +75,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
             {
                 var handler = new ViewReleaseAuthorizationHandler(contentDbContext);
 
-                var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewReleaseRequirement>() },
-                    null,
-                    amendedRelease
-                );
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(amendedRelease);
 
                 await handler.HandleAsync(authContext);
 
@@ -113,11 +105,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
             {
                 var handler = new ViewReleaseAuthorizationHandler(contentDbContext);
 
-                var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewReleaseRequirement>() },
-                    null,
-                    release
-                );
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(release);
 
                 await handler.HandleAsync(authContext);
 
@@ -156,11 +144,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
             {
                 var handler = new ViewReleaseAuthorizationHandler(contentDbContext);
 
-                var authContext = new AuthorizationHandlerContext(
-                    new IAuthorizationRequirement[] { Activator.CreateInstance<ViewReleaseRequirement>() },
-                    null,
-                    originalRelease
-                );
+                var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(originalRelease);
 
                 await handler.HandleAsync(authContext);
 
@@ -175,14 +159,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Security.Tests.Auth
 
             var handler = new ViewReleaseAuthorizationHandler(contentDbContext);
 
-            var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] { Activator.CreateInstance<ViewReleaseRequirement>() },
-                null,
-                new Release
-                {
-                    Id = Guid.NewGuid()
-                }
-            );
+            var authContext = CreateAnonymousAuthContext<ViewReleaseRequirement, Release>(new Release
+            {
+                Id = Guid.NewGuid()
+            });
 
             await handler.HandleAsync(authContext);
 
