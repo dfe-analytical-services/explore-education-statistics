@@ -106,9 +106,17 @@ describe('PublicationReleasesPage', () => {
     },
   };
 
+  beforeAll(() => {
+    jest.useFakeTimers();
+  });
+
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   beforeEach(() => {
     releaseService.getReleaseStatus.mockResolvedValue({
-      overallStage: 'Scheduled',
+      overallStage: 'Complete',
     });
     releaseService.getReleaseChecklist.mockResolvedValue({
       errors: [],
@@ -160,7 +168,7 @@ describe('PublicationReleasesPage', () => {
     ).toBeInTheDocument();
   });
 
-  test('does not show the create release button if you do not have permission', () => {
+  test('does not show the create release button if you do not have permission', async () => {
     const publication = {
       ...testPublication,
       permissions: {
@@ -171,6 +179,10 @@ describe('PublicationReleasesPage', () => {
     publicationService.getMyPublication.mockResolvedValue(publication);
 
     renderPage(publication);
+
+    await waitFor(() => {
+      expect(screen.getByText('Manage releases')).toBeInTheDocument();
+    });
 
     expect(
       screen.queryByRole('link', { name: 'Create new release' }),
