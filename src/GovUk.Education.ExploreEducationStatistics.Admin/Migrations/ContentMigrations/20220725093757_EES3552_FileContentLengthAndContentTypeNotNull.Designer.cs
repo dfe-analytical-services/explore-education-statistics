@@ -4,6 +4,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMigrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220725093757_EES3552_FileContentLengthAndContentTypeNotNull")]
+    partial class EES3552_FileContentLengthAndContentTypeNotNull
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -167,16 +169,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("GeographicLevels")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("ImportedRows")
-                        .HasColumnType("int");
 
                     b.Property<Guid>("MetaFileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("NumBatches")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Rows")
                         .HasColumnType("int");
 
                     b.Property<int>("RowsPerBatch")
@@ -192,7 +193,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("TotalRows")
+                    b.Property<int>("TotalRows")
                         .HasColumnType("int");
 
                     b.Property<Guid?>("ZipFileId")
