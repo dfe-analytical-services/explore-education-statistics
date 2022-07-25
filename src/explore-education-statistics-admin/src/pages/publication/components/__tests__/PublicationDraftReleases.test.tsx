@@ -117,23 +117,23 @@ describe('PublicationDraftReleases', () => {
     });
 
     expect(
+      within(row1cells[4]).getByRole('link', { name: 'Edit Release 1' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/summary',
+    );
+
+    expect(
       within(row1cells[4]).queryByRole('button', {
         name: 'Cancel amendment for Release 1',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      within(row1cells[5]).queryByRole('link', {
+      within(row1cells[4]).queryByRole('link', {
         name: 'View original for Release 1',
       }),
     ).not.toBeInTheDocument();
-
-    expect(
-      within(row1cells[6]).getByRole('link', { name: 'Edit Release 1' }),
-    ).toHaveAttribute(
-      'href',
-      '/publication/publication-1/release/release-1/summary',
-    );
 
     // In review
     const row2cells = within(rows[2]).getAllByRole('cell');
@@ -148,23 +148,23 @@ describe('PublicationDraftReleases', () => {
     });
 
     expect(
+      within(row2cells[4]).getByRole('link', { name: 'Edit Release 2' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-2/summary',
+    );
+
+    expect(
       within(row2cells[4]).queryByRole('button', {
         name: 'Cancel amendment for Release 2',
       }),
     ).not.toBeInTheDocument();
 
     expect(
-      within(row2cells[5]).queryByRole('link', {
+      within(row2cells[4]).queryByRole('link', {
         name: 'View original for Release 2',
       }),
     ).not.toBeInTheDocument();
-
-    expect(
-      within(row2cells[6]).getByRole('link', { name: 'Edit Release 2' }),
-    ).toHaveAttribute(
-      'href',
-      '/publication/publication-1/release/release-2/summary',
-    );
 
     // Amendment
     const row3cells = within(rows[3]).getAllByRole('cell');
@@ -181,25 +181,25 @@ describe('PublicationDraftReleases', () => {
     });
 
     expect(
+      within(row3cells[4]).getByRole('link', { name: 'Edit Release 3' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-3/summary',
+    );
+
+    expect(
       within(row3cells[4]).getByRole('button', {
         name: 'Cancel amendment for Release 3',
       }),
     ).toBeInTheDocument();
 
     expect(
-      within(row3cells[5]).getByRole('link', {
+      within(row3cells[4]).getByRole('link', {
         name: 'View original for Release 3',
       }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-previous-id/summary',
-    );
-
-    expect(
-      within(row3cells[6]).getByRole('link', { name: 'Edit Release 3' }),
-    ).toHaveAttribute(
-      'href',
-      '/publication/publication-1/release/release-3/summary',
     );
   });
 
@@ -225,7 +225,7 @@ describe('PublicationDraftReleases', () => {
     const row1cells = within(rows[1]).getAllByRole('cell');
 
     expect(
-      within(row1cells[6]).getByRole('link', { name: 'View Release 1' }),
+      within(row1cells[4]).getByRole('link', { name: 'View Release 1' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/summary',
@@ -253,7 +253,7 @@ describe('PublicationDraftReleases', () => {
     const rows = screen.getAllByRole('row');
     const row3cells = within(rows[3]).getAllByRole('cell');
     expect(
-      within(row3cells[5]).queryByRole('button', {
+      within(row3cells[4]).queryByRole('button', {
         name: 'Cancel amendment for Release 3',
       }),
     ).not.toBeInTheDocument();

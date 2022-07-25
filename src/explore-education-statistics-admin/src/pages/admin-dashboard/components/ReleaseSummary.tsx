@@ -1,8 +1,7 @@
-import ReleaseServiceStatus, {
-  CurrentStatusBlock,
-} from '@admin/components/ReleaseServiceStatus';
-import useReleaseServiceStatus from '@admin/hooks/useReleaseServiceStatus';
+import useReleasePublishingStatus from '@admin/pages/release/hooks/useReleasePublishingStatus';
 import publicationSummaryStyles from '@admin/pages/admin-dashboard/components/PublicationSummary.module.scss';
+import ReleasePublishingStatus from '@admin/pages/release/components/ReleasePublishingStatus';
+import ReleasePublishingCurrentStatus from '@admin/pages/release/components/ReleasePublishingCurrrentStatus';
 import {
   getReleaseApprovalStatusLabel,
   getReleaseSummaryLabel,
@@ -36,7 +35,7 @@ const ReleaseSummary = ({
   open = false,
   children,
 }: Props) => {
-  const { currentStatus, currentStatusDetail } = useReleaseServiceStatus({
+  const { currentStatus, currentStatusDetail } = useReleasePublishingStatus({
     releaseId: release.id,
   });
   return (
@@ -61,7 +60,7 @@ const ReleaseSummary = ({
             >
               <>
                 {' '}
-                <CurrentStatusBlock
+                <ReleasePublishingCurrentStatus
                   currentStatus={currentStatus}
                   color={currentStatusDetail.color}
                   isApproved
@@ -98,7 +97,7 @@ const ReleaseSummary = ({
             )}
             {release.approvalStatus === 'Approved' && (
               <SummaryListItem term="Release process status">
-                <ReleaseServiceStatus releaseId={release.id} />
+                <ReleasePublishingStatus releaseId={release.id} />
               </SummaryListItem>
             )}
             <SummaryListItem term="Lead statistician">

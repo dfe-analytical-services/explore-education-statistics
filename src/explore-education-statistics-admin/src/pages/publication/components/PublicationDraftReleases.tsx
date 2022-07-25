@@ -56,7 +56,7 @@ const PublicationDraftReleases = ({ releases, onChange }: Props) => {
                 <InfoIcon description="Guidance on draft release issues" />
               </ButtonText>
             </th>
-            <th colSpan={3}>Actions</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>

@@ -1,5 +1,5 @@
 import { StatusBlockProps } from '@admin/components/StatusBlock';
-import { getStatusDetail } from '@admin/components/ReleaseServiceStatus';
+import getStatusDetail from '@admin/pages/release/utils/releaseStatusDetail';
 import releaseService, {
   ReleaseStageStatuses,
 } from '@admin/services/releaseService';
@@ -11,7 +11,7 @@ export interface StatusDetail {
   text: string;
 }
 
-interface Props {
+interface options {
   refreshPeriod?: number;
   releaseId: string;
 }
@@ -19,10 +19,10 @@ interface Props {
 /**
  * Hook to get and refresh the status for the given release.
  */
-export default function useReleaseServiceStatus({
+export default function useReleasePublishingStatus({
   refreshPeriod = 10000,
   releaseId,
-}: Props): {
+}: options): {
   currentStatus: ReleaseStageStatuses | undefined;
   currentStatusDetail: StatusDetail;
 } {
@@ -34,28 +34,25 @@ export default function useReleaseServiceStatus({
 
   const timeoutRef = useRef<NodeJS.Timeout>();
 
-  const fetchReleaseServiceStatus = useCallback(() => {
-    return releaseService
-      .getReleaseStatus(releaseId)
-      .then(status => {
-        if (!status) {
-          // 204 response waiting for status
-          setCurrentStatus({ overallStage: 'Validating' });
-          timeoutRef.current = setTimeout(
-            fetchReleaseServiceStatus,
-            refreshPeriod,
-          );
-        } else {
-          setCurrentStatus(status);
-          if (status && status.overallStage === 'Started') {
-            timeoutRef.current = setTimeout(
-              fetchReleaseServiceStatus,
-              refreshPeriod,
-            );
-          }
-        }
-      })
-      .then(forceCheck);
+  const fetchReleasePublishingStatus = useCallback(async () => {
+    const status = await releaseService.getReleaseStatus(releaseId);
+    if (!status) {
+      // 204 response waiting for status
+      setCurrentStatus({ overallStage: 'Validating' });
+      timeoutRef.current = setTimeout(
+        fetchReleasePublishingStatus,
+        refreshPeriod,
+      );
+    } else {
+      setCurrentStatus(status);
+      if (status && status.overallStage === 'Started') {
+        timeoutRef.current = setTimeout(
+          fetchReleasePublishingStatus,
+          refreshPeriod,
+        );
+      }
+    }
+    forceCheck();
   }, [releaseId, refreshPeriod]);
 
   function cancelTimer() {
@@ -63,12 +60,12 @@ export default function useReleaseServiceStatus({
   }
 
   useEffect(() => {
-    fetchReleaseServiceStatus();
+    fetchReleasePublishingStatus();
     return () => {
       // cleans up the timeout
       cancelTimer();
     };
-  }, [fetchReleaseServiceStatus]);
+  }, [fetchReleasePublishingStatus]);
 
   useEffect(() => {
     if (currentStatus && currentStatus.overallStage) {

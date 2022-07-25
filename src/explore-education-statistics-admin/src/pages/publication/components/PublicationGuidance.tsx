@@ -26,11 +26,15 @@ export const DraftStatusGuidanceModal = ({
       <SummaryListItem term={<Tag>Draft</Tag>}>
         This is an unpublished draft release
       </SummaryListItem>
-      <SummaryListItem term={<Tag>In review</Tag>}>
+      <SummaryListItem term={<Tag>In Review</Tag>}>
         This is a release that is ready to be reviewed prior to publication
       </SummaryListItem>
-      <SummaryListItem term={<Tag>Amendment</Tag>}>
+      <SummaryListItem term={<Tag>Draft Amendment</Tag>}>
         This is a published release that is currently being amended
+      </SummaryListItem>
+      <SummaryListItem term={<Tag>Draft In Review</Tag>}>
+        This is a published release that has been amended and is ready to be
+        reviewed prior to publication
       </SummaryListItem>
     </SummaryList>
     <Button className="govuk-!-margin-bottom-0" onClick={onClose}>

@@ -1,9 +1,7 @@
 import Link from '@admin/components/Link';
-import {
-  CurrentStatusBlock,
-  ReleaseStages,
-} from '@admin/components/ReleaseServiceStatus';
-import useReleaseServiceStatus from '@admin/hooks/useReleaseServiceStatus';
+import ReleasePublishingCurrentStatus from '@admin/pages/release/components/ReleasePublishingCurrrentStatus';
+import ReleasePublishingStages from '@admin/pages/release/components/ReleasePublishingStages';
+import useReleasePublishingStatus from '@admin/pages/release/hooks/useReleasePublishingStatus';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -19,7 +17,7 @@ interface Props {
 }
 
 const ScheduledReleaseRow = ({ release }: Props) => {
-  const { currentStatus, currentStatusDetail } = useReleaseServiceStatus({
+  const { currentStatus, currentStatusDetail } = useReleasePublishingStatus({
     releaseId: release.id,
   });
 
@@ -27,13 +25,13 @@ const ScheduledReleaseRow = ({ release }: Props) => {
     <tr>
       <td>{release.title}</td>
       <td>
-        <CurrentStatusBlock
+        <ReleasePublishingCurrentStatus
           currentStatus={currentStatus}
           color={currentStatusDetail.color}
         />
       </td>
       <td>
-        <ReleaseStages
+        <ReleasePublishingStages
           checklistStyle
           currentStatus={currentStatus}
           includeScheduled

@@ -77,7 +77,7 @@ const PublicationPublishedReleases = ({ publicationId, releases }: Props) => {
               </ButtonText>
             </th>
             <th>Published date</th>
-            <th colSpan={2}>Actions</th>
+            <th className={styles.actionsColumn}>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -98,13 +98,6 @@ const PublicationPublishedReleases = ({ publicationId, releases }: Props) => {
                 )}
               </td>
               <td>
-                {release.permissions.canMakeAmendmentOfRelease && (
-                  <ButtonText onClick={() => setAmendReleaseId(release.id)}>
-                    Amend<VisuallyHidden> {release.title}</VisuallyHidden>
-                  </ButtonText>
-                )}
-              </td>
-              <td>
                 <Link
                   to={generatePath<ReleaseRouteParams>(
                     releaseSummaryRoute.path,
@@ -116,6 +109,14 @@ const PublicationPublishedReleases = ({ publicationId, releases }: Props) => {
                 >
                   View<VisuallyHidden> {release.title}</VisuallyHidden>
                 </Link>
+                {release.permissions.canMakeAmendmentOfRelease && (
+                  <ButtonText
+                    className="govuk-!-margin-left-4"
+                    onClick={() => setAmendReleaseId(release.id)}
+                  >
+                    Amend<VisuallyHidden> {release.title}</VisuallyHidden>
+                  </ButtonText>
+                )}
               </td>
             </tr>
           ))}
@@ -128,8 +129,8 @@ const PublicationPublishedReleases = ({ publicationId, releases }: Props) => {
             setCurrentPage(currentPage + 1);
           }}
         >
-          {`Show next ${showMoreNumber} published release${
-            showMoreNumber > 1 && 's'
+          {`Show ${showMoreNumber} more published release${
+            showMoreNumber > 1 ? 's' : ''
           }`}
         </ButtonText>
       )}

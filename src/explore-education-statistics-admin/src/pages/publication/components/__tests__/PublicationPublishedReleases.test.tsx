@@ -126,7 +126,7 @@ describe('PublicationPublishedReleases', () => {
 
     expect(screen.getByText('Published releases (5 of 7)')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: 'Show next 2 published releases' }),
+      screen.getByRole('button', { name: 'Show 2 more published releases' }),
     ).toBeInTheDocument();
 
     const rows = screen.getAllByRole('row');
@@ -142,7 +142,7 @@ describe('PublicationPublishedReleases', () => {
       within(row1cells[3]).getByRole('button', { name: 'Amend Release 1' }),
     ).toBeInTheDocument();
     expect(
-      within(row1cells[4]).getByRole('link', { name: 'View Release 1' }),
+      within(row1cells[3]).getByRole('link', { name: 'View Release 1' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-1/summary',
@@ -158,7 +158,7 @@ describe('PublicationPublishedReleases', () => {
       within(row2cells[3]).getByRole('button', { name: 'Amend Release 2' }),
     ).toBeInTheDocument();
     expect(
-      within(row2cells[4]).getByRole('link', { name: 'View Release 2' }),
+      within(row2cells[3]).getByRole('link', { name: 'View Release 2' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-2/summary',
@@ -174,7 +174,7 @@ describe('PublicationPublishedReleases', () => {
       within(row3cells[3]).getByRole('button', { name: 'Amend Release 3' }),
     ).toBeInTheDocument();
     expect(
-      within(row3cells[4]).getByRole('link', { name: 'View Release 3' }),
+      within(row3cells[3]).getByRole('link', { name: 'View Release 3' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-3/summary',
@@ -190,7 +190,7 @@ describe('PublicationPublishedReleases', () => {
       within(row4cells[3]).getByRole('button', { name: 'Amend Release 4' }),
     ).toBeInTheDocument();
     expect(
-      within(row4cells[4]).getByRole('link', { name: 'View Release 4' }),
+      within(row4cells[3]).getByRole('link', { name: 'View Release 4' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-4/summary',
@@ -206,7 +206,7 @@ describe('PublicationPublishedReleases', () => {
       within(row5cells[3]).getByRole('button', { name: 'Amend Release 5' }),
     ).toBeInTheDocument();
     expect(
-      within(row5cells[4]).getByRole('link', { name: 'View Release 5' }),
+      within(row5cells[3]).getByRole('link', { name: 'View Release 5' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-5/summary',
@@ -224,7 +224,7 @@ describe('PublicationPublishedReleases', () => {
     expect(screen.getAllByRole('row')).toHaveLength(6);
 
     userEvent.click(
-      screen.getByRole('button', { name: 'Show next 2 published releases' }),
+      screen.getByRole('button', { name: 'Show 2 more published releases' }),
     );
 
     const rows = screen.getAllByRole('row');
@@ -240,7 +240,7 @@ describe('PublicationPublishedReleases', () => {
       within(row6cells[3]).getByRole('button', { name: 'Amend Release 6' }),
     ).toBeInTheDocument();
     expect(
-      within(row6cells[4]).getByRole('link', { name: 'View Release 6' }),
+      within(row6cells[3]).getByRole('link', { name: 'View Release 6' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-6/summary',
@@ -256,14 +256,14 @@ describe('PublicationPublishedReleases', () => {
       within(row7cells[3]).getByRole('button', { name: 'Amend Release 7' }),
     ).toBeInTheDocument();
     expect(
-      within(row7cells[4]).getByRole('link', { name: 'View Release 7' }),
+      within(row7cells[3]).getByRole('link', { name: 'View Release 7' }),
     ).toHaveAttribute(
       'href',
       '/publication/publication-1/release/release-7/summary',
     );
 
     expect(
-      screen.queryByRole('button', { name: 'Show next 2 published releases' }),
+      screen.queryByRole('button', { name: 'Show 2 more published releases' }),
     ).not.toBeInTheDocument();
   });
 

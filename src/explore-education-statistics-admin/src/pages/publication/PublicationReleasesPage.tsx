@@ -60,7 +60,6 @@ const PublicationReleasesPage = () => {
           to={generatePath<PublicationRouteParams>(releaseCreateRoute.path, {
             publicationId,
           })}
-          data-testid={`Create new release link for ${publication.title}`}
         >
           Create new release
         </ButtonLink>

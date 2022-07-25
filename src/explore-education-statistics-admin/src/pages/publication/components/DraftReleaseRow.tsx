@@ -1,8 +1,5 @@
 import Link from '@admin/components/Link';
-import {
-  getReleaseApprovalStatusLabel,
-  getReleaseSummaryLabel,
-} from '@admin/pages/release/utils/releaseSummaryUtil';
+import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import releaseService, { MyRelease } from '@admin/services/releaseService';
 import {
   ReleaseRouteParams,
@@ -16,77 +13,71 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath } from 'react-router';
 
-const ErrorsAndWarnings = ({ releaseId }: { releaseId: string }) => {
-  const { value: checklist, isLoading } = useAsyncHandledRetry(() =>
-    releaseService.getReleaseChecklist(releaseId),
-  );
-  return (
-    <>
-      <td>
-        <LoadingSpinner inline loading={isLoading} size="sm">
-          {checklist?.errors.length}
-        </LoadingSpinner>
-      </td>
-      <td>
-        <LoadingSpinner inline loading={isLoading} size="sm">
-          {checklist?.warnings.length}
-        </LoadingSpinner>
-      </td>
-    </>
-  );
-};
-
 interface Props {
   release: MyRelease;
   onDelete: () => void;
 }
 
-const DraftReleaseRow = ({ release, onDelete }: Props) => (
-  <tr>
-    <td>{release.title}</td>
-    <td>
-      <Tag>
-        {getReleaseApprovalStatusLabel(release.approvalStatus)}
-        {release.amendment && ' Amendment'}
-      </Tag>
-    </td>
-    <ErrorsAndWarnings releaseId={release.id} />
-    <td>
-      {release.permissions.canDeleteRelease && release.amendment && (
-        <ButtonText onClick={onDelete}>
-          Cancel amendment
-          <VisuallyHidden> for {release.title}</VisuallyHidden>
-        </ButtonText>
-      )}
-    </td>
-    <td>
-      {release.amendment && (
+const DraftReleaseRow = ({ release, onDelete }: Props) => {
+  const {
+    value: checklist,
+    isLoading: isLoadingChecklist,
+  } = useAsyncHandledRetry(() =>
+    releaseService.getReleaseChecklist(release.id),
+  );
+
+  return (
+    <tr>
+      <td>{release.title}</td>
+      <td>
+        <Tag>
+          {`${getReleaseApprovalStatusLabel(release.approvalStatus)}${
+            release.amendment ? ' Amendment' : ''
+          }`}
+        </Tag>
+      </td>
+      <td>
+        <LoadingSpinner inline loading={isLoadingChecklist} size="sm">
+          {checklist?.errors.length}
+        </LoadingSpinner>
+      </td>
+      <td>
+        <LoadingSpinner inline loading={isLoadingChecklist} size="sm">
+          {checklist?.warnings.length}
+        </LoadingSpinner>
+      </td>
+      <td>
         <Link
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
             publicationId: release.publicationId,
-            releaseId: release.previousVersionId,
+            releaseId: release.id,
           })}
-          data-testid={`View original release link for ${
-            release.publicationTitle
-          }, ${getReleaseSummaryLabel(release)}`}
         >
-          View original
-          <VisuallyHidden> for {release.title}</VisuallyHidden>
+          {release.permissions.canUpdateRelease ? 'Edit' : 'View'}
+          <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
-      )}
-    </td>
-    <td>
-      <Link
-        to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
-          publicationId: release.publicationId,
-          releaseId: release.id,
-        })}
-      >
-        {release.permissions.canUpdateRelease ? 'Edit' : 'View'}
-        <VisuallyHidden> {release.title}</VisuallyHidden>
-      </Link>
-    </td>
-  </tr>
-);
+        {release.permissions.canDeleteRelease && release.amendment && (
+          <ButtonText className="govuk-!-margin-left-4" onClick={onDelete}>
+            Cancel amendment
+            <VisuallyHidden> for {release.title}</VisuallyHidden>
+          </ButtonText>
+        )}
+
+        {release.amendment && (
+          <Link
+            className="govuk-!-margin-left-4"
+            to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {
+              publicationId: release.publicationId,
+              releaseId: release.previousVersionId,
+            })}
+          >
+            View original
+            <VisuallyHidden> for {release.title}</VisuallyHidden>
+          </Link>
+        )}
+      </td>
+    </tr>
+  );
+};
 
 export default DraftReleaseRow;
