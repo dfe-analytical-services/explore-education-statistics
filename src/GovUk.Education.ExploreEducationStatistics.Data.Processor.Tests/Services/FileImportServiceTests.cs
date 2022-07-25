@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 SubjectId = Guid.NewGuid(),
                 Status = STAGE_4,
                 NumBatches = 1,
-                TotalRows = 2
+                ImportedRows = 2
             };
 
             var dataImportService = new Mock<IDataImportService>(Strict);
@@ -117,7 +117,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 SubjectId = Guid.NewGuid(),
                 Status = STAGE_4,
                 NumBatches = 2,
-                TotalRows = 2
+                ImportedRows = 2
             };
 
             var batchService = new Mock<IBatchService>(Strict);
@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 SubjectId = Guid.NewGuid(),
                 Status = STAGE_4,
                 NumBatches = 2,
-                TotalRows = 2
+                ImportedRows = 2
             };
 
             var batchService = new Mock<IBatchService>(Strict);
@@ -245,7 +245,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 SubjectId = Guid.NewGuid(),
                 Status = STAGE_4,
                 NumBatches = 1,
-                TotalRows = 2
+                ImportedRows = 2
             };
 
             var dataImportService = new Mock<IDataImportService>(Strict);
@@ -309,7 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 SubjectId = Guid.NewGuid(),
                 Status = STAGE_4,
                 NumBatches = 1,
-                TotalRows = 3
+                ImportedRows = 3
             };
 
             var dataImportService = new Mock<IDataImportService>(Strict);
@@ -320,7 +320,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             dataImportService
                 .Setup(s => s.FailImport(import.Id, 
-                    $"Number of observations inserted (2) does not equal that expected ({import.TotalRows}) : Please delete & retry"))
+                    $"Number of observations inserted (2) does not equal that expected ({import.ImportedRows}) : Please delete & retry"))
                 .Returns(Task.CompletedTask);
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -376,7 +376,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 SubjectId = Guid.NewGuid(),
                 Status = STAGE_4,
                 NumBatches = 2,
-                TotalRows = 2
+                ImportedRows = 2
             };
             
             var batchService = new Mock<IBatchService>(Strict);
@@ -446,7 +446,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                 SubjectId = Guid.NewGuid(),
                 Status = STAGE_4,
                 NumBatches = 2,
-                TotalRows = 3
+                ImportedRows = 3
             };
             
             var batchService = new Mock<IBatchService>(Strict);
@@ -462,7 +462,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
 
             dataImportService
                 .Setup(s => s.FailImport(import.Id,
-                    $"Number of observations inserted (2) does not equal that expected ({import.TotalRows}) : Please delete & retry"))
+                    $"Number of observations inserted (2) does not equal that expected ({import.ImportedRows}) : Please delete & retry"))
                 .Returns(Task.CompletedTask);
 
             var statisticsDbContextId = Guid.NewGuid().ToString();
@@ -520,7 +520,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         SubjectId = Guid.NewGuid(),
                         Status = finishedStatus,
                         NumBatches = 1,
-                        TotalRows = 2
+                        ImportedRows = 2
                     };
 
                     var dataImportService = new Mock<IDataImportService>(Strict);
@@ -569,7 +569,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         SubjectId = Guid.NewGuid(),
                         Status = finishedStatus,
                         NumBatches = 2,
-                        TotalRows = 2
+                        ImportedRows = 2
                     };
 
                     var dataImportService = new Mock<IDataImportService>(Strict);
@@ -618,7 +618,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         SubjectId = Guid.NewGuid(),
                         Status = abortingStatus,
                         NumBatches = 1,
-                        TotalRows = 2
+                        ImportedRows = 2
                     };
 
                     var dataImportService = new Mock<IDataImportService>(Strict);
@@ -672,7 +672,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Tests.Servic
                         SubjectId = Guid.NewGuid(),
                         Status = abortingStatus,
                         NumBatches = 2,
-                        TotalRows = 2
+                        ImportedRows = 2
                     };
 
                     var dataImportService = new Mock<IDataImportService>(Strict);

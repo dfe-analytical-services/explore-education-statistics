@@ -67,7 +67,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 ReleaseTitle = release.Title,
                 FileId = file.Id,
                 DataFileName = file.Filename,
-                Rows = dataImport.Rows,
+                TotalRows = dataImport.TotalRows,
                 Batches = dataImport.NumBatches,
                 Status = dataImport.Status,
                 StagePercentageComplete = dataImport.StagePercentageComplete,

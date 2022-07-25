@@ -45,13 +45,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid? ZipFileId { get; set; }
 
-        public int Rows { get; set; }
+        public int TotalRows { get; set; }
 
         public int NumBatches { get; set; }
 
         public int RowsPerBatch { get; set; }
 
-        public int TotalRows { get; set; }
+        public int ImportedRows { get; set; }
 
         public HashSet<GeographicLevel> GeographicLevels { get; set; }
 

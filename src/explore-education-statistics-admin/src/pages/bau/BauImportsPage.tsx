@@ -49,7 +49,7 @@ const BauImportsPage = () => {
                   <td>{subject.status}</td>
                   <td>{subject.subjectId}</td>
                   <td>{subject.dataFileName}</td>
-                  <td>{subject.rows}</td>
+                  <td>{subject.totalRows}</td>
                   <td>{subject.batches}</td>
                   <td>{subject.stagePercentageComplete}%</td>
                   <td>{subject.percentageComplete}%</td>

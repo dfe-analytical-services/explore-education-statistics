@@ -88,7 +88,7 @@ describe('ReleaseDataFileReplacePage', () => {
       status: 'COMPLETE',
       percentageComplete: 100,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
 
     render(
@@ -137,7 +137,7 @@ describe('ReleaseDataFileReplacePage', () => {
       status: 'COMPLETE',
       percentageComplete: 100,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testValidReplacementPlan,
@@ -188,7 +188,7 @@ describe('ReleaseDataFileReplacePage', () => {
       status: 'COMPLETE',
       percentageComplete: 100,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testValidReplacementPlan,
@@ -275,7 +275,7 @@ describe('ReleaseDataFileReplacePage', () => {
       status: 'COMPLETE',
       percentageComplete: 100,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
 
     render(
@@ -348,7 +348,7 @@ describe('ReleaseDataFileReplacePage', () => {
       status: 'COMPLETE',
       percentageComplete: 100,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
     dataReplacementService.getReplacementPlan.mockResolvedValue(
       testValidReplacementPlan,
@@ -402,13 +402,13 @@ describe('ReleaseDataFileReplacePage', () => {
       status: 'COMPLETE',
       percentageComplete: 100,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
     releaseDataFileService.getDataFileImportStatus.mockResolvedValueOnce({
       status: 'STAGE_1',
       percentageComplete: 10,
       stagePercentageComplete: 100,
-      numberOfRows: 110,
+      totalRows: 110,
     });
 
     render(
@@ -457,7 +457,7 @@ describe('ReleaseDataFileReplacePage', () => {
       status: 'COMPLETE',
       percentageComplete: 100,
       stagePercentageComplete: 100,
-      numberOfRows: 100,
+      totalRows: 100,
     });
     dataReplacementService.getReplacementPlan.mockRejectedValue(
       new Error('Something went wrong'),
@@ -581,7 +581,7 @@ describe('ReleaseDataFileReplacePage', () => {
       status: 'FAILED',
       percentageComplete: 0,
       stagePercentageComplete: 0,
-      numberOfRows: 0,
+      totalRows: 0,
     });
 
     render(

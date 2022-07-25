@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 {
                     await _dataImportService.Update(importId, 
                         rowsPerBatch: result.RowsPerBatch,
-                        totalRows: result.ImportableRowCount,
+                        importedRows: result.ImportableRowCount,
                         numBatches: result.NumBatches,
                         geographicLevels: result.GeographicLevels);
                 })

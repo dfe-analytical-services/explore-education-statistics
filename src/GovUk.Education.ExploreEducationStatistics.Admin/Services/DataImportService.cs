@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Errors = import.Errors.Select(error => error.Message).ToList(),
                 PercentageComplete = import.PercentageComplete(),
                 StagePercentageComplete = import.StagePercentageComplete,
-                NumberOfRows = import.Rows,
+                TotalRows = import.TotalRows,
                 Status = import.Status
             };
         }
@@ -101,7 +101,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FileId = dataFile.Id,
                 MetaFileId = metaFile.Id,
                 SubjectId = subjectId,
-                Rows = CalculateNumberOfRows(formFile.OpenReadStream()),
+                TotalRows = CalculateNumberOfRows(formFile.OpenReadStream()),
                 Status = DataImportStatus.QUEUED
             });
 

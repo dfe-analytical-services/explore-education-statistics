@@ -8,7 +8,7 @@ export interface ImportStatus {
   releaseId: string;
   releaseTitle: string;
   dataFileName: string;
-  rows: number;
+  totalRows: number;
   batches: number;
   status: number;
   stagePercentageComplete: number;
