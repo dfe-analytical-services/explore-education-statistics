@@ -1,4 +1,5 @@
-﻿using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+﻿#nullable enable
+using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Security;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.AuthorizationHandlers;
@@ -17,6 +18,10 @@ public static class StartupSecurityConfiguration
     {
         services.AddAuthorization(options =>
         {
+            // does this use have permission to view a specific MethodologyVersion?
+            options.AddPolicy(ContentSecurityPolicies.CanViewSpecificMethodologyVersion.ToString(), policy =>
+                policy.Requirements.Add(new ViewMethodologyVersionRequirement()));
+
             // does this use have permission to view a specific Publication?
             options.AddPolicy(ContentSecurityPolicies.CanViewSpecificPublication.ToString(), policy =>
                 policy.Requirements.Add(new ViewPublicationRequirement()));
@@ -35,6 +40,7 @@ public static class StartupSecurityConfiguration
     {
         services.AddTransient<IUserService, UserService>();
 
+        services.AddTransient<IAuthorizationHandler, ViewMethodologyVersionAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewPublicationAuthorizationHandler>();
         services.AddTransient<IAuthorizationHandler, ViewReleaseAuthorizationHandler>();
     }
