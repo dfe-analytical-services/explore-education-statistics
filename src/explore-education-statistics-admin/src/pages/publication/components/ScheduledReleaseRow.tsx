@@ -1,5 +1,5 @@
 import Link from '@admin/components/Link';
-import ReleasePublishingCurrentStatus from '@admin/pages/release/components/ReleasePublishingCurrrentStatus';
+import ReleasePublishingStatusTag from '@admin/pages/release/components/ReleasePublishingStatusTag';
 import ReleasePublishingStages from '@admin/pages/release/components/ReleasePublishingStages';
 import useReleasePublishingStatus from '@admin/pages/release/hooks/useReleasePublishingStatus';
 import {
@@ -25,7 +25,7 @@ const ScheduledReleaseRow = ({ release }: Props) => {
     <tr>
       <td>{release.title}</td>
       <td>
-        <ReleasePublishingCurrentStatus
+        <ReleasePublishingStatusTag
           currentStatus={currentStatus}
           color={currentStatusDetail.color}
         />

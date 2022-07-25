@@ -1,5 +1,5 @@
 import { StatusBlockProps } from '@admin/components/StatusBlock';
-import getStatusDetail from '@admin/pages/release/utils/releaseStatusDetail';
+import getStatusDetail from '@admin/pages/release/utils/getStatusDetail';
 import releaseService, {
   ReleaseStageStatuses,
 } from '@admin/services/releaseService';
@@ -11,7 +11,7 @@ export interface StatusDetail {
   text: string;
 }
 
-interface options {
+interface Options {
   refreshPeriod?: number;
   releaseId: string;
 }
@@ -22,7 +22,7 @@ interface options {
 export default function useReleasePublishingStatus({
   refreshPeriod = 10000,
   releaseId,
-}: options): {
+}: Options): {
   currentStatus: ReleaseStageStatuses | undefined;
   currentStatusDetail: StatusDetail;
 } {

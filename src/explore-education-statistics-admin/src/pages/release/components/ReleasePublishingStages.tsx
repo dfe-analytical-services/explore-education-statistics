@@ -1,5 +1,5 @@
 import StatusBlock from '@admin/components/StatusBlock';
-import getStatusDetail from '@admin/pages/release/utils/releaseStatusDetail';
+import getStatusDetail from '@admin/pages/release/utils/getStatusDetail';
 import { ReleaseStageStatuses } from '@admin/services/releaseService';
 import Details from '@common/components/Details';
 import React from 'react';

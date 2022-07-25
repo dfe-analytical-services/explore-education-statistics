@@ -11,7 +11,7 @@ interface Props {
   isApproved?: boolean;
 }
 
-const ReleasePublishingCurrentStatus = ({
+const ReleasePublishingStatusTag = ({
   color,
   currentStatus,
   isApproved = false,
@@ -45,4 +45,4 @@ const ReleasePublishingCurrentStatus = ({
   );
 };
 
-export default ReleasePublishingCurrentStatus;
+export default ReleasePublishingStatusTag;

@@ -1,7 +1,7 @@
 import useReleasePublishingStatus from '@admin/pages/release/hooks/useReleasePublishingStatus';
 import publicationSummaryStyles from '@admin/pages/admin-dashboard/components/PublicationSummary.module.scss';
 import ReleasePublishingStatus from '@admin/pages/release/components/ReleasePublishingStatus';
-import ReleasePublishingCurrentStatus from '@admin/pages/release/components/ReleasePublishingCurrrentStatus';
+import ReleasePublishingStatusTag from '@admin/pages/release/components/ReleasePublishingStatusTag';
 import {
   getReleaseApprovalStatusLabel,
   getReleaseSummaryLabel,
@@ -60,7 +60,7 @@ const ReleaseSummary = ({
             >
               <>
                 {' '}
-                <ReleasePublishingCurrentStatus
+                <ReleasePublishingStatusTag
                   currentStatus={currentStatus}
                   color={currentStatusDetail.color}
                   isApproved

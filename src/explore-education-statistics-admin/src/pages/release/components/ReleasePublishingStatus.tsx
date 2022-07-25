@@ -1,5 +1,5 @@
 import useReleasePublishingStatus from '@admin/pages/release/hooks/useReleasePublishingStatus';
-import ReleasePublishingCurrentStatus from '@admin/pages/release/components/ReleasePublishingCurrrentStatus';
+import ReleasePublishingStatusTag from '@admin/pages/release/components/ReleasePublishingStatusTag';
 import ReleasePublishingStages from '@admin/pages/release/components/ReleasePublishingStages';
 import React from 'react';
 
@@ -17,7 +17,7 @@ const ReleasePublishingStatus = ({
   });
   return (
     <>
-      <ReleasePublishingCurrentStatus
+      <ReleasePublishingStatusTag
         currentStatus={currentStatus}
         color={currentStatusDetail.color}
         isApproved={isApproved}
