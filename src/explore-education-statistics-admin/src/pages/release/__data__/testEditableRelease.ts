@@ -31,10 +31,10 @@ export const testEditableRelease: EditableRelease = {
     legacyReleases: [],
     topic: { theme: { title: 'Children, early years and social care' } },
     contact: {
-      teamName: 'Explore Education Statistics',
-      teamEmail: 'explore.statistics@education.gov.uk',
-      contactName: 'Cameron Race',
-      contactTelNo: '07780991976',
+      contactName: 'John Smith',
+      contactTelNo: '0777777777',
+      teamEmail: 'john.smith@test.com',
+      teamName: 'Team Smith',
     },
     methodologies: [
       {

@@ -7,6 +7,7 @@ import AdoptMethodologyPage from '@admin/pages/methodology/adopt-methodology/Ado
 import ExternalMethodologyPage from '@admin/pages/methodology/external-methodology/ExternalMethodologyPage';
 import PublicationCreatePage from '@admin/pages/publication/PublicationCreatePage';
 import PublicationEditPage from '@admin/pages/publication/PublicationEditPage';
+import PublicationPageContainer from '@admin/pages/publication/PublicationPageContainer';
 import PreReleaseAccessListPage from '@admin/pages/release/pre-release/PreReleaseAccessListPage';
 import PreReleasePageContainer from '@admin/pages/release/pre-release/PreReleasePageContainer';
 import ReleaseCreatePage from '@admin/pages/release/ReleaseCreatePage';
@@ -100,6 +101,12 @@ export const publicationCreateRoute: ProtectedRouteProps = {
   component: PublicationCreatePage,
   protectionAction: user => user.permissions.canAccessAnalystPages,
   exact: true,
+};
+
+export const publicationRoute: ProtectedRouteProps = {
+  path: '/publication/:publicationId',
+  protectionAction: user => user.permissions.canAccessAnalystPages,
+  component: PublicationPageContainer,
 };
 
 export const publicationEditRoute: ProtectedRouteProps = {
@@ -214,6 +221,7 @@ const routes = {
   releaseRoute,
   releaseCreateRoute,
   legacyReleasesRoute,
+  publicationRoute,
 };
 
 export default routes;

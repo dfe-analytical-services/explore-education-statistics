@@ -7,8 +7,14 @@ import {
   MyPublicationMethodology,
   PublicationContactDetails,
 } from '@admin/services/publicationService';
+import _releaseService, {
+  MyRelease,
+  ReleaseStageStatuses,
+} from '@admin/services/releaseService';
 import { MemoryRouter } from 'react-router-dom';
-import { MyRelease } from '@admin/services/releaseService';
+
+jest.mock('@admin/services/releaseService');
+const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('PublicationSummary', () => {
   const testTopicId = 'test-topic';
@@ -128,6 +134,14 @@ describe('PublicationSummary', () => {
     title: 'External methodology',
     url: 'https://example.com',
   };
+
+  const completeReleaseStatus: ReleaseStageStatuses = {
+    overallStage: 'Complete',
+  };
+
+  beforeEach(() => {
+    releaseService.getReleaseStatus.mockResolvedValue(completeReleaseStatus);
+  });
 
   test('renders correctly with a publication with no releases, methodologies, contact details or permissions', async () => {
     render(
