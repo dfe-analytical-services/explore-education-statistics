@@ -17,14 +17,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
             _methodologyImageService = methodologyImageService;
         }
 
-        [HttpGet("methodologies/{methodologyId}/images/{fileId}")]
-        public async Task<ActionResult> Stream(string methodologyId, string fileId)
+        [HttpGet("methodologies/{methodologyVersionId}/images/{fileId}")]
+        public async Task<ActionResult> Stream(string methodologyVersionId, string fileId)
         {
-            if (Guid.TryParse(methodologyId, out var methodologyIdAsGuid) &&
+            if (Guid.TryParse(methodologyVersionId, out var methodologyVersionIdAsGuid) &&
                 Guid.TryParse(fileId, out var fileIdAsGuid))
             {
                 return await _methodologyImageService
-                    .Stream(methodologyId: methodologyIdAsGuid, fileId: fileIdAsGuid)
+                    .Stream(methodologyVersionId: methodologyVersionIdAsGuid, fileId: fileIdAsGuid)
                     .HandleFailures();
             }
 

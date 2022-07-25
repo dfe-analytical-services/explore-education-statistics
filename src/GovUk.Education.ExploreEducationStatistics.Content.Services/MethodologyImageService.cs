@@ -28,12 +28,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             _blobStorageService = blobStorageService;
         }
 
-        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyId, Guid fileId)
+        public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyVersionId, Guid fileId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<MethodologyFile>(q => q
                     .Include(mf => mf.File)
-                    .Where(mf => mf.MethodologyVersionId == methodologyId && mf.FileId == fileId))
+                    .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
                 .OnSuccess(async mf =>
                 {
                     return await GetBlob(mf.Path())
