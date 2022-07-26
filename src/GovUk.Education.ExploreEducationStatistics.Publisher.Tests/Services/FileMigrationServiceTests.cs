@@ -105,7 +105,6 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
             file.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
                 contentType: "text/csv",
                 contentLength: 1024));
 
@@ -355,7 +354,6 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
             file.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
                 contentType: "text/csv",
                 contentLength: 1024));
 
@@ -415,7 +413,6 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
             file.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
                 contentType: "text/csv",
                 contentLength: 1024,
                 meta: new Dictionary<string, string>
