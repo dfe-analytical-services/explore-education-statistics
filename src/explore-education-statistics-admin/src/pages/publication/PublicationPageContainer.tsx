@@ -5,10 +5,13 @@ import PageTitle from '@admin/components/PageTitle';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import {
   publicationContactRoute,
+  PublicationManageReleaseContributorsPageRoute,
   publicationDetailsRoute,
   publicationAdoptMethodologyRoute,
   publicationExternalMethodologyRoute,
   publicationMethodologiesRoute,
+  publicationInviteUsersPageRoute,
+  publicationTeamAccessRoute,
   publicationReleasesRoute,
   publicationLegacyReleasesRoute,
   publicationCreateLegacyReleaseRoute,
@@ -28,6 +31,7 @@ const navRoutes = [
   publicationMethodologiesRoute,
   publicationDetailsRoute,
   publicationContactRoute,
+  publicationTeamAccessRoute,
   publicationLegacyReleasesRoute,
 ];
 
@@ -37,6 +41,8 @@ const routes = [
   publicationExternalMethodologyRoute,
   publicationCreateLegacyReleaseRoute,
   publicationEditLegacyReleaseRoute,
+  PublicationManageReleaseContributorsPageRoute,
+  publicationInviteUsersPageRoute,
 ];
 
 const PublicationPageContainer = ({

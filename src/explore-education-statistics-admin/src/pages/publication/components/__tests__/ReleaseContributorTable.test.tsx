@@ -1,4 +1,4 @@
-import ReleaseContributorsPermissions from '@admin/pages/publication/components/ReleaseContributorPermissions';
+import ReleaseContributorsPermissions from '@admin/pages/publication/components/ReleaseContributorTable';
 import {
   ContributorInvite,
   ContributorViewModel,
@@ -9,7 +9,7 @@ import userEvent from '@testing-library/user-event';
 
 jest.mock('@admin/services/userService');
 
-describe('ReleaseContributorPermissions', () => {
+describe('ReleaseContributorTable', () => {
   const testReleaseContributors: ContributorViewModel[] = [
     {
       userId: 'user-1',
@@ -33,32 +33,6 @@ describe('ReleaseContributorPermissions', () => {
     { email: 'user5@test.com' },
   ];
 
-  test('renders a message when there are no release contributors or invites', async () => {
-    const onUserRemove = jest.fn();
-    const onUserInvitesRemove = jest.fn();
-
-    render(
-      <ReleaseContributorsPermissions
-        contributors={[]}
-        invites={[]}
-        onUserRemove={onUserRemove}
-        onUserInvitesRemove={onUserInvitesRemove}
-      />,
-    );
-
-    await waitFor(() => {
-      expect(screen.getByText('Warning')).toBeInTheDocument();
-
-      expect(
-        screen.getByTestId('releaseContributors-warning').textContent,
-      ).toContain(
-        'There are currently no team members or pending invites associated with this publication.',
-      );
-    });
-
-    expect(screen.queryByRole('table')).not.toBeInTheDocument();
-  });
-
   test('renders the contributors table correctly', async () => {
     const onUserRemove = jest.fn();
     const onUserInvitesRemove = jest.fn();
@@ -77,37 +51,41 @@ describe('ReleaseContributorPermissions', () => {
     });
 
     const rows = screen.getAllByRole('row');
-    expect(rows.length).toBe(5);
+    expect(rows.length).toBe(6);
 
     expect(
-      within(rows[0]).getByText('User Name 1 (user1@test.com)'),
+      within(rows[1]).getByText('User Name 1 (user1@test.com)'),
     ).toBeInTheDocument();
     expect(
-      within(rows[0]).getByRole('button', { name: 'Remove user' }),
-    ).toBeInTheDocument();
-
-    expect(
-      within(rows[1]).getByText('User Name 2 (user2@test.com)'),
-    ).toBeInTheDocument();
-    expect(
-      within(rows[1]).getByRole('button', { name: 'Remove user' }),
+      within(rows[1]).getByRole('button', { name: 'Remove User Name 1' }),
     ).toBeInTheDocument();
 
     expect(
-      within(rows[2]).getByText('User Name 3 (user3@test.com)'),
+      within(rows[2]).getByText('User Name 2 (user2@test.com)'),
     ).toBeInTheDocument();
     expect(
-      within(rows[2]).getByRole('button', { name: 'Remove user' }),
-    ).toBeInTheDocument();
-
-    expect(within(rows[3]).getByText('user4@test.com')).toBeInTheDocument();
-    expect(
-      within(rows[3]).getByRole('button', { name: 'Cancel invite' }),
+      within(rows[2]).getByRole('button', { name: 'Remove User Name 2' }),
     ).toBeInTheDocument();
 
-    expect(within(rows[4]).getByText('user5@test.com')).toBeInTheDocument();
     expect(
-      within(rows[4]).getByRole('button', { name: 'Cancel invite' }),
+      within(rows[3]).getByText('User Name 3 (user3@test.com)'),
+    ).toBeInTheDocument();
+    expect(
+      within(rows[3]).getByRole('button', { name: 'Remove User Name 3' }),
+    ).toBeInTheDocument();
+
+    expect(within(rows[4]).getByText('user4@test.com')).toBeInTheDocument();
+    expect(
+      within(rows[4]).getByRole('button', {
+        name: 'Cancel invite for user4@test.com',
+      }),
+    ).toBeInTheDocument();
+
+    expect(within(rows[5]).getByText('user5@test.com')).toBeInTheDocument();
+    expect(
+      within(rows[5]).getByRole('button', {
+        name: 'Cancel invite for user5@test.com',
+      }),
     ).toBeInTheDocument();
   });
 
@@ -129,10 +107,10 @@ describe('ReleaseContributorPermissions', () => {
     });
 
     const rows = screen.getAllByRole('row');
-    expect(rows.length).toBe(3);
+    expect(rows.length).toBe(4);
 
     userEvent.click(
-      within(rows[0]).getByRole('button', { name: 'Remove user' }),
+      within(rows[1]).getByRole('button', { name: 'Remove User Name 1' }),
     );
 
     const modal = screen.getByRole('dialog');
@@ -177,10 +155,12 @@ describe('ReleaseContributorPermissions', () => {
     });
 
     const rows = screen.getAllByRole('row');
-    expect(rows.length).toBe(2);
+    expect(rows.length).toBe(3);
 
     userEvent.click(
-      within(rows[0]).getByRole('button', { name: 'Cancel invite' }),
+      within(rows[1]).getByRole('button', {
+        name: 'Cancel invite for user4@test.com',
+      }),
     );
 
     const modal = screen.getByRole('dialog');

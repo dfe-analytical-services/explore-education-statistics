@@ -1,34 +1,38 @@
-import WarningMessage from '@common/components/WarningMessage';
-import React from 'react';
+import {
+  PublicationTeamRouteParams,
+  publicationTeamAccessRoute,
+} from '@admin/routes/publicationRoutes';
 import releasePermissionService, {
   ContributorViewModel,
 } from '@admin/services/releasePermissionService';
-import { Formik } from 'formik';
 import { Form, FormFieldCheckboxGroup } from '@common/components/form';
 import Button from '@common/components/Button';
-import useFormSubmit from '@common/hooks/useFormSubmit';
-import { generatePath, useHistory } from 'react-router-dom';
-import { publicationManageTeamAccessReleaseRoute } from '@admin/routes/routes';
-import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import ButtonText from '@common/components/ButtonText';
 import ButtonGroup from '@common/components/ButtonGroup';
+import ButtonText from '@common/components/ButtonText';
+import WarningMessage from '@common/components/WarningMessage';
+import useFormSubmit from '@common/hooks/useFormSubmit';
+import { Formik } from 'formik';
+import React from 'react';
+import { generatePath, useHistory } from 'react-router-dom';
 
 interface AddExistingUsersFormValues {
   userIds: string[];
 }
 
-export interface Props {
-  publicationId: string;
-  releaseId: string;
+interface Props {
   publicationContributors: ContributorViewModel[];
+  publicationId: string;
   releaseContributors: ContributorViewModel[];
+  releaseId: string;
+  returnRoute?: string; // EES-3217 remove when pages go live
 }
 
 const PublicationReleaseContributorsForm = ({
-  publicationId,
-  releaseId,
   publicationContributors,
+  publicationId,
   releaseContributors,
+  releaseId,
+  returnRoute,
 }: Props) => {
   const history = useHistory();
 
@@ -39,13 +43,14 @@ const PublicationReleaseContributorsForm = ({
         values.userIds,
       );
       history.push(
-        generatePath<ReleaseRouteParams>(
-          publicationManageTeamAccessReleaseRoute.path,
-          {
-            publicationId,
-            releaseId,
-          },
-        ),
+        returnRoute ??
+          generatePath<PublicationTeamRouteParams>(
+            publicationTeamAccessRoute.path,
+            {
+              publicationId,
+              releaseId,
+            },
+          ),
       );
     },
     [],
@@ -53,9 +58,27 @@ const PublicationReleaseContributorsForm = ({
 
   if (!publicationContributors || !publicationContributors.length) {
     return (
-      <WarningMessage>
-        There are no contributors for this release's publication.
-      </WarningMessage>
+      <>
+        <WarningMessage>
+          There are no contributors for this release's publication.
+        </WarningMessage>
+        <ButtonText
+          onClick={() => {
+            history.push(
+              returnRoute ??
+                generatePath<PublicationTeamRouteParams>(
+                  publicationTeamAccessRoute.path,
+                  {
+                    publicationId,
+                    releaseId,
+                  },
+                ),
+            );
+          }}
+        >
+          Go back
+        </ButtonText>
+      </>
     );
   }
 
@@ -80,6 +103,7 @@ const PublicationReleaseContributorsForm = ({
               legendSize="m"
               disabled={form.isSubmitting}
               selectAll
+              small
               options={publicationContributors.map(c => {
                 return {
                   label: `${c.userDisplayName} (${c.userEmail})`,
@@ -94,13 +118,14 @@ const PublicationReleaseContributorsForm = ({
               <ButtonText
                 onClick={() => {
                   history.push(
-                    generatePath<ReleaseRouteParams>(
-                      publicationManageTeamAccessReleaseRoute.path,
-                      {
-                        publicationId,
-                        releaseId,
-                      },
-                    ),
+                    returnRoute ??
+                      generatePath<PublicationTeamRouteParams>(
+                        publicationTeamAccessRoute.path,
+                        {
+                          publicationId,
+                          releaseId,
+                        },
+                      ),
                   );
                 }}
               >

@@ -9,10 +9,8 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
-
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - invite contributor %{RUN_IDENTIFIER}
-
 
 *** Test Cases ***
 Create Publication as bau1
@@ -160,10 +158,9 @@ Validate contributors for 2000/01 release again
     user waits until page contains    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk    %{WAIT_SMALL}
     user checks page contains tag    Pending Invite
 
-
 *** Keywords ***
 user clicks remove user button for row
     [Arguments]    ${text}
     ${row}=    get webelement    xpath://tbody/tr/td[.="${text}"]/..
-    ${remove_user_button}=    get child element    ${row}    xpath://button[text()="Remove user"]
+    ${remove_user_button}=    get child element    ${row}    xpath://button[text()="Remove"]
     user clicks element    ${remove_user_button}

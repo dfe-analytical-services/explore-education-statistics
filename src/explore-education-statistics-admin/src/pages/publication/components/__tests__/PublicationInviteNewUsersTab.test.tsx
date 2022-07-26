@@ -1,13 +1,13 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
 import {
   BasicPublicationDetails,
   PublicationContactDetails,
 } from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
-import userEvent from '@testing-library/user-event';
 import userService from '@admin/services/userService';
-import PublicationInviteNewUsersTab from '../PublicationInviteNewUsersTab';
+import PublicationInviteNewUsersForm from '@admin/pages/publication/components/PublicationInviteNewUsersForm';
+import userEvent from '@testing-library/user-event';
+import { render, screen, waitFor } from '@testing-library/react';
+import React from 'react';
 
 jest.mock('@admin/services/userService');
 
@@ -29,6 +29,8 @@ const publication: BasicPublicationDetails = {
   topicId: 'topic-id',
 };
 
+const currentReleaseId = 'release-1-id';
+
 const releases: ReleaseSummary[] = [
   {
     id: 'release1-id',
@@ -43,6 +45,7 @@ const releases: ReleaseSummary[] = [
     latestInternalReleaseNote: 'release1-release-note',
     approvalStatus: 'Draft',
     yearTitle: '2000/01',
+    live: false,
   },
   {
     id: 'release2-id',
@@ -57,6 +60,7 @@ const releases: ReleaseSummary[] = [
     latestInternalReleaseNote: 'release2-release-note',
     approvalStatus: 'Draft',
     yearTitle: '2001/02',
+    live: false,
   },
   {
     id: 'release3-id',
@@ -71,15 +75,17 @@ const releases: ReleaseSummary[] = [
     latestInternalReleaseNote: 'release3-release-note',
     approvalStatus: 'Draft',
     yearTitle: '2002/03',
+    live: false,
   },
 ];
 
-describe('PublicationInviteNewUsersTab', () => {
+describe('PublicationInviteNewUsersForm', () => {
   test('submits correct request', async () => {
     render(
-      <PublicationInviteNewUsersTab
+      <PublicationInviteNewUsersForm
         publication={publication}
         releases={releases}
+        releaseId={currentReleaseId}
       />,
     );
 
@@ -136,11 +142,12 @@ describe('PublicationInviteNewUsersTab', () => {
     });
   });
 
-  test('no email entered', async () => {
+  test('shows an error if no email is entered', async () => {
     render(
-      <PublicationInviteNewUsersTab
+      <PublicationInviteNewUsersForm
         publication={publication}
         releases={releases}
+        releaseId={currentReleaseId}
       />,
     );
 
@@ -164,11 +171,12 @@ describe('PublicationInviteNewUsersTab', () => {
     });
   });
 
-  test('invite to no releases', async () => {
+  test('shows an error if no releases are selected', async () => {
     render(
-      <PublicationInviteNewUsersTab
+      <PublicationInviteNewUsersForm
         publication={publication}
         releases={releases}
+        releaseId={currentReleaseId}
       />,
     );
 

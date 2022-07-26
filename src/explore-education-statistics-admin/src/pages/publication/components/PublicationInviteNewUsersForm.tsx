@@ -1,23 +1,27 @@
-import React from 'react';
-import { BasicPublicationDetails } from 'src/services/publicationService';
+import {
+  PublicationTeamRouteParams,
+  publicationTeamAccessRoute,
+} from '@admin/routes/publicationRoutes';
+import {
+  BasicPublicationDetails,
+  MyPublication,
+} from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
-import Yup from '@common/validation/yup';
-import { Form, Formik } from 'formik';
+import userService from '@admin/services/userService';
+import Button from '@common/components/Button';
+import ButtonGroup from '@common/components/ButtonGroup';
+import ButtonText from '@common/components/ButtonText';
 import {
   FormFieldCheckboxGroup,
   FormFieldTextInput,
 } from '@common/components/form';
 import useFormSubmit from '@common/hooks/useFormSubmit';
-import ButtonGroup from '@common/components/ButtonGroup';
-import Button from '@common/components/Button';
-import userService from '@admin/services/userService';
 import { mapFieldErrors } from '@common/validation/serverValidations';
+import Yup from '@common/validation/yup';
+import { Form, Formik } from 'formik';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 import { generatePath } from 'react-router';
-import {
-  publicationManageTeamAccessRoute,
-  PublicationRouteParams,
-} from '@admin/routes/routes';
 
 interface InviteContributorFormValues {
   email: string;
@@ -37,13 +41,23 @@ export const errorMappings = [
   }),
 ];
 
-export interface Props {
-  publication: BasicPublicationDetails;
+interface Props {
+  hideCancelButton?: boolean; // EES-3217 remove when pages live
+  publication: BasicPublicationDetails | MyPublication; // EES-3217 can be just one type when this goes live
   releases: ReleaseSummary[];
+  releaseId: string;
+  returnRoute?: string; // EES-3217 remove when pages live
 }
 
-const PublicationInviteNewUsersTab = ({ publication, releases }: Props) => {
+const PublicationInviteNewUsersForm = ({
+  hideCancelButton = false,
+  publication,
+  releases,
+  releaseId,
+  returnRoute,
+}: Props) => {
   const history = useHistory();
+
   const handleSubmit = useFormSubmit<InviteContributorFormValues>(
     async values => {
       await userService.inviteContributor(
@@ -52,12 +66,14 @@ const PublicationInviteNewUsersTab = ({ publication, releases }: Props) => {
         values.releaseIds,
       );
       history.push(
-        generatePath<PublicationRouteParams>(
-          publicationManageTeamAccessRoute.path,
-          {
-            publicationId: publication.id,
-          },
-        ),
+        returnRoute ??
+          generatePath<PublicationTeamRouteParams>(
+            publicationTeamAccessRoute.path,
+            {
+              publicationId: publication.id,
+              releaseId,
+            },
+          ),
       );
     },
     errorMappings,
@@ -90,6 +106,7 @@ const PublicationInviteNewUsersTab = ({ publication, releases }: Props) => {
                 legendSize="m"
                 disabled={form.isSubmitting}
                 selectAll
+                small
                 order={[]}
                 options={releases.map(release => {
                   return {
@@ -102,6 +119,23 @@ const PublicationInviteNewUsersTab = ({ publication, releases }: Props) => {
                 <Button type="submit" disabled={form.isSubmitting}>
                   Invite user
                 </Button>
+                {!hideCancelButton && (
+                  <ButtonText
+                    onClick={() => {
+                      history.push(
+                        generatePath<PublicationTeamRouteParams>(
+                          publicationTeamAccessRoute.path,
+                          {
+                            publicationId: publication.id,
+                            releaseId,
+                          },
+                        ),
+                      );
+                    }}
+                  >
+                    Cancel
+                  </ButtonText>
+                )}
               </ButtonGroup>
             </Form>
           );
@@ -111,4 +145,4 @@ const PublicationInviteNewUsersTab = ({ publication, releases }: Props) => {
   );
 };
 
-export default PublicationInviteNewUsersTab;
+export default PublicationInviteNewUsersForm;
