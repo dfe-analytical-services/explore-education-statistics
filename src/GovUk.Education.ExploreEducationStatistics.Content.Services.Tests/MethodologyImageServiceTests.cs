@@ -222,7 +222,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
         {
             return new MethodologyImageService(
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                blobStorageService ?? new Mock<IBlobStorageService>().Object
+                blobStorageService ?? new Mock<IBlobStorageService>().Object,
+                MockUtils.AlwaysTrueUserService().Object
             );
         }
     }

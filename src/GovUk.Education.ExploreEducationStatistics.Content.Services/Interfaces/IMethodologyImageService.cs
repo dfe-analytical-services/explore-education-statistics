@@ -8,6 +8,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
 {
     public interface IMethodologyImageService
     {
-        Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyId, Guid fileId);
+        Task<Either<ActionResult, FileStreamResult>> Stream(Guid methodologyVersionId, Guid fileId);
     }
 }
