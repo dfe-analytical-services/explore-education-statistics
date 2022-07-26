@@ -164,7 +164,7 @@ public class FileMigrationServiceTests
     {
         var dataFiles = new List<DataImport>
         {
-            // Files have ContentLength and ContentType and TotalRows is 0 so all should be ignored
+            // Files have ContentLength and ContentType and TotalRows is positive so all should be ignored
             new()
             {
                 File = new File
@@ -310,7 +310,7 @@ public class FileMigrationServiceTests
             },
             new()
             {
-                // Ignored as ContentLength, ContentType already migrated and TotalRows is set
+                // Ignored as ContentLength, ContentType already migrated and TotalRows is positive
                 File = new File
                 {
                     Id = Guid.NewGuid(),

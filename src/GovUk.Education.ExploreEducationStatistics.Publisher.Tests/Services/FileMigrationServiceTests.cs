@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -12,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
@@ -67,6 +69,56 @@ public class FileMigrationServiceTests
             MockUtils.VerifyAllMocks(blobStorageService);
 
             result.AssertNotFound();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var after = await contentDbContext.Files.SingleAsync(f => f.Id == file.Id);
+
+            Assert.Null(after.ContentType);
+            Assert.Null(after.ContentLength);
+        }
+    }
+
+    [Fact]
+    public async Task MigrateFile_DataFileHasNoDataImport()
+    {
+        var file = new File
+        {
+            Id = Guid.NewGuid(),
+            RootPath = Guid.NewGuid(),
+            ContentType = null,
+            ContentLength = null,
+            Type = FileType.Data
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.Files.AddAsync(file);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+
+        blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
+            file.Path(),
+            new BlobInfo(path: "not used",
+                size: "not used",
+                contentType: "text/csv",
+                contentLength: 1024));
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = BuildService(contentDbContext: contentDbContext,
+                blobStorageService.Object);
+
+            var result = await service.MigrateFile(file.Id);
+
+            MockUtils.VerifyAllMocks(blobStorageService);
+
+            result.AssertLeft();
         }
 
         await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
@@ -273,6 +325,132 @@ public class FileMigrationServiceTests
         }
     }
 
+    [Fact]
+    public async Task MigrateFile_MigratesDataFileButNotDataImport()
+    {
+        var file = new File
+        {
+            Id = Guid.NewGuid(),
+            RootPath = Guid.NewGuid(),
+            ContentType = null,
+            ContentLength = null,
+            Type = FileType.Data
+        };
+
+        var dataImport = new DataImport
+        {
+            Id = Guid.NewGuid(),
+            File = file,
+            TotalRows = 100 // TotalRows is already set and doesn't need updating
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.Files.AddAsync(file);
+            await contentDbContext.DataImports.AddAsync(dataImport);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+
+        blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
+            file.Path(),
+            new BlobInfo(path: "not used",
+                size: "not used",
+                contentType: "text/csv",
+                contentLength: 1024));
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = BuildService(contentDbContext: contentDbContext,
+                blobStorageService.Object);
+
+            var result = await service.MigrateFile(file.Id);
+
+            MockUtils.VerifyAllMocks(blobStorageService);
+
+            result.AssertRight();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var fileAfter = await contentDbContext.Files.SingleAsync(f => f.Id == file.Id);
+            Assert.Equal("text/csv", fileAfter.ContentType);
+            Assert.Equal(1024, fileAfter.ContentLength);
+
+            var dataImportAfter = await contentDbContext.DataImports.SingleAsync(di => di.Id == dataImport.Id);
+            Assert.Equal(100, dataImportAfter.TotalRows);
+        }
+    }
+
+    [Fact]
+    public async Task MigrateFile_MigratesDataFileAndDataImport()
+    {
+        var file = new File
+        {
+            Id = Guid.NewGuid(),
+            RootPath = Guid.NewGuid(),
+            ContentType = null,
+            ContentLength = null,
+            Type = FileType.Data
+        };
+
+        var dataImport = new DataImport
+        {
+            Id = Guid.NewGuid(),
+            File = file,
+            TotalRows = 0
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.Files.AddAsync(file);
+            await contentDbContext.DataImports.AddAsync(dataImport);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+
+        blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
+            file.Path(),
+            new BlobInfo(path: "not used",
+                size: "not used",
+                contentType: "text/csv",
+                contentLength: 1024,
+                meta: new Dictionary<string, string>
+                {
+                    {
+                        "NumberOfRows", "100" // This should get set as TotalRows value on DataImport
+                    }
+                }));
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = BuildService(contentDbContext: contentDbContext,
+                blobStorageService.Object);
+
+            var result = await service.MigrateFile(file.Id);
+
+            MockUtils.VerifyAllMocks(blobStorageService);
+
+            result.AssertRight();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var fileAfter = await contentDbContext.Files.SingleAsync(f => f.Id == file.Id);
+            Assert.Equal("text/csv", fileAfter.ContentType);
+            Assert.Equal(1024, fileAfter.ContentLength);
+
+            var dataImportAfter = await contentDbContext.DataImports.SingleAsync(di => di.Id == dataImport.Id);
+            Assert.Equal(100, dataImportAfter.TotalRows);
+        }
+    }
+
     private static FileMigrationService BuildService(
         ContentDbContext contentDbContext,
         IBlobStorageService? blobStorageService = null)
@@ -280,6 +458,7 @@ public class FileMigrationServiceTests
         return new FileMigrationService(
             contentDbContext,
             new PersistenceHelper<ContentDbContext>(contentDbContext),
-            blobStorageService ?? Mock.Of<IBlobStorageService>(Strict));
+            blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
+            new Mock<ILogger<FileMigrationService>>().Object);
     }
 }
