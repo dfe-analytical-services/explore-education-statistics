@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -11,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 
@@ -23,15 +25,17 @@ public class FileMigrationService : IFileMigrationService
     private readonly ContentDbContext _contentDbContext;
     private readonly IPersistenceHelper<ContentDbContext> _contentPersistenceHelper;
     private readonly IBlobStorageService _privateBlobStorageService;
+    private readonly ILogger<FileMigrationService> _logger;
 
-    public FileMigrationService(
-        ContentDbContext contentDbContext,
+    public FileMigrationService(ContentDbContext contentDbContext,
         IPersistenceHelper<ContentDbContext> contentPersistenceHelper,
-        IBlobStorageService privateBlobStorageService)
+        IBlobStorageService privateBlobStorageService,
+        ILogger<FileMigrationService> logger)
     {
         _contentDbContext = contentDbContext;
         _contentPersistenceHelper = contentPersistenceHelper;
         _privateBlobStorageService = privateBlobStorageService;
+        _logger = logger;
     }
 
     public async Task<Either<ActionResult, Unit>> MigrateFile(Guid id)
@@ -56,9 +60,55 @@ public class FileMigrationService : IFileMigrationService
                 _contentDbContext.Files.Update(file);
                 file.ContentType = blob.ContentType;
                 file.ContentLength = blob.ContentLength;
-                await _contentDbContext.SaveChangesAsync();
 
-                return new Either<ActionResult, Unit>(Unit.Instance);
+                if (file.Type == FileType.Data)
+                {
+                    // Also check the corresponding DataImport has a positive value for TotalRows set
+                    return await UpdateDataImportIfNecessary(file, blob)
+                        .OnSuccessVoid(async () =>
+                        {
+                            await _contentDbContext.SaveChangesAsync();
+                        });
+                }
+
+                await _contentDbContext.SaveChangesAsync();
+                return Unit.Instance;
+            });
+    }
+
+    private async Task<Either<ActionResult, Unit>> UpdateDataImportIfNecessary(File file, BlobInfo blob)
+    {
+        if (file.Type != FileType.Data)
+        {
+            throw new ArgumentException("Expecting data file", nameof(file));
+        }
+
+        return await _contentPersistenceHelper
+            .CheckEntityExists<DataImport>(q =>
+                q.Where(dataImport => dataImport.FileId == file.Id))
+            .OnSuccessVoid(async dataImport =>
+            {
+                // Update DataImport if TotalRows is not positive 
+                if (dataImport.TotalRows < 1)
+                {
+                    if (blob.Meta.TryGetValue("NumberOfRows", out var numberOfRowsStringVal))
+                    {
+                        if (int.TryParse(numberOfRowsStringVal, out var numberOfRowsIntVal))
+                        {
+                            _contentDbContext.DataImports.Update(dataImport);
+                            dataImport.TotalRows = numberOfRowsIntVal;
+                        }
+                        else
+                        {
+                            _logger.LogWarning(
+                                "Could not convert NumberOfRows metadata property to int for blob: {path}", blob.Path);
+                        }
+                    }
+                    else
+                    {
+                        _logger.LogWarning("NumberOfRows metadata property not found for blob: {path}", blob.Path);
+                    }
+                }
             });
     }
 
