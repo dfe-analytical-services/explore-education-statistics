@@ -29,9 +29,7 @@ const PublicationContactForm = ({
   onCancel,
   onSubmit,
 }: Props) => {
-  const [showConfirmSubmitModal, toggleShowConfirmSubmitModal] = useToggle(
-    false,
-  );
+  const [showConfirmModal, toggleConfirmModal] = useToggle(false);
 
   const validationSchema = Yup.object<FormValues>({
     teamName: Yup.string().required('Enter a team name'),
@@ -54,43 +52,34 @@ const PublicationContactForm = ({
         }),
       }}
       validationSchema={validationSchema}
-      onSubmit={useFormSubmit((values: FormValues) => {
-        onSubmit(values);
-      })}
+      onSubmit={useFormSubmit(onSubmit)}
     >
       {form => (
         <>
           <Form id="publicationContactForm">
-            <FormFieldset
-              id="contact"
-              legend="Contact for this publication"
-              legendSize="m"
-              hint="They will be the main point of contact for data and methodology enquiries for this publication and its releases."
-            >
-              <FormFieldTextInput<FormValues>
-                name="teamName"
-                label="Team name"
-                className="govuk-!-width-one-half"
-              />
+            <FormFieldTextInput<FormValues>
+              name="teamName"
+              label="Team name"
+              className="govuk-!-width-one-half"
+            />
 
-              <FormFieldTextInput<FormValues>
-                name="teamEmail"
-                label="Team email"
-                className="govuk-!-width-one-half"
-              />
+            <FormFieldTextInput<FormValues>
+              name="teamEmail"
+              label="Team email"
+              className="govuk-!-width-one-half"
+            />
 
-              <FormFieldTextInput<FormValues>
-                name="contactName"
-                label="Contact name"
-                className="govuk-!-width-one-half"
-              />
+            <FormFieldTextInput<FormValues>
+              name="contactName"
+              label="Contact name"
+              className="govuk-!-width-one-half"
+            />
 
-              <FormFieldTextInput<FormValues>
-                name="contactTelNo"
-                label="Contact telephone"
-                className="govuk-!-width-one-half"
-              />
-            </FormFieldset>
+            <FormFieldTextInput<FormValues>
+              name="contactTelNo"
+              label="Contact telephone"
+              className="govuk-!-width-one-half"
+            />
 
             <ButtonGroup>
               <Button
@@ -98,7 +87,7 @@ const PublicationContactForm = ({
                 onClick={async e => {
                   e.preventDefault();
                   if (form.isValid) {
-                    toggleShowConfirmSubmitModal.on();
+                    toggleConfirmModal.on();
                   } else {
                     await form.submitForm();
                   }
@@ -115,9 +104,9 @@ const PublicationContactForm = ({
             onConfirm={async () => {
               await form.submitForm();
             }}
-            onExit={toggleShowConfirmSubmitModal.off}
-            onCancel={toggleShowConfirmSubmitModal.off}
-            open={showConfirmSubmitModal}
+            onExit={toggleConfirmModal.off}
+            onCancel={toggleConfirmModal.off}
+            open={showConfirmModal}
           >
             <p>
               Any changes made here will appear on the public site immediately.

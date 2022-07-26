@@ -51,32 +51,14 @@ describe('PublicationContactPage', () => {
       screen.getByText('Contact for this publication'),
     ).toBeInTheDocument();
 
-    expect(screen.getByTestId('Team name-key')).toHaveTextContent('Team name');
-    expect(screen.getByTestId('Team name-value')).toHaveTextContent(
-      'Team Smith',
-    );
-
-    expect(screen.getByTestId('Team email-key')).toHaveTextContent(
-      'Team email',
-    );
-    expect(screen.getByTestId('Team email-value')).toHaveTextContent(
+    expect(screen.getByTestId('Team name')).toHaveTextContent('Team Smith');
+    expect(screen.getByTestId('Team email')).toHaveTextContent(
       'john.smith@test.com',
     );
-
-    expect(screen.getByTestId('Contact name-key')).toHaveTextContent(
-      'Contact name',
-    );
-    expect(screen.getByTestId('Contact name-value')).toHaveTextContent(
-      'John Smith',
-    );
-
-    expect(screen.getByTestId('Contact telephone-key')).toHaveTextContent(
-      'Contact telephone',
-    );
-    expect(screen.getByTestId('Contact telephone-value')).toHaveTextContent(
+    expect(screen.getByTestId('Contact name')).toHaveTextContent('John Smith');
+    expect(screen.getByTestId('Contact telephone')).toHaveTextContent(
       '0777777777',
     );
-
     expect(
       screen.getByRole('button', { name: 'Edit contact details' }),
     ).toBeInTheDocument();
@@ -114,7 +96,20 @@ describe('PublicationContactPage', () => {
 
     userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
 
-    expect(screen.getByTestId('Team name-key')).toHaveTextContent('Team name');
+    expect(screen.getByTestId('Team name')).toHaveTextContent('Team Smith');
+
+    expect(screen.queryByLabelText('Team name')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Team email')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('Contact name')).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText('Contact telephone'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Update contact details' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Cancel' }),
+    ).not.toBeInTheDocument();
   });
 
   test('shows validation errors when there are no contact details', async () => {

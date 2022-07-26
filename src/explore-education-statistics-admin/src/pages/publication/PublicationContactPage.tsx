@@ -36,17 +36,17 @@ const PublicationContactPage = () => {
 
   return (
     <>
+      <h2>Contact for this publication</h2>
+      <div className="govuk-grid-row  govuk-!-margin-bottom-6">
+        <div className="govuk-grid-column-three-quarters">
+          <p>
+            They will be the main point of contact for data and methodology
+            enquiries for this publication and its releases.
+          </p>
+        </div>
+      </div>
       {readOnly ? (
         <>
-          <h2>Contact for this publication</h2>
-          <div className="govuk-grid-row  govuk-!-margin-bottom-6">
-            <div className="govuk-grid-column-three-quarters">
-              <p>
-                They will be the main point of contact for data and methodology
-                enquiries for this publication and its releases.
-              </p>
-            </div>
-          </div>
           <SummaryList>
             <SummaryListItem term="Team name">
               {contact?.teamName}
