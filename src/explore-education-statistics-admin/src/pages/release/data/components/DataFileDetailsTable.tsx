@@ -113,27 +113,26 @@ const DataFileDetailsTable = ({
         <tr>
           <th scope="row">Data file size</th>
           <td data-testid="Data file size">
-            <>
-              {dataFile.fileSize.size.toLocaleString()} {dataFile.fileSize.unit}
-            </>
+            {`${dataFile.fileSize.size.toLocaleString()} ${
+              dataFile.fileSize.unit
+            }`}
           </td>
           {replacementDataFile && (
             <td data-testid="Replacement Data file size">
-              <>
-                {replacementDataFile.fileSize.size.toLocaleString()}{' '}
-                {replacementDataFile.fileSize.unit}
-              </>
+              {`${replacementDataFile.fileSize.size.toLocaleString()} ${
+                replacementDataFile.fileSize.unit
+              }`}
             </td>
           )}
         </tr>
         <tr>
           <th scope="row">Number of rows</th>
           <td data-testid="Number of rows">
-            {dataFile.rows?.toLocaleString()}
+            {dataFile.rows?.toLocaleString() ?? 'Unknown'}
           </td>
           {replacementDataFile && (
             <td data-testid="Replacement Number of rows">
-              {replacementDataFile.rows?.toLocaleString()}
+              {replacementDataFile.rows?.toLocaleString() ?? 'Unknown'}
             </td>
           )}
         </tr>

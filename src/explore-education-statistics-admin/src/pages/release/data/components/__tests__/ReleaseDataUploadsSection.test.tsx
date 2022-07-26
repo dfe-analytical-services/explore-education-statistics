@@ -754,7 +754,9 @@ describe('ReleaseDataUploadsSection', () => {
       expect(section3.getByTestId('Data file size')).toHaveTextContent(
         '150 Kb',
       );
-      expect(section3.getByTestId('Number of rows')).toHaveTextContent('');
+      expect(section3.getByTestId('Number of rows')).toHaveTextContent(
+        'Unknown',
+      );
       expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
       expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
         'user1@test.com',
@@ -846,7 +848,9 @@ describe('ReleaseDataUploadsSection', () => {
       expect(section3.getByTestId('Data file size')).toHaveTextContent(
         '150 Kb',
       );
-      expect(section3.getByTestId('Number of rows')).toHaveTextContent('');
+      expect(section3.getByTestId('Number of rows')).toHaveTextContent(
+        'Unknown',
+      );
       expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
       expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
         'user1@test.com',
