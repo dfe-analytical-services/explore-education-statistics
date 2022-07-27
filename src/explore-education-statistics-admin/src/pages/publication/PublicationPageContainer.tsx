@@ -6,7 +6,9 @@ import { PublicationContextProvider } from '@admin/pages/publication/contexts/Pu
 import {
   publicationContactRoute,
   publicationDetailsRoute,
-  publicationMethodologyRoute,
+  publicationAdoptMethodologyRoute,
+  publicationExternalMethodologyRoute,
+  publicationMethodologiesRoute,
   publicationReleasesRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
@@ -20,13 +22,17 @@ import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 
 const navRoutes = [
   publicationReleasesRoute,
-  publicationMethodologyRoute,
+  publicationMethodologiesRoute,
   publicationDetailsRoute,
   publicationContactRoute,
   publicationDetailsRoute,
 ];
 
-const routes = [...navRoutes];
+const routes = [
+  ...navRoutes,
+  publicationAdoptMethodologyRoute,
+  publicationExternalMethodologyRoute,
+];
 
 const PublicationPageContainer = ({
   match,
