@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseId, bool forceDelete = false);
 
-        Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseId, Guid id);
+        Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseId, Guid fileId);
 
         Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseId);
 

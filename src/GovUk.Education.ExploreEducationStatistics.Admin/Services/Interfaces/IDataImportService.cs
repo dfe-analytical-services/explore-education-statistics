@@ -22,6 +22,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile);
 
-        Task ImportZip(Guid subjectId, File dataFile, File metaFile, File zipFile);
+        Task<DataImport> ImportZip(Guid subjectId, File dataFile, File metaFile, File zipFile);
     }
 }

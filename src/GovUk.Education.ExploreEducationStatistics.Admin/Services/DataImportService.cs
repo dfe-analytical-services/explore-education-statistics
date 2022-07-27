@@ -114,7 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return import;
         }
 
-        public async Task ImportZip(Guid subjectId, File dataFile, File metaFile, File zipFile)
+        public async Task<DataImport> ImportZip(Guid subjectId, File dataFile, File metaFile, File zipFile)
         {
             var import = await _dataImportRepository.Add(new DataImport
             {
@@ -127,6 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
 
             await _queueService.AddMessageAsync(ImportsPendingQueue, new ImportMessage(import.Id));
+            return import;
         }
     }
 }

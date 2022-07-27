@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -149,23 +148,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 forceDelete: forceDelete);
         }
 
-        public async Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(
-                    async release => await _persistenceHelper
-                        .CheckEntityExists<ReleaseFile>(
-                            q => q.Include(rf => rf.File)
-                                .Where(
-                                    rf => rf.ReleaseId == release.Id
-                                          && rf.File.Type == FileType.Data
-                                          && rf.FileId == id
-                                )
-                        )
-                )
-                .OnSuccess(async file => await GetDataFileInfo(releaseId, file.File));
+                .CheckEntityExists<ReleaseFile>(q => q.Where(
+                        rf => rf.ReleaseId == releaseId
+                              && rf.File.Type == FileType.Data
+                              && rf.FileId == fileId)
+                    .Include(rf => rf.Release))
+                .OnSuccessDo(rf => _userService.CheckCanViewRelease(rf.Release))
+                .OnSuccess(BuildDataFileViewModel);
         }
 
         public async Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseId)
@@ -178,14 +170,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var files = await _releaseFileRepository.GetByFileType(releaseId, FileType.Data);
 
                     // Exclude files that are replacements in progress
-                    var filesExcludingReplacements = files.Where(file => !file.File.ReplacingId.HasValue);
+                    var filesExcludingReplacements = files.Where(file => !file.File.ReplacingId.HasValue).ToList();
 
-                    return await filesExcludingReplacements
-                        .ToAsyncEnumerable()
-                        .SelectAwait(async file => await GetDataFileInfo(releaseId, file.File))
-                        .OrderBy(file => file.Name.IsNullOrWhitespace())
-                        .ThenBy(file => file.Name)
-                        .ToListAsync();
+                    return await BuildDataFileViewModels(filesExcludingReplacements);
                 });
         }
 
@@ -242,23 +229,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 dataFile: dataFile,
                                 metaFile: metaFile);
 
-                            await _contentDbContext.Entry(dataFile)
-                                .Reference(f => f.CreatedBy)
-                                .LoadAsync();
+                            var permissions = await _userService.GetDataFilePermissions(dataFile);
 
-                            return new DataFileInfo
-                            {
-                                Id = dataFile.Id,
-                                FileName = dataFile.Filename,
-                                Name = validSubjectName,
-                                Size = dataFile.DisplaySize(),
-                                MetaFileId = metaFile.Id,
-                                MetaFileName = metaFile.Filename,
-                                UserName = dataFile.CreatedBy.Email,
-                                Status = dataImport.Status,
-                                Created = dataFile.Created,
-                                Permissions = await _userService.GetDataFilePermissions(dataFile)
-                            };
+                            return BuildDataFileViewModel(dataFile: dataFile,
+                                metaFile: metaFile,
+                                validSubjectName,
+                                dataImport.TotalRows,
+                                dataImport.Status,
+                                permissions);
                         });
                 });
         }
@@ -317,60 +295,100 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                                                     await UploadFileToStorage(zipFile, zipFormFile);
 
-                                                    await _dataImportService.ImportZip(
+                                                    var dataImport = await _dataImportService.ImportZip(
                                                         subjectId: subjectId,
                                                         dataFile: dataFile,
                                                         metaFile: metaFile,
                                                         zipFile: zipFile);
 
-                                                    await _contentDbContext.Entry(dataFile)
-                                                        .Reference(f => f.CreatedBy)
-                                                        .LoadAsync();
+                                                    var permissions = await _userService.GetDataFilePermissions(dataFile);
 
-                                                    return new DataFileInfo
-                                                    {
-                                                        Id = dataFile.Id,
-                                                        FileName = dataFile.Filename,
-                                                        Name = validSubjectName,
-                                                        Size = dataFile.DisplaySize(),
-                                                        MetaFileId = metaFile.Id,
-                                                        MetaFileName = metaFile.Filename,
-                                                        UserName = dataFile.CreatedBy.Email,
-                                                        Status = DataImportStatus.QUEUED,
-                                                        Created = dataFile.Created,
-                                                        Permissions =
-                                                            await _userService.GetDataFilePermissions(dataFile)
-                                                    };
+                                                    return BuildDataFileViewModel(dataFile: dataFile,
+                                                        metaFile: metaFile,
+                                                        validSubjectName,
+                                                        dataImport.TotalRows,
+                                                        dataImport.Status,
+                                                        permissions);
                                                 });
                                         }));
                         });
                 });
         }
 
-        private async Task<DataFileInfo> GetDataFileInfo(Guid releaseId, File dataFile)
+        private async Task<DataFileInfo> BuildDataFileViewModel(ReleaseFile releaseFile)
         {
-            var metaFile = await GetAssociatedMetaFile(releaseId, dataFile);
+            var dataImport = await _contentDbContext.DataImports
+                .AsSplitQuery()
+                .Include(di => di.File)
+                .ThenInclude(f => f.CreatedBy)
+                .Include(di => di.MetaFile)
+                .SingleAsync(di => di.FileId == releaseFile.FileId);
 
-            await _contentDbContext.Entry(dataFile)
-                .Reference(f => f.CreatedBy)
-                .LoadAsync();
+            var permissions = await _userService.GetDataFilePermissions(dataImport.File);
 
-            var dataImport = await _dataImportService.GetImport(dataFile.Id);
+            return BuildDataFileViewModel(dataFile: dataImport.File,
+                metaFile: dataImport.MetaFile,
+                releaseFile.Name,
+                dataImport.TotalRows,
+                dataImport.Status,
+                permissions);
+        }
 
+        private async Task<List<DataFileInfo>> BuildDataFileViewModels(List<ReleaseFile> releaseFiles)
+        {
+            var fileIds = releaseFiles.Select(rf => rf.FileId).ToList();
+
+            var dataImports = await _contentDbContext.DataImports
+                .AsSplitQuery()
+                .Include(di => di.File)
+                .ThenInclude(f => f.CreatedBy)
+                .Include(di => di.MetaFile)
+                .Where(di => fileIds.Contains(di.FileId))
+                .ToDictionaryAsync(di => di.FileId);
+
+            var subjectNames = releaseFiles.ToDictionary(rf => rf.FileId, rf => rf.Name);
+
+            // TODO Optimise GetDataFilePermissions here instead of potentially making several db queries
+            // Work out if the user has permission to cancel any import which Bau users can.
+            // Combine it with the import status (already known) to evaluate whether a particular import can be cancelled
+            var permissions = await releaseFiles
+                .ToAsyncEnumerable()
+                .ToDictionaryAwaitAsync(rf => ValueTask.FromResult(rf.FileId),
+                    async rf => await _userService.GetDataFilePermissions(rf.File));
+
+            return fileIds.Select(fileId =>
+            {
+                var dataImport = dataImports[fileId];
+                return BuildDataFileViewModel(dataFile: dataImport.File,
+                    metaFile: dataImport.MetaFile,
+                    subjectNames[fileId],
+                    dataImport.TotalRows,
+                    dataImport.Status,
+                    permissions[fileId]);
+            }).ToList();
+        }
+
+        private static DataFileInfo BuildDataFileViewModel(File dataFile,
+            File metaFile,
+            string? subjectName,
+            int? totalRows,
+            DataImportStatus importStatus,
+            DataFilePermissions permissions)
+        {
             return new DataFileInfo
             {
                 Id = dataFile.Id,
                 FileName = dataFile.Filename,
-                Name = await GetSubjectName(releaseId, dataFile),
+                Name = subjectName ?? "Unknown",
                 Size = dataFile.DisplaySize(),
                 MetaFileId = metaFile.Id,
                 MetaFileName = metaFile.Filename,
                 ReplacedBy = dataFile.ReplacedById,
-                Rows = dataImport?.TotalRows,
+                Rows = totalRows,
                 UserName = dataFile.CreatedBy?.Email ?? "",
-                Status = dataImport?.Status ?? DataImportStatus.NOT_FOUND,
+                Status = importStatus,
                 Created = dataFile.Created,
-                Permissions = await _userService.GetDataFilePermissions(dataFile)
+                Permissions = permissions
             };
         }
 
