@@ -94,7 +94,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 Errors = import.Errors.Select(error => error.Message).ToList(),
                 PercentageComplete = import.PercentageComplete(),
                 StagePercentageComplete = import.StagePercentageComplete,
-                TotalRows = import.TotalRows > 0 ? import.TotalRows : null,
+                TotalRows = import.TotalRows,
                 Status = import.Status
             };
         }

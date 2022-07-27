@@ -366,7 +366,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 MetaFileId = metaFile.Id,
                 MetaFileName = metaFile.Filename,
                 ReplacedBy = dataFile.ReplacedById,
-                Rows = dataImport?.TotalRows > 0 ? dataImport.TotalRows : null,
+                Rows = dataImport?.TotalRows,
                 UserName = dataFile.CreatedBy?.Email ?? "",
                 Status = dataImport?.Status ?? DataImportStatus.NOT_FOUND,
                 Created = dataFile.Created,

@@ -343,7 +343,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(dataFile.Id, result.FileId);
                 Assert.Equal(metaFile.Id, result.MetaFileId);
                 Assert.Equal(subjectId, result.SubjectId);
-                Assert.Equal(0, result.TotalRows);
                 Assert.Equal(DataImportStatus.QUEUED, result.Status);
                 Assert.InRange(DateTime.UtcNow.Subtract(result.Created).Milliseconds, 0, 1500);
             }
