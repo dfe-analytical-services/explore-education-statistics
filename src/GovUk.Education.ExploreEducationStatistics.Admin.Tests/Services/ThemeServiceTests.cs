@@ -180,7 +180,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Title = "Test theme",
                 Slug = "test-theme",
-                Summary = "Test summary"
+                Summary = "Test summary",
+                Topics = new List<Topic>
+                {
+                    new()
+                    {
+                        Title = "Test topic 1",
+                        Slug = "test-topic-1"
+                    },
+                    new()
+                    {
+                        Title = "Test topic 2",
+                        Slug = "test-topic-2",
+                    }
+                }
+            };
+
+            // This topic should not be included with
+            // the theme as it is unrelated.
+            var unrelatedTopic = new Topic
+            {
+                Title = "Unrelated topic",
+                Slug = "unrelated-topic"
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -188,6 +209,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 context.Add(theme);
+                context.Add(unrelatedTopic);
 
                 await context.SaveChangesAsync();
             }
@@ -197,11 +219,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var service = SetupThemeService(context);
                 var result = await service.GetTheme(theme.Id);
 
-                result.AssertRight();
-                Assert.Equal(theme.Id, result.Right.Id);
-                Assert.Equal("Test theme", result.Right.Title);
-                Assert.Equal("test-theme", result.Right.Slug);
-                Assert.Equal("Test summary", result.Right.Summary);
+                var viewModel = result.AssertRight();
+                Assert.Equal(theme.Id, viewModel.Id);
+                Assert.Equal("Test theme", viewModel.Title);
+                Assert.Equal("test-theme", viewModel.Slug);
+                Assert.Equal("Test summary", viewModel.Summary);
+                
+                Assert.Equal(2, theme.Topics.Count);
+                Assert.Equal("Test topic 1", theme.Topics[0].Title);
+                Assert.Equal("test-topic-1", theme.Topics[0].Slug);
+                
+                Assert.Equal("Test topic 2", theme.Topics[1].Title);
+                Assert.Equal("test-topic-2", theme.Topics[1].Slug);
             }
         }
 
