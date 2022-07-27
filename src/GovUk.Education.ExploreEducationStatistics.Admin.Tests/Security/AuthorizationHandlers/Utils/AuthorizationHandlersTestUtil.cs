@@ -10,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using Microsoft.AspNetCore.Authorization;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Security.AuthorizationHandlerContextFactory;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.EnumUtil;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.AuthorizationHandlers.Utils
@@ -113,9 +114,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
             HandlerTestScenario scenario)
             where TRequirement : IAuthorizationRequirement
         {
-            var authContext = new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
-                scenario.User, scenario.Entity);
+            var authContext = CreateAuthContext<TRequirement>(scenario.User, scenario.Entity);
 
             await handler.HandleAsync(authContext);
 
@@ -158,9 +157,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Security.Author
         public static AuthorizationHandlerContext CreateAuthorizationHandlerContext<TRequirement, TEntity>(
             ClaimsPrincipal user, TEntity entity) where TRequirement : IAuthorizationRequirement
         {
-            return new AuthorizationHandlerContext(
-                new IAuthorizationRequirement[] { Activator.CreateInstance<TRequirement>() },
-                user, entity);
+            return CreateAuthContext<TRequirement, TEntity>(user, entity);
         }
 
         public class HandlerTestScenario

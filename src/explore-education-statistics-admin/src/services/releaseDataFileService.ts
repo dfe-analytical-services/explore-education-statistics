@@ -88,7 +88,7 @@ export interface DataFileImportStatus {
   percentageComplete: number;
   stagePercentageComplete: number;
   errors?: string[];
-  numberOfRows: number;
+  totalRows: number;
 }
 
 function mapFile({ name, ...file }: DataFileInfo): DataFile {

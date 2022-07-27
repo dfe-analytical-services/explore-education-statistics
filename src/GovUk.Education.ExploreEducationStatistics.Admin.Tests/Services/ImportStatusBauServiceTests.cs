@@ -77,7 +77,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 File = releaseFile1.File,
                 NumBatches = 1,
-                Rows = 100,
+                TotalRows = 100,
                 StagePercentageComplete = 99,
                 Status = FAILED,
                 SubjectId = Guid.NewGuid(),
@@ -88,7 +88,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 File = releaseFile2.File,
                 NumBatches = 2,
-                Rows = 200,
+                TotalRows = 200,
                 StagePercentageComplete = 54,
                 Status = STAGE_1,
                 SubjectId = Guid.NewGuid(),
@@ -99,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 File = releaseFile3.File,
                 NumBatches = 3,
-                Rows = 300,
+                TotalRows = 300,
                 StagePercentageComplete = 76,
                 Status = STAGE_4,
                 SubjectId = Guid.NewGuid(),
@@ -136,7 +136,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Id, imports[0].ReleaseId);
                 Assert.Equal(release.Title, imports[0].ReleaseTitle);
                 Assert.Equal(import2.File.Filename, imports[0].DataFileName);
-                Assert.Equal(import2.Rows, imports[0].Rows);
+                Assert.Equal(import2.TotalRows, imports[0].TotalRows);
                 Assert.Equal(import2.NumBatches, imports[0].Batches);
                 Assert.Equal(import2.Status, imports[0].Status);
                 Assert.Equal(import2.StagePercentageComplete, imports[0].StagePercentageComplete);
@@ -150,7 +150,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Id, imports[1].ReleaseId);
                 Assert.Equal(release.Title, imports[1].ReleaseTitle);
                 Assert.Equal(import1.File.Filename, imports[1].DataFileName);
-                Assert.Equal(import1.Rows, imports[1].Rows);
+                Assert.Equal(import1.TotalRows, imports[1].TotalRows);
                 Assert.Equal(import1.NumBatches, imports[1].Batches);
                 Assert.Equal(import1.Status, imports[1].Status);
                 Assert.Equal(import1.StagePercentageComplete, imports[1].StagePercentageComplete);
@@ -164,7 +164,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Id, imports[2].ReleaseId);
                 Assert.Equal(release.Title, imports[2].ReleaseTitle);
                 Assert.Equal(import3.File.Filename, imports[2].DataFileName);
-                Assert.Equal(import3.Rows, imports[2].Rows);
+                Assert.Equal(import3.TotalRows, imports[2].TotalRows);
                 Assert.Equal(import3.NumBatches, imports[2].Batches);
                 Assert.Equal(import3.StagePercentageComplete, imports[2].StagePercentageComplete);
                 Assert.Equal(import3.PercentageComplete(), imports[2].PercentageComplete);

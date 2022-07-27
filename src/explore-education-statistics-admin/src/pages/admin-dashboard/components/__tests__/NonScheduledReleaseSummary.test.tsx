@@ -5,6 +5,7 @@ import { MemoryRouter, Router } from 'react-router-dom';
 import _releaseService, {
   MyRelease,
   ReleaseSummary,
+  ReleaseStageStatuses,
 } from '@admin/services/releaseService';
 import userEvent from '@testing-library/user-event';
 import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
@@ -31,6 +32,14 @@ describe('NonScheduledReleaseSummary', () => {
     },
     approvalStatus: 'Draft',
   } as MyRelease;
+
+  const completeReleaseStatus: ReleaseStageStatuses = {
+    overallStage: 'Complete',
+  };
+
+  beforeEach(() => {
+    releaseService.getReleaseStatus.mockResolvedValue(completeReleaseStatus);
+  });
 
   test('renders correctly with a release and no permissions', async () => {
     render(

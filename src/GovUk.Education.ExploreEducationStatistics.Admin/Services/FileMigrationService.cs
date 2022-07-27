@@ -54,21 +54,33 @@ public class FileMigrationService : IFileMigrationService
                         return ValidationActionResult(NonEmptyFileMigrationQueue);
                 }
 
-                // Queue one message per file for all files that don't have values
-                // for the new ContentLength or ContentType properties
-                var files = await _contentDbContext.Files
+                // Get all files that don't have values for the new ContentLength or ContentType properties
+                var fileIds = await _contentDbContext.Files
                     .AsNoTracking()
                     .Where(file => file.ContentLength == null || file.ContentType == null)
-                    .Select(file => new MigrateFileMessage(file.Id))
+                    .Select(file => file.Id)
                     .ToListAsync();
 
-                if (files.Any())
+                // Get all files that don't have a positive TotalRows value for their corresponding DataImport
+                var fileIdsWithoutTotalRows = await _contentDbContext.DataImports
+                    .AsNoTracking()
+                    .Where(dataImport => dataImport.TotalRows < 1)
+                    .Select(dataImport => dataImport.FileId)
+                    .ToListAsync();
+
+                // Produce the set union to exclude any duplicate id's
+                var fileIdsToMigrate = fileIds.Union(fileIdsWithoutTotalRows).ToList();
+
+                if (fileIdsToMigrate.Any())
                 {
+                    // Queue one message per file that needs migrating
+                    var messages = fileIdsToMigrate.Select(id => new MigrateFileMessage(id)).ToList();
+
                     _logger.LogInformation("Adding {count} messages to the '{queue}' queue",
-                        files.Count,
+                        messages.Count,
                         MigrateFilesQueue);
 
-                    await _storageQueueService.AddMessages(MigrateFilesQueue, files);
+                    await _storageQueueService.AddMessages(MigrateFilesQueue, messages);
                 }
                 else
                 {

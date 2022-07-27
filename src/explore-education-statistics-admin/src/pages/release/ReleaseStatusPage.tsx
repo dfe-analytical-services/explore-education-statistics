@@ -1,7 +1,7 @@
-import ReleaseServiceStatus from '@admin/components/ReleaseServiceStatus';
 import StatusBlock from '@admin/components/StatusBlock';
 import { useConfig } from '@admin/contexts/ConfigContext';
 import { useLastLocation } from '@admin/contexts/LastLocationContext';
+import ReleasePublishingStatus from '@admin/pages/release/components/ReleasePublishingStatus';
 import { useReleaseContext } from '@admin/pages/release/contexts/ReleaseContext';
 import ReleaseStatusEditPage from '@admin/pages/release/ReleaseStatusEditPage';
 import permissionService, {
@@ -113,7 +113,7 @@ const ReleaseStatusPage = () => {
         </SummaryListItem>
         {release.approvalStatus === 'Approved' && (
           <SummaryListItem term="Release process status">
-            <ReleaseServiceStatus releaseId={releaseId} />
+            <ReleasePublishingStatus releaseId={releaseId} />
           </SummaryListItem>
         )}
         <SummaryListItem term="Scheduled release">

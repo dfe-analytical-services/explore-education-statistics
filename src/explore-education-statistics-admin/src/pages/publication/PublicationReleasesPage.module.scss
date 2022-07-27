@@ -1,0 +1,12 @@
+@import '~govuk-frontend/govuk/base';
+
+.row {
+  &:focus-visible {
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+  }
+}
+
+.actionsColumn,
+.statusColumn {
+  width: 150px;
+}

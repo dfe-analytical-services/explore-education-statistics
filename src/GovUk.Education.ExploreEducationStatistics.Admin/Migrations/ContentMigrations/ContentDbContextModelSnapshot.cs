@@ -169,13 +169,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Migrations.ContentMig
                     b.Property<string>("GeographicLevels")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ImportedRows")
+                        .HasColumnType("int");
+
                     b.Property<Guid>("MetaFileId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("NumBatches")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Rows")
                         .HasColumnType("int");
 
                     b.Property<int>("RowsPerBatch")

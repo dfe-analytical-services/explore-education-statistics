@@ -123,7 +123,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     new FileMigrationService(
                         contentDbContext: provider.GetService<ContentDbContext>(),
                         provider.GetService<IPersistenceHelper<ContentDbContext>>(),
-                        privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage")
+                        privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
+                        logger: provider.GetRequiredService<ILogger<FileMigrationService>>()
                     ));
 
             AddPersistenceHelper<ContentDbContext>(builder.Services);
