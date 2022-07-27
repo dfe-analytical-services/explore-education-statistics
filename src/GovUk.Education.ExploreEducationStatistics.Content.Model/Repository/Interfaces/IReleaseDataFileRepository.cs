@@ -13,7 +13,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.In
             Guid subjectId,
             string filename,
             long contentLength,
-            string? contentType,
             FileType type,
             Guid createdById,
             string? name = null,

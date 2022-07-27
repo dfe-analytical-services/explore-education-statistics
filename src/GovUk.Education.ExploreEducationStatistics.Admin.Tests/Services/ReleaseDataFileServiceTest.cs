@@ -1482,8 +1482,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var dataFormFile = CreateFormFileMock(dataFileName, "text/csv").Object;
-            var metaFormFile = CreateFormFileMock(metaFileName, "text/csv").Object;
+            var dataFormFile = CreateFormFileMock(dataFileName).Object;
+            var metaFormFile = CreateFormFileMock(metaFileName).Object;
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);
@@ -1652,8 +1652,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await statisticsDbContext.SaveChangesAsync();
             }
 
-            var dataFormFile = CreateFormFileMock(dataFileName, "text/csv").Object;
-            var metaFormFile = CreateFormFileMock(metaFileName, "text/csv").Object;
+            var dataFormFile = CreateFormFileMock(dataFileName).Object;
+            var metaFormFile = CreateFormFileMock(metaFileName).Object;
             var blobStorageService = new Mock<IBlobStorageService>(Strict);
             var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
             var dataImportService = new Mock<IDataImportService>(Strict);

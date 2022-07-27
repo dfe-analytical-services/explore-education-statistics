@@ -221,7 +221,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 subjectId: subjectId,
                                 filename: dataFormFile.FileName.ToLower(),
                                 contentLength: dataFormFile.Length,
-                                contentType: dataFormFile.ContentType,
                                 type: FileType.Data,
                                 createdById: _userService.GetUserId(),
                                 name: validSubjectName,
@@ -232,7 +231,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 subjectId: subjectId,
                                 filename: metaFormFile.FileName.ToLower(),
                                 contentLength: metaFormFile.Length,
-                                contentType: metaFormFile.ContentType,
                                 type: Metadata,
                                 createdById: _userService.GetUserId());
 
@@ -302,7 +300,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         subjectId: subjectId,
                                                         filename: archiveFile.DataFileName,
                                                         contentLength: archiveFile.DataFileSize,
-                                                        contentType: "text/csv",
                                                         type: FileType.Data,
                                                         createdById: _userService.GetUserId(),
                                                         name: validSubjectName,
@@ -314,7 +311,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         subjectId: subjectId,
                                                         filename: archiveFile.MetaFileName,
                                                         contentLength: archiveFile.MetaFileSize,
-                                                        contentType: "text/csv",
                                                         type: Metadata,
                                                         createdById: _userService.GetUserId(),
                                                         source: zipFile);

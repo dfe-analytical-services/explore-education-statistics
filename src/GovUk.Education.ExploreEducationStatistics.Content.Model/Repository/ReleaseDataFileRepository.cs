@@ -31,7 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             Guid subjectId,
             string filename,
             long contentLength,
-            string? contentType,
             FileType type,
             Guid createdById,
             string? name = null,
@@ -59,7 +58,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                     SubjectId = subjectId,
                     Filename = filename,
                     ContentLength = contentLength,
-                    ContentType = contentType,
+                    ContentType = "text/csv",
                     Type = type,
                     Replacing = replacingFile,
                     Source = source
