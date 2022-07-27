@@ -1,6 +1,7 @@
 import PublicationDetailsPage from '@admin/pages/publication/PublicationDetailsPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import _publicationService, {
+  BasicPublicationDetails,
   MyPublication,
   PublicationContactDetails,
 } from '@admin/services/publicationService';
@@ -111,7 +112,11 @@ describe('PublicationDetailsPage', () => {
   ];
 
   beforeEach(() => {
+    themeService.getTheme.mockResolvedValue(testThemes[0]);
     themeService.getThemes.mockResolvedValue(testThemes);
+    publicationService.getPublication.mockResolvedValue(
+      testPublicationSummaries[1] as BasicPublicationDetails,
+    );
     publicationService.getPublicationSummaries.mockResolvedValue(
       testPublicationSummaries,
     );
@@ -159,6 +164,10 @@ describe('PublicationDetailsPage', () => {
     userEvent.click(
       screen.getByRole('button', { name: 'Edit publication details' }),
     );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+    });
 
     expect(screen.getByLabelText('Publication title')).toHaveValue(
       'Publication 1',
@@ -215,6 +224,10 @@ describe('PublicationDetailsPage', () => {
       screen.getByRole('button', { name: 'Edit publication details' }),
     );
 
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+    });
+
     const topics = within(screen.getByLabelText('Select topic')).getAllByRole(
       'option',
     );
@@ -247,6 +260,10 @@ describe('PublicationDetailsPage', () => {
     userEvent.click(
       screen.getByRole('button', { name: 'Edit publication details' }),
     );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+    });
 
     expect(screen.getByLabelText('Publication title')).toHaveValue(
       'Publication 1',
@@ -285,6 +302,10 @@ describe('PublicationDetailsPage', () => {
       screen.getByRole('button', { name: 'Edit publication details' }),
     );
 
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+    });
+
     userEvent.clear(screen.getByLabelText('Publication title'));
     userEvent.tab();
 
@@ -307,6 +328,10 @@ describe('PublicationDetailsPage', () => {
     userEvent.click(
       screen.getByRole('button', { name: 'Edit publication details' }),
     );
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+    });
 
     expect(publicationService.updatePublication).not.toHaveBeenCalled();
 
@@ -332,6 +357,10 @@ describe('PublicationDetailsPage', () => {
       screen.getByRole('button', { name: 'Edit publication details' }),
     );
 
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+    });
+
     userEvent.type(screen.getByLabelText('Publication title'), ' updated');
 
     userEvent.selectOptions(screen.getByLabelText('Select theme'), ['theme-2']);
@@ -354,12 +383,7 @@ describe('PublicationDetailsPage', () => {
       expect(publicationService.updatePublication).toHaveBeenCalledWith(
         testPublication.id,
         {
-          contact: {
-            contactName: 'John Smith',
-            contactTelNo: '0777777777',
-            teamEmail: 'john.smith@test.com',
-            teamName: 'Team Smith',
-          },
+          contact: testContact,
           supersededById: 'publication-2',
           title: 'Publication 1 updated',
           topicId: 'theme-2-topic-2',

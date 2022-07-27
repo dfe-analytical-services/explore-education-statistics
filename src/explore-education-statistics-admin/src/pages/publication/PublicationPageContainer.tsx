@@ -76,7 +76,7 @@ const PublicationPageContainer = ({
                 publicationId,
               }),
             }))}
-            label="Release"
+            label="Publication"
           />
 
           <PublicationContextProvider

@@ -62,12 +62,7 @@ const MethodologySummary = ({
   const handleRemoveExternalMethodology = async () => {
     const updatedPublication = {
       title,
-      contact: {
-        contactName: contact?.contactName ?? '',
-        contactTelNo: contact?.contactTelNo ?? '',
-        teamEmail: contact?.teamEmail ?? '',
-        teamName: contact?.teamName ?? '',
-      },
+      contact,
       topicId,
     };
 

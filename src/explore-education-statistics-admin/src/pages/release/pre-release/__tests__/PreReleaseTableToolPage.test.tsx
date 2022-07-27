@@ -8,6 +8,7 @@ import _dataBlockService, {
 } from '@admin/services/dataBlockService';
 import _publicationService, {
   BasicPublicationDetails,
+  PublicationContactDetails,
 } from '@admin/services/publicationService';
 import _tableBuilderService, {
   SubjectMeta,
@@ -183,7 +184,16 @@ describe('PreReleaseTableToolPage', () => {
     ],
   };
 
+  const testContact: PublicationContactDetails = {
+    id: 'contact-1',
+    contactName: 'John Smith',
+    contactTelNo: '0777777777',
+    teamEmail: 'john.smith@test.com',
+    teamName: 'Team Smith',
+  };
+
   const testPublication: BasicPublicationDetails = {
+    contact: testContact,
     id: 'publication-1',
     title: 'Pupil absence',
     slug: 'pupil-absence',

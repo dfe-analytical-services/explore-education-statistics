@@ -26,37 +26,27 @@ const PublicationDetailsPage = () => {
   const [readOnly, toggleReadOnly] = useToggle(true);
 
   const { value, isLoading } = useAsyncHandledRetry(async () => {
-    const themes = await themeService.getThemes();
-    if (!supersededById && !permissions.canUpdatePublicationSupersededBy) {
-      return { themes };
+    const theme = await themeService.getTheme(themeId);
+    if (!supersededById) {
+      return { theme };
     }
 
-    const allPublications = await publicationService.getPublicationSummaries();
-    const publications = allPublications.filter(pub => pub.id !== id);
+    const supersedingPublication = await publicationService.getPublication(id);
 
     return {
-      themes,
-      publications,
+      theme,
+      supersedingPublication,
     };
   });
 
-  const { themes, publications } = value ?? {};
+  const { theme, supersedingPublication } = value ?? {};
 
-  const currentTheme = themes?.find(theme => theme.id === themeId);
-  const currentTopic = currentTheme?.topics.find(topic => topic.id === topicId);
-  const currentSupersededByPublication = publications?.find(
-    pub => pub.id === supersededById,
-  );
+  const topic = theme?.topics.find(themeTopic => themeTopic.id === topicId);
 
   const handleSubmit = async (values: FormValues) => {
     await publicationService.updatePublication(publication.id, {
       ...values,
-      contact: {
-        teamName: contact?.teamName ?? '',
-        teamEmail: contact?.teamEmail ?? '',
-        contactName: contact?.contactName ?? '',
-        contactTelNo: contact?.contactTelNo ?? '',
-      },
+      contact,
     });
     onReload();
   };
@@ -68,21 +58,19 @@ const PublicationDetailsPage = () => {
           <h2>Publication details</h2>
           <SummaryList>
             <SummaryListItem term="Publication title">{title}</SummaryListItem>
-            <SummaryListItem term="Theme">
-              {currentTheme?.title}
-            </SummaryListItem>
-            <SummaryListItem term="Topic">
-              {currentTopic?.title}
-            </SummaryListItem>
+            <SummaryListItem term="Theme">{theme?.title}</SummaryListItem>
+            <SummaryListItem term="Topic">{topic?.title}</SummaryListItem>
             <SummaryListItem term="Superseding publication">
               {supersededById
-                ? currentSupersededByPublication?.title
+                ? supersedingPublication?.title
                 : 'This publication is not archived'}
             </SummaryListItem>
           </SummaryList>
-          <Button variant="secondary" onClick={toggleReadOnly.off}>
-            Edit publication details
-          </Button>
+          {permissions.canUpdatePublication && (
+            <Button variant="secondary" onClick={toggleReadOnly.off}>
+              Edit publication details
+            </Button>
+          )}
         </>
       ) : (
         <PublicationDetailsForm
@@ -95,8 +83,7 @@ const PublicationDetailsPage = () => {
             title,
             topicId,
           }}
-          publications={publications}
-          themes={themes}
+          publicationId={id}
           onCancel={toggleReadOnly.on}
           onSubmit={handleSubmit}
         />

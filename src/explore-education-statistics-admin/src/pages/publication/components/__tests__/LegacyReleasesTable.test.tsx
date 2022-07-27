@@ -1,6 +1,9 @@
 import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
 import _legacyReleaseService from '@admin/services/legacyReleaseService';
-import { MyPublication } from '@admin/services/publicationService';
+import {
+  MyPublication,
+  PublicationContactDetails,
+} from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { Router } from 'react-router';
 import userEvent from '@testing-library/user-event';
@@ -13,7 +16,16 @@ const legacyReleaseService = _legacyReleaseService as jest.Mocked<
 >;
 
 describe('LegacyReleasesTable', () => {
+  const testContact: PublicationContactDetails = {
+    id: 'contact-1',
+    contactName: 'John Smith',
+    contactTelNo: '0777777777',
+    teamEmail: 'john.smith@test.com',
+    teamName: 'Team Smith',
+  };
+
   const testPublication: MyPublication = {
+    contact: testContact,
     id: 'publication-id-1',
     title: 'Publication 1',
     releases: [],

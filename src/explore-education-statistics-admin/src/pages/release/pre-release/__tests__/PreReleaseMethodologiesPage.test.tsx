@@ -3,6 +3,7 @@ import { preReleaseMethodologiesRoute } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import _publicationService, {
   MyPublication,
+  PublicationContactDetails,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -15,7 +16,16 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PreReleaseMethodologiesPage', () => {
+  const testContact: PublicationContactDetails = {
+    id: 'contact-1',
+    contactName: 'John Smith',
+    contactTelNo: '0777777777',
+    teamEmail: 'john.smith@test.com',
+    teamName: 'Team Smith',
+  };
+
   const testPublicationNoMethodologies: MyPublication = {
+    contact: testContact,
     id: 'pub-1-id',
     title: 'Publication 1',
     releases: [],
