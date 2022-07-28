@@ -25,7 +25,6 @@ const navRoutes = [
   publicationMethodologiesRoute,
   publicationDetailsRoute,
   publicationContactRoute,
-  publicationDetailsRoute,
 ];
 
 const routes = [

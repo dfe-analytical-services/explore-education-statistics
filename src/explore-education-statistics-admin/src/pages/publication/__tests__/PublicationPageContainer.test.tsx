@@ -65,7 +65,7 @@ describe('PublicationPageContainer', () => {
         name: 'Publication',
       }),
     ).getAllByRole('link');
-    expect(navLinks).toHaveLength(3);
+    expect(navLinks).toHaveLength(4);
     expect(navLinks[0]).toHaveTextContent('Releases');
     expect(navLinks[0].getAttribute('aria-current')).toBe('page');
     expect(navLinks[1]).toHaveTextContent('Methodologies');
