@@ -63,9 +63,11 @@ const PublicationContactPage = () => {
               {contact?.contactTelNo}
             </SummaryListItem>
           </SummaryList>
-          <Button variant="secondary" onClick={toggleReadOnly.off}>
-            Edit contact details
-          </Button>
+          {publication.permissions.canUpdatePublication && (
+            <Button variant="secondary" onClick={toggleReadOnly.off}>
+              Edit contact details
+            </Button>
+          )}
         </>
       ) : (
         <PublicationContactForm

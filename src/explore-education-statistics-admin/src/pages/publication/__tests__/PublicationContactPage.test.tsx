@@ -64,6 +64,20 @@ describe('PublicationContactPage', () => {
     ).toBeInTheDocument();
   });
 
+  test('does not show the edit button if do not have permission', () => {
+    renderPage({
+      ...testPublication,
+      permissions: {
+        ...testPublication.permissions,
+        canUpdatePublication: false,
+      },
+    });
+
+    expect(
+      screen.queryByRole('button', { name: 'Edit contact details' }),
+    ).not.toBeInTheDocument();
+  });
+
   test('clicking the edit button shows the edit form', () => {
     renderPage(testPublication);
 
