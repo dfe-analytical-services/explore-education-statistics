@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                           && rf.File.SubjectId.HasValue
                 )
                 .OrderBy(rf => rf.Order)
-                .ThenBy(rf => rf.Name)
+                .ThenBy(rf => rf.Name) // For subjects existing before ordering was added
                 .Select(rf => rf.File);
         }
     }

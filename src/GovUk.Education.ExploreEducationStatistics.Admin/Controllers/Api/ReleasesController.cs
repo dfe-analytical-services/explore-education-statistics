@@ -98,10 +98,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
         public async Task<ActionResult<List<DataFileInfo>>> ReorderDataFiles(Guid releaseId,
-            Dictionary<Guid,int> newOrder)
+            List<Guid> fileIds)
         {
             return await _releaseDataFileService
-                .ReorderDataFiles(releaseId, newOrder)
+                .ReorderDataFiles(releaseId, fileIds)
                 .HandleFailuresOrOk();
         }
 

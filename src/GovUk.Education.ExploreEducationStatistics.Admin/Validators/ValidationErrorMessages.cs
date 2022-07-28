@@ -51,6 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         FileTypeInvalid,
 
         // Data file
+        SubjectTitleCannotBeEmptyString,
         SubjectTitleCannotContainSpecialCharacters,
         SubjectTitleMustBeUnique,
         CannotOverwriteDataFile,

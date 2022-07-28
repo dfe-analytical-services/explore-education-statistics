@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                         }
                     ))
                 .OrderBy(svm => svm.Order)
-                .ThenBy(svm => svm.Name)
+                .ThenBy(svm => svm.Name) // For subjects existing before ordering was added
                 .ToList();
         }
 

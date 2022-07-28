@@ -146,7 +146,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     userService =>
                     {
                         var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.ReorderDataFiles(_release.Id, new Dictionary<Guid, int>());
+                        return service.ReorderDataFiles(_release.Id, new List<Guid>());
                     }
                 );
         }

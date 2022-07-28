@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 
                     return result
                         .OrderBy(viewModel => viewModel.Order)
-                        .ThenBy(viewModel => viewModel.Name)
+                        .ThenBy(viewModel => viewModel.Name) // For subjects existing before ordering was added
                         .ToList();
                 })
                 // Currently we expect a failure checking the Release exists and succeed with an empty list.

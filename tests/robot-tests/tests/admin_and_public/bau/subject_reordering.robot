@@ -28,23 +28,23 @@ Navigate to release
 Upload subjects to release
     user uploads subject
     ...    Four
-    ...    four.csv
-    ...    four.meta.csv
+    ...    ordering-test-4.csv
+    ...    ordering-test-4.meta.csv
 
     user uploads subject
     ...    Three
-    ...    three.csv
-    ...    three.meta.csv
+    ...    ordering-test-3.csv
+    ...    ordering-test-3.meta.csv
 
     user uploads subject
     ...    One
-    ...    one.csv
-    ...    one.meta.csv
+    ...    ordering-test-1.csv
+    ...    ordering-test-1.meta.csv
 
     user uploads subject
     ...    Two
-    ...    two.csv
-    ...    two.meta.csv
+    ...    ordering-test-2.csv
+    ...    ordering-test-2.meta.csv
 
 Validate order of subjects after upload
     user checks there are x accordion sections    4    id:uploadedDataFiles
@@ -103,16 +103,16 @@ Start replacing last subject in order
     user opens accordion section    Three
     ${THREE_CONTENT}    user gets accordion section content element    Three    id:uploadedDataFiles
     user clicks link    Replace data    ${THREE_CONTENT}
-    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}three_replacement.csv
+    user chooses file    id:dataFileUploadForm-dataFile    ${FILES_DIR}ordering-test-3-replacement.csv
     user chooses file    id:dataFileUploadForm-metadataFile
-    ...    ${FILES_DIR}three_replacement.meta.csv
+    ...    ${FILES_DIR}ordering-test-3-replacement.meta.csv
     user clicks button    Upload data files
 
     user waits until page contains element    testid:Replacement Subject title
     user checks headed table body row cell contains    Subject title    1    Three
-    user checks headed table body row cell contains    Data file    1    three.csv
+    user checks headed table body row cell contains    Data file    1    ordering-test-3.csv
     user checks headed table body row cell contains    Subject title    2    Three
-    user checks headed table body row cell contains    Data file    2    three_replacement.csv
+    user checks headed table body row cell contains    Data file    2    ordering-test-3-replacement.csv
     user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
 
 Reorder subject that is being replaced
@@ -192,14 +192,10 @@ Check subject order in data tables
     user waits until table tool wizard step is available    2    Choose a subject
     user checks previous table tool step contains    1    Publication    ${PUBLICATION_NAME}
 
-    user checks page contains element
-    ...    xpath://*[contains(@class, "govuk-radios__item")][1]//label[contains(text(), "One")]
-    user checks page contains element
-    ...    xpath://*[contains(@class, "govuk-radios__item")][2]//label[contains(text(), "Two")]
-    user checks page contains element
-    ...    xpath://*[contains(@class, "govuk-radios__item")][3]//label[contains(text(), "Three")]
-    user checks page contains element
-    ...    xpath://*[contains(@class, "govuk-radios__item")][4]//label[contains(text(), "Four")]
+    user checks radio in position has label    1    One
+    user checks radio in position has label    2    Two
+    user checks radio in position has label    3    Three
+    user checks radio in position has label    4    Four
 
 Check subject order in data catalogue
     user navigates to data catalogue page on public frontend
@@ -216,14 +212,10 @@ Check subject order in data catalogue
 
     user waits until page contains    Choose files to download
 
-    user checks page contains element
-    ...    xpath://*[contains(@class, "govuk-checkboxes__item")][1]//label[contains(text(), "One")]
-    user checks page contains element
-    ...    xpath://*[contains(@class, "govuk-checkboxes__item")][2]//label[contains(text(), "Two")]
-    user checks page contains element
-    ...    xpath://*[contains(@class, "govuk-checkboxes__item")][3]//label[contains(text(), "Three")]
-    user checks page contains element
-    ...    xpath://*[contains(@class, "govuk-checkboxes__item")][4]//label[contains(text(), "Four")]
+    user checks checkbox in position has label    1    One
+    user checks checkbox in position has label    2    Two
+    user checks checkbox in position has label    3    Three
+    user checks checkbox in position has label    4    Four
 
 Check subject order in data guidance
     user navigates to find statistics page on public frontend

@@ -158,9 +158,14 @@ const releaseDataFileService = {
   },
   updateDataFilesOrder(
     releaseId: string,
-    order: Dictionary<number>,
+    order: string[],
   ): Promise<DataFile[]> {
-    return client.put<DataFile[]>(`/release/${releaseId}/data/order`, order);
+    return client
+      .put<DataFileInfo[]>(`/release/${releaseId}/data/order`, order)
+      .then(response => {
+        const dataFiles = response.filter(file => file.metaFileName.length > 0);
+        return dataFiles.map(mapFile);
+      });
   },
   getDataFileImportStatus(
     releaseId: string,

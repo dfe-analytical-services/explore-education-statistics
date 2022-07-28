@@ -59,6 +59,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
           </button>
           <div
             class="govuk-checkboxes__item"
+            data-testid="checkbox-item"
           >
             <input
               class="govuk-checkboxes__input"
@@ -76,6 +77,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
           </div>
           <div
             class="govuk-checkboxes__item"
+            data-testid="checkbox-item"
           >
             <input
               class="govuk-checkboxes__input"
@@ -118,6 +120,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
           </button>
           <div
             class="govuk-checkboxes__item"
+            data-testid="checkbox-item"
           >
             <input
               class="govuk-checkboxes__input"
@@ -135,6 +138,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
           </div>
           <div
             class="govuk-checkboxes__item"
+            data-testid="checkbox-item"
           >
             <input
               class="govuk-checkboxes__input"
@@ -197,6 +201,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
       </button>
       <div
         class="govuk-checkboxes__item"
+        data-testid="checkbox-item"
       >
         <input
           class="govuk-checkboxes__input"
@@ -214,6 +219,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
       </div>
       <div
         class="govuk-checkboxes__item"
+        data-testid="checkbox-item"
       >
         <input
           class="govuk-checkboxes__input"
@@ -254,6 +260,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with single c
     >
       <div
         class="govuk-checkboxes__item"
+        data-testid="checkbox-item"
       >
         <input
           class="govuk-checkboxes__input"

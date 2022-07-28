@@ -42,7 +42,9 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
             >
               Select all 2 subgroup options
             </button>
-            <div class="govuk-checkboxes__item">
+            <div class="govuk-checkboxes__item"
+                 data-testid="checkbox-item"
+            >
               <input class="govuk-checkboxes__input"
                      id="test-checkboxes-options-1-1"
                      name="testCheckboxes"
@@ -55,7 +57,9 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
                 Checkbox 1
               </label>
             </div>
-            <div class="govuk-checkboxes__item">
+            <div class="govuk-checkboxes__item"
+                 data-testid="checkbox-item"
+            >
               <input class="govuk-checkboxes__input"
                      id="test-checkboxes-options-1-2"
                      name="testCheckboxes"
@@ -85,7 +89,9 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
             >
               Select all 2 subgroup options
             </button>
-            <div class="govuk-checkboxes__item">
+            <div class="govuk-checkboxes__item"
+                 data-testid="checkbox-item"
+            >
               <input class="govuk-checkboxes__input"
                      id="test-checkboxes-options-2-3"
                      name="testCheckboxes"
@@ -98,7 +104,9 @@ exports[`FormCheckboxSearchSubGroups renders groups of checkboxes in correct ord
                 Checkbox 3
               </label>
             </div>
-            <div class="govuk-checkboxes__item">
+            <div class="govuk-checkboxes__item"
+                 data-testid="checkbox-item"
+            >
               <input class="govuk-checkboxes__input"
                      id="test-checkboxes-options-2-4"
                      name="testCheckboxes"
@@ -148,7 +156,9 @@ exports[`FormCheckboxSearchSubGroups renders single group of checkboxes correctl
         >
           Select all 2 options
         </button>
-        <div class="govuk-checkboxes__item">
+        <div class="govuk-checkboxes__item"
+             data-testid="checkbox-item"
+        >
           <input class="govuk-checkboxes__input"
                  id="test-checkboxes-1-1"
                  name="testCheckboxes"
@@ -161,7 +171,9 @@ exports[`FormCheckboxSearchSubGroups renders single group of checkboxes correctl
             Checkbox 1
           </label>
         </div>
-        <div class="govuk-checkboxes__item">
+        <div class="govuk-checkboxes__item"
+             data-testid="checkbox-item"
+        >
           <input class="govuk-checkboxes__input"
                  id="test-checkboxes-1-2"
                  name="testCheckboxes"

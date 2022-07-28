@@ -20,6 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(Guid releaseId, IDataArchiveFile archiveFile);
 
-        Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseId, string? name);
+        Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseId, string name);
     }
 }

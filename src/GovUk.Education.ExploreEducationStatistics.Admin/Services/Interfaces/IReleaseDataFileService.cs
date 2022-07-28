@@ -23,7 +23,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, List<DataFileInfo>>> ReorderDataFiles(
             Guid releaseId,
-            Dictionary<Guid, int> newOrder);
+            List<Guid> fileIds);
 
         Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseId,
             IFormFile dataFormFile,
