@@ -62,15 +62,12 @@ const PublicationMethodologiesPage = () => {
   ] = useToggle(false);
 
   const handleRemoveExternalMethodology = async () => {
+    if (!publication) {
+      return;
+    }
     const updatedPublication: UpdatePublicationRequest = {
-      title,
-      contact: {
-        contactName: contact?.contactName ?? '',
-        contactTelNo: contact?.contactTelNo ?? '',
-        teamEmail: contact?.teamEmail ?? '',
-        teamName: contact?.teamName ?? '',
-      },
-      topicId,
+      ...publication,
+      externalMethodology: undefined,
     };
 
     await publicationService.updatePublication(
@@ -85,14 +82,7 @@ const PublicationMethodologiesPage = () => {
     return <LoadingSpinner />;
   }
 
-  const {
-    contact,
-    externalMethodology,
-    methodologies,
-    permissions,
-    title,
-    topicId,
-  } = publication;
+  const { externalMethodology, methodologies, permissions } = publication;
 
   return (
     <>

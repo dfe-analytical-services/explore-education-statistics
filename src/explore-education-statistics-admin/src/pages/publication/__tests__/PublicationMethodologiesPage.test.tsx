@@ -107,7 +107,7 @@ describe('PublicationMethodologiesPage', () => {
 
   const testExternalMethodology: ExternalMethodology = {
     title: 'External methodolology title',
-    url: 'http:///test.com',
+    url: 'http://test.com',
   };
 
   const testContact: PublicationContactDetails = {
@@ -1207,7 +1207,7 @@ describe('PublicationMethodologiesPage', () => {
         within(row3Cells[4]).getByRole('link', {
           name: 'View External methodolology title',
         }),
-      ).toHaveAttribute('href', 'http:///test.com');
+      ).toHaveAttribute('href', 'http://test.com');
     });
 
     test('renders the table when there is only an external methodology', async () => {
@@ -1233,7 +1233,7 @@ describe('PublicationMethodologiesPage', () => {
         within(row1Cells[4]).getByRole('link', {
           name: 'View External methodolology title',
         }),
-      ).toHaveAttribute('href', 'http:///test.com');
+      ).toHaveAttribute('href', 'http://test.com');
     });
 
     test('shows the edit and delete buttons if have permission to manage external methodologies', async () => {
@@ -1345,14 +1345,8 @@ describe('PublicationMethodologiesPage', () => {
         userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
         const updatedPublication: UpdatePublicationRequest = {
-          title: testPublication.title,
-          contact: {
-            contactName: testContact.contactName,
-            contactTelNo: testContact.contactTelNo,
-            teamEmail: testContact.teamEmail,
-            teamName: testContact.teamName,
-          },
-          topicId: testPublication.topicId,
+          ...testPublication,
+          externalMethodology: undefined,
         };
 
         await waitFor(() => {
