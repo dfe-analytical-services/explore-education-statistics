@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,10 +12,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Model;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Data.Processor.Model.ImporterQueues;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
@@ -41,9 +40,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _userService = userService;
         }
 
-        public async Task<DataImportStatus> GetStatus(Guid fileId)
+        public async Task<DataImport?> GetImport(Guid fileId)
         {
-            return await _dataImportRepository.GetStatusByFileId(fileId);
+            return await _dataImportRepository.GetByFileId(fileId);
         }
 
         public async Task<Either<ActionResult, Unit>> CancelImport(Guid releaseId, Guid fileId)
@@ -53,7 +52,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccessVoid(async file =>
                 {
                     var import = await _dataImportRepository.GetByFileId(file.Id);
-                    await _queueService.AddMessageAsync(ImportsCancellingQueue, new CancelImportMessage(import.Id));
+                    if (import != null)
+                    {
+                        await _queueService.AddMessageAsync(ImportsCancellingQueue, new CancelImportMessage(import.Id));
+                    }
                 });
         }
 
@@ -74,16 +76,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .AnyAsync(import => import.Status != DataImportStatus.COMPLETE);
         }
 
-        public async Task<DataImportViewModel> GetImport(Guid fileId)
+        public async Task<DataImportStatusViewModel> GetImportStatus(Guid fileId)
         {
             var import = await _dataImportRepository.GetByFileId(fileId);
 
             if (import == null)
             {
-                return DataImportViewModel.NotFound();
+                return DataImportStatusViewModel.NotFound();
             }
 
-            return new DataImportViewModel
+            await _contentDbContext.Entry(import)
+                .Collection(i => i.Errors)
+                .LoadAsync();
+
+            return new DataImportStatusViewModel
             {
                 Errors = import.Errors.Select(error => error.Message).ToList(),
                 PercentageComplete = import.PercentageComplete(),
@@ -93,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        public async Task Import(Guid subjectId, File dataFile, File metaFile, IFormFile formFile)
+        public async Task<DataImport> Import(Guid subjectId, File dataFile, File metaFile)
         {
             var import = await _dataImportRepository.Add(new DataImport
             {
@@ -101,14 +107,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 FileId = dataFile.Id,
                 MetaFileId = metaFile.Id,
                 SubjectId = subjectId,
-                TotalRows = CalculateNumberOfRows(formFile.OpenReadStream()),
                 Status = DataImportStatus.QUEUED
             });
 
             await _queueService.AddMessageAsync(ImportsPendingQueue, new ImportMessage(import.Id));
+            return import;
         }
 
-        public async Task ImportZip(Guid subjectId, File dataFile, File metaFile, File zipFile)
+        public async Task<DataImport> ImportZip(Guid subjectId, File dataFile, File metaFile, File zipFile)
         {
             var import = await _dataImportRepository.Add(new DataImport
             {
@@ -121,6 +127,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             });
 
             await _queueService.AddMessageAsync(ImportsPendingQueue, new ImportMessage(import.Id));
+            return import;
         }
     }
 }

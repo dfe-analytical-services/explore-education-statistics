@@ -8,6 +8,7 @@ import _dataBlockService, {
 } from '@admin/services/dataBlockService';
 import _publicationService, {
   BasicPublicationDetails,
+  PublicationContactDetails,
 } from '@admin/services/publicationService';
 import _tableBuilderService, {
   SubjectMeta,
@@ -183,7 +184,16 @@ describe('PreReleaseTableToolPage', () => {
     ],
   };
 
+  const testContact: PublicationContactDetails = {
+    id: 'contact-1',
+    contactName: 'John Smith',
+    contactTelNo: '0777777777',
+    teamEmail: 'john.smith@test.com',
+    teamName: 'Team Smith',
+  };
+
   const testPublication: BasicPublicationDetails = {
+    contact: testContact,
     id: 'publication-1',
     title: 'Pupil absence',
     slug: 'pupil-absence',
@@ -274,29 +284,26 @@ describe('PreReleaseTableToolPage', () => {
         'aria-current',
         'step',
       );
-
-      const step1 = within(screen.getByTestId('wizardStep-1'));
-      const tabs = step1.getAllByRole('tabpanel', { hidden: true });
-
-      expect(tabs).toHaveLength(2);
-
-      expect(
-        within(tabs[0]).getByRole('heading', { name: 'Choose a table' }),
-      ).toBeInTheDocument();
-      expect(
-        within(tabs[0]).getByRole('link', { name: 'Test highlight' }),
-      ).toHaveAttribute(
-        'href',
-        '/publication/publication-1/release/release-1/prerelease/table-tool/block-1',
-      );
-
-      expect(
-        within(tabs[1]).getByLabelText('Test subject'),
-      ).toBeInTheDocument();
-
-      expect(screen.queryByTestId('dataTableCaption')).not.toBeInTheDocument();
-      expect(screen.queryByRole('table')).not.toBeInTheDocument();
     });
+    const step1 = within(screen.getByTestId('wizardStep-1'));
+    const tabs = step1.getAllByRole('tabpanel', { hidden: true });
+
+    expect(tabs).toHaveLength(2);
+
+    expect(
+      within(tabs[0]).getByRole('heading', { name: 'Choose a table' }),
+    ).toBeInTheDocument();
+    expect(
+      within(tabs[0]).getByRole('link', { name: 'Test highlight' }),
+    ).toHaveAttribute(
+      'href',
+      '/publication/publication-1/release/release-1/prerelease/table-tool/block-1',
+    );
+
+    expect(within(tabs[1]).getByLabelText('Test subject')).toBeInTheDocument();
+
+    expect(screen.queryByTestId('dataTableCaption')).not.toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   test('renders correctly on step 1 without featured tables', async () => {
@@ -311,17 +318,17 @@ describe('PreReleaseTableToolPage', () => {
         'aria-current',
         'step',
       );
-
-      const step1 = within(screen.getByTestId('wizardStep-1'));
-
-      expect(step1.getByLabelText('Test subject')).toBeInTheDocument();
-      expect(
-        step1.queryByRole('heading', { name: 'Choose a table' }),
-      ).not.toBeInTheDocument();
-
-      expect(screen.queryByTestId('dataTableCaption')).not.toBeInTheDocument();
-      expect(screen.queryByRole('table')).not.toBeInTheDocument();
     });
+
+    const step1 = within(screen.getByTestId('wizardStep-1'));
+
+    expect(step1.getByLabelText('Test subject')).toBeInTheDocument();
+    expect(
+      step1.queryByRole('heading', { name: 'Choose a table' }),
+    ).not.toBeInTheDocument();
+
+    expect(screen.queryByTestId('dataTableCaption')).not.toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   test('renders correctly on step 5 with `dataBlockId` route param', async () => {
@@ -352,31 +359,31 @@ describe('PreReleaseTableToolPage', () => {
         'aria-current',
         'step',
       );
-
-      expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
-        /Number of authorised absence sessions for 'Absence by characteristic'/,
-      );
-
-      expect(screen.getByRole('table')).toBeInTheDocument();
-      expect(screen.getAllByRole('row')).toHaveLength(3);
-      expect(screen.getAllByRole('cell')).toHaveLength(5);
-
-      expect(
-        screen.queryByRole('radio', {
-          name: 'Table in ODS format (spreadsheet, with title and footnotes)',
-        }),
-      ).toBeInTheDocument();
-      expect(
-        screen.queryByRole('radio', {
-          name: 'Table in CSV format (flat file, with location codes)',
-        }),
-      ).toBeInTheDocument();
-      expect(
-        screen.queryByRole('button', {
-          name: 'Download table',
-        }),
-      ).toBeInTheDocument();
     });
+
+    expect(screen.getByTestId('dataTableCaption')).toHaveTextContent(
+      /Number of authorised absence sessions for 'Absence by characteristic'/,
+    );
+
+    expect(screen.getByRole('table')).toBeInTheDocument();
+    expect(screen.getAllByRole('row')).toHaveLength(3);
+    expect(screen.getAllByRole('cell')).toHaveLength(5);
+
+    expect(
+      screen.queryByRole('radio', {
+        name: 'Table in ODS format (spreadsheet, with title and footnotes)',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('radio', {
+        name: 'Table in CSV format (flat file, with location codes)',
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', {
+        name: 'Download table',
+      }),
+    ).toBeInTheDocument();
   });
 
   const renderPage = (

@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -54,9 +55,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             await _validatorService.Validate(importId, executionContext)
                 .OnSuccessDo(async result =>
                 {
-                    await _dataImportService.Update(importId, 
+                    await _dataImportService.Update(importId,
                         rowsPerBatch: result.RowsPerBatch,
                         importedRows: result.ImportableRowCount,
+                        totalRows: result.TotalRowCount,
                         numBatches: result.NumBatches,
                         geographicLevels: result.GeographicLevels);
                 })

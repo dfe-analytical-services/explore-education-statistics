@@ -8,7 +8,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -21,7 +20,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using FileInfo = GovUk.Education.ExploreEducationStatistics.Common.Model.FileInfo;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -101,15 +99,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .CheckEntityExists<MethodologyFile>(q => q
                     .Include(mf => mf.File)
                     .Where(mf => mf.MethodologyVersionId == methodologyVersionId && mf.FileId == fileId))
-                .OnSuccess(async methodologyFile =>
+                .OnSuccessCombineWith(mf =>
+                    _blobStorageService.DownloadToStream(PrivateMethodologyFiles, mf.Path(), new MemoryStream()))
+                .OnSuccess(methodologyFileAndStream =>
                 {
-                    var path = methodologyFile.Path();
-                    var blob = await _blobStorageService.GetBlob(PrivateMethodologyFiles, path);
-
-                    var stream = new MemoryStream();
-                    await _blobStorageService.DownloadToStream(PrivateMethodologyFiles, path, stream);
-
-                    return new FileStreamResult(stream, blob.ContentType)
+                    var (methodologyFile, stream) = methodologyFileAndStream;
+                    return new FileStreamResult(stream, methodologyFile.File.ContentType)
                     {
                         FileDownloadName = methodologyFile.File.Filename
                     };
@@ -126,20 +121,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     methodologyVersionId,
                     Image,
                     formFile))
-                .OnSuccess(fileInfo => new ImageFileViewModel($"/api/methodologies/{methodologyVersionId}/images/{fileInfo.Id}")
+                .OnSuccess(methodologyFile => new ImageFileViewModel($"/api/methodologies/{methodologyVersionId}/images/{methodologyFile.File.Id}")
                 {
                     // TODO EES-1922 Add support for resizing the image
                 });
         }
 
-        private async Task<Either<ActionResult, FileInfo>> Upload(Guid methodologyVersionId,
+        private async Task<Either<ActionResult, MethodologyFile>> Upload(Guid methodologyVersionId,
             FileType type,
-            IFormFile formFile,
-            IDictionary<string, string>? metadata = null)
+            IFormFile formFile)
         {
             var methodologyFile = await _methodologyFileRepository.Create(
                 methodologyVersionId: methodologyVersionId,
                 filename: formFile.FileName,
+                contentLength: formFile.Length,
+                contentType: formFile.ContentType,
                 type: type,
                 createdById: _userService.GetUserId());
 
@@ -148,14 +144,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             await _blobStorageService.UploadFile(
                 containerName: PrivateMethodologyFiles,
                 path: methodologyFile.Path(),
-                file: formFile,
-                metadata: metadata);
+                file: formFile);
 
-            var blob = await _blobStorageService.GetBlob(
-                PrivateMethodologyFiles,
-                methodologyFile.Path());
-
-            return methodologyFile.ToFileInfo(blob);
+            return methodologyFile;
         }
     }
 }

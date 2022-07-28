@@ -48,7 +48,7 @@ Upload a ZIP file subject
     user checks headed table body row contains    Data file    absence_in_prus.csv    ${section}
     user checks headed table body row contains    Metadata file    absence_in_prus.meta.csv    ${section}
     user checks headed table body row contains    Data file size    141 Kb    ${section}
-    user checks headed table body row contains    Number of rows    613    ${section}
+    user checks headed table body row contains    Number of rows    612    ${section}
     user checks headed table body row contains    Status    Complete    ${section}    %{WAIT_LONG}
 
 Change subject title

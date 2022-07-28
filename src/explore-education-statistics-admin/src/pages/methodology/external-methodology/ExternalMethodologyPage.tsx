@@ -30,12 +30,7 @@ const ExternalMethodologyPage = ({
     }
     const updatedPublication: UpdatePublicationRequest = {
       title: publication.title,
-      contact: {
-        contactName: publication.contact?.contactName ?? '',
-        contactTelNo: publication.contact?.contactTelNo ?? '',
-        teamEmail: publication.contact?.teamEmail ?? '',
-        teamName: publication.contact?.teamName ?? '',
-      },
+      contact: publication.contact,
       topicId: publication.topicId,
       externalMethodology: {
         title: values.title,

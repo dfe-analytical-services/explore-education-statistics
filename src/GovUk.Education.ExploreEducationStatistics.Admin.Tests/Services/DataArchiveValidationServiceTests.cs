@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -31,7 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
                 .Returns(() => true);
 
-            var result = service.ValidateDataArchiveFile(Guid.NewGuid(), archive).Result;
+            var result = service.ValidateDataArchiveFile(archive).Result;
 
             Assert.True(result.IsRight);
 
@@ -53,7 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Setup(s => s.HasMatchingEncodingType(archive, It.IsAny<IEnumerable<string>>()))
                 .Returns(() => true);
 
-            var result = service.ValidateDataArchiveFile(Guid.NewGuid(), archive).Result;
+            var result = service.ValidateDataArchiveFile(archive).Result;
             VerifyAllMocks(fileTypeService);
             
             result.AssertBadRequest(DataZipFileDoesNotContainCsvFiles);

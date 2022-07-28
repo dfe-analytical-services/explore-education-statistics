@@ -1,3 +1,4 @@
+#nullable enable
 using System.IO.Compression;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
@@ -5,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Processor.Services.Interfaces;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -30,18 +30,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var dataFile = file1.Name.Contains(".meta.") ? file2 : file1;
             var metadataFile = file1.Name.Contains(".meta.") ? file1 : file2;
 
-            await using (var rowStream = dataFile.Open())
             await using (var stream = dataFile.Open())
             {
                 await _blobStorageService.UploadStream(
                     containerName: PrivateReleaseFiles,
                     path: import.File.Path(),
                     stream: stream,
-                    contentType: "text/csv",
-                    metadata: GetDataFileMetaValues(
-                            metaFileName: metadataFile.Name,
-                            numberOfRows: CalculateNumberOfRows(rowStream)
-                        ));
+                    contentType: "text/csv");
             }
 
             await using (var stream = metadataFile.Open())

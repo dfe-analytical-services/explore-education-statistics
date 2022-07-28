@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -18,9 +17,7 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Utils;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
-using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Publisher.Extensions.PublisherExtensions;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
@@ -32,28 +29,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly ContentDbContext _contentDbContext;
         private readonly StatisticsDbContext _statisticsDbContext;
         private readonly PublicStatisticsDbContext _publicStatisticsDbContext;
-        private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IMethodologyService _methodologyService;
         private readonly IReleaseSubjectRepository _releaseSubjectRepository;
-        private readonly ILogger<ReleaseService> _logger;
         private readonly IMapper _mapper;
 
         public ReleaseService(ContentDbContext contentDbContext,
             StatisticsDbContext statisticsDbContext,
             PublicStatisticsDbContext publicStatisticsDbContext,
-            IBlobStorageService publicBlobStorageService,
             IMethodologyService methodologyService,
             IReleaseSubjectRepository releaseSubjectRepository,
-            ILogger<ReleaseService> logger,
             IMapper mapper)
         {
             _contentDbContext = contentDbContext;
             _statisticsDbContext = statisticsDbContext;
             _publicStatisticsDbContext = publicStatisticsDbContext;
-            _publicBlobStorageService = publicBlobStorageService;
             _methodologyService = methodologyService;
             _releaseSubjectRepository = releaseSubjectRepository;
-            _logger = logger;
             _mapper = mapper;
         }
 
@@ -307,28 +298,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         private async Task<FileInfo> GetPublicFileInfo(Release release, File file)
         {
-            var exists = await _publicBlobStorageService.CheckBlobExists(
-                containerName: PublicReleaseFiles,
-                path: file.PublicPath(release));
-
-            if (!exists)
-            {
-                _logger.LogWarning("Public blob not found for file: {0} at: {1}", file.Id,
-                    file.PublicPath(release));
-                return file.ToFileInfoNotFound();
-            }
-
-            var blob = await _publicBlobStorageService.GetBlob(
-                containerName: PublicReleaseFiles,
-                path: file.PublicPath(release));
-
             var releaseFile = await _contentDbContext.ReleaseFiles
                 .Include(rf => rf.File)
                 .FirstAsync(rf =>
                     rf.ReleaseId == release.Id
                     && rf.FileId == file.Id);
 
-            return releaseFile.ToPublicFileInfo(blob);
+            return releaseFile.ToPublicFileInfo();
         }
 
         private async Task RemoveStatisticalReleases(IEnumerable<Guid> releaseIds)

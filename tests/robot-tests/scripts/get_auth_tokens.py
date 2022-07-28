@@ -10,12 +10,6 @@ from .get_webdriver import get_webdriver
 from pathlib import Path
 
 
-def debug_auth_issues(identity_provder: str, driver) -> None:
-    if not os.path.exists('debug'):
-        os.mkdir('debug')
-    driver.save_screenshot(f'debug/auth-debug-{identity_provder}-{str(int(time.time()))}.png')
-
-
 def wait_until_page_contains_xpath(context, selector):
     timeout = 10
     max_time = time.time() + timeout
@@ -46,12 +40,10 @@ def login_with_keycloak(url, email, password, driver):
         try:
             wait_until_page_contains_xpath(driver, '//h1[text()="Dashboard"]')  # Should be Admin dashboard for user
         except BaseException:
-            debug_auth_issues(os.getenv('IDENTITY_PROVIDER'), driver)
             raise AssertionError(
                 f'Couldn\'t find \'//h1[text()="Dashboard"]\' on page. Incorrect user details used? Found page source: \n{driver.page_source}')
 
     except BaseException:
-        debug_auth_issues(os.getenv('IDENTITY_PROVIDER'), driver)
         raise AssertionError(f"Couldn't login with keycloak. Error: {traceback.format_exc()}")
 
     return get_local_storage_json(driver, url), get_identity_cookie(driver)
@@ -67,7 +59,6 @@ def login_with_azure(url, email, password, first_name, last_name, driver):
         wait_until_page_contains_xpath(driver, '//div[text()="Sign in"]')
         time.sleep(1)
     except BaseException:
-        debug_auth_issues(os.getenv('IDENTITY_PROVIDER'), driver)
         raise AssertionError('Sign in page didn\'t appear?')
 
     try:
@@ -79,7 +70,6 @@ def login_with_azure(url, email, password, first_name, last_name, driver):
         time.sleep(1)
 
     except BaseException:
-        debug_auth_issues(os.getenv('IDENTITY_PROVIDER'), driver)
         raise AssertionError('Error when entering/submitting email!')
 
     try:
@@ -90,7 +80,6 @@ def login_with_azure(url, email, password, first_name, last_name, driver):
         wait_until_page_contains_xpath(driver, '//div[text()="Stay signed in?"]')
         wait_until_page_contains_xpath(driver, '//input[@value="No"]')
     except BaseException:
-        debug_auth_issues(os.getenv('IDENTITY_PROVIDER'), driver)
         raise AssertionError('Error when entering/submitting password')
 
     time.sleep(1)

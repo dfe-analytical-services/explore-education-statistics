@@ -9,7 +9,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
@@ -64,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 File = new File
                 {
                     Filename = "data1.csv",
+                    ContentLength = 10240,
                     Type = FileType.Data,
                     SubjectId = releaseSubject1.Subject.Id
                 },
@@ -76,6 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 File = new File
                 {
                     Filename = "data2.csv",
+                    ContentLength = 20480,
                     Type = FileType.Data,
                     SubjectId = releaseSubject2.Subject.Id,
                 }
@@ -123,49 +124,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                     .Setup(s => s.GetGeographicLevels(releaseSubject2.SubjectId))
                     .ReturnsAsync(ListOf("National"));
 
-                var fileInfoGetter = new Mock<IReleaseService.IBlobInfoGetter>(MockBehavior.Strict);
-
-                fileInfoGetter
-                    .Setup(
-                        s => s.Get(
-                            It.Is<ReleaseFile>(rf => rf.Id == releaseFile1.Id)
-                        )
-                    )
-                    .ReturnsAsync(
-                        new BlobInfo(
-                            path: releaseFile1.Path(),
-                            size: "1 Mb",
-                            contentType: "text/csv",
-                            contentLength: 0L
-                        )
-                    );
-
-                fileInfoGetter
-                    .Setup(
-                        s => s.Get(
-                            It.Is<ReleaseFile>(rf => rf.Id == releaseFile2.Id)
-                        )
-                    )
-                    .ReturnsAsync(
-                        new BlobInfo(
-                            path: releaseFile2.Path(),
-                            size: "2 Mb",
-                            contentType: "text/csv",
-                            contentLength: 0L
-                        )
-                    );
-
                 var service = BuildReleaseService(
                     contentDbContext: contentDbContext,
                     statisticsDbContext: statisticsDbContext,
                     dataGuidanceSubjectService: dataGuidanceSubjectService.Object,
-                    timePeriodService: timePeriodService.Object,
-                    fileSizeGetter: fileInfoGetter.Object
+                    timePeriodService: timePeriodService.Object
                 );
 
                 var result = await service.ListSubjects(contentRelease.Id);
 
-                MockUtils.VerifyAllMocks(dataGuidanceSubjectService, fileInfoGetter);
+                MockUtils.VerifyAllMocks(dataGuidanceSubjectService, timePeriodService);
 
                 var subjects = result.AssertRight();
 
@@ -175,7 +143,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(releaseFile1.Name, subjects[0].Name);
                 Assert.Equal(releaseFile1.File.Id, subjects[0].File.Id);
                 Assert.Equal(releaseFile1.File.Filename, subjects[0].File.FileName);
-                Assert.Equal("1 Mb", subjects[0].File.Size);
+                Assert.Equal("10 Kb", subjects[0].File.Size);
                 Assert.Equal("csv", subjects[0].File.Extension);
 
                 Assert.Equal(releaseSubject1.DataGuidance, subjects[0].Content);
@@ -191,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 Assert.Equal(releaseFile2.Name, subjects[1].Name);
                 Assert.Equal(releaseFile2.File.Id, subjects[1].File.Id);
                 Assert.Equal(releaseFile2.File.Filename, subjects[1].File.FileName);
-                Assert.Equal("2 Mb", subjects[1].File.Size);
+                Assert.Equal("20 Kb", subjects[1].File.Size);
                 Assert.Equal(releaseSubject2.DataGuidance, subjects[1].Content);
                 Assert.Equal("csv", subjects[1].File.Extension);
 
@@ -941,8 +909,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             StatisticsDbContext? statisticsDbContext = null,
             IUserService? userService = null,
             IDataGuidanceSubjectService? dataGuidanceSubjectService = null,
-            ITimePeriodService? timePeriodService = null,
-            IReleaseService.IBlobInfoGetter? fileSizeGetter = null)
+            ITimePeriodService? timePeriodService = null)
         {
             return new ReleaseService(
                 contentDbContext,
@@ -950,8 +917,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? MockUtils.AlwaysTrueUserService().Object,
                 dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>(),
-                timePeriodService ?? Mock.Of<ITimePeriodService>(),
-                fileSizeGetter ?? Mock.Of<IReleaseService.IBlobInfoGetter>()
+                timePeriodService ?? Mock.Of<ITimePeriodService>()
             );
         }
     }

@@ -65,10 +65,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                     .Where(rf => rf.ReleaseId == releaseId && rf.FileId == fileId)
                 )
                 .OnSuccessDo(rf => _userService.CheckCanViewRelease(rf.Release))
-                .OnSuccess(async rf =>
+                .OnSuccessCombineWith(rf =>
+                    _blobStorageService.DownloadToStream(PublicReleaseFiles, rf.PublicPath(), new MemoryStream()))
+                .OnSuccess(methodologyFileAndStream =>
                 {
-                    return await GetBlob(rf.PublicPath())
-                        .OnSuccess(blob => DownloadToStreamResult(blob, rf.File.Filename));
+                    var (releaseFile, stream) = methodologyFileAndStream;
+                    return new FileStreamResult(stream, releaseFile.File.ContentType)
+                    {
+                        FileDownloadName = releaseFile.File.Filename
+                    };
                 });
         }
 
@@ -125,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
             if (allFilesZip?.Updated is not null
                 && allFilesZip.Updated.Value.AddSeconds(AllFilesZipTtl) >= DateTime.UtcNow)
             {
-                await _blobStorageService.DownloadToStream(
+                var result = await _blobStorageService.DownloadToStream(
                     containerName: PublicReleaseFiles,
                     path: path,
                     stream: outputStream,
@@ -134,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
                 await outputStream.DisposeAsync();
 
-                return true;
+                return result.IsRight;
             }
 
             return false;
@@ -228,29 +233,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
 
                 await _dataGuidanceFileWriter.WriteToStream(entryStream, release, subjectIds);
             }
-        }
-
-        private async Task<FileStreamResult> DownloadToStreamResult(BlobInfo blob, string filename)
-        {
-            var stream = new MemoryStream();
-            var next = await _blobStorageService.DownloadToStream(PublicReleaseFiles, blob.Path, stream);
-
-            return new FileStreamResult(next, blob.ContentType)
-            {
-                FileDownloadName = filename
-            };
-        }
-
-        private async Task<Either<ActionResult, BlobInfo>> GetBlob(string path)
-        {
-            var blob = await _blobStorageService.FindBlob(PublicReleaseFiles, path);
-
-            if (blob is null)
-            {
-                return new NotFoundResult();
-            }
-
-            return blob;
         }
 
         private IQueryable<ReleaseFile> QueryReleaseFiles(Guid releaseId)

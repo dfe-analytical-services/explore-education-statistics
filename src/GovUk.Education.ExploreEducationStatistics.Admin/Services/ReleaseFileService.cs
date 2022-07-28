@@ -35,6 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             Ancillary,
             FileType.Data
         };
+
         private static readonly FileType[] DeletableFileTypes =
         {
             Ancillary,
@@ -127,27 +128,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId, types);
 
-                    var filesWithMetadata = await releaseFiles
-                        .SelectAsync(async releaseFile =>
-                        {
-                            var file = releaseFile.File;
-
-                            // Files should exists in storage but if not then allow user to delete
-                            var exists = await _blobStorageService.CheckBlobExists(
-                                PrivateReleaseFiles,
-                                file.Path());
-
-                            if (!exists)
-                            {
-                                return file.ToFileInfoNotFound();
-                            }
-
-                            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, file.Path());
-                            return releaseFile.ToFileInfo(blob);
-                        });
-
-                    return filesWithMetadata
-                        .OrderBy(file => file.Name)
+                    return releaseFiles
+                        .Select(releaseFile => releaseFile.ToFileInfo())
+                        .OrderBy(file => file.Name.IsNullOrWhitespace())
+                        .ThenBy(file => file.Name)
                         .AsEnumerable();
                 });
         }
@@ -158,23 +142,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(() => _releaseFileRepository.FindOrNotFound(releaseId, fileId))
-                .OnSuccess(GetReleaseFileInfo);
-        }
-
-        private async Task<FileInfo> GetReleaseFileInfo(ReleaseFile releaseFile)
-        {
-            var blobExists = await _blobStorageService.CheckBlobExists(
-                PrivateReleaseFiles,
-                releaseFile.Path()
-            );
-
-            if (!blobExists)
-            {
-                return releaseFile.ToFileInfoNotFound();
-            }
-
-            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, releaseFile.Path());
-            return releaseFile.ToFileInfo(blob);
+                .OnSuccess(releaseFile => releaseFile.ToFileInfo());
         }
 
         public async Task<Either<ActionResult, FileStreamResult>> Stream(Guid releaseId, Guid id)
@@ -183,22 +151,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(release => _releaseFileRepository.CheckFileExists(releaseId, id))
-                .OnSuccess(async file =>
+                .OnSuccessCombineWith(file =>
+                    _blobStorageService.DownloadToStream(PrivateReleaseFiles, file.Path(), new MemoryStream()))
+                .OnSuccess(fileAndStream =>
                 {
-                    var path = file.Path();
-                    var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, path);
-
-                    var stream = new MemoryStream();
-                    await _blobStorageService.DownloadToStream(PrivateReleaseFiles, path, stream);
-
-                    return new FileStreamResult(stream, blob.ContentType)
+                    var (file, stream) = fileAndStream;
+                    return new FileStreamResult(stream, file.ContentType)
                     {
                         FileDownloadName = file.Filename
                     };
                 });
         }
 
-      public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
+        public async Task<Either<ActionResult, Unit>> ZipFilesToStream(
             Guid releaseId,
             Stream outputStream,
             IEnumerable<Guid>? fileIds = null,
@@ -315,20 +280,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var releaseFiles = await _releaseFileRepository.GetByFileType(releaseId, Ancillary);
 
                     var filesWithMetadata = await releaseFiles
-                        .SelectAsync(async releaseFile =>
-                        {
-                            var exists = await _blobStorageService.CheckBlobExists(
-                                PrivateReleaseFiles,
-                                releaseFile.Path());
-
-                            if (!exists)
-                            {
-                                return await ToAncillaryFileInfoNotFound(releaseFile);
-                            }
-
-                            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, releaseFile.Path());
-                            return await ToAncillaryFileInfo(releaseFile, blob);
-                        });
+                        .SelectAsync(async releaseFile => await ToAncillaryFileInfo(releaseFile));
 
                     return filesWithMetadata
                         .OrderBy(file => file.Name)
@@ -349,6 +301,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var releaseFile = await _releaseFileRepository.Create(
                         releaseId: releaseId,
                         filename: upload.File.FileName,
+                        contentLength: upload.File.Length,
+                        contentType: upload.File.ContentType,
                         type: Ancillary,
                         createdById: _userService.GetUserId(),
                         name: upload.Title,
@@ -361,11 +315,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         path: releaseFile.Path(),
                         file: upload.File);
 
-                    var blob = await _blobStorageService.GetBlob(
-                        PrivateReleaseFiles,
-                        releaseFile.Path());
-
-                    return await ToAncillaryFileInfo(releaseFile, blob);
+                    return await ToAncillaryFileInfo(releaseFile);
                 });
         }
 
@@ -387,6 +337,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         : await _releaseFileRepository.Create(
                             releaseId: releaseId,
                             filename: formFile.FileName,
+                            contentLength: formFile.Length,
+                            contentType: formFile.ContentType,
                             type: Chart,
                             createdById: _userService.GetUserId());
 
@@ -396,11 +348,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         file: formFile
                     );
 
-                    var blob = await _blobStorageService.GetBlob(
-                        PrivateReleaseFiles,
-                        releaseFile.Path());
-
-                    return releaseFile.ToFileInfo(blob);
+                    return releaseFile.ToFileInfo();
                 });
         }
 
@@ -414,17 +362,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .LoadAsync();
         }
 
-        private async Task<FileInfo> ToAncillaryFileInfo(ReleaseFile releaseFile, BlobInfo blobInfo)
+        private async Task<FileInfo> ToAncillaryFileInfo(ReleaseFile releaseFile)
         {
             await HydrateReleaseFile(releaseFile);
-            return releaseFile.ToFileInfo(blobInfo);
-        }
-
-        // TODO: Remove after completion of EES-2343
-        private async Task<FileInfo> ToAncillaryFileInfoNotFound(ReleaseFile releaseFile)
-        {
-            await HydrateReleaseFile(releaseFile);
-            return releaseFile.ToFileInfoNotFound();
+            return releaseFile.ToFileInfo();
         }
 
         private IQueryable<ReleaseFile> QueryZipReleaseFiles(Guid releaseId)

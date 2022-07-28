@@ -83,7 +83,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services
             Assert.Equal("test.pdf", result.FileName);
             Assert.Equal(new Dictionary<string, string>(), result.Meta);
             Assert.Equal("path/to/test.pdf", result.Path);
-            Assert.Equal("10 Kb", result.Size);
         }
 
         [Fact]

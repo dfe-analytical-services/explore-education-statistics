@@ -89,7 +89,7 @@ public class FileMigrationService : IFileMigrationService
             .OnSuccessVoid(async dataImport =>
             {
                 // Update DataImport if TotalRows is not positive 
-                if (dataImport.TotalRows < 1)
+                if (dataImport.TotalRows is null or < 1)
                 {
                     if (blob.Meta.TryGetValue("NumberOfRows", out var numberOfRowsStringVal))
                     {

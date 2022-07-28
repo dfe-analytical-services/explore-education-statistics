@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
@@ -16,21 +17,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, Unit>> DeleteAll(Guid releaseId, bool forceDelete = false);
 
-        Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseId, Guid id);
+        Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseId, Guid fileId);
 
-        Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListAll(Guid releaseId);
+        Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseId);
 
         Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            string userName,
             Guid? replacingFileId = null,
-            string subjectName = null);
+            string? subjectName = null);
 
         Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseId,
             IFormFile zipFormFile,
-            string userName,
             Guid? replacingFileId = null,
-            string subjectName = null);
+            string? subjectName = null);
     }
 }

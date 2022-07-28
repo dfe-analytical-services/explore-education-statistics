@@ -17,7 +17,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
 {
     public class ReleaseServicePermissionTests
     {
-        private readonly Release _release = new Release
+        private readonly Release _release = new()
         {
             Id = Guid.NewGuid()
         };
@@ -42,8 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
             StatisticsDbContext? statisticsDbContext = null,
             IUserService? userService = null,
             IDataGuidanceSubjectService? dataGuidanceSubjectService = null,
-            ITimePeriodService? timePeriodService = null,
-            IReleaseService.IBlobInfoGetter? fileSizeGetter = null)
+            ITimePeriodService? timePeriodService = null)
         {
             return new ReleaseService(
                 contentDbContext ?? Mock.Of<ContentDbContext>(),
@@ -51,8 +50,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.Tests
                 statisticsDbContext ?? Mock.Of<StatisticsDbContext>(),
                 userService ?? Mock.Of<IUserService>(),
                 dataGuidanceSubjectService ?? Mock.Of<IDataGuidanceSubjectService>(),
-                timePeriodService ?? Mock.Of<ITimePeriodService>(),
-                fileSizeGetter ?? Mock.Of<IReleaseService.IBlobInfoGetter>()
+                timePeriodService ?? Mock.Of<ITimePeriodService>()
             );
         }
 

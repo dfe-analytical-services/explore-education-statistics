@@ -3,10 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -18,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Services
 {
@@ -30,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
         private readonly IUserService _userService;
         private readonly IDataGuidanceSubjectService _dataGuidanceSubjectService;
         private readonly ITimePeriodService _timePeriodService;
-        private readonly IReleaseService.IBlobInfoGetter _blobInfoGetter;
 
         public ReleaseService(
             ContentDbContext contentDbContext,
@@ -38,8 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             StatisticsDbContext statisticsDbContext,
             IUserService userService,
             IDataGuidanceSubjectService dataGuidanceSubjectService,
-            ITimePeriodService timePeriodService,
-            IReleaseService.IBlobInfoGetter blobInfoGetter)
+            ITimePeriodService timePeriodService)
         {
             _contentDbContext = contentDbContext;
             _contentPersistenceHelper = contentPersistenceHelper;
@@ -47,7 +42,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             _userService = userService;
             _dataGuidanceSubjectService = dataGuidanceSubjectService;
             _timePeriodService = timePeriodService;
-            _blobInfoGetter = blobInfoGetter;
         }
 
         public async Task<Either<ActionResult, List<SubjectViewModel>>> ListSubjects(Guid releaseId)
@@ -82,24 +76,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                 .ToListAsync();
 
             return (await releaseSubjects
-                .SelectAsync(
-                    async rs =>
-                    {
-                        var releaseFile = releaseFiles.First(rf => rf.File.SubjectId == rs.SubjectId);
-                        var blobInfo = await _blobInfoGetter.Get(releaseFile);
+                    .SelectAsync(
+                        async rs =>
+                        {
+                            var releaseFile = releaseFiles.First(rf => rf.File.SubjectId == rs.SubjectId);
 
-                        return new SubjectViewModel(
-                            id: rs.SubjectId,
-                            name: await GetSubjectName(releaseId, rs.SubjectId),
-                            content: rs.DataGuidance,
-                            timePeriods: _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
-                            geographicLevels: await _dataGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
-                            file: blobInfo is null
-                                ? releaseFile.ToPublicFileInfoNotFound()
-                                : releaseFile.ToFileInfo(blobInfo)
-                        );
-                    }
-                ))
+                            return new SubjectViewModel(
+                                id: rs.SubjectId,
+                                name: await GetSubjectName(releaseId, rs.SubjectId),
+                                content: rs.DataGuidance,
+                                timePeriods: _timePeriodService.GetTimePeriodLabels(rs.SubjectId),
+                                geographicLevels: await _dataGuidanceSubjectService.GetGeographicLevels(rs.SubjectId),
+                                file: releaseFile.ToFileInfo()
+                            );
+                        }
+                    ))
                 .OrderBy(svm => svm.Name)
                 .ToList();
         }
@@ -172,25 +163,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
                           && !rf.File.ReplacingId.HasValue
                           && rf.File.SubjectId.HasValue
                 );
-        }
-
-        // TODO: EES-2343 Remove when file sizes are stored in database
-        public class DefaultBlobInfoGetter : IReleaseService.IBlobInfoGetter
-        {
-            private readonly IBlobStorageService _blobStorageService;
-
-            public DefaultBlobInfoGetter(IBlobStorageService blobStorageService)
-            {
-                _blobStorageService = blobStorageService;
-            }
-
-            public async Task<BlobInfo?> Get(ReleaseFile releaseFile)
-            {
-                return await _blobStorageService.FindBlob(
-                    containerName: BlobContainers.PublicReleaseFiles,
-                    path: releaseFile.File.PublicPath(releaseFile.ReleaseId)
-                );
-            }
         }
     }
 }

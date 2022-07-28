@@ -6,13 +6,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 {
     public class BlobInfo
     {
-        public const string NameKey = "name";
-
         public readonly string Path;
 
         public readonly string ContentType;
-
-        public readonly string Size;
 
         public readonly long ContentLength;
 
@@ -24,7 +20,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
 
         public BlobInfo(
             string path,
-            string size,
             string contentType,
             long contentLength,
             IDictionary<string, string>? meta = null,
@@ -32,7 +27,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Model
             DateTimeOffset? updated = null)
         {
             Path = path;
-            Size = size;
             ContentType = contentType;
             ContentLength = contentLength;
             Meta = meta ?? new Dictionary<string, string>();

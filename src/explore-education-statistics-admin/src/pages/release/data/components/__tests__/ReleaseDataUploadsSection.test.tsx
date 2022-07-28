@@ -70,7 +70,7 @@ describe('ReleaseDataUploadsSection', () => {
     fileName: 'test-data.csv',
     metaFileId: 'file-1-meta',
     metaFileName: 'test-data.meta.csv',
-    rows: 300,
+    rows: undefined,
     fileSize: {
       size: 150,
       unit: 'Kb',
@@ -89,7 +89,7 @@ describe('ReleaseDataUploadsSection', () => {
     fileName: 'test-data.zip',
     metaFileId: 'file-1-meta',
     metaFileName: 'test-data.meta.zip',
-    rows: 300,
+    rows: undefined,
     fileSize: {
       size: 150,
       unit: 'Kb',
@@ -109,10 +109,10 @@ describe('ReleaseDataUploadsSection', () => {
   };
 
   const testImportingImportStatus: DataFileImportStatus = {
-    status: 'STAGE_1',
+    status: 'STAGE_2',
     percentageComplete: 0,
     stagePercentageComplete: 0,
-    totalRows: 0,
+    totalRows: 100,
   };
 
   const testCompleteImportStatus: DataFileImportStatus = {
@@ -754,7 +754,9 @@ describe('ReleaseDataUploadsSection', () => {
       expect(section3.getByTestId('Data file size')).toHaveTextContent(
         '150 Kb',
       );
-      expect(section3.getByTestId('Number of rows')).toHaveTextContent('300');
+      expect(section3.getByTestId('Number of rows')).toHaveTextContent(
+        'Unknown',
+      );
       expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
       expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
         'user1@test.com',
@@ -843,8 +845,12 @@ describe('ReleaseDataUploadsSection', () => {
       expect(section3.getByTestId('Metadata file')).toHaveTextContent(
         'test-data.meta.zip',
       );
-      expect(section3.getByTestId('Data file size')).toHaveTextContent('');
-      expect(section3.getByTestId('Number of rows')).toHaveTextContent('');
+      expect(section3.getByTestId('Data file size')).toHaveTextContent(
+        '150 Kb',
+      );
+      expect(section3.getByTestId('Number of rows')).toHaveTextContent(
+        'Unknown',
+      );
       expect(section3.getByTestId('Status')).toHaveTextContent('Queued');
       expect(section3.getByTestId('Uploaded by')).toHaveTextContent(
         'user1@test.com',
@@ -854,18 +860,79 @@ describe('ReleaseDataUploadsSection', () => {
       );
     });
 
-    test('updates the zip file size and rows when status changes', async () => {
+    test('updates the number of rows after uploading CSV file when status changes', async () => {
+      releaseDataFileService.uploadDataFiles.mockResolvedValue(
+        testUploadedDataFile,
+      );
+      releaseDataFileService.getDataFileImportStatus
+        .mockResolvedValue(testQueuedImportStatus)
+        .mockResolvedValueOnce(testImportingImportStatus);
+
+      permissionService.getDataFilePermissions.mockResolvedValue(
+        {} as DataFilePermissions,
+      );
+
+      render(
+        <MemoryRouter>
+          <ReleaseDataUploadsSection
+            publicationId="publication-1"
+            releaseId="release-1"
+            canUpdateRelease
+          />
+        </MemoryRouter>,
+      );
+
+      const dataFile = new File(['test'], 'test-data.csv', {
+        type: 'text/csv',
+      });
+      const metadataFile = new File(['test'], 'test-data.meta.csv', {
+        type: 'text/csv',
+      });
+
+      await userEvent.type(
+        screen.getByLabelText('Subject title'),
+        'Test title',
+      );
+
+      userEvent.upload(screen.getByLabelText('Upload data file'), dataFile);
+      userEvent.upload(
+        screen.getByLabelText('Upload metadata file'),
+        metadataFile,
+      );
+      userEvent.click(
+        screen.getByRole('button', {
+          name: 'Upload data files',
+        }),
+      );
+
+      await waitFor(() => {
+        expect(releaseDataFileService.uploadDataFiles).toHaveBeenCalledWith(
+          'release-1',
+          {
+            title: 'Test title',
+            dataFile,
+            metadataFile,
+          } as UploadDataFilesRequest,
+        );
+      });
+
+      const sections = screen.getAllByTestId('accordionSection');
+      const section3 = within(sections[2]);
+
+      await waitFor(() =>
+        expect(
+          releaseDataFileService.getDataFileImportStatus,
+        ).toHaveBeenCalledWith('release-1', testUploadedDataFile),
+      );
+      await waitFor(() => {
+        expect(section3.getByTestId('Number of rows')).toHaveTextContent('100');
+      });
+    });
+
+    test('updates the number of rows after uploading ZIP file when status changes', async () => {
       releaseDataFileService.uploadZipDataFile.mockResolvedValue({
         ...testUploadedZipFile,
       });
-
-      const testUpdatedZipFile: DataFile = {
-        ...testUploadedZipFile,
-        status: 'STAGE_1',
-      };
-      releaseDataFileService.getDataFile
-        .mockResolvedValue(testUploadedZipFile)
-        .mockResolvedValueOnce(testUpdatedZipFile);
 
       releaseDataFileService.getDataFileImportStatus
         .mockResolvedValue(testQueuedImportStatus)
@@ -917,16 +984,12 @@ describe('ReleaseDataUploadsSection', () => {
       const section3 = within(sections[2]);
 
       await waitFor(() =>
-        expect(releaseDataFileService.getDataFile).toHaveBeenCalledWith(
-          'release-1',
-          testUploadedZipFile.id,
-        ),
+        expect(
+          releaseDataFileService.getDataFileImportStatus,
+        ).toHaveBeenCalledWith('release-1', testUploadedZipFile),
       );
       await waitFor(() => {
-        expect(section3.getByTestId('Data file size')).toHaveTextContent(
-          '150 Kb',
-        );
-        expect(section3.getByTestId('Number of rows')).toHaveTextContent('300');
+        expect(section3.getByTestId('Number of rows')).toHaveTextContent('100');
       });
     });
 

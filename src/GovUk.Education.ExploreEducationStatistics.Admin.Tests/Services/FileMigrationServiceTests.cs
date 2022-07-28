@@ -204,6 +204,23 @@ public class FileMigrationServiceTests
                 },
                 TotalRows = 0
             },
+            // Files have no ContentLength or ContentType or TotalRows so all files should be migrated
+            new()
+            {
+                File = new File
+                {
+                    Id = Guid.NewGuid()
+                },
+                MetaFile = new File
+                {
+                    Id = Guid.NewGuid()
+                },
+                ZipFile = new File
+                {
+                    Id = Guid.NewGuid()
+                },
+                TotalRows = null
+            },
             // Files have ContentLength and ContentType but TotalRows is 0 so the *data* file should be migrated
             new()
             {
@@ -226,6 +243,29 @@ public class FileMigrationServiceTests
                     ContentLength = 1024
                 },
                 TotalRows = 0
+            },
+            // Files have ContentLength and ContentType but no TotalRows so the *data* file should be migrated
+            new()
+            {
+                File = new File
+                {
+                    Id = Guid.NewGuid(),
+                    ContentType = "text/csv",
+                    ContentLength = 1024
+                },
+                MetaFile = new File
+                {
+                    Id = Guid.NewGuid(),
+                    ContentType = "text/csv",
+                    ContentLength = 1024
+                },
+                ZipFile = new File
+                {
+                    Id = Guid.NewGuid(),
+                    ContentType = "application/x-zip-compressed",
+                    ContentLength = 1024
+                },
+                TotalRows = null
             }
         };
 
@@ -244,8 +284,12 @@ public class FileMigrationServiceTests
                 {
                     new(dataFiles[1].File.Id),
                     new(dataFiles[1].MetaFile.Id),
-                    new(dataFiles[1].ZipFile.Id),
-                    new(dataFiles[2].File.Id)
+                    new(dataFiles[1].ZipFile!.Id),
+                    new(dataFiles[2].File.Id),
+                    new(dataFiles[2].MetaFile.Id),
+                    new(dataFiles[2].ZipFile!.Id),
+                    new(dataFiles[3].File.Id),
+                    new(dataFiles[4].File.Id)
                 }))
             .Returns(Task.CompletedTask);
 
@@ -378,7 +422,7 @@ public class FileMigrationServiceTests
                     new(files[2].Id),
                     new(dataFiles[0].File.Id),
                     new(dataFiles[0].MetaFile.Id),
-                    new(dataFiles[0].ZipFile.Id),
+                    new(dataFiles[0].ZipFile!.Id),
                     new(dataFiles[2].File.Id)
                 }))
             .Returns(Task.CompletedTask);

@@ -905,12 +905,7 @@ describe('MethodologySummary', () => {
 
       const updatedPublication: UpdatePublicationRequest = {
         title: testPublicationWithExternalMethodology.title,
-        contact: {
-          contactName: testContact.contactName,
-          contactTelNo: testContact.contactTelNo,
-          teamEmail: testContact.teamEmail,
-          teamName: testContact.teamName,
-        },
+        contact: testContact,
         topicId: testTopicId,
       };
 

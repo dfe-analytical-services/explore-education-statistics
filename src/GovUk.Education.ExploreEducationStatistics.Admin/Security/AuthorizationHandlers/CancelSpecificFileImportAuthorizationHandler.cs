@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿#nullable enable
+using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -10,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
     {
     }
 
-    public class CancelSpecificFileImportAuthorizationHandler 
+    public class CancelSpecificFileImportAuthorizationHandler
         : AuthorizationHandler<CancelSpecificFileImportRequirement, File>
     {
         private readonly IDataImportRepository _dataImportRepository;
@@ -25,12 +26,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Security.Authorizatio
             File file)
         {
             var status = await _dataImportRepository.GetStatusByFileId(file.Id);
-            
+
             if (status.IsFinishedOrAborting())
             {
                 return;
             }
-            
+
             if (SecurityUtils.HasClaim(ctx.User, CancelAllFileImports))
             {
                 ctx.Succeed(requirement);

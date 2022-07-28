@@ -18,6 +18,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
@@ -58,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
+                    ContentType = "application/pdf",
                     Type = Ancillary
                 }
             };
@@ -73,14 +75,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            var blob = new BlobInfo(
-                path: releaseFile.PublicPath(),
-                size: "100 KB",
-                contentType: "application/pdf",
-                contentLength: 0L);
-
-            blobStorageService
-                .SetupFindBlob(PublicReleaseFiles, releaseFile.PublicPath(), blob);
             blobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile.PublicPath(), "Test blob");
 
@@ -123,16 +117,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            await using (var contentDbContext = InMemoryContentDbContext())
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.StreamFile(Guid.NewGuid(), releaseFile.File.Id);
-
-                MockUtils.VerifyAllMocks(blobStorageService);
 
                 result.AssertNotFound();
             }
@@ -151,16 +140,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.StreamFile(release.Id, Guid.NewGuid());
-
-                MockUtils.VerifyAllMocks(blobStorageService);
 
                 result.AssertNotFound();
             }
@@ -200,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 
             var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
 
-            blobStorageService.SetupFindBlob(PublicReleaseFiles, releaseFile.PublicPath(), null);
+            blobStorageService.SetupDownloadToStreamNotFound(PublicReleaseFiles, releaseFile.PublicPath());
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -513,9 +497,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             blobStorageService
                 .SetupDownloadToStream(PublicReleaseFiles, releaseFile1.PublicPath(), "Test 2 blob");
             blobStorageService
-                .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test 3 blob");;
+                .SetupDownloadToStream(PublicReleaseFiles, releaseFile2.PublicPath(), "Test 3 blob");
             blobStorageService
-                .SetupDownloadToStream(PublicReleaseFiles, releaseFile3.PublicPath(), "Test 1 blob");;
+                .SetupDownloadToStream(PublicReleaseFiles, releaseFile3.PublicPath(), "Test 1 blob");
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -999,8 +983,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             PublicReleaseFiles,
                             allFilesZipPath,
                             It.IsAny<Stream>(),
-                            "application/zip",
-                            null
+                            "application/zip"
                         )
                 )
                 .Returns(Task.CompletedTask);
@@ -1093,7 +1076,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     allFilesZipPath,
                     new BlobInfo(
                         path: allFilesZipPath,
-                        size: "1 Mb",
                         contentType: "application/zip",
                         contentLength: 1000L,
                         updated: DateTimeOffset.UtcNow.AddMinutes(-5)
@@ -1111,7 +1093,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                         )
                 )
                 .Returns<IBlobContainer, string, Stream, CancellationToken?>(
-                    (_, _, stream, _) => Task.FromResult(stream)
+                    (_, _, stream, _) => Task.FromResult(new Either<ActionResult, Stream>(stream))
                 )
                 .Callback<IBlobContainer, string, Stream, CancellationToken?>(
                     (_, _, stream, _) => { stream.WriteText("Test cached all files zip"); }
@@ -1185,7 +1167,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                     allFilesZipPath,
                     new BlobInfo(
                         path: allFilesZipPath,
-                        size: "1 Mb",
                         contentType: "application/zip",
                         contentLength: 1000L,
                         updated: DateTimeOffset.UtcNow.AddMinutes(-60)
@@ -1205,8 +1186,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
                             PublicReleaseFiles,
                             allFilesZipPath,
                             It.IsAny<Stream>(),
-                            "application/zip",
-                            null
+                            "application/zip"
                         )
                 )
                 .Returns(Task.CompletedTask);
@@ -1253,7 +1233,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
             IDataGuidanceFileWriter? dataGuidanceFileWriter = null,
             IUserService? userService = null)
         {
-            return new (
+            return new(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
                 blobStorageService ?? Mock.Of<IBlobStorageService>(MockBehavior.Strict),

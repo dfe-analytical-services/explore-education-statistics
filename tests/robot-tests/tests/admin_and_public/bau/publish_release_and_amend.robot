@@ -315,7 +315,7 @@ Navigate to data replacement page
     user checks headed table body row contains    Subject title    Dates test subject
     user checks headed table body row contains    Data file    dates.csv
     user checks headed table body row contains    Metadata file    dates.meta.csv
-    user checks headed table body row contains    Number of rows    119
+    user checks headed table body row contains    Number of rows    118
     user checks headed table body row contains    Data file size    17 Kb
     user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
 
@@ -332,14 +332,14 @@ Upload replacement data
     user checks headed table body row cell contains    Subject title    1    Dates test subject
     user checks headed table body row cell contains    Data file    1    dates.csv
     user checks headed table body row cell contains    Metadata file    1    dates.meta.csv
-    user checks headed table body row cell contains    Number of rows    1    119
+    user checks headed table body row cell contains    Number of rows    1    118
     user checks headed table body row cell contains    Data file size    1    17 Kb
     user checks headed table body row cell contains    Status    1    Data replacement in progress    wait=%{WAIT_LONG}
 
     user checks headed table body row cell contains    Subject title    2    Dates test subject
     user checks headed table body row cell contains    Data file    2    dates-replacement.csv
     user checks headed table body row cell contains    Metadata file    2    dates-replacement.meta.csv
-    user checks headed table body row cell contains    Number of rows    2    119
+    user checks headed table body row cell contains    Number of rows    2    118
     user checks headed table body row cell contains    Data file size    2    17 Kb
     user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
 
