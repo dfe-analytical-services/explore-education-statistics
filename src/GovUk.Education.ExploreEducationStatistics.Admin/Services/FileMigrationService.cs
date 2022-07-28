@@ -64,7 +64,7 @@ public class FileMigrationService : IFileMigrationService
                 // Get all files that don't have a positive TotalRows value for their corresponding DataImport
                 var fileIdsWithoutTotalRows = await _contentDbContext.DataImports
                     .AsNoTracking()
-                    .Where(dataImport => dataImport.TotalRows < 1)
+                    .Where(dataImport => dataImport.TotalRows == null || dataImport.TotalRows < 1)
                     .Select(dataImport => dataImport.FileId)
                     .ToListAsync();
 

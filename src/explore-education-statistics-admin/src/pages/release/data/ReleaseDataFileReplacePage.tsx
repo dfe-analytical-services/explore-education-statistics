@@ -51,23 +51,17 @@ const ReleaseDataFileReplacePage = ({
     if (!dataFile?.replacedBy) {
       return undefined;
     }
-    const file = await releaseDataFileService.getDataFile(
-      releaseId,
-      dataFile.replacedBy,
-    );
-    if (dataFile.isReplacedByZipFile) {
-      file.isQueuedZipUpload = true;
-    }
-    return file;
+    return releaseDataFileService.getDataFile(releaseId, dataFile.replacedBy);
   }, [dataFile]);
 
   const handleStatusChange = async (
     file: DataFile,
-    { status }: DataFileImportStatus,
+    { totalRows, status }: DataFileImportStatus,
   ) => {
     setDataFile({
       value: {
         ...file,
+        rows: totalRows,
         status,
         permissions: await permissionService.getDataFilePermissions(
           releaseId,
@@ -79,26 +73,16 @@ const ReleaseDataFileReplacePage = ({
 
   const handleReplacementStatusChange = async (
     file: DataFile,
-    { status }: DataFileImportStatus,
+    { totalRows, status }: DataFileImportStatus,
   ) => {
-    let updatedDataFile = file;
-    if (
-      file.isQueuedZipUpload &&
-      ['UPLOADING', 'QUEUED'].indexOf(status) === -1
-    ) {
-      updatedDataFile = await releaseDataFileService.getDataFile(
-        releaseId,
-        file.id,
-      );
-    }
-
     const permissions = await permissionService.getDataFilePermissions(
       releaseId,
       file.id,
     );
     setReplacementDataFile({
       value: {
-        ...updatedDataFile,
+        ...file,
+        rows: totalRows,
         status,
         permissions,
       },
@@ -128,7 +112,6 @@ const ReleaseDataFileReplacePage = ({
       value: {
         ...currentFile,
         replacedBy: file.id,
-        isReplacedByZipFile: values.uploadType !== 'csv',
       },
     });
     setReplacementDataFile({

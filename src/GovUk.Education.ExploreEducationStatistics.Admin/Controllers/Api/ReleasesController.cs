@@ -26,7 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         private readonly IReleaseDataFileService _releaseDataFileService;
         private readonly IReleasePublishingStatusService _releasePublishingStatusService;
         private readonly IReleaseChecklistService _releaseChecklistService;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IDataImportService _dataImportService;
 
         public ReleasesController(
@@ -35,14 +34,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IReleaseDataFileService releaseDataFileService,
             IReleasePublishingStatusService releasePublishingStatusService,
             IReleaseChecklistService releaseChecklistService,
-            UserManager<ApplicationUser> userManager,
             IDataImportService dataImportService)
         {
             _releaseService = releaseService;
             _releaseDataFileService = releaseDataFileService;
             _releasePublishingStatusService = releasePublishingStatusService;
             _releaseChecklistService = releaseChecklistService;
-            _userManager = userManager;
             _dataImportService = dataImportService;
             _releaseApprovalService = releaseApprovalService;
         }
@@ -89,13 +86,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [Produces("application/json")]
         [ProducesResponseType(200)]
         [ProducesResponseType(404)]
-        public async Task<ActionResult<IEnumerable<DataFileInfo>>> GetDataFileInfo(Guid releaseId)
+        public async Task<ActionResult<List<DataFileInfo>>> GetDataFileInfo(Guid releaseId)
         {
             return await _releaseDataFileService
                 .ListAll(releaseId)
                 .HandleFailuresOrOk();
         }
-
 
         [HttpPost("release/{releaseId}/data")]
         [Produces("application/json")]
@@ -109,13 +105,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             IFormFile file,
             IFormFile metaFile)
         {
-            var user = await _userManager.GetUserAsync(User);
-
             return await _releaseDataFileService
                 .Upload(releaseId: releaseId,
                     dataFormFile: file,
                     metaFormFile: metaFile,
-                    userName: user.Email,
                     replacingFileId: replacingFileId,
                     subjectName: subjectName)
                 .HandleFailuresOrOk();
@@ -132,12 +125,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [FromQuery(Name = "title")] string subjectName,
             IFormFile zipFile)
         {
-            var user = await _userManager.GetUserAsync(User);
-
             return await _releaseDataFileService
                 .UploadAsZip(releaseId: releaseId,
                     zipFormFile: zipFile,
-                    userName: user.Email,
                     replacingFileId: replacingFileId,
                     subjectName: subjectName)
                 .HandleFailuresOrOk();
@@ -213,7 +203,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("release/{releaseId}/data/{fileId}/import/status")]
-        public Task<ActionResult<DataImportViewModel>> GetDataUploadStatus(Guid releaseId, Guid fileId)
+        public Task<ActionResult<DataImportStatusViewModel>> GetDataUploadStatus(Guid releaseId, Guid fileId)
         {
             return _releaseService
                 .GetDataFileImportStatus(releaseId, fileId)

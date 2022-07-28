@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
     {
         private readonly ContentDbContext _contentDbContext;
 
-        private static readonly List<FileType> SupportedFileTypes = new List<FileType>
+        private static readonly List<FileType> SupportedFileTypes = new()
         {
             Image
         };
@@ -30,6 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
         public async Task<MethodologyFile> Create(Guid methodologyVersionId,
             string filename,
+            long contentLength,
+            string contentType,
             FileType type,
             Guid createdById)
         {
@@ -43,10 +46,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 MethodologyVersionId = methodologyVersionId,
                 File = new File
                 {
-                    Created = DateTime.UtcNow,
                     CreatedById = createdById,
                     RootPath = methodologyVersionId,
                     Filename = filename,
+                    ContentLength = contentLength,
+                    ContentType = contentType,
                     Type = type
                 }
             };
@@ -86,7 +90,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
         }
 
-        public async Task<MethodologyFile> Get(Guid methodologyVersionId, Guid fileId)
+        public async Task<MethodologyFile?> Get(Guid methodologyVersionId, Guid fileId)
         {
             return await _contentDbContext.MethodologyFiles
                 .Include(methodologyFile => methodologyFile.File)

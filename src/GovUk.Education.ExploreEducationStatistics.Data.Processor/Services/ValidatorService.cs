@@ -247,14 +247,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 Guid importId)
         {
             var colValues = CsvUtil.GetColumnValues(cols);
-            var totalRowCount = 0;
             var rowCountByGeographicLevel = new Dictionary<GeographicLevel, int>();
             var errors = new List<DataImportError>();
-            var dataRows = rows.Count;
+            var totalRows = rows.Count;
 
+            var rowCounter = 0;
             foreach (DataRow row in rows)
             {
-                totalRowCount++;
+                rowCounter++;
                 if (errors.Count == 100)
                 {
                     errors.Add(new DataImportError(FirstOneHundredErrors.GetEnumLabel()));
@@ -279,14 +279,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                 }
                 catch (Exception e)
                 {
-                    errors.Add(new DataImportError($"error at row {totalRowCount}: {e.Message}"));
+                    errors.Add(new DataImportError($"error at row {rowCounter}: {e.Message}"));
                 }
 
-                if (totalRowCount % Stage1RowCheck == 0)
+                if (rowCounter % Stage1RowCheck == 0)
                 {
                     await _dataImportService.UpdateStatus(importId,
                         DataImportStatus.STAGE_1,
-                        (double) totalRowCount / dataRows * 100);
+                        (double) rowCounter / totalRows * 100);
                 }
             }
 
@@ -303,10 +303,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 
             return new ProcessorStatistics
             (
-                importableRowCount: GetImportableRowCount(rowCountByGeographicLevel),
-                rowsPerBatch: rowsPerBatch,
-                numBatches: GetNumBatches(totalRowCount, rowsPerBatch),
-                geographicLevels: rowCountByGeographicLevel.Keys.ToHashSet()
+                TotalRowCount: totalRows,
+                ImportableRowCount: GetImportableRowCount(rowCountByGeographicLevel),
+                RowsPerBatch: rowsPerBatch,
+                NumBatches: GetNumBatches(totalRows, rowsPerBatch),
+                GeographicLevels: rowCountByGeographicLevel.Keys.ToHashSet()
             );
         }
 

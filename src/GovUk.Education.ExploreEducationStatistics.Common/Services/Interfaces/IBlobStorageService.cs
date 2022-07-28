@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Storage.DataMovement;
 using Newtonsoft.Json;
 
@@ -40,15 +41,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         public Task UploadFile(
             IBlobContainer containerName,
             string path,
-            IFormFile file,
-            IDictionary<string, string>? metadata = null);
+            IFormFile file);
 
         public Task UploadStream(
             IBlobContainer containerName,
             string path,
             Stream stream,
-            string contentType,
-            IDictionary<string, string>? metadata = null);
+            string contentType);
 
         public Task UploadAsJson<T>(
             IBlobContainer containerName,
@@ -64,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
         /// <param name="stream">stream to output blob to</param>
         /// <param name="cancellationToken">used to cancel the download</param>
         /// <returns>the stream that the blob has been output to</returns>
-        public Task<Stream> DownloadToStream(
+        public Task<Either<ActionResult, Stream>> DownloadToStream(
             IBlobContainer containerName,
             string path,
             Stream stream,

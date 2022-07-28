@@ -105,7 +105,6 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
             file.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
                 contentType: "text/csv",
                 contentLength: 1024));
 
@@ -192,7 +191,6 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
             file.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
                 contentType: "application/pdf",
                 contentLength: 1024));
 
@@ -246,7 +244,6 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
             releaseFile.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
                 contentType: "image/png",
                 contentLength: 1024));
 
@@ -300,7 +297,6 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateMethodologyFiles,
             methodologyFile.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
                 contentType: "image/png",
                 contentLength: 1024));
 
@@ -358,7 +354,6 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
             file.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
                 contentType: "text/csv",
                 contentLength: 1024));
 
@@ -386,7 +381,7 @@ public class FileMigrationServiceTests
     }
 
     [Fact]
-    public async Task MigrateFile_MigratesDataFileAndDataImport()
+    public async Task MigrateFile_MigratesDataFileAndDataImport_TotalRowsIsZero()
     {
         var file = new File
         {
@@ -418,7 +413,71 @@ public class FileMigrationServiceTests
         blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
             file.Path(),
             new BlobInfo(path: "not used",
-                size: "not used",
+                contentType: "text/csv",
+                contentLength: 1024,
+                meta: new Dictionary<string, string>
+                {
+                    {
+                        "NumberOfRows", "100" // This should get set as TotalRows value on DataImport
+                    }
+                }));
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var service = BuildService(contentDbContext: contentDbContext,
+                blobStorageService.Object);
+
+            var result = await service.MigrateFile(file.Id);
+
+            MockUtils.VerifyAllMocks(blobStorageService);
+
+            result.AssertRight();
+        }
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            var fileAfter = await contentDbContext.Files.SingleAsync(f => f.Id == file.Id);
+            Assert.Equal("text/csv", fileAfter.ContentType);
+            Assert.Equal(1024, fileAfter.ContentLength);
+
+            var dataImportAfter = await contentDbContext.DataImports.SingleAsync(di => di.Id == dataImport.Id);
+            Assert.Equal(100, dataImportAfter.TotalRows);
+        }
+    }
+
+    [Fact]
+    public async Task MigrateFile_MigratesDataFileAndDataImport_TotalRowsIsNull()
+    {
+        var file = new File
+        {
+            Id = Guid.NewGuid(),
+            RootPath = Guid.NewGuid(),
+            ContentType = null,
+            ContentLength = null,
+            Type = FileType.Data
+        };
+
+        var dataImport = new DataImport
+        {
+            Id = Guid.NewGuid(),
+            File = file,
+            TotalRows = null
+        };
+
+        var contentDbContextId = Guid.NewGuid().ToString();
+
+        await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+        {
+            await contentDbContext.Files.AddAsync(file);
+            await contentDbContext.DataImports.AddAsync(dataImport);
+            await contentDbContext.SaveChangesAsync();
+        }
+
+        var blobStorageService = new Mock<IBlobStorageService>(Strict);
+
+        blobStorageService.SetupFindBlob(BlobContainers.PrivateReleaseFiles,
+            file.Path(),
+            new BlobInfo(path: "not used",
                 contentType: "text/csv",
                 contentLength: 1024,
                 meta: new Dictionary<string, string>

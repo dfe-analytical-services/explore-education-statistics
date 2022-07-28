@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Mappings;
@@ -26,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class ReleaseDataFileServicePermissionTests
     {
-        private readonly Release _release = new Release
+        private readonly Release _release = new()
         {
             Id = Guid.NewGuid()
         };
@@ -99,13 +100,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetInfo()
         {
+            var releaseFile = new ReleaseFile
+            {
+                Release = _release,
+                File = new File
+                {
+                    Id = Guid.NewGuid()
+                }
+            };
+
+            var persistenceHelper = MockUtils.MockPersistenceHelper<ContentDbContext, ReleaseFile>(releaseFile);
+
             await PolicyCheckBuilder<ContentSecurityPolicies>()
-                .SetupResourceCheckToFail(_release, ContentSecurityPolicies.CanViewSpecificRelease)
+                .SetupResourceCheckToFail(releaseFile.Release, ContentSecurityPolicies.CanViewSpecificRelease)
                 .AssertForbidden(
                     userService =>
                     {
-                        var service = SetupReleaseDataFileService(userService: userService.Object);
-                        return service.GetInfo(_release.Id, Guid.NewGuid());
+                        var service = SetupReleaseDataFileService(userService: userService.Object,
+                            contentPersistenceHelper: persistenceHelper.Object);
+                        return service.GetInfo(releaseFile.Release.Id, releaseFile.File.Id);
                     }
                 );
         }
@@ -136,7 +149,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         return service.Upload(releaseId: _release.Id,
                             dataFormFile: new Mock<IFormFile>().Object,
                             metaFormFile: new Mock<IFormFile>().Object,
-                            userName: "",
                             replacingFileId: null,
                             subjectName: "");
                     }
@@ -154,7 +166,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         var service = SetupReleaseDataFileService(userService: userService.Object);
                         return service.UploadAsZip(releaseId: _release.Id,
                             zipFormFile: new Mock<IFormFile>().Object,
-                            userName: "",
                             replacingFileId: null,
                             subjectName: "");
                     }
@@ -162,21 +173,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         private ReleaseDataFileService SetupReleaseDataFileService(
-            ContentDbContext contentDbContext = null,
-            StatisticsDbContext statisticsDbContext = null,
-            IPersistenceHelper<ContentDbContext> contentPersistenceHelper = null,
-            IBlobStorageService blobStorageService = null,
-            IDataArchiveValidationService dataArchiveValidationService = null,
-            IFileUploadsValidatorService fileUploadsValidatorService = null,
-            IFileRepository fileRepository = null,
-            IReleaseRepository releaseRepository = null,
-            IReleaseFileRepository releaseFileRepository = null,
-            IReleaseDataFileRepository releaseDataFileRepository = null,
-            IDataImportService dataImportService = null,
-            IUserService userService = null)
+            ContentDbContext? contentDbContext = null,
+            StatisticsDbContext? statisticsDbContext = null,
+            IPersistenceHelper<ContentDbContext>? contentPersistenceHelper = null,
+            IBlobStorageService? blobStorageService = null,
+            IDataArchiveValidationService? dataArchiveValidationService = null,
+            IFileUploadsValidatorService? fileUploadsValidatorService = null,
+            IFileRepository? fileRepository = null,
+            IReleaseRepository? releaseRepository = null,
+            IReleaseFileRepository? releaseFileRepository = null,
+            IReleaseDataFileRepository? releaseDataFileRepository = null,
+            IDataImportService? dataImportService = null,
+            IUserService? userService = null)
         {
+            contentDbContext ??= new Mock<ContentDbContext>().Object;
+
             return new ReleaseDataFileService(
-                contentDbContext ?? new Mock<ContentDbContext>().Object,
+                contentDbContext,
                 contentPersistenceHelper ?? DefaultPersistenceHelperMock().Object,
                 blobStorageService ?? new Mock<IBlobStorageService>().Object,
                 dataArchiveValidationService ?? new Mock<IDataArchiveValidationService>().Object,

@@ -1,11 +1,11 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -17,7 +17,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -149,56 +148,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 forceDelete: forceDelete);
         }
 
-        public async Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseId, Guid id)
+        public async Task<Either<ActionResult, DataFileInfo>> GetInfo(Guid releaseId, Guid fileId)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(releaseId)
-                .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(
-                    async release => await _persistenceHelper
-                        .CheckEntityExists<ReleaseFile>(
-                            q => q.Include(rf => rf.File)
-                                .Where(
-                                    rf => rf.ReleaseId == release.Id
-                                          && rf.File.Type == FileType.Data
-                                          && rf.FileId == id
-                                )
-                        )
-                )
-                .OnSuccess(async file => await GetDataFileInfo(releaseId, file.File));
+                .CheckEntityExists<ReleaseFile>(q => q.Where(
+                        rf => rf.ReleaseId == releaseId
+                              && rf.File.Type == FileType.Data
+                              && rf.FileId == fileId)
+                    .Include(rf => rf.Release))
+                .OnSuccessDo(rf => _userService.CheckCanViewRelease(rf.Release))
+                .OnSuccess(BuildDataFileViewModel);
         }
 
-        public async Task<Either<ActionResult, IEnumerable<DataFileInfo>>> ListAll(Guid releaseId)
+        public async Task<Either<ActionResult, List<DataFileInfo>>> ListAll(Guid releaseId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanViewRelease)
-                .OnSuccess(async _ =>
+                .OnSuccess(async () =>
                 {
-                    var fileList = new List<DataFileInfo>();
                     var files = await _releaseFileRepository.GetByFileType(releaseId, FileType.Data);
 
                     // Exclude files that are replacements in progress
-                    var filesExcludingReplacements = files.Where(file =>
-                        !file.File.ReplacingId.HasValue);
+                    var filesExcludingReplacements = files.Where(file => !file.File.ReplacingId.HasValue).ToList();
 
-                    await filesExcludingReplacements
-                        .ToAsyncEnumerable()
-                        .ForEachAwaitAsync(async file =>
-                            fileList.Add(await GetDataFileInfo(releaseId, file.File)));
-
-                    return fileList
-                        .OrderBy(file => file.Name)
-                        .AsEnumerable();
+                    return await BuildDataFileViewModels(filesExcludingReplacements);
                 });
         }
 
         public async Task<Either<ActionResult, DataFileInfo>> Upload(Guid releaseId,
             IFormFile dataFormFile,
             IFormFile metaFormFile,
-            string userName,
             Guid? replacingFileId = null,
-            string subjectName = null)
+            string? subjectName = null)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -225,6 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 releaseId: releaseId,
                                 subjectId: subjectId,
                                 filename: dataFormFile.FileName.ToLower(),
+                                contentLength: dataFormFile.Length,
                                 type: FileType.Data,
                                 createdById: _userService.GetUserId(),
                                 name: validSubjectName,
@@ -234,55 +217,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 releaseId: releaseId,
                                 subjectId: subjectId,
                                 filename: metaFormFile.FileName.ToLower(),
+                                contentLength: metaFormFile.Length,
                                 type: Metadata,
                                 createdById: _userService.GetUserId());
 
-                            var dataInfo = GetDataFileMetaValues(
-                                metaFileName: metaFile.Filename,
-                                numberOfRows: CalculateNumberOfRows(dataFormFile.OpenReadStream())
-                            );
-
-                            await UploadFileToStorage(dataFile, dataFormFile, dataInfo);
+                            await UploadFileToStorage(dataFile, dataFormFile);
                             await UploadFileToStorage(metaFile, metaFormFile);
 
-                            await _dataImportService.Import(
+                            var dataImport = await _dataImportService.Import(
                                 subjectId: subjectId,
                                 dataFile: dataFile,
+                                metaFile: metaFile);
+
+                            var permissions = await _userService.GetDataFilePermissions(dataFile);
+
+                            return BuildDataFileViewModel(dataFile: dataFile,
                                 metaFile: metaFile,
-                                formFile: dataFormFile);
-
-                            var blob = await _blobStorageService.GetBlob(
-                                PrivateReleaseFiles,
-                                dataFile.Path()
-                            );
-
-                            await _contentDbContext.Entry(dataFile)
-                                .Reference(f => f.CreatedBy)
-                                .LoadAsync();
-
-                            return new DataFileInfo
-                            {
-                                Id = dataFile.Id,
-                                FileName = dataFile.Filename,
-                                Name = validSubjectName,
-                                Size = blob.Size,
-                                MetaFileId = metaFile.Id,
-                                MetaFileName = metaFile.Filename,
-                                Rows = blob.GetNumberOfRows(),
-                                UserName = dataFile.CreatedBy.Email,
-                                Status = DataImportStatus.QUEUED,
-                                Created = dataFile.Created,
-                                Permissions = await _userService.GetDataFilePermissions(dataFile)
-                            };
+                                validSubjectName,
+                                dataImport.TotalRows,
+                                dataImport.Status,
+                                permissions);
                         });
                 });
         }
 
         public async Task<Either<ActionResult, DataFileInfo>> UploadAsZip(Guid releaseId,
             IFormFile zipFormFile,
-            string userName,
             Guid? replacingFileId = null,
-            string subjectName = null)
+            string? subjectName = null)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
@@ -294,14 +256,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         {
                             return await ValidateSubjectName(releaseId, subjectName, replacingFile)
                                 .OnSuccess(validSubjectName =>
-                                    _dataArchiveValidationService.ValidateDataArchiveFile(releaseId, zipFormFile)
+                                    _dataArchiveValidationService.ValidateDataArchiveFile(zipFormFile)
                                         .OnSuccess(async archiveFile =>
                                         {
-                                            var dataInfo = GetDataFileMetaValues(
-                                                metaFileName: archiveFile.MetaFileName,
-                                                numberOfRows: 0
-                                            );
-
                                             return await _fileUploadsValidatorService
                                                 .ValidateDataArchiveEntriesForUpload(releaseId, archiveFile)
                                                 .OnSuccess(async () =>
@@ -311,6 +268,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                                                     var zipFile = await _releaseDataFileRepository.CreateZip(
                                                         filename: zipFormFile.FileName.ToLower(),
+                                                        contentLength: zipFormFile.Length,
+                                                        contentType: zipFormFile.ContentType,
                                                         releaseId: releaseId,
                                                         createdById: _userService.GetUserId());
 
@@ -318,6 +277,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         releaseId: releaseId,
                                                         subjectId: subjectId,
                                                         filename: archiveFile.DataFileName,
+                                                        contentLength: archiveFile.DataFileSize,
                                                         type: FileType.Data,
                                                         createdById: _userService.GetUserId(),
                                                         name: validSubjectName,
@@ -328,133 +288,107 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         releaseId: releaseId,
                                                         subjectId: subjectId,
                                                         filename: archiveFile.MetaFileName,
+                                                        contentLength: archiveFile.MetaFileSize,
                                                         type: Metadata,
                                                         createdById: _userService.GetUserId(),
                                                         source: zipFile);
 
-                                                    await UploadFileToStorage(zipFile, zipFormFile, dataInfo);
+                                                    await UploadFileToStorage(zipFile, zipFormFile);
 
-                                                    await _dataImportService.ImportZip(
+                                                    var dataImport = await _dataImportService.ImportZip(
                                                         subjectId: subjectId,
                                                         dataFile: dataFile,
                                                         metaFile: metaFile,
                                                         zipFile: zipFile);
 
-                                                    var blob = await _blobStorageService.GetBlob(
-                                                        PrivateReleaseFiles,
-                                                        zipFile.Path()
-                                                    );
+                                                    var permissions = await _userService.GetDataFilePermissions(dataFile);
 
-                                                    await _contentDbContext.Entry(dataFile)
-                                                        .Reference(f => f.CreatedBy)
-                                                        .LoadAsync();
-
-                                                    return new DataFileInfo
-                                                    {
-                                                        // TODO size and rows are for zip file but they need to be for
-                                                        // the datafile which isn't extracted yet
-                                                        Id = dataFile.Id,
-                                                        FileName = dataFile.Filename,
-                                                        Name = validSubjectName,
-                                                        Size = blob.Size,
-                                                        MetaFileId = metaFile.Id,
-                                                        MetaFileName = metaFile.Filename,
-                                                        Rows = blob.GetNumberOfRows(),
-                                                        UserName = dataFile.CreatedBy.Email,
-                                                        Status = DataImportStatus.QUEUED,
-                                                        Created = dataFile.Created,
-                                                        Permissions =
-                                                            await _userService.GetDataFilePermissions(dataFile)
-                                                    };
+                                                    return BuildDataFileViewModel(dataFile: dataFile,
+                                                        metaFile: metaFile,
+                                                        validSubjectName,
+                                                        dataImport.TotalRows,
+                                                        dataImport.Status,
+                                                        permissions);
                                                 });
                                         }));
                         });
                 });
         }
 
-        private async Task<DataFileInfo> GetDataFileInfo(Guid releaseId, File dataFile)
+        private async Task<DataFileInfo> BuildDataFileViewModel(ReleaseFile releaseFile)
         {
-            // Files should exists in storage but if not then allow user to delete
-            var blobExists =
-                await _blobStorageService.CheckBlobExists(PrivateReleaseFiles, dataFile.Path());
+            var dataImport = await _contentDbContext.DataImports
+                .AsSplitQuery()
+                .Include(di => di.File)
+                .ThenInclude(f => f.CreatedBy)
+                .Include(di => di.MetaFile)
+                .SingleAsync(di => di.FileId == releaseFile.FileId);
 
-            if (!blobExists)
+            var permissions = await _userService.GetDataFilePermissions(dataImport.File);
+
+            return BuildDataFileViewModel(dataFile: dataImport.File,
+                metaFile: dataImport.MetaFile,
+                releaseFile.Name,
+                dataImport.TotalRows,
+                dataImport.Status,
+                permissions);
+        }
+
+        private async Task<List<DataFileInfo>> BuildDataFileViewModels(List<ReleaseFile> releaseFiles)
+        {
+            var fileIds = releaseFiles.Select(rf => rf.FileId).ToList();
+
+            var dataImports = await _contentDbContext.DataImports
+                .AsSplitQuery()
+                .Include(di => di.File)
+                .ThenInclude(f => f.CreatedBy)
+                .Include(di => di.MetaFile)
+                .Where(di => fileIds.Contains(di.FileId))
+                .ToDictionaryAsync(di => di.FileId);
+
+            var subjectNames = releaseFiles.ToDictionary(rf => rf.FileId, rf => rf.Name);
+
+            // TODO Optimise GetDataFilePermissions here instead of potentially making several db queries
+            // Work out if the user has permission to cancel any import which Bau users can.
+            // Combine it with the import status (already known) to evaluate whether a particular import can be cancelled
+            var permissions = await releaseFiles
+                .ToAsyncEnumerable()
+                .ToDictionaryAwaitAsync(rf => ValueTask.FromResult(rf.FileId),
+                    async rf => await _userService.GetDataFilePermissions(rf.File));
+
+            return fileIds.Select(fileId =>
             {
-                return await GetFallbackDataFileInfo(releaseId, dataFile);
-            }
+                var dataImport = dataImports[fileId];
+                return BuildDataFileViewModel(dataFile: dataImport.File,
+                    metaFile: dataImport.MetaFile,
+                    subjectNames[fileId],
+                    dataImport.TotalRows,
+                    dataImport.Status,
+                    permissions[fileId]);
+            }).ToList();
+        }
 
-            var blob = await _blobStorageService.GetBlob(PrivateReleaseFiles, dataFile.Path());
-
-            var metaFile = await GetAssociatedMetaFile(releaseId, dataFile);
-
-            await _contentDbContext.Entry(dataFile)
-                .Reference(f => f.CreatedBy)
-                .LoadAsync();
-
+        private static DataFileInfo BuildDataFileViewModel(File dataFile,
+            File metaFile,
+            string? subjectName,
+            int? totalRows,
+            DataImportStatus importStatus,
+            DataFilePermissions permissions)
+        {
             return new DataFileInfo
             {
                 Id = dataFile.Id,
                 FileName = dataFile.Filename,
-                Name = await GetSubjectName(releaseId, dataFile),
-                Size = blob.Size,
+                Name = subjectName ?? "Unknown",
+                Size = dataFile.DisplaySize(),
                 MetaFileId = metaFile.Id,
                 MetaFileName = metaFile.Filename,
                 ReplacedBy = dataFile.ReplacedById,
-                Rows = blob.GetNumberOfRows(),
+                Rows = totalRows,
                 UserName = dataFile.CreatedBy?.Email ?? "",
-                Status = await _dataImportService.GetStatus(dataFile.Id),
+                Status = importStatus,
                 Created = dataFile.Created,
-                Permissions = await _userService.GetDataFilePermissions(dataFile)
-            };
-        }
-
-        private async Task<DataFileInfo> GetFallbackDataFileInfo(Guid releaseId, File dataFile)
-        {
-            await _contentDbContext.Entry(dataFile)
-                .Reference(f => f.CreatedBy)
-                .LoadAsync();
-
-            // Try to get the name from the zip file if existing
-            if (dataFile.SourceId != null)
-            {
-                var source = await _fileRepository.Get(dataFile.SourceId.Value);
-
-                if (await _blobStorageService.CheckBlobExists(PrivateReleaseFiles, source.Path()))
-                {
-                    var zipBlob = await _blobStorageService.GetBlob(PrivateReleaseFiles, source.Path());
-
-                    return new DataFileInfo
-                    {
-                        Id = dataFile.Id,
-                        FileName = dataFile.Filename,
-                        Name = await GetSubjectName(releaseId, dataFile),
-                        Size = zipBlob.Size,
-                        MetaFileId = null,
-                        MetaFileName = zipBlob.GetMetaFileName(),
-                        Rows = 0,
-                        UserName = dataFile.CreatedBy?.Email ?? "",
-                        Status = await _dataImportService.GetStatus(dataFile.Id),
-                        Created = dataFile.Created,
-                        Permissions = await _userService.GetDataFilePermissions(dataFile)
-                    };
-                }
-            }
-
-            var metaFile = await GetAssociatedMetaFile(releaseId, dataFile);
-
-            return new DataFileInfo
-            {
-                Id = dataFile.Id,
-                FileName = dataFile.Filename,
-                Name = await GetSubjectName(releaseId, dataFile),
-                Size = "0.00 B",
-                MetaFileId = metaFile.Id,
-                MetaFileName = metaFile.Filename ?? "",
-                Rows = 0,
-                UserName = dataFile.CreatedBy?.Email ?? "",
-                Status = await _dataImportService.GetStatus(dataFile.Id),
-                Created = dataFile.Created,
-                Permissions = await _userService.GetDataFilePermissions(dataFile)
+                Permissions = permissions
             };
         }
 
@@ -469,7 +403,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         private async Task<Either<ActionResult, string>> ValidateSubjectName(Guid releaseId,
-            string subjectName, File replacingFile)
+            string subjectName,
+            File? replacingFile)
         {
             if (replacingFile == null)
             {
@@ -482,14 +417,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task UploadFileToStorage(
             File file,
-            IFormFile formFile,
-            IDictionary<string, string> metadata = null)
+            IFormFile formFile)
         {
             await _blobStorageService.UploadFile(
                 containerName: PrivateReleaseFiles,
                 path: file.Path(),
-                file: formFile,
-                metadata: metadata
+                file: formFile
             );
         }
 

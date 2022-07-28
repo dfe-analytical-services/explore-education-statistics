@@ -13,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
         public Task<MethodologyFile> Create(
             Guid methodologyVersionId,
             string filename,
+            long contentLength,
+            string contentType,
             FileType type,
             Guid createdById);
 
@@ -22,10 +24,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.M
 
         public Task Delete(Guid methodologyVersionId, Guid fileId);
 
-        public Task<MethodologyFile> Get(Guid methodologyVersionId, Guid fileId);
+        public Task<MethodologyFile?> Get(Guid methodologyVersionId, Guid fileId);
 
         public Task<List<MethodologyFile>> GetByFileType(Guid methodologyVersionId, params FileType[] types);
-        
+
         public Task<List<MethodologyFile>> GetByFile(Guid fileId);
     }
 }

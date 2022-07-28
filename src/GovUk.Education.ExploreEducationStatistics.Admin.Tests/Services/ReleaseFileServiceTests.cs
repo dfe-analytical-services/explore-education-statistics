@@ -30,6 +30,7 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Utils.ContentDbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockFormTestUtils;
+using static Moq.MockBehavior;
 using File = GovUk.Education.ExploreEducationStatistics.Content.Model.File;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
@@ -45,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             _filePaths.ForEach(System.IO.File.Delete);
         }
 
-        private readonly User _user = new User
+        private readonly User _user = new()
         {
             Id = Guid.NewGuid(),
             Email = "test@test.com"
@@ -98,7 +99,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.Setup(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()))
@@ -110,6 +111,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobStorageService: blobStorageService.Object);
 
                 var result = await service.Delete(release.Id, ancillaryFile.File.Id);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 Assert.True(result.IsRight);
 
@@ -129,8 +132,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(imageFile.Id));
                 Assert.NotNull(await contentDbContext.Files.FindAsync(imageFile.File.Id));
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -172,7 +173,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -180,6 +181,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobStorageService: blobStorageService.Object);
 
                 var result = await service.Delete(amendmentRelease.Id, ancillaryFile.Id);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 Assert.True(result.IsRight);
             }
@@ -193,8 +196,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(await contentDbContext.Files.FindAsync(ancillaryFile.Id));
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(releaseFile.Id));
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -223,12 +224,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.Delete(release.Id, dataFile.File.Id);
 
@@ -241,8 +239,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(dataFile.Id));
                 Assert.NotNull(await contentDbContext.Files.FindAsync(dataFile.File.Id));
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -270,7 +266,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -278,6 +274,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobStorageService: blobStorageService.Object);
 
                 var result = await service.Delete(Guid.NewGuid(), ancillaryFile.File.Id);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 result.AssertNotFound();
             }
@@ -288,8 +286,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(ancillaryFile.Id));
                 Assert.NotNull(await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -305,19 +301,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.Delete(release.Id, Guid.NewGuid());
 
                 result.AssertNotFound();
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -367,7 +358,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.Setup(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()))
@@ -393,6 +384,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     imageFile.File.Id
                 });
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 Assert.True(result.IsRight);
 
                 blobStorageService.Verify(mock =>
@@ -416,8 +409,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(imageFile.Id));
                 Assert.Null(await contentDbContext.Files.FindAsync(imageFile.File.Id));
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -457,7 +448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -469,6 +460,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ancillaryFile.File.Id,
                     dataFile.File.Id
                 });
+
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 result.AssertBadRequest(FileTypeInvalid);
             }
@@ -482,8 +475,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(dataFile.Id));
                 Assert.NotNull(await contentDbContext.Files.FindAsync(dataFile.File.Id));
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -533,7 +524,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -546,6 +537,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     chartFile.File.Id,
                     imageFile.File.Id
                 });
+
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 result.AssertNotFound();
             }
@@ -562,8 +555,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(imageFile.Id));
                 Assert.NotNull(await contentDbContext.Files.FindAsync(imageFile.File.Id));
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -591,7 +582,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -605,6 +596,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Guid.NewGuid()
                 });
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 result.AssertNotFound();
             }
 
@@ -614,8 +607,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(ancillaryFile.Id));
                 Assert.NotNull(await contentDbContext.Files.FindAsync(ancillaryFile.File.Id));
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -671,7 +662,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.Setup(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()))
@@ -687,6 +678,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     ancillaryFile.Id,
                     chartFile.Id
                 });
+
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 Assert.True(result.IsRight);
 
@@ -708,8 +701,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(await contentDbContext.Files.FindAsync(chartFile.Id));
                 Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(chartAmendmentReleaseFile.Id));
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -782,7 +773,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.Setup(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, ancillaryFile.Path()))
@@ -806,6 +797,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobStorageService: blobStorageService.Object);
 
                 var result = await service.DeleteAll(release.Id);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 Assert.True(result.IsRight);
 
@@ -840,26 +833,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(await contentDbContext.ReleaseFiles.FindAsync(dataFile.Id));
                 Assert.NotNull(await contentDbContext.Files.FindAsync(dataFile.File.Id));
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
         public async Task DeleteAll_ReleaseNotFound()
         {
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            await using var contentDbContext = InMemoryContentDbContext();
 
-            await using (var contentDbContext = InMemoryContentDbContext())
-            {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+            var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-                var result = await service.DeleteAll(Guid.NewGuid());
+            var result = await service.DeleteAll(Guid.NewGuid());
 
-                result.AssertNotFound();
-            }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -875,7 +860,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -884,10 +869,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.DeleteAll(release.Id);
 
+                MockUtils.VerifyAllMocks(blobStorageService);
+
                 Assert.True(result.IsRight);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -959,7 +944,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.Setup(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, chartFile.Path()))
@@ -975,6 +960,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     blobStorageService: blobStorageService.Object);
 
                 var result = await service.DeleteAll(amendmentRelease.Id);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
 
                 Assert.True(result.IsRight);
 
@@ -999,8 +986,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Null(await contentDbContext.Files.FindAsync(dataGuidanceFile.Id));
                 Assert.Null(await contentDbContext.ReleaseFiles.FindAsync(dataGuidanceAmendmentReleaseFile.Id));
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -1016,38 +1001,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.ListAll(release.Id, Ancillary, Chart);
 
                 Assert.True(result.IsRight);
                 Assert.Empty(result.Right);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
         public async Task ListAll_ReleaseNotFound()
         {
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            await using var contentDbContext = InMemoryContentDbContext();
 
-            await using (var contentDbContext = InMemoryContentDbContext())
-            {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+            var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-                var result = await service.ListAll(Guid.NewGuid(), Ancillary, Chart);
+            var result = await service.ListAll(Guid.NewGuid(), Ancillary, Chart);
 
-                result.AssertNotFound();
-            }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
+            result.AssertNotFound();
         }
 
         [Fact]
@@ -1063,6 +1037,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary_1.pdf",
+                    ContentLength = 10240,
                     Type = Ancillary,
                     CreatedBy = new User
                     {
@@ -1080,6 +1055,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "Ancillary 2.pdf",
+                    ContentLength = 10240,
                     Type = Ancillary,
                     CreatedBy = new User
                     {
@@ -1096,6 +1072,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "chart.png",
+                    ContentLength = 20480,
                     Type = Chart,
                     CreatedBy = new User
                     {
@@ -1129,6 +1106,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "image.png",
+                    ContentLength = 30720,
                     Type = Image,
                     CreatedBy = new User
                     {
@@ -1148,78 +1126,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            blobStorageService.Setup(mock =>
-                    mock.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
-                        ancillaryFile1.Path(),
-                        ancillaryFile2.Path(),
-                        chartFile.Path(),
-                        imageFile.Path())))
-                .ReturnsAsync(true);
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateReleaseFiles, ancillaryFile1.Path()))
-                .ReturnsAsync(new BlobInfo(
-                    path: ancillaryFile1.Path(),
-                    size: "10 Kb",
-                    contentType: "application/pdf",
-                    contentLength: 0L,
-                    meta: new Dictionary<string, string>(),
-                    created: null));
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateReleaseFiles, ancillaryFile2.Path()))
-                .ReturnsAsync(new BlobInfo(
-                    path: ancillaryFile2.Path(),
-                    size: "10 Kb",
-                    contentType: "application/pdf",
-                    contentLength: 0L,
-                    meta: new Dictionary<string, string>(),
-                    created: null));
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateReleaseFiles, chartFile.Path()))
-                .ReturnsAsync(new BlobInfo(
-                    path: chartFile.Path(),
-                    size: "20 Kb",
-                    contentType: "image/png",
-                    contentLength: 0L,
-                    meta: new Dictionary<string, string>(),
-                    created: null));
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateReleaseFiles, imageFile.Path()))
-                .ReturnsAsync(new BlobInfo(
-                    path: imageFile.Path(),
-                    size: "30 Kb",
-                    contentType: "image/png",
-                    contentLength: 0L,
-                    meta: new Dictionary<string, string>(),
-                    created: null));
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.ListAll(release.Id, Ancillary, Chart, Image);
 
                 Assert.True(result.IsRight);
-
-                blobStorageService.Verify(mock =>
-                    mock.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
-                        ancillaryFile1.Path(),
-                        ancillaryFile2.Path(),
-                        chartFile.Path(),
-                        imageFile.Path())), Times.Exactly(4));
-
-                blobStorageService.Verify(mock =>
-                    mock.GetBlob(PrivateReleaseFiles, It.IsIn(
-                        ancillaryFile1.Path(),
-                        ancillaryFile2.Path(),
-                        chartFile.Path(),
-                        imageFile.Path())), Times.Exactly(4));
 
                 var fileInfoList = result.Right.ToList();
                 Assert.Equal(4, fileInfoList.Count);
@@ -1241,19 +1154,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(chartFile.File.Id, fileInfoList[2].Id);
                 Assert.Equal("png", fileInfoList[2].Extension);
                 Assert.Equal("chart.png", fileInfoList[2].FileName);
-                Assert.Equal("chart.png", fileInfoList[2].Name);
+                Assert.Equal("", fileInfoList[2].Name);
                 Assert.Equal("20 Kb", fileInfoList[2].Size);
                 Assert.Equal(Chart, fileInfoList[2].Type);
 
                 Assert.Equal(imageFile.File.Id, fileInfoList[3].Id);
                 Assert.Equal("png", fileInfoList[3].Extension);
                 Assert.Equal("image.png", fileInfoList[3].FileName);
-                Assert.Equal("image.png", fileInfoList[3].Name);
+                Assert.Equal("", fileInfoList[3].Name);
                 Assert.Equal("30 Kb", fileInfoList[3].Size);
                 Assert.Equal(Image, fileInfoList[3].Type);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -1269,6 +1180,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary_1.pdf",
+                    ContentLength = 10240,
                     Type = Ancillary,
                     CreatedBy = new User
                     {
@@ -1286,6 +1198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "Ancillary 2.pdf",
+                    ContentLength = 10240,
                     Type = Ancillary,
                     CreatedBy = new User
                     {
@@ -1354,52 +1267,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            blobStorageService.Setup(mock =>
-                    mock.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
-                        ancillaryFile1.Path(),
-                        ancillaryFile2.Path())))
-                .ReturnsAsync(true);
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateReleaseFiles, ancillaryFile1.Path()))
-                .ReturnsAsync(new BlobInfo(
-                    path: ancillaryFile1.Path(),
-                    size: "10 Kb",
-                    contentType: "application/pdf",
-                    contentLength: 0L,
-                    meta: new Dictionary<string, string>(),
-                    created: null));
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateReleaseFiles, ancillaryFile2.Path()))
-                .ReturnsAsync(new BlobInfo(
-                    path: ancillaryFile2.Path(),
-                    size: "10 Kb",
-                    contentType: "application/pdf",
-                    contentLength: 0L,
-                    meta: new Dictionary<string, string>(),
-                    created: null));
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.GetAncillaryFiles(release.Id);
 
                 Assert.True(result.IsRight);
-
-                blobStorageService.Verify(mock =>
-                    mock.CheckBlobExists(PrivateReleaseFiles, It.IsIn(
-                        ancillaryFile1.Path(), ancillaryFile2.Path())),
-                        Times.Exactly(2));
-
-                blobStorageService.Verify(mock =>
-                    mock.GetBlob(PrivateReleaseFiles, It.IsIn(
-                        ancillaryFile1.Path(), ancillaryFile2.Path())),
-                        Times.Exactly(2));
 
                 var fileInfoList = result.Right.ToList();
                 Assert.Equal(2, fileInfoList.Count);
@@ -1422,8 +1296,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(ancillaryFile2.File.Created, fileInfoList[1].Created);
                 Assert.Equal(ancillaryFile2.File.CreatedBy.Email, fileInfoList[1].UserName);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -1437,6 +1309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
+                    ContentLength = 10240,
                     Type = Ancillary
                 }
             };
@@ -1448,29 +1321,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            blobStorageService
-                .Setup(mock => mock.CheckBlobExists(PrivateReleaseFiles, releaseFile.Path()))
-                .ReturnsAsync(true);
-            blobStorageService
-                .Setup(mock => mock.GetBlob(PrivateReleaseFiles, releaseFile.Path()))
-                .ReturnsAsync(
-                    new BlobInfo(
-                        path: string.Empty,
-                        size: "93 Kb",
-                        contentType: "application/pdf",
-                        contentLength: 0L,
-                        meta: null,
-                        created: null
-                    )
-                );
-
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(
-                    contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.GetFile(releaseFile.ReleaseId, releaseFile.FileId);
                 Assert.True(result.IsRight);
@@ -1480,103 +1333,44 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(releaseFile.FileId, fileInfo.Id);
                 Assert.Equal("pdf", fileInfo.Extension);
                 Assert.Equal("ancillary.pdf", fileInfo.FileName);
-                Assert.Equal("93 Kb", fileInfo.Size);
+                Assert.Equal("10 Kb", fileInfo.Size);
                 Assert.Equal(Ancillary, fileInfo.Type);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
         public async Task GetFile_NoRelease()
         {
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            await using var contentDbContext = InMemoryContentDbContext();
 
-            await using (var contentDbContext = InMemoryContentDbContext())
-            {
-                var service = SetupReleaseFileService(
-                    contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+            var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
-                var result = await service.GetFile(Guid.NewGuid(), Guid.NewGuid());
+            var result = await service.GetFile(Guid.NewGuid(), Guid.NewGuid());
 
-                result.AssertNotFound();
-            }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
+            result.AssertNotFound();
         }
 
         [Fact]
         public async Task GetFile_NoReleaseFile()
         {
             var release = new Release();
-            var contextId = Guid.NewGuid().ToString();
 
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
                 await contentDbContext.AddAsync(release);
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contextId))
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(
-                    contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.GetFile(release.Id, Guid.NewGuid());
 
                 result.AssertNotFound();
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
-        }
-
-        [Fact]
-        public async Task GetFile_NoBlob()
-        {
-            var releaseFile = new ReleaseFile
-            {
-                Release = new Release(),
-                Name = "Test PDF File",
-                File = new File
-                {
-                    RootPath = Guid.NewGuid(),
-                    Filename = "ancillary.pdf",
-                    Type = Ancillary
-                }
-            };
-
-            var contentDbContextId = Guid.NewGuid().ToString();
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                await contentDbContext.AddAsync(releaseFile);
-                await contentDbContext.SaveChangesAsync();
-            }
-
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            blobStorageService.Setup(mock =>
-                    mock.CheckBlobExists(PrivateReleaseFiles, releaseFile.Path()))
-                .ReturnsAsync(false);
-
-            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
-            {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
-
-                var result = await service.GetFile(releaseFile.ReleaseId, releaseFile.FileId);
-                var fileInfo = result.AssertRight();
-
-                Assert.Equal("Test PDF File", fileInfo.Name);
-                Assert.Equal(releaseFile.FileId, fileInfo.Id);
-                Assert.Equal("pdf", fileInfo.Extension);
-                Assert.Equal(releaseFile.File.Filename, fileInfo.FileName);
-                Assert.Equal("0.00 B", fileInfo.Size);
-                Assert.Equal(releaseFile.File.Type, fileInfo.Type);
-            }
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -1591,6 +1385,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "ancillary.pdf",
+                    ContentType = "application/pdf",
                     Type = Ancillary
                 }
             };
@@ -1604,19 +1399,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            var blob = new BlobInfo(
-                path: string.Empty,
-                size: string.Empty,
-                contentType: "application/pdf",
-                contentLength: 0L,
-                meta: null,
-                created: null);
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateReleaseFiles, releaseFile.Path()))
-                .ReturnsAsync(blob);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.Setup(mock =>
                     mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
@@ -1630,11 +1413,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.Stream(release.Id, releaseFile.File.Id);
 
-                Assert.True(result.IsRight);
+                MockUtils.VerifyAllMocks(blobStorageService);
 
-                blobStorageService.Verify(
-                    mock => mock.GetBlob(PrivateReleaseFiles, releaseFile.Path()),
-                    Times.Once());
+                Assert.True(result.IsRight);
 
                 blobStorageService.Verify(
                     mock =>
@@ -1646,8 +1427,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("ancillary.pdf", result.Right.FileDownloadName);
                 Assert.IsType<MemoryStream>(result.Right.FileStream);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -1662,6 +1441,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 {
                     RootPath = Guid.NewGuid(),
                     Filename = "Ancillary 1.pdf",
+                    ContentType = "application/pdf",
                     Type = Ancillary
                 }
             };
@@ -1675,19 +1455,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            var blob = new BlobInfo(
-                path: string.Empty,
-                size: string.Empty,
-                contentType: "application/pdf",
-                contentLength: 0L,
-                meta: null,
-                created: null);
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateReleaseFiles, releaseFile.Path()))
-                .ReturnsAsync(blob);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService.Setup(mock =>
                     mock.DownloadToStream(PrivateReleaseFiles, releaseFile.Path(),
@@ -1701,11 +1469,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.Stream(release.Id, releaseFile.File.Id);
 
-                Assert.True(result.IsRight);
+                MockUtils.VerifyAllMocks(blobStorageService);
 
-                blobStorageService.Verify(
-                    mock => mock.GetBlob(PrivateReleaseFiles, releaseFile.Path()),
-                    Times.Once());
+                Assert.True(result.IsRight);
 
                 blobStorageService.Verify(
                     mock =>
@@ -1717,8 +1483,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Ancillary 1.pdf", result.Right.FileDownloadName);
                 Assert.IsType<MemoryStream>(result.Right.FileStream);
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -1746,19 +1510,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            await using (var contentDbContext = InMemoryContentDbContext())
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.Stream(Guid.NewGuid(), releaseFile.File.Id);
 
                 result.AssertNotFound();
             }
-
-            MockUtils.VerifyAllMocks(blobStorageService);
         }
 
         [Fact]
@@ -1774,19 +1533,57 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-
-            await using (var contentDbContext = InMemoryContentDbContext())
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
-                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
-                    blobStorageService: blobStorageService.Object);
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext);
 
                 var result = await service.Stream(release.Id, Guid.NewGuid());
 
                 result.AssertNotFound();
             }
+        }
 
-            MockUtils.VerifyAllMocks(blobStorageService);
+        [Fact]
+        public async Task Stream_BlobDoesNotExist()
+        {
+            var release = new Release();
+
+            var releaseFile = new ReleaseFile
+            {
+                Release = release,
+                File = new File
+                {
+                    RootPath = Guid.NewGuid(),
+                    Filename = "ancillary.pdf",
+                    ContentType = "application/pdf",
+                    Type = Ancillary
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddAsync(release);
+                await contentDbContext.AddAsync(releaseFile);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+
+            blobStorageService.SetupDownloadToStreamNotFound(PrivateReleaseFiles, releaseFile.Path());
+
+            await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseFileService(contentDbContext: contentDbContext,
+                    blobStorageService: blobStorageService.Object);
+
+                var result = await service.Stream(release.Id, releaseFile.File.Id);
+
+                MockUtils.VerifyAllMocks(blobStorageService);
+
+                result.AssertNotFound();
+            }
         }
 
         [Fact]
@@ -1833,7 +1630,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService
                 .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile1.Path(), true);
@@ -1849,7 +1646,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Select(rf => rf.File.SubjectId.GetValueOrDefault())
                 .ToList();
 
-            var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
+            var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(Strict);
 
             dataGuidanceFileWriter
                 .Setup(
@@ -1949,7 +1746,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService
                 .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile1.Path(), true);
@@ -1965,7 +1762,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .Select(rf => rf.File.SubjectId.GetValueOrDefault())
                 .ToList();
 
-            var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(MockBehavior.Strict);
+            var dataGuidanceFileWriter = new Mock<IDataGuidanceFileWriter>(Strict);
 
             dataGuidanceFileWriter
                 .Setup(
@@ -2076,7 +1873,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var path = GenerateZipFilePath();
             var stream = System.IO.File.OpenWrite(path);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             blobStorageService
                 .SetupCheckBlobExists(PrivateReleaseFiles, releaseFile1.Path(), true);
@@ -2191,7 +1988,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var path = GenerateZipFilePath();
             var stream = System.IO.File.OpenWrite(path);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -2264,7 +2061,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var path = GenerateZipFilePath();
             var stream = System.IO.File.OpenWrite(path);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             // Files do not exist in blob storage
             blobStorageService.SetupCheckBlobExists(PrivateReleaseFiles, releaseFile1.Path(), false);
@@ -2342,7 +2139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var path = GenerateZipFilePath();
             var stream = System.IO.File.OpenWrite(path);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -2391,7 +2188,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var path = GenerateZipFilePath();
             var stream = System.IO.File.OpenWrite(path);
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             await using (var contentDbContext = InMemoryContentDbContext(contentDbContextId))
             {
@@ -2462,7 +2259,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var tokenSource = new CancellationTokenSource();
 
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
 
             // After the first file has completed, we cancel the request
             // to prevent the next file from being fetched.
@@ -2747,29 +2544,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var formFile = CreateFormFileMock(filename).Object;
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
+            var formFile = CreateFormFileMock(filename, "application/pdf").Object;
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
 
             blobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
                         path.Contains(FilesPath(release.Id, Ancillary))),
-                    formFile,
-                    null
+                    formFile
                 )).Returns(Task.CompletedTask);
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateReleaseFiles,
-                        It.Is<string>(path =>
-                            path.Contains(FilesPath(release.Id, Ancillary)))))
-                .ReturnsAsync(new BlobInfo(
-                    path: "ancillary/file/path",
-                    size: "10 Kb",
-                    contentType: "application/pdf",
-                    contentLength: 0L,
-                    meta: new Dictionary<string, string>(),
-                    created: null));
 
             fileUploadsValidatorService.Setup(mock =>
                     mock.ValidateFileForUpload(formFile, Ancillary))
@@ -2791,6 +2575,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     }
                 );
 
+                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+
                 var fileInfo = result.AssertRight();
 
                 fileUploadsValidatorService.Verify(mock =>
@@ -2800,15 +2586,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, Ancillary))),
-                        formFile,
-                        null
+                        formFile
                     ), Times.Once);
-
-                blobStorageService.Verify(mock =>
-                        mock.GetBlob(PrivateReleaseFiles,
-                            It.Is<string>(path =>
-                                path.Contains(FilesPath(release.Id, Ancillary)))),
-                    Times.Once);
 
                 Assert.True(fileInfo.Id.HasValue);
                 Assert.Equal("pdf", fileInfo.Extension);
@@ -2832,11 +2611,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 );
 
                 Assert.NotNull(releaseFile);
-                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile!.File.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
-                Assert.Equal(_user.Id, releaseFile.File.CreatedById);
-            }
+                var file = releaseFile!.File;
 
-            MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+                Assert.Equal(10240, file.ContentLength);
+                Assert.Equal("application/pdf", file.ContentType);
+                Assert.InRange(DateTime.UtcNow.Subtract(file.Created.GetValueOrDefault()).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, file.CreatedById);
+            }
         }
 
         [Fact]
@@ -2854,29 +2635,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.SaveChangesAsync();
             }
 
-            var formFile = CreateFormFileMock(filename).Object;
-            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
-            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
+            var formFile = CreateFormFileMock(filename, "image/png").Object;
+            var blobStorageService = new Mock<IBlobStorageService>(Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(Strict);
 
             blobStorageService.Setup(mock =>
                 mock.UploadFile(PrivateReleaseFiles,
                     It.Is<string>(path =>
                         path.Contains(FilesPath(release.Id, Chart))),
-                    formFile,
-                    null
+                    formFile
                 )).Returns(Task.CompletedTask);
-
-            blobStorageService.Setup(mock =>
-                    mock.GetBlob(PrivateReleaseFiles,
-                        It.Is<string>(path =>
-                            path.Contains(FilesPath(release.Id, Chart)))))
-                .ReturnsAsync(new BlobInfo(
-                    path: "chart/file/path",
-                    size: "20 Kb",
-                    contentType: "image/png",
-                    contentLength: 0L,
-                    meta: new Dictionary<string, string>(),
-                    created: null));
 
             fileUploadsValidatorService.Setup(mock =>
                     mock.ValidateFileForUpload(formFile, Chart))
@@ -2890,6 +2658,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var result = await service.UploadChart(release.Id, formFile);
 
+                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+
                 Assert.True(result.IsRight);
 
                 fileUploadsValidatorService.Verify(mock =>
@@ -2899,21 +2669,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     mock.UploadFile(PrivateReleaseFiles,
                         It.Is<string>(path =>
                             path.Contains(FilesPath(release.Id, Chart))),
-                        formFile,
-                        null
+                        formFile
                     ), Times.Once);
-
-                blobStorageService.Verify(mock =>
-                    mock.GetBlob(PrivateReleaseFiles,
-                        It.Is<string>(path =>
-                            path.Contains(FilesPath(release.Id, Chart)))),
-                    Times.Once);
 
                 Assert.True(result.Right.Id.HasValue);
                 Assert.Equal("png", result.Right.Extension);
                 Assert.Equal("chart.png", result.Right.FileName);
-                Assert.Equal("chart.png", result.Right.Name);
-                Assert.Equal("20 Kb", result.Right.Size);
+                Assert.Equal("", result.Right.Name);
+                Assert.Equal("10 Kb", result.Right.Size);
                 Assert.Equal(Chart, result.Right.Type);
             }
 
@@ -2928,11 +2691,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     );
 
                 Assert.NotNull(releaseFile);
-                Assert.InRange(DateTime.UtcNow.Subtract(releaseFile.File.Created!.Value).Milliseconds, 0, 1500);
-                Assert.Equal(_user.Id, releaseFile.File.CreatedById);
-            }
+                var file = releaseFile!.File;
 
-            MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService);
+                Assert.Equal(10240, file.ContentLength);
+                Assert.Equal("image/png", file.ContentType);
+                Assert.InRange(DateTime.UtcNow.Subtract(file.Created!.Value).Milliseconds, 0, 1500);
+                Assert.Equal(_user.Id, file.CreatedById);
+            }
         }
 
         private string GenerateZipFilePath()
@@ -2959,11 +2724,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             return new ReleaseFileService(
                 contentDbContext,
                 contentPersistenceHelper ?? new PersistenceHelper<ContentDbContext>(contentDbContext),
-                blobStorageService ?? Mock.Of<IBlobStorageService>(),
+                blobStorageService ?? Mock.Of<IBlobStorageService>(Strict),
                 fileRepository ?? new FileRepository(contentDbContext),
-                fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(),
+                fileUploadsValidatorService ?? Mock.Of<IFileUploadsValidatorService>(Strict),
                 releaseFileRepository ?? new ReleaseFileRepository(contentDbContext),
-                dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(),
+                dataGuidanceFileWriter ?? Mock.Of<IDataGuidanceFileWriter>(Strict),
                 userService ?? MockUtils.AlwaysTrueUserService(_user.Id).Object
             );
         }

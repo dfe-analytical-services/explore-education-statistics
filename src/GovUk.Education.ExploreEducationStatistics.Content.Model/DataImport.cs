@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using GovUk.Education.ExploreEducationStatistics.Common.Converters;
@@ -11,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     public class DataImport
     {
         private static readonly Dictionary<DataImportStatus, double> ProcessingRatios =
-            new Dictionary<DataImportStatus, double>
+            new()
             {
                 {STAGE_1, .1},
                 {STAGE_2, .1},
@@ -33,29 +34,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public Guid SubjectId { get; set; }
 
-        public File File { get; set; }
+        public File File { get; set; } = null!;
 
         public Guid FileId { get; set; }
 
-        public File MetaFile { get; set; }
+        public File MetaFile { get; set; } = null!;
 
         public Guid MetaFileId { get; set; }
 
-        public File ZipFile { get; set; }
+        public File? ZipFile { get; set; }
 
         public Guid? ZipFileId { get; set; }
 
-        public int TotalRows { get; set; }
+        public int? TotalRows { get; set; }
 
         public int NumBatches { get; set; }
 
         public int RowsPerBatch { get; set; }
 
-        public int ImportedRows { get; set; }
+        public int? ImportedRows { get; set; }
 
-        public HashSet<GeographicLevel> GeographicLevels { get; set; }
+        public HashSet<GeographicLevel> GeographicLevels { get; set; } = new();
 
-        public List<DataImportError> Errors { get; set; } = new List<DataImportError>();
+        public List<DataImportError> Errors { get; set; } = new();
 
         public int PercentageComplete()
         {

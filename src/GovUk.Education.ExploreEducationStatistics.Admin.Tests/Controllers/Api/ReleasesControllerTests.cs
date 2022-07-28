@@ -1,19 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
-using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Utils.AdminMockUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -63,7 +62,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service => service.Upload(_releaseId,
                     dataFile,
                     metaFile,
-                    "test@example.com",
                     null,
                     "Subject name"))
                 .ReturnsAsync(dataFileInfo);
@@ -92,7 +90,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 .Setup(service => service.Upload(_releaseId,
                     dataFile,
                     metaFile,
-                    "test@example.com",
                     null,
                     "Subject name"))
                 .ReturnsAsync(ValidationActionResult(CannotOverwriteFile));
@@ -111,17 +108,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         }
 
         [Fact]
-        public async Task GetDataFilesAsync_Returns_A_List_Of_Files()
+        public async Task GetDataFileInfo_Returns_A_List_Of_Files()
         {
-            IEnumerable<DataFileInfo> testFiles = new[]
+            var testFiles = new List<DataFileInfo>
             {
-                new DataFileInfo
+                new()
                 {
                     FileName = "file1.csv",
                     Name = "Release a file 1",
                     Size = "1 Kb"
                 },
-                new DataFileInfo
+                new()
                 {
                     FileName = "file2.csv",
                     Name = "Release a file 2",
@@ -134,8 +131,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
             mocks
                 .ReleaseDataFilesService
                 .Setup(s => s.ListAll(_releaseId))
-                .ReturnsAsync(new Either<ActionResult, IEnumerable<DataFileInfo>>(testFiles));
-            
+                .ReturnsAsync(testFiles);
+
             var controller = ReleasesControllerWithMocks(mocks);
 
             // Call the method under test
@@ -329,15 +326,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
         private static IFormFile MockFile(string fileName)
         {
             var fileMock = new Mock<IFormFile>(Strict);
-            const string content = "test content";
-            var ms = new MemoryStream();
-            var writer = new StreamWriter(ms);
-            writer.Write(content);
-            writer.Flush();
-            ms.Position = 0;
-            fileMock.Setup(_ => _.OpenReadStream()).Returns(ms);
-            fileMock.Setup(_ => _.FileName).Returns(fileName);
-            fileMock.Setup(_ => _.Length).Returns(ms.Length);
+            var stream = "test content".ToStream();
+            fileMock.Setup(formFile => formFile.OpenReadStream()).Returns(stream);
+            fileMock.Setup(formFile => formFile.FileName).Returns(fileName);
+            fileMock.Setup(formFile => formFile.Length).Returns(stream.Length);
             return fileMock.Object;
         }
 
@@ -374,10 +366,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 mocks.ReleaseDataFileService.Object,
                 mocks.ReleaseStatusService.Object,
                 mocks.ReleaseChecklistService.Object,
-                MockUserManager(new ApplicationUser
-                {
-                    Email = "test@example.com"
-                }).Object,
                 mocks.ImportService.Object);
         }
     }

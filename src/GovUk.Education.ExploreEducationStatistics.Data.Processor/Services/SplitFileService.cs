@@ -18,7 +18,6 @@ using GovUk.Education.ExploreEducationStatistics.Data.Processor.Utils;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStorageUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
 {
@@ -109,7 +108,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
             var colValues = CsvUtil.GetColumnValues(dataFileTable.Columns);
             var batches = dataFileTable.Rows.OfType<DataRow>().Batch(dataImport.RowsPerBatch);
             var batchCount = 1;
-            var numRows = dataFileTable.Rows.Count + 1;
             var numBatches = (int)Math.Ceiling((double)dataFileTable.Rows.Count / dataImport.RowsPerBatch);
 
             var existingBatchFiles = await _batchService.GetBatchFilesForDataFile(dataImport.File);
@@ -172,11 +170,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Processor.Services
                     containerName: PrivateReleaseFiles,
                     path: dataImport.File.BatchPath(batchCount),
                     stream: stream,
-                    contentType: "text/csv",
-                    metadata: GetDataFileMetaValues(
-                        metaFileName: dataImport.MetaFile.Filename,
-                        numberOfRows: numRows
-                    ));
+                    contentType: "text/csv");
 
                 batchFilesExist = true;
                 batchCount++;

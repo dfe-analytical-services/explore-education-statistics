@@ -9,10 +9,12 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Variables ***
 ${PUBLICATION_NAME}     UI tests - data reordering %{RUN_IDENTIFIER}
 ${RELEASE_NAME}         Calendar Year 2022
 ${SUBJECT_NAME}         UI test subject
+
 
 *** Test Cases ***
 Create new publication and release via API
@@ -210,7 +212,7 @@ Replace subject data
     user checks headed table body row cell contains    Subject title    1    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    1    grouped-filters-and-indicators.csv
     user checks headed table body row cell contains    Metadata file    1    grouped-filters-and-indicators.meta.csv
-    user checks headed table body row cell contains    Number of rows    1    101
+    user checks headed table body row cell contains    Number of rows    1    100
     user checks headed table body row cell contains    Data file size    1    13 Kb
     user checks headed table body row cell contains    Status    1    Data replacement in progress    wait=%{WAIT_LONG}
 
@@ -218,7 +220,7 @@ Replace subject data
     user checks headed table body row cell contains    Data file    2    grouped-filters-and-indicators-replacement.csv
     user checks headed table body row cell contains    Metadata file    2
     ...    grouped-filters-and-indicators-replacement.meta.csv
-    user checks headed table body row cell contains    Number of rows    2    141
+    user checks headed table body row cell contains    Number of rows    2    140
     user checks headed table body row cell contains    Data file size    2    19 Kb
     user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
 
@@ -598,6 +600,7 @@ Validate table cells again
     user checks results table cell contains    5    1    4,355,910
     user checks results table cell contains    6    1    7,922,048
     user checks results table cell contains    7    1    6,759,498
+
 
 *** Keywords ***
 user moves item of draggable list down
