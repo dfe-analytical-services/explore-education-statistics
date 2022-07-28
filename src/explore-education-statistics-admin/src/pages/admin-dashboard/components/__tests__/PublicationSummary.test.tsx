@@ -40,7 +40,7 @@ describe('PublicationSummary', () => {
   const testPublication: MyPublication = {
     id: 'publication-1',
     title: 'Publication 1',
-    contact: undefined,
+    contact: testContact,
     releases: [],
     legacyReleases: [],
     methodologies: [],
@@ -143,7 +143,7 @@ describe('PublicationSummary', () => {
     releaseService.getReleaseStatus.mockResolvedValue(completeReleaseStatus);
   });
 
-  test('renders correctly with a publication with no releases, methodologies, contact details or permissions', async () => {
+  test('renders correctly with a publication with no releases, methodologies or permissions', async () => {
     render(
       <MemoryRouter>
         <PublicationSummary
@@ -153,9 +153,6 @@ describe('PublicationSummary', () => {
         />
       </MemoryRouter>,
     );
-
-    expect(screen.getByText('No team name')).toBeInTheDocument();
-    expect(screen.getByText('No contact name')).toBeInTheDocument();
 
     expect(screen.getByText('No releases created')).toBeInTheDocument();
 
@@ -186,7 +183,7 @@ describe('PublicationSummary', () => {
     ).not.toBeInTheDocument();
   });
 
-  test('renders correctly with team and contact details', async () => {
+  test('renders contact details correctly', async () => {
     render(
       <MemoryRouter>
         <PublicationSummary

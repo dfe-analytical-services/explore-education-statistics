@@ -1,6 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
-import { BasicPublicationDetails } from '@admin/services/publicationService';
+import {
+  BasicPublicationDetails,
+  PublicationContactDetails,
+} from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import userEvent from '@testing-library/user-event';
 import userService from '@admin/services/userService';
@@ -8,7 +11,16 @@ import PublicationInviteNewUsersTab from '../PublicationInviteNewUsersTab';
 
 jest.mock('@admin/services/userService');
 
+const testContact: PublicationContactDetails = {
+  id: 'contact-1',
+  contactName: 'John Smith',
+  contactTelNo: '0777777777',
+  teamEmail: 'john.smith@test.com',
+  teamName: 'Team Smith',
+};
+
 const publication: BasicPublicationDetails = {
+  contact: testContact,
   id: 'publication-id',
   title: 'Publication title',
   slug: 'publication-slug',

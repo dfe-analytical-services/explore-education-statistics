@@ -109,7 +109,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ThemeViewModel>> GetTheme(Guid id)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Theme>(id)
+                .CheckEntityExists<Theme>(id, q => 
+                    q.Include(t => t.Topics))
                 .OnSuccessDo(_userService.CheckCanManageAllTaxonomy)
                 .OnSuccess(_mapper.Map<ThemeViewModel>);
         }

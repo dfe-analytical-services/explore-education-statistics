@@ -10,6 +10,7 @@ export interface FormThemeTopicSelectProps {
   error?: string;
   id: string;
   hint?: string;
+  inline?: boolean;
   legend: string;
   legendHidden?: FormFieldsetProps['legendHidden'];
   legendSize?: FormFieldsetProps['legendSize'];
@@ -22,8 +23,9 @@ export interface FormThemeTopicSelectProps {
 
 const FormThemeTopicSelect = ({
   error,
-  id,
   hint,
+  id,
+  inline = true,
   legend,
   legendHidden,
   legendSize,
@@ -50,13 +52,17 @@ const FormThemeTopicSelect = ({
       legendHidden={legendHidden}
       legendSize={legendSize}
     >
-      <div className="dfe-flex dfe-flex-wrap">
-        <div className="govuk-!-margin-right-4">
+      <div className={inline ? 'dfe-flex dfe-flex-wrap' : ''}>
+        <div
+          className={
+            inline ? 'govuk-!-margin-right-4' : 'govuk-!-margin-bottom-6'
+          }
+        >
           <FormSelect
             id={`${id}-themeId`}
             label="Select theme"
             name={themeInputName}
-            className={styles.select}
+            className={inline ? styles.select : 'govuk-!-width-one-half'}
             value={selectedTheme?.id}
             options={themes.map(theme => ({
               label: theme.title,
@@ -91,7 +97,7 @@ const FormThemeTopicSelect = ({
             id={`${id}-topicId`}
             label="Select topic"
             name={topicInputName}
-            className={styles.select}
+            className={inline ? styles.select : 'govuk-!-width-one-half'}
             value={topicId}
             options={
               selectedTheme?.topics.map(topic => ({

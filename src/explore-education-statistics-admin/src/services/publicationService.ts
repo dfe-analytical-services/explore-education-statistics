@@ -21,14 +21,14 @@ export interface PublicationContactDetails {
   contactName: string;
   contactTelNo: string;
   teamEmail: string;
-  teamName?: string;
+  teamName: string;
 }
 
 export interface SavePublicationContact {
   contactName: string;
   contactTelNo: string;
   teamEmail: string;
-  teamName?: string;
+  teamName: string;
 }
 
 export interface ExternalMethodology {
@@ -45,7 +45,7 @@ export interface MyPublication {
   legacyReleases: LegacyRelease[];
   topicId: string;
   themeId: string;
-  contact?: PublicationContactDetails;
+  contact: PublicationContactDetails;
   permissions: {
     canAdoptMethodologies: boolean;
     canCreateReleases: boolean;
@@ -71,7 +71,7 @@ export interface BasicPublicationDetails {
   id: string;
   title: string;
   slug: string;
-  contact?: PublicationContactDetails;
+  contact: PublicationContactDetails;
   releases?: Release[];
   methodologies?: BasicMethodologyVersion[];
   externalMethodology?: ExternalMethodology;

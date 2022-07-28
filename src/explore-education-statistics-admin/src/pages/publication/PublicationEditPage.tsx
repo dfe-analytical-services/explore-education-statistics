@@ -73,10 +73,10 @@ const PublicationEditPage = ({
             initialValues={{
               title: publication.title,
               topicId: publication.topicId,
-              teamName: contact?.teamName ?? '',
-              teamEmail: contact?.teamEmail ?? '',
-              contactName: contact?.contactName ?? '',
-              contactTelNo: contact?.contactTelNo ?? '',
+              teamName: contact.teamName,
+              teamEmail: contact.teamEmail,
+              contactName: contact.contactName,
+              contactTelNo: contact.contactTelNo,
               supersededById: publication.supersededById,
             }}
             onSubmit={async ({
