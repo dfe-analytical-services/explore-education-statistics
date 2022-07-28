@@ -12,11 +12,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Model
         public const string PublishTaxonomyQueue = "publish-taxonomy";
         public const string RetryStageQueue = "retry";
         public const string NotifyChangeQueue = "notify";
-
-        /**
-         * Temporary queue used to migrate files in EES-3547
-         * TODO Remove in EES-3552
-         */
-        public const string MigrateFilesQueue = "migrate-files";
     }
 }

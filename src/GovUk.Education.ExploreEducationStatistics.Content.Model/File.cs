@@ -8,8 +8,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
     {
         public Guid Id { get; set; }
 
-        // TODO EES-3552 Remove nullable and migrate db column to be not-null
-        public string? ContentType { get; set; }
+        public string ContentType { get; set; } = string.Empty;
 
         public Guid RootPath { get; set; }
 
@@ -31,8 +30,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         public File? Source { get; set; }
 
-        // TODO EES-3552 Remove nullable and migrate db column to be not-null
-        public long? ContentLength { get; set; }
+        public long ContentLength { get; set; }
 
         public DateTime? Created { get; set; }
 

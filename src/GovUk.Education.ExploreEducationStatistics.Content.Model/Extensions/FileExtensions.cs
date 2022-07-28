@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions
 
         public static string DisplaySize(this File file)
         {
-            var contentLength = file.ContentLength ?? 0;
+            var contentLength = file.ContentLength;
             var unit = FileSizeUnit.B;
             while (contentLength >= 1024 && unit < FileSizeUnit.Tb)
             {
