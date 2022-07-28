@@ -1,7 +1,6 @@
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ButtonText from '@common/components/ButtonText';
-import { FormFieldset } from '@common/components/form';
 import Form from '@common/components/form/Form';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -11,7 +10,7 @@ import Yup from '@common/validation/yup';
 import { Formik } from 'formik';
 import React from 'react';
 
-export interface FormValues {
+export interface PublicationContactFormValues {
   teamName: string;
   teamEmail: string;
   contactName: string;
@@ -19,9 +18,9 @@ export interface FormValues {
 }
 
 interface Props {
-  initialValues: FormValues;
+  initialValues: PublicationContactFormValues;
   onCancel: () => void;
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: PublicationContactFormValues) => void;
 }
 
 const PublicationContactForm = ({
@@ -31,7 +30,7 @@ const PublicationContactForm = ({
 }: Props) => {
   const [showConfirmModal, toggleConfirmModal] = useToggle(false);
 
-  const validationSchema = Yup.object<FormValues>({
+  const validationSchema = Yup.object<PublicationContactFormValues>({
     teamName: Yup.string().required('Enter a team name'),
     teamEmail: Yup.string()
       .required('Enter a team email')
@@ -41,41 +40,34 @@ const PublicationContactForm = ({
   });
 
   return (
-    <Formik<FormValues>
+    <Formik<PublicationContactFormValues>
       enableReinitialize
-      initialValues={{
-        ...(initialValues ?? {
-          teamName: '',
-          teamEmail: '',
-          contactName: '',
-          contactTelNo: '',
-        }),
-      }}
+      initialValues={initialValues}
       validationSchema={validationSchema}
       onSubmit={useFormSubmit(onSubmit)}
     >
       {form => (
         <>
           <Form id="publicationContactForm">
-            <FormFieldTextInput<FormValues>
+            <FormFieldTextInput<PublicationContactFormValues>
               name="teamName"
               label="Team name"
               className="govuk-!-width-one-half"
             />
 
-            <FormFieldTextInput<FormValues>
+            <FormFieldTextInput<PublicationContactFormValues>
               name="teamEmail"
               label="Team email"
               className="govuk-!-width-one-half"
             />
 
-            <FormFieldTextInput<FormValues>
+            <FormFieldTextInput<PublicationContactFormValues>
               name="contactName"
               label="Contact name"
               className="govuk-!-width-one-half"
             />
 
-            <FormFieldTextInput<FormValues>
+            <FormFieldTextInput<PublicationContactFormValues>
               name="contactTelNo"
               label="Contact telephone"
               className="govuk-!-width-one-half"

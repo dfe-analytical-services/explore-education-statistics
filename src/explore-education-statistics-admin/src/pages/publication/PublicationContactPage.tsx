@@ -1,38 +1,63 @@
-import Button from '@common/components/Button';
+import { useLastLocation } from '@admin/contexts/LastLocationContext';
 import PublicationContactForm, {
-  FormValues,
+  PublicationContactFormValues,
 } from '@admin/pages/publication/components/PublicationContactForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import publicationService from '@admin/services/publicationService';
+import Button from '@common/components/Button';
+import LoadingSpinner from '@common/components/LoadingSpinner';
 import SummaryList from '@common/components/SummaryList';
 import SummaryListItem from '@common/components/SummaryListItem';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';
+import { useLocation } from 'react-router';
 
 const PublicationContactPage = () => {
-  const { publication, onReload } = usePublicationContext();
-  const { contact } = publication;
+  const {
+    publicationId,
+    publication: contextPublication,
+    onReload,
+  } = usePublicationContext();
+  const location = useLocation();
+  const lastLocation = useLastLocation();
   const [readOnly, toggleReadOnly] = useToggle(true);
+
+  const { value: publication } = useAsyncHandledRetry(
+    async () =>
+      lastLocation && lastLocation !== location
+        ? publicationService.getMyPublication(publicationId)
+        : contextPublication,
+    [publicationId],
+  );
 
   const handleSubmit = async ({
     teamName,
     teamEmail,
     contactName,
     contactTelNo,
-  }: FormValues) => {
-    await publicationService.updatePublication(publication.id, {
+  }: PublicationContactFormValues) => {
+    if (!publication) {
+      return;
+    }
+    await publicationService.updatePublication(publicationId, {
+      ...publication,
       contact: {
         teamName,
         teamEmail,
         contactName,
         contactTelNo,
       },
-      title: publication.title,
-      topicId: publication.topicId,
     });
 
     onReload();
   };
+
+  if (!publication) {
+    return <LoadingSpinner />;
+  }
+
+  const { contact } = publication;
 
   return (
     <>
@@ -49,18 +74,18 @@ const PublicationContactPage = () => {
         <>
           <SummaryList>
             <SummaryListItem term="Team name">
-              {contact?.teamName}
+              {contact.teamName}
             </SummaryListItem>
             <SummaryListItem term="Team email">
-              {contact?.teamEmail && (
+              {contact.teamEmail && (
                 <a href={`mailto:${contact.teamEmail}`}>{contact.teamEmail}</a>
               )}
             </SummaryListItem>
             <SummaryListItem term="Contact name">
-              {contact?.contactName}
+              {contact.contactName}
             </SummaryListItem>
             <SummaryListItem term="Contact telephone">
-              {contact?.contactTelNo}
+              {contact.contactTelNo}
             </SummaryListItem>
           </SummaryList>
           {publication.permissions.canUpdatePublication && (
@@ -71,12 +96,7 @@ const PublicationContactPage = () => {
         </>
       ) : (
         <PublicationContactForm
-          initialValues={{
-            teamName: contact?.teamName ?? '',
-            teamEmail: contact?.teamEmail ?? '',
-            contactName: contact?.contactName ?? '',
-            contactTelNo: contact?.contactTelNo ?? '',
-          }}
+          initialValues={contact}
           onCancel={toggleReadOnly.on}
           onSubmit={handleSubmit}
         />

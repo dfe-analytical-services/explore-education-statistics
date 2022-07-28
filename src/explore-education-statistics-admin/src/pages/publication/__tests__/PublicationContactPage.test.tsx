@@ -47,9 +47,11 @@ describe('PublicationContactPage', () => {
   test('renders the contact page correctly', async () => {
     renderPage(testPublication);
 
-    expect(
-      screen.getByText('Contact for this publication'),
-    ).toBeInTheDocument();
+    await waitFor(() => {
+      expect(
+        screen.getByText('Contact for this publication'),
+      ).toBeInTheDocument();
+    });
 
     expect(screen.getByTestId('Team name')).toHaveTextContent('Team Smith');
     expect(screen.getByTestId('Team email')).toHaveTextContent(
@@ -64,7 +66,7 @@ describe('PublicationContactPage', () => {
     ).toBeInTheDocument();
   });
 
-  test('does not show the edit button if do not have permission', () => {
+  test('does not show the edit button if do not have permission', async () => {
     renderPage({
       ...testPublication,
       permissions: {
@@ -73,13 +75,25 @@ describe('PublicationContactPage', () => {
       },
     });
 
+    await waitFor(() => {
+      expect(
+        screen.getByText('Contact for this publication'),
+      ).toBeInTheDocument();
+    });
+
     expect(
       screen.queryByRole('button', { name: 'Edit contact details' }),
     ).not.toBeInTheDocument();
   });
 
-  test('clicking the edit button shows the edit form', () => {
+  test('clicking the edit button shows the edit form', async () => {
     renderPage(testPublication);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Contact for this publication'),
+      ).toBeInTheDocument();
+    });
 
     userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
@@ -99,8 +113,14 @@ describe('PublicationContactPage', () => {
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
   });
 
-  test('clicking the cancel button switches back to readOnly view', () => {
+  test('clicking the cancel button switches back to readOnly view', async () => {
     renderPage(testPublication);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Contact for this publication'),
+      ).toBeInTheDocument();
+    });
 
     userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
@@ -128,6 +148,12 @@ describe('PublicationContactPage', () => {
 
   test('shows validation errors when there are no contact details', async () => {
     renderPage(testPublication);
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Contact for this publication'),
+      ).toBeInTheDocument();
+    });
 
     userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
@@ -175,6 +201,12 @@ describe('PublicationContactPage', () => {
   test('show validation error when contact email is not valid', async () => {
     renderPage(testPublication);
 
+    await waitFor(() => {
+      expect(
+        screen.getByText('Contact for this publication'),
+      ).toBeInTheDocument();
+    });
+
     userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
@@ -197,6 +229,12 @@ describe('PublicationContactPage', () => {
   test('shows a confirmation modal on submit', async () => {
     renderPage(testPublication);
 
+    await waitFor(() => {
+      expect(
+        screen.getByText('Contact for this publication'),
+      ).toBeInTheDocument();
+    });
+
     userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
@@ -217,6 +255,12 @@ describe('PublicationContactPage', () => {
   test('clicking confirm calls the publication service', async () => {
     renderPage(testPublication);
 
+    await waitFor(() => {
+      expect(
+        screen.getByText('Contact for this publication'),
+      ).toBeInTheDocument();
+    });
+
     userEvent.click(
       screen.getByRole('button', { name: 'Edit contact details' }),
     );
@@ -231,14 +275,13 @@ describe('PublicationContactPage', () => {
       expect(publicationService.updatePublication).toHaveBeenCalledWith(
         testPublication.id,
         {
+          ...testPublication,
           contact: {
             contactName: 'John Smith',
             contactTelNo: '0777777777',
             teamEmail: 'john.smith@test.com',
             teamName: 'Team Smith',
           },
-          title: testPublication.title,
-          topicId: testPublication.topicId,
         },
       );
     });
