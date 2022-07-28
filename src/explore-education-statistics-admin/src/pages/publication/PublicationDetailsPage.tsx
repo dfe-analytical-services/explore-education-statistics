@@ -1,5 +1,5 @@
 import PublicationDetailsForm, {
-  FormValues,
+  PublicationDetailsFormValues,
 } from '@admin/pages/publication/components/PublicationDetailsForm';
 import usePublicationContext from '@admin/pages/publication/contexts/PublicationContext';
 import publicationService from '@admin/services/publicationService';
@@ -27,23 +27,23 @@ const PublicationDetailsPage = () => {
 
   const { value, isLoading } = useAsyncHandledRetry(async () => {
     const theme = await themeService.getTheme(themeId);
+    const topic = theme?.topics.find(themeTopic => themeTopic.id === topicId);
     if (!supersededById) {
-      return { theme };
+      return { theme, topic };
     }
 
     const supersedingPublication = await publicationService.getPublication(id);
 
     return {
       theme,
+      topic,
       supersedingPublication,
     };
   });
 
-  const { theme, supersedingPublication } = value ?? {};
+  const { theme, topic, supersedingPublication } = value ?? {};
 
-  const topic = theme?.topics.find(themeTopic => themeTopic.id === topicId);
-
-  const handleSubmit = async (values: FormValues) => {
+  const handleSubmit = async (values: PublicationDetailsFormValues) => {
     await publicationService.updatePublication(publication.id, {
       ...values,
       contact,

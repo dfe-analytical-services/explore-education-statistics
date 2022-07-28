@@ -154,241 +154,250 @@ describe('PublicationDetailsPage', () => {
     );
   });
 
-  test('shows the form when the edit button is clicked', async () => {
-    renderPage(testPublication);
+  describe('details form', () => {
+    test('shows the form when the edit button is clicked', async () => {
+      renderPage(testPublication);
 
-    await waitFor(() => {
-      expect(screen.getByText('Publication details')).toBeInTheDocument();
-    });
+      await waitFor(() => {
+        expect(screen.getByText('Publication details')).toBeInTheDocument();
+      });
 
-    userEvent.click(
-      screen.getByRole('button', { name: 'Edit publication details' }),
-    );
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit publication details' }),
+      );
 
-    await waitFor(() => {
-      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
-    });
+      await waitFor(() => {
+        expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+      });
 
-    expect(screen.getByLabelText('Publication title')).toHaveValue(
-      'Publication 1',
-    );
+      expect(screen.getByLabelText('Publication title')).toHaveValue(
+        'Publication 1',
+      );
 
-    const themeSelect = screen.getByLabelText('Select theme');
-    expect(themeSelect).toHaveValue('theme-1');
-    const themes = within(themeSelect).getAllByRole('option');
-    expect(themes).toHaveLength(2);
-    expect(themes[0]).toHaveTextContent('Theme 1');
-    expect(themes[0]).toHaveValue('theme-1');
-    expect(themes[1]).toHaveTextContent('Theme 2');
-    expect(themes[1]).toHaveValue('theme-2');
+      const themeSelect = screen.getByLabelText('Select theme');
+      expect(themeSelect).toHaveValue('theme-1');
+      const themes = within(themeSelect).getAllByRole('option');
+      expect(themes).toHaveLength(2);
+      expect(themes[0]).toHaveTextContent('Theme 1');
+      expect(themes[0]).toHaveValue('theme-1');
+      expect(themes[1]).toHaveTextContent('Theme 2');
+      expect(themes[1]).toHaveValue('theme-2');
 
-    const topicSelect = screen.getByLabelText('Select topic');
-    expect(topicSelect).toHaveValue('theme-1-topic-2');
-    const topics = within(topicSelect).getAllByRole('option');
-    expect(topics).toHaveLength(2);
-    expect(topics[0]).toHaveTextContent('Theme 1 Topic 1');
-    expect(topics[0]).toHaveValue('theme-1-topic-1');
-    expect(topics[1]).toHaveTextContent('Theme 1 Topic 2');
-    expect(topics[1]).toHaveValue('theme-1-topic-2');
+      const topicSelect = screen.getByLabelText('Select topic');
+      expect(topicSelect).toHaveValue('theme-1-topic-2');
+      const topics = within(topicSelect).getAllByRole('option');
+      expect(topics).toHaveLength(2);
+      expect(topics[0]).toHaveTextContent('Theme 1 Topic 1');
+      expect(topics[0]).toHaveValue('theme-1-topic-1');
+      expect(topics[1]).toHaveTextContent('Theme 1 Topic 2');
+      expect(topics[1]).toHaveValue('theme-1-topic-2');
 
-    const supersedingPublicationSelect = screen.getByLabelText(
-      'Superseding publication',
-    );
-    expect(supersedingPublicationSelect).toHaveValue('');
-    const supersedingPublications = within(
-      supersedingPublicationSelect,
-    ).getAllByRole('option');
-    expect(supersedingPublications).toHaveLength(3);
-    expect(supersedingPublications[0]).toHaveTextContent('None selected');
-    expect(supersedingPublications[0]).toHaveValue('');
-    expect(supersedingPublications[1]).toHaveTextContent('Publication 2');
-    expect(supersedingPublications[1]).toHaveValue('publication-2');
-    expect(supersedingPublications[2]).toHaveTextContent('Publication 3');
-    expect(supersedingPublications[2]).toHaveValue('publication-3');
+      const supersedingPublicationSelect = screen.getByLabelText(
+        'Superseding publication',
+      );
+      expect(supersedingPublicationSelect).toHaveValue('');
+      const supersedingPublications = within(
+        supersedingPublicationSelect,
+      ).getAllByRole('option');
+      expect(supersedingPublications).toHaveLength(3);
+      expect(supersedingPublications[0]).toHaveTextContent('None selected');
+      expect(supersedingPublications[0]).toHaveValue('');
+      expect(supersedingPublications[1]).toHaveTextContent('Publication 2');
+      expect(supersedingPublications[1]).toHaveValue('publication-2');
+      expect(supersedingPublications[2]).toHaveTextContent('Publication 3');
+      expect(supersedingPublications[2]).toHaveValue('publication-3');
 
-    expect(
-      screen.getByRole('button', { name: 'Update publication details' }),
-    ).toBeInTheDocument();
-
-    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
-  });
-
-  test('updates the topics dropdown when change the theme', async () => {
-    renderPage(testPublication);
-
-    await waitFor(() => {
-      expect(screen.getByText('Publication details')).toBeInTheDocument();
-    });
-
-    userEvent.click(
-      screen.getByRole('button', { name: 'Edit publication details' }),
-    );
-
-    await waitFor(() => {
-      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
-    });
-
-    const topics = within(screen.getByLabelText('Select topic')).getAllByRole(
-      'option',
-    );
-    expect(topics).toHaveLength(2);
-
-    expect(topics[0]).toHaveTextContent('Theme 1 Topic 1');
-    expect(topics[0]).toHaveValue('theme-1-topic-1');
-    expect(topics[1]).toHaveTextContent('Theme 1 Topic 2');
-    expect(topics[1]).toHaveValue('theme-1-topic-2');
-
-    userEvent.selectOptions(screen.getByLabelText('Select theme'), ['theme-2']);
-
-    const updatedTopics = within(
-      screen.getByLabelText('Select topic'),
-    ).getAllByRole('option');
-
-    expect(updatedTopics[0]).toHaveTextContent('Theme 2 Topic 1');
-    expect(updatedTopics[0]).toHaveValue('theme-2-topic-1');
-    expect(updatedTopics[1]).toHaveTextContent('Theme 2 Topic 2');
-    expect(updatedTopics[1]).toHaveValue('theme-2-topic-2');
-  });
-
-  test('clicking the cancel button switches back to readOnly view', async () => {
-    renderPage(testPublication);
-
-    await waitFor(() => {
-      expect(screen.getByText('Publication details')).toBeInTheDocument();
-    });
-
-    userEvent.click(
-      screen.getByRole('button', { name: 'Edit publication details' }),
-    );
-
-    await waitFor(() => {
-      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
-    });
-
-    expect(screen.getByLabelText('Publication title')).toHaveValue(
-      'Publication 1',
-    );
-
-    userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
-
-    expect(screen.getByTestId('Publication title')).toHaveTextContent(
-      'Publication 1',
-    );
-
-    expect(
-      screen.queryByLabelText('Publication title'),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Theme')).not.toBeInTheDocument();
-    expect(screen.queryByLabelText('Topic')).not.toBeInTheDocument();
-    expect(
-      screen.queryByLabelText('Superseding publication'),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Update publication details' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Cancel' }),
-    ).not.toBeInTheDocument();
-  });
-
-  test('shows validation errors when there is no title', async () => {
-    renderPage(testPublication);
-
-    await waitFor(() => {
-      expect(screen.getByText('Publication details')).toBeInTheDocument();
-    });
-
-    userEvent.click(
-      screen.getByRole('button', { name: 'Edit publication details' }),
-    );
-
-    await waitFor(() => {
-      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
-    });
-
-    userEvent.clear(screen.getByLabelText('Publication title'));
-    userEvent.tab();
-
-    await waitFor(() => {
       expect(
-        screen.getByText('Enter a title', {
-          selector: '#publicationDetailsForm-title-error',
-        }),
+        screen.getByRole('button', { name: 'Update publication details' }),
+      ).toBeInTheDocument();
+
+      expect(
+        screen.getByRole('button', { name: 'Cancel' }),
       ).toBeInTheDocument();
     });
-  });
 
-  test('shows a confirmation modal on submit', async () => {
-    renderPage(testPublication);
+    test('updates the topics dropdown when change the theme', async () => {
+      renderPage(testPublication);
 
-    await waitFor(() => {
-      expect(screen.getByText('Publication details')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Publication details')).toBeInTheDocument();
+      });
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit publication details' }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+      });
+
+      const topics = within(screen.getByLabelText('Select topic')).getAllByRole(
+        'option',
+      );
+      expect(topics).toHaveLength(2);
+
+      expect(topics[0]).toHaveTextContent('Theme 1 Topic 1');
+      expect(topics[0]).toHaveValue('theme-1-topic-1');
+      expect(topics[1]).toHaveTextContent('Theme 1 Topic 2');
+      expect(topics[1]).toHaveValue('theme-1-topic-2');
+
+      userEvent.selectOptions(screen.getByLabelText('Select theme'), [
+        'theme-2',
+      ]);
+
+      const updatedTopics = within(
+        screen.getByLabelText('Select topic'),
+      ).getAllByRole('option');
+      expect(updatedTopics).toHaveLength(2);
+
+      expect(updatedTopics[0]).toHaveTextContent('Theme 2 Topic 1');
+      expect(updatedTopics[0]).toHaveValue('theme-2-topic-1');
+      expect(updatedTopics[1]).toHaveTextContent('Theme 2 Topic 2');
+      expect(updatedTopics[1]).toHaveValue('theme-2-topic-2');
     });
 
-    userEvent.click(
-      screen.getByRole('button', { name: 'Edit publication details' }),
-    );
+    test('clicking the cancel button switches back to readOnly view', async () => {
+      renderPage(testPublication);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Publication details')).toBeInTheDocument();
+      });
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit publication details' }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+      });
+
+      expect(screen.getByLabelText('Publication title')).toHaveValue(
+        'Publication 1',
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+      expect(screen.getByTestId('Publication title')).toHaveTextContent(
+        'Publication 1',
+      );
+
+      expect(
+        screen.queryByLabelText('Publication title'),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Theme')).not.toBeInTheDocument();
+      expect(screen.queryByLabelText('Topic')).not.toBeInTheDocument();
+      expect(
+        screen.queryByLabelText('Superseding publication'),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Update publication details' }),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByRole('button', { name: 'Cancel' }),
+      ).not.toBeInTheDocument();
     });
 
-    expect(publicationService.updatePublication).not.toHaveBeenCalled();
+    test('shows validation errors when there is no title', async () => {
+      renderPage(testPublication);
 
-    userEvent.click(
-      screen.getByRole('button', { name: 'Update publication details' }),
-    );
+      await waitFor(() => {
+        expect(screen.getByText('Publication details')).toBeInTheDocument();
+      });
 
-    const modal = within(screen.getByRole('dialog'));
-    expect(modal.getByRole('heading')).toHaveTextContent(
-      'Confirm publication changes',
-    );
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
-  });
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit publication details' }),
+      );
 
-  test('successfullly submits with updated values', async () => {
-    renderPage(testPublication);
+      await waitFor(() => {
+        expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+      });
 
-    await waitFor(() => {
-      expect(screen.getByText('Publication details')).toBeInTheDocument();
+      userEvent.clear(screen.getByLabelText('Publication title'));
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Enter a title', {
+            selector: '#publicationDetailsForm-title-error',
+          }),
+        ).toBeInTheDocument();
+      });
     });
 
-    userEvent.click(
-      screen.getByRole('button', { name: 'Edit publication details' }),
-    );
+    test('shows a confirmation modal on submit', async () => {
+      renderPage(testPublication);
 
-    await waitFor(() => {
-      expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getByText('Publication details')).toBeInTheDocument();
+      });
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit publication details' }),
+      );
+
+      await waitFor(() => {
+        expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+      });
+
+      expect(publicationService.updatePublication).not.toHaveBeenCalled();
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Update publication details' }),
+      );
+
+      const modal = within(screen.getByRole('dialog'));
+      expect(modal.getByRole('heading')).toHaveTextContent(
+        'Confirm publication changes',
+      );
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
     });
 
-    userEvent.type(screen.getByLabelText('Publication title'), ' updated');
+    test('successfullly submits with updated values', async () => {
+      renderPage(testPublication);
 
-    userEvent.selectOptions(screen.getByLabelText('Select theme'), ['theme-2']);
+      await waitFor(() => {
+        expect(screen.getByText('Publication details')).toBeInTheDocument();
+      });
 
-    userEvent.selectOptions(screen.getByLabelText('Select topic'), [
-      'theme-2-topic-2',
-    ]);
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit publication details' }),
+      );
 
-    userEvent.selectOptions(screen.getByLabelText('Superseding publication'), [
-      'publication-2',
-    ]);
+      await waitFor(() => {
+        expect(screen.getByLabelText('Publication title')).toBeInTheDocument();
+      });
 
-    userEvent.click(
-      screen.getByRole('button', { name: 'Update publication details' }),
-    );
+      userEvent.type(screen.getByLabelText('Publication title'), ' updated');
 
-    userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+      userEvent.selectOptions(screen.getByLabelText('Select theme'), [
+        'theme-2',
+      ]);
 
-    await waitFor(() => {
-      expect(publicationService.updatePublication).toHaveBeenCalledWith(
-        testPublication.id,
-        {
+      userEvent.selectOptions(screen.getByLabelText('Select topic'), [
+        'theme-2-topic-2',
+      ]);
+
+      userEvent.selectOptions(
+        screen.getByLabelText('Superseding publication'),
+        ['publication-2'],
+      );
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Update publication details' }),
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Confirm' }));
+
+      await waitFor(() => {
+        expect(publicationService.updatePublication).toHaveBeenCalledWith<
+          Parameters<typeof publicationService.updatePublication>
+        >(testPublication.id, {
           contact: testContact,
           supersededById: 'publication-2',
           title: 'Publication 1 updated',
           topicId: 'theme-2-topic-2',
-        },
-      );
+        });
+      });
     });
   });
 });

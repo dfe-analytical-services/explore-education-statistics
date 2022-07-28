@@ -18,7 +18,7 @@ import { Formik } from 'formik';
 import React from 'react';
 
 const errorMappings = [
-  mapFieldErrors<FormValues>({
+  mapFieldErrors<PublicationDetailsFormValues>({
     target: 'title',
     messages: {
       SlugNotUnique: 'Choose a unique title',
@@ -26,7 +26,9 @@ const errorMappings = [
   }),
 ];
 
-export interface FormValues {
+const id = 'publicationDetailsForm';
+
+export interface PublicationDetailsFormValues {
   supersededById?: string;
   title: string;
   topicId: string;
@@ -35,10 +37,10 @@ export interface FormValues {
 interface Props {
   canUpdatePublicationSupersededBy?: boolean;
   canUpdatePublicationTitle?: boolean;
-  initialValues: FormValues;
+  initialValues: PublicationDetailsFormValues;
   publicationId: string;
   onCancel: () => void;
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: PublicationDetailsFormValues) => void;
 }
 
 const PublicationDetailsForm = ({
@@ -70,11 +72,9 @@ const PublicationDetailsForm = ({
 
   const { themes, publications } = value ?? {};
 
-  const id = 'publicationDetailsForm';
-
   return (
     <LoadingSpinner loading={isLoading}>
-      <Formik<FormValues>
+      <Formik<PublicationDetailsFormValues>
         enableReinitialize
         initialValues={{
           ...(initialValues ?? {
@@ -83,7 +83,7 @@ const PublicationDetailsForm = ({
             topicId: '',
           }),
         }}
-        validationSchema={Yup.object<FormValues>({
+        validationSchema={Yup.object<PublicationDetailsFormValues>({
           title: Yup.string().required('Enter a title'),
           topicId: Yup.string().required('Choose a topic'),
         })}
@@ -94,13 +94,13 @@ const PublicationDetailsForm = ({
             <Form id={id}>
               {canUpdatePublicationTitle && (
                 <FormFieldset id="details" legend="Publication details">
-                  <FormFieldTextInput<FormValues>
+                  <FormFieldTextInput<PublicationDetailsFormValues>
                     name="title"
                     label="Publication title"
                     className="govuk-!-width-one-half"
                   />
                   {themes && initialValues?.topicId && (
-                    <FormFieldThemeTopicSelect<FormValues>
+                    <FormFieldThemeTopicSelect<PublicationDetailsFormValues>
                       id={id}
                       inline={false}
                       legend="Choose a topic for this publication"
@@ -117,7 +117,7 @@ const PublicationDetailsForm = ({
                   legend="Archive this publication"
                   legendSize="s"
                 >
-                  <FormFieldSelect<FormValues>
+                  <FormFieldSelect<PublicationDetailsFormValues>
                     className="govuk-!-width-one-half"
                     hint="If superseded by a publication with a live release, this will archive the current publication immediately"
                     label="Superseding publication"
