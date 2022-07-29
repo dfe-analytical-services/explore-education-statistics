@@ -38,6 +38,80 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             new DateTime(2020, 09, 09).AsStartOfDayUtcForTimeZone();
 
         [Fact]
+        public async Task GetPreReleaseUsers()
+        {
+            var release = new Release();
+            var contextId = Guid.NewGuid().ToString();
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(
+                    // Add roles for existing users
+                    new UserReleaseRole
+                    {
+                        Release = release,
+                        Role = ReleaseRole.PrereleaseViewer,
+                        User = new User
+                        {
+                            Email = "existing.1@test.com"
+                        }
+                    },
+                    new UserReleaseRole
+                    {
+                        Release = release,
+                        Role = ReleaseRole.PrereleaseViewer,
+                        User = new User
+                        {
+                            Email = "existing.2@test.com"
+                        }
+                    }
+                );
+
+                await context.AddRangeAsync(
+                    // Add invites for new users
+                    new UserReleaseInvite
+                    {
+                        Release = release,
+                        Email = "invited.1@test.com",
+                        Role = ReleaseRole.PrereleaseViewer
+                    },
+                    new UserReleaseInvite
+                    {
+                        Release = release,
+                        Email = "invited.2@test.com",
+                        Role = ReleaseRole.PrereleaseViewer
+                    },
+                    // Existing users may also have invites depending on their state and the release status at the time of being invited
+                    // * If they were a new user then an invite will exist
+                    // * If the release was draft an invite will exist (since emails are sent on approval based on invites)
+                    new UserReleaseInvite
+                    {
+                        Release = release,
+                        Email = "existing.1@test.com",
+                        Role = ReleaseRole.PrereleaseViewer
+                    }
+                );
+
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            await using (var userAndRolesDbContext = InMemoryUserAndRolesDbContext())
+            {
+                var service = SetupPreReleaseUserService(context, usersAndRolesDbContext: userAndRolesDbContext);
+                var result = await service.GetPreReleaseUsers(release.Id);
+
+                var users = result.AssertRight();
+
+                Assert.Equal(4, users.Count);
+                Assert.Equal("existing.1@test.com", users[0].Email);
+                Assert.Equal("existing.2@test.com", users[1].Email);
+                Assert.Equal("invited.1@test.com", users[2].Email);
+                Assert.Equal("invited.2@test.com", users[3].Email);
+            }
+        }
+
+        [Fact]
         public async Task GetPreReleaseUsers_OrderedCorrectly()
         {
             var release = new Release();
