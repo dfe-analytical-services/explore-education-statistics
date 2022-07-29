@@ -4,29 +4,21 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class PreReleaseUserViewModel
-    {
-        public PreReleaseUserViewModel(string email)
-        {
-            Email = email;
-        }
-
-        [EmailAddress] public string Email { get; }
-    }
+    public record PreReleaseUserViewModel(string Email);
 
     public class PreReleaseUserInvitePlan
     {
-        public List<string> AlreadyInvited { get; } = new List<string>();
+        public List<string> AlreadyInvited { get; } = new();
 
-        public List<string> AlreadyAccepted { get; } = new List<string>();
+        public List<string> AlreadyAccepted { get; } = new();
 
-        public List<string> Invitable { get; } = new List<string>();
+        public List<string> Invitable { get; } = new();
     }
 
     public class PreReleaseUserInviteViewModel
     {
         [MinLength(1, ErrorMessage = "Must have at least one email.")]
-        public List<string> Emails { get; set; } = new List<string>();
+        public List<string> Emails { get; set; } = new();
     }
 
     public class PreReleaseUserRemoveRequest
