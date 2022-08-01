@@ -12,13 +12,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 {
     public class MemoryCacheAttribute : CacheAttribute
     {
-        /**
-         * A Dictionary of available IMemoryCacheService implementations. It is possible here to register
-         * MemoryCacheServices that can each handle a different cache and with a different configuration. Therefore
-         * we could register services that handle short-lived caches, caches that never expire etc, and the individual
-         * [MemoryCache] attributes on methods could identify which cache service they need via the "ServiceName"
-         * parameter.
-         */
+        /// <summary>
+        /// A Dictionary of available IMemoryCacheService implementations. It is possible here to register
+        /// MemoryCacheServices that can each handle a different cache and with a different configuration. Therefore
+        /// we could register services that handle short-lived caches, caches that never expire etc, and the individual
+        /// [MemoryCache] attributes on methods could identify which cache service they need via the "ServiceName"
+        /// parameter.
+        /// </summary>
         private static Dictionary<string, IMemoryCacheService> Services { get; set; } = new();
 
         protected override Type BaseKey => typeof(IMemoryCacheKey);
