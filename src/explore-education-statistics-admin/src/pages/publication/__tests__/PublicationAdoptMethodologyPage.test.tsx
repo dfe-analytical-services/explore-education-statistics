@@ -1,29 +1,19 @@
 import PublicationAdoptMethodologyPage from '@admin/pages/publication/PublicationAdoptMethodologyPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import _methodologyService, {
-  BasicMethodologyVersion,
-} from '@admin/services/methodologyService';
+import { BasicMethodologyVersion } from '@admin/services/methodologyService';
 import _publicationService, {
-  ExternalMethodology,
   MyPublication,
-  MyPublicationMethodology,
   PublicationContactDetails,
-  UpdatePublicationRequest,
 } from '@admin/services/publicationService';
-import { render, screen, within, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter, Router } from 'react-router-dom';
 import { createMemoryHistory } from 'history';
 import noop from 'lodash/noop';
-import produce from 'immer';
 
-jest.mock('@admin/services/methodologyService');
 jest.mock('@admin/services/publicationService');
 
-const methodologyService = _methodologyService as jest.Mocked<
-  typeof _methodologyService
->;
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
@@ -139,6 +129,99 @@ describe('PublicationAdoptMethodologyPage', () => {
 
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+  });
+
+  test('shows a message if there are no methodologies', async () => {
+    publicationService.getAdoptableMethodologies.mockResolvedValue([]);
+    renderPage(testPublication);
+
+    await waitFor(() =>
+      expect(
+        screen.getByText('No methodologies available.'),
+      ).toBeInTheDocument(),
+    );
+
+    expect(screen.queryByText('Select a methodology')).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByLabelText('Search for a methodology'),
+    ).not.toBeInTheDocument();
+
+    expect(screen.queryByRole('radio')).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Save' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Cancel' }),
+    ).not.toBeInTheDocument();
+  });
+
+  test('handles successful form submission', async () => {
+    const history = createMemoryHistory();
+    publicationService.getAdoptableMethodologies.mockResolvedValue(
+      testMethodologies,
+    );
+    render(
+      <Router history={history}>
+        <PublicationContextProvider
+          publication={testPublication}
+          onPublicationChange={noop}
+          onReload={noop}
+        >
+          <PublicationAdoptMethodologyPage />
+        </PublicationContextProvider>
+      </Router>,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText('Select a methodology')).toBeInTheDocument(),
+    );
+
+    userEvent.click(screen.getByLabelText('Methodology 2'));
+
+    userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => {
+      expect(publicationService.adoptMethodology).toHaveBeenCalledWith(
+        'publication-1',
+        'methodology-2',
+      );
+    });
+
+    expect(history.location.pathname).toBe(
+      `/publication/publication-1/methodologies`,
+    );
+  });
+
+  test('handles clicking the cancel button', async () => {
+    const history = createMemoryHistory();
+    publicationService.getAdoptableMethodologies.mockResolvedValue(
+      testMethodologies,
+    );
+    render(
+      <Router history={history}>
+        <PublicationContextProvider
+          publication={testPublication}
+          onPublicationChange={noop}
+          onReload={noop}
+        >
+          <PublicationAdoptMethodologyPage />
+        </PublicationContextProvider>
+      </Router>,
+    );
+
+    await waitFor(() =>
+      expect(screen.getByText('Select a methodology')).toBeInTheDocument(),
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(publicationService.adoptMethodology).not.toHaveBeenCalled();
+
+    expect(history.location.pathname).toBe(
+      `/publication/publication-1/methodologies`,
+    );
   });
 });
 

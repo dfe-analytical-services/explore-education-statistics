@@ -1,14 +1,22 @@
 import PublicationExternalMethodologyPage from '@admin/pages/publication/PublicationExternalMethodologyPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import {
+import _publicationService, {
   ExternalMethodology,
   MyPublication,
   PublicationContactDetails,
 } from '@admin/services/publicationService';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, Router } from 'react-router-dom';
+import { createMemoryHistory } from 'history';
 import noop from 'lodash/noop';
+
+jest.mock('@admin/services/publicationService');
+
+const publicationService = _publicationService as jest.Mocked<
+  typeof _publicationService
+>;
 
 describe('PublicationExternalMethodologyPage', () => {
   const testContact: PublicationContactDetails = {
@@ -82,6 +90,69 @@ describe('PublicationExternalMethodologyPage', () => {
     expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
 
     expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+  });
+
+  test('handles successful form submission', async () => {
+    const history = createMemoryHistory();
+
+    render(
+      <Router history={history}>
+        <PublicationContextProvider
+          publication={testPublication}
+          onPublicationChange={noop}
+          onReload={noop}
+        >
+          <PublicationExternalMethodologyPage />
+        </PublicationContextProvider>
+      </Router>,
+    );
+
+    userEvent.type(screen.getByLabelText('Link title'), 'The link title');
+
+    userEvent.type(screen.getByLabelText('URL'), 'test.com');
+
+    userEvent.click(screen.getByRole('button', { name: 'Save' }));
+
+    await waitFor(() => {
+      expect(publicationService.updatePublication).toHaveBeenCalledWith(
+        'publication-1',
+        {
+          ...testPublication,
+          externalMethodology: {
+            title: 'The link title',
+            url: 'https://test.com',
+          },
+        },
+      );
+    });
+
+    expect(history.location.pathname).toBe(
+      `/publication/publication-1/methodologies`,
+    );
+  });
+
+  test('handles clicking the cancel button', async () => {
+    const history = createMemoryHistory();
+
+    render(
+      <Router history={history}>
+        <PublicationContextProvider
+          publication={testPublication}
+          onPublicationChange={noop}
+          onReload={noop}
+        >
+          <PublicationExternalMethodologyPage />
+        </PublicationContextProvider>
+      </Router>,
+    );
+
+    userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+
+    expect(publicationService.updatePublication).not.toHaveBeenCalled();
+
+    expect(history.location.pathname).toBe(
+      `/publication/publication-1/methodologies`,
+    );
   });
 });
 
