@@ -65,13 +65,15 @@ describe('PublicationPageContainer', () => {
         name: 'Publication',
       }),
     ).getAllByRole('link');
-    expect(navLinks).toHaveLength(3);
+    expect(navLinks).toHaveLength(4);
     expect(navLinks[0]).toHaveTextContent('Releases');
     expect(navLinks[0].getAttribute('aria-current')).toBe('page');
-    expect(navLinks[1]).toHaveTextContent('Details');
+    expect(navLinks[1]).toHaveTextContent('Methodologies');
     expect(navLinks[1]).not.toHaveAttribute('aria-current');
-    expect(navLinks[2]).toHaveTextContent('Contact');
+    expect(navLinks[2]).toHaveTextContent('Details');
     expect(navLinks[2]).not.toHaveAttribute('aria-current');
+    expect(navLinks[3]).toHaveTextContent('Contact');
+    expect(navLinks[3]).not.toHaveAttribute('aria-current');
 
     expect(screen.getByText('Manage releases')).toBeInTheDocument();
   });
