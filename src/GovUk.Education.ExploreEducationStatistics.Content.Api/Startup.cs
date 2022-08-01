@@ -122,7 +122,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
                 }
             );
             services.AddTransient<IBlobCacheService, BlobCacheService>();
-            services.AddSingleton<IInMemoryCacheService, InMemoryCacheService>();
+            services.AddSingleton<IMemoryCacheService, MemoryCacheService>();
             services.AddTransient<IFileStorageService, FileStorageService>();
             services.AddTransient<IFilterRepository, FilterRepository>();
             services.AddTransient<IIndicatorRepository, IndicatorRepository>();
@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             // Enable caching and register any caching services
             CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", app.ApplicationServices.GetService<IBlobCacheService>());
-            InMemoryCacheAttribute.AddService("default", app.ApplicationServices.GetService<IInMemoryCacheService>());
+            MemoryCacheAttribute.AddService("default", app.ApplicationServices.GetService<IMemoryCacheService>());
 
             if (env.IsDevelopment())
             {

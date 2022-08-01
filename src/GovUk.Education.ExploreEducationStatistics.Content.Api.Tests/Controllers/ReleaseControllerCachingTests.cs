@@ -1,7 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Cache;
@@ -27,7 +27,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         
         var releaseService = new Mock<IReleaseService>(Strict);
         
-        InMemoryCacheService
+        MemoryCacheService
             .Setup(s => s.GetItem(
                 new GetLatestReleaseCacheKey(publicationSlug), 
                 typeof(ReleaseViewModel)))
@@ -39,9 +39,9 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(mock => mock.GetCachedViewModel(publicationSlug, null))
             .ReturnsAsync(release);
 
-        var expectedCacheConfiguration = new InMemoryCacheConfiguration(ExpirySchedule.HalfHourly, 30);
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(ExpirySchedule.HalfHourly, 30);
         
-        InMemoryCacheService
+        MemoryCacheService
             .Setup(s => s.SetItem<object>(
                 new GetLatestReleaseCacheKey(publicationSlug), 
                 release, 
@@ -52,7 +52,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         var controller = BuildReleaseController(releaseService.Object);
 
         var result = await controller.GetLatestRelease(publicationSlug);
-        VerifyAllMocks(releaseService, InMemoryCacheService);
+        VerifyAllMocks(releaseService, MemoryCacheService);
 
         result.AssertOkResult(release);
     }
@@ -64,7 +64,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         
         var release = BuildReleaseViewModel();
         
-        InMemoryCacheService
+        MemoryCacheService
             .Setup(s => s.GetItem(
                 new GetLatestReleaseCacheKey(publicationSlug), 
                 typeof(ReleaseViewModel)))
@@ -73,7 +73,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         var controller = BuildReleaseController();
 
         var result = await controller.GetLatestRelease(publicationSlug);
-        VerifyAllMocks(InMemoryCacheService);
+        VerifyAllMocks(MemoryCacheService);
 
         result.AssertOkResult(release);
     }
@@ -86,7 +86,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
 
         var releaseService = new Mock<IReleaseService>(Strict);
         
-        InMemoryCacheService
+        MemoryCacheService
             .Setup(s => s.GetItem(
                 new GetReleaseCacheKey(publicationSlug, releaseSlug), 
                 typeof(ReleaseViewModel)))
@@ -98,9 +98,9 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(mock => mock.GetCachedViewModel(publicationSlug, releaseSlug))
             .ReturnsAsync(release);
 
-        var expectedCacheConfiguration = new InMemoryCacheConfiguration(ExpirySchedule.HalfHourly, 30);
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(ExpirySchedule.HalfHourly, 30);
         
-        InMemoryCacheService
+        MemoryCacheService
             .Setup(s => s.SetItem<object>(
                 new GetReleaseCacheKey(publicationSlug, releaseSlug), 
                 release, 
@@ -111,7 +111,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         var controller = BuildReleaseController(releaseService.Object);
 
         var result = await controller.GetRelease(publicationSlug, releaseSlug);
-        VerifyAllMocks(releaseService, InMemoryCacheService);
+        VerifyAllMocks(releaseService, MemoryCacheService);
 
         result.AssertOkResult(release);
     }
@@ -124,7 +124,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
 
         var release = BuildReleaseViewModel();
         
-        InMemoryCacheService
+        MemoryCacheService
             .Setup(s => s.GetItem(
                 new GetReleaseCacheKey(publicationSlug, releaseSlug), 
                 typeof(ReleaseViewModel)))
@@ -133,7 +133,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
         var controller = BuildReleaseController();
 
         var result = await controller.GetRelease(publicationSlug, releaseSlug);
-        VerifyAllMocks(InMemoryCacheService);
+        VerifyAllMocks(MemoryCacheService);
 
         result.AssertOkResult(release);
     }

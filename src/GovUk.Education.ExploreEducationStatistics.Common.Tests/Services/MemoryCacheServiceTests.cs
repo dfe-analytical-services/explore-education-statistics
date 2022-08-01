@@ -1,9 +1,9 @@
 ﻿#nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -13,7 +13,7 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services;
 
-public class InMemoryCacheServiceTests
+public class MemoryCacheServiceTests
 {
     private record SampleClassSuperclass;
 
@@ -21,7 +21,7 @@ public class InMemoryCacheServiceTests
 
     private record SampleClassSubtype : SampleClass;
 
-    private record SampleCacheKey(string Key) : IInMemoryCacheKey;
+    private record SampleCacheKey(string Key) : IMemoryCacheKey;
 
     [Fact]
     public async Task SetItem()
@@ -31,7 +31,7 @@ public class InMemoryCacheServiceTests
 
         var memoryCache = new Mock<IMemoryCache>(Strict);
 
-        var cacheConfiguration = new InMemoryCacheConfiguration(ExpirySchedule.Hourly, 45);
+        var cacheConfiguration = new MemoryCacheConfiguration(ExpirySchedule.Hourly, 45);
             
         var now = 
             new DateTime(
@@ -77,7 +77,7 @@ public class InMemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new InMemoryCacheConfiguration(
+        var cacheConfiguration = new MemoryCacheConfiguration(
             ExpirySchedule.Hourly, 
             45);
 
@@ -105,7 +105,7 @@ public class InMemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new InMemoryCacheConfiguration(
+        var cacheConfiguration = new MemoryCacheConfiguration(
             ExpirySchedule.Hourly, 
             45);
 
@@ -133,7 +133,7 @@ public class InMemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new InMemoryCacheConfiguration(
+        var cacheConfiguration = new MemoryCacheConfiguration(
             ExpirySchedule.Hourly, 
             45);
 
@@ -162,7 +162,7 @@ public class InMemoryCacheServiceTests
         // The requested ExpirySchedule is half-hourly, meaning that cached items will have
         // their expiry times truncated if the requested cache duration would carry over into
         // a new half-hour of the day.
-        var cacheConfiguration = new InMemoryCacheConfiguration(
+        var cacheConfiguration = new MemoryCacheConfiguration(
             ExpirySchedule.HalfHourly, 
             15);
 
@@ -190,7 +190,7 @@ public class InMemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new InMemoryCacheConfiguration(
+        var cacheConfiguration = new MemoryCacheConfiguration(
             ExpirySchedule.HalfHourly, 
             45);
 
@@ -218,7 +218,7 @@ public class InMemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new InMemoryCacheConfiguration(
+        var cacheConfiguration = new MemoryCacheConfiguration(
             ExpirySchedule.HalfHourly, 
             45);
 
@@ -247,7 +247,7 @@ public class InMemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new InMemoryCacheConfiguration(
+        var cacheConfiguration = new MemoryCacheConfiguration(
             ExpirySchedule.None, 
             6000);
 
@@ -270,7 +270,7 @@ public class InMemoryCacheServiceTests
 
     private async Task SetItemAndAssertExpiryTime(
         DateTime now,
-        InMemoryCacheConfiguration cacheConfiguration,
+        MemoryCacheConfiguration cacheConfiguration,
         DateTime expectedCacheExpiry)
     {
         var cacheKey = new SampleCacheKey("Key");
@@ -428,12 +428,12 @@ public class InMemoryCacheServiceTests
         Assert.Null(result);
     }
 
-    private static InMemoryCacheService SetupService(
+    private static MemoryCacheService SetupService(
         IMemoryCache? memoryCache = null,
-        ILogger<InMemoryCacheService>? logger = null)
+        ILogger<MemoryCacheService>? logger = null)
     {
-        var service = new InMemoryCacheService(
-            logger ?? Mock.Of<ILogger<InMemoryCacheService>>()
+        var service = new MemoryCacheService(
+            logger ?? Mock.Of<ILogger<MemoryCacheService>>()
         );
         service.SetMemoryCache(memoryCache ?? Mock.Of<IMemoryCache>());
         return service;

@@ -1,8 +1,8 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers;
@@ -21,16 +21,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
     {
         public ReleaseControllerTests()
         {
-            InMemoryCacheService
+            MemoryCacheService
                 .Setup(s => s.GetItem(
-                    It.IsAny<IInMemoryCacheKey>(), typeof(ReleaseViewModel)))
+                    It.IsAny<IMemoryCacheKey>(), typeof(ReleaseViewModel)))
                 .ReturnsAsync(null);
 
-            InMemoryCacheService
+            MemoryCacheService
                 .Setup(s => s.SetItem<object>(
-                    It.IsAny<IInMemoryCacheKey>(), 
+                    It.IsAny<IMemoryCacheKey>(), 
                     It.IsAny<ReleaseViewModel>(), 
-                    It.IsAny<InMemoryCacheConfiguration>(),
+                    It.IsAny<MemoryCacheConfiguration>(),
                     null))
                 .Returns(Task.CompletedTask);
         }

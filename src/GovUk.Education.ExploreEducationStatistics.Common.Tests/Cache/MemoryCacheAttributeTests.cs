@@ -13,54 +13,54 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockU
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache;
 
 [Collection(CacheTestFixture.CollectionName)]
-public class InMemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposable
+public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposable
 {
-    private readonly Mock<IInMemoryCacheService> _inMemoryCacheService = new(MockBehavior.Strict);
+    private readonly Mock<IMemoryCacheService> _memoryCacheService = new(MockBehavior.Strict);
 
-    public InMemoryCacheAttributeTests()
+    public MemoryCacheAttributeTests()
     {
-        InMemoryCacheAttribute.AddService("default", _inMemoryCacheService.Object);
+        MemoryCacheAttribute.AddService("default", _memoryCacheService.Object);
     }
 
     public void Dispose()
     {
-        InMemoryCacheAttribute.ClearServices();
+        MemoryCacheAttribute.ClearServices();
 
-        _inMemoryCacheService.Reset();
+        _memoryCacheService.Reset();
     }
 
     private record TestValue;
 
-    private record TestInMemoryCacheKey(string Key) : IInMemoryCacheKey;
+    private record TestMemoryCacheKey(string Key) : IMemoryCacheKey;
 
     // ReSharper disable UnusedParameter.Local
     private static class TestMethods
     {
-        [InMemoryCache(typeof(TestInMemoryCacheKey), expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45)]
+        [MemoryCache(typeof(TestMemoryCacheKey), expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45)]
         public static TestValue SingleParam(string param1)
         {
             return new();
         }
 
-        [InMemoryCache(typeof(TestInMemoryCacheKey), expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45, ServiceName = "target")]
+        [MemoryCache(typeof(TestMemoryCacheKey), expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45, ServiceName = "target")]
         public static TestValue SpecificCacheService(string param1)
         {
             return new();
         }
 
-        [InMemoryCache(null!, expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45)]
+        [MemoryCache(null!, expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45)]
         public static TestValue NullKeyType()
         {
             return new();
         }
 
-        [InMemoryCache(typeof(object), expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45)]
+        [MemoryCache(typeof(object), expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45)]
         public static TestValue InvalidKeyType()
         {
             return new();
         }
             
-        [InMemoryCache(typeof(TestInMemoryCacheKey), cacheDurationInSeconds: 135)]
+        [MemoryCache(typeof(TestMemoryCacheKey), cacheDurationInSeconds: 135)]
         public static TestValue DefaultCacheConfig(string param1)
         {
             return new();
@@ -71,10 +71,10 @@ public class InMemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDis
     [Fact]
     public void CacheHit()
     {
-        var cacheKey = new TestInMemoryCacheKey("test");
+        var cacheKey = new TestMemoryCacheKey("test");
         var expectedResult = new TestValue();
 
-        _inMemoryCacheService
+        _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
             .ReturnsAsync(expectedResult);
 
@@ -83,7 +83,7 @@ public class InMemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDis
         Assert.IsType<TestValue>(result);
         Assert.Equal(expectedResult, result);
 
-        _inMemoryCacheService.Verify(
+        _memoryCacheService.Verify(
             s => s.GetItem(cacheKey, typeof(TestValue)), 
             Times.Once);
     }
@@ -91,17 +91,17 @@ public class InMemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDis
     [Fact]
     public void CacheMiss()
     {
-        var cacheKey = new TestInMemoryCacheKey("test");
+        var cacheKey = new TestMemoryCacheKey("test");
 
-        _inMemoryCacheService
+        _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
             .ReturnsAsync(null);
 
         var args = new List<object>();
 
-        var expectedCacheConfiguration = new InMemoryCacheConfiguration(ExpirySchedule.Hourly, 45);
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(ExpirySchedule.Hourly, 45);
             
-        _inMemoryCacheService
+        _memoryCacheService
             .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedCacheConfiguration, null))
             .Returns(Task.CompletedTask);
 
@@ -110,11 +110,11 @@ public class InMemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDis
         Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
 
-        _inMemoryCacheService.Verify(
+        _memoryCacheService.Verify(
             s => s.GetItem(cacheKey, typeof(TestValue)), 
             Times.Once);
 
-        _inMemoryCacheService.Verify(
+        _memoryCacheService.Verify(
             s => s.SetItem(cacheKey, Capture.In(args), expectedCacheConfiguration, null), 
             Times.Once);
     }
@@ -122,17 +122,17 @@ public class InMemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDis
     [Fact]
     public void CacheMiss_DefaultCacheConfigOptions()
     {
-        var cacheKey = new TestInMemoryCacheKey("test");
+        var cacheKey = new TestMemoryCacheKey("test");
 
-        _inMemoryCacheService
+        _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
             .ReturnsAsync(null);
 
         var args = new List<object>();
 
-        var expectedDefaultCacheConfiguration = new InMemoryCacheConfiguration(ExpirySchedule.None, 135);
+        var expectedDefaultCacheConfiguration = new MemoryCacheConfiguration(ExpirySchedule.None, 135);
             
-        _inMemoryCacheService
+        _memoryCacheService
             .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedDefaultCacheConfiguration, null))
             .Returns(Task.CompletedTask);
 
@@ -141,11 +141,11 @@ public class InMemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDis
         Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
 
-        _inMemoryCacheService.Verify(
+        _memoryCacheService.Verify(
             s => s.GetItem(cacheKey, typeof(TestValue)), 
             Times.Once);
 
-        _inMemoryCacheService.Verify(
+        _memoryCacheService.Verify(
             s => s.SetItem(cacheKey, Capture.In(args), expectedDefaultCacheConfiguration, null), 
             Times.Once);
     }
@@ -153,27 +153,27 @@ public class InMemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDis
     [Fact]
     public void SpecificCacheService()
     {
-        var targetInMemoryCacheService = new Mock<IInMemoryCacheService>(MockBehavior.Strict);
+        var targetMemoryCacheService = new Mock<IMemoryCacheService>(MockBehavior.Strict);
 
-        InMemoryCacheAttribute.AddService("target", targetInMemoryCacheService.Object);
+        MemoryCacheAttribute.AddService("target", targetMemoryCacheService.Object);
 
-        var cacheKey = new TestInMemoryCacheKey("test");
+        var cacheKey = new TestMemoryCacheKey("test");
 
-        targetInMemoryCacheService
+        targetMemoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
             .ReturnsAsync(null);
 
         var args = new List<object>();
 
-        var expectedCacheConfiguration = new InMemoryCacheConfiguration(ExpirySchedule.Hourly, 45);
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(ExpirySchedule.Hourly, 45);
             
-        targetInMemoryCacheService
+        targetMemoryCacheService
             .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedCacheConfiguration, null))
             .Returns(Task.CompletedTask);
 
         var result = TestMethods.SpecificCacheService("test");
 
-        VerifyAllMocks(_inMemoryCacheService, targetInMemoryCacheService);
+        VerifyAllMocks(_memoryCacheService, targetMemoryCacheService);
 
         Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
@@ -182,11 +182,11 @@ public class InMemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDis
     [Fact]
     public void NoCacheService()
     {
-        InMemoryCacheAttribute.ClearServices();
+        MemoryCacheAttribute.ClearServices();
 
         var result = TestMethods.SingleParam("test");
 
-        VerifyAllMocks(_inMemoryCacheService);
+        VerifyAllMocks(_memoryCacheService);
 
         Assert.IsType<TestValue>(result);
     }
@@ -205,7 +205,7 @@ public class InMemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDis
         var exception = Assert.Throws<ArgumentException>(TestMethods.InvalidKeyType);
 
         Assert.Equal(
-            $"Cache key type {typeof(object).FullName} must be assignable to {typeof(IInMemoryCacheKey).GetPrettyFullName()}",
+            $"Cache key type {typeof(object).FullName} must be assignable to {typeof(IMemoryCacheKey).GetPrettyFullName()}",
             exception.Message
         );
     }

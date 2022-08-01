@@ -3,17 +3,18 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.ExpirySchedule;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cache.ExpirySchedule;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services
 {
-    public class InMemoryCacheService : IInMemoryCacheService
+    public class MemoryCacheService : IMemoryCacheService
     {
         private const int MaxCacheSizeInMb = 50;
     
@@ -21,10 +22,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             GetJsonSerializerSettings(new CamelCaseNamingStrategy());
         
         private IMemoryCache _cache;
-        private readonly ILogger<InMemoryCacheService> _logger;
+        private readonly ILogger<MemoryCacheService> _logger;
         
-        public InMemoryCacheService(
-            ILogger<InMemoryCacheService> logger)
+        public MemoryCacheService(
+            ILogger<MemoryCacheService> logger)
         {
             _cache = new MemoryCache(new MemoryCacheOptions
             {
@@ -34,7 +35,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger = logger;
         }
 
-        public Task<object?> GetItem(IInMemoryCacheKey cacheKey, Type targetType)
+        public Task<object?> GetItem(IMemoryCacheKey cacheKey, Type targetType)
         {
             object? cachedItem;
 
@@ -79,9 +80,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         }
 
         public Task SetItem<TItem>(
-            IInMemoryCacheKey cacheKey,
+            IMemoryCacheKey cacheKey,
             TItem item,
-            InMemoryCacheConfiguration configuration,
+            MemoryCacheConfiguration configuration,
             DateTime? nowUtc = null)
         {
             var now = nowUtc ?? DateTime.UtcNow;
@@ -129,7 +130,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return Task.CompletedTask;
         }
 
-        private static string GetCacheKeyDescription(IInMemoryCacheKey cacheKey)
+        private static string GetCacheKeyDescription(IMemoryCacheKey cacheKey)
         {
             return $"{cacheKey.GetType().Name} {cacheKey.Key}";
         }

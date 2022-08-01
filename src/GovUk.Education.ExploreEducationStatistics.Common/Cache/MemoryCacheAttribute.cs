@@ -6,22 +6,22 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.ExpirySchedule;
+using static GovUk.Education.ExploreEducationStatistics.Common.Cache.ExpirySchedule;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 {
-    public class InMemoryCacheAttribute : CacheAttribute
+    public class MemoryCacheAttribute : CacheAttribute
     {
         /**
          * A Dictionary of available IMemoryCacheService implementations. It is possible here to register
-         * InMemoryCacheServices that can each handle a different cache and with a different configuration. Therefore
+         * MemoryCacheServices that can each handle a different cache and with a different configuration. Therefore
          * we could register services that handle short-lived caches, caches that never expire etc, and the individual
-         * [InMemoryCache] attributes on methods could identify which cache service they need via the "ServiceName"
+         * [MemoryCache] attributes on methods could identify which cache service they need via the "ServiceName"
          * parameter.
          */
-        private static Dictionary<string, IInMemoryCacheService> Services { get; set; } = new();
+        private static Dictionary<string, IMemoryCacheService> Services { get; set; } = new();
 
-        protected override Type BaseKey => typeof(IInMemoryCacheKey);
+        protected override Type BaseKey => typeof(IMemoryCacheKey);
         
         private int CacheDurationInSeconds { get; }
         
@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// </summary>
         public string? ServiceName { get; set; }
 
-        public InMemoryCacheAttribute(
+        public MemoryCacheAttribute(
             Type key, 
             int cacheDurationInSeconds, 
             ExpirySchedule expirySchedule = None
@@ -43,7 +43,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             ExpirySchedule = expirySchedule;
         }
 
-        public static void AddService(string name, IInMemoryCacheService service)
+        public static void AddService(string name, IMemoryCacheService service)
         {
             Services[name] = service;
         }
@@ -59,7 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 
         public override async Task<object?> Get(ICacheKey cacheKey, Type returnType)
         {
-            if (cacheKey is IInMemoryCacheKey key)
+            if (cacheKey is IMemoryCacheKey key)
             {
                 var service = GetService();
 
@@ -76,7 +76,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 
         public override async Task Set(ICacheKey cacheKey, object value)
         {
-            if (cacheKey is IInMemoryCacheKey key)
+            if (cacheKey is IMemoryCacheKey key)
             {
                 var service = GetService();
 
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                     return;
                 }
 
-                var itemCachingConfiguration = new InMemoryCacheConfiguration(ExpirySchedule, CacheDurationInSeconds);
+                var itemCachingConfiguration = new MemoryCacheConfiguration(ExpirySchedule, CacheDurationInSeconds);
                 await service.SetItem(key, value, itemCachingConfiguration);
                 return;
             }
@@ -93,7 +93,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             throw new ArgumentException($"Cache key must by assignable to {BaseKey.GetPrettyFullName()}");
         }
 
-        private IInMemoryCacheService? GetService()
+        private IMemoryCacheService? GetService()
         {
             if (ServiceName is not null)
             {
