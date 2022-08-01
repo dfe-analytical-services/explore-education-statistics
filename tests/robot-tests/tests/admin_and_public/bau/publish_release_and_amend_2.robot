@@ -9,12 +9,14 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
+
 *** Variables ***
 ${RELEASE_NAME}         Academic Year Q1 2020/21
 ${PUBLICATION_NAME}     UI tests - publish release and amend 2 %{RUN_IDENTIFIER}
 ${SUBJECT_NAME}         Seven filters
 ${SECOND_SUBJECT}       upload file test
 ${THIRD_SUBJECT}        upload file test with filter subject
+
 
 *** Test Cases ***
 Create publication
@@ -306,6 +308,10 @@ Validate Release status table row is correct
 
 Approve release amendment
     user approves amended release for immediate publication
+
+Check new release status history entry is present
+    user waits until h3 is visible    Release status history    10
+    table cell should contain    testid:release-status-history    2    4    2    # Release version 2
 
 Go to permalink page & check for error element to be present
     user navigates to public frontend    ${PERMA_LOCATION_URL}

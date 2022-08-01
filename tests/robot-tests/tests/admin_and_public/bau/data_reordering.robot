@@ -212,7 +212,7 @@ Replace subject data
     user checks headed table body row cell contains    Subject title    1    ${SUBJECT_NAME}
     user checks headed table body row cell contains    Data file    1    grouped-filters-and-indicators.csv
     user checks headed table body row cell contains    Metadata file    1    grouped-filters-and-indicators.meta.csv
-    user checks headed table body row cell contains    Number of rows    1    100
+    user checks headed table body row cell contains    Number of rows    1    100    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Data file size    1    13 Kb
     user checks headed table body row cell contains    Status    1    Data replacement in progress    wait=%{WAIT_LONG}
 
@@ -220,8 +220,8 @@ Replace subject data
     user checks headed table body row cell contains    Data file    2    grouped-filters-and-indicators-replacement.csv
     user checks headed table body row cell contains    Metadata file    2
     ...    grouped-filters-and-indicators-replacement.meta.csv
-    user checks headed table body row cell contains    Number of rows    2    140
-    user checks headed table body row cell contains    Data file size    2    19 Kb
+    user checks headed table body row cell contains    Number of rows    2    140    wait=%{WAIT_SMALL}
+    user checks headed table body row cell contains    Data file size    2    19 Kb    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
 
 Confirm data replacement
@@ -530,8 +530,6 @@ Validate table cells
     user checks results table cell contains    10    2    39,761,905
 
 Go back to locations step
-    # TODO not sure why button with test Id isn't found? Using label instead
-    # user clicks button    testid:wizardStep-3-goToButton
     user clicks button    Edit locations
     user waits until page contains element    xpath://h2[text()="Go back to previous step"]
     user clicks button    Confirm

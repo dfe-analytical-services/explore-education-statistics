@@ -455,10 +455,6 @@ Select subject "${SUBJECT_2_NAME}" in table tool
     user checks previous table tool step contains    2    Subject    ${SUBJECT_2_NAME}
 
 Select locations in table tool
-    # LH: Not using the 'user opens details dropdown' keyword here as
-    # it opens the 'Local Authority District' dropdown instead
-    # due to using 'contains'
-    # TODO: LH - fix this
     user clicks element    testid:Expand Details Section Local Authority
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham

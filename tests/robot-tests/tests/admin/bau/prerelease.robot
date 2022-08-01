@@ -188,6 +188,14 @@ Invite users to the prerelease
     user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
     user checks results table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
 
+Refresh page and check prerelease user list isn't duplicated
+    [Documentation]    EES-3535
+    user reloads page
+    user waits until table is visible
+    user checks table body has x rows    2
+    user checks table cell in offset row contains    1    0    1    ees-test.analyst1@education.gov.uk
+    user checks table cell in offset row contains    2    0    1    simulate-delivered@notifications.service.gov.uk
+
 Validate the invite emails field is invalid for addresses that are all already invited or accepted
     ${emails}=    Catenate    SEPARATOR=\n
     ...    simulate-delivered@notifications.service.gov.uk
@@ -209,6 +217,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
     user waits until element contains    ${modal}    Email notifications will be sent immediately
 
     user checks list has x items    testid:invitableList    2    ${modal}
+
     user checks list item contains    testid:invitableList    1    simulate-delivered-2@notifications.service.gov.uk
     ...    ${modal}
     user checks list item contains    testid:invitableList    2    simulate-delivered-3@notifications.service.gov.uk
@@ -221,10 +230,13 @@ Invite a further list of new users but mixed with existing invitees and accepted
     user checks list item contains    testid:invitedList    1    simulate-delivered@notifications.service.gov.uk
     ...    ${modal}
 
+    user waits until button is enabled    Confirm    10
     user clicks button    Confirm
+    user waits until table is visible    css:body    %{WAIT_SMALL}
     user checks table column heading contains    1    1    User email
-    user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
-    user checks results table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
+
+    user checks results table cell contains    1    1    ees-test.analyst1@education.gov.uk
+    user checks results table cell contains    2    1    simulate-delivered@notifications.service.gov.uk
     user checks results table cell contains    3    1    simulate-delivered-2@notifications.service.gov.uk
     user checks results table cell contains    4    1    simulate-delivered-3@notifications.service.gov.uk
 

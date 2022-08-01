@@ -629,7 +629,7 @@ user clears element text
     [Arguments]    ${selector}
     user clicks element    ${selector}
     press keys    ${selector}    CTRL+a+BACKSPACE
-    sleep    0.1
+    sleep    0.3
 
 user presses keys
     [Arguments]    @{keys}
@@ -642,7 +642,7 @@ user enters text into element
     user waits until element is visible    ${selector}    %{WAIT_SMALL}
     user clears element text    ${selector}
     press keys    ${selector}    ${text}
-    sleep    0.1
+    sleep    0.3
 
 user checks element count is x
     [Arguments]    ${locator}    ${count}

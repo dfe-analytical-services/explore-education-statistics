@@ -82,6 +82,13 @@ Validate subject files file type and file unit style
 Validate absence_in_prus.csv file can be downloaded
     [Documentation]    DFE-958    DFE-562
     [Tags]    NotAgainstLocal    Failing
+
+    # TODO: This needs new file utils to be added to (related to EES-3241):
+    # * unzip the directory once download
+    # * navigate to the 'data' directory
+    # * find 'absence_in_prus.csv' in the directory
+    #    * run 'downloaded file should have first line' keyword
+
     user opens details dropdown    Download data files
 
     download file    link:Absence in PRUs    absence_in_prus.csv
