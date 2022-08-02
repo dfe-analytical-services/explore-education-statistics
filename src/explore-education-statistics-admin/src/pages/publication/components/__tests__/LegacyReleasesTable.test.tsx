@@ -83,27 +83,45 @@ describe('LegacyReleasesTable', () => {
     expect(row2Cells[0]).toHaveTextContent('3');
     expect(row2Cells[1]).toHaveTextContent('Legacy release 3');
     expect(row2Cells[2]).toHaveTextContent('http://gov.uk/3');
-    expect(within(row2Cells[3]).getByRole('button', { name: 'Edit release' }));
     expect(
-      within(row2Cells[3]).getByRole('button', { name: 'Delete release' }),
+      within(row2Cells[3]).getByRole('button', {
+        name: 'Edit Legacy release 3',
+      }),
+    );
+    expect(
+      within(row2Cells[3]).getByRole('button', {
+        name: 'Delete Legacy release 3',
+      }),
     ).toBeInTheDocument();
 
     const row3Cells = within(rows[2]).getAllByRole('cell');
     expect(row3Cells[0]).toHaveTextContent('2');
     expect(row3Cells[1]).toHaveTextContent('Legacy release 2');
     expect(row3Cells[2]).toHaveTextContent('http://gov.uk/2');
-    expect(within(row3Cells[3]).getByRole('button', { name: 'Edit release' }));
     expect(
-      within(row3Cells[3]).getByRole('button', { name: 'Delete release' }),
+      within(row3Cells[3]).getByRole('button', {
+        name: 'Edit Legacy release 2',
+      }),
+    );
+    expect(
+      within(row3Cells[3]).getByRole('button', {
+        name: 'Delete Legacy release 2',
+      }),
     ).toBeInTheDocument();
 
     const row4Cells = within(rows[3]).getAllByRole('cell');
     expect(row4Cells[0]).toHaveTextContent('1');
     expect(row4Cells[1]).toHaveTextContent('Legacy release 1');
     expect(row4Cells[2]).toHaveTextContent('http://gov.uk/1');
-    expect(within(row4Cells[3]).getByRole('button', { name: 'Edit release' }));
     expect(
-      within(row4Cells[3]).getByRole('button', { name: 'Delete release' }),
+      within(row4Cells[3]).getByRole('button', {
+        name: 'Edit Legacy release 1',
+      }),
+    );
+    expect(
+      within(row4Cells[3]).getByRole('button', {
+        name: 'Delete Legacy release 1',
+      }),
     ).toBeInTheDocument();
 
     expect(
@@ -112,6 +130,28 @@ describe('LegacyReleasesTable', () => {
     expect(
       screen.getByRole('button', { name: 'Reorder legacy releases' }),
     ).toBeInTheDocument();
+  });
+
+  test('shows a message when there are no legacy releases', () => {
+    render(
+      <LegacyReleasesTable
+        publication={{ ...testPublication, legacyReleases: [] }}
+      />,
+    );
+
+    expect(
+      screen.getByText('No legacy releases for this publication.'),
+    ).toBeInTheDocument();
+
+    expect(
+      screen.getByRole('button', { name: 'Create legacy release' }),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+
+    expect(
+      screen.queryByRole('button', { name: 'Reorder legacy releases' }),
+    ).not.toBeInTheDocument();
   });
 
   describe('editing', () => {
@@ -123,7 +163,7 @@ describe('LegacyReleasesTable', () => {
         </Router>,
       );
       userEvent.click(
-        screen.getAllByRole('button', { name: 'Edit release' })[0],
+        screen.getByRole('button', { name: 'Edit Legacy release 3' }),
       );
       await waitFor(() => {
         expect(screen.getByText('Warning')).toBeInTheDocument();
@@ -147,7 +187,7 @@ describe('LegacyReleasesTable', () => {
         </Router>,
       );
       userEvent.click(
-        screen.getAllByRole('button', { name: 'Edit release' })[0],
+        screen.getByRole('button', { name: 'Edit Legacy release 3' }),
       );
       await waitFor(() => {
         expect(screen.getByText('Edit legacy release')).toBeInTheDocument();
@@ -157,7 +197,7 @@ describe('LegacyReleasesTable', () => {
 
       await waitFor(() => {
         expect(history.location.pathname).toBe(
-          `/publication/${testPublication.id}/legacy-releases/${testPublication.legacyReleases[0].id}/edit`,
+          `/publication/${testPublication.id}/legacy/${testPublication.legacyReleases[0].id}/edit`,
         );
       });
     });
@@ -167,7 +207,7 @@ describe('LegacyReleasesTable', () => {
     test('shows a warning modal when the delete release button is clicked', async () => {
       render(<LegacyReleasesTable publication={testPublication} />);
       userEvent.click(
-        screen.getAllByRole('button', { name: 'Delete release' })[0],
+        screen.getByRole('button', { name: 'Delete Legacy release 3' }),
       );
       await waitFor(() => {
         expect(screen.getByText('Delete legacy release')).toBeInTheDocument();
@@ -190,7 +230,7 @@ describe('LegacyReleasesTable', () => {
     test('sends the delete request and updates the releases table when confirm is clicked', async () => {
       render(<LegacyReleasesTable publication={testPublication} />);
       userEvent.click(
-        screen.getAllByRole('button', { name: 'Delete release' })[0],
+        screen.getByRole('button', { name: 'Delete Legacy release 3' }),
       );
       await waitFor(() => {
         expect(screen.getByText('Delete legacy release')).toBeInTheDocument();
@@ -253,7 +293,7 @@ describe('LegacyReleasesTable', () => {
       userEvent.click(modal.getByRole('button', { name: 'OK' }));
       await waitFor(() => {
         expect(history.location.pathname).toBe(
-          `/publication/${testPublication.id}/legacy-releases/create`,
+          `/publication/${testPublication.id}/legacy/create`,
         );
       });
     });

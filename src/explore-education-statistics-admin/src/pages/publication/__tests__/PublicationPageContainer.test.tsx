@@ -65,7 +65,7 @@ describe('PublicationPageContainer', () => {
         name: 'Publication',
       }),
     ).getAllByRole('link');
-    expect(navLinks).toHaveLength(4);
+    expect(navLinks).toHaveLength(5);
     expect(navLinks[0]).toHaveTextContent('Releases');
     expect(navLinks[0].getAttribute('aria-current')).toBe('page');
     expect(navLinks[1]).toHaveTextContent('Methodologies');
@@ -74,6 +74,8 @@ describe('PublicationPageContainer', () => {
     expect(navLinks[2]).not.toHaveAttribute('aria-current');
     expect(navLinks[3]).toHaveTextContent('Contact');
     expect(navLinks[3]).not.toHaveAttribute('aria-current');
+    expect(navLinks[4]).toHaveTextContent('Legacy releases');
+    expect(navLinks[4]).not.toHaveAttribute('aria-current');
 
     expect(screen.getByText('Manage releases')).toBeInTheDocument();
   });

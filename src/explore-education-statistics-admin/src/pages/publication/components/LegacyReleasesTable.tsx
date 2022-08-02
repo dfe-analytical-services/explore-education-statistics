@@ -1,8 +1,9 @@
 import {
-  legacyReleaseCreateRoute,
-  legacyReleaseEditRoute,
-  LegacyReleaseRouteParams,
-} from '@admin/routes/legacyReleaseRoutes';
+  publicationCreateLegacyReleaseRoute,
+  PublicationRouteParams,
+  publicationEditLegacyReleaseRoute,
+  PublicationEditLegacyReleaseRouteParams,
+} from '@admin/routes/publicationRoutes';
 import legacyReleaseService, {
   LegacyRelease,
 } from '@admin/services/legacyReleaseService';
@@ -21,6 +22,8 @@ import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { generatePath } from 'react-router';
 import { useHistory } from 'react-router-dom';
+import ButtonText from '@common/components/ButtonText';
+import VisuallyHidden from '@common/components/VisuallyHidden';
 
 interface ConfirmAction {
   type: 'create' | 'edit' | 'reordering';
@@ -41,9 +44,15 @@ const getModalTitle = (confirmAction?: ConfirmAction): string => {
 };
 
 interface Props {
+  createRoute?: string; // EES-3217 remove when live
+  editRoute?: (id: string) => string; // EES-3217 remove when live
   publication: MyPublication;
 }
-const LegacyReleasesTable = ({ publication }: Props) => {
+const LegacyReleasesTable = ({
+  createRoute,
+  editRoute,
+  publication,
+}: Props) => {
   const history = useHistory();
   const [isReordering, toggleReordering] = useToggle(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>();
@@ -61,6 +70,8 @@ const LegacyReleasesTable = ({ publication }: Props) => {
         Legacy releases will be displayed in descending order on the
         publication.
       </p>
+
+      <h3>Legacy release order</h3>
 
       {legacyReleases.length > 0 ? (
         <DragDropContext
@@ -94,9 +105,7 @@ const LegacyReleasesTable = ({ publication }: Props) => {
                     <th>Order</th>
                     <th>Description</th>
                     <th>URL</th>
-                    {!isReordering && (
-                      <th className="govuk-!-width-one-third">Actions</th>
-                    )}
+                    {!isReordering && <th>Actions</th>}
                   </tr>
                 </thead>
                 <tbody>
@@ -146,7 +155,7 @@ const LegacyReleasesTable = ({ publication }: Props) => {
                           {!isReordering && (
                             <td>
                               <ButtonGroup className="govuk-!-margin-bottom-0">
-                                <Button
+                                <ButtonText
                                   onClick={() =>
                                     setConfirmAction({
                                       type: 'edit',
@@ -154,16 +163,24 @@ const LegacyReleasesTable = ({ publication }: Props) => {
                                     })
                                   }
                                 >
-                                  Edit release
-                                </Button>
-                                <Button
+                                  Edit
+                                  <VisuallyHidden>
+                                    {' '}
+                                    {release.description}
+                                  </VisuallyHidden>
+                                </ButtonText>
+                                <ButtonText
                                   variant="warning"
                                   onClick={() => {
                                     setDeleteLegacyRelease(release);
                                   }}
                                 >
-                                  Delete release
-                                </Button>
+                                  Delete
+                                  <VisuallyHidden>
+                                    {' '}
+                                    {release.description}
+                                  </VisuallyHidden>
+                                </ButtonText>
                               </ButtonGroup>
                             </td>
                           )}
@@ -258,27 +275,34 @@ const LegacyReleasesTable = ({ publication }: Props) => {
         title={getModalTitle(confirmAction)}
         onConfirm={() => {
           switch (confirmAction?.type) {
-            case 'create':
+            case 'create': {
               history.push(
-                generatePath<LegacyReleaseRouteParams>(
-                  legacyReleaseCreateRoute.path,
-                  {
-                    publicationId: publication.id,
-                  },
-                ),
+                createRoute ??
+                  generatePath<PublicationRouteParams>(
+                    publicationCreateLegacyReleaseRoute.path,
+                    {
+                      publicationId: publication.id,
+                    },
+                  ),
               );
               break;
-            case 'edit':
-              history.push(
-                generatePath<LegacyReleaseRouteParams>(
-                  legacyReleaseEditRoute.path,
-                  {
-                    publicationId: publication.id,
-                    legacyReleaseId: confirmAction.id,
-                  },
-                ),
-              );
+            }
+            case 'edit': {
+              if (confirmAction.id) {
+                history.push(
+                  editRoute
+                    ? editRoute(confirmAction.id)
+                    : generatePath<PublicationEditLegacyReleaseRouteParams>(
+                        publicationEditLegacyReleaseRoute.path,
+                        {
+                          publicationId: publication.id,
+                          legacyReleaseId: confirmAction.id,
+                        },
+                      ),
+                );
+              }
               break;
+            }
             case 'reordering':
               toggleReordering.on();
               break;

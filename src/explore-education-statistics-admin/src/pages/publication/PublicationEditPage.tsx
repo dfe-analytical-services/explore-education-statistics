@@ -2,6 +2,11 @@ import Link from '@admin/components/Link';
 import Page from '@admin/components/Page';
 import PublicationForm from '@admin/pages/publication/components/PublicationForm';
 import {
+  legacyReleaseCreateRoute,
+  legacyReleaseEditRoute,
+  LegacyReleaseRouteParams,
+} from '@admin/routes/legacyReleaseRoutes';
+import {
   dashboardRoute,
   PublicationRouteParams,
   ThemeTopicParams,
@@ -13,7 +18,7 @@ import WarningMessage from '@common/components/WarningMessage';
 import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
-import { RouteComponentProps, useHistory } from 'react-router';
+import { generatePath, RouteComponentProps, useHistory } from 'react-router';
 
 const PublicationEditPage = ({
   match,
@@ -110,7 +115,24 @@ const PublicationEditPage = ({
             confirmOnSubmit
           />
           <h2>Manage legacy releases</h2>
-          <LegacyReleasesTable publication={publication} />
+          <LegacyReleasesTable
+            createRoute={generatePath<LegacyReleaseRouteParams>(
+              legacyReleaseCreateRoute.path,
+              {
+                publicationId: publication.id,
+              },
+            )}
+            editRoute={id => {
+              return generatePath<LegacyReleaseRouteParams>(
+                legacyReleaseEditRoute.path,
+                {
+                  publicationId: publication.id,
+                  legacyReleaseId: id,
+                },
+              );
+            }}
+            publication={publication}
+          />
         </div>
       </div>
     </Page>

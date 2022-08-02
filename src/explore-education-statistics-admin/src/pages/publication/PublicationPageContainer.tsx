@@ -10,6 +10,9 @@ import {
   publicationExternalMethodologyRoute,
   publicationMethodologiesRoute,
   publicationReleasesRoute,
+  publicationLegacyReleasesRoute,
+  publicationCreateLegacyReleaseRoute,
+  publicationEditLegacyReleaseRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
 import publicationService from '@admin/services/publicationService';
@@ -25,12 +28,15 @@ const navRoutes = [
   publicationMethodologiesRoute,
   publicationDetailsRoute,
   publicationContactRoute,
+  publicationLegacyReleasesRoute,
 ];
 
 const routes = [
   ...navRoutes,
   publicationAdoptMethodologyRoute,
   publicationExternalMethodologyRoute,
+  publicationCreateLegacyReleaseRoute,
+  publicationEditLegacyReleaseRoute,
 ];
 
 const PublicationPageContainer = ({
