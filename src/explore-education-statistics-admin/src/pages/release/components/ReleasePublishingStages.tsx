@@ -64,6 +64,19 @@ const ReleasePublishingStages = ({
           );
         })}
       </ul>
+      {checklistStyle && currentStatus.overallStage === 'Failed' && (
+        <>
+          <p className="govuk-!-margin-bottom-0 govuk-!-font-size-16">
+            <strong>Help and guidance</strong>
+          </p>
+          <p className=" govuk-!-font-size-16">
+            For extra help and guidance to help rectify this issue please email:{' '}
+            <a href="mailto:explore.statistics@education.gov.uk">
+              explore.statistics@education.gov.uk
+            </a>
+          </p>
+        </>
+      )}
     </Details>
   );
 };
