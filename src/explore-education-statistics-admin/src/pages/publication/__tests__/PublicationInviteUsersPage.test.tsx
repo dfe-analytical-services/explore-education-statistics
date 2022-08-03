@@ -1,13 +1,11 @@
 import PublicationInviteUsersPage from '@admin/pages/publication/PublicationInviteUsersPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
+import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import {
   publicationInviteUsersPageRoute,
   PublicationManageTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
-import _publicationService, {
-  MyPublication,
-  PublicationContactDetails,
-} from '@admin/services/publicationService';
+import _publicationService from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { render, screen, waitFor } from '@testing-library/react';
 import { generatePath, match } from 'react-router';
@@ -20,34 +18,6 @@ jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
-
-const testContact: PublicationContactDetails = {
-  contactName: 'John Smith',
-  contactTelNo: '0777777777',
-  id: 'contact-id-1',
-  teamEmail: 'john.smith@test.com',
-  teamName: 'Team Smith',
-};
-
-const testPublication: MyPublication = {
-  id: 'publication-1',
-  title: 'Publication 1',
-  contact: testContact,
-  releases: [],
-  legacyReleases: [],
-  methodologies: [],
-  themeId: 'theme-1',
-  topicId: 'theme-1-topic-2',
-  permissions: {
-    canAdoptMethodologies: true,
-    canCreateReleases: true,
-    canUpdatePublication: true,
-    canUpdatePublicationTitle: true,
-    canUpdatePublicationSupersededBy: true,
-    canCreateMethodologies: true,
-    canManageExternalMethodology: true,
-  },
-};
 
 const testReleases: ReleaseSummary[] = [
   {

@@ -1,13 +1,10 @@
 import PublicationManageReleaseContributorsPage from '@admin/pages/publication/PublicationManageReleaseContributorsPage';
+import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import {
   PublicationManageReleaseContributorsPageRoute,
   PublicationManageTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
-import {
-  MyPublication,
-  PublicationContactDetails,
-} from '@admin/services/publicationService';
 import _releaseService, { Release } from '@admin/services/releaseService';
 import _releasePermissionService, {
   ContributorViewModel,
@@ -26,34 +23,6 @@ jest.mock('@admin/services/releasePermissionService');
 const releasePermissionService = _releasePermissionService as jest.Mocked<
   typeof _releasePermissionService
 >;
-
-const testContact: PublicationContactDetails = {
-  contactName: 'John Smith',
-  contactTelNo: '0777777777',
-  id: 'contact-id-1',
-  teamEmail: 'john.smith@test.com',
-  teamName: 'Team Smith',
-};
-
-const testPublication: MyPublication = {
-  id: 'publication-1',
-  title: 'Publication 1',
-  contact: testContact,
-  releases: [],
-  legacyReleases: [],
-  methodologies: [],
-  themeId: 'theme-1',
-  topicId: 'theme-1-topic-2',
-  permissions: {
-    canAdoptMethodologies: true,
-    canCreateReleases: true,
-    canUpdatePublication: true,
-    canUpdatePublicationTitle: true,
-    canUpdatePublicationSupersededBy: true,
-    canCreateMethodologies: true,
-    canManageExternalMethodology: true,
-  },
-};
 
 const testRelease = {
   id: 'release-1',

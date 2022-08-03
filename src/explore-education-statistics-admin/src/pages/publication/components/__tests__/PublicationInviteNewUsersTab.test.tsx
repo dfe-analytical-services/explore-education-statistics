@@ -1,3 +1,4 @@
+import { testContact } from '@admin/pages/publication/__data__/testPublication';
 import {
   BasicPublicationDetails,
   PublicationContactDetails,
@@ -10,14 +11,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import React from 'react';
 
 jest.mock('@admin/services/userService');
-
-const testContact: PublicationContactDetails = {
-  id: 'contact-1',
-  contactName: 'John Smith',
-  contactTelNo: '0777777777',
-  teamEmail: 'john.smith@test.com',
-  teamName: 'Team Smith',
-};
 
 const publication: BasicPublicationDetails = {
   contact: testContact,
