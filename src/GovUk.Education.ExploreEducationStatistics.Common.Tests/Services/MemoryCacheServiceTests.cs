@@ -167,6 +167,24 @@ public class MemoryCacheServiceTests
 
         await SetItemAndAssertExpiryTime(now, cacheConfiguration, expectedCacheExpiry);
     }
+        
+    [Fact]
+    public async Task SetItem_ExceptionHandledGracefullyWhenCachingItem()
+    {
+        var cacheConfiguration = new MemoryCacheConfiguration(
+            ExpirySchedule.None, 
+            6000);
+
+        var memoryCache = new Mock<IMemoryCache>(Strict);
+
+        memoryCache
+            .Setup(mock => mock.CreateEntry(_cacheKey))
+            .Throws(new Exception("Exception during \"SetItem\" call should have been handled gracefully"));
+
+        var service = SetupService(memoryCache.Object);
+        await service.SetItem(_cacheKey, "test item", cacheConfiguration, DateTime.UtcNow);
+        VerifyAllMocks(memoryCache);
+    }
 
     [Fact]
     public async Task GetItem()

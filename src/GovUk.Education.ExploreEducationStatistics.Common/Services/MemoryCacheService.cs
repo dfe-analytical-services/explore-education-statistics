@@ -84,49 +84,59 @@ public class MemoryCacheService : IMemoryCacheService
         MemoryCacheConfiguration configuration,
         DateTime? nowUtc = null)
     {
-        var now = nowUtc ?? DateTime.UtcNow;
-
-        DateTime absoluteExpiryTime;
-
-        if (configuration.ExpirySchedule == None)
+        try
         {
-            absoluteExpiryTime = now.AddSeconds(configuration.CacheDurationInSeconds);
+            var now = nowUtc ?? DateTime.UtcNow;
+
+            DateTime absoluteExpiryTime;
+
+            if (configuration.ExpirySchedule == None)
+            {
+                absoluteExpiryTime = now.AddSeconds(configuration.CacheDurationInSeconds);
+            }
+            else
+            {
+                var midnightToday = now.Date;
+                var targetAbsoluteExpiryDateTime = now.AddSeconds(configuration.CacheDurationInSeconds);
+
+                var expiryWindowStartTimesToday = configuration.GetDailyExpiryStartTimesInSeconds()
+                    .Select(milliseconds => midnightToday.AddSeconds(milliseconds))
+                    .ToList();
+
+                var midnightTomorrow = midnightToday.AddDays(1);
+                var nextExpiryWindowStart = expiryWindowStartTimesToday
+                    .FirstOrDefault(expiryWindowStart => expiryWindowStart > now, midnightTomorrow);
+
+                absoluteExpiryTime = targetAbsoluteExpiryDateTime < nextExpiryWindowStart
+                    ? targetAbsoluteExpiryDateTime
+                    : nextExpiryWindowStart;
+            }
+
+            // Calculate an approximate size in bytes for this object. As there is no built-in mechanism
+            // for determining the memory size of a C# object, this is a rough approximation.
+            var json = JsonConvert.SerializeObject(item, null, _jsonSerializerSettings);
+            var approximateSizeInBytes = Encoding.GetEncoding("utf-8").GetByteCount(json);
+
+            var expiryTime = new DateTimeOffset(absoluteExpiryTime);
+
+            _cache.Set(cacheKey, item, new MemoryCacheEntryOptions
+            {
+                Size = approximateSizeInBytes,
+                AbsoluteExpiration = expiryTime
+            });
+
+            _logger.LogInformation("Setting cached item with cache key {CacheKeyDescription}, " +
+                                   "approx size {Size} bytes, expiry time {ExpiryTime}",
+                GetCacheKeyDescription(cacheKey), approximateSizeInBytes, expiryTime);
+            return Task.CompletedTask;
         }
-        else
+        catch (Exception e)
         {
-            var midnightToday = now.Date;
-            var targetAbsoluteExpiryDateTime = now.AddSeconds(configuration.CacheDurationInSeconds);
-
-            var expiryWindowStartTimesToday = configuration.GetDailyExpiryStartTimesInSeconds()
-                .Select(milliseconds => midnightToday.AddSeconds(milliseconds))
-                .ToList();
-
-            var midnightTomorrow = midnightToday.AddDays(1);
-            var nextExpiryWindowStart = expiryWindowStartTimesToday
-                .FirstOrDefault(expiryWindowStart => expiryWindowStart > now, midnightTomorrow);
-
-            absoluteExpiryTime = targetAbsoluteExpiryDateTime < nextExpiryWindowStart 
-                ? targetAbsoluteExpiryDateTime 
-                : nextExpiryWindowStart;
+            _logger.LogError(e, "Exception thrown when caching item with cache key {CacheKeyDescription}.  " +
+                                "Returning gracefully.", 
+                GetCacheKeyDescription(cacheKey));
+            return Task.CompletedTask;
         }
-        
-        // Calculate an approximate size in bytes for this object. As there is no built-in mechanism
-        // for determining the memory size of a C# object, this is a rough approximation.
-        var json = JsonConvert.SerializeObject(item, null, _jsonSerializerSettings);
-        var approximateSizeInBytes = Encoding.GetEncoding("utf-8").GetByteCount(json);
-
-        var expiryTime = new DateTimeOffset(absoluteExpiryTime);
-        
-        _cache.Set(cacheKey, item, new MemoryCacheEntryOptions
-        {
-            Size = approximateSizeInBytes,
-            AbsoluteExpiration = expiryTime 
-        });
-        
-        _logger.LogInformation("Setting cached item with cache key {CacheKeyDescription}, " +
-                               "approx size {Size} bytes, expiry time {ExpiryTime}", 
-            GetCacheKeyDescription(cacheKey), approximateSizeInBytes, expiryTime);
-        return Task.CompletedTask;
     }
 
     private static string GetCacheKeyDescription(IMemoryCacheKey cacheKey)
