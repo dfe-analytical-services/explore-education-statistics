@@ -30,7 +30,10 @@ const PublicationLegacyReleasesPage = () => {
   return (
     <>
       <h2>Legacy releases</h2>
-      <LegacyReleasesTable publication={publication} />
+      <LegacyReleasesTable
+        legacyReleases={publication.legacyReleases}
+        publicationId={publication.id}
+      />
     </>
   );
 };

@@ -11,7 +11,7 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps, useHistory } from 'react-router';
 
-const PublicationEditLegacyReleasePage = ({
+const PublicationLegacyReleaseEditPage = ({
   match,
 }: RouteComponentProps<PublicationEditLegacyReleaseRouteParams>) => {
   const { legacyReleaseId } = match.params;
@@ -59,4 +59,4 @@ const PublicationEditLegacyReleasePage = ({
   );
 };
 
-export default PublicationEditLegacyReleasePage;
+export default PublicationLegacyReleaseEditPage;

@@ -131,7 +131,8 @@ const PublicationEditPage = ({
                 },
               );
             }}
-            publication={publication}
+            legacyReleases={publication.legacyReleases}
+            publicationId={publication.id}
           />
         </div>
       </div>

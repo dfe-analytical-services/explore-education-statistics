@@ -1,9 +1,12 @@
 import PublicationDetailsPage from '@admin/pages/publication/PublicationDetailsPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
+import {
+  testContact,
+  testPublication,
+} from '@admin/pages/publication/__data__/testPublication';
 import _publicationService, {
   BasicPublicationDetails,
   MyPublication,
-  PublicationContactDetails,
 } from '@admin/services/publicationService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import { PublicationSummary } from '@common/services/publicationService';
@@ -22,34 +25,6 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationDetailsPage', () => {
-  const testContact: PublicationContactDetails = {
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    id: 'contact-id-1',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
-
-  const testPublication: MyPublication = {
-    id: 'publication-1',
-    title: 'Publication 1',
-    contact: testContact,
-    releases: [],
-    legacyReleases: [],
-    methodologies: [],
-    themeId: 'theme-1',
-    topicId: 'theme-1-topic-2',
-    permissions: {
-      canAdoptMethodologies: true,
-      canCreateReleases: true,
-      canUpdatePublication: true,
-      canUpdatePublicationTitle: true,
-      canUpdatePublicationSupersededBy: true,
-      canCreateMethodologies: true,
-      canManageExternalMethodology: true,
-    },
-  };
-
   const testThemes: Theme[] = [
     {
       id: 'theme-1',

@@ -1,9 +1,7 @@
 import LegacyReleasesTable from '@admin/pages/publication/components/LegacyReleasesTable';
-import _legacyReleaseService from '@admin/services/legacyReleaseService';
-import {
-  MyPublication,
-  PublicationContactDetails,
-} from '@admin/services/publicationService';
+import _legacyReleaseService, {
+  LegacyRelease,
+} from '@admin/services/legacyReleaseService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { Router } from 'react-router';
 import userEvent from '@testing-library/user-event';
@@ -16,57 +14,39 @@ const legacyReleaseService = _legacyReleaseService as jest.Mocked<
 >;
 
 describe('LegacyReleasesTable', () => {
-  const testContact: PublicationContactDetails = {
-    id: 'contact-1',
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
-
-  const testPublication: MyPublication = {
-    contact: testContact,
-    id: 'publication-id-1',
-    title: 'Publication 1',
-    releases: [],
-    legacyReleases: [
-      {
-        description: 'Legacy release 3',
-        id: 'legacy-release-3',
-        order: 3,
-        publicationId: 'publication-id-1',
-        url: 'http://gov.uk/3',
-      },
-      {
-        description: 'Legacy release 2',
-        id: 'legacy-release-2',
-        order: 2,
-        publicationId: 'publication-id-1',
-        url: 'http://gov.uk/2',
-      },
-      {
-        description: 'Legacy release 1',
-        id: 'legacy-release-1',
-        order: 1,
-        publicationId: 'publication-id-1',
-        url: 'http://gov.uk/1',
-      },
-    ],
-    methodologies: [],
-    themeId: 'theme-1',
-    topicId: 'topic-1',
-    permissions: {
-      canAdoptMethodologies: true,
-      canCreateReleases: true,
-      canUpdatePublication: true,
-      canUpdatePublicationTitle: true,
-      canUpdatePublicationSupersededBy: true,
-      canCreateMethodologies: true,
-      canManageExternalMethodology: true,
+  const testLegacyReleases: LegacyRelease[] = [
+    {
+      description: 'Legacy release 3',
+      id: 'legacy-release-3',
+      order: 3,
+      publicationId: 'publication-id-1',
+      url: 'http://gov.uk/3',
     },
-  };
+    {
+      description: 'Legacy release 2',
+      id: 'legacy-release-2',
+      order: 2,
+      publicationId: 'publication-id-1',
+      url: 'http://gov.uk/2',
+    },
+    {
+      description: 'Legacy release 1',
+      id: 'legacy-release-1',
+      order: 1,
+      publicationId: 'publication-id-1',
+      url: 'http://gov.uk/1',
+    },
+  ];
+
+  const testPublicationId = 'publication-1';
+
   test('renders the legacy releases table correctly', () => {
-    render(<LegacyReleasesTable publication={testPublication} />);
+    render(
+      <LegacyReleasesTable
+        legacyReleases={testLegacyReleases}
+        publicationId={testPublicationId}
+      />,
+    );
 
     const table = screen.getByRole('table');
     const rows = within(table).getAllByRole('row');
@@ -135,7 +115,8 @@ describe('LegacyReleasesTable', () => {
   test('shows a message when there are no legacy releases', () => {
     render(
       <LegacyReleasesTable
-        publication={{ ...testPublication, legacyReleases: [] }}
+        legacyReleases={[]}
+        publicationId={testPublicationId}
       />,
     );
 
@@ -159,7 +140,10 @@ describe('LegacyReleasesTable', () => {
       const history = createMemoryHistory();
       render(
         <Router history={history}>
-          <LegacyReleasesTable publication={testPublication} />
+          <LegacyReleasesTable
+            legacyReleases={testLegacyReleases}
+            publicationId={testPublicationId}
+          />
         </Router>,
       );
       userEvent.click(
@@ -183,7 +167,10 @@ describe('LegacyReleasesTable', () => {
       const history = createMemoryHistory();
       render(
         <Router history={history}>
-          <LegacyReleasesTable publication={testPublication} />
+          <LegacyReleasesTable
+            legacyReleases={testLegacyReleases}
+            publicationId={testPublicationId}
+          />
         </Router>,
       );
       userEvent.click(
@@ -197,7 +184,7 @@ describe('LegacyReleasesTable', () => {
 
       await waitFor(() => {
         expect(history.location.pathname).toBe(
-          `/publication/${testPublication.id}/legacy/${testPublication.legacyReleases[0].id}/edit`,
+          `/publication/${testPublicationId}/legacy/${testLegacyReleases[0].id}/edit`,
         );
       });
     });
@@ -205,7 +192,12 @@ describe('LegacyReleasesTable', () => {
 
   describe('deleting', () => {
     test('shows a warning modal when the delete release button is clicked', async () => {
-      render(<LegacyReleasesTable publication={testPublication} />);
+      render(
+        <LegacyReleasesTable
+          legacyReleases={testLegacyReleases}
+          publicationId={testPublicationId}
+        />,
+      );
       userEvent.click(
         screen.getByRole('button', { name: 'Delete Legacy release 3' }),
       );
@@ -228,7 +220,12 @@ describe('LegacyReleasesTable', () => {
     });
 
     test('sends the delete request and updates the releases table when confirm is clicked', async () => {
-      render(<LegacyReleasesTable publication={testPublication} />);
+      render(
+        <LegacyReleasesTable
+          legacyReleases={testLegacyReleases}
+          publicationId={testPublicationId}
+        />,
+      );
       userEvent.click(
         screen.getByRole('button', { name: 'Delete Legacy release 3' }),
       );
@@ -239,7 +236,7 @@ describe('LegacyReleasesTable', () => {
       userEvent.click(modal.getByRole('button', { name: 'Confirm' }));
 
       expect(legacyReleaseService.deleteLegacyRelease).toHaveBeenCalledWith(
-        testPublication.legacyReleases[0].id,
+        testLegacyReleases[0].id,
       );
 
       const table = within(screen.getByRole('table'));
@@ -256,7 +253,10 @@ describe('LegacyReleasesTable', () => {
       const history = createMemoryHistory();
       render(
         <Router history={history}>
-          <LegacyReleasesTable publication={testPublication} />
+          <LegacyReleasesTable
+            legacyReleases={testLegacyReleases}
+            publicationId={testPublicationId}
+          />
         </Router>,
       );
       userEvent.click(
@@ -280,7 +280,10 @@ describe('LegacyReleasesTable', () => {
       const history = createMemoryHistory();
       render(
         <Router history={history}>
-          <LegacyReleasesTable publication={testPublication} />
+          <LegacyReleasesTable
+            legacyReleases={testLegacyReleases}
+            publicationId={testPublicationId}
+          />
         </Router>,
       );
       userEvent.click(
@@ -293,7 +296,7 @@ describe('LegacyReleasesTable', () => {
       userEvent.click(modal.getByRole('button', { name: 'OK' }));
       await waitFor(() => {
         expect(history.location.pathname).toBe(
-          `/publication/${testPublication.id}/legacy/create`,
+          `/publication/${testPublicationId}/legacy/create`,
         );
       });
     });
@@ -301,7 +304,12 @@ describe('LegacyReleasesTable', () => {
 
   describe('reordering', () => {
     test('shows a warning modal when the reorder legacy releases button is clicked', async () => {
-      render(<LegacyReleasesTable publication={testPublication} />);
+      render(
+        <LegacyReleasesTable
+          legacyReleases={testLegacyReleases}
+          publicationId={testPublicationId}
+        />,
+      );
       userEvent.click(
         screen.getByRole('button', { name: 'Reorder legacy releases' }),
       );
@@ -320,7 +328,12 @@ describe('LegacyReleasesTable', () => {
     });
 
     test('shows the reordering UI when OK is clicked', async () => {
-      render(<LegacyReleasesTable publication={testPublication} />);
+      render(
+        <LegacyReleasesTable
+          legacyReleases={testLegacyReleases}
+          publicationId={testPublicationId}
+        />,
+      );
       userEvent.click(
         screen.getByRole('button', { name: 'Reorder legacy releases' }),
       );

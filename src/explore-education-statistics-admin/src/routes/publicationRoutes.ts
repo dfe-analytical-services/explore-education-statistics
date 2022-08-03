@@ -5,8 +5,8 @@ import PublicationExternalMethodologyPage from '@admin/pages/publication/Publica
 import PublicationMethodologiesPage from '@admin/pages/publication/PublicationMethodologiesPage';
 import PublicationReleasesPage from '@admin/pages/publication/PublicationReleasesPage';
 import PublicationLegacyReleasesPage from '@admin/pages/publication/PublicationLegacyReleasesPage';
-import PublicationCreateLegacyReleasePage from '@admin/pages/publication/PublicationCreateLegacyReleasePage';
-import PublicationEditLegacyReleasePage from '@admin/pages/publication/PublicationEditLegacyReleasePage';
+import PublicationLegacyReleaseCreatePage from '@admin/pages/publication/PublicationLegacyReleaseCreatePage';
+import PublicationLegacyReleaseEditPage from '@admin/pages/publication/PublicationLegacyReleaseEditPage';
 import { RouteProps } from 'react-router';
 
 export type PublicationRouteParams = {
@@ -37,13 +37,13 @@ export const publicationMethodologiesRoute: PublicationRouteProps = {
 
 export const publicationAdoptMethodologyRoute: PublicationRouteProps = {
   path: '/publication/:publicationId/methodologies/adopt',
-  title: 'Adopt a Methodology',
+  title: 'Adopt a methodology',
   component: PublicationAdoptMethodologyPage,
 };
 
 export const publicationExternalMethodologyRoute: PublicationRouteProps = {
   path: '/publication/:publicationId/methodologies/external',
-  title: 'External Methodology',
+  title: 'External methodology',
   component: PublicationExternalMethodologyPage,
 };
 
@@ -67,12 +67,12 @@ export const publicationLegacyReleasesRoute: PublicationRouteProps = {
 
 export const publicationCreateLegacyReleaseRoute: PublicationRouteProps = {
   path: '/publication/:publicationId/legacy/create',
-  title: 'Create Legacy Release',
-  component: PublicationCreateLegacyReleasePage,
+  title: 'Create legacy release',
+  component: PublicationLegacyReleaseCreatePage,
 };
 
 export const publicationEditLegacyReleaseRoute: PublicationRouteProps = {
   path: '/publication/:publicationId/legacy/:legacyReleaseId/edit',
-  title: 'Edit Legacy Release',
-  component: PublicationEditLegacyReleasePage,
+  title: 'Edit legacy release',
+  component: PublicationLegacyReleaseEditPage,
 };

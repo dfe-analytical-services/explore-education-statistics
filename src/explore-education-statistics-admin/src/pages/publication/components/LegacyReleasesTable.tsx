@@ -7,9 +7,7 @@ import {
 import legacyReleaseService, {
   LegacyRelease,
 } from '@admin/services/legacyReleaseService';
-import publicationService, {
-  MyPublication,
-} from '@admin/services/publicationService';
+import publicationService from '@admin/services/publicationService';
 import Button from '@common/components/Button';
 import ButtonGroup from '@common/components/ButtonGroup';
 import ModalConfirm from '@common/components/ModalConfirm';
@@ -44,14 +42,16 @@ const getModalTitle = (confirmAction?: ConfirmAction): string => {
 };
 
 interface Props {
-  createRoute?: string; // EES-3217 remove when live
-  editRoute?: (id: string) => string; // EES-3217 remove when live
-  publication: MyPublication;
+  createRoute?: string; // TODO EES-3217 remove when live
+  editRoute?: (id: string) => string; // TODO EES-3217 remove when live
+  legacyReleases: LegacyRelease[];
+  publicationId: string;
 }
 const LegacyReleasesTable = ({
   createRoute,
   editRoute,
-  publication,
+  legacyReleases: initialLegacyReleases,
+  publicationId,
 }: Props) => {
   const history = useHistory();
   const [isReordering, toggleReordering] = useToggle(false);
@@ -60,9 +60,7 @@ const LegacyReleasesTable = ({
     LegacyRelease
   >();
 
-  const [legacyReleases, setLegacyReleases] = useState(
-    publication.legacyReleases,
-  );
+  const [legacyReleases, setLegacyReleases] = useState(initialLegacyReleases);
 
   return (
     <>
@@ -219,7 +217,7 @@ const LegacyReleasesTable = ({
           <Button
             onClick={async () => {
               await publicationService.partialUpdateLegacyReleases(
-                publication.id,
+                publicationId,
                 legacyReleases.map(release => ({
                   id: release.id,
                   order: release.order,
@@ -234,7 +232,7 @@ const LegacyReleasesTable = ({
           <Button
             variant="secondary"
             onClick={() => {
-              setLegacyReleases(publication.legacyReleases);
+              setLegacyReleases(legacyReleases);
               toggleReordering.off();
             }}
           >
@@ -281,7 +279,7 @@ const LegacyReleasesTable = ({
                   generatePath<PublicationRouteParams>(
                     publicationCreateLegacyReleaseRoute.path,
                     {
-                      publicationId: publication.id,
+                      publicationId,
                     },
                   ),
               );
@@ -295,7 +293,7 @@ const LegacyReleasesTable = ({
                     : generatePath<PublicationEditLegacyReleaseRouteParams>(
                         publicationEditLegacyReleaseRoute.path,
                         {
-                          publicationId: publication.id,
+                          publicationId,
                           legacyReleaseId: confirmAction.id,
                         },
                       ),

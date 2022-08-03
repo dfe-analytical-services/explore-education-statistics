@@ -1,28 +1,22 @@
-import PublicationCreateLegacyReleasePage from '@admin/pages/publication/PublicationCreateLegacyReleasePage';
+import PublicationLegacyReleaseCreatePage from '@admin/pages/publication/PublicationLegacyReleaseCreatePage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import {
-  MyPublication,
-  PublicationContactDetails,
-} from '@admin/services/publicationService';
-import { render, screen } from '@testing-library/react';
+import { testPublication as baseTestPublication } from '@admin/pages/publication/__data__/testPublication';
+import _legacyReleaseService from '@admin/services/legacyReleaseService';
+import { MyPublication } from '@admin/services/publicationService';
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
 
-describe('PublicationCreateLegacyReleasePage', () => {
-  const testContact: PublicationContactDetails = {
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    id: 'contact-id-1',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
+jest.mock('@admin/services/legacyReleaseService');
+const legacyReleaseService = _legacyReleaseService as jest.Mocked<
+  typeof _legacyReleaseService
+>;
 
+describe('PublicationLegacyReleaseCreatePage', () => {
   const testPublication: MyPublication = {
-    id: 'publication-1',
-    title: 'Publication 1',
-    contact: testContact,
-    releases: [],
+    ...baseTestPublication,
     legacyReleases: [
       {
         description: 'Legacy release 3',
@@ -46,18 +40,6 @@ describe('PublicationCreateLegacyReleasePage', () => {
         url: 'http://gov.uk/1',
       },
     ],
-    methodologies: [],
-    themeId: 'theme-1',
-    topicId: 'theme-1-topic-2',
-    permissions: {
-      canAdoptMethodologies: true,
-      canCreateReleases: true,
-      canUpdatePublication: true,
-      canUpdatePublicationTitle: true,
-      canUpdatePublicationSupersededBy: true,
-      canCreateMethodologies: true,
-      canManageExternalMethodology: true,
-    },
   };
 
   test('renders the create legacy release page', async () => {
@@ -69,7 +51,30 @@ describe('PublicationCreateLegacyReleasePage', () => {
     expect(
       screen.getByRole('button', { name: 'Save legacy release' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Cancel' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Cancel' })).toHaveAttribute(
+      'href',
+      '/publication/publication-1/legacy',
+    );
+  });
+
+  test('handles successfully submitting the form', async () => {
+    renderPage(testPublication);
+
+    userEvent.type(screen.getByLabelText('Description'), 'Test description');
+    userEvent.type(screen.getByLabelText('URL'), 'http://test.com');
+    userEvent.click(
+      screen.getByRole('button', {
+        name: 'Save legacy release',
+      }),
+    );
+
+    await waitFor(() => {
+      expect(legacyReleaseService.createLegacyRelease).toHaveBeenCalledWith({
+        description: 'Test description',
+        url: 'http://test.com',
+        publicationId: 'publication-1',
+      });
+    });
   });
 });
 
@@ -81,7 +86,7 @@ function renderPage(publication: MyPublication) {
         onPublicationChange={noop}
         onReload={noop}
       >
-        <PublicationCreateLegacyReleasePage />
+        <PublicationLegacyReleaseCreatePage />
       </PublicationContextProvider>
     </MemoryRouter>,
   );

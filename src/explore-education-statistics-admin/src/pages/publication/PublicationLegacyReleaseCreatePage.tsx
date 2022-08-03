@@ -6,7 +6,7 @@ import legacyReleaseService from '@admin/services/legacyReleaseService';
 import React from 'react';
 import { generatePath, useHistory } from 'react-router';
 
-const PublicationCreateLegacyReleasePage = () => {
+const PublicationLegacyReleaseCreatePage = () => {
   const { publicationId } = usePublicationContext();
   const history = useHistory();
 
@@ -40,4 +40,4 @@ const PublicationCreateLegacyReleasePage = () => {
   );
 };
 
-export default PublicationCreateLegacyReleasePage;
+export default PublicationLegacyReleaseCreatePage;

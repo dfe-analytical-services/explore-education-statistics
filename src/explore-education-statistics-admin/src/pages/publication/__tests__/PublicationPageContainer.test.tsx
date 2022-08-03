@@ -1,13 +1,11 @@
 import PublicationPageContainer from '@admin/pages/publication/PublicationPageContainer';
+import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import {
   publicationReleasesRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
 import { publicationRoute } from '@admin/routes/routes';
-import _publicationService, {
-  MyPublication,
-  PublicationContactDetails,
-} from '@admin/services/publicationService';
+import _publicationService from '@admin/services/publicationService';
 import { generatePath, MemoryRouter } from 'react-router';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
@@ -19,34 +17,6 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationPageContainer', () => {
-  const testContact: PublicationContactDetails = {
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    id: 'contact-id-1',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
-
-  const testPublication: MyPublication = {
-    id: 'publication-1',
-    title: 'Publication 1',
-    contact: testContact,
-    releases: [],
-    legacyReleases: [],
-    methodologies: [],
-    themeId: 'theme-1',
-    topicId: 'theme-1-topic-2',
-    permissions: {
-      canAdoptMethodologies: true,
-      canCreateReleases: true,
-      canUpdatePublication: true,
-      canUpdatePublicationTitle: true,
-      canUpdatePublicationSupersededBy: true,
-      canCreateMethodologies: true,
-      canManageExternalMethodology: true,
-    },
-  };
-
   test('renders the page with the releases tab', async () => {
     publicationService.getMyPublication.mockResolvedValue(testPublication);
 

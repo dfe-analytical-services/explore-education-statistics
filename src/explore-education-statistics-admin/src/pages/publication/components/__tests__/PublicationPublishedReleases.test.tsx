@@ -1,5 +1,5 @@
 import PublicationPublishedReleases from '@admin/pages/publication/components/PublicationPublishedReleases';
-import { PublicationContactDetails } from '@admin/services/publicationService';
+import { testContact } from '@admin/pages/publication/__data__/testPublication';
 import _releaseService, {
   MyRelease,
   ReleaseSummary,
@@ -20,14 +20,6 @@ const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('PublicationPublishedReleases', () => {
   const testPublicationId = 'publication-1';
-
-  const testContact: PublicationContactDetails = {
-    id: 'contact-1',
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
 
   const testRelease1: MyRelease = {
     amendment: false,
