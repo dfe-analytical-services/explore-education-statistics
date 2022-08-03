@@ -1,5 +1,6 @@
 import PublicationMethodologiesPage from '@admin/pages/publication/PublicationMethodologiesPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
+import { testPublication as baseTestPublication } from '@admin/pages/publication/__data__/testPublication';
 import _methodologyService, {
   BasicMethodologyVersion,
 } from '@admin/services/methodologyService';
@@ -7,7 +8,6 @@ import _publicationService, {
   ExternalMethodology,
   MyPublication,
   MyPublicationMethodology,
-  PublicationContactDetails,
   UpdatePublicationRequest,
 } from '@admin/services/publicationService';
 import { render, screen, within, waitFor } from '@testing-library/react';
@@ -110,32 +110,9 @@ describe('PublicationMethodologiesPage', () => {
     url: 'http://test.com',
   };
 
-  const testContact: PublicationContactDetails = {
-    id: 'contact-1',
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
-
   const testPublication: MyPublication = {
-    id: 'publication-1',
-    title: 'Publication 1',
-    contact: testContact,
-    releases: [],
-    legacyReleases: [],
+    ...baseTestPublication,
     methodologies: [testMethodology1, testMethodology2],
-    themeId: 'theme-1',
-    topicId: 'topic-1',
-    permissions: {
-      canAdoptMethodologies: true,
-      canCreateReleases: true,
-      canUpdatePublication: true,
-      canUpdatePublicationTitle: true,
-      canUpdatePublicationSupersededBy: true,
-      canCreateMethodologies: true,
-      canManageExternalMethodology: true,
-    },
   };
 
   const testPublicationNoMethodologies = {

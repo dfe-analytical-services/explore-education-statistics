@@ -1,9 +1,9 @@
 import PublicationAdoptMethodologyPage from '@admin/pages/publication/PublicationAdoptMethodologyPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
+import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import { BasicMethodologyVersion } from '@admin/services/methodologyService';
 import _publicationService, {
   MyPublication,
-  PublicationContactDetails,
 } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -59,34 +59,6 @@ describe('PublicationAdoptMethodologyPage', () => {
     owningPublication: {
       id: 'publication-4',
       title: 'Publication 4',
-    },
-  };
-
-  const testContact: PublicationContactDetails = {
-    id: 'contact-1',
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
-
-  const testPublication: MyPublication = {
-    id: 'publication-1',
-    title: 'Publication 1',
-    contact: testContact,
-    releases: [],
-    legacyReleases: [],
-    methodologies: [],
-    themeId: 'theme-1',
-    topicId: 'topic-1',
-    permissions: {
-      canAdoptMethodologies: true,
-      canCreateReleases: true,
-      canUpdatePublication: true,
-      canUpdatePublicationTitle: true,
-      canUpdatePublicationSupersededBy: true,
-      canCreateMethodologies: true,
-      canManageExternalMethodology: true,
     },
   };
 
