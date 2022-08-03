@@ -293,11 +293,10 @@ public class MemoryCacheServiceTests
         IMemoryCache? memoryCache = null,
         ILogger<MemoryCacheService>? logger = null)
     {
-        var service = new MemoryCacheService(
+        return new MemoryCacheService(
+            memoryCache ?? new MemoryCache(new MemoryCacheOptions()),
             logger ?? Mock.Of<ILogger<MemoryCacheService>>()
         );
-        service.SetMemoryCache(memoryCache ?? new MemoryCache(new MemoryCacheOptions()));
-        return service;
     }
 
     private record TestCacheEntry : ICacheEntry
