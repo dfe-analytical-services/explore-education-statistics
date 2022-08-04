@@ -8,12 +8,10 @@ Suite Setup         user signs in as bau1
 Suite Teardown      user closes the browser
 Test Setup          fail test fast if required
 
-
 *** Variables ***
-${PUBLICATION_NAME}         UI tests - legacy releases %{RUN_IDENTIFIER}
-${DESCRIPTION}              legacy release description
-${UPDATED_DESCRIPTION}      updated legacy release description
-
+${PUBLICATION_NAME}=        UI tests - legacy releases %{RUN_IDENTIFIER}
+${DESCRIPTION}=             legacy release description
+${UPDATED_DESCRIPTION}=     updated legacy release description
 
 *** Test Cases ***
 Create new publication for topic
@@ -86,7 +84,7 @@ Navigate to publication to update legacy releases
     user waits until h1 is visible    Manage publication
 
 Update legacy release
-    user clicks element    xpath://tr[1]//*[text()="Edit release"]
+    user clicks element    xpath://tr[1]//*[text()="Edit"]
     user waits until modal is visible    Edit legacy release
     user clicks button    OK
     user waits until modal is not visible    Edit legacy release
@@ -128,7 +126,7 @@ Navigate to publication to update legacy releases again
     user waits until h1 is visible    Manage publication
 
 Delete legacy release
-    user clicks element    xpath://tr[1]//*[text()="Delete release"]
+    user clicks element    xpath://tr[1]//*[text()="Delete"]
     user clicks button    Confirm
     user waits until page does not contain element    css:table
 
@@ -180,7 +178,6 @@ Validate reordered legacy releases
     user checks results table cell contains    3    1    1
     user checks results table cell contains    3    2    Test collection 3
     user checks results table cell contains    3    3    http://test-3.com
-
 
 *** Keywords ***
 user creates legacy release

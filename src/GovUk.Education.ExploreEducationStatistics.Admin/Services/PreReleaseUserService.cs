@@ -76,30 +76,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(
                     async _ =>
                     {
-                        var activePrereleaseContacts = await _context
+                        var emailsFromRoles = await _context
                             .UserReleaseRoles
                             .Include(r => r.User)
                             .Where(r => r.Role == PrereleaseViewer && r.ReleaseId == releaseId)
                             .Select(r => r.User.Email.ToLower())
                             .Distinct()
-                            .Select(email => new PreReleaseUserViewModel(email))
                             .ToListAsync();
 
-                        var invitedPrereleaseContacts = await _context
+                        var emailsFromInvites = await _context
                             .UserReleaseInvites
-                            .AsQueryable()
-                            .Where(r =>
-                                r.Role == PrereleaseViewer && r.ReleaseId == releaseId
-                            )
+                            .Where(i => i.Role == PrereleaseViewer && i.ReleaseId == releaseId)
                             .Select(i => i.Email.ToLower())
                             .Distinct()
-                            .Select(email => new PreReleaseUserViewModel(email))
                             .ToListAsync();
 
-                        return activePrereleaseContacts
-                            .Concat(invitedPrereleaseContacts)
+                        return emailsFromRoles
+                            .Concat(emailsFromInvites)
                             .Distinct()
-                            .OrderBy(c => c.Email)
+                            .Select(email => new PreReleaseUserViewModel(email))
+                            .OrderBy(model => model.Email)
                             .ToList();
                     }
                 );
@@ -111,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
-                .OnSuccess(release => EmailValidator.ValidateEmailAddresses(emails))
+                .OnSuccess(_ => EmailValidator.ValidateEmailAddresses(emails))
                 .OnSuccess<ActionResult, List<string>, PreReleaseUserInvitePlan>(async validEmails =>
                 {
                     var plan = new PreReleaseUserInvitePlan();
@@ -153,7 +149,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper.CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanAssignPrereleaseContactsToRelease)
-                .OnSuccessCombineWith(release => GetPreReleaseUsersInvitePlan(releaseId, emails))
+                .OnSuccessCombineWith(_ => GetPreReleaseUsersInvitePlan(releaseId, emails))
                 .OnSuccess<ActionResult, Tuple<Release, PreReleaseUserInvitePlan>, List<PreReleaseUserViewModel>>(
                     async releaseAndPlan =>
                     {

@@ -4,8 +4,15 @@ import Page from '@admin/components/Page';
 import PageTitle from '@admin/components/PageTitle';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import {
+  publicationContactRoute,
   publicationDetailsRoute,
+  publicationAdoptMethodologyRoute,
+  publicationExternalMethodologyRoute,
+  publicationMethodologiesRoute,
   publicationReleasesRoute,
+  publicationLegacyReleasesRoute,
+  publicationCreateLegacyReleaseRoute,
+  publicationEditLegacyReleaseRoute,
   PublicationRouteParams,
 } from '@admin/routes/publicationRoutes';
 import publicationService from '@admin/services/publicationService';
@@ -16,9 +23,21 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, Route, RouteComponentProps, Switch } from 'react-router';
 
-const navRoutes = [publicationReleasesRoute, publicationDetailsRoute];
+const navRoutes = [
+  publicationReleasesRoute,
+  publicationMethodologiesRoute,
+  publicationDetailsRoute,
+  publicationContactRoute,
+  publicationLegacyReleasesRoute,
+];
 
-const routes = [...navRoutes];
+const routes = [
+  ...navRoutes,
+  publicationAdoptMethodologyRoute,
+  publicationExternalMethodologyRoute,
+  publicationCreateLegacyReleaseRoute,
+  publicationEditLegacyReleaseRoute,
+];
 
 const PublicationPageContainer = ({
   match,
@@ -35,7 +54,7 @@ const PublicationPageContainer = ({
 
   return (
     <LoadingSpinner loading={loadingPublication}>
-      {publication && (
+      {publication ? (
         <Page wide breadcrumbs={[{ name: 'Manage publication' }]}>
           <div className="govuk-grid-row">
             <div className="govuk-grid-column-two-thirds">
@@ -93,6 +112,10 @@ const PublicationPageContainer = ({
             </Switch>
           </PublicationContextProvider>
         </Page>
+      ) : (
+        <WarningMessage>
+          There was a problem loading this publication.
+        </WarningMessage>
       )}
     </LoadingSpinner>
   );

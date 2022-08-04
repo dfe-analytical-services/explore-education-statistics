@@ -1,8 +1,11 @@
 import PublicationReleasesPage from '@admin/pages/publication/PublicationReleasesPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
+import {
+  testContact,
+  testPublication as baseTestPublication,
+} from '@admin/pages/publication/__data__/testPublication';
 import _publicationService, {
   MyPublication,
-  PublicationContactDetails,
 } from '@admin/services/publicationService';
 import _releaseService, { MyRelease } from '@admin/services/releaseService';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -19,14 +22,6 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationReleasesPage', () => {
-  const testContact: PublicationContactDetails = {
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    id: 'contact-id-1',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
-
   const testRelease1: MyRelease = {
     amendment: false,
     approvalStatus: 'Approved',
@@ -87,23 +82,8 @@ describe('PublicationReleasesPage', () => {
   };
 
   const testPublication: MyPublication = {
-    id: 'publication-1',
-    title: 'Publication 1',
-    contact: testContact,
+    ...baseTestPublication,
     releases: [testRelease1, testRelease2, testRelease3, testRelease4],
-    legacyReleases: [],
-    methodologies: [],
-    themeId: 'theme-1',
-    topicId: 'topic-1',
-    permissions: {
-      canAdoptMethodologies: true,
-      canCreateReleases: true,
-      canUpdatePublication: true,
-      canUpdatePublicationTitle: true,
-      canUpdatePublicationSupersededBy: true,
-      canCreateMethodologies: true,
-      canManageExternalMethodology: true,
-    },
   };
 
   beforeAll(() => {

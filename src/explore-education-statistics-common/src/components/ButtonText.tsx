@@ -11,14 +11,16 @@ interface Props {
   onClick?: MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit' | 'reset';
   underline?: boolean;
+  variant?: 'warning';
 }
 
 const ButtonText = ({
   children,
   className,
+  testId,
   type = 'button',
   underline = true,
-  testId,
+  variant,
   ...props
 }: Props) => {
   return (
@@ -29,6 +31,7 @@ const ButtonText = ({
         styles.button,
         {
           [styles.noUnderline]: !underline,
+          [styles.warning]: variant === 'warning',
         },
         className,
       )}

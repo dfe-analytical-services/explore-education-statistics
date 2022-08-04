@@ -97,10 +97,5 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         NoPublicPreReleaseAccessList,
         MethodologyNotApproved,
 
-        // File migration (EES-3547)
-        // TODO Remove in EES-3552
-        NullMessageCountForFileMigrationQueue,
-        NonEmptyFileMigrationQueue,
-
     }
 }

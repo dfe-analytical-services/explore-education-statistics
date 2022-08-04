@@ -1,5 +1,5 @@
 import PublicationDraftReleases from '@admin/pages/publication/components/PublicationDraftReleases';
-import { PublicationContactDetails } from '@admin/services/publicationService';
+import { testContact } from '@admin/pages/publication/__data__/testPublication';
 import _releaseService, { MyRelease } from '@admin/services/releaseService';
 import {
   render as baseRender,
@@ -16,14 +16,6 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('PublicationDraftReleases', () => {
-  const testContact: PublicationContactDetails = {
-    contactName: 'John Smith',
-    contactTelNo: '0777777777',
-    id: 'contact-id-1',
-    teamEmail: 'john.smith@test.com',
-    teamName: 'Team Smith',
-  };
-
   const testRelease1: MyRelease = {
     amendment: false,
     approvalStatus: 'Draft',
