@@ -1,6 +1,7 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
+using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -39,7 +40,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(mock => mock.GetCachedViewModel(publicationSlug, null))
             .ReturnsAsync(release);
 
-        var expectedCacheConfiguration = new MemoryCacheConfiguration(ExpirySchedule.HalfHourly, 30);
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(30, CronExpression.Parse(ExpirySchedules.HalfHourly));
         
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
@@ -98,7 +99,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(mock => mock.GetCachedViewModel(publicationSlug, releaseSlug))
             .ReturnsAsync(release);
 
-        var expectedCacheConfiguration = new MemoryCacheConfiguration(ExpirySchedule.HalfHourly, 30);
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(30, CronExpression.Parse(ExpirySchedules.HalfHourly));
         
         MemoryCacheService
             .Setup(s => s.SetItem<object>(

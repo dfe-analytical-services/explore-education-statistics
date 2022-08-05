@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -10,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
+using static System.Globalization.DateTimeStyles;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 using static Moq.MockBehavior;
 
@@ -34,11 +36,11 @@ public class MemoryCacheServiceTests
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
         var cacheConfiguration = new MemoryCacheConfiguration(
-            ExpirySchedule.Hourly, 
-            45);
+            45,
+            CronExpression.Parse(ExpirySchedules.Hourly));
 
         // Set the current DateTime to be 29 minutes and 30 seconds past the hour.
-        var now = DateTime.Parse("2022-07-18 00:29:30Z");
+        var now = DateTime.Parse("2022-07-18 00:29:30Z", styles: RoundtripKind);
 
         // Set the expected cache duration to be 45 seconds as per the requested duration.
         // This should not be truncated as it does not carry over into the next hour.
@@ -54,11 +56,11 @@ public class MemoryCacheServiceTests
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
         var cacheConfiguration = new MemoryCacheConfiguration(
-            ExpirySchedule.Hourly, 
-            45);
+            45,
+            CronExpression.Parse(ExpirySchedules.Hourly));
 
         // Set the current DateTime to be 59 minutes and 30 seconds past the hour.
-        var now = DateTime.Parse("2022-07-18 00:59:30Z");
+        var now = DateTime.Parse("2022-07-18 00:59:30Z", styles: RoundtripKind);
 
         // Set the expected cache duration to be 45 seconds as per the requested duration.
         // This should be truncated as it carries 15 seconds over into the next hour.
@@ -74,12 +76,12 @@ public class MemoryCacheServiceTests
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
         var cacheConfiguration = new MemoryCacheConfiguration(
-            ExpirySchedule.Hourly, 
-            45);
+            45,
+            CronExpression.Parse(ExpirySchedules.Hourly));
 
         // Set the current DateTime to be 59 minutes and 30 seconds past the hour during the last
         // hour of the day.
-        var now = DateTime.Parse("2022-07-18 23:59:30Z");
+        var now = DateTime.Parse("2022-07-18 23:59:30Z", styles: RoundtripKind);
 
         // Set the expected cache duration to be 45 seconds as per the requested duration.
         // This should be truncated as it carries 15 seconds over into the next hour.
@@ -95,11 +97,11 @@ public class MemoryCacheServiceTests
         // their expiry times truncated if the requested cache duration would carry over into
         // a new half-hour of the day.
         var cacheConfiguration = new MemoryCacheConfiguration(
-            ExpirySchedule.HalfHourly, 
-            15);
+            15,
+            CronExpression.Parse(ExpirySchedules.HalfHourly));
 
         // Set the current DateTime to be 29 minutes and 30 seconds past the hour.
-        var now = DateTime.Parse("2022-07-18 00:29:30Z");
+        var now = DateTime.Parse("2022-07-18 00:29:30Z", styles: RoundtripKind);
 
         // Set the expected cache duration to be 15 seconds as per the requested duration.
         // This should not be truncated as it does not carry over into the next half hour.
@@ -115,11 +117,11 @@ public class MemoryCacheServiceTests
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
         var cacheConfiguration = new MemoryCacheConfiguration(
-            ExpirySchedule.HalfHourly, 
-            45);
+            45,
+            CronExpression.Parse(ExpirySchedules.HalfHourly));
 
         // Set the current DateTime to be 59 minutes and 30 seconds past the hour.
-        var now = DateTime.Parse("2022-07-18 00:29:30Z");
+        var now = DateTime.Parse("2022-07-18 00:29:30Z", styles: RoundtripKind);
 
         // Set the expected cache duration to be 45 seconds as per the requested duration.
         // This should be truncated as it carries 15 seconds over into the next half hour.
@@ -135,12 +137,12 @@ public class MemoryCacheServiceTests
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
         var cacheConfiguration = new MemoryCacheConfiguration(
-            ExpirySchedule.HalfHourly, 
-            45);
+            45,
+            CronExpression.Parse(ExpirySchedules.HalfHourly));
 
         // Set the current DateTime to be 59 minutes and 30 seconds past the hour during the last
         // half hour of the day.
-        var now = DateTime.Parse("2022-07-18 23:59:30Z");
+        var now = DateTime.Parse("2022-07-18 23:59:30Z", styles: RoundtripKind);
 
         // Set the expected cache duration to be 45 seconds as per the requested duration.
         // This should be truncated as it carries 15 seconds over into the next half hour.
@@ -155,11 +157,9 @@ public class MemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new MemoryCacheConfiguration(
-            ExpirySchedule.None, 
-            6000);
+        var cacheConfiguration = new MemoryCacheConfiguration(6000);
 
-        var now = DateTime.Parse("2022-07-18 00:29:30Z");
+        var now = DateTime.Parse("2022-07-18 00:29:30Z", styles: RoundtripKind);
 
         // The requested cache duration is really long, but because there's no regular cache clearing
         // schedule, the requested cache duration will be honoured.
@@ -171,9 +171,7 @@ public class MemoryCacheServiceTests
     [Fact]
     public async Task SetItem_ExceptionHandledGracefullyWhenCachingItem()
     {
-        var cacheConfiguration = new MemoryCacheConfiguration(
-            ExpirySchedule.None, 
-            6000);
+        var cacheConfiguration = new MemoryCacheConfiguration(6000);
 
         var memoryCache = new Mock<IMemoryCache>(Strict);
 

@@ -1,6 +1,5 @@
 ﻿#nullable enable
 using System;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
@@ -10,7 +9,6 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cache.ExpirySchedule;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services;
     
@@ -89,27 +87,19 @@ public class MemoryCacheService : IMemoryCacheService
             var now = nowUtc ?? DateTime.UtcNow;
 
             DateTime absoluteExpiryTime;
+            var targetAbsoluteExpiryDateTime = now.AddSeconds(configuration.CacheDurationInSeconds);
 
-            if (configuration.ExpirySchedule == None)
+            if (configuration.ExpirySchedule == null)
             {
-                absoluteExpiryTime = now.AddSeconds(configuration.CacheDurationInSeconds);
+                absoluteExpiryTime = targetAbsoluteExpiryDateTime;
             }
             else
             {
-                var midnightToday = now.Date;
-                var targetAbsoluteExpiryDateTime = now.AddSeconds(configuration.CacheDurationInSeconds);
-
-                var expiryWindowStartTimesToday = configuration.GetDailyExpiryStartTimesInSeconds()
-                    .Select(milliseconds => midnightToday.AddSeconds(milliseconds))
-                    .ToList();
-
-                var midnightTomorrow = midnightToday.AddDays(1);
-                var nextExpiryWindowStart = expiryWindowStartTimesToday
-                    .FirstOrDefault(expiryWindowStart => expiryWindowStart > now, midnightTomorrow);
-
-                absoluteExpiryTime = targetAbsoluteExpiryDateTime < nextExpiryWindowStart
+                var nextExpiryTime = configuration.ExpirySchedule.GetNextOccurrence(now)!;
+                
+                absoluteExpiryTime = targetAbsoluteExpiryDateTime < nextExpiryTime.Value
                     ? targetAbsoluteExpiryDateTime
-                    : nextExpiryWindowStart;
+                    : nextExpiryTime.Value;
             }
 
             // Calculate an approximate size in bytes for this object. As there is no built-in mechanism

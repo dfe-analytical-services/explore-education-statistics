@@ -3,10 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
-using static GovUk.Education.ExploreEducationStatistics.Common.Cache.ExpirySchedule;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 {
@@ -25,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         
         private int CacheDurationInSeconds { get; }
         
-        private ExpirySchedule ExpirySchedule { get; }
+        private CronExpression? ExpirySchedule { get; }
 
         /// <summary>
         /// Specify a service to use <see cref="Services"/>.
@@ -36,11 +36,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         public MemoryCacheAttribute(
             Type key, 
             int cacheDurationInSeconds, 
-            ExpirySchedule expirySchedule = None
+            string? expiryScheduleCron = null
             ) : base(key)
         {
             CacheDurationInSeconds = cacheDurationInSeconds;
-            ExpirySchedule = expirySchedule;
+            ExpirySchedule = expiryScheduleCron != null ? CronExpression.Parse(expiryScheduleCron) : null;
         }
 
         public static void AddService(string name, IMemoryCacheService service)
@@ -85,7 +85,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                     return;
                 }
 
-                var itemCachingConfiguration = new MemoryCacheConfiguration(ExpirySchedule, CacheDurationInSeconds);
+                var itemCachingConfiguration = new MemoryCacheConfiguration(CacheDurationInSeconds, ExpirySchedule);
                 await service.SetItem(key, value, itemCachingConfiguration);
                 return;
             }

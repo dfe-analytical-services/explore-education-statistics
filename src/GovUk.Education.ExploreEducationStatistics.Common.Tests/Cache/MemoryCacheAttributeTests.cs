@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -36,25 +37,25 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     // ReSharper disable UnusedParameter.Local
     private static class TestMethods
     {
-        [MemoryCache(typeof(TestMemoryCacheKey), expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45)]
+        [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: ExpirySchedules.Hourly, cacheDurationInSeconds: 45)]
         public static TestValue SingleParam(string param1)
         {
             return new();
         }
 
-        [MemoryCache(typeof(TestMemoryCacheKey), expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45, ServiceName = "target")]
+        [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: ExpirySchedules.Hourly, cacheDurationInSeconds: 45, ServiceName = "target")]
         public static TestValue SpecificCacheService(string param1)
         {
             return new();
         }
 
-        [MemoryCache(null!, expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45)]
+        [MemoryCache(null!, expiryScheduleCron: ExpirySchedules.Hourly, cacheDurationInSeconds: 45)]
         public static TestValue NullKeyType()
         {
             return new();
         }
 
-        [MemoryCache(typeof(object), expirySchedule: ExpirySchedule.Hourly, cacheDurationInSeconds: 45)]
+        [MemoryCache(typeof(object), expiryScheduleCron: ExpirySchedules.Hourly, cacheDurationInSeconds: 45)]
         public static TestValue InvalidKeyType()
         {
             return new();
@@ -99,7 +100,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         var args = new List<object>();
 
-        var expectedCacheConfiguration = new MemoryCacheConfiguration(ExpirySchedule.Hourly, 45);
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CronExpression.Parse(ExpirySchedules.Hourly));
             
         _memoryCacheService
             .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedCacheConfiguration, null))
@@ -130,7 +131,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         var args = new List<object>();
 
-        var expectedDefaultCacheConfiguration = new MemoryCacheConfiguration(ExpirySchedule.None, 135);
+        var expectedDefaultCacheConfiguration = new MemoryCacheConfiguration(135);
             
         _memoryCacheService
             .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedDefaultCacheConfiguration, null))
@@ -165,7 +166,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         var args = new List<object>();
 
-        var expectedCacheConfiguration = new MemoryCacheConfiguration(ExpirySchedule.Hourly, 45);
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CronExpression.Parse(ExpirySchedules.Hourly));
             
         targetMemoryCacheService
             .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedCacheConfiguration, null))
