@@ -163,7 +163,7 @@ Verify release associated files
     ${downloads}=    user gets accordion section content element    Explore data and files
     user waits until page contains element    ${downloads}    %{WAIT_SMALL}
 
-    user checks element should contain    ${downloads}    Download all data
+    user checks element should contain    ${downloads}    Download all data (zip)
     ...    %{WAIT_SMALL}
     user checks element should contain    ${downloads}
     ...    All data used in this release is available as open data for download
@@ -515,7 +515,7 @@ Verify amendment is published
 Verify amendment files
     user opens accordion section    Explore data and files
     ${downloads}=    user gets accordion section content element    Explore data and files
-    user checks element should contain    ${downloads}    Download all data
+    user checks element should contain    ${downloads}    Download all data (zip)
     ...    %{WAIT_SMALL}
 
     user opens details dropdown    List of all supporting files
