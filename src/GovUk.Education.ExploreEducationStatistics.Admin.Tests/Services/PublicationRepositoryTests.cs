@@ -229,20 +229,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Unrelated publications are excluded since they are for different topics
                 Assert.Equal(3, result.Count);
 
-                Assert.Equal("Related publication 1", result[0].Title);
+                Assert.Equal("Related publication 2", result[0].Title);
                 Assert.Equal(2, result[0].Releases.Count);
-                Assert.Equal("Academic Year 2012/13", result[0].Releases[0].Title);
-                Assert.Equal("Academic Year 2011/12", result[0].Releases[1].Title);
+                Assert.Equal("Academic Year 2015/16", result[0].Releases[0].Title);
+                Assert.Equal("Academic Year 2016/17", result[0].Releases[1].Title);
 
-                Assert.Equal("Related publication 2", result[1].Title);
+                Assert.Equal("Related publication 3", result[1].Title);
                 Assert.Equal(2, result[1].Releases.Count);
-                Assert.Equal("Academic Year 2016/17", result[1].Releases[0].Title);
-                Assert.Equal("Academic Year 2015/16", result[1].Releases[1].Title);
+                Assert.Equal("Academic Year 2015/16", result[1].Releases[0].Title);
+                Assert.Equal("Academic Year 2016/17", result[1].Releases[1].Title);
 
-                Assert.Equal("Related publication 3", result[2].Title);
-                Assert.Equal(2, result[1].Releases.Count);
-                Assert.Equal("Academic Year 2016/17", result[2].Releases[0].Title);
-                Assert.Equal("Academic Year 2015/16", result[2].Releases[1].Title);
+                Assert.Equal("Related publication 1", result[2].Title);
+                Assert.Equal(2, result[2].Releases.Count);
+                Assert.Equal("Academic Year 2011/12", result[2].Releases[0].Title);
+                Assert.Equal("Academic Year 2012/13", result[2].Releases[1].Title);
             }
         }
 
@@ -354,22 +354,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(publication);
                 Assert.Equal(3, publication.Methodologies.Count);
 
-                // Check that the latest versions of the methodologies are returned in title order 
+                // Methodologies aren't ordered
+                var methodology2Version0 = Assert.Single(publication.Methodologies[0].Methodology.Versions);
+                Assert.Equal(methodology2Id, methodology2Version0.Id);
 
-                var link1 = publication.Methodologies[0];
-                Assert.True(link1.Owner);
-                Assert.Equal(methodology1Id, link1.Methodology.Id);
-                Assert.Equal("Methodology 1", link1.Methodology.Title);
+                var methodology1Version0 = Assert.Single(publication.Methodologies[1].Methodology.Versions);
+                Assert.Equal(methodology1Id, methodology1Version0.Id);
 
-                var link2 = publication.Methodologies[1];
-                Assert.False(link2.Owner);
-                Assert.Equal(methodology2Id, link2.Methodology.Id);
-                Assert.Equal("Methodology 2", link2.Methodology.Title);
-
-                var link3 = publication.Methodologies[2];
-                Assert.False(link3.Owner);
-                Assert.Equal(methodology3Version1Id, link3.Methodology.Id);
-                Assert.Equal("Methodology 3 Version 1", link3.Methodology.Title);
+                Assert.Equal(2, publication.Methodologies[2].Methodology.Versions.Count);
+                var methodology3Version0 = publication.Methodologies[2].Methodology.Versions[0];
+                var methodology3Version1 = publication.Methodologies[2].Methodology.Versions[1];
+                Assert.Equal(methodology3Version0Id, methodology3Version0.Id);
+                Assert.Equal(methodology3Version1Id, methodology3Version1.Id);
             }
         }
 
@@ -554,9 +550,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
                 // Result should contain the publication related to this topic
-                Assert.Single(result);
-                Assert.Equal("Related publication 1", result[0].Title);
-                Assert.Empty(result[0].Releases);
+                var publication = Assert.Single(result);
+                Assert.Equal("Related publication 1", publication.Title);
+                Assert.Empty(publication.Releases);
             }
         }
 
@@ -625,12 +621,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var contentDbContext = InMemoryApplicationDbContext(contextId))
             {
                 var service = SetupPublicationRepository(contentDbContext);
-                var result = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
+                var publications = await service.GetPublicationsForTopicRelatedToUser(topic.Id, user.Id);
 
-                Assert.Single(result);
-                Assert.Equal("Publication", result[0].Title);
-                Assert.Single(result[0].Releases);
-                Assert.Equal("Academic Year 2011/12", result[0].Releases[0].Title);
+                var resultPublication = Assert.Single(publications);
+                Assert.Equal("Publication", resultPublication.Title);
+
+                var resultRelease = Assert.Single(resultPublication.Releases);
+                Assert.Equal("Academic Year 2011/12", resultRelease.Title);
             }
         }
 
@@ -708,68 +705,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = SetupPublicationRepository(context);
                 var publications = await publicationService.GetAllPublicationsForTopic(topicId);
                 var releases = publications.Single().Releases;
-                Assert.Equal("Week 1 2001", releases[0].Title);
-                Assert.Equal("Week 11 2000", releases[1].Title);
-                Assert.Equal("Week 3 2000", releases[2].Title);
-                Assert.Equal("Week 2 2000", releases[3].Title);
-                Assert.Equal("Week 1 2000", releases[4].Title);
-                Assert.Equal("Week 1 1999", releases[5].Title);
-            }
-        }
 
-        [Fact]
-        public async Task GetAllPublicationsForTopic_LatestReleaseCorrectlyReportedInPublication()
-        {
-            var latestReleaseId = Guid.NewGuid();
-            var notLatestReleaseId = Guid.NewGuid();
-            var topicId = Guid.NewGuid();
-            var contextId = Guid.NewGuid().ToString();
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                context.Add(new Topic
-                {
-                    Id = topicId,
-                    Publications = new List<Publication>
-                    {
-                        new()
-                        {
-                            Id = Guid.NewGuid(),
-                            Title = "Publication",
-                            TopicId = topicId,
-                            Releases = AsList(
-                                new Release
-                                {
-                                    Id = notLatestReleaseId,
-                                    ReleaseName = "2019",
-                                    TimePeriodCoverage = December,
-                                    Published = DateTime.UtcNow
-                                },
-                                new Release
-                                {
-                                    Id = latestReleaseId,
-                                    ReleaseName = "2020",
-                                    TimePeriodCoverage = June,
-                                    Published = DateTime.UtcNow
-                                }
-                            )
-                        }
-                    }
-                });
-                await context.SaveChangesAsync();
-            }
-
-            await using (var context = InMemoryApplicationDbContext(contextId))
-            {
-                var publicationService = SetupPublicationRepository(context);
-
-                // Method under test - this return a list of publication for a user. The releases in the publication
-                // should correctly report whether they are the latest or not. Note that this is dependent on the mapper
-                // that we are passing in.
-                var publications = await publicationService.GetAllPublicationsForTopic(topicId);
-                var releases = publications.Single().Releases;
-                Assert.True(releases.Exists(r => r.Id == latestReleaseId && r.LatestRelease));
-                Assert.True(releases.Exists(r => r.Id == notLatestReleaseId && !r.LatestRelease));
+                Assert.Equal(6, releases.Count);
             }
         }
 
@@ -994,21 +931,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var repository = SetupPublicationRepository(context);
-                var viewModel = await repository.GetPublicationWithAllReleases(publication.Id);
+                var resultPublication = await repository.GetPublicationWithAllReleases(publication.Id);
 
-                Assert.Equal(publication.Id, viewModel.Id);
-                Assert.Equal(publication.Title, viewModel.Title);
-                Assert.Equal(publication.Summary, viewModel.Summary);
-                Assert.Equal(publication.TopicId, viewModel.TopicId);
-                Assert.Equal(publication.Contact.ContactName, viewModel.Contact.ContactName);
+                Assert.Equal(publication.Id, resultPublication.Id);
+                Assert.Equal(publication.Title, resultPublication.Title);
+                Assert.Equal(publication.Summary, resultPublication.Summary);
+                Assert.Equal(publication.TopicId, resultPublication.TopicId);
+                Assert.Equal(publication.Contact.ContactName, resultPublication.Contact.ContactName);
 
-                Assert.Equal(2, viewModel.Releases.Count);
-                Assert.Equal(release1.Id, viewModel.Releases[1].Id);
-                Assert.Equal(release2.Id, viewModel.Releases[0].Id);
+                Assert.Equal(2, resultPublication.Releases.Count);
 
-                Assert.Single(viewModel.Methodologies);
-                Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Methodology.Id);
-                Assert.Equal(methodologyVersion.AlternativeTitle, viewModel.Methodologies[0].Methodology.Title);
+                Assert.Single(resultPublication.Methodologies);
+                Assert.Equal(publication.Methodologies[0].MethodologyId, resultPublication.Methodologies[0].Methodology.Id);
+                Assert.Equal(publication.Methodologies[0].Methodology.Versions[0].AlternativeTitle,
+                    resultPublication.Methodologies[0].Methodology.Versions[0].AlternativeTitle);
             }
         }
 
@@ -1030,8 +966,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var repository = SetupPublicationRepository(context);
-                var viewModel = await repository.GetPublicationWithAllReleases(publication.Id);
-                Assert.Equal(publication.Id, viewModel.Id);
+                var resultPublication = await repository.GetPublicationWithAllReleases(publication.Id);
+                Assert.Equal(publication.Id, resultPublication.Id);
             }
         }
 
@@ -1067,15 +1003,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
                 var repository = SetupPublicationRepository(context);
-                var viewModel = await repository.GetPublicationForUser(publication.Id, userId);
+                var resultPublication = await repository.GetPublicationForUser(publication.Id, userId);
 
-                Assert.Equal(publication.Id, viewModel.Id);
-                Assert.Equal(publication.Title, viewModel.Title);
-                Assert.Equal(publication.Summary, viewModel.Summary);
-                Assert.Equal(publication.TopicId, viewModel.TopicId);
+                Assert.Equal(publication.Id, resultPublication.Id);
+                Assert.Equal(publication.Title, resultPublication.Title);
+                Assert.Equal(publication.Summary, resultPublication.Summary);
+                Assert.Equal(publication.TopicId, resultPublication.TopicId);
 
-                Assert.Empty(viewModel.Releases);
-                Assert.Empty(viewModel.Methodologies);
+                Assert.Empty(resultPublication.Releases);
+                Assert.Empty(resultPublication.Methodologies);
             }
         }
 

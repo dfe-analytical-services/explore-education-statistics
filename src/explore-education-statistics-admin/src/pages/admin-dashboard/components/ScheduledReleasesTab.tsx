@@ -6,14 +6,14 @@ import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
-import { MyRelease } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
 import { generatePath } from 'react-router';
 
 interface Props {
   isLoading: boolean;
-  releases: MyRelease[];
+  releases: Release[];
   showNewDashboard?: boolean; // TODO EES-3217 remove when ready to go live
 }
 

@@ -1,6 +1,6 @@
 import ReleaseSummary from '@admin/pages/admin-dashboard/components/ReleaseSummary';
 import _releaseService, {
-  MyRelease,
+  Release,
   ReleaseStageStatuses,
 } from '@admin/services/releaseService';
 import { render, screen, waitFor, within } from '@testing-library/react';
@@ -12,7 +12,7 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('ReleaseSummary', () => {
-  const testRelease: MyRelease = {
+  const testRelease: Release = {
     amendment: false,
     approvalStatus: 'Approved',
     contact: {

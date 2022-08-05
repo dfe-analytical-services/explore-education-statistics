@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import DraftReleaseRowIssues from '@admin/pages/admin-dashboard/components/DraftReleaseRowIssues';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import { MyRelease } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -14,7 +14,7 @@ import { generatePath } from 'react-router';
 
 interface Props {
   isBauUser: boolean;
-  release: MyRelease;
+  release: Release;
   onDelete: () => void;
 }
 
@@ -37,10 +37,10 @@ const DraftReleaseRow = ({ isBauUser, release, onDelete }: Props) => {
             releaseId: release.id,
           })}
         >
-          {release.permissions.canUpdateRelease ? 'Edit' : 'View'}
+          {release.permissions?.canUpdateRelease ? 'Edit' : 'View'}
           <VisuallyHidden> {release.title}</VisuallyHidden>
         </Link>
-        {release.permissions.canDeleteRelease && release.amendment && (
+        {release.permissions?.canDeleteRelease && release.amendment && (
           <ButtonText className="govuk-!-margin-left-4" onClick={onDelete}>
             Cancel amendment
             <VisuallyHidden> for {release.title}</VisuallyHidden>

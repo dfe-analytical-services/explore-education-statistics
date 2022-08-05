@@ -3,9 +3,9 @@ import React from 'react';
 import { noop } from 'lodash';
 import { MemoryRouter, Router } from 'react-router-dom';
 import _releaseService, {
-  MyRelease,
   ReleaseSummary,
   ReleaseStageStatuses,
+  Release,
 } from '@admin/services/releaseService';
 import userEvent from '@testing-library/user-event';
 import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
@@ -17,7 +17,7 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('NonScheduledReleaseSummary', () => {
-  const testRelease: MyRelease = {
+  const testRelease: Release = {
     id: 'rel-3',
     latestRelease: false,
     published: '2021-01-01T11:21:17',
@@ -29,9 +29,10 @@ describe('NonScheduledReleaseSummary', () => {
       canUpdateRelease: false,
       canDeleteRelease: false,
       canMakeAmendmentOfRelease: false,
+      canAddPrereleaseUsers: false,
     },
     approvalStatus: 'Draft',
-  } as MyRelease;
+  } as Release;
 
   const completeReleaseStatus: ReleaseStageStatuses = {
     overallStage: 'Complete',
@@ -108,8 +109,8 @@ describe('NonScheduledReleaseSummary', () => {
         <NonScheduledReleaseSummary
           includeCreateAmendmentControls
           release={produce(testRelease, draft => {
-            draft.permissions.canUpdateRelease = true;
-            draft.permissions.canMakeAmendmentOfRelease = true;
+            draft.permissions!.canUpdateRelease = true;
+            draft.permissions!.canMakeAmendmentOfRelease = true;
           })}
           onAmendmentCancelled={noop}
         />
@@ -238,8 +239,8 @@ describe('NonScheduledReleaseSummary', () => {
           release={produce(testRelease, draft => {
             draft.amendment = true;
             draft.previousVersionId = 'rel-2';
-            draft.permissions.canUpdateRelease = true;
-            draft.permissions.canDeleteRelease = true;
+            draft.permissions!.canUpdateRelease = true;
+            draft.permissions!.canDeleteRelease = true;
           })}
           onAmendmentCancelled={noop}
         />
@@ -304,7 +305,7 @@ describe('NonScheduledReleaseSummary', () => {
         <NonScheduledReleaseSummary
           includeCreateAmendmentControls
           release={produce(testRelease, draft => {
-            draft.permissions.canMakeAmendmentOfRelease = true;
+            draft.permissions!.canMakeAmendmentOfRelease = true;
           })}
           onAmendmentCancelled={noop}
         />
@@ -359,7 +360,7 @@ describe('NonScheduledReleaseSummary', () => {
         <NonScheduledReleaseSummary
           includeCreateAmendmentControls
           release={produce(testRelease, draft => {
-            draft.permissions.canDeleteRelease = true;
+            draft.permissions!.canDeleteRelease = true;
             draft.amendment = true;
             draft.previousVersionId = 'rel-2';
           })}
@@ -429,7 +430,7 @@ describe('NonScheduledReleaseSummary', () => {
       <MemoryRouter>
         <NonScheduledReleaseSummary
           release={produce(testRelease, draft => {
-            draft.permissions.canMakeAmendmentOfRelease = true;
+            draft.permissions!.canMakeAmendmentOfRelease = true;
           })}
           onAmendmentCancelled={noop}
         />

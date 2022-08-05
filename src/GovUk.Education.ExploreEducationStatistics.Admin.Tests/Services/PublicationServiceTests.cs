@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
@@ -32,6 +31,948 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
     public class PublicationServiceTests
     {
+        [Fact]
+        public async Task GetMyPublicationsAndReleasesByTopic_CanViewAllReleases_ReleaseOrder()
+        {
+            var topic = new Topic
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            // The order they should appear in result
+            var publication1Release1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+            };
+            var publication1Release2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.Week2,
+            };
+            var publication1Release3 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+            };
+            var publication1Release4 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "1999",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+            };
+            var publication1 = new Publication
+            {
+                Title = "publication1",
+                Releases = new List<Release>
+                {
+                    publication1Release2,
+                    publication1Release3,
+                    publication1Release4,
+                    publication1Release1,
+                },
+            };
+
+            var publication2Release1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            };
+            var publication2Release2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            };
+            var publication2 = new Publication
+            {
+                Title = "publication1",
+                Releases = new List<Release>
+                {
+                    publication2Release2,
+                    publication2Release1,
+                },
+            };
+
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            publicationRepository.Setup(s => s.GetAllPublicationsForTopic(topic.Id))
+                .ReturnsAsync(
+                    new List<Publication>
+                    {
+                        publication1,
+                        publication2,
+                    });
+
+            publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
+                .Returns(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+                var publicationViewModels = result.AssertRight();
+
+                Assert.Equal(2, publicationViewModels.Count);
+                Assert.Equal(publication1.Id, publicationViewModels[0].Id);
+
+                var publication1Releases = publicationViewModels[0].Releases;
+                Assert.Equal(4, publication1Releases.Count);
+                Assert.Equal(publication1Release1.Id, publication1Releases[0].Id);
+                Assert.Equal(publication1Release2.Id, publication1Releases[1].Id);
+                Assert.Equal(publication1Release3.Id, publication1Releases[2].Id);
+                Assert.Equal(publication1Release4.Id, publication1Releases[3].Id);
+
+                Assert.Equal(publication2.Id, publicationViewModels[1].Id);
+                var publication2Releases = publicationViewModels[1].Releases;
+                Assert.Equal(2, publication2Releases.Count);
+                Assert.Equal(publication2Release1.Id, publication2Releases[0].Id);
+                Assert.Equal(publication2Release2.Id, publication2Releases[1].Id);
+            }
+        }
+
+        [Fact]
+        public async Task GetMyPublicationsAndReleasesByTopic_CanViewAllReleases_MethodologyOrder()
+        {
+            var topic = new Topic
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+            };
+            var methodology1Version1 = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 1 Version 1",
+                Version = 0,
+                Status = Draft
+            };
+
+            var methodology2Version1 = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 2 Version 1",
+                Version = 0,
+                Status = Approved
+            };
+
+            var methodology2Version2 = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 2 Version 2",
+                Version = 1,
+                Status = Draft,
+                PreviousVersionId = methodology2Version1.Id
+            };
+
+            var methodology3Version1 = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 3 Version 1",
+                Version = 1,
+                Status = Approved,
+            };
+
+            var publication1 = new Publication
+            {
+                Title = "publication1",
+                Releases = new List<Release>
+                {
+                    release,
+                },
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        Methodology = new Methodology
+                        {
+                            Slug = "methodology-2-slug",
+                            Versions = AsList(methodology2Version2, methodology2Version1)
+                        },
+                        Owner = false
+                    },
+                    new PublicationMethodology
+                    {
+                        Methodology = new Methodology
+                        {
+                            Slug = "methodology-3-slug",
+                            Versions = AsList(methodology3Version1)
+                        },
+                        Owner = false
+                    },
+                    new PublicationMethodology
+                    {
+                        Methodology = new Methodology
+                        {
+                            Slug = "methodology-1-slug",
+                            Versions = AsList(methodology1Version1)
+                        },
+                        Owner = true
+                    }
+                )
+            };
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            publicationRepository.Setup(s => s.GetAllPublicationsForTopic(topic.Id))
+                .ReturnsAsync(
+                    new List<Publication>
+                    {
+                        publication1,
+                    });
+
+            publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
+                .Returns(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+                var publicationViewModels = result.AssertRight();
+
+                var publicationViewModel = Assert.Single(publicationViewModels);
+                Assert.Equal(publication1.Id, publicationViewModel.Id);
+
+                var releases = publicationViewModel.Releases;
+                Assert.Single(releases);
+                Assert.Equal(release.Id, releases[0].Id);
+
+                var methodologies = publicationViewModel.Methodologies;
+                Assert.Equal(3, methodologies.Count);
+
+                Assert.Equal(methodology1Version1.AlternativeTitle, methodologies[0].Methodology.Title);
+                Assert.True(methodologies[0].Owner);
+
+                Assert.Equal(methodology2Version2.AlternativeTitle, methodologies[1].Methodology.Title);
+                Assert.False(methodologies[1].Owner);
+
+                Assert.Equal(methodology3Version1.AlternativeTitle, methodologies[2].Methodology.Title);
+                Assert.False(methodologies[2].Owner);
+            }
+        }
+
+        [Fact]
+        public async Task GetMyPublicationsAndReleasesByTopic_CanViewAllReleases_LatestRelease()
+        {
+            var topic = new Topic
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            // The order they should appear in result
+            var publication1Release1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+                Published = DateTime.UtcNow,
+            };
+            var publication1Release2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.Week2,
+                Published = DateTime.UtcNow,
+            };
+            var publication1Release3 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+                Published = DateTime.UtcNow,
+            };
+            var publication1Release4 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "1999",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+                Published = DateTime.UtcNow,
+            };
+            var publication1 = new Publication
+            {
+                Title = "publication1",
+                Releases = new List<Release>
+                {
+                    publication1Release2,
+                    publication1Release3,
+                    publication1Release4,
+                    publication1Release1,
+                },
+            };
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            publicationRepository.Setup(s => s.GetAllPublicationsForTopic(topic.Id))
+                .ReturnsAsync(
+                    new List<Publication>
+                    {
+                        publication1,
+                    });
+
+            publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
+                .Returns(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddRangeAsync(publication1);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+                var publicationViewModels = result.AssertRight();
+
+                var publicationViewModel = Assert.Single(publicationViewModels);
+                Assert.Equal(publication1.Id, publicationViewModel.Id);
+
+                var publication1Releases = publicationViewModel.Releases;
+                Assert.Equal(4, publication1Releases.Count);
+
+                Assert.Equal(publication1Release1.Id, publication1Releases[0].Id);
+                Assert.True(publication1Releases[0].LatestRelease);
+
+                Assert.Equal(publication1Release2.Id, publication1Releases[1].Id);
+                Assert.False(publication1Releases[1].LatestRelease);
+
+                Assert.Equal(publication1Release3.Id, publication1Releases[2].Id);
+                Assert.False(publication1Releases[2].LatestRelease);
+
+                Assert.Equal(publication1Release4.Id, publication1Releases[3].Id);
+                Assert.False(publication1Releases[3].LatestRelease);
+            }
+        }
+
+        [Fact]
+        public async Task GetMyPublicationsAndReleasesByTopic_CanViewAllReleases_ReleasePermissionsSet()
+        {
+            var topic = new Topic
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            var publication1Release1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+            };
+            var publication1Release2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.Week2,
+            };
+            var publication1 = new Publication
+            {
+                Title = "publication1",
+                Releases = new List<Release>
+                {
+                    publication1Release1,
+                    publication1Release2,
+                },
+            };
+
+            var userService = new Mock<IUserService>(Strict);
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.GetUserId())
+                .Returns(Guid.NewGuid());
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanDeleteSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+                .ReturnsAsync(false);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
+                .ReturnsAsync(false);
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+            publicationRepository.Setup(s => s.GetAllPublicationsForTopic(topic.Id))
+                .ReturnsAsync(
+                    new List<Publication>
+                    {
+                        publication1,
+                    });
+            publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
+                .Returns(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+                var publicationViewModels = result.AssertRight();
+
+                var publicationViewModel = Assert.Single(publicationViewModels);
+                Assert.Equal(publication1.Id, publicationViewModel.Id);
+
+                var publication1Releases = publicationViewModel.Releases;
+                Assert.Equal(2, publication1Releases.Count);
+
+                Assert.Equal(publication1Release1.Id, publication1Releases[0].Id);
+                Assert.True(publication1Releases[0].Permissions!.CanUpdateRelease);
+                Assert.True(publication1Releases[0].Permissions!.CanDeleteRelease);
+                Assert.False(publication1Releases[0].Permissions!.CanAddPrereleaseUsers);
+                Assert.False(publication1Releases[0].Permissions!.CanMakeAmendmentOfRelease);
+
+                Assert.Equal(publication1Release2.Id, publication1Releases[1].Id);
+                Assert.True(publication1Releases[1].Permissions!.CanUpdateRelease);
+                Assert.True(publication1Releases[1].Permissions!.CanDeleteRelease);
+                Assert.False(publication1Releases[1].Permissions!.CanAddPrereleaseUsers);
+                Assert.False(publication1Releases[1].Permissions!.CanMakeAmendmentOfRelease);
+            }
+        }
+
+        [Fact]
+        public async Task GetMyPublicationsAndReleasesByTopic_NotViewAllReleases_ReleaseOrder()
+        {
+            var userId = Guid.NewGuid();
+
+            var topic = new Topic
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            // The order they should appear in result
+            var publication1Release1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+            };
+            var publication1Release2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.Week2,
+            };
+            var publication1Release3 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+            };
+            var publication1Release4 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "1999",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+            };
+            var publication1 = new Publication
+            {
+                Title = "publication1",
+                Releases = new List<Release>
+                {
+                    publication1Release2,
+                    publication1Release3,
+                    publication1Release4,
+                    publication1Release1,
+                },
+            };
+
+            var publication2Release1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            };
+            var publication2Release2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+            };
+            var publication2 = new Publication
+            {
+                Title = "publication1",
+                Releases = new List<Release>
+                {
+                    publication2Release2,
+                    publication2Release1,
+                },
+            };
+
+            var userService = new Mock<IUserService>(Strict);
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+                .ReturnsAsync(false);
+            userService.Setup(s => s.GetUserId())
+                .Returns(userId);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanDeleteSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+                .ReturnsAsync(false);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
+                .ReturnsAsync(false);
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+            publicationRepository
+                .Setup(s => s.GetPublicationsForTopicRelatedToUser(topic.Id, userId))
+                .ReturnsAsync(new List<Publication> { publication1, publication2, });
+            publicationRepository
+                .Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
+                .Returns(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddRangeAsync(publication1, publication2);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+                var publicationViewModels = result.AssertRight();
+
+                Assert.Equal(2, publicationViewModels.Count);
+                Assert.Equal(publication1.Id, publicationViewModels[0].Id);
+
+                var publication1Releases = publicationViewModels[0].Releases;
+                Assert.Equal(4, publication1Releases.Count);
+
+                Assert.Equal(publication1Release1.Id, publication1Releases[0].Id);
+                Assert.Equal(publication1Release2.Id, publication1Releases[1].Id);
+                Assert.Equal(publication1Release3.Id, publication1Releases[2].Id);
+                Assert.Equal(publication1Release4.Id, publication1Releases[3].Id);
+
+                Assert.Equal(publication2.Id, publicationViewModels[1].Id);
+                var publication2Releases = publicationViewModels[1].Releases;
+                Assert.Equal(2, publication2Releases.Count);
+
+                Assert.Equal(publication2Release1.Id, publication2Releases[0].Id);
+                Assert.Equal(publication2Release2.Id, publication2Releases[1].Id);
+            }
+        }
+
+        [Fact]
+        public async Task GetMyPublicationsAndReleasesByTopic_NotViewAllReleases_MethodologyOrder()
+        {
+            var userId = Guid.NewGuid();
+
+            var topic = new Topic
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+            };
+            var methodology1Version1 = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 1 Version 1",
+                Version = 0,
+                Status = Draft
+            };
+
+            var methodology2Version1 = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 2 Version 1",
+                Version = 0,
+                Status = Approved
+            };
+
+            var methodology2Version2 = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 2 Version 2",
+                Version = 1,
+                Status = Draft,
+                PreviousVersionId = methodology2Version1.Id
+            };
+
+            var methodology3Version1 = new MethodologyVersion
+            {
+                Id = Guid.NewGuid(),
+                AlternativeTitle = "Methodology 3 Version 1",
+                Version = 1,
+                Status = Approved,
+            };
+
+            var publication1 = new Publication
+            {
+                Title = "publication1",
+                Releases = new List<Release>
+                {
+                    release,
+                },
+                Methodologies = AsList(
+                    new PublicationMethodology
+                    {
+                        Methodology = new Methodology
+                        {
+                            Slug = "methodology-2-slug",
+                            Versions = AsList(methodology2Version2, methodology2Version1)
+                        },
+                        Owner = false
+                    },
+                    new PublicationMethodology
+                    {
+                        Methodology = new Methodology
+                        {
+                            Slug = "methodology-3-slug",
+                            Versions = AsList(methodology3Version1)
+                        },
+                        Owner = false
+                    },
+                    new PublicationMethodology
+                    {
+                        Methodology = new Methodology
+                        {
+                            Slug = "methodology-1-slug",
+                            Versions = AsList(methodology1Version1)
+                        },
+                        Owner = true
+                    }
+                )
+            };
+
+            var userService = new Mock<IUserService>(Strict);
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+                .ReturnsAsync(false);
+            userService.Setup(s => s.GetUserId())
+                .Returns(userId);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanDeleteSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+                .ReturnsAsync(false);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
+                .ReturnsAsync(false);
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            publicationRepository.Setup(s => s.GetPublicationsForTopicRelatedToUser(topic.Id, userId))
+                .ReturnsAsync(
+                    new List<Publication>
+                    {
+                        publication1,
+                    });
+
+            publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
+                .Returns(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+                var publicationViewModels = result.AssertRight();
+
+                var publicationViewModel = Assert.Single(publicationViewModels);
+                Assert.Equal(publication1.Id, publicationViewModel.Id);
+
+                var releases = publicationViewModel.Releases;
+                Assert.Single(releases);
+                Assert.Equal(release.Id, releases[0].Id);
+
+                var methodologies = publicationViewModel.Methodologies;
+                Assert.Equal(3, methodologies.Count);
+
+                Assert.Equal(methodology1Version1.AlternativeTitle, methodologies[0].Methodology.Title);
+                Assert.True(methodologies[0].Owner);
+
+                Assert.Equal(methodology2Version2.AlternativeTitle, methodologies[1].Methodology.Title);
+                Assert.False(methodologies[1].Owner);
+
+                Assert.Equal(methodology3Version1.AlternativeTitle, methodologies[2].Methodology.Title);
+                Assert.False(methodologies[2].Owner);
+            }
+        }
+
+        [Fact]
+        public async Task GetMyPublicationsAndReleasesByTopic_NotViewAllReleases_LatestRelease()
+        {
+            var userId = Guid.NewGuid();
+
+            var topic = new Topic
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            // The order they should appear in result
+            var publication1Release1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+                Published = DateTime.UtcNow,
+            };
+            var publication1Release2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.Week2,
+                Published = DateTime.UtcNow,
+            };
+            var publication1Release3 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+                Published = DateTime.UtcNow,
+            };
+            var publication1Release4 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "1999",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+                Published = DateTime.UtcNow,
+            };
+            var publication1 = new Publication
+            {
+                Title = "publication1",
+                Releases = new List<Release>
+                {
+                    publication1Release1,
+                    publication1Release2,
+                    publication1Release3,
+                    publication1Release4,
+                },
+            };
+
+            var userService = new Mock<IUserService>(Strict);
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+                .ReturnsAsync(false);
+            userService.Setup(s => s.GetUserId())
+                .Returns(userId);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanDeleteSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+                .ReturnsAsync(false);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
+                .ReturnsAsync(false);
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+
+            publicationRepository.Setup(s => s.GetPublicationsForTopicRelatedToUser(topic.Id, userId))
+                .ReturnsAsync(
+                    new List<Publication>
+                    {
+                        publication1,
+                    });
+
+            publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
+                .Returns(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Publications.AddRangeAsync(publication1);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+                var publicationViewModels = result.AssertRight();
+
+                var publicationViewModel = Assert.Single(publicationViewModels);
+                Assert.Equal(publication1.Id, publicationViewModel.Id);
+
+                var publication1Releases = publicationViewModel.Releases;
+                Assert.Equal(4, publication1Releases.Count);
+
+                Assert.Equal(publication1Release1.Id, publication1Releases[0].Id);
+                Assert.True(publication1Releases[0].LatestRelease);
+
+                Assert.Equal(publication1Release2.Id, publication1Releases[1].Id);
+                Assert.False(publication1Releases[1].LatestRelease);
+
+                Assert.Equal(publication1Release3.Id, publication1Releases[2].Id);
+                Assert.False(publication1Releases[2].LatestRelease);
+
+                Assert.Equal(publication1Release4.Id, publication1Releases[3].Id);
+                Assert.False(publication1Releases[3].LatestRelease);
+            }
+        }
+
+        [Fact]
+        public async Task GetMyPublicationsAndReleasesByTopic_NotViewAllReleases_ReleasePermissionsSet()
+        {
+            var userId = Guid.NewGuid();
+
+            var topic = new Topic
+            {
+                Id = Guid.NewGuid(),
+            };
+
+            var publication1Release1 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2001",
+                TimePeriodCoverage = TimeIdentifier.Week1,
+            };
+            var publication1Release2 = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                TimePeriodCoverage = TimeIdentifier.Week2,
+            };
+            var publication1 = new Publication
+            {
+                Title = "publication1",
+                Releases = new List<Release>
+                {
+                    publication1Release1,
+                    publication1Release2,
+                },
+            };
+
+            var userService = new Mock<IUserService>(Strict);
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanAccessSystem))
+                .ReturnsAsync(true);
+            userService.Setup(s => s.MatchesPolicy(SecurityPolicies.CanViewAllReleases))
+                .ReturnsAsync(false);
+            userService.Setup(s => s.GetUserId())
+                .Returns(userId);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanUpdateSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanDeleteSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+                .ReturnsAsync(false);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(), SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
+                .ReturnsAsync(false);
+
+            var publicationRepository = new Mock<IPublicationRepository>(Strict);
+            publicationRepository.Setup(s => s.GetPublicationsForTopicRelatedToUser(topic.Id, userId))
+                .ReturnsAsync(
+                    new List<Publication>
+                    {
+                        publication1,
+                    });
+            publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
+                .Returns(false);
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var publicationService = BuildPublicationService(
+                    context: contentDbContext,
+                    userService: userService.Object,
+                    publicationRepository: publicationRepository.Object);
+
+                var result = await publicationService.GetMyPublicationsAndReleasesByTopic(topic.Id);
+                var publicationViewModels = result.AssertRight();
+
+                var publicationViewModel = Assert.Single(publicationViewModels);
+                Assert.Equal(publication1.Id, publicationViewModel.Id);
+
+                var publication1Releases = publicationViewModel.Releases;
+                Assert.Equal(2, publication1Releases.Count);
+
+                Assert.Equal(publication1Release1.Id, publication1Releases[0].Id);
+                Assert.True(publication1Releases[0].Permissions!.CanUpdateRelease);
+                Assert.True(publication1Releases[0].Permissions!.CanDeleteRelease);
+                Assert.False(publication1Releases[0].Permissions!.CanAddPrereleaseUsers);
+                Assert.False(publication1Releases[0].Permissions!.CanMakeAmendmentOfRelease);
+
+                Assert.Equal(publication1Release2.Id, publication1Releases[1].Id);
+                Assert.True(publication1Releases[1].Permissions!.CanUpdateRelease);
+                Assert.True(publication1Releases[1].Permissions!.CanDeleteRelease);
+                Assert.False(publication1Releases[1].Permissions!.CanAddPrereleaseUsers);
+                Assert.False(publication1Releases[1].Permissions!.CanMakeAmendmentOfRelease);
+            }
+        }
+
         [Fact]
         public async Task GetPublication()
         {
@@ -196,7 +1137,25 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         },
                         Owner = true
                     },
-                }
+                },
+                Releases = new List<Release>
+                {
+                    new Release
+                    {
+                        ReleaseName = "1999",
+                        TimePeriodCoverage = TimeIdentifier.Week1,
+                    },
+                    new Release
+                    {
+                        ReleaseName = "2000",
+                        TimePeriodCoverage = TimeIdentifier.Week1,
+                    },
+                    new Release
+                    {
+                        ReleaseName = "2000",
+                        TimePeriodCoverage = TimeIdentifier.Week2,
+                    },
+                },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -230,6 +1189,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(viewModel.Methodologies);
                 Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Methodology.Id);
                 Assert.Equal(methodologyVersion.Title, viewModel.Methodologies[0].Methodology.Title);
+
+                Assert.Equal(3, viewModel.Releases.Count);
+                var releases = viewModel.Releases;
+                Assert.Equal("2000", releases[0].YearTitle);
+                Assert.Equal(TimeIdentifier.Week2, releases[0].TimePeriodCoverage);
+                Assert.Equal("2000", releases[1].YearTitle);
+                Assert.Equal(TimeIdentifier.Week1, releases[1].TimePeriodCoverage);
+                Assert.Equal("1999", releases[2].YearTitle);
+                Assert.Equal(TimeIdentifier.Week1, releases[2].TimePeriodCoverage);
             }
         }
 
@@ -293,7 +1261,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         },
                         Owner = true
                     },
-                }
+                },
             };
 
             var contextId = Guid.NewGuid().ToString();
@@ -323,6 +1291,27 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     s.MatchesPolicy(
                         It.Is<Publication>(p => p.Id == publication.Id),
                         SecurityPolicies.CanViewSpecificPublication))
+                .ReturnsAsync(true);
+
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(),
+                    SecurityPolicies.CanAssignPrereleaseContactsToSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(),
+                    SecurityPolicies.CanUpdateSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(),
+                    SecurityPolicies.CanDeleteSpecificRelease))
+                .ReturnsAsync(true);
+            userService
+                .Setup(s => s.MatchesPolicy(
+                    It.IsAny<Release>(),
+                    SecurityPolicies.CanMakeAmendmentOfSpecificRelease))
                 .ReturnsAsync(true);
 
             await using (var context = InMemoryApplicationDbContext(contextId))
@@ -1459,7 +2448,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 context,
                 AdminMapper(),
                 new PersistenceHelper<ContentDbContext>(context),
-                userService ?? AlwaysTrueUserService().Object, 
+                userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),
                 publicBlobCacheService ?? Mock.Of<IBlobCacheService>(Strict));

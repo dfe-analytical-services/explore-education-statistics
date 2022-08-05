@@ -1,5 +1,5 @@
 import ScheduledReleasesTable from '@admin/pages/admin-dashboard/components/ScheduledReleasesTable';
-import _releaseService, { MyRelease } from '@admin/services/releaseService';
+import _releaseService, { Release } from '@admin/services/releaseService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
@@ -9,7 +9,7 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('ScheduledReleasesTable', () => {
-  const testReleases: MyRelease[] = [
+  const testReleases: Release[] = [
     {
       id: 'release-1',
       latestRelease: true,
@@ -22,7 +22,7 @@ describe('ScheduledReleasesTable', () => {
         canUpdateRelease: true,
       },
       approvalStatus: 'Approved',
-    } as MyRelease,
+    } as Release,
     {
       id: 'release-2',
       latestRelease: true,
@@ -35,7 +35,7 @@ describe('ScheduledReleasesTable', () => {
         canUpdateRelease: true,
       },
       approvalStatus: 'Approved',
-    } as MyRelease,
+    } as Release,
     {
       id: 'release-3',
       latestRelease: false,
@@ -49,7 +49,7 @@ describe('ScheduledReleasesTable', () => {
         canDeleteRelease: true,
       },
       approvalStatus: 'Approved',
-    } as MyRelease,
+    } as Release,
 
     {
       id: 'release-4',
@@ -63,7 +63,7 @@ describe('ScheduledReleasesTable', () => {
         canUpdateRelease: true,
       },
       approvalStatus: 'Approved',
-    } as MyRelease,
+    } as Release,
   ];
 
   beforeEach(() => {
@@ -145,7 +145,7 @@ describe('ScheduledReleasesTable', () => {
             {
               ...testReleases[0],
               permissions: {
-                ...testReleases[0].permissions,
+                ...testReleases[0].permissions!,
                 canUpdateRelease: false,
               },
             },

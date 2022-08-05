@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public DateTime? NextUpdate { get; set; }
 
-        public List<MyReleaseViewModel> Releases { get; set; }
+        public List<ReleaseViewModel> Releases { get; set; }
 
         public List<MyPublicationMethodologyVersionViewModel> Methodologies { get; set; }
 

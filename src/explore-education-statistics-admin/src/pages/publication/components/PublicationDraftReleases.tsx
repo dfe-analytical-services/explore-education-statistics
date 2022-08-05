@@ -6,7 +6,7 @@ import {
 } from '@admin/pages/publication/components/PublicationGuidance';
 import releaseService, {
   DeleteReleasePlan,
-  MyRelease,
+  Release,
 } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
@@ -14,7 +14,7 @@ import useToggle from '@common/hooks/useToggle';
 import React, { useState } from 'react';
 
 interface Props {
-  releases: MyRelease[];
+  releases: Release[];
   onChange: () => void;
 }
 

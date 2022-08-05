@@ -1,7 +1,7 @@
 import PublicationPublishedReleases from '@admin/pages/publication/components/PublicationPublishedReleases';
 import { testContact } from '@admin/pages/publication/__data__/testPublication';
 import _releaseService, {
-  MyRelease,
+  Release,
   ReleaseSummary,
 } from '@admin/services/releaseService';
 import {
@@ -21,7 +21,7 @@ const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 describe('PublicationPublishedReleases', () => {
   const testPublicationId = 'publication-1';
 
-  const testRelease1: MyRelease = {
+  const testRelease1: Release = {
     amendment: false,
     approvalStatus: 'Approved',
     id: 'release-1',
@@ -51,7 +51,7 @@ describe('PublicationPublishedReleases', () => {
     preReleaseAccessList: '',
   };
 
-  const testRelease2: MyRelease = {
+  const testRelease2: Release = {
     ...testRelease1,
     id: 'release-2',
     published: '2022-01-02T00:00:00',
@@ -59,7 +59,7 @@ describe('PublicationPublishedReleases', () => {
     title: 'Release 2',
   };
 
-  const testRelease3: MyRelease = {
+  const testRelease3: Release = {
     ...testRelease1,
     id: 'release-3',
     published: '2022-01-03T00:00:00',
@@ -67,7 +67,7 @@ describe('PublicationPublishedReleases', () => {
     title: 'Release 3',
   };
 
-  const testRelease4: MyRelease = {
+  const testRelease4: Release = {
     ...testRelease1,
     id: 'release-4',
     published: '2022-01-04T00:00:00',
@@ -75,7 +75,7 @@ describe('PublicationPublishedReleases', () => {
     title: 'Release 4',
   };
 
-  const testRelease5: MyRelease = {
+  const testRelease5: Release = {
     ...testRelease1,
     id: 'release-5',
     published: '2022-01-05T00:00:00',
@@ -83,7 +83,7 @@ describe('PublicationPublishedReleases', () => {
     title: 'Release 5',
   };
 
-  const testRelease6: MyRelease = {
+  const testRelease6: Release = {
     ...testRelease1,
     id: 'release-6',
     published: '2022-01-06T00:00:00',
@@ -91,7 +91,7 @@ describe('PublicationPublishedReleases', () => {
     title: 'Release 6',
   };
 
-  const testRelease7: MyRelease = {
+  const testRelease7: Release = {
     ...testRelease1,
     id: 'release-7',
     published: '2022-01-07T00:00:00',
@@ -319,7 +319,7 @@ describe('PublicationPublishedReleases', () => {
           {
             ...testRelease1,
             permissions: {
-              ...testRelease1.permissions,
+              ...testRelease1.permissions!,
               canMakeAmendmentOfRelease: false,
             },
           },

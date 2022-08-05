@@ -29,10 +29,7 @@ export interface Release {
   previousVersionId: string;
   preReleaseAccessList: string;
   yearTitle?: string;
-}
-
-export interface MyRelease extends Release {
-  permissions: {
+  permissions?: {
     canAddPrereleaseUsers: boolean;
     canUpdateRelease: boolean;
     canDeleteRelease: boolean;
@@ -221,11 +218,11 @@ const releaseService = {
     return client.delete(`/release/${releaseId}`);
   },
 
-  getDraftReleases(): Promise<MyRelease[]> {
+  getDraftReleases(): Promise<Release[]> {
     return client.get('/releases/draft');
   },
 
-  getScheduledReleases(): Promise<MyRelease[]> {
+  getScheduledReleases(): Promise<Release[]> {
     return client.get('/releases/scheduled');
   },
 

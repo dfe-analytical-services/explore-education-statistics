@@ -1,7 +1,7 @@
 import Link from '@admin/components/Link';
 import { PublishedStatusGuidanceModal } from '@admin/pages/publication/components/PublicationGuidance';
 import styles from '@admin/pages/publication//PublicationReleasesPage.module.scss';
-import releaseService, { MyRelease } from '@admin/services/releaseService';
+import releaseService, { Release } from '@admin/services/releaseService';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
@@ -20,7 +20,7 @@ const pageSize = 5;
 
 interface Props {
   publicationId: string;
-  releases: MyRelease[];
+  releases: Release[];
 }
 
 const PublicationPublishedReleases = ({ publicationId, releases }: Props) => {
@@ -109,7 +109,7 @@ const PublicationPublishedReleases = ({ publicationId, releases }: Props) => {
                 >
                   View<VisuallyHidden> {release.title}</VisuallyHidden>
                 </Link>
-                {release.permissions.canMakeAmendmentOfRelease && (
+                {release.permissions?.canMakeAmendmentOfRelease && (
                   <ButtonText
                     className="govuk-!-margin-left-4"
                     onClick={() => setAmendReleaseId(release.id)}

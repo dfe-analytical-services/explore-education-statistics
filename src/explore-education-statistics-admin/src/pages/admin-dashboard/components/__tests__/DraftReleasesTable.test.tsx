@@ -1,5 +1,5 @@
 import DraftReleasesTable from '@admin/pages/admin-dashboard/components/DraftReleasesTable';
-import _releaseService, { MyRelease } from '@admin/services/releaseService';
+import _releaseService, { Release } from '@admin/services/releaseService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -11,7 +11,7 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('DraftReleasesTable', () => {
-  const testReleases: MyRelease[] = [
+  const testReleases: Release[] = [
     {
       id: 'release-1',
       latestRelease: true,
@@ -21,9 +21,12 @@ describe('DraftReleasesTable', () => {
       publicationTitle: 'Publication 1',
       permissions: {
         canUpdateRelease: true,
+        canDeleteRelease: false,
+        canMakeAmendmentOfRelease: false,
+        canAddPrereleaseUsers: false,
       },
       approvalStatus: 'Draft',
-    } as MyRelease,
+    } as Release,
     {
       id: 'release-2',
       latestRelease: true,
@@ -34,11 +37,13 @@ describe('DraftReleasesTable', () => {
       permissions: {
         canDeleteRelease: true,
         canUpdateRelease: true,
+        canMakeAmendmentOfRelease: false,
+        canAddPrereleaseUsers: false,
       },
       approvalStatus: 'Draft',
       amendment: true,
       previousVersionId: 'previous-version-id',
-    } as MyRelease,
+    } as Release,
     {
       id: 'release-3',
       latestRelease: false,
@@ -49,9 +54,11 @@ describe('DraftReleasesTable', () => {
       permissions: {
         canUpdateRelease: true,
         canDeleteRelease: true,
+        canMakeAmendmentOfRelease: false,
+        canAddPrereleaseUsers: false,
       },
       approvalStatus: 'HigherLevelReview',
-    } as MyRelease,
+    } as Release,
 
     {
       id: 'release-4',
@@ -63,11 +70,13 @@ describe('DraftReleasesTable', () => {
       permissions: {
         canDeleteRelease: true,
         canUpdateRelease: true,
+        canMakeAmendmentOfRelease: false,
+        canAddPrereleaseUsers: false,
       },
       approvalStatus: 'HigherLevelReview',
       amendment: true,
       previousVersionId: 'previous-version-id',
-    } as MyRelease,
+    } as Release,
   ];
 
   beforeAll(() => {
@@ -370,7 +379,7 @@ describe('DraftReleasesTable', () => {
             {
               ...testReleases[0],
               permissions: {
-                ...testReleases[0].permissions,
+                ...testReleases[0].permissions!,
                 canUpdateRelease: false,
               },
             },
@@ -406,7 +415,7 @@ describe('DraftReleasesTable', () => {
             {
               ...testReleases[2],
               permissions: {
-                ...testReleases[2].permissions,
+                ...testReleases[2].permissions!,
                 canDeleteRelease: false,
               },
             },

@@ -7,7 +7,7 @@ import {
 import _publicationService, {
   MyPublication,
 } from '@admin/services/publicationService';
-import _releaseService, { MyRelease } from '@admin/services/releaseService';
+import _releaseService, { Release } from '@admin/services/releaseService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
@@ -22,7 +22,7 @@ const publicationService = _publicationService as jest.Mocked<
 >;
 
 describe('PublicationReleasesPage', () => {
-  const testRelease1: MyRelease = {
+  const testRelease1: Release = {
     amendment: false,
     approvalStatus: 'Approved',
     id: 'release-1',
@@ -53,7 +53,7 @@ describe('PublicationReleasesPage', () => {
     preReleaseAccessList: '',
   };
 
-  const testRelease2: MyRelease = {
+  const testRelease2: Release = {
     ...testRelease1,
     approvalStatus: 'Draft',
     id: 'release-2',
@@ -62,7 +62,7 @@ describe('PublicationReleasesPage', () => {
     title: 'Release 2',
   };
 
-  const testRelease3: MyRelease = {
+  const testRelease3: Release = {
     ...testRelease1,
     approvalStatus: 'Approved',
     id: 'release-3',
@@ -72,7 +72,7 @@ describe('PublicationReleasesPage', () => {
     title: 'Release 3',
   };
 
-  const testRelease4: MyRelease = {
+  const testRelease4: Release = {
     ...testRelease1,
     approvalStatus: 'Approved',
     id: 'release-4',

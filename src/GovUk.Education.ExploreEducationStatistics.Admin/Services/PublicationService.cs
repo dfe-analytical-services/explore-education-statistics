@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -65,7 +66,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_ => _userService.CheckCanViewAllReleases()
                     .OnSuccess(() => _publicationRepository.GetAllPublicationsForTopic(topicId))
                     .OrElse(() => _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId, userId))
-                );
+                )
+                .OnSuccess(HydrateMyPublicationsViewModel);
         }
 
         public async Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId)
@@ -80,9 +82,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .OrElse(async () =>
                     {
                         var publication = _context.Find<Publication>(publicationId);
-                        return await _userService.CheckCanViewPublication(publication)
+                        return await _userService.CheckCanViewPublication(publication!)
                             .OnSuccess(_ => _publicationRepository.GetPublicationForUser(publicationId, userId));
-                    }));
+                    })
+                ).OnSuccess(HydrateMyPublicationViewModel);
         }
 
         public async Task<Either<ActionResult, List<PublicationSummaryViewModel>>> ListPublicationSummaries()
@@ -357,6 +360,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.Methodologies)
                 .ThenInclude(p => p.Methodology)
                 .ThenInclude(p => p.Versions);
+        }
+
+        private List<MyPublicationViewModel> HydrateMyPublicationsViewModel(List<Publication> publications)
+        {
+            return publications
+                .Select(HydrateMyPublicationViewModel)
+                .OrderBy(publicationViewModel => publicationViewModel.Title)
+                .ToList();
+        }
+
+        private MyPublicationViewModel HydrateMyPublicationViewModel(Publication publication)
+        {
+            var publicationViewModel = _mapper.Map<MyPublicationViewModel>(publication);
+
+            publicationViewModel.IsSuperseded = _publicationRepository.IsSuperseded(publication);
+
+            publicationViewModel.Releases.ForEach(releaseViewModel =>
+            {
+                var release = publication.Releases.Single(release => release.Id == releaseViewModel.Id);
+                releaseViewModel.Permissions = PermissionsUtils.GetPermissionsSet(_userService, release);
+            });
+
+            return publicationViewModel;
         }
     }
 }

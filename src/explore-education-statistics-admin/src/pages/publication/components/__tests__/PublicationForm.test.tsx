@@ -1,7 +1,7 @@
 import PublicationForm, {
   FormValues,
 } from '@admin/pages/publication/components/PublicationForm';
-import { MyRelease } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import _publicationService, {
   MyPublication,
@@ -446,7 +446,7 @@ describe('PublicationForm', () => {
       ],
     };
 
-    const testRelease1: MyRelease = {
+    const testRelease1: Release = {
       amendment: false,
       approvalStatus: 'Approved',
       contact: {

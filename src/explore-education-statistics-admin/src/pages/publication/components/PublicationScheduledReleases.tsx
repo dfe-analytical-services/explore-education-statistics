@@ -4,14 +4,14 @@ import {
   ScheduledStagesGuidanceModal,
   ScheduledStatusGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
-import { MyRelease } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
 import useToggle from '@common/hooks/useToggle';
 import React from 'react';
 
 interface Props {
-  releases: MyRelease[];
+  releases: Release[];
 }
 
 const PublicationScheduledReleases = ({ releases }: Props) => {

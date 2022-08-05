@@ -1,11 +1,11 @@
-import { MyRelease } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import { Dictionary } from '@common/types';
 import React, { ReactNode } from 'react';
 
 interface Props {
   noReleasesMessage: string;
-  releases: MyRelease[];
-  renderReleaseSummary: (release: MyRelease) => ReactNode;
+  releases: Release[];
+  renderReleaseSummary: (release: Release) => ReactNode;
 }
 
 const ReleasesByStatusTab = ({
@@ -13,7 +13,7 @@ const ReleasesByStatusTab = ({
   noReleasesMessage,
   renderReleaseSummary,
 }: Props) => {
-  const releasesByPublication: Dictionary<MyRelease[]> = {};
+  const releasesByPublication: Dictionary<Release[]> = {};
 
   releases.forEach(release => {
     if (releasesByPublication[release.publicationTitle]) {

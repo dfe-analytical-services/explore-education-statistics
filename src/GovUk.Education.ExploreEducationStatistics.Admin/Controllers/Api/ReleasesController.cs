@@ -199,7 +199,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/draft")]
-        public async Task<ActionResult<List<MyReleaseViewModel>>> GetDraftReleasesAsync()
+        public async Task<ActionResult<List<ReleaseViewModel>>> GetDraftReleasesAsync()
         {
             return await _releaseService
                 .GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Draft, ReleaseApprovalStatus.HigherLevelReview)
@@ -207,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/scheduled")]
-        public async Task<ActionResult<List<MyReleaseViewModel>>> GetScheduledReleasesAsync()
+        public async Task<ActionResult<List<ReleaseViewModel>>> GetScheduledReleasesAsync()
         {
             return await _releaseService
                 .GetMyScheduledReleasesAsync()

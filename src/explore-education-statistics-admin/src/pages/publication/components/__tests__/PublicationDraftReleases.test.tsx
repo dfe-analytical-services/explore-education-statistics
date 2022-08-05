@@ -1,6 +1,6 @@
 import PublicationDraftReleases from '@admin/pages/publication/components/PublicationDraftReleases';
 import { testContact } from '@admin/pages/publication/__data__/testPublication';
-import _releaseService, { MyRelease } from '@admin/services/releaseService';
+import _releaseService, { Release } from '@admin/services/releaseService';
 import {
   render as baseRender,
   screen,
@@ -16,7 +16,7 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('PublicationDraftReleases', () => {
-  const testRelease1: MyRelease = {
+  const testRelease1: Release = {
     amendment: false,
     approvalStatus: 'Draft',
     id: 'release-1',
@@ -46,7 +46,7 @@ describe('PublicationDraftReleases', () => {
     preReleaseAccessList: '',
   };
 
-  const testRelease2: MyRelease = {
+  const testRelease2: Release = {
     ...testRelease1,
     approvalStatus: 'HigherLevelReview',
     id: 'release-2',
@@ -55,7 +55,7 @@ describe('PublicationDraftReleases', () => {
     title: 'Release 2',
   };
 
-  const testRelease3: MyRelease = {
+  const testRelease3: Release = {
     ...testRelease1,
     amendment: true,
     id: 'release-3',
@@ -211,7 +211,7 @@ describe('PublicationDraftReleases', () => {
           {
             ...testRelease1,
             permissions: {
-              ...testRelease1.permissions,
+              ...testRelease1.permissions!,
               canUpdateRelease: false,
             },
           },
@@ -242,7 +242,7 @@ describe('PublicationDraftReleases', () => {
           {
             ...testRelease3,
             permissions: {
-              ...testRelease2.permissions,
+              ...testRelease2.permissions!,
               canDeleteRelease: false,
             },
           },
