@@ -56,7 +56,7 @@ describe('ReleaseDataAccordion', () => {
     slug: 'release-1',
   } as Release;
 
-  const mockAllFilesButton = <a href="#">Mock download all data</a>;
+  const mockAllFilesButton = <a href="#">Mock download all data (zip)</a>;
   const mockCreateTablesButton = <a href="#">Mock create tables button</a>;
   const mockDataCatalogueLink = <a href="#">Mock data catalogue link</a>;
   const mockDownloadLink = (file: FileInfo) => <a href="/">{file.name}</a>;
@@ -81,7 +81,7 @@ describe('ReleaseDataAccordion', () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.getByRole('link', { name: 'Mock download all data' }),
+      screen.getByRole('link', { name: 'Mock download all data (zip)' }),
     ).toBeInTheDocument();
   });
 

@@ -247,7 +247,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                         });
                       }}
                     >
-                      Download all data
+                      Download all data (zip)
                     </ButtonLink>
                   </li>
                 )}
@@ -408,7 +408,7 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                 });
               }}
             >
-              Download all data
+              Download all data (zip)
             </ButtonLink>
           }
           renderCreateTablesButton={<CreateTablesButton release={release} />}

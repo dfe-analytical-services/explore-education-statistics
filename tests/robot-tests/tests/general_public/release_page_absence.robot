@@ -66,7 +66,7 @@ Validate "About these statistics" -- "Last updated"
 Check data downloads navigation contains links
     user checks element contains link    testid:data-downloads    Explore data and files
     user checks element contains link    testid:data-downloads    View data guidance
-    user checks element contains link    testid:data-downloads    Download all data
+    user checks element contains link    testid:data-downloads    Download all data (zip)
 
 Check supporting information contains methodology link
     user checks page contains link with text and url    Pupil absence statistics: methodology

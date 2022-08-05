@@ -134,7 +134,7 @@ Validate 'Explore data and files' accordion
     ${section}=    user gets accordion section content element    Explore data and files
 
     # All files zip
-    user checks element contains button    ${section}    Download all data
+    user checks element contains button    ${section}    Download all data (zip)
 
     # Data files
     user waits until h3 is visible    Open data
