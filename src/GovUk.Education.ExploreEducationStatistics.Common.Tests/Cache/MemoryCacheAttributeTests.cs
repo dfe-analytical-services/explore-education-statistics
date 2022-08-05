@@ -7,8 +7,10 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
+using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache;
@@ -16,6 +18,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache;
 [Collection(CacheTestFixture.CollectionName)]
 public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDisposable
 {
+    private const string HourlyExpirySchedule = "0 * * * *";
+    private const string HalfHourlyExpirySchedule = "*/30 * * * *";
+    
     private readonly Mock<IMemoryCacheService> _memoryCacheService = new(MockBehavior.Strict);
 
     public MemoryCacheAttributeTests()
@@ -26,6 +31,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     public void Dispose()
     {
         MemoryCacheAttribute.ClearServices();
+        MemoryCacheAttribute.SetConfiguration(null);
 
         _memoryCacheService.Reset();
     }
@@ -37,26 +43,38 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     // ReSharper disable UnusedParameter.Local
     private static class TestMethods
     {
-        [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: ExpirySchedules.Hourly, cacheDurationInSeconds: 45)]
+        [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: HourlyExpirySchedule, cacheDurationInSeconds: 45)]
         public static TestValue SingleParam(string param1)
         {
             return new();
         }
 
-        [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: ExpirySchedules.Hourly, cacheDurationInSeconds: 45, ServiceName = "target")]
+        [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: HourlyExpirySchedule, cacheDurationInSeconds: 45, ServiceName = "target")]
         public static TestValue SpecificCacheService(string param1)
         {
             return new();
         }
 
-        [MemoryCache(null!, expiryScheduleCron: ExpirySchedules.Hourly, cacheDurationInSeconds: 45)]
+        [MemoryCache(null!, expiryScheduleCron: HourlyExpirySchedule, cacheDurationInSeconds: 45)]
         public static TestValue NullKeyType()
         {
             return new();
         }
 
-        [MemoryCache(typeof(object), expiryScheduleCron: ExpirySchedules.Hourly, cacheDurationInSeconds: 45)]
+        [MemoryCache(typeof(object), expiryScheduleCron: HourlyExpirySchedule, cacheDurationInSeconds: 45)]
         public static TestValue InvalidKeyType()
+        {
+            return new();
+        }
+
+        [MemoryCache(typeof(TestMemoryCacheKey), cacheConfigKey: "SpecificCacheConfigurationKey")]
+        public static TestValue SpecificCacheConfigurationKey(string param1)
+        {
+            return new();
+        }
+
+        [MemoryCache(typeof(TestMemoryCacheKey), cacheConfigKey: "UnspecifiedCacheConfigurationKey")]
+        public static TestValue UnspecifiedCacheConfigurationKey(string param1)
         {
             return new();
         }
@@ -100,7 +118,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         var args = new List<object>();
 
-        var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CronExpression.Parse(ExpirySchedules.Hourly));
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CronExpression.Parse(HourlyExpirySchedule));
             
         _memoryCacheService
             .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedCacheConfiguration, null))
@@ -166,7 +184,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         var args = new List<object>();
 
-        var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CronExpression.Parse(ExpirySchedules.Hourly));
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CronExpression.Parse(HourlyExpirySchedule));
             
         targetMemoryCacheService
             .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedCacheConfiguration, null))
@@ -178,6 +196,114 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
+    }
+
+    [Fact]
+    public void SpecificCacheConfigurationKey()
+    {
+        var configuration = new Mock<IConfigurationSection>(MockBehavior.Strict);
+        var specificCacheConfiguration = CreateMockConfigurationSection(
+            TupleOf("CacheDurationInSeconds", "35"),
+            TupleOf("ExpirySchedule", HalfHourlyExpirySchedule));
+        configuration
+            .Setup(s => s.GetSection("SpecificCacheConfigurationKey"))
+            .Returns(specificCacheConfiguration.Object);
+        MemoryCacheAttribute.SetConfiguration(configuration.Object);
+        
+        var cacheKey = new TestMemoryCacheKey("test");
+
+        _memoryCacheService
+            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+            .ReturnsAsync(null);
+
+        var args = new List<object>();
+
+        // We expect the cache configuration to be read from the ConfigurationSection.
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(35, CronExpression.Parse(HalfHourlyExpirySchedule));
+            
+        _memoryCacheService
+            .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedCacheConfiguration, null))
+            .Returns(Task.CompletedTask);
+
+        var result = TestMethods.SpecificCacheConfigurationKey("test");
+
+        VerifyAllMocks(_memoryCacheService);
+
+        Assert.IsType<TestValue>(result);
+        Assert.Equal(args[0], result);
+    }
+
+    [Fact]
+    public void SpecificCacheConfigurationKey_CacheDurationInSecondsMissing()
+    {
+        var configuration = new Mock<IConfigurationSection>(MockBehavior.Strict);
+        var specificCacheConfiguration = CreateMockConfigurationSection(
+            TupleOf("CacheDurationInSeconds", (string) null));
+        configuration
+            .Setup(s => s.GetSection("SpecificCacheConfigurationKey"))
+            .Returns(specificCacheConfiguration.Object);
+        MemoryCacheAttribute.SetConfiguration(configuration.Object);
+        
+        var cacheKey = new TestMemoryCacheKey("test");
+
+        _memoryCacheService
+            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+            .ReturnsAsync(null);
+
+        var exception = Assert.Throws<ArgumentException>(() => TestMethods.SpecificCacheConfigurationKey("test"));
+        Assert.Equal("A value for configuration MemoryCache.Configurations.CacheDurationInSeconds " +
+                     "must be specified", exception.Message);
+    }
+
+    [Fact]
+    public void SpecificCacheConfigurationKey_ExpiryScheduleMissing()
+    {
+        var configuration = new Mock<IConfigurationSection>(MockBehavior.Strict);
+        var specificCacheConfiguration = CreateMockConfigurationSection(
+            TupleOf("CacheDurationInSeconds", "35"),
+            TupleOf("ExpirySchedule", (string) null));
+        configuration
+            .Setup(s => s.GetSection("SpecificCacheConfigurationKey"))
+            .Returns(specificCacheConfiguration.Object);
+        MemoryCacheAttribute.SetConfiguration(configuration.Object);
+        
+        var cacheKey = new TestMemoryCacheKey("test");
+        
+        _memoryCacheService
+            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+            .ReturnsAsync(null);
+
+        var args = new List<object>();
+
+        // We expect the cache configuration to be read from the ConfigurationSection with no ExpirySchedule.
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(35);
+            
+        _memoryCacheService
+            .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedCacheConfiguration, null))
+            .Returns(Task.CompletedTask);
+
+        var result = TestMethods.SpecificCacheConfigurationKey("test");
+
+        VerifyAllMocks(_memoryCacheService);
+
+        Assert.IsType<TestValue>(result);
+        Assert.Equal(args[0], result);
+    }
+
+    [Fact]
+    public void UnspecifiedCacheConfigurationKey()
+    {
+        MemoryCacheAttribute.SetConfiguration(Mock.Of<IConfigurationSection>());
+        
+        var cacheKey = new TestMemoryCacheKey("test");
+
+        _memoryCacheService
+            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+            .ReturnsAsync(null);
+
+        var exception = Assert.Throws<ArgumentException>(() => TestMethods.UnspecifiedCacheConfigurationKey("test"));
+        Assert.Equal("Could not find MemoryCache.Configurations entry with key " +
+                     "UnspecifiedCacheConfigurationKey", exception.Message);
     }
 
     [Fact]

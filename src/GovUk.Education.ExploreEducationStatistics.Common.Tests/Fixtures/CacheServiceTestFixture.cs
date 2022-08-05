@@ -2,7 +2,10 @@
 using System;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Moq;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
+using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures
 {
@@ -16,12 +19,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures
 
         protected static readonly Mock<IBlobCacheService> BlobCacheService = new(MockBehavior.Strict);
         protected static readonly Mock<IMemoryCacheService> MemoryCacheService = new(MockBehavior.Strict);
+        protected static readonly Mock<IConfigurationSection> MemoryCacheConfig = new(MockBehavior.Strict);
 
         protected CacheServiceTestFixture()
         {
             CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", BlobCacheService.Object);
             MemoryCacheAttribute.AddService("default", MemoryCacheService.Object);
+            MemoryCacheAttribute.SetConfiguration(MemoryCacheConfig.Object);
         }
 
         public void Dispose()

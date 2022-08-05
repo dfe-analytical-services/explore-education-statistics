@@ -19,6 +19,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services;
 
 public class MemoryCacheServiceTests
 {
+    private readonly CronExpression _hourlyExpirySchedule = CronExpression.Parse("0 * * * *");
+    private readonly CronExpression _halfHourlyExpirySchedule = CronExpression.Parse("*/30 * * * *");
+
     private record SampleClassSuperclass;
 
     private record SampleClass : SampleClassSuperclass;
@@ -35,9 +38,7 @@ public class MemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new MemoryCacheConfiguration(
-            45,
-            CronExpression.Parse(ExpirySchedules.Hourly));
+        var cacheConfiguration = new MemoryCacheConfiguration(45, _hourlyExpirySchedule);
 
         // Set the current DateTime to be 29 minutes and 30 seconds past the hour.
         var now = DateTime.Parse("2022-07-18 00:29:30Z", styles: RoundtripKind);
@@ -55,9 +56,7 @@ public class MemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new MemoryCacheConfiguration(
-            45,
-            CronExpression.Parse(ExpirySchedules.Hourly));
+        var cacheConfiguration = new MemoryCacheConfiguration(45, _hourlyExpirySchedule);
 
         // Set the current DateTime to be 59 minutes and 30 seconds past the hour.
         var now = DateTime.Parse("2022-07-18 00:59:30Z", styles: RoundtripKind);
@@ -75,9 +74,7 @@ public class MemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new MemoryCacheConfiguration(
-            45,
-            CronExpression.Parse(ExpirySchedules.Hourly));
+        var cacheConfiguration = new MemoryCacheConfiguration(45, _hourlyExpirySchedule);
 
         // Set the current DateTime to be 59 minutes and 30 seconds past the hour during the last
         // hour of the day.
@@ -96,9 +93,7 @@ public class MemoryCacheServiceTests
         // The requested ExpirySchedule is half-hourly, meaning that cached items will have
         // their expiry times truncated if the requested cache duration would carry over into
         // a new half-hour of the day.
-        var cacheConfiguration = new MemoryCacheConfiguration(
-            15,
-            CronExpression.Parse(ExpirySchedules.HalfHourly));
+        var cacheConfiguration = new MemoryCacheConfiguration(15, _halfHourlyExpirySchedule);
 
         // Set the current DateTime to be 29 minutes and 30 seconds past the hour.
         var now = DateTime.Parse("2022-07-18 00:29:30Z", styles: RoundtripKind);
@@ -116,9 +111,7 @@ public class MemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new MemoryCacheConfiguration(
-            45,
-            CronExpression.Parse(ExpirySchedules.HalfHourly));
+        var cacheConfiguration = new MemoryCacheConfiguration(45, _halfHourlyExpirySchedule);
 
         // Set the current DateTime to be 59 minutes and 30 seconds past the hour.
         var now = DateTime.Parse("2022-07-18 00:29:30Z", styles: RoundtripKind);
@@ -136,9 +129,7 @@ public class MemoryCacheServiceTests
         // The requested ExpirySchedule is hourly, meaning that cached items will have their 
         // expiry times truncated if the requested cache duration would carry over into a new
         // hour.
-        var cacheConfiguration = new MemoryCacheConfiguration(
-            45,
-            CronExpression.Parse(ExpirySchedules.HalfHourly));
+        var cacheConfiguration = new MemoryCacheConfiguration(45, _halfHourlyExpirySchedule);
 
         // Set the current DateTime to be 59 minutes and 30 seconds past the hour during the last
         // half hour of the day.

@@ -9,6 +9,7 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
+
 *** Variables ***
 ${PUBLICATION_NAME_ARCHIVE}=        UI tests - archived publication %{RUN_IDENTIFIER}
 ${RELEASE_NAME_ARCHIVE}=            Financial Year 3000-01
@@ -17,6 +18,7 @@ ${SUBJECT_NAME_ARCHIVE}=            Subject for archived publication
 ${PUBLICATION_NAME_SUPERSEDE}=      UI tests - superseding publication %{RUN_IDENTIFIER}
 ${RELEASE_NAME_SUPERSEDE}=          Financial Year 2000-01
 ${SUBJECT_NAME_SUPERSEDE}=          Subject for superseding publication
+
 
 *** Test Cases ***
 Create new publication to be archived and release via API
@@ -278,6 +280,8 @@ Set archive-publication to be no longer be superseded
 
     # Otherwise gets to Find Stats page before cache is invalidated
     user waits until h1 is visible    Dashboard
+
+    Sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
 
 Check public Find stats page and check archive-publication is no longer archived
     user navigates to find statistics page on public frontend

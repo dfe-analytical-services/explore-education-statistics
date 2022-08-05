@@ -7,6 +7,7 @@ using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
+using Microsoft.Extensions.Configuration;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 {
@@ -20,6 +21,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// parameter.
         /// </summary>
         private static Dictionary<string, IMemoryCacheService> Services { get; set; } = new();
+
+        private static IConfigurationSection? _configuration;
 
         protected override Type BaseKey => typeof(IMemoryCacheKey);
         
@@ -43,6 +46,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             ExpirySchedule = expiryScheduleCron != null ? CronExpression.Parse(expiryScheduleCron) : null;
         }
 
+        public MemoryCacheAttribute(Type key, string cacheConfigKey) : base(key)
+        {
+            if (_configuration == null)
+            {
+                return;
+            }
+            
+            var cacheConfiguration = _configuration.GetSection(cacheConfigKey);
+
+            if (cacheConfiguration == null)
+            {
+                throw new ArgumentException($"Could not find MemoryCache.Configurations entry with key {cacheConfigKey}");
+            }
+            
+            var cacheDuration = cacheConfiguration.GetValue<int>("CacheDurationInSeconds", 0);
+
+            if (0 == cacheDuration)
+            {
+                throw new ArgumentException("A value for configuration " +
+                                            "MemoryCache.Configurations.CacheDurationInSeconds must be specified");
+            }
+
+            CacheDurationInSeconds = cacheDuration;
+
+            var expirySchedule = cacheConfiguration.GetValue<string>("ExpirySchedule", "");
+
+            if ("" != expirySchedule)
+            {
+                ExpirySchedule = CronExpression.Parse(expirySchedule);
+            }
+        }
+
         public static void AddService(string name, IMemoryCacheService service)
         {
             Services[name] = service;
@@ -55,6 +90,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         public static void ClearServices()
         {
             Services.Clear();
+        }
+
+        public static void SetConfiguration(IConfigurationSection? configurationSection)
+        {
+            _configuration = configurationSection;
         }
 
         public override async Task<object?> Get(ICacheKey cacheKey, Type returnType)

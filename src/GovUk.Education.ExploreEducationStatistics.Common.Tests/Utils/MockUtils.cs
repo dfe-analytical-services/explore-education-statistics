@@ -160,17 +160,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils
         public static Mock<IConfiguration> CreateMockConfiguration(params Tuple<string, string>[] keysAndValues)
         {
             var configuration = new Mock<IConfiguration>(MockBehavior.Strict);
+            return PopulateMockConfiguration(keysAndValues, configuration);
+        }
 
+        public static Mock<IConfigurationSection> CreateMockConfigurationSection(params Tuple<string, string>[] keysAndValues)
+        {
+            var configuration = new Mock<IConfigurationSection>(MockBehavior.Strict);
+            return PopulateMockConfiguration(keysAndValues, configuration);
+        }
+
+        private static Mock<TConfiguration> PopulateMockConfiguration<TConfiguration>(Tuple<string, string>[] keysAndValues, Mock<TConfiguration> configuration)
+            where TConfiguration : class, IConfiguration
+        {
             foreach (var keyValue in keysAndValues)
             {
                 var (key, value) = keyValue;
-                
+
                 var section = new Mock<IConfigurationSection>();
-            
+
                 section
                     .Setup(s => s.Value)
                     .Returns(value);
-            
+
                 configuration
                     .Setup(c => c.GetSection(key))
                     .Returns(section.Object);

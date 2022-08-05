@@ -21,6 +21,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 [Collection(CacheServiceTests)]
 public class ReleaseControllerCachingTests : CacheServiceTestFixture
 {
+    private const string HourlyExpirySchedule = "0 * * * *";
+    private const string HalfHourlyExpirySchedule = "*/30 * * * *";
+
+    public ReleaseControllerCachingTests()
+    {
+        var getReleaseConfig = CreateMockConfigurationSection(
+            TupleOf("CacheDurationInSeconds", "45"),
+            TupleOf("ExpirySchedule", HalfHourlyExpirySchedule));
+            
+        var getLatestReleaseConfig = CreateMockConfigurationSection(
+            TupleOf("CacheDurationInSeconds", "55"),
+            TupleOf("ExpirySchedule", HourlyExpirySchedule));
+            
+        MemoryCacheConfig
+            .Setup(s => s.GetSection("GetRelease"))
+            .Returns(getReleaseConfig.Object);
+            
+        MemoryCacheConfig
+            .Setup(s => s.GetSection("GetLatestRelease"))
+            .Returns(getLatestReleaseConfig.Object);
+    }
+    
     [Fact]
     public async Task GetLatestRelease_NoCachedEntryExists()
     {
@@ -40,7 +62,8 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(mock => mock.GetCachedViewModel(publicationSlug, null))
             .ReturnsAsync(release);
 
-        var expectedCacheConfiguration = new MemoryCacheConfiguration(30, CronExpression.Parse(ExpirySchedules.HalfHourly));
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(
+            55, CronExpression.Parse(HourlyExpirySchedule));
         
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
@@ -99,7 +122,8 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .Setup(mock => mock.GetCachedViewModel(publicationSlug, releaseSlug))
             .ReturnsAsync(release);
 
-        var expectedCacheConfiguration = new MemoryCacheConfiguration(30, CronExpression.Parse(ExpirySchedules.HalfHourly));
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(
+            45, CronExpression.Parse(HalfHourlyExpirySchedule));
         
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
