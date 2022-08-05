@@ -780,7 +780,7 @@ user checks checkbox input is not checked
 user checks checkbox in position has label
     [Arguments]    ${position}    ${label}
     user checks page contains element
-    ...    xpath://*[@data-testid="checkbox-item"][${position}]//label[contains(text(), "${label}")]
+    ...    xpath://*[contains(@data-testid,"Checkbox item for ")][${position}]//label[contains(text(), "${label}")]
 
 user checks list has x items
     [Arguments]    ${locator}    ${count}    ${parent}=css:body

@@ -28,7 +28,7 @@ exports[`FormCheckboxSearchGroup renders list of checkboxes in correct order 1`]
       </span>
       <div class="govuk-checkboxes govuk-checkboxes--small">
         <div class="govuk-checkboxes__item"
-             data-testid="checkbox-item"
+             data-testid="Checkbox item for Test checkbox 1"
         >
           <input class="govuk-checkboxes__input"
                  id="test-checkboxes-options-1"
@@ -43,7 +43,7 @@ exports[`FormCheckboxSearchGroup renders list of checkboxes in correct order 1`]
           </label>
         </div>
         <div class="govuk-checkboxes__item"
-             data-testid="checkbox-item"
+             data-testid="Checkbox item for Test checkbox 2"
         >
           <input class="govuk-checkboxes__input"
                  id="test-checkboxes-options-2"
@@ -58,7 +58,7 @@ exports[`FormCheckboxSearchGroup renders list of checkboxes in correct order 1`]
           </label>
         </div>
         <div class="govuk-checkboxes__item"
-             data-testid="checkbox-item"
+             data-testid="Checkbox item for Test checkbox 3"
         >
           <input class="govuk-checkboxes__input"
                  id="test-checkboxes-options-3"

@@ -18,6 +18,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -192,7 +194,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     if (fileIds.Distinct().Count() != fileIds.Count)
                     {
-                        throw new ArgumentException("fileIds elements should all be unique");
+                        return ValidationActionResult(FileIdsShouldBeDistinct);
                     }
 
                     var releaseFiles = await _contentDbContext.ReleaseFiles
@@ -205,8 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
                     if (releaseFiles.Count != fileIds.Count)
                     {
-                        throw new ArgumentException(
-                            "fileIds.Count should equal the number of non-replacement related data files attached to the release {releaseId}");
+                        return ValidationActionResult(IncorrectNumberOfFileIds);
                     }
 
                     fileIds.ForEach((fileId, order) =>

@@ -51,7 +51,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         FileTypeInvalid,
 
         // Data file
-        SubjectTitleCannotBeEmptyString,
+        SubjectTitleCannotBeEmpty,
         SubjectTitleCannotContainSpecialCharacters,
         SubjectTitleMustBeUnique,
         CannotOverwriteDataFile,
@@ -62,6 +62,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Validators
         CannotRemoveDataFilesUntilImportComplete,
         CannotRemoveDataFilesOnceReleaseApproved,
         FileTypeMustBeData,
+        FileIdsShouldBeDistinct,
+        IncorrectNumberOfFileIds,
 
         // Data zip file
         DataFileMustBeZipFile,

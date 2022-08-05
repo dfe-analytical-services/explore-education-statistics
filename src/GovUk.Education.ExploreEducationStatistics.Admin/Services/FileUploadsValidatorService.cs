@@ -79,7 +79,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (!name.Any())
             {
-                return ValidationActionResult(SubjectTitleCannotBeEmptyString);
+                return ValidationActionResult(SubjectTitleCannotBeEmpty);
             }
 
             if (FileContainsSpecialChars(name))
