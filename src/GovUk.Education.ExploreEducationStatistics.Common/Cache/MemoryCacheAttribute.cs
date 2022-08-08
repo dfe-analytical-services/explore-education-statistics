@@ -26,7 +26,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 
         protected override Type BaseKey => typeof(IMemoryCacheKey);
         
-        private int CacheDurationInSeconds { get; }
+        private int DurationInSeconds { get; }
         
         private CronExpression? ExpirySchedule { get; }
 
@@ -38,11 +38,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 
         public MemoryCacheAttribute(
             Type key, 
-            int cacheDurationInSeconds, 
+            int durationInSeconds, 
             string? expiryScheduleCron = null
             ) : base(key)
         {
-            CacheDurationInSeconds = cacheDurationInSeconds;
+            DurationInSeconds = durationInSeconds;
             ExpirySchedule = expiryScheduleCron != null ? CronExpression.Parse(expiryScheduleCron) : null;
         }
 
@@ -60,15 +60,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                 throw new ArgumentException($"Could not find MemoryCache.Configurations entry with key {cacheConfigKey}");
             }
             
-            var cacheDuration = cacheConfiguration.GetValue<int>("CacheDurationInSeconds", 0);
+            var cacheDuration = cacheConfiguration.GetValue("DurationInSeconds", 0);
 
             if (0 == cacheDuration)
             {
                 throw new ArgumentException("A value for configuration " +
-                                            "MemoryCache.Configurations.CacheDurationInSeconds must be specified");
+                                            "MemoryCache.Configurations.DurationInSeconds must be specified");
             }
 
-            CacheDurationInSeconds = cacheDuration;
+            DurationInSeconds = cacheDuration;
 
             var expirySchedule = cacheConfiguration.GetValue<string>("ExpirySchedule", "");
 
@@ -125,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
                     return;
                 }
 
-                var itemCachingConfiguration = new MemoryCacheConfiguration(CacheDurationInSeconds, ExpirySchedule);
+                var itemCachingConfiguration = new MemoryCacheConfiguration(DurationInSeconds, ExpirySchedule);
                 await service.SetItem(key, value, itemCachingConfiguration);
                 return;
             }

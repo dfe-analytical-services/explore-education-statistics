@@ -87,7 +87,7 @@ public class MemoryCacheService : IMemoryCacheService
             var now = nowUtc ?? DateTime.UtcNow;
 
             DateTime absoluteExpiryTime;
-            var targetAbsoluteExpiryDateTime = now.AddSeconds(configuration.CacheDurationInSeconds);
+            var targetAbsoluteExpiryDateTime = now.AddSeconds(configuration.DurationInSeconds);
 
             if (configuration.ExpirySchedule == null)
             {

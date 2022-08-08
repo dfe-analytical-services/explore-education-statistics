@@ -43,25 +43,25 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     // ReSharper disable UnusedParameter.Local
     private static class TestMethods
     {
-        [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: HourlyExpirySchedule, cacheDurationInSeconds: 45)]
+        [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: HourlyExpirySchedule, durationInSeconds: 45)]
         public static TestValue SingleParam(string param1)
         {
             return new();
         }
 
-        [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: HourlyExpirySchedule, cacheDurationInSeconds: 45, ServiceName = "target")]
+        [MemoryCache(typeof(TestMemoryCacheKey), expiryScheduleCron: HourlyExpirySchedule, durationInSeconds: 45, ServiceName = "target")]
         public static TestValue SpecificCacheService(string param1)
         {
             return new();
         }
 
-        [MemoryCache(null!, expiryScheduleCron: HourlyExpirySchedule, cacheDurationInSeconds: 45)]
+        [MemoryCache(null!, expiryScheduleCron: HourlyExpirySchedule, durationInSeconds: 45)]
         public static TestValue NullKeyType()
         {
             return new();
         }
 
-        [MemoryCache(typeof(object), expiryScheduleCron: HourlyExpirySchedule, cacheDurationInSeconds: 45)]
+        [MemoryCache(typeof(object), expiryScheduleCron: HourlyExpirySchedule, durationInSeconds: 45)]
         public static TestValue InvalidKeyType()
         {
             return new();
@@ -79,7 +79,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
             return new();
         }
             
-        [MemoryCache(typeof(TestMemoryCacheKey), cacheDurationInSeconds: 135)]
+        [MemoryCache(typeof(TestMemoryCacheKey), durationInSeconds: 135)]
         public static TestValue DefaultCacheConfig(string param1)
         {
             return new();
@@ -203,7 +203,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     {
         var configuration = new Mock<IConfigurationSection>(MockBehavior.Strict);
         var specificCacheConfiguration = CreateMockConfigurationSection(
-            TupleOf("CacheDurationInSeconds", "35"),
+            TupleOf("DurationInSeconds", "35"),
             TupleOf("ExpirySchedule", HalfHourlyExpirySchedule));
         configuration
             .Setup(s => s.GetSection("SpecificCacheConfigurationKey"))
@@ -234,11 +234,11 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     }
 
     [Fact]
-    public void SpecificCacheConfigurationKey_CacheDurationInSecondsMissing()
+    public void SpecificCacheConfigurationKey_DurationInSecondsMissing()
     {
         var configuration = new Mock<IConfigurationSection>(MockBehavior.Strict);
         var specificCacheConfiguration = CreateMockConfigurationSection(
-            TupleOf("CacheDurationInSeconds", (string) null));
+            TupleOf("DurationInSeconds", (string) null));
         configuration
             .Setup(s => s.GetSection("SpecificCacheConfigurationKey"))
             .Returns(specificCacheConfiguration.Object);
@@ -251,7 +251,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
             .ReturnsAsync(null);
 
         var exception = Assert.Throws<ArgumentException>(() => TestMethods.SpecificCacheConfigurationKey("test"));
-        Assert.Equal("A value for configuration MemoryCache.Configurations.CacheDurationInSeconds " +
+        Assert.Equal("A value for configuration MemoryCache.Configurations.DurationInSeconds " +
                      "must be specified", exception.Message);
     }
 
@@ -260,7 +260,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     {
         var configuration = new Mock<IConfigurationSection>(MockBehavior.Strict);
         var specificCacheConfiguration = CreateMockConfigurationSection(
-            TupleOf("CacheDurationInSeconds", "35"),
+            TupleOf("DurationInSeconds", "35"),
             TupleOf("ExpirySchedule", (string) null));
         configuration
             .Setup(s => s.GetSection("SpecificCacheConfigurationKey"))

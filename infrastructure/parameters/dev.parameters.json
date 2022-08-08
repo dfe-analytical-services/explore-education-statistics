@@ -77,10 +77,10 @@
     "openIdConnectSpaClientRefreshTokenExpiration": {
       "value": "Sliding"
     },
-    "memoryCacheConfigurationsGetReleaseCacheDurationInSeconds": {
+    "memoryCacheConfigurationsGetReleaseDurationInSeconds": {
       "value": 5
     },
-    "memoryCacheConfigurationsGetLatestReleaseCacheDurationInSeconds": {
+    "memoryCacheConfigurationsGetLatestReleaseDurationInSeconds": {
       "value": 5
     },
     "branch": {

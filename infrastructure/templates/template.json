@@ -575,7 +575,7 @@
         "description": "The frequency of scans to evict expired entries from the in-memory cache."
       }
     },
-    "memoryCacheConfigurationsGetReleaseCacheDurationInSeconds": {
+    "memoryCacheConfigurationsGetReleaseDurationInSeconds": {
       "type": "int",
       "defaultValue": 30,
       "metadata": {
@@ -589,7 +589,7 @@
         "description": "Cron expression for regular expiry times for all cached Releases"
       }
     },
-    "memoryCacheConfigurationsGetLatestReleaseCacheDurationInSeconds": {
+    "memoryCacheConfigurationsGetLatestReleaseDurationInSeconds": {
       "type": "int",
       "defaultValue": 15,
       "metadata": {
@@ -1821,9 +1821,9 @@
         "MemoryCache:Enabled": "[parameters('memoryCacheEnabled')]",
         "MemoryCache:MaxCacheSizeMb": "[parameters('memoryCacheMaxCacheSizeMb')]",
         "MemoryCache:ExpirationScanFrequencySeconds": "[parameters('memoryCacheExpirationScanFrequencySeconds')]",
-        "MemoryCache:Configurations:GetRelease:CacheDurationInSeconds": "[parameters('memoryCacheConfigurationsGetReleaseCacheDurationInSeconds')]",
+        "MemoryCache:Configurations:GetRelease:DurationInSeconds": "[parameters('memoryCacheConfigurationsGetReleaseDurationInSeconds')]",
         "MemoryCache:Configurations:GetRelease:ExpirySchedule": "[parameters('memoryCacheConfigurationsGetReleaseExpirySchedule')]",
-        "MemoryCache:Configurations:GetLatestRelease:CacheDurationInSeconds": "[parameters('memoryCacheConfigurationsGetLatestReleaseCacheDurationInSeconds')]",
+        "MemoryCache:Configurations:GetLatestRelease:DurationInSeconds": "[parameters('memoryCacheConfigurationsGetLatestReleaseDurationInSeconds')]",
         "MemoryCache:Configurations:GetLatestRelease:ExpirySchedule": "[parameters('memoryCacheConfigurationsGetLatestReleaseExpirySchedule')]",
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core'), '2018-02-14').secretUriWithVersion, ')')]",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",

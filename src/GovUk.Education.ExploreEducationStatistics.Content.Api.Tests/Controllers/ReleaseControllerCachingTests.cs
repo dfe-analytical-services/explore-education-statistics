@@ -27,11 +27,11 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
     public ReleaseControllerCachingTests()
     {
         var getReleaseConfig = CreateMockConfigurationSection(
-            TupleOf("CacheDurationInSeconds", "45"),
+            TupleOf("DurationInSeconds", "45"),
             TupleOf("ExpirySchedule", HalfHourlyExpirySchedule));
             
         var getLatestReleaseConfig = CreateMockConfigurationSection(
-            TupleOf("CacheDurationInSeconds", "55"),
+            TupleOf("DurationInSeconds", "55"),
             TupleOf("ExpirySchedule", HourlyExpirySchedule));
             
         MemoryCacheConfig
