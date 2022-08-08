@@ -61,9 +61,12 @@ describe('DraftReleasesTable', () => {
       publicationId: 'publication-3',
       publicationTitle: 'Publication 3',
       permissions: {
+        canDeleteRelease: true,
         canUpdateRelease: true,
       },
-      approvalStatus: 'Draft',
+      approvalStatus: 'HigherLevelReview',
+      amendment: true,
+      previousVersionId: 'previous-version-id',
     } as MyRelease,
   ];
 
@@ -95,7 +98,6 @@ describe('DraftReleasesTable', () => {
       <MemoryRouter>
         <DraftReleasesTable
           isBauUser
-          isLoading={false}
           releases={testReleases}
           onChangeRelease={noop}
         />
@@ -198,10 +200,12 @@ describe('DraftReleasesTable', () => {
       'Publication 3',
     );
 
-    // Draft
+    // In review amendment
     const row8cells = within(rows[7]).getAllByRole('cell');
     expect(within(row8cells[0]).getByText('Release 4')).toBeInTheDocument();
-    expect(within(row8cells[1]).getByText('Draft')).toBeInTheDocument();
+    expect(
+      within(row8cells[1]).getByText('In Review Amendment'),
+    ).toBeInTheDocument();
     expect(
       within(row8cells[2]).getByRole('link', { name: 'Edit Release 4' }),
     ).toHaveAttribute(
@@ -215,20 +219,19 @@ describe('DraftReleasesTable', () => {
       within(row8cells[2]).queryByRole('button', {
         name: 'Cancel amendment for Release 4',
       }),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
     expect(
       within(row8cells[2]).queryByRole('link', {
         name: 'View original for Release 4',
       }),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
   });
 
-  test('renders the table correctly for non-BAU users ', async () => {
+  test('renders the table correctly for non-BAU users', async () => {
     render(
       <MemoryRouter>
         <DraftReleasesTable
           isBauUser={false}
-          isLoading={false}
           releases={testReleases}
           onChangeRelease={noop}
         />
@@ -331,10 +334,12 @@ describe('DraftReleasesTable', () => {
       'Publication 3',
     );
 
-    // Draft
+    // In review amendment
     const row8cells = within(rows[7]).getAllByRole('cell');
     expect(within(row8cells[0]).getByText('Release 4')).toBeInTheDocument();
-    expect(within(row8cells[1]).getByText('Draft')).toBeInTheDocument();
+    expect(
+      within(row8cells[1]).getByText('In Review Amendment'),
+    ).toBeInTheDocument();
     expect(
       within(row8cells[2]).getByRole('button', { name: 'View issues (3)' }),
     ).toBeInTheDocument();
@@ -348,12 +353,12 @@ describe('DraftReleasesTable', () => {
       within(row8cells[3]).queryByRole('button', {
         name: 'Cancel amendment for Release 4',
       }),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
     expect(
       within(row8cells[3]).queryByRole('link', {
         name: 'View original for Release 4',
       }),
-    ).not.toBeInTheDocument();
+    ).toBeInTheDocument();
   });
 
   test('shows a view instead of edit link if you do not have permission to edit the release', async () => {
@@ -361,7 +366,6 @@ describe('DraftReleasesTable', () => {
       <MemoryRouter>
         <DraftReleasesTable
           isBauUser
-          isLoading={false}
           releases={[
             {
               ...testReleases[0],
@@ -398,7 +402,6 @@ describe('DraftReleasesTable', () => {
       <MemoryRouter>
         <DraftReleasesTable
           isBauUser
-          isLoading={false}
           releases={[
             {
               ...testReleases[2],
@@ -447,7 +450,6 @@ describe('DraftReleasesTable', () => {
       <MemoryRouter>
         <DraftReleasesTable
           isBauUser
-          isLoading={false}
           releases={testReleases}
           onChangeRelease={handleOnChange}
         />
@@ -503,12 +505,7 @@ describe('DraftReleasesTable', () => {
   test('renders correctly when no releases are available', async () => {
     render(
       <MemoryRouter>
-        <DraftReleasesTable
-          isBauUser
-          isLoading={false}
-          releases={[]}
-          onChangeRelease={noop}
-        />
+        <DraftReleasesTable isBauUser releases={[]} onChangeRelease={noop} />
       </MemoryRouter>,
     );
 

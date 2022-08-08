@@ -75,7 +75,7 @@ describe('ScheduledReleasesTable', () => {
   test('renders the table of releases grouped by publication ', async () => {
     render(
       <MemoryRouter>
-        <ScheduledReleasesTable isLoading={false} releases={testReleases} />
+        <ScheduledReleasesTable releases={testReleases} />
       </MemoryRouter>,
     );
 
@@ -141,7 +141,6 @@ describe('ScheduledReleasesTable', () => {
     render(
       <MemoryRouter>
         <ScheduledReleasesTable
-          isLoading={false}
           releases={[
             {
               ...testReleases[0],
@@ -175,7 +174,7 @@ describe('ScheduledReleasesTable', () => {
   test('renders correctly when no releases are available', async () => {
     render(
       <MemoryRouter>
-        <ScheduledReleasesTable isLoading={false} releases={[]} />
+        <ScheduledReleasesTable releases={[]} />
       </MemoryRouter>,
     );
 

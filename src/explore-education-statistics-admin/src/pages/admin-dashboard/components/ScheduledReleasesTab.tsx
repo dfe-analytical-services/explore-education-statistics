@@ -35,16 +35,26 @@ const ScheduledReleasesTab = ({
             </p>
           </div>
         </div>
-        <ScheduledReleasesTable isLoading={isLoading} releases={releases} />
+        <LoadingSpinner
+          hideText
+          loading={isLoading}
+          text="Loading scheduled releases"
+        >
+          <ScheduledReleasesTable releases={releases} />
+        </LoadingSpinner>
       </>
     );
   }
   return (
-    <LoadingSpinner loading={isLoading}>
+    <LoadingSpinner
+      hideText
+      loading={isLoading}
+      text="Loading scheduled releases"
+    >
       <ReleasesTab
         releases={releases}
         noReleasesMessage="There are currently no scheduled releases"
-        releaseSummaryRenderer={release => (
+        renderReleaseSummary={release => (
           <ReleaseSummary
             key={release.id}
             release={release}

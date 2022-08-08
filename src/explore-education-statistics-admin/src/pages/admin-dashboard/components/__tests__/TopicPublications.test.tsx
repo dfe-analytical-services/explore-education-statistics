@@ -51,12 +51,14 @@ describe('TopicPublications', () => {
       expect(screen.getByText('Theme 1 / Topic 1')).toBeInTheDocument();
     });
 
-    expect(
-      screen.getByRole('link', { name: 'Publication 1' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('link', { name: 'Publication 2' }),
-    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Publication 1' })).toHaveAttribute(
+      'href',
+      '/publication/publication-1/releases',
+    );
+    expect(screen.getByRole('link', { name: 'Publication 2' })).toHaveAttribute(
+      'href',
+      '/publication/publication-2/releases',
+    );
   });
 
   test('renders correctly when no publications are available', async () => {
@@ -94,7 +96,7 @@ describe('TopicPublications', () => {
 
     expect(
       screen.getByRole('link', { name: 'Create new publication' }),
-    ).toBeInTheDocument();
+    ).toHaveAttribute('href', '/topics/topic-1/publications/create');
   });
 
   test("does not render 'Create new publication' button if unauthorised", async () => {

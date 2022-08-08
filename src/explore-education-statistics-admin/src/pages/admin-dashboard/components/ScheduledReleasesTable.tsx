@@ -6,7 +6,6 @@ import {
 import { MyRelease } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
@@ -31,12 +30,11 @@ const PublicationRow = ({ publication, releases }: PublicationRowProps) => {
   );
 };
 
-interface Props {
-  isLoading: boolean;
+interface ScheduledReleasesTableProps {
   releases: MyRelease[];
 }
 
-const ScheduledReleasesTable = ({ isLoading, releases }: Props) => {
+const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
   const [
     showScheduledStatusGuidance,
     toggleScheduledStatusGuidance,
@@ -47,60 +45,57 @@ const ScheduledReleasesTable = ({ isLoading, releases }: Props) => {
   ] = useToggle(false);
 
   const releasesByPublication: Dictionary<MyRelease[]> = useMemo(() => {
-    const groupedReleases: Dictionary<MyRelease[]> = {};
-    releases.forEach(release => {
-      if (groupedReleases[release.publicationTitle]) {
-        groupedReleases[release.publicationTitle].push(release);
+    return releases.reduce<Dictionary<MyRelease[]>>((acc, release) => {
+      if (acc[release.publicationTitle]) {
+        acc[release.publicationTitle].push(release);
       } else {
-        groupedReleases[release.publicationTitle] = [release];
+        acc[release.publicationTitle] = [release];
       }
-    });
-    return groupedReleases;
-  }, [releases]);
 
+      return acc;
+    }, {});
+  }, [releases]);
   return (
     <>
-      <LoadingSpinner loading={isLoading}>
-        {releases.length === 0 ? (
-          <p>There are currently no scheduled releases</p>
-        ) : (
-          <>
-            {releasesByPublication &&
-              Object.keys(releasesByPublication).length > 0 && (
-                <table>
-                  <thead>
-                    <tr>
-                      <th>Publication / Release period</th>
-                      <th>
-                        Status{' '}
-                        <ButtonText onClick={toggleScheduledStatusGuidance.on}>
-                          <InfoIcon description="Guidance on scheduled states" />
-                        </ButtonText>
-                      </th>
-                      <th className="govuk-!-width-one-quarter">
-                        Stages checklist{' '}
-                        <ButtonText onClick={toggleScheduledStagesGuidance.on}>
-                          <InfoIcon description="Guidance on publication stages" />
-                        </ButtonText>
-                      </th>
-                      <th>Scheduled publish date</th>
-                      <th>Actions</th>
-                    </tr>
-                    {orderBy(Object.keys(releasesByPublication)).map(
-                      publication => (
-                        <PublicationRow
-                          key={publication}
-                          publication={publication}
-                          releases={releasesByPublication[publication]}
-                        />
-                      ),
-                    )}
-                  </thead>
-                </table>
-              )}
-          </>
-        )}
-      </LoadingSpinner>
+      {releases.length === 0 ? (
+        <p>There are currently no scheduled releases</p>
+      ) : (
+        <>
+          {releasesByPublication &&
+            Object.keys(releasesByPublication).length > 0 && (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Publication / Release period</th>
+                    <th>
+                      Status{' '}
+                      <ButtonText onClick={toggleScheduledStatusGuidance.on}>
+                        <InfoIcon description="Guidance on scheduled states" />
+                      </ButtonText>
+                    </th>
+                    <th className="govuk-!-width-one-quarter">
+                      Stages checklist{' '}
+                      <ButtonText onClick={toggleScheduledStagesGuidance.on}>
+                        <InfoIcon description="Guidance on publication stages" />
+                      </ButtonText>
+                    </th>
+                    <th>Scheduled publish date</th>
+                    <th>Actions</th>
+                  </tr>
+                  {orderBy(Object.keys(releasesByPublication)).map(
+                    publication => (
+                      <PublicationRow
+                        key={publication}
+                        publication={publication}
+                        releases={releasesByPublication[publication]}
+                      />
+                    ),
+                  )}
+                </thead>
+              </table>
+            )}
+        </>
+      )}
       <ScheduledStagesGuidanceModal
         open={showScheduledStagesGuidance}
         onClose={toggleScheduledStagesGuidance.off}

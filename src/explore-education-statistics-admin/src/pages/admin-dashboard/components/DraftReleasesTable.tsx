@@ -11,7 +11,6 @@ import releaseService, {
 } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import useToggle from '@common/hooks/useToggle';
 import { Dictionary } from '@common/types';
 import orderBy from 'lodash/orderBy';
@@ -48,19 +47,17 @@ const PublicationRow = ({
   );
 };
 
-interface Props {
+interface DraftReleasesTableProps {
   isBauUser: boolean;
-  isLoading: boolean;
   releases: MyRelease[];
   onChangeRelease: () => void;
 }
 
 const DraftReleasesTable = ({
   isBauUser,
-  isLoading,
   releases,
   onChangeRelease,
-}: Props) => {
+}: DraftReleasesTableProps) => {
   const [deleteReleasePlan, setDeleteReleasePlan] = useState<
     DeleteReleasePlan & {
       releaseId: string;
@@ -71,77 +68,75 @@ const DraftReleasesTable = ({
   const [showIssuesGuidance, toggleIssuesGuidance] = useToggle(false);
 
   const releasesByPublication: Dictionary<MyRelease[]> = useMemo(() => {
-    const groupedReleases: Dictionary<MyRelease[]> = {};
-    releases.forEach(release => {
-      if (groupedReleases[release.publicationTitle]) {
-        groupedReleases[release.publicationTitle].push(release);
+    return releases.reduce<Dictionary<MyRelease[]>>((acc, release) => {
+      if (acc[release.publicationTitle]) {
+        acc[release.publicationTitle].push(release);
       } else {
-        groupedReleases[release.publicationTitle] = [release];
+        acc[release.publicationTitle] = [release];
       }
-    });
-    return groupedReleases;
+
+      return acc;
+    }, {});
   }, [releases]);
 
   return (
     <>
-      <LoadingSpinner loading={isLoading}>
+      {releases.length === 0 ? (
+        <p>There are currently no draft releases</p>
+      ) : (
         <>
-          {releases.length === 0 ? (
-            <p>There are currently no draft releases</p>
-          ) : (
-            <>
-              {releasesByPublication &&
-                Object.keys(releasesByPublication).length > 0 && (
-                  <table>
-                    <thead>
-                      <tr>
-                        <th
-                          className={isBauUser ? 'govuk-!-width-one-half' : ''}
-                        >
-                          Publication / Release period
-                        </th>
-                        <th>
-                          Status{' '}
-                          <ButtonText onClick={toggleDraftStatusGuidance.on}>
-                            <InfoIcon description="Guidance on draft states" />
-                          </ButtonText>
-                        </th>
-                        {/* Don't render the issues for BAU users to prevent performance problems. */}
-                        {!isBauUser && (
-                          <th className={styles.issuesColumn}>
-                            Issues{' '}
-                            <ButtonText onClick={toggleIssuesGuidance.on}>
-                              <InfoIcon description="Guidance on draft release issues" />
-                            </ButtonText>
-                          </th>
-                        )}
-                        <th>Actions</th>
-                      </tr>
-                      {orderBy(Object.keys(releasesByPublication)).map(
-                        publication => (
-                          <PublicationRow
-                            key={publication}
-                            isBauUser={isBauUser}
-                            publication={publication}
-                            releases={releasesByPublication[publication]}
-                            onDelete={async releaseId => {
-                              setDeleteReleasePlan({
-                                ...(await releaseService.getDeleteReleasePlan(
-                                  releaseId,
-                                )),
-                                releaseId,
-                              });
-                            }}
-                          />
-                        ),
-                      )}
-                    </thead>
-                  </table>
-                )}
-            </>
-          )}
+          {releasesByPublication &&
+            Object.keys(releasesByPublication).length > 0 && (
+              <table>
+                <thead>
+                  <tr>
+                    <th
+                      className={
+                        isBauUser ? 'govuk-!-width-one-half' : undefined
+                      }
+                    >
+                      Publication / Release period
+                    </th>
+                    <th>
+                      Status{' '}
+                      <ButtonText onClick={toggleDraftStatusGuidance.on}>
+                        <InfoIcon description="Guidance on draft states" />
+                      </ButtonText>
+                    </th>
+                    {/* Don't render the issues for BAU users to prevent performance problems. */}
+                    {!isBauUser && (
+                      <th className={styles.issuesColumn}>
+                        Issues{' '}
+                        <ButtonText onClick={toggleIssuesGuidance.on}>
+                          <InfoIcon description="Guidance on draft release issues" />
+                        </ButtonText>
+                      </th>
+                    )}
+                    <th>Actions</th>
+                  </tr>
+                  {orderBy(Object.keys(releasesByPublication)).map(
+                    publication => (
+                      <PublicationRow
+                        key={publication}
+                        isBauUser={isBauUser}
+                        publication={publication}
+                        releases={releasesByPublication[publication]}
+                        onDelete={async releaseId => {
+                          setDeleteReleasePlan({
+                            ...(await releaseService.getDeleteReleasePlan(
+                              releaseId,
+                            )),
+                            releaseId,
+                          });
+                        }}
+                      />
+                    ),
+                  )}
+                </thead>
+              </table>
+            )}
         </>
-      </LoadingSpinner>
+      )}
 
       {deleteReleasePlan && (
         <CancelAmendmentModal

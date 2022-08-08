@@ -34,22 +34,26 @@ const DraftReleasesTab = ({
             </p>
           </div>
         </div>
-
-        <DraftReleasesTable
-          isBauUser={isBauUser}
-          isLoading={isLoading}
-          releases={releases}
-          onChangeRelease={onChangeRelease}
-        />
+        <LoadingSpinner
+          hideText
+          loading={isLoading}
+          text="Loading draft releases"
+        >
+          <DraftReleasesTable
+            isBauUser={isBauUser}
+            releases={releases}
+            onChangeRelease={onChangeRelease}
+          />
+        </LoadingSpinner>
       </>
     );
   }
   return (
-    <LoadingSpinner loading={isLoading}>
+    <LoadingSpinner hideText loading={isLoading} text="Loading draft releases">
       <ReleasesTab
         releases={releases}
         noReleasesMessage="There are currently no draft releases"
-        releaseSummaryRenderer={release => (
+        renderReleaseSummary={release => (
           <NonScheduledReleaseSummary
             key={release.id}
             release={release}

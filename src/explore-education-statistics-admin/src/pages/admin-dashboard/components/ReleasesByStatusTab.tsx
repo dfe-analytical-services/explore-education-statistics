@@ -5,13 +5,13 @@ import React, { ReactNode } from 'react';
 interface Props {
   noReleasesMessage: string;
   releases: MyRelease[];
-  releaseSummaryRenderer: (release: MyRelease) => ReactNode;
+  renderReleaseSummary: (release: MyRelease) => ReactNode;
 }
 
 const ReleasesByStatusTab = ({
   releases,
   noReleasesMessage,
-  releaseSummaryRenderer,
+  renderReleaseSummary,
 }: Props) => {
   const releasesByPublication: Dictionary<MyRelease[]> = {};
 
@@ -35,7 +35,7 @@ const ReleasesByStatusTab = ({
               <hr />
               <h3>{publication}</h3>
               {releasesByPublication[publication].map(release =>
-                releaseSummaryRenderer(release),
+                renderReleaseSummary(release),
               )}
             </div>
           ))}

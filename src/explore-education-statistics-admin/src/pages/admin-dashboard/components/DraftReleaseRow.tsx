@@ -1,19 +1,16 @@
 import Link from '@admin/components/Link';
+import DraftReleaseRowIssues from '@admin/pages/admin-dashboard/components/DraftReleaseRowIssues';
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
-import releaseService, { MyRelease } from '@admin/services/releaseService';
+import { MyRelease } from '@admin/services/releaseService';
 import {
   ReleaseRouteParams,
   releaseSummaryRoute,
 } from '@admin/routes/releaseRoutes';
 import ButtonText from '@common/components/ButtonText';
-import Details from '@common/components/Details';
-import LoadingSpinner from '@common/components/LoadingSpinner';
 import Tag from '@common/components/Tag';
 import VisuallyHidden from '@common/components/VisuallyHidden';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath } from 'react-router';
-import TagGroup from '@common/components/TagGroup';
 
 interface Props {
   isBauUser: boolean;
@@ -22,17 +19,6 @@ interface Props {
 }
 
 const DraftReleaseRow = ({ isBauUser, release, onDelete }: Props) => {
-  const {
-    value: checklist,
-    isLoading: isLoadingChecklist,
-  } = useAsyncHandledRetry(() =>
-    releaseService.getReleaseChecklist(release.id),
-  );
-
-  const totalIssues = checklist
-    ? checklist?.errors?.length + checklist?.warnings.length
-    : 0;
-
   return (
     <tr>
       <td>{release.title}</td>
@@ -43,25 +29,7 @@ const DraftReleaseRow = ({ isBauUser, release, onDelete }: Props) => {
           }`}
         </Tag>
       </td>
-      {!isBauUser && (
-        <td>
-          <LoadingSpinner inline loading={isLoadingChecklist} size="sm">
-            {totalIssues === 0 ? (
-              'No issues'
-            ) : (
-              <Details
-                className="govuk-!-margin-bottom-0"
-                summary={`View issues (${totalIssues})`}
-              >
-                <TagGroup>
-                  <Tag colour="red">{`${checklist?.errors.length} errors`}</Tag>
-                  <Tag colour="yellow">{`${checklist?.warnings.length} warnings`}</Tag>
-                </TagGroup>
-              </Details>
-            )}
-          </LoadingSpinner>
-        </td>
-      )}
+      {!isBauUser && <DraftReleaseRowIssues releaseId={release.id} />}
       <td>
         <Link
           to={generatePath<ReleaseRouteParams>(releaseSummaryRoute.path, {

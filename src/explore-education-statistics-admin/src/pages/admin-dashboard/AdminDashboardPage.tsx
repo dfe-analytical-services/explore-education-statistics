@@ -105,7 +105,7 @@ const AdminDashboardPage = () => {
       </div>
 
       <Tabs
-        id="publicationTabs"
+        id="dashboardTabs"
         onToggle={section => {
           if (showNewDashboard && section.id === 'draft-releases') {
             reloadDraftReleases();
@@ -113,7 +113,7 @@ const AdminDashboardPage = () => {
         }}
       >
         <TabsSection
-          id="publicationsReleases"
+          id={showNewDashboard ? 'publications' : 'publicationsReleases'}
           title={
             showNewDashboard
               ? 'Your publications'

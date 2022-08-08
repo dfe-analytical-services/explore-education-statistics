@@ -120,7 +120,7 @@ describe('PublicationsTab', () => {
     },
   ];
 
-  const testTopic2Publications = [
+  const testTopic2Publications: MyPublication[] = [
     {
       id: 'publication-3',
       title: 'Publication 3',
@@ -142,7 +142,7 @@ describe('PublicationsTab', () => {
     },
   ];
 
-  const testTopic3Publications = [
+  const testTopic3Publications: MyPublication[] = [
     {
       id: 'publication-4',
       title: 'Publication 4',
@@ -164,7 +164,7 @@ describe('PublicationsTab', () => {
     },
   ];
 
-  const testTopic4Publications = [
+  const testTopic4Publications: MyPublication[] = [
     {
       id: 'publication-5',
       title: 'Publication 5',

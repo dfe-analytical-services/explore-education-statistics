@@ -105,12 +105,12 @@ const PublicationsTab = ({ isBauUser }: Props) => {
     topicId,
   ]);
 
-  if (loadingThemes) {
-    return <LoadingSpinner />;
-  }
-
   return (
-    <>
+    <LoadingSpinner
+      hideText
+      loading={loadingThemes}
+      text="Loading your publications"
+    >
       <h2>View and manage your publications</h2>
       <p>Select a publication to:</p>
 
@@ -148,7 +148,7 @@ const PublicationsTab = ({ isBauUser }: Props) => {
         </>
       )}
 
-      <hr />
+      <hr className="govuk-!-margin-bottom-0" />
 
       {themes?.length === 0 ? (
         <>
@@ -191,7 +191,7 @@ const PublicationsTab = ({ isBauUser }: Props) => {
           )}
         </>
       )}
-    </>
+    </LoadingSpinner>
   );
 };
 
