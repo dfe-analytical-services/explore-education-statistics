@@ -5,7 +5,7 @@ import PageTitle from '@admin/components/PageTitle';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import {
   publicationContactRoute,
-  PublicationManageReleaseContributorsPageRoute,
+  publicationManageReleaseContributorsPageRoute,
   publicationDetailsRoute,
   publicationAdoptMethodologyRoute,
   publicationExternalMethodologyRoute,
@@ -41,7 +41,7 @@ const routes = [
   publicationExternalMethodologyRoute,
   publicationCreateLegacyReleaseRoute,
   publicationEditLegacyReleaseRoute,
-  PublicationManageReleaseContributorsPageRoute,
+  publicationManageReleaseContributorsPageRoute,
   publicationInviteUsersPageRoute,
 ];
 

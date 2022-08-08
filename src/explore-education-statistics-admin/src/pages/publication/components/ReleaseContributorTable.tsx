@@ -31,7 +31,7 @@ const ReleaseContributorTable = ({
         <thead>
           <tr>
             <th>Name</th>
-            <th className={styles.control}>Actions</th>
+            <th className={styles.actions}>Actions</th>
           </tr>
         </thead>
         <tbody>

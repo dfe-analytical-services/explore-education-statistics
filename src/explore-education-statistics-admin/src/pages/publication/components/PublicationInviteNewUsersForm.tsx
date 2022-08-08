@@ -42,11 +42,11 @@ export const errorMappings = [
 ];
 
 interface Props {
-  hideCancelButton?: boolean; // EES-3217 remove when pages live
-  publication: BasicPublicationDetails | MyPublication; // EES-3217 can be just one type when this goes live
+  hideCancelButton?: boolean; // TODO EES-3217 remove when pages live
+  publication: BasicPublicationDetails | MyPublication; // TODO EES-3217 can be just one type when this goes live
   releases: ReleaseSummary[];
   releaseId: string;
-  returnRoute?: string; // EES-3217 remove when pages live
+  returnRoute?: string; // TODO EES-3217 remove when pages live
 }
 
 const PublicationInviteNewUsersForm = ({
@@ -85,7 +85,7 @@ const PublicationInviteNewUsersForm = ({
   };
   return (
     <>
-      <h2>Invite a user to edit {publication.title}</h2>
+      <h2>Invite a user to edit this publication</h2>
       <Formik<InviteContributorFormValues>
         initialValues={initialValues}
         validationSchema={Yup.object({
@@ -99,7 +99,11 @@ const PublicationInviteNewUsersForm = ({
         {form => {
           return (
             <Form id="inviteContributorForm">
-              <FormFieldTextInput name="email" label="Enter an email address" />
+              <FormFieldTextInput
+                className="govuk-!-width-one-third"
+                name="email"
+                label="Enter an email address"
+              />
               <FormFieldCheckboxGroup<InviteContributorFormValues>
                 name="releaseIds"
                 legend="Select which releases you wish the user to have access"

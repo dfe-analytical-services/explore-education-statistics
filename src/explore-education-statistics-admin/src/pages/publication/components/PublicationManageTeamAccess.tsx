@@ -3,7 +3,7 @@ import ReleaseContributorTable from '@admin/pages/publication/components/Release
 import { getReleaseApprovalStatusLabel } from '@admin/pages/release/utils/releaseSummaryUtil';
 import {
   PublicationTeamRouteParams,
-  PublicationManageReleaseContributorsPageRoute,
+  publicationManageReleaseContributorsPageRoute,
 } from '@admin/routes/publicationRoutes';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import releasePermissionService, {
@@ -19,8 +19,8 @@ import React, { ReactNode } from 'react';
 import { generatePath } from 'react-router-dom';
 
 interface Props {
-  addUserPath?: string; // EES-3217 remove when pages go live
-  heading?: ReactNode; // EES-3217 remove when pages go live
+  addUserPath?: string; // TODO EES-3217 remove when pages go live
+  heading?: ReactNode; // TODO EES-3217 remove when pages go live
   publicationId: string;
   release: ReleaseSummary;
 }
@@ -106,7 +106,7 @@ const PublicationManageTeamAccess = ({
         to={
           addUserPath ??
           generatePath<PublicationTeamRouteParams>(
-            PublicationManageReleaseContributorsPageRoute.path,
+            publicationManageReleaseContributorsPageRoute.path,
             {
               publicationId,
               releaseId: release.id,

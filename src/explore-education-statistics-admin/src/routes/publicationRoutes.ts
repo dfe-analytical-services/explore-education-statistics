@@ -74,11 +74,11 @@ export const publicationContactRoute: PublicationRouteProps = {
 
 export const publicationTeamAccessRoute: PublicationRouteProps = {
   path: '/publication/:publicationId/team/:releaseId?',
-  title: 'Team Access',
+  title: 'Team access',
   component: PublicationTeamAccessPage,
 };
 
-export const PublicationManageReleaseContributorsPageRoute: PublicationRouteProps = {
+export const publicationManageReleaseContributorsPageRoute: PublicationRouteProps = {
   path: '/publication/:publicationId/team/:releaseId/manage-contributors',
   title: 'Add contributors',
   component: PublicationManageReleaseContributorsPage,

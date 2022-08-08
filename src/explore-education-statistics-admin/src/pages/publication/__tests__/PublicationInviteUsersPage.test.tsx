@@ -8,11 +8,10 @@ import {
 import _publicationService from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import { render, screen, waitFor } from '@testing-library/react';
-import { generatePath, match } from 'react-router';
+import { generatePath, Route } from 'react-router';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
-import { createMemoryHistory, createLocation } from 'history';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -59,7 +58,7 @@ describe('PublicationInviteUsersPage', () => {
 
     await waitFor(() => {
       expect(
-        screen.getByText('Invite a user to edit Publication 1'),
+        screen.getByText('Invite a user to edit this publication'),
       ).toBeInTheDocument();
     });
 
@@ -90,7 +89,6 @@ describe('PublicationInviteUsersPage', () => {
 });
 
 function renderPage() {
-  const history = createMemoryHistory();
   const path = generatePath<PublicationManageTeamRouteParams>(
     publicationInviteUsersPageRoute.path,
     {
@@ -99,30 +97,14 @@ function renderPage() {
     },
   );
 
-  const mockMatch: match<PublicationManageTeamRouteParams> = {
-    isExact: false,
-    path,
-    url: path,
-    params: {
-      publicationId: testPublication.id,
-      releaseId: testReleases[0].id,
-    },
-  };
-
-  const routeComponentPropsMock = {
-    history,
-    location: createLocation(path),
-    match: mockMatch,
-  };
-
   render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[path]}>
       <PublicationContextProvider
         publication={testPublication}
         onPublicationChange={noop}
         onReload={noop}
       >
-        <PublicationInviteUsersPage {...routeComponentPropsMock} />
+        <Route path={path} component={PublicationInviteUsersPage} />
       </PublicationContextProvider>
     </MemoryRouter>,
   );

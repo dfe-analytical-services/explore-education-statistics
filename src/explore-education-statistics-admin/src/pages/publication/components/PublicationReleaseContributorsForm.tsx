@@ -24,7 +24,7 @@ interface Props {
   publicationId: string;
   releaseContributors: ContributorViewModel[];
   releaseId: string;
-  returnRoute?: string; // EES-3217 remove when pages go live
+  returnRoute?: string; // TODO EES-3217 remove when pages go live
 }
 
 const PublicationReleaseContributorsForm = ({

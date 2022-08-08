@@ -1,8 +1,11 @@
 import PublicationManageReleaseContributorsPage from '@admin/pages/publication/PublicationManageReleaseContributorsPage';
-import { testPublication } from '@admin/pages/publication/__data__/testPublication';
+import {
+  testContact,
+  testPublication,
+} from '@admin/pages/publication/__data__/testPublication';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import {
-  PublicationManageReleaseContributorsPageRoute,
+  publicationManageReleaseContributorsPageRoute,
   PublicationManageTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
 import _releaseService, { Release } from '@admin/services/releaseService';
@@ -10,11 +13,10 @@ import _releasePermissionService, {
   ContributorViewModel,
 } from '@admin/services/releasePermissionService';
 import { render, screen, waitFor } from '@testing-library/react';
-import { generatePath, match } from 'react-router';
+import { generatePath, Route } from 'react-router';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
-import { createMemoryHistory, createLocation } from 'history';
 
 jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
@@ -24,21 +26,30 @@ const releasePermissionService = _releasePermissionService as jest.Mocked<
   typeof _releasePermissionService
 >;
 
-const testRelease = {
+const testRelease: Release = {
+  amendment: false,
+  approvalStatus: 'Draft',
+  contact: testContact,
   id: 'release-1',
+  latestInternalReleaseNote: 'release1-release-note',
+  releaseName: '2000',
+  latestRelease: true,
+  live: false,
+  preReleaseAccessList: '',
+  previousVersionId: '',
+  publicationId: 'publication-1',
+  publicationSlug: 'publication-slug-1',
+  publicationTitle: 'Publication 1',
+  publishScheduled: '',
+  slug: 'release-slug-1',
   timePeriodCoverage: {
     value: 'AY',
     label: 'Academic Year',
   },
   title: 'Release 1',
-  releaseName: '2000',
   type: 'AdHocStatistics',
-  publishScheduled: '',
-  latestInternalReleaseNote: 'release1-release-note',
-  approvalStatus: 'Draft',
   yearTitle: '2000/01',
-  live: false,
-} as Release;
+};
 
 const testPublicationContributors: ContributorViewModel[] = [
   {
@@ -120,37 +131,24 @@ describe('PublicationManageReleaseContributorsPage', () => {
 });
 
 function renderPage() {
-  const history = createMemoryHistory();
   const path = generatePath<PublicationManageTeamRouteParams>(
-    PublicationManageReleaseContributorsPageRoute.path,
+    publicationManageReleaseContributorsPageRoute.path,
     {
       publicationId: testPublication.id,
       releaseId: testRelease.id,
     },
   );
 
-  const mockMatch: match<PublicationManageTeamRouteParams> = {
-    isExact: false,
-    path,
-    url: path,
-    params: { publicationId: testPublication.id, releaseId: testRelease.id },
-  };
-
-  const routeComponentPropsMock = {
-    history,
-    location: createLocation(path),
-    match: mockMatch,
-  };
-
   render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[path]}>
       <PublicationContextProvider
         publication={testPublication}
         onPublicationChange={noop}
         onReload={noop}
       >
-        <PublicationManageReleaseContributorsPage
-          {...routeComponentPropsMock}
+        <Route
+          path={path}
+          component={PublicationManageReleaseContributorsPage}
         />
       </PublicationContextProvider>
     </MemoryRouter>,

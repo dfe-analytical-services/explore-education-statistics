@@ -67,12 +67,14 @@ describe('PublicationManageTeamAccess', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', {
-          name: 'Release 1 (Not live) Draft',
-        }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Release 1 (Not live)')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Release 1 (Not live) Draft',
+      }),
+    ).toBeInTheDocument();
 
     const rows = screen.getAllByRole('row');
     expect(rows).toHaveLength(3);
@@ -127,12 +129,14 @@ describe('PublicationManageTeamAccess', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', {
-          name: 'Release 1 (Not live) Draft',
-        }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Release 1 (Not live)')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Release 1 (Not live) Draft',
+      }),
+    ).toBeInTheDocument();
 
     userEvent.click(screen.getByRole('button', { name: 'Remove User 1' }));
 
@@ -164,12 +168,14 @@ describe('PublicationManageTeamAccess', () => {
     );
 
     await waitFor(() => {
-      expect(
-        screen.getByRole('heading', {
-          name: 'Release 1 (Not live) Draft',
-        }),
-      ).toBeInTheDocument();
+      expect(screen.getByText('Release 1 (Not live)')).toBeInTheDocument();
     });
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Release 1 (Not live) Draft',
+      }),
+    ).toBeInTheDocument();
 
     userEvent.click(
       screen.getByRole('button', { name: 'Cancel invite for user2@test.com' }),

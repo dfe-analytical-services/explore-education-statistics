@@ -44,7 +44,7 @@ describe('PublicationPageContainer', () => {
     expect(navLinks[2]).not.toHaveAttribute('aria-current');
     expect(navLinks[3]).toHaveTextContent('Contact');
     expect(navLinks[3]).not.toHaveAttribute('aria-current');
-    expect(navLinks[4]).toHaveTextContent('Team Access');
+    expect(navLinks[4]).toHaveTextContent('Team access');
     expect(navLinks[4]).not.toHaveAttribute('aria-current');
     expect(navLinks[5]).toHaveTextContent('Legacy releases');
     expect(navLinks[5]).not.toHaveAttribute('aria-current');

@@ -51,7 +51,7 @@ export interface ReleaseSummary {
   publishScheduled: string;
   nextReleaseDate?: PartialDate;
   latestInternalReleaseNote: string;
-  live?: boolean;
+  live: boolean;
   approvalStatus: ReleaseApprovalStatus;
   yearTitle: string;
 }

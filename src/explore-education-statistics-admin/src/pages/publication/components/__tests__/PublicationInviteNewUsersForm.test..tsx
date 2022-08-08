@@ -1,8 +1,5 @@
 import { testContact } from '@admin/pages/publication/__data__/testPublication';
-import {
-  BasicPublicationDetails,
-  PublicationContactDetails,
-} from '@admin/services/publicationService';
+import { BasicPublicationDetails } from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
 import userService from '@admin/services/userService';
 import PublicationInviteNewUsersForm from '@admin/pages/publication/components/PublicationInviteNewUsersForm';

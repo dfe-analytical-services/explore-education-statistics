@@ -65,7 +65,7 @@ Validate Select release dropdown
 
 Invite existing user analyst2 to be a contributor for 2002/03 release
     user clicks link    Invite new users
-    user waits until page contains    Invite a user to edit ${PUBLICATION_NAME}
+    user waits until page contains    Invite a user to edit this publication
     user enters text into element    id:email    EES-test.ANALYST2@education.gov.uk
 
     user checks checkbox is checked    Academic Year 2002/03
@@ -145,7 +145,7 @@ Validate contributors for 2000/01 release
 
 Invite brand new user
     user clicks link    Invite new users
-    user waits until page contains    Invite a user to edit ${PUBLICATION_NAME}
+    user waits until page contains    Invite a user to edit this publication
     user enters text into element    id:email    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
 
     user clicks button    Invite user

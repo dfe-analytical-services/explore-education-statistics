@@ -13,11 +13,11 @@ import _releasePermissionService, {
 } from '@admin/services/releasePermissionService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { generatePath, match } from 'react-router';
+import { generatePath, Route } from 'react-router';
 import React from 'react';
 import { Router } from 'react-router-dom';
 import noop from 'lodash/noop';
-import { createMemoryHistory, createLocation, MemoryHistory } from 'history';
+import { createMemoryHistory, MemoryHistory } from 'history';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -84,11 +84,7 @@ describe('PublicationTeamAccessPage', () => {
 
   test('renders the page correctly with no releases', async () => {
     publicationService.getReleases.mockResolvedValue([]);
-    renderPage({});
-
-    await waitFor(() => {
-      expect(screen.getByText('Update release access')).toBeInTheDocument();
-    });
+    await renderPage({});
 
     expect(
       screen.getByText(
@@ -99,12 +95,7 @@ describe('PublicationTeamAccessPage', () => {
 
   test('renders the page correctly with releases', async () => {
     publicationService.getReleases.mockResolvedValue(testReleases);
-
-    renderPage({});
-
-    await waitFor(() => {
-      expect(screen.getByText('Update release access')).toBeInTheDocument();
-    });
+    await renderPage({});
 
     const releaseSelect = screen.getByLabelText('Select release');
     expect(releaseSelect).toHaveValue('release-1');
@@ -141,10 +132,8 @@ describe('PublicationTeamAccessPage', () => {
 
   test('selects the release from the id in the url', async () => {
     publicationService.getReleases.mockResolvedValue(testReleases);
-    renderPage({ releaseId: 'release-2' });
-
-    await waitFor(() => {
-      expect(screen.getByText('Update release access')).toBeInTheDocument();
+    await renderPage({
+      releaseId: 'release-2',
     });
 
     expect(
@@ -159,11 +148,7 @@ describe('PublicationTeamAccessPage', () => {
   test('selects the first release if no release is set in the url', async () => {
     publicationService.getReleases.mockResolvedValue(testReleases);
     const history = createMemoryHistory();
-    renderPage({ historyParam: history });
-
-    await waitFor(() => {
-      expect(screen.getByText('Update release access')).toBeInTheDocument();
-    });
+    await renderPage({ history });
 
     expect(screen.getByLabelText('Select release')).toHaveValue('release-1');
 
@@ -181,11 +166,7 @@ describe('PublicationTeamAccessPage', () => {
   test('updates the page and url when select a different release', async () => {
     publicationService.getReleases.mockResolvedValue(testReleases);
     const history = createMemoryHistory();
-    renderPage({ historyParam: history });
-
-    await waitFor(() => {
-      expect(screen.getByText('Update release access')).toBeInTheDocument();
-    });
+    await renderPage({ history });
 
     expect(screen.getByLabelText('Select release')).toHaveValue('release-1');
     expect(
@@ -217,34 +198,19 @@ describe('PublicationTeamAccessPage', () => {
   });
 });
 
-function renderPage({
-  historyParam,
+async function renderPage({
+  history = createMemoryHistory(),
   releaseId,
 }: {
-  historyParam?: MemoryHistory;
+  history?: MemoryHistory;
   releaseId?: string;
 }) {
-  const history = historyParam ?? createMemoryHistory();
-  const path = generatePath<PublicationTeamRouteParams>(
-    publicationTeamAccessRoute.path,
-    {
-      publicationId: testPublication.id,
+  history.push(
+    generatePath<PublicationTeamRouteParams>(publicationTeamAccessRoute.path, {
+      publicationId: 'publication-1',
       releaseId,
-    },
+    }),
   );
-
-  const mockMatch: match<PublicationTeamRouteParams> = {
-    isExact: false,
-    path,
-    url: path,
-    params: { publicationId: testPublication.id, releaseId },
-  };
-
-  const routeComponentPropsMock = {
-    history,
-    location: createLocation(path),
-    match: mockMatch,
-  };
 
   render(
     <Router history={history}>
@@ -253,8 +219,15 @@ function renderPage({
         onPublicationChange={noop}
         onReload={noop}
       >
-        <PublicationTeamAccessPage {...routeComponentPropsMock} />
+        <Route
+          path={publicationTeamAccessRoute.path}
+          component={PublicationTeamAccessPage}
+        />
       </PublicationContextProvider>
     </Router>,
   );
+
+  await waitFor(() => {
+    expect(screen.getByText('Update release access')).toBeInTheDocument();
+  });
 }

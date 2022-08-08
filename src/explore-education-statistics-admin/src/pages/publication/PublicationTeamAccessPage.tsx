@@ -31,9 +31,6 @@ const PublicationTeamAccessPage = ({
       const fetchedReleases = await publicationService.getReleases(
         publicationId,
       );
-      if (!fetchedReleases.length) {
-        return [];
-      }
       if (!releaseId && fetchedReleases.length) {
         setCurrentReleaseId(fetchedReleases[0].id);
         history.replace(
@@ -100,9 +97,9 @@ const PublicationTeamAccessPage = ({
             }}
           />
         </div>
-        <div className="govuk-grid-column-one-third dfe-align--right">
-          <h3 className="govuk-!-font-size-19">Other options</h3>
-          {currentReleaseId && (
+        {currentReleaseId && (
+          <div className="govuk-grid-column-one-third dfe-align--right">
+            <h3 className="govuk-!-font-size-19">Other options</h3>
             <Link
               to={generatePath<PublicationTeamRouteParams>(
                 publicationInviteUsersPageRoute.path,
@@ -114,8 +111,8 @@ const PublicationTeamAccessPage = ({
             >
               Invite new users
             </Link>
-          )}
-        </div>
+          </div>
+        )}
       </div>
 
       {currentRelease && (
