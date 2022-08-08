@@ -4,12 +4,23 @@
 
 .dfe-content {
   .table {
-    margin: govuk-spacing(6) govuk-spacing(4);
+    display: table;
+    margin: 0;
     overflow: auto;
+    padding: govuk-spacing(6) govuk-spacing(4);
+    width: 100%;
   }
 
   figcaption {
-    font-size: 1rem;
+    caption-side: top;
+    display: table-caption;
+    font-size: 1.18rem;
+    font-weight: $govuk-font-weight-bold;
+    padding: govuk-spacing(6) govuk-spacing(4);
+  }
+
+  table {
+    box-sizing: border-box;
   }
 
   .image {

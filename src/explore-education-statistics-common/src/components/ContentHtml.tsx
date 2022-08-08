@@ -39,6 +39,7 @@ const ContentHtml = ({
       if (
         trackContentLinks &&
         element.tagName.toLowerCase() === 'a' &&
+        element.href.includes(process.env.PUBLIC_URL) &&
         element.href
       ) {
         event.preventDefault();
