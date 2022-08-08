@@ -5,7 +5,6 @@ import shutil
 import json
 import requests
 from bs4 import BeautifulSoup
-
 PATH = f'{os.getcwd()}{os.sep}test-results'
 
 
@@ -14,6 +13,7 @@ def _generate_slack_attachments(env: str, suite: str):
         contents = report.read()
 
     soup = BeautifulSoup(contents, features='xml')
+
     test = soup.find('total').find('stat')
 
     failed_tests = int(test['fail'])
@@ -57,7 +57,7 @@ def _tests_failed():
     with open(f'{PATH}{os.sep}output.xml', 'rb') as report:
         contents = report.read()
 
-        soup = BeautifulSoup(contents, 'lxml')
+        soup = BeautifulSoup(contents, features='xml')
         test = soup.find('total').find('stat')
 
         failed_tests = int(test['fail'])
