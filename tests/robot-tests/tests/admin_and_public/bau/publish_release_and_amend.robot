@@ -315,8 +315,8 @@ Navigate to data replacement page
     user checks headed table body row contains    Subject title    Dates test subject
     user checks headed table body row contains    Data file    dates.csv
     user checks headed table body row contains    Metadata file    dates.meta.csv
-    user checks headed table body row contains    Number of rows    118
-    user checks headed table body row contains    Data file size    17 Kb
+    user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
+    user checks headed table body row contains    Data file size    17 Kb    wait=%{WAIT_SMALL}
     user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
 
 Upload replacement data
@@ -332,15 +332,15 @@ Upload replacement data
     user checks headed table body row cell contains    Subject title    1    Dates test subject
     user checks headed table body row cell contains    Data file    1    dates.csv
     user checks headed table body row cell contains    Metadata file    1    dates.meta.csv
-    user checks headed table body row cell contains    Number of rows    1    118
-    user checks headed table body row cell contains    Data file size    1    17 Kb
+    user checks headed table body row cell contains    Number of rows    1    118    wait=%{WAIT_SMALL}
+    user checks headed table body row cell contains    Data file size    1    17 Kb    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Status    1    Data replacement in progress    wait=%{WAIT_LONG}
 
     user checks headed table body row cell contains    Subject title    2    Dates test subject
     user checks headed table body row cell contains    Data file    2    dates-replacement.csv
     user checks headed table body row cell contains    Metadata file    2    dates-replacement.meta.csv
-    user checks headed table body row cell contains    Number of rows    2    118
-    user checks headed table body row cell contains    Data file size    2    17 Kb
+    user checks headed table body row cell contains    Number of rows    2    118    wait=%{WAIT_SMALL}
+    user checks headed table body row cell contains    Data file size    2    17 Kb    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
 
 Confirm data replacement
@@ -372,7 +372,23 @@ Update existing data guidance for amendment
 
     user clicks button    Save guidance
 
-# TODO luke: Add footnotes
+Navigate to 'Footnotes' section
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+
+Add a Footnote
+    user waits until page contains link    Create footnote
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+    user clicks footnote subject radio    Dates test subject    Applies to all data
+    user clicks element    id:footnoteForm-content
+    user enters text into element    id:footnoteForm-content
+    ...    A footnote
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Check footnote has been added
+    user checks element is visible    testid:Footnote - A footnote
 
 Add ancillary file to amendment
     user clicks link    Data and files
@@ -438,11 +454,11 @@ Save data block for amendment
     user waits until page contains button    Delete this data block
 
 Update data block chart for amendment
-    user waits until page contains link    Chart
+    user waits until page contains link    Chart    %{WAIT_SMALL}
     user waits until page does not contain loading spinner
     user clicks link    Chart
 
-    user waits until page contains element    id:chartConfigurationForm-title
+    user waits until page contains element    id:chartConfigurationForm-title    %{WAIT_SMALL}
 
     user checks radio is checked    Use table title
     user clicks radio    Set an alternative title
@@ -502,15 +518,13 @@ Navigate to amendment release page
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
 
 Verify amendment is displayed as the latest release
-    [Documentation]    EES-1301
-    [Tags]    Failing
     user checks page does not contain    View latest data:
     user checks page does not contain    See other releases (1)
 
 Verify amendment is published
     user checks summary list contains    Published
     ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
-    user checks summary list contains    Next update    December 3001    # TODO: Check Next update date can be updated
+    user checks summary list contains    Next update    December 3001
 
 Verify amendment files
     user opens accordion section    Explore data and files
@@ -527,7 +541,6 @@ Verify amendment files
     user opens details dropdown    More details    ${other_files_1}
     ${other_files_1_details}=    user gets details content element    More details    ${other_files_1}
     user checks element should contain    ${other_files_1_details}    Test ancillary file 1 summary
-
     download file    link:Test ancillary file 1    test_ancillary_file_1.txt
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
 
@@ -630,3 +643,34 @@ Verify amendment Test text accordion section contains correct text
     user opens accordion section    Test text    id:content
     ${section}=    user gets accordion section content element    Test text    id:content
     user closes accordion section    Test text    id:content
+
+Check next release date can be updated
+    user navigates to admin dashboard    Bau1
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
+    user clicks link    Sign off
+    user clicks button    Edit release status
+    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
+    user enters text into element    releaseStatusForm-nextReleaseDate-month    08
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    4001
+    user clicks button    Update status
+
+Leave release note for amendment
+    user clicks link    Content
+    user clicks button    Add note
+    user enters text into element    testid:comment-textarea    updated amendment
+    user clicks button    Save note
+
+Approve release amendment for immedate publication
+    user approves amended release for immediate publication
+
+Save public release link for later use
+    user waits until page contains element    testid:public-release-url
+    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
+    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
+Navigate to amended public release
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+
+Validate Next update date
+    user checks summary list contains    Next update    August 4001

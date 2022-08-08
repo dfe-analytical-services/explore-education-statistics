@@ -7,7 +7,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from typing import Union
 from .get_webdriver import get_webdriver
-from pathlib import Path
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
 
 def wait_until_page_contains_xpath(context, selector):
@@ -130,14 +130,26 @@ def get_identity_info(identity_provider, url, email, password, first_name="Bau1"
     if not driver:
         get_webdriver("latest")
 
+    # TODO: investigate whether this is necessary for data-guidance assertions
+    # when downloading files, place them by default in ~/tests/robot-tests directory
+    # this is useful when testing data-guidance downloads (without this it
+    # would be placed in your user's download directory)
+
+    # preferences = {
+    #     "download.default_directory": f'{Path().absolute()}/downloads',
+    #     "download.prompt_for_download": False,
+    #     "download.directory_upgrade": True
+    # }
+
     chrome_options = webdriver.ChromeOptions()
+    # chrome_options.add_experimental_option('prefs', preferences)
     chrome_options.add_argument('--no-sandbox')
     chrome_options.add_argument('--headless')
     chrome_options.add_argument('--disable-gpu')
     chrome_options.add_argument('--ignore-certificate-errors')
     chrome_options.add_argument('--disable-logging')
     chrome_options.add_argument('--log-level=\3')
-    driver = webdriver.Chrome(options=chrome_options)
+    driver = webdriver.Chrome(options=chrome_options, desired_capabilities=DesiredCapabilities.CHROME)
 
     if identity_provider == 'KEYCLOAK':
         try:

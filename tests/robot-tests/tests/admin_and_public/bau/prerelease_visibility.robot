@@ -76,7 +76,6 @@ Go to "Sign off" page
     user waits until page contains button    Edit release status    %{WAIT_SMALL}
 
 Approve release and wait for it to be Scheduled
-    [Tags]    NotAgainstDev
     ${day}=    get current datetime    %-d    2
     ${month}=    get current datetime    %-m    2
     ${month_word}=    get current datetime    %B    2

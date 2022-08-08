@@ -61,8 +61,6 @@ Add summary content to release
     user adds summary text block
     user adds content to summary text block    Test intro text for ${PUBLICATION_NAME}
 
-# TODO: Add comment to summary content
-
 Add release note to release
     user clicks button    Add note
     user enters text into element    id:createReleaseNoteForm-reason    Test release note one
