@@ -13,7 +13,7 @@ const FigureFootnotes = ({ footnotes }: Props) => {
     <>
       <h3 className="govuk-heading-m">Footnotes</h3>
 
-      <CollapsibleList listStyle="number" testId="footnotes">
+      <CollapsibleList listStyle="number" collapseAfter={2} testId="footnotes">
         {footnotes.map(footnote => (
           <li key={footnote.id}>{footnote.label}</li>
         ))}
