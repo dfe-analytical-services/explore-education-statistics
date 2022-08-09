@@ -26,7 +26,7 @@ const errorMappings = [
   mapFieldErrors<FormValues>({
     target: 'emails',
     messages: {
-      InvalidEmailAddress: 'Enter only @education.gov.uk email addresses',
+      InvalidEmailAddress: 'Enter valid email addresses',
       NoInvitableEmails:
         'All of the email addresses have already been invited or accepted',
     },
@@ -59,6 +59,10 @@ const PreReleaseUserAccessForm = ({
   ]);
 
   const [invitePlan, setInvitePlan] = useState<PreReleaseInvitePlan>();
+
+  const isValidEmail = (input: string) => {
+    return /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(input);
+  };
 
   const splitAndTrimLines = (input: string) =>
     input
@@ -119,7 +123,7 @@ const PreReleaseUserAccessForm = ({
               .trim()
               .required('Enter 1 or more email addresses')
               .test({
-                name: 'number of lines',
+                name: 'number-of-lines',
                 message: `Enter between 1 and ${inviteLimit} lines of email addresses`,
                 test: (value: string) => {
                   if (value) {
@@ -130,27 +134,27 @@ const PreReleaseUserAccessForm = ({
                 },
               })
               .test({
-                name: 'email format',
-                message: 'Enter only @education.gov.uk email addresses',
-                test: (value: string) => {
+                name: 'lines-contain-valid-emails',
+                message: ({ value }) =>
+                  `'${value}' is not a valid email address`,
+                test(value?: string) {
                   if (value) {
                     const emails = splitAndTrimLines(value);
-                    return emails.every(email => {
-                      if (
-                        /^simulate-delivered(?:-[1-3])?@notifications.service.gov.uk$/i.test(
-                          email,
-                        )
-                      ) {
-                        return true;
-                      }
-                      const emailSegments = email.split('@');
-                      return (
-                        emailSegments.length === 2 &&
-                        emailSegments[1] === 'education.gov.uk'
-                      );
+                    const indexOfFirstInvalid = emails.findIndex(
+                      email => !isValidEmail(email),
+                    );
+                    if (indexOfFirstInvalid < 0) {
+                      return true;
+                    }
+                    // eslint-disable-next-line react/no-this-in-sfc
+                    return this.createError({
+                      path: 'emails',
+                      params: {
+                        value: emails[indexOfFirstInvalid],
+                      },
                     });
                   }
-                  return false;
+                  return true;
                 },
               }),
           })}
