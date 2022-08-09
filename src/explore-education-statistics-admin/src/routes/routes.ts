@@ -39,7 +39,12 @@ export type TopicParams = {
   topicId: string;
 };
 
-export type ThemeTopicParams = ThemeParams & TopicParams;
+// TODO EES-3217 - feature flag to show new dashboard, remove when ready to go live
+export type NewDashBoardParams = {
+  showNewDashboard?: string;
+};
+
+export type ThemeTopicParams = ThemeParams & TopicParams & NewDashBoardParams;
 
 export const homeRoute: ProtectedRouteProps = {
   path: '/',
