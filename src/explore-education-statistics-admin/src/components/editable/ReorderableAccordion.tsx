@@ -1,4 +1,3 @@
-import { useEditingContext } from '@admin/contexts/EditingContext';
 import Accordion, { AccordionProps } from '@common/components/Accordion';
 import Button from '@common/components/Button';
 import useToggle from '@common/hooks/useToggle';
@@ -15,33 +14,31 @@ import React, {
   useState,
 } from 'react';
 import { DragDropContext, Droppable, DropResult } from 'react-beautiful-dnd';
-import styles from './EditableAccordion.module.scss';
+import styles from './ReorderableAccordion.module.scss';
 import {
   DraggableAccordionSectionProps,
-  EditableAccordionSectionProps,
-} from './EditableAccordionSection';
+  ReorderableAccordionSectionProps,
+} from './ReorderableAccordionSection';
 
-export interface EditableAccordionProps
+export interface ReorderableAccordionProps
   extends OmitStrict<AccordionProps, 'openAll'> {
-  sectionName?: string;
-  onAddSection: () => void;
+  heading?: string;
   onReorder: (sectionIds: string[]) => void;
 }
 
-const EditableAccordion = (props: EditableAccordionProps) => {
-  const { children, id, sectionName, onAddSection, onReorder } = props;
+const ReorderableAccordion = (props: ReorderableAccordionProps) => {
+  const { children, id, heading, onReorder } = props;
 
-  const { editingMode } = useEditingContext();
   const [isReordering, toggleReordering] = useToggle(false);
 
   const [sections, setSections] = useState<
-    ReactElement<EditableAccordionSectionProps>[]
+    ReactElement<ReorderableAccordionSectionProps>[]
   >([]);
 
   useEffect(() => {
     const nextSections = React.Children.toArray(children).filter(
       isValidElement,
-    ) as ReactElement<EditableAccordionSectionProps>[];
+    ) as ReactElement<ReorderableAccordionSectionProps>[];
 
     setSections(nextSections);
   }, [children, id, isReordering]);
@@ -67,7 +64,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
       <Accordion {...props} openAll={isReordering ? false : undefined}>
         {sections.map((child, index) => {
           const section = child as ReactElement<
-            EditableAccordionSectionProps & DraggableAccordionSectionProps
+            ReorderableAccordionSectionProps & DraggableAccordionSectionProps
           >;
 
           return cloneElement(section, {
@@ -79,16 +76,10 @@ const EditableAccordion = (props: EditableAccordionProps) => {
     );
   }, [isReordering, props, sections]);
 
-  if (editingMode !== 'edit') {
-    return <Accordion {...props}>{children}</Accordion>;
-  }
-
   return (
     <div className={styles.container}>
       <div className="dfe-flex dfe-justify-content--space-between govuk-!-margin-bottom-3">
-        <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
-          {sectionName}
-        </h2>
+        <h2 className="govuk-heading-l govuk-!-margin-bottom-0">{heading}</h2>
 
         {sections.length > 1 &&
           (!isReordering ? (
@@ -97,7 +88,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
               className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
               onClick={toggleReordering.on}
             >
-              Reorder<span className="govuk-visually-hidden"> sections</span>
+              Reorder<span className="govuk-visually-hidden"> data files</span>
             </Button>
           ) : (
             <Button
@@ -130,18 +121,8 @@ const EditableAccordion = (props: EditableAccordionProps) => {
           )}
         </Droppable>
       </DragDropContext>
-
-      <div>
-        <Button
-          onClick={onAddSection}
-          className={styles.addSectionButton}
-          disabled={isReordering}
-        >
-          Add new section
-        </Button>
-      </div>
     </div>
   );
 };
 
-export default EditableAccordion;
+export default ReorderableAccordion;

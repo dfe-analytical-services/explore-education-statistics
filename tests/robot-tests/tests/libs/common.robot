@@ -747,6 +747,11 @@ user checks radio is checked
     [Arguments]    ${label}
     user checks page contains element    xpath://label[text()="${label}"]/../input[@type="radio" and @checked]
 
+user checks radio in position has label
+    [Arguments]    ${position}    ${label}
+    user checks page contains element
+    ...    xpath://*[contains(@data-testid, "Radio item for ")][${position}]//label[contains(text(), "${label}")]
+
 user clicks checkbox
     [Arguments]    ${label}
     user scrolls to element    xpath://label[text()="${label}" or strong[text()="${label}"]]/../input[@type="checkbox"]
@@ -771,6 +776,11 @@ user checks checkbox input is not checked
     [Arguments]    ${selector}
     user waits until page contains element    ${selector}
     checkbox should not be selected    ${selector}
+
+user checks checkbox in position has label
+    [Arguments]    ${position}    ${label}
+    user checks page contains element
+    ...    xpath://*[contains(@data-testid,"Checkbox item for ")][${position}]//label[contains(text(), "${label}")]
 
 user checks list has x items
     [Arguments]    ${locator}    ${count}    ${parent}=css:body

@@ -97,6 +97,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                             id => new SubjectViewModel(
                                 id: id,
                                 name: $"Subject {id}",
+                                order: 0,
                                 content: "Test content",
                                 timePeriods: new TimePeriodLabels(),
                                 geographicLevels: new List<string>(),

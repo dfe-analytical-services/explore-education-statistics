@@ -23,24 +23,6 @@ describe('DownloadStep', () => {
 
   const testSubjects: Subject[] = [
     {
-      id: 'test-subject-1',
-      name: 'Subject 1',
-      content: 'Some content here 1',
-      geographicLevels: ['National'],
-      timePeriods: {
-        from: '2018',
-        to: '2019',
-      },
-      file: {
-        id: 'file-1',
-        name: 'Subject 1',
-        fileName: 'file-1.csv',
-        extension: 'csv',
-        size: '10 Mb',
-        type: 'Data',
-      },
-    },
-    {
       id: 'test-subject-2',
       name: 'Another Subject',
       content: 'Some content here 2',
@@ -55,6 +37,24 @@ describe('DownloadStep', () => {
         fileName: 'file-2.csv',
         extension: 'csv',
         size: '20 Mb',
+        type: 'Data',
+      },
+    },
+    {
+      id: 'test-subject-1',
+      name: 'Subject 1',
+      content: 'Some content here 1',
+      geographicLevels: ['National'],
+      timePeriods: {
+        from: '2018',
+        to: '2019',
+      },
+      file: {
+        id: 'file-1',
+        name: 'Subject 1',
+        fileName: 'file-1.csv',
+        extension: 'csv',
+        size: '10 Mb',
         type: 'Data',
       },
     },

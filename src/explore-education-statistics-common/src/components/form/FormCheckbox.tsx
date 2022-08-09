@@ -43,7 +43,10 @@ const FormCheckbox = ({
 }: FormCheckboxProps) => {
   return (
     <>
-      <div className={classNames('govuk-checkboxes__item', className)}>
+      <div
+        className={classNames('govuk-checkboxes__item', className)}
+        data-testid={`Checkbox item for ${label}`}
+      >
         <input
           aria-describedby={hint ? `${id}-item-hint` : undefined}
           className="govuk-checkboxes__input"

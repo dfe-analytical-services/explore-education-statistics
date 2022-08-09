@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -76,6 +77,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, Unit>> ValidateSubjectName(Guid releaseId, string name)
         {
+            if (!name.Any())
+            {
+                return ValidationActionResult(SubjectTitleCannotBeEmpty);
+            }
+
             if (FileContainsSpecialChars(name))
             {
                 return ValidationActionResult(SubjectTitleCannotContainSpecialCharacters);
@@ -92,7 +98,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(SubjectTitleMustBeUnique);
             }
 
-            return Unit.Instance;
+            return await Task.FromResult(Unit.Instance);
         }
 
         private async Task<bool> IsCsvFile(IFormFile file)

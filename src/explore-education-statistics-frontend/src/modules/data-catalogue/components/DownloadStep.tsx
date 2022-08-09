@@ -147,6 +147,7 @@ const DownloadStep = ({
               {checkboxOptions.length > 0 && (
                 <FormFieldCheckboxGroup<DownloadFormValues>
                   name="files"
+                  order={[]}
                   legend="Choose files from the list below"
                   legendHidden
                   disabled={form.isSubmitting}

@@ -20,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
@@ -65,6 +66,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var releaseDataFile = new ReleaseFile
             {
                 Release = release,
+                Order = 1,
                 File = new File
                 {
                     RootPath = Guid.NewGuid(),
@@ -87,6 +89,36 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 }
             };
 
+            // The deleting shouldn't effect the order of other ReleaseFiles
+            var releaseFile1 = new ReleaseFile
+            {
+                Release = release,
+                Order = 0,
+                File = new File { Type = FileType.Data },
+            };
+            var releaseFile3 = new ReleaseFile
+            {
+                Release = release,
+                Order = 2,
+                File = new File { Type = FileType.Data },
+            };
+            var releaseFile4 = new ReleaseFile
+            {
+                Release = release,
+                Order = 3,
+                File = new File { Type = FileType.Data },
+            };
+            var releaseFile4Replacement = new ReleaseFile
+            {
+                Release = release,
+                Order = 3,
+                File = new File
+                {
+                    Type = FileType.Data,
+                    Replacing = releaseFile4.File,
+                }
+            };
+
             var contentDbContextId = Guid.NewGuid().ToString();
 
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
@@ -94,6 +126,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 await contentDbContext.AddAsync(release);
                 await contentDbContext.AddAsync(zipFile);
                 await contentDbContext.AddRangeAsync(releaseDataFile, releaseMetaFile);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
+                    releaseFile1, releaseFile3, releaseFile4, releaseFile4Replacement);
                 await contentDbContext.SaveChangesAsync();
             }
 
@@ -103,7 +137,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataImportService.Setup(mock => mock.DeleteImport(releaseDataFile.File.Id))
                 .Returns(Task.CompletedTask);
 
-            // test that the deletion of the main data and metadata files completed, as well as any zip files that 
+            // test that the deletion of the main data and metadata files completed, as well as any zip files that
             // were uploaded
             blobStorageService.Setup(mock =>
                     mock.DeleteBlob(PrivateReleaseFiles, It.IsIn(
@@ -113,7 +147,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             // test that the deletion of any remaining batch files went ahead for this particular data file
             blobStorageService
                 .Setup(mock => mock.DeleteBlobs(
-                    PrivateReleaseFiles, 
+                    PrivateReleaseFiles,
                     releaseDataFile.BatchesPath(),
                     null))
                 .Returns(Task.CompletedTask);
@@ -152,6 +186,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await contentDbContext.Files.FindAsync(releaseMetaFile.File.Id));
 
                 Assert.Null(await contentDbContext.Files.FindAsync(zipFile.Id));
+
+                var dbReleaseFile1 = contentDbContext.ReleaseFiles.Single(rf => rf.Id == releaseFile1.Id);
+                Assert.Equal(0, dbReleaseFile1.Order);
+
+                var dbReleaseFile3 = contentDbContext.ReleaseFiles.Single(rf => rf.Id == releaseFile3.Id);
+                Assert.Equal(2, dbReleaseFile3.Order);
+
+                var dbReleaseFile4 = contentDbContext.ReleaseFiles.Single(rf => rf.Id == releaseFile4.Id);
+                Assert.Equal(3, dbReleaseFile4.Order);
+
+                var dbReleaseFile4Replacement = contentDbContext.ReleaseFiles.Single(rf => rf.Id == releaseFile4Replacement.Id);
+                Assert.Equal(3, dbReleaseFile4Replacement.Order);
             }
         }
 
@@ -778,7 +824,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 TotalRows = 200,
                 Status = COMPLETE
             };
-            
+
             var contentDbContextId = Guid.NewGuid().ToString();
             await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
             {
@@ -992,6 +1038,219 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("10 Kb", fileInfo.Size);
                 Assert.Equal(dataFile.Created, fileInfo.Created);
                 Assert.Equal(COMPLETE, fileInfo.Status);
+            }
+        }
+
+        [Fact]
+        public async Task ReorderDataFiles()
+        {
+            var release = new Release();
+            var releaseDataFile1 = new ReleaseFile
+            {
+                Release = release,
+                Order = 5,
+                File = new File
+                {
+                    Type = FileType.Data,
+                },
+            };
+            var releaseDataFile2 = new ReleaseFile
+            {
+                Release = release,
+                Order = 3,
+                File = new File
+                {
+                    Type = FileType.Data,
+                },
+            };
+            var releaseDataFile3 = new ReleaseFile
+            {
+                Release = release,
+                Order = 1,
+                File = new File
+                {
+                    Type = FileType.Data,
+                },
+            };
+            var releaseDataFile4 = new ReleaseFile
+            {
+                Release = release,
+                Order = 2,
+                File = new File
+                {
+                    Type = FileType.Data,
+                },
+            };
+            var releaseDataFile5 = new ReleaseFile
+            {
+                Release = release,
+                Order = 0,
+                File = new File
+                {
+                    Type = FileType.Data,
+                },
+            };
+
+            var releaseMetaFile1 = new ReleaseFile
+            {
+                Release = releaseDataFile1.Release,
+                File = new File
+                {
+                    Type = FileType.Metadata,
+                }
+            };
+            var releaseMetaFile2 = new ReleaseFile
+            {
+                Release = releaseDataFile2.Release,
+                File = new File
+                {
+                    Type = FileType.Metadata,
+                }
+            };
+            var releaseMetaFile3 = new ReleaseFile
+            {
+                Release = releaseDataFile3.Release,
+                File = new File
+                {
+                    Type = FileType.Metadata,
+                }
+            };
+            var releaseMetaFile4 = new ReleaseFile
+            {
+                Release = releaseDataFile4.Release,
+                File = new File
+                {
+                    Type = FileType.Metadata,
+                }
+            };
+            var releaseMetaFile5 = new ReleaseFile
+            {
+                Release = releaseDataFile5.Release,
+                File = new File
+                {
+                    Type = FileType.Metadata,
+                }
+            };
+
+            var dataImports = new List<DataImport>
+            {
+                new()
+                {
+                    File = releaseDataFile1.File,
+                    MetaFile = releaseMetaFile1.File,
+                },
+                new()
+                {
+                    File = releaseDataFile2.File,
+                    MetaFile = releaseMetaFile2.File,
+                },
+                new()
+                {
+                    File = releaseDataFile3.File,
+                    MetaFile = releaseMetaFile3.File,
+                },
+                new()
+                {
+                    File = releaseDataFile4.File,
+                    MetaFile = releaseMetaFile4.File,
+                },
+                new()
+                {
+                    File = releaseDataFile5.File,
+                    MetaFile = releaseMetaFile5.File,
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.ReleaseFiles.AddRangeAsync(
+                    releaseDataFile1, releaseDataFile2, releaseDataFile3, releaseDataFile4, releaseDataFile5,
+                    releaseMetaFile1, releaseMetaFile2, releaseMetaFile3, releaseMetaFile4, releaseMetaFile5
+                    );
+                await contentDbContext.DataImports.AddRangeAsync(dataImports);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext
+                );
+
+                var result = await service.ReorderDataFiles(
+                    release.Id,
+                    new List<Guid>
+                    {
+                        releaseDataFile1.File.Id,
+                        releaseDataFile2.File.Id,
+                        releaseDataFile3.File.Id,
+                        releaseDataFile4.File.Id,
+                        releaseDataFile5.File.Id,
+                    });
+
+                var dataFiles = result.AssertRight().ToList();
+                Assert.Equal(5, dataFiles.Count);
+
+                Assert.Equal(releaseDataFile1.File.Id, dataFiles[0].Id);
+                Assert.Equal(releaseDataFile2.File.Id, dataFiles[1].Id);
+                Assert.Equal(releaseDataFile3.File.Id, dataFiles[2].Id);
+                Assert.Equal(releaseDataFile4.File.Id, dataFiles[3].Id);
+                Assert.Equal(releaseDataFile5.File.Id, dataFiles[4].Id);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var dbDataFiles = contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Where(rf => rf.ReleaseId == release.Id && rf.File.Type == FileType.Data)
+                    .ToList();
+
+                var dbDataFile1 = dbDataFiles.Find(rf => rf.Id == releaseDataFile1.Id);
+                Assert.NotNull(dbDataFile1);
+                Assert.Equal(0, dbDataFile1!.Order);
+
+                var dbDataFile2 = dbDataFiles.Find(rf => rf.Id == releaseDataFile2.Id);
+                Assert.NotNull(dbDataFile2);
+                Assert.Equal(1, dbDataFile2!.Order);
+
+                var dbDataFile3 = dbDataFiles.Find(rf => rf.Id == releaseDataFile3.Id);
+                Assert.NotNull(dbDataFile3);
+                Assert.Equal(2, dbDataFile3!.Order);
+
+                var dbDataFile4 = dbDataFiles.Find(rf => rf.Id == releaseDataFile4.Id);
+                Assert.NotNull(dbDataFile4);
+                Assert.Equal(3, dbDataFile4!.Order);
+
+                var dbDataFile5 = dbDataFiles.Find(rf => rf.Id == releaseDataFile5.Id);
+                Assert.NotNull(dbDataFile5);
+                Assert.Equal(4, dbDataFile5!.Order);
+
+                var dbMetaFiles = contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Where(rf => rf.ReleaseId == release.Id && rf.File.Type == FileType.Metadata)
+                    .ToList();
+
+                // Non-FileType.Data files should default to Order 0
+                var dbMetaFile1 = dbMetaFiles.Find(rf => rf.Id == releaseMetaFile1.Id);
+                Assert.NotNull(dbMetaFile1);
+                Assert.Equal(0, dbMetaFile1!.Order);
+
+                var dbMetaFile2 = dbMetaFiles.Find(rf => rf.Id == releaseMetaFile2.Id);
+                Assert.NotNull(dbMetaFile2);
+                Assert.Equal(0, dbMetaFile2!.Order);
+
+                var dbMetaFile3 = dbMetaFiles.Find(rf => rf.Id == releaseMetaFile3.Id);
+                Assert.NotNull(dbMetaFile3);
+                Assert.Equal(0, dbMetaFile3!.Order);
+
+                var dbMetaFile4 = dbMetaFiles.Find(rf => rf.Id == releaseMetaFile4.Id);
+                Assert.NotNull(dbMetaFile4);
+                Assert.Equal(0, dbMetaFile4!.Order);
+
+                var dbMetaFile5 = dbMetaFiles.Find(rf => rf.Id == releaseMetaFile5.Id);
+                Assert.NotNull(dbMetaFile5);
+                Assert.Equal(0, dbMetaFile5!.Order);
             }
         }
 
@@ -1465,7 +1724,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_user.Email, result.Right.UserName);
                 Assert.Null(result.Right.Rows);
                 Assert.Equal("10 Kb", result.Right.Size);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(QUEUED, result.Right.Status);
             }
 
@@ -1533,6 +1792,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Release = release,
                 Name = "Test data",
+                Order = 93,
                 File = new File
                 {
                     Filename = "original-data.csv",
@@ -1617,21 +1877,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     metaFormFile: metaFormFile,
                     replacingFileId: originalDataReleaseFile.File.Id);
 
-                Assert.True(result.IsRight);
+                var dataFileInfo = result.AssertRight();
 
                 MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService, dataImportService);
 
-                Assert.True(result.Right.Id.HasValue);
-                Assert.Equal(originalDataReleaseFile.Name, result.Right.Name);
-                Assert.Equal(dataFileName, result.Right.FileName);
-                Assert.Equal("csv", result.Right.Extension);
-                Assert.True(result.Right.MetaFileId.HasValue);
-                Assert.Equal(metaFileName, result.Right.MetaFileName);
-                Assert.Equal(_user.Email, result.Right.UserName);
-                Assert.Null(result.Right.Rows);
-                Assert.Equal("10 Kb", result.Right.Size);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Right.Created.Value).Milliseconds, 0, 1500);
-                Assert.Equal(QUEUED, result.Right.Status);
+                Assert.True(dataFileInfo.Id.HasValue);
+                Assert.Equal(originalDataReleaseFile.Name, dataFileInfo.Name);
+                Assert.Equal(dataFileName, dataFileInfo.FileName);
+                Assert.Equal("csv", dataFileInfo.Extension);
+                Assert.True(dataFileInfo.MetaFileId.HasValue);
+                Assert.Equal(metaFileName, dataFileInfo.MetaFileName);
+                Assert.Equal(_user.Email, dataFileInfo.UserName);
+                Assert.Null(dataFileInfo.Rows);
+                Assert.Equal("10 Kb", dataFileInfo.Size);
+                Assert.InRange(DateTime.UtcNow.Subtract(dataFileInfo.Created!.Value).Milliseconds, 0, 1500);
+                Assert.Equal(QUEUED, dataFileInfo.Status);
             }
 
             await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
@@ -1651,7 +1911,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         && rs.ReleaseId == release.Id);
                 Assert.Contains(releaseSubjects,
                     rs =>
-                        rs.SubjectId == replacementSubject.Id
+                        rs.SubjectId == replacementSubject!.Id
                         && rs.ReleaseId == release.Id);
             }
             
@@ -1684,12 +1944,180 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(3, releaseFiles.Count);
 
-                Assert.NotNull(releaseFiles.SingleOrDefault(rf =>
-                    rf.ReleaseId == release.Id && rf.FileId == originalDataFile.Id));
-                Assert.NotNull(releaseFiles.SingleOrDefault(rf =>
-                    rf.ReleaseId == release.Id && rf.FileId == dataFile.Id));
+                var dbOriginalReleaseDataFile = Assert.Single(releaseFiles
+                    .Where(rf =>
+                        rf.ReleaseId == release.Id
+                        && rf.FileId == originalDataFile.Id)
+                    .ToList());
+                Assert.Equal(93, dbOriginalReleaseDataFile.Order);
+
+                var dbReleaseDataFile = Assert.Single(releaseFiles
+                    .Where(rf =>
+                        rf.ReleaseId == release.Id
+                        && rf.FileId == dataFile.Id)
+                    .ToList());
+                Assert.Equal(93, dbReleaseDataFile.Order);
+
                 Assert.NotNull(releaseFiles.SingleOrDefault(rf =>
                     rf.ReleaseId == release.Id && rf.FileId == metaFile.Id));
+            }
+        }
+
+        [Fact]
+        public async Task Upload_Order()
+        {
+            const string subjectName = "Test Subject";
+            const string dataFileName = "test-data.csv";
+            const string metaFileName = "test-data.meta.csv";
+
+            var release = new Release
+            {
+                ReleaseName = "2000",
+                Publication = new Publication
+                {
+                    Title = "Test publication",
+                    Topic = new Topic
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Test topic",
+                        Theme = new Theme
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = "Test theme"
+                        }
+                    }
+                },
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                new ()
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Data },
+                    Order = 0,
+                },
+                new ()
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Data },
+                    Order = 1,
+                },
+                new ()
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Data },
+                    Order = 3,
+
+                },
+                new () // Ancillary files should be ignored
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Ancillary },
+                    Order = 5,
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var dataFormFile = CreateFormFileMock(dataFileName).Object;
+            var metaFormFile = CreateFormFileMock(metaFileName).Object;
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
+            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                fileUploadsValidatorService
+                    .Setup(s => s.ValidateSubjectName(release.Id, subjectName))
+                    .ReturnsAsync(Unit.Instance);
+
+                fileUploadsValidatorService
+                    .Setup(s => s.ValidateDataFilesForUpload(
+                        release.Id,
+                        dataFormFile,
+                        metaFormFile,
+                        null))
+                    .ReturnsAsync(Unit.Instance);
+
+                dataImportService
+                    .Setup(s => s.Import(
+                        It.IsAny<Guid>(),
+                        It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName)))
+                    .ReturnsAsync(new DataImport());
+
+                blobStorageService.Setup(mock =>
+                    mock.UploadFile(PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
+                        dataFormFile
+                    )).Returns(Task.CompletedTask);
+
+                blobStorageService.Setup(mock =>
+                    mock.UploadFile(PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(release.Id, FileType.Data))),
+                        metaFormFile
+                    )).Returns(Task.CompletedTask);
+
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    dataImportService: dataImportService.Object,
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object
+                );
+
+                var result = await service.Upload(
+                    releaseId: release.Id,
+                    dataFormFile: dataFormFile,
+                    metaFormFile: metaFormFile,
+                    subjectName: subjectName);
+
+                var dataFileInfo = result.AssertRight();
+
+                MockUtils.VerifyAllMocks(blobStorageService, fileUploadsValidatorService, dataImportService);
+
+                Assert.True(dataFileInfo.Id.HasValue);
+                Assert.Equal(dataFileName, dataFileInfo.FileName);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var files = contentDbContext.Files.ToList();
+                Assert.Equal(6, files.Count);
+
+                var dbDataReleaseFiles = contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Where(rf => rf.File.Type == FileType.Data)
+                    .ToList();
+                Assert.Equal(4, dbDataReleaseFiles.Count);
+
+                Assert.Equal(0, dbDataReleaseFiles[0].Order);
+                Assert.Equal(1, dbDataReleaseFiles[1].Order);
+                Assert.Equal(3, dbDataReleaseFiles[2].Order);
+                Assert.Equal(4, dbDataReleaseFiles[3].Order); // Highest Order of existing releaseFiles is 3 then + 1
+                Assert.Equal(subjectName, dbDataReleaseFiles[3].Name);
+
+
+                var dbMetaReleaseFiles = contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Where(rf => rf.File.Type == FileType.Metadata)
+                    .ToList();
+                var dbMetaReleaseFile = Assert.Single(dbMetaReleaseFiles);
+
+                Assert.Equal(metaFileName, dbMetaReleaseFile.File.Filename);
+                Assert.Equal(0, dbMetaReleaseFile.Order); // Files that aren't FileType.Data have Order set to 0
             }
         }
 
@@ -1842,6 +2270,169 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task UploadAsZip_Order()
+        {
+            const string subjectName = "Test Subject";
+
+            const string dataFileName = "test-data.csv";
+            const string metaFileName = "test-data.meta.csv";
+            const string zipFileName = "test-data-archive.zip";
+
+            var release = new Release
+            {
+                Id = Guid.NewGuid(),
+                ReleaseName = "2000",
+                Publication = new Publication
+                {
+                    Title = "Test publication",
+                    Topic = new Topic
+                    {
+                        Id = Guid.NewGuid(),
+                        Title = "Test topic",
+                        Theme = new Theme
+                        {
+                            Id = Guid.NewGuid(),
+                            Title = "Test theme"
+                        }
+                    }
+                }
+            };
+
+            var releaseFiles = new List<ReleaseFile>
+            {
+                new ()
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Data },
+                    Order = 0,
+                },
+                new ()
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Data },
+                    Order = 1,
+                },
+                new ()
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Data },
+                    Order = 3,
+
+                },
+                new () // Ancillary files should be ignored
+                {
+                    Release = release,
+                    File = new File { Type = FileType.Ancillary },
+                    Order = 5,
+                },
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            var statisticsDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.Releases.AddRangeAsync(release);
+                await contentDbContext.ReleaseFiles.AddRangeAsync(releaseFiles);
+
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            var zipFormFile = CreateFormFileMock(zipFileName).Object;
+            var archiveFile = CreateDataArchiveFileMock(dataFileName, metaFileName).Object;
+            var blobStorageService = new Mock<IBlobStorageService>(MockBehavior.Strict);
+            var dataArchiveValidationService = new Mock<IDataArchiveValidationService>(MockBehavior.Strict);
+            var fileUploadsValidatorService = new Mock<IFileUploadsValidatorService>(MockBehavior.Strict);
+            var dataImportService = new Mock<IDataImportService>(MockBehavior.Strict);
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            await using (var statisticsDbContext = InMemoryStatisticsDbContext(statisticsDbContextId))
+            {
+                fileUploadsValidatorService
+                    .Setup(s => s.ValidateSubjectName(release.Id, subjectName))
+                    .ReturnsAsync(Unit.Instance);
+
+                fileUploadsValidatorService
+                    .Setup(s => s.ValidateDataArchiveEntriesForUpload(release.Id, archiveFile))
+                    .ReturnsAsync(Unit.Instance);
+
+                dataArchiveValidationService
+                    .Setup(s => s.ValidateDataArchiveFile(zipFormFile))
+                    .ReturnsAsync(new Either<ActionResult, IDataArchiveFile>(archiveFile));
+
+                dataImportService
+                    .Setup(s => s.ImportZip(
+                        It.IsAny<Guid>(),
+                        It.Is<File>(file => file.Type == FileType.Data && file.Filename == dataFileName),
+                        It.Is<File>(file => file.Type == Metadata && file.Filename == metaFileName),
+                        It.Is<File>(file => file.Type == DataZip && file.Filename == zipFileName)))
+                    .ReturnsAsync(new DataImport());
+
+                blobStorageService.Setup(mock =>
+                    mock.UploadFile(PrivateReleaseFiles,
+                        It.Is<string>(path =>
+                            path.Contains(FilesPath(release.Id, DataZip))),
+                        zipFormFile
+                    )).Returns(Task.CompletedTask);
+
+                var service = SetupReleaseDataFileService(
+                    contentDbContext: contentDbContext,
+                    statisticsDbContext: statisticsDbContext,
+                    blobStorageService: blobStorageService.Object,
+                    dataImportService: dataImportService.Object,
+                    dataArchiveValidationService: dataArchiveValidationService.Object,
+                    fileUploadsValidatorService: fileUploadsValidatorService.Object
+                );
+
+                var result = await service.UploadAsZip(
+                    releaseId: release.Id,
+                    zipFormFile: zipFormFile,
+                    subjectName: subjectName);
+
+                var dataFileInfo = result.AssertRight();
+
+                MockUtils.VerifyAllMocks(blobStorageService,
+                    dataArchiveValidationService,
+                    fileUploadsValidatorService,
+                    dataImportService);
+
+                Assert.True(dataFileInfo.Id.HasValue);
+                Assert.Equal(dataFileName, dataFileInfo.FileName);
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var files = contentDbContext.Files.ToList();
+                Assert.Equal(7, files.Count);
+
+                Assert.Single(files.Where(f => f.Type == FileType.DataZip).ToList());
+
+
+                var dbDataReleaseFiles = contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Where(rf => rf.File.Type == FileType.Data)
+                    .ToList();
+                Assert.Equal(4, dbDataReleaseFiles.Count);
+
+                Assert.Equal(0, dbDataReleaseFiles[0].Order);
+                Assert.Equal(1, dbDataReleaseFiles[1].Order);
+                Assert.Equal(3, dbDataReleaseFiles[2].Order);
+                Assert.Equal(4, dbDataReleaseFiles[3].Order); // Highest Order of existing releaseFiles is 3 then + 1
+                Assert.Equal(subjectName, dbDataReleaseFiles[3].Name);
+
+
+                var dbMetaReleaseFiles = contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .Where(rf => rf.File.Type == FileType.Metadata)
+                    .ToList();
+                var dbMetaReleaseFile = Assert.Single(dbMetaReleaseFiles);
+
+                Assert.Equal(metaFileName, dbMetaReleaseFile.File.Filename);
+                Assert.Equal(0, dbMetaReleaseFile.Order); // Files that aren't FileType.Data have Order set to 0
+            }
+        }
+
+        [Fact]
         public async Task UploadAsZip_Replacing()
         {
             const string dataFileName = "test-data.csv";
@@ -1971,7 +2562,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(_user.Email, result.UserName);
                 Assert.Null(result.Rows);
                 Assert.Equal("1 Mb", result.Size);
-                Assert.InRange(DateTime.UtcNow.Subtract(result.Created.Value).Milliseconds, 0, 1500);
+                Assert.InRange(DateTime.UtcNow.Subtract(result.Created!.Value).Milliseconds, 0, 1500);
                 Assert.Equal(QUEUED, result.Status);
             }
 
@@ -1992,7 +2583,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         && rs.ReleaseId == release.Id);
                 Assert.Contains(releaseSubjects,
                     rs =>
-                        rs.SubjectId == replacementSubject.Id
+                        rs.SubjectId == replacementSubject!.Id
                         && rs.ReleaseId == release.Id);
             }
 
@@ -2059,7 +2650,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             dataArchiveFile
                 .SetupGet(f => f.MetaFileName)
                 .Returns(metaFileName);
-            
+
             dataArchiveFile
                 .SetupGet(f => f.MetaFileSize)
                 .Returns(1024);

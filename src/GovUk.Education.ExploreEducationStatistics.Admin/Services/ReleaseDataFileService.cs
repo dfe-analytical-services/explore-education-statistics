@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Models;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -17,6 +18,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interf
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
+using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using Release = GovUk.Education.ExploreEducationStatistics.Content.Model.Release;
@@ -81,7 +84,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(async release => await _userService.CheckCanUpdateRelease(release, ignoreCheck: forceDelete))
-                .OnSuccess(async release =>
+                .OnSuccess(async _ =>
                     await ids.Select(id => _releaseFileRepository.CheckFileExists(releaseId, id, FileType.Data))
                         .OnSuccessAll())
                 .OnSuccessVoid(async files =>
@@ -170,9 +173,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var files = await _releaseFileRepository.GetByFileType(releaseId, FileType.Data);
 
                     // Exclude files that are replacements in progress
-                    var filesExcludingReplacements = files.Where(file => !file.File.ReplacingId.HasValue).ToList();
+                    var filesExcludingReplacements = files
+                        .Where(releaseFile => !releaseFile.File.ReplacingId.HasValue)
+                        .OrderBy(releaseFile => releaseFile.Order)
+                        .ThenBy(releaseFile => releaseFile.Name) // For subjects existing before ordering was added
+                        .ToList();
 
                     return await BuildDataFileViewModels(filesExcludingReplacements);
+                });
+        }
+
+        public async Task<Either<ActionResult, List<DataFileInfo>>> ReorderDataFiles(
+            Guid releaseId,
+            List<Guid> fileIds)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Release>(releaseId)
+                .OnSuccess(release => _userService.CheckCanUpdateRelease(release))
+                .OnSuccess(async _ =>
+                {
+                    if (fileIds.Distinct().Count() != fileIds.Count)
+                    {
+                        return ValidationActionResult(FileIdsShouldBeDistinct);
+                    }
+
+                    var releaseFiles = await _contentDbContext.ReleaseFiles
+                        .Include(releaseFile => releaseFile.File)
+                        .Where(releaseFile =>
+                            releaseFile.File.Type == FileType.Data
+                            && releaseFile.ReleaseId == releaseId
+                            && !releaseFile.File.ReplacingId.HasValue)
+                        .ToDictionaryAsync(releaseFile => releaseFile.File.Id);
+
+                    if (releaseFiles.Count != fileIds.Count)
+                    {
+                        return ValidationActionResult(IncorrectNumberOfFileIds);
+                    }
+
+                    fileIds.ForEach((fileId, order) =>
+                    {
+                        if (!releaseFiles.TryGetValue(fileId, out var matchingReleaseFile))
+                        {
+                            throw new ArgumentException(
+                                $"fileId {fileId} not found in db as non-replacement related data file attached to the release {releaseId}");
+                        }
+
+                        matchingReleaseFile.Order = order;
+                        _contentDbContext.Update(matchingReleaseFile);
+
+                        if (matchingReleaseFile.File.ReplacedById != null)
+                        {
+                            var replacingReleaseFile = _contentDbContext.ReleaseFiles
+                                .Single(releaseFile => releaseFile.FileId == matchingReleaseFile.File.ReplacedById);
+                            replacingReleaseFile.Order = order;
+                            _contentDbContext.Update(replacingReleaseFile);
+                        }
+                    });
+
+                    await _contentDbContext.SaveChangesAsync();
+
+                    return await ListAll(releaseId);
                 });
         }
 
@@ -185,14 +245,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .OnSuccess(async _ =>
                 {
                     return await _persistenceHelper
                         .CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccessDo(replacingFile =>
                             _fileUploadsValidatorService.ValidateDataFilesForUpload(releaseId, dataFormFile,
                                 metaFormFile, replacingFile))
-                        // First, create with status uploading to prevent other users uploading the same datafile
                         .OnSuccessCombineWith(replacingFile =>
                             ValidateSubjectName(releaseId, subjectName, replacingFile))
                         .OnSuccess(async replacingFileAndSubjectName =>
@@ -203,6 +262,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 await _releaseRepository
                                     .CreateStatisticsDbReleaseAndSubjectHierarchy(releaseId);
 
+                            var releaseDataFileOrder = await GetNextDataFileOrder(replacingFile, releaseId);
+
                             var dataFile = await _releaseDataFileRepository.Create(
                                 releaseId: releaseId,
                                 subjectId: subjectId,
@@ -211,7 +272,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 type: FileType.Data,
                                 createdById: _userService.GetUserId(),
                                 name: validSubjectName,
-                                replacingFile: replacingFile);
+                                replacingFile: replacingFile,
+                                order: releaseDataFileOrder);
 
                             var metaFile = await _releaseDataFileRepository.Create(
                                 releaseId: releaseId,
@@ -249,7 +311,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId)
                 .OnSuccess(_userService.CheckCanUpdateRelease)
-                .OnSuccess(async release =>
+                .OnSuccess(async _ =>
                 {
                     return await _persistenceHelper.CheckOptionalEntityExists<File>(replacingFileId)
                         .OnSuccess(async replacingFile =>
@@ -273,6 +335,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         releaseId: releaseId,
                                                         createdById: _userService.GetUserId());
 
+                                                    var releaseDataFileOrder = await GetNextDataFileOrder(replacingFile, releaseId);
+
                                                     var dataFile = await _releaseDataFileRepository.Create(
                                                         releaseId: releaseId,
                                                         subjectId: subjectId,
@@ -282,7 +346,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                                         createdById: _userService.GetUserId(),
                                                         name: validSubjectName,
                                                         replacingFile: replacingFile,
-                                                        source: zipFile);
+                                                        source: zipFile,
+                                                        order: releaseDataFileOrder);
 
                                                     var metaFile = await _releaseDataFileRepository.Create(
                                                         releaseId: releaseId,
@@ -392,27 +457,28 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             };
         }
 
-        private async Task<string> GetSubjectName(Guid releaseId, File file)
-        {
-            if (file.Type != FileType.Data)
-            {
-                throw new ArgumentException("file.Type should equal FileType.Data");
-            }
-
-            return (await _releaseFileRepository.Find(releaseId, file.Id))?.Name ?? "Unknown";
-        }
-
         private async Task<Either<ActionResult, string>> ValidateSubjectName(Guid releaseId,
-            string subjectName,
+            string? subjectName,
             File? replacingFile)
         {
-            if (replacingFile == null)
+            if (replacingFile != null)
             {
-                return await _fileUploadsValidatorService.ValidateSubjectName(releaseId, subjectName)
-                    .OnSuccess(async () => await Task.FromResult(subjectName));
+                if (replacingFile.Type != FileType.Data)
+                {
+                    throw new ArgumentException("replacingFile.Type should equal FileType.Data");
+                }
+
+                return (await _releaseFileRepository.Find(releaseId, replacingFile.Id))?.Name ?? "Unknown";
             }
 
-            return await GetSubjectName(releaseId, replacingFile);
+            if (subjectName == null)
+            {
+                throw new ArgumentException("Original subjects cannot have null subject name");
+            }
+
+            return await _fileUploadsValidatorService.ValidateSubjectName(releaseId, subjectName)
+                .OnSuccess(async () => await Task.FromResult(subjectName));
+
         }
 
         private async Task UploadFileToStorage(
@@ -440,6 +506,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private async Task DeleteBatchFiles(File dataFile)
         {
             await _blobStorageService.DeleteBlobs(PrivateReleaseFiles, dataFile.BatchesPath());
+        }
+
+        private async Task<int> GetNextDataFileOrder(File? replacingFile, Guid releaseId)
+        {
+            if (replacingFile != null)
+            {
+                var replacedReleaseDataFile = await _contentDbContext.ReleaseFiles
+                    .Include(rf => rf.File)
+                    .SingleAsync(rf =>
+                        rf.ReleaseId == releaseId
+                        && rf.File.Type == FileType.Data
+                        && rf.File.Id == replacingFile.Id);
+                return replacedReleaseDataFile.Order;
+            }
+
+            var maxOrder = await _contentDbContext.ReleaseFiles
+                .Include(releaseFile => releaseFile.File)
+                .Where(releaseFile => releaseFile.ReleaseId == releaseId
+                                      && releaseFile.File.Type == FileType.Data
+                                      && releaseFile.File.ReplacingId == null)
+                .MaxAsync(releaseFile => (int?)releaseFile.Order);
+
+            return maxOrder.HasValue ? maxOrder.Value + 1 : 0;
         }
     }
 }
