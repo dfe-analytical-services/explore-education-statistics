@@ -12,6 +12,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
   </legend>
   
   <button
+    aria-disabled="false"
     class="button noUnderline govuk-!-margin-bottom-4"
     id="test-all"
     type="button"
@@ -51,6 +52,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
           class="govuk-checkboxes govuk-checkboxes--small"
         >
           <button
+            aria-disabled="false"
             class="button noUnderline selectAll"
             id="test-options-1-all"
             type="button"
@@ -112,6 +114,7 @@ exports[`FormFieldCheckboxGroupsMenu renders multiple checkbox groups in correct
           class="govuk-checkboxes govuk-checkboxes--small"
         >
           <button
+            aria-disabled="false"
             class="button noUnderline selectAll"
             id="test-options-2-all"
             type="button"
@@ -193,6 +196,7 @@ exports[`FormFieldCheckboxGroupsMenu renders single checkbox group with search i
       class="govuk-checkboxes govuk-checkboxes--small"
     >
       <button
+        aria-disabled="false"
         class="button noUnderline selectAll"
         id="test-1-all"
         type="button"

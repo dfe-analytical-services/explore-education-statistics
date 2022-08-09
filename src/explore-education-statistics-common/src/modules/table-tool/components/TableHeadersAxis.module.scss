@@ -1,0 +1,35 @@
+@import '~govuk-frontend/govuk/base';
+@import '@common/styles/variables';
+
+.container {
+  background-color: govuk-colour('white');
+  border: 2px solid govuk-colour('mid-grey');
+  overflow-x: auto;
+  padding: govuk-spacing(2);
+  position: relative;
+  width: 100%;
+
+  + .container {
+    border-top: 0;
+  }
+
+  &.isDraggingActive {
+    background-color: $govuk-focus-colour;
+    border-color: govuk-colour('dark-grey');
+  }
+}
+
+.groupsContainer {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100%;
+
+  @include govuk-media-query($from: desktop) {
+    flex-direction: row;
+  }
+}
+
+.groupContainer {
+  padding: govuk-spacing(1);
+}

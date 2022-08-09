@@ -1,3 +1,4 @@
+import Button from '@common/components/Button';
 import Tag from '@common/components/Tag';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
 import useToggle from '@common/hooks/useToggle';
@@ -36,6 +37,9 @@ const TableToolFinalStep = ({
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
   const [hasTableError, toggleHasTableError] = useToggle(false);
+  const [showTableHeadersForm, toggleShowTableHeadersForm] = useToggle(false);
+
+  const tableHeadersFormId = 'tableHeaderForm';
 
   const { value: fullPublication } = useAsyncRetry(
     async () =>
@@ -70,21 +74,9 @@ const TableToolFinalStep = ({
       className="govuk-!-margin-bottom-4"
       data-testid="Table tool final step container"
     >
-      <TableHeadersForm
-        initialValues={tableHeaders}
-        onSubmit={nextTableHeaders => {
-          onReorderTableHeaders(nextTableHeaders);
-          if (dataTableRef.current) {
-            dataTableRef.current.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-          }
-        }}
-      />
       {table && tableHeaders && (
         <>
-          <div className="govuk-!-margin-bottom-3">
+          <div className="govuk-!-margin-bottom-3 dfe-flex dfe-align-items-start dfe-justify-content--space-between">
             {selectedPublication.selectedRelease.latestData && (
               <Tag strong>This is the latest data</Tag>
             )}
@@ -110,7 +102,38 @@ const TableToolFinalStep = ({
                 </Link>
               </>
             )}
+
+            {!showTableHeadersForm && (
+              <Button
+                className="govuk-!-margin-bottom-0"
+                ariaControls={tableHeadersFormId}
+                ariaExpanded={showTableHeadersForm}
+                onClick={toggleShowTableHeadersForm}
+              >
+                Move and reorder table headers
+              </Button>
+            )}
           </div>
+
+          {showTableHeadersForm && (
+            <TableHeadersForm
+              id={tableHeadersFormId}
+              initialValues={tableHeaders}
+              onSubmit={nextTableHeaders => {
+                toggleShowTableHeadersForm.off();
+                onReorderTableHeaders(nextTableHeaders);
+                if (dataTableRef.current) {
+                  // add a short delay so the reordering form is closed before it scrolls.
+                  setTimeout(() => {
+                    dataTableRef?.current?.scrollIntoView({
+                      behavior: 'smooth',
+                      block: 'start',
+                    });
+                  }, 200);
+                }
+              }}
+            />
+          )}
 
           <TimePeriodDataTable
             ref={dataTableRef}

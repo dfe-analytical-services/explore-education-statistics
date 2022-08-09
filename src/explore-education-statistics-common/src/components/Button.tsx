@@ -11,7 +11,9 @@ import React, {
 import styles from './Button.module.scss';
 
 export interface ButtonProps {
+  ariaControls?: string;
   ariaDisabled?: boolean;
+  ariaExpanded?: boolean;
   children: ReactNode;
   className?: string;
   disabled?: boolean;
@@ -25,7 +27,9 @@ export interface ButtonProps {
 
 function Button(
   {
+    ariaControls,
     ariaDisabled,
+    ariaExpanded,
     children,
     className,
     disabled = false,
@@ -71,7 +75,9 @@ function Button(
 
   return (
     <button
+      aria-controls={ariaControls}
       aria-disabled={isDisabled}
+      aria-expanded={ariaExpanded}
       className={classNames(
         'govuk-button',
         {

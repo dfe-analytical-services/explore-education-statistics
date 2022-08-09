@@ -2,6 +2,8 @@ import Link from '@admin/components/Link';
 import { preReleaseContentRoute } from '@admin/routes/preReleaseRoutes';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
 import { BasicPublicationDetails } from '@admin/services/publicationService';
+import Button from '@common/components/Button';
+import useToggle from '@common/hooks/useToggle';
 import TableHeadersForm from '@common/modules/table-tool/components/TableHeadersForm';
 import TimePeriodDataTable from '@common/modules/table-tool/components/TimePeriodDataTable';
 import { FullTable } from '@common/modules/table-tool/types/fullTable';
@@ -30,21 +32,42 @@ const PreReleaseTableToolFinalStep = ({
   onReorderTableHeaders,
 }: TableToolFinalStepProps) => {
   const dataTableRef = useRef<HTMLElement>(null);
+  const [showTableHeadersForm, toggleShowTableHeadersForm] = useToggle(false);
+
+  const tableHeadersFormId = 'tableHeadersForm';
 
   return (
     <div className="govuk-!-margin-bottom-4">
-      <TableHeadersForm
-        initialValues={tableHeaders}
-        onSubmit={nextTableHeaders => {
-          onReorderTableHeaders(nextTableHeaders);
-          if (dataTableRef.current) {
-            dataTableRef.current.scrollIntoView({
-              behavior: 'smooth',
-              block: 'start',
-            });
-          }
-        }}
-      />
+      {!showTableHeadersForm ? (
+        <div className="govuk-!-margin-bottom-3 dfe-flex dfe-justify-content--flex-end ">
+          <Button
+            className="govuk-!-margin-bottom-0"
+            ariaControls={tableHeadersFormId}
+            ariaExpanded={showTableHeadersForm}
+            onClick={toggleShowTableHeadersForm}
+          >
+            Move and reorder table headers
+          </Button>
+        </div>
+      ) : (
+        <TableHeadersForm
+          id={tableHeadersFormId}
+          initialValues={tableHeaders}
+          onSubmit={nextTableHeaders => {
+            toggleShowTableHeadersForm.off();
+            onReorderTableHeaders(nextTableHeaders);
+            if (dataTableRef.current) {
+              // add a short delay so the reordering form is closed before it scrolls.
+              setTimeout(() => {
+                dataTableRef?.current?.scrollIntoView({
+                  behavior: 'smooth',
+                  block: 'start',
+                });
+              }, 200);
+            }
+          }}
+        />
+      )}
       {table && tableHeaders && (
         <TimePeriodDataTable
           ref={dataTableRef}

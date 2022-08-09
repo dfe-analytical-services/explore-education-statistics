@@ -37,13 +37,9 @@ describe('TableToolFinalStep', () => {
     );
 
     // test the reordering controls for the table headers are present
-    const groups = screen.queryAllByRole('group');
-    expect(groups).toHaveLength(2);
-
-    const reorderTableHeadersGroup = groups[0];
     expect(
-      within(reorderTableHeadersGroup).queryByRole('button', {
-        name: 'Re-order table headers',
+      screen.getByRole('button', {
+        name: 'Move and reorder table headers',
       }),
     ).toBeInTheDocument();
 
@@ -111,7 +107,7 @@ describe('TableToolFinalStep', () => {
     });
   });
 
-  test('shows and hides table header re-ordering controls successfully', async () => {
+  test('shows and hides table header reordering controls successfully', async () => {
     publicationService.getLatestPublicationRelease.mockResolvedValue(
       testPublicationRelease,
     );
@@ -127,18 +123,20 @@ describe('TableToolFinalStep', () => {
     );
 
     const reorderRevealButton = screen.getByRole('button', {
-      name: 'Re-order table headers',
+      name: 'Move and reorder table headers',
     });
 
     expect(
-      screen.queryByRole('button', { name: 'Re-order table' }),
+      screen.queryByRole('button', { name: 'Update and view reordered table' }),
     ).not.toBeInTheDocument();
 
     userEvent.click(reorderRevealButton);
 
     await waitFor(() =>
       expect(
-        screen.queryByRole('button', { name: 'Re-order table' }),
+        screen.queryByRole('button', {
+          name: 'Update and view reordered table',
+        }),
       ).toBeInTheDocument(),
     );
   });

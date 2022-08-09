@@ -20,6 +20,7 @@
 
   &:disabled {
     cursor: not-allowed;
+    text-decoration: none;
   }
 }
 
@@ -29,4 +30,8 @@
 
 .warning {
   color: govuk-colour('red');
+}
+
+.disabled:hover {
+  color: govuk-colour('blue');
 }

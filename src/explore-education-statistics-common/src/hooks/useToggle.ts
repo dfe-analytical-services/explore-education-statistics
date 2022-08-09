@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 
-type Toggle = ((nextValue?: boolean | unknown) => void) & {
+export type Toggle = ((nextValue?: boolean | unknown) => void) & {
   off: () => void;
   on: () => void;
 };

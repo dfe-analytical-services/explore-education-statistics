@@ -1,0 +1,49 @@
+@import '~govuk-frontend/govuk/base';
+@import '@common/styles/variables';
+
+// .group is used by NotDraggableGroup as well.
+.group {
+  background: govuk-colour('light-grey');
+  border: 2px solid govuk-colour('mid-grey');
+  border-bottom: 0;
+  box-sizing: border-box;
+  display: block;
+  padding: govuk-spacing(2);
+  position: relative;
+
+  @include govuk-media-query($from: desktop) {
+    width: $dfe-table-header-group-width;
+  }
+
+  legend {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  &:focus-visible {
+    outline: $govuk-focus-colour solid $govuk-focus-width;
+  }
+
+  &:hover {
+    background: govuk-colour('light-grey');
+    // Fallback if grab is unsupported
+    cursor: move;
+    cursor: grab;
+  }
+
+  &.isDragging {
+    background: govuk-colour('white');
+    border-color: transparent;
+    outline: $govuk-focus-width solid govuk-colour('blue');
+  }
+
+  &.isDraggingActive {
+    border-bottom: 2px solid govuk-colour('mid-grey');
+  }
+
+  &.isDraggedOutside {
+    opacity: 0.4;
+    outline: none;
+  }
+}

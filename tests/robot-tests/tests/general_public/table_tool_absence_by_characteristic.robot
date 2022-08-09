@@ -124,25 +124,31 @@ Validate Gender female Unauthorised absence rate row
     user checks row cell contains text    ${row}    4    1.1%
 
 Reorder Gender to be column group
-    user opens details dropdown    Re-order table headers
+    user clicks button    Move and reorder table headers
     # Column group needs to be inside the viewport
-    user scrolls to element    xpath://button[text()="Re-order table"]
-    user sets focus to element    xpath://legend[text()="Row group 1"]/../../..
+    user scrolls to element    xpath://button[text()="Update and view reordered table"]
+    user clicks button    Move    testId:rowGroups-0
+
+Move Gender to be first column group
+    # The /.. to get to a focusable element
+    user sets focus to element    xpath://h4[text()="Characteristic"]/..
     user presses keys    ${SPACE}
-    user presses keys    ARROW_DOWN
     user presses keys    ARROW_LEFT
     user presses keys    ${SPACE}
 
-Reorder Gender male to be second
+Reorder Gender male to be first 
+    user clicks button    Reorder    testId:columnGroups-0
     # The /../.. to get to a focusable element
-    user sets focus to element    xpath://strong[text()="Gender male"]/../..
+    user sets focus to element    xpath://*[text()="Gender male"]/../..    testId:columnGroups-0
     user presses keys    ${SPACE}
-    user presses keys    ARROW_DOWN
+    user presses keys    ARROW_UP
     user presses keys    ${SPACE}
+    user clicks button    Done
 
 Reorder Authorised absence rate to be last
+    user clicks button    Reorder    testId:rowGroups-0
     # The /../.. to get to a focusable element
-    user sets focus to element    xpath://strong[text()="Authorised absence rate"]/../..
+    user sets focus to element    xpath://*[text()="Authorised absence rate"]/../..    testId:rowGroups-0
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
@@ -151,27 +157,31 @@ Reorder Authorised absence rate to be last
 
 Reorder Overall absence rate to be first
     # The /../.. to get to a focusable element
-    user sets focus to element    xpath://strong[text()="Overall absence rate"]/../..
+    user sets focus to element    xpath://*[text()="Overall absence rate"]/../..    testId:rowGroups-0
     user presses keys    ${SPACE}
     user presses keys    ${SPACE}
     user presses keys    ARROW_UP
     user presses keys    ARROW_UP    # Twice to ensure
     user presses keys    ${SPACE}
+    user clicks button    Done
 
 Reorder 2012/13 to be last
-    user sets focus to element    xpath://strong[text()="2012/13"]/../..    # The /../.. to get to a focusable element
+    user clicks button    Reorder    testId:columnGroups-1
+    # The /../.. to get to a focusable element
+    user sets focus to element    xpath://*[text()="2012/13"]/../..    testId:columnGroups-1
     user presses keys    ${SPACE}
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
     user presses keys    ARROW_DOWN
     user presses keys    ${SPACE}
+    user clicks button    Done
 
-Click Re-order table button
-    user clicks element    xpath://button[text()="Re-order table"]
+Click Update and view reordered table button
+    user clicks button    Update and view reordered table
 
 Validate results table column headings after reordering
-    user checks table column heading contains    1    1    Gender female
-    user checks table column heading contains    1    2    Gender male
+    user checks table column heading contains    1    1    Gender male
+    user checks table column heading contains    1    2    Gender female
     user checks table column heading contains    2    1    2013/14
     user checks table column heading contains    2    2    2014/15
     user checks table column heading contains    2    3    2015/16
@@ -190,12 +200,12 @@ Validate rows after reordering
     # Overall absence rate
     user checks results table cell contains    1    1    4.5%
     user checks results table cell contains    1    2    4.6%
-    user checks results table cell contains    1    3    4.5%
-    user checks results table cell contains    1    4    5.3%
+    user checks results table cell contains    1    3    4.6%
+    user checks results table cell contains    1    4    5.2%
     user checks results table cell contains    1    5    4.5%
     user checks results table cell contains    1    6    4.6%
-    user checks results table cell contains    1    7    4.6%
-    user checks results table cell contains    1    8    5.2%
+    user checks results table cell contains    1    7    4.5%
+    user checks results table cell contains    1    8    5.3%
 
     # Unauthorised absence rate
     user checks results table cell contains    2    1    1.1%
@@ -208,13 +218,13 @@ Validate rows after reordering
     user checks results table cell contains    2    8    1.1%
 
     # Authorised absence rate
-    user checks results table cell contains    3    1    3.5%
-    user checks results table cell contains    3    2    3.5%
-    user checks results table cell contains    3    3    3.4%
+    user checks results table cell contains    3    1    3.4%
+    user checks results table cell contains    3    2    3.6%
+    user checks results table cell contains    3    3    3.5%
     user checks results table cell contains    3    4    4.2%
-    user checks results table cell contains    3    5    3.4%
-    user checks results table cell contains    3    6    3.6%
-    user checks results table cell contains    3    7    3.5%
+    user checks results table cell contains    3    5    3.5%
+    user checks results table cell contains    3    6    3.5%
+    user checks results table cell contains    3    7    3.4%
     user checks results table cell contains    3    8    4.2%
 
 User generates a permanent link
@@ -229,8 +239,8 @@ User validates permanent link works correctly
     user waits until h1 is visible    'Absence by characteristic' from 'Pupil absence in schools in England'
 
 User validates permalink table
-    user checks table column heading contains    1    1    Gender female
-    user checks table column heading contains    1    2    Gender male
+    user checks table column heading contains    1    1    Gender male
+    user checks table column heading contains    1    2    Gender female
     user checks table column heading contains    2    1    2013/14
     user checks table column heading contains    2    2    2014/15
     user checks table column heading contains    2    3    2015/16
@@ -247,12 +257,12 @@ User validates permalink table
     # Overall absence rate
     user checks results table cell contains    1    1    4.5%
     user checks results table cell contains    1    2    4.6%
-    user checks results table cell contains    1    3    4.5%
-    user checks results table cell contains    1    4    5.3%
+    user checks results table cell contains    1    3    4.6%
+    user checks results table cell contains    1    4    5.2%
     user checks results table cell contains    1    5    4.5%
     user checks results table cell contains    1    6    4.6%
-    user checks results table cell contains    1    7    4.6%
-    user checks results table cell contains    1    8    5.2%
+    user checks results table cell contains    1    7    4.5%
+    user checks results table cell contains    1    8    5.3%
 
     # Unauthorised absence rate
     user checks results table cell contains    2    1    1.1%
@@ -265,11 +275,11 @@ User validates permalink table
     user checks results table cell contains    2    8    1.1%
 
     # Authorised absence rate
-    user checks results table cell contains    3    1    3.5%
-    user checks results table cell contains    3    2    3.5%
-    user checks results table cell contains    3    3    3.4%
+    user checks results table cell contains    3    1    3.4%
+    user checks results table cell contains    3    2    3.6%
+    user checks results table cell contains    3    3    3.5%
     user checks results table cell contains    3    4    4.2%
-    user checks results table cell contains    3    5    3.4%
-    user checks results table cell contains    3    6    3.6%
-    user checks results table cell contains    3    7    3.5%
+    user checks results table cell contains    3    5    3.5%
+    user checks results table cell contains    3    6    3.5%
+    user checks results table cell contains    3    7    3.4%
     user checks results table cell contains    3    8    4.2%
