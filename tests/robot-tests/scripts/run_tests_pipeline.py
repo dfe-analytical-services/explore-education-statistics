@@ -23,6 +23,9 @@ def run_tests_pipeline():
     # subprocess.check_call(["python3", "-m", "pip install --upgrade pip"])
     # subprocess.check_call(["pip install", "pipenv"])
     # subprocess.check_call(["pipenv", "install"])
+    subprocess.run('python -m pip install --upgrade pip', shell=True)
+    subprocess.run('pip install pipenv', shell=True)
+    subprocess.run('pipenv install', shell=True)
 
     # utility to not send slack test report if snapshot tests are being run
     def should_send_test_reports() -> bool:
