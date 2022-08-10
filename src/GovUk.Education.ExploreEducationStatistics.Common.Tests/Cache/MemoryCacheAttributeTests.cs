@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
-using Microsoft.Extensions.Configuration;
 using Moq;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
@@ -31,8 +30,7 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     public void Dispose()
     {
         MemoryCacheAttribute.ClearServices();
-        MemoryCacheAttribute.SetConfiguration(null);
-
+        MemoryCacheAttribute.SetOverrideConfiguration(null);
         _memoryCacheService.Reset();
     }
 
@@ -67,18 +65,6 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
             return new();
         }
 
-        [MemoryCache(typeof(TestMemoryCacheKey), cacheConfigKey: "SpecificCacheConfigurationKey")]
-        public static TestValue SpecificCacheConfigurationKey(string param1)
-        {
-            return new();
-        }
-
-        [MemoryCache(typeof(TestMemoryCacheKey), cacheConfigKey: "UnspecifiedCacheConfigurationKey")]
-        public static TestValue UnspecifiedCacheConfigurationKey(string param1)
-        {
-            return new();
-        }
-            
         [MemoryCache(typeof(TestMemoryCacheKey), durationInSeconds: 135)]
         public static TestValue DefaultCacheConfig(string param1)
         {
@@ -199,16 +185,13 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     }
 
     [Fact]
-    public void SpecificCacheConfigurationKey()
+    public void OverrideDurationInSecondsAndExpirySchedule()
     {
-        var configuration = new Mock<IConfigurationSection>(MockBehavior.Strict);
-        var specificCacheConfiguration = CreateMockConfigurationSection(
-            TupleOf("DurationInSeconds", "35"),
+        var configuration = CreateMockConfigurationSection(
+            TupleOf("DurationInSeconds", "456"),
             TupleOf("ExpirySchedule", HalfHourlyExpirySchedule));
-        configuration
-            .Setup(s => s.GetSection("SpecificCacheConfigurationKey"))
-            .Returns(specificCacheConfiguration.Object);
-        MemoryCacheAttribute.SetConfiguration(configuration.Object);
+        
+        MemoryCacheAttribute.SetOverrideConfiguration(configuration.Object);
         
         var cacheKey = new TestMemoryCacheKey("test");
 
@@ -218,14 +201,16 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
 
         var args = new List<object>();
 
-        // We expect the cache configuration to be read from the ConfigurationSection.
-        var expectedCacheConfiguration = new MemoryCacheConfiguration(35, CronExpression.Parse(HalfHourlyExpirySchedule));
+        // We expect the override cache configuration to be read from the ConfigurationSection - the DurationInSeconds
+        // and the ExpirySchedule are different from those on the `TestMethods.SingleParam` method's cache attribute
+        // itself, so we know they've both been overridden.
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(456, CronExpression.Parse(HalfHourlyExpirySchedule));
             
         _memoryCacheService
             .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedCacheConfiguration, null))
             .Returns(Task.CompletedTask);
 
-        var result = TestMethods.SpecificCacheConfigurationKey("test");
+        var result = TestMethods.SingleParam("test");
 
         VerifyAllMocks(_memoryCacheService);
 
@@ -234,76 +219,37 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     }
 
     [Fact]
-    public void SpecificCacheConfigurationKey_DurationInSecondsMissing()
+    public void OverrideConfigSectionSpecifiedButNoValues()
     {
-        var configuration = new Mock<IConfigurationSection>(MockBehavior.Strict);
-        var specificCacheConfiguration = CreateMockConfigurationSection(
-            TupleOf("DurationInSeconds", (string) null));
-        configuration
-            .Setup(s => s.GetSection("SpecificCacheConfigurationKey"))
-            .Returns(specificCacheConfiguration.Object);
-        MemoryCacheAttribute.SetConfiguration(configuration.Object);
-        
-        var cacheKey = new TestMemoryCacheKey("test");
-
-        _memoryCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .ReturnsAsync(null);
-
-        var exception = Assert.Throws<ArgumentException>(() => TestMethods.SpecificCacheConfigurationKey("test"));
-        Assert.Equal("A value for configuration MemoryCache.Configurations.DurationInSeconds " +
-                     "must be specified", exception.Message);
-    }
-
-    [Fact]
-    public void SpecificCacheConfigurationKey_ExpiryScheduleMissing()
-    {
-        var configuration = new Mock<IConfigurationSection>(MockBehavior.Strict);
-        var specificCacheConfiguration = CreateMockConfigurationSection(
-            TupleOf("DurationInSeconds", "35"),
+        var configuration = CreateMockConfigurationSection(
+            TupleOf("DurationInSeconds", (string) null),
             TupleOf("ExpirySchedule", (string) null));
-        configuration
-            .Setup(s => s.GetSection("SpecificCacheConfigurationKey"))
-            .Returns(specificCacheConfiguration.Object);
-        MemoryCacheAttribute.SetConfiguration(configuration.Object);
+        
+        MemoryCacheAttribute.SetOverrideConfiguration(configuration.Object);
         
         var cacheKey = new TestMemoryCacheKey("test");
-        
+
         _memoryCacheService
             .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
             .ReturnsAsync(null);
 
         var args = new List<object>();
 
-        // We expect the cache configuration to be read from the ConfigurationSection with no ExpirySchedule.
-        var expectedCacheConfiguration = new MemoryCacheConfiguration(35);
+        // We expect the override cache configuration to be read from the ConfigurationSection, but as no non-null
+        // values have been specified for either override parameter, then the `TestMethods.SingleParam` cache
+        // attribute's config values should still be used.
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CronExpression.Parse(HourlyExpirySchedule));
             
         _memoryCacheService
             .Setup(s => s.SetItem(cacheKey, Capture.In(args), expectedCacheConfiguration, null))
             .Returns(Task.CompletedTask);
 
-        var result = TestMethods.SpecificCacheConfigurationKey("test");
+        var result = TestMethods.SingleParam("test");
 
         VerifyAllMocks(_memoryCacheService);
 
         Assert.IsType<TestValue>(result);
         Assert.Equal(args[0], result);
-    }
-
-    [Fact]
-    public void UnspecifiedCacheConfigurationKey()
-    {
-        MemoryCacheAttribute.SetConfiguration(Mock.Of<IConfigurationSection>());
-        
-        var cacheKey = new TestMemoryCacheKey("test");
-
-        _memoryCacheService
-            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
-            .ReturnsAsync(null);
-
-        var exception = Assert.Throws<ArgumentException>(() => TestMethods.UnspecifiedCacheConfigurationKey("test"));
-        Assert.Equal("Could not find MemoryCache.Configurations entry with key " +
-                     "UnspecifiedCacheConfigurationKey", exception.Message);
     }
 
     [Fact]

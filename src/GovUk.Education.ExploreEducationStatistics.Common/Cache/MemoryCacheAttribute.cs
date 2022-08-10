@@ -22,7 +22,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         /// </summary>
         private static Dictionary<string, IMemoryCacheService> Services { get; set; } = new();
 
-        private static IConfigurationSection? _configuration;
+        private static int? OverrideDurationInSeconds;
+        
+        private static CronExpression? OverrideExpirySchedule;
 
         protected override Type BaseKey => typeof(IMemoryCacheKey);
         
@@ -42,40 +44,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             string? expiryScheduleCron = null
             ) : base(key)
         {
-            DurationInSeconds = durationInSeconds;
-            ExpirySchedule = expiryScheduleCron != null ? CronExpression.Parse(expiryScheduleCron) : null;
-        }
-
-        public MemoryCacheAttribute(Type key, string cacheConfigKey) : base(key)
-        {
-            if (_configuration == null)
-            {
-                return;
-            }
-            
-            var cacheConfiguration = _configuration.GetSection(cacheConfigKey);
-
-            if (cacheConfiguration == null)
-            {
-                throw new ArgumentException($"Could not find MemoryCache.Configurations entry with key {cacheConfigKey}");
-            }
-            
-            var cacheDuration = cacheConfiguration.GetValue("DurationInSeconds", 0);
-
-            if (0 == cacheDuration)
-            {
-                throw new ArgumentException("A value for configuration " +
-                                            "MemoryCache.Configurations.DurationInSeconds must be specified");
-            }
-
-            DurationInSeconds = cacheDuration;
-
-            var expirySchedule = cacheConfiguration.GetValue<string>("ExpirySchedule", "");
-
-            if ("" != expirySchedule)
-            {
-                ExpirySchedule = CronExpression.Parse(expirySchedule);
-            }
+            DurationInSeconds = OverrideDurationInSeconds ?? durationInSeconds;
+            ExpirySchedule = OverrideExpirySchedule ?? (
+                expiryScheduleCron != null ? CronExpression.Parse(expiryScheduleCron) : null);
         }
 
         public static void AddService(string name, IMemoryCacheService service)
@@ -92,9 +63,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             Services.Clear();
         }
 
-        public static void SetConfiguration(IConfigurationSection? configurationSection)
+        public static void SetOverrideConfiguration(IConfigurationSection? configurationSection)
         {
-            _configuration = configurationSection;
+            OverrideDurationInSeconds = configurationSection?.GetValue<int?>("DurationInSeconds");
+
+            var overrideExpirySchedule = configurationSection?.GetValue<string?>("ExpirySchedule");
+
+            OverrideExpirySchedule = overrideExpirySchedule != null 
+                ? CronExpression.Parse(overrideExpirySchedule) : null;
         }
 
         public override async Task<object?> Get(ICacheKey cacheKey, Type returnType)

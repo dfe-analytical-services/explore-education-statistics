@@ -21,9 +21,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             return new HashSet<T>(objects);
         }
 
-        public static Tuple<T1, T2> TupleOf<T1, T2>(T1 obj1, T2 obj2)
+        public static Tuple<T1, T2> TupleOf<T1, T2>(T1 obj1, T2? obj2)
         {
-            return new Tuple<T1, T2>(obj1, obj2);
+            return new Tuple<T1, T2>(obj1, obj2!);
         }
     }
 }

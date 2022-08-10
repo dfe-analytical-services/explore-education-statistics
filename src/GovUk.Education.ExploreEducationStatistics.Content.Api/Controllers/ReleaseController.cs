@@ -15,6 +15,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class ReleaseController : ControllerBase
     {
+        private const string HalfHourlyExpirySchedule = "*/30 * * * *";
+
         private readonly IReleaseService _releaseService;
 
         public ReleaseController(IReleaseService releaseService)
@@ -29,7 +31,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        [MemoryCache(typeof(GetLatestReleaseCacheKey), cacheConfigKey: "GetLatestRelease")]
+        [MemoryCache(typeof(GetLatestReleaseCacheKey), durationInSeconds: 10, expiryScheduleCron: HalfHourlyExpirySchedule)]
         [HttpGet("publications/{publicationSlug}/releases/latest")]
         public async Task<ActionResult<ReleaseViewModel>> GetLatestRelease(string publicationSlug)
         {
@@ -44,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 .HandleFailuresOrOk();
         }
 
-        [MemoryCache(typeof(GetReleaseCacheKey), cacheConfigKey: "GetRelease")]
+        [MemoryCache(typeof(GetReleaseCacheKey), durationInSeconds: 15, expiryScheduleCron: HalfHourlyExpirySchedule)]
         [HttpGet("publications/{publicationSlug}/releases/{releaseSlug}")]
         public async Task<ActionResult<ReleaseViewModel>> GetRelease(string publicationSlug, string releaseSlug)
         {

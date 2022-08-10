@@ -187,7 +187,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api
             var memoryCacheConfig = Configuration.GetSection("MemoryCache");
             if (memoryCacheConfig.GetValue("Enabled", false))
             {
-                MemoryCacheAttribute.SetConfiguration(memoryCacheConfig.GetSection("Configurations"));
+                MemoryCacheAttribute.SetOverrideConfiguration(memoryCacheConfig.GetSection("Overrides"));
                 MemoryCacheAttribute.AddService("default", app.ApplicationServices.GetService<IMemoryCacheService>()!);
             }
 

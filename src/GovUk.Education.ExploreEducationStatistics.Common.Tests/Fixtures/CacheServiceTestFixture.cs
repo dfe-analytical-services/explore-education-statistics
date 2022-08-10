@@ -26,7 +26,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures
             CacheAspect.Enabled = true;
             BlobCacheAttribute.AddService("default", BlobCacheService.Object);
             MemoryCacheAttribute.AddService("default", MemoryCacheService.Object);
-            MemoryCacheAttribute.SetConfiguration(MemoryCacheConfig.Object);
         }
 
         public void Dispose()
