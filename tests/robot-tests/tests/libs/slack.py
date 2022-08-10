@@ -75,6 +75,14 @@ def send_slack_report(env: str, suite: str):
     assert webhook_url, print("SLACK_TEST_REPORT_WEBHOOK_URL env variable needs to be set")
     assert slack_bot_token, print("SLACK_BOT_TOKEN env variable needs to be set")
 
+    if 'hooks.slack.com' not in webhook_url:
+        raise Exception(
+            f"Invalid slack webhook URL provided: {webhook_url}. Valid URL: https://hooks.slack.com/services/... (https://api.slack.com/messaging/webhooks)")
+
+    if 'xoxb-' not in slack_bot_token:
+        raise Exception(
+            f"Invalid slack bot token provided: {slack_bot_token}. Valid token: xoxb-... (https://api.slack.com/authentication/token-types#bot)")
+
     response = requests.post(
         url=webhook_url,
         data=json.dumps({"attachments": attachments}), headers={'Content-Type': 'application/json'}
