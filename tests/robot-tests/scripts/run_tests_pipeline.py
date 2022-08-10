@@ -20,7 +20,7 @@ def run_tests_pipeline():
 
     print('Installing dependencies')
     subprocess.check_call(['google-chrome-stable', '--version'])
-    subprocess.check_call(["python -m", "pip install --upgrade pip"])
+    subprocess.check_call(["python", "pip install --upgrade pip"])
     subprocess.check_call(["pip install", "pipenv"])
     subprocess.check_call(["pipenv", "install"])
 
