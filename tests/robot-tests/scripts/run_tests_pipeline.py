@@ -5,6 +5,10 @@ import subprocess
 # stored in the CI pipeline as secret variables, which means they cannot be accessed as normal
 # environment variables, and instead must be passed as an argument to this script.
 
+# WARNING: If any of the passwords contain a "$", bash/Azure devops will not pass the variable to run_tests.py correctly.
+# Our current solution to this is to escape any dollars where the password is stored
+# i.e. password "hello$world" should be stored as "hello\$world"
+
 
 def run_tests_pipeline():
     assert args.admin_password, "Provide an admin password with an '--admin-pass PASS' argument"
@@ -20,9 +24,6 @@ def run_tests_pipeline():
 
     print('Installing dependencies')
     subprocess.check_call(['google-chrome-stable', '--version'])
-    # subprocess.check_call(["python3", "-m", "pip install --upgrade pip"])
-    # subprocess.check_call(["pip install", "pipenv"])
-    # subprocess.check_call(["pipenv", "install"])
     subprocess.run('python -m pip install --upgrade pip', shell=True)
     subprocess.run('pip install pipenv', shell=True)
     subprocess.run('pipenv install', shell=True)
@@ -31,7 +32,7 @@ def run_tests_pipeline():
     def should_send_test_reports() -> bool:
         return args.file != 'tests/general_public/check_snapshots.robot'
 
-    command = f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes 4 {'--enable-slack' if should_send_test_reports() else None}"
+    command = f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes 3 {'--enable-slack' if should_send_test_reports() else None}"
 
     subprocess.run(command, shell=True)
 
