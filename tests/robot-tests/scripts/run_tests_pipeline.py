@@ -31,7 +31,7 @@ def run_tests_pipeline():
     def should_send_test_reports() -> bool:
         return args.file != 'tests/general_public/check_snapshots.robot'
 
-    command = f"cd .. && pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes 4 {'--enable-slack' if should_send_test_reports() else None}"
+    command = f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes 4 {'--enable-slack' if should_send_test_reports() else None}"
 
     subprocess.run(command, shell=True)
 
