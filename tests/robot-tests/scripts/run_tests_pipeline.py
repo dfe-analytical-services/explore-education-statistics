@@ -24,9 +24,9 @@ def run_tests_pipeline():
 
     print('Installing dependencies')
     subprocess.check_call(['google-chrome-stable', '--version'])
-    subprocess.run('python -m pip install --upgrade pip', shell=True)
-    subprocess.run('pip install pipenv', shell=True)
-    subprocess.run('pipenv install', shell=True)
+    subprocess.check_call('python -m pip install --upgrade pip', shell=True)
+    subprocess.check_call('pip install pipenv', shell=True)
+    subprocess.check_call('pipenv install', shell=True)
 
     # utility to not send slack test report if snapshot tests are being run
     def should_send_test_reports() -> bool:
