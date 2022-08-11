@@ -132,9 +132,18 @@ const publicationService = {
     return client.get<MyPublication>(`/me/publication/${publicationId}`);
   },
 
-  getReleases(publicationId: string): Promise<ReleaseSummary[]> {
+  getReleases(
+    publicationId: string,
+    live: boolean | undefined = undefined,
+  ): Promise<ReleaseSummary[]> {
+    if (live === undefined) {
+      return client.get<ReleaseSummary[]>(
+        `/publication/${publicationId}/releases`,
+      );
+    }
     return client.get<ReleaseSummary[]>(
       `/publication/${publicationId}/releases`,
+      { params: { live } },
     );
   },
 

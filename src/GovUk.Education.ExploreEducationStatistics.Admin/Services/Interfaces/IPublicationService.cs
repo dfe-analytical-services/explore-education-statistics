@@ -28,7 +28,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId);
 
-        Task<Either<ActionResult, List<ReleaseViewModel>>> ListActiveReleases(Guid publicationId);
+        Task<Either<ActionResult, List<ReleaseViewModel>>> ListActiveReleases(Guid publicationId, bool? live = null);
         
         Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
             Guid publicationId, 

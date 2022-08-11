@@ -279,7 +279,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
         }
 
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListActiveReleases(Guid publicationId)
+        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListActiveReleases(Guid publicationId, bool? live = null)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, query => query
@@ -288,6 +288,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(_userService.CheckCanViewPublication)
                 .OnSuccess(publication =>
                     publication.ListActiveReleases()
+                        .Where(release => live == null || release.Live == live)
                         .OrderByDescending(r => r.Year)
                         .ThenByDescending(r => r.TimePeriodCoverage)
                         .Select(r => _mapper.Map<ReleaseViewModel>(r))

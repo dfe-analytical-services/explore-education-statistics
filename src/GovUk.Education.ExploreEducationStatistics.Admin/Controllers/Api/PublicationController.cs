@@ -63,10 +63,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 
         [HttpGet("api/publication/{publicationId}/releases")]
         public async Task<ActionResult<List<ReleaseViewModel>>> ListActiveReleases(
-            [Required] Guid publicationId)
+            [Required] Guid publicationId, [FromQuery] bool? live = null)
         {
             return await _publicationService
-                .ListActiveReleases(publicationId)
+                .ListActiveReleases(publicationId, live)
                 .HandleFailuresOrOk();
         }
 

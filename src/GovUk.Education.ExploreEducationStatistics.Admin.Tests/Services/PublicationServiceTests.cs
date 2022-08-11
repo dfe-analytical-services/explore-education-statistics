@@ -2437,6 +2437,138 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             }
         }
 
+        [Fact]
+        public async Task ListActiveReleases_live_true()
+        {
+            var release1Original = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+                Published = DateTime.UtcNow,
+            };
+            var release1Amendment = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+                PreviousVersion = release1Original,
+            };
+            var release2 = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2001",
+            };
+            var release3Original = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2002",
+                Published = DateTime.UtcNow,
+            };
+            var release3Amendment = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2002",
+                PreviousVersion = release3Original,
+                Published = DateTime.UtcNow,
+            };
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    release1Original,
+                    release1Amendment,
+                    release2,
+                    release3Original,
+                    release3Amendment,
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication, release1Original, release1Amendment);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                var result = await publicationService.ListActiveReleases(
+                    publication.Id, true);
+
+                var releases = result.AssertRight();
+
+                var release = Assert.Single(releases);
+                Assert.Equal(release3Amendment.Id, release.Id);
+            }
+        }
+
+        [Fact]
+        public async Task ListActiveReleases_live_false()
+        {
+            var release1Original = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+                Published = DateTime.UtcNow,
+            };
+            var release1Amendment = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+                PreviousVersion = release1Original,
+            };
+            var release2 = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2001",
+            };
+            var release3Original = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2002",
+                Published = DateTime.UtcNow,
+            };
+            var release3Amendment = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2002",
+                PreviousVersion = release3Original,
+                Published = DateTime.UtcNow,
+            };
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    release1Original,
+                    release1Amendment,
+                    release2,
+                    release3Original,
+                    release3Amendment,
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication, release1Original, release1Amendment);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                var result = await publicationService.ListActiveReleases(
+                    publication.Id, false);
+
+                var releases = result.AssertRight();
+                Assert.Equal(2, releases.Count);
+                Assert.Equal(release2.Id, releases[0].Id);
+                Assert.Equal(release1Amendment.Id, releases[1].Id);
+            }
+        }
+
         private static PublicationService BuildPublicationService(
             ContentDbContext context,
             IUserService? userService = null,
