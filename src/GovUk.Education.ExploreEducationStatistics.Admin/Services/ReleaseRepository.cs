@@ -53,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var userPublicationIds = await _contentDbContext
                 .UserPublicationRoles
                 .AsQueryable()
-                .Where(r => r.UserId == userId && r.Role == PublicationRole.Owner) // @MarkFix should include PublicationRole.ReleaseApprover?
+                .Where(r => r.UserId == userId)
                 .Select(r => r.PublicationId)
                 .ToListAsync();
             var userPublicationRoleReleaseIds = await _contentDbContext
