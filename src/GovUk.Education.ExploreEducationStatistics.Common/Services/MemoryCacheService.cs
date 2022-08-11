@@ -95,11 +95,11 @@ public class MemoryCacheService : IMemoryCacheService
             }
             else
             {
-                var nextExpiryTime = configuration.ExpirySchedule.GetNextOccurrence(now)!;
+                var nextExpiryTime = configuration.ExpirySchedule.GetNextOccurrence(now);
                 
-                absoluteExpiryTime = targetAbsoluteExpiryDateTime < nextExpiryTime.Value
+                absoluteExpiryTime = targetAbsoluteExpiryDateTime < nextExpiryTime
                     ? targetAbsoluteExpiryDateTime
-                    : nextExpiryTime.Value;
+                    : nextExpiryTime;
             }
 
             // Calculate an approximate size in bytes for this object. As there is no built-in mechanism

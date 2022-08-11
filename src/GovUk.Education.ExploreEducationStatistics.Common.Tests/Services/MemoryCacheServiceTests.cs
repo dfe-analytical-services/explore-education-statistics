@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
@@ -10,6 +9,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
 using Moq;
+using NCrontab;
 using Xunit;
 using static System.Globalization.DateTimeStyles;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -19,8 +19,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Services;
 
 public class MemoryCacheServiceTests
 {
-    private readonly CronExpression _hourlyExpirySchedule = CronExpression.Parse("0 * * * *");
-    private readonly CronExpression _halfHourlyExpirySchedule = CronExpression.Parse("*/30 * * * *");
+    private readonly CrontabSchedule _hourlyExpirySchedule = CrontabSchedule.Parse("0 * * * *");
+    private readonly CrontabSchedule _halfHourlyExpirySchedule = CrontabSchedule.Parse("*/30 * * * *");
 
     private record SampleClassSuperclass;
 

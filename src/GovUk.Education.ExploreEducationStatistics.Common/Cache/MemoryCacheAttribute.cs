@@ -3,11 +3,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
+using NCrontab;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 {
@@ -24,13 +24,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 
         private static int? OverrideDurationInSeconds;
         
-        private static CronExpression? OverrideExpirySchedule;
+        private static CrontabSchedule? OverrideExpirySchedule;
 
         protected override Type BaseKey => typeof(IMemoryCacheKey);
         
         private int DurationInSeconds { get; }
         
-        private CronExpression? ExpirySchedule { get; }
+        private CrontabSchedule? ExpirySchedule { get; }
 
         /// <summary>
         /// Specify a service to use <see cref="Services"/>.
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
         {
             DurationInSeconds = OverrideDurationInSeconds ?? durationInSeconds;
             ExpirySchedule = OverrideExpirySchedule ?? (
-                expiryScheduleCron != null ? CronExpression.Parse(expiryScheduleCron) : null);
+                expiryScheduleCron != null ? CrontabSchedule.Parse(expiryScheduleCron) : null);
         }
 
         public static void AddService(string name, IMemoryCacheService service)
@@ -70,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             var overrideExpirySchedule = configurationSection?.GetValue<string?>("ExpirySchedule");
 
             OverrideExpirySchedule = overrideExpirySchedule != null 
-                ? CronExpression.Parse(overrideExpirySchedule) : null;
+                ? CrontabSchedule.Parse(overrideExpirySchedule) : null;
         }
 
         public override async Task<object?> Get(ICacheKey cacheKey, Type returnType)

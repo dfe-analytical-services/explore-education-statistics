@@ -108,7 +108,7 @@ Validate public frontend shows changes made to legacy release after saving publi
     user clicks button    Confirm
     user waits until modal is not visible    Confirm publication changes
 
-    Sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
+    sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
     user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
 
     user opens details dropdown    See other releases (1)

@@ -1,7 +1,6 @@
 #nullable enable
 using System;
 using System.Threading.Tasks;
-using Cronos;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Fixtures;
@@ -11,6 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Moq;
+using NCrontab;
 using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
@@ -63,7 +63,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .ReturnsAsync(release);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
-            55, CronExpression.Parse(HourlyExpirySchedule));
+            55, CrontabSchedule.Parse(HourlyExpirySchedule));
         
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
@@ -123,7 +123,7 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .ReturnsAsync(release);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
-            45, CronExpression.Parse(HalfHourlyExpirySchedule));
+            45, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
         
         MemoryCacheService
             .Setup(s => s.SetItem<object>(

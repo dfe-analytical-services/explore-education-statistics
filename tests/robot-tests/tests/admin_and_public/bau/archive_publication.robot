@@ -281,7 +281,7 @@ Set archive-publication to be no longer be superseded
     # Otherwise gets to Find Stats page before cache is invalidated
     user waits until h1 is visible    Dashboard
 
-    Sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
+    sleep    %{WAIT_MEMORY_CACHE_EXPIRY}
 
 Check public Find stats page and check archive-publication is no longer archived
     user navigates to find statistics page on public frontend
