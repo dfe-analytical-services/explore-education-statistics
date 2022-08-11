@@ -28,20 +28,28 @@ describe('PreReleaseUserAccessForm', () => {
     render(<PreReleaseUserAccessForm releaseId="release-1" />);
 
     await waitFor(() => {
-      const rows = screen.getAllByRole('row');
-      expect(rows).toHaveLength(3);
-
-      const headerCells = within(rows[0]).getAllByRole('columnheader');
-      expect(headerCells[0]).toHaveTextContent('User email');
-
-      const row1Cells = within(rows[1]).getAllByRole('cell');
-
-      expect(row1Cells[0]).toHaveTextContent('test1@test.com');
-
-      const row2Cells = within(rows[2]).getAllByRole('cell');
-
-      expect(row2Cells[0]).toHaveTextContent('test2@test.com');
+      expect(
+        screen.getByText(
+          'These people will have access to a preview of the release 24 hours before the scheduled publish date.',
+        ),
+      ).toBeInTheDocument();
     });
+
+    expect(screen.getByRole('table')).toBeInTheDocument();
+
+    const rows = screen.getAllByRole('row');
+    expect(rows).toHaveLength(3);
+
+    const headerCells = within(rows[0]).getAllByRole('columnheader');
+    expect(headerCells[0]).toHaveTextContent('User email');
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+
+    expect(row1Cells[0]).toHaveTextContent('test1@test.com');
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+
+    expect(row2Cells[0]).toHaveTextContent('test2@test.com');
   });
 
   test('renders empty message when there are no users', async () => {
@@ -50,11 +58,12 @@ describe('PreReleaseUserAccessForm', () => {
     render(<PreReleaseUserAccessForm releaseId="release-1" />);
 
     await waitFor(() => {
-      expect(screen.queryByRole('table')).not.toBeInTheDocument();
       expect(
         screen.getByText('No pre-release users have been invited.'),
       ).toBeInTheDocument();
     });
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   test('renders correctly when the release is live', async () => {
@@ -90,11 +99,12 @@ describe('PreReleaseUserAccessForm', () => {
     render(<PreReleaseUserAccessForm releaseId="release-1" />);
 
     await waitFor(() => {
-      expect(screen.queryByRole('table')).not.toBeInTheDocument();
       expect(
         screen.getByText('Could not load pre-release users'),
       ).toBeInTheDocument();
     });
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   describe('inviting new users', () => {
@@ -523,11 +533,9 @@ describe('PreReleaseUserAccessForm', () => {
 
       const modal = within(screen.getByRole('dialog'));
 
-      await waitFor(() => {
-        expect(
-          modal.getByText('Email notifications will be sent immediately.'),
-        ).toBeInTheDocument();
-      });
+      expect(
+        modal.getByText('Email notifications will be sent immediately.'),
+      ).toBeInTheDocument();
     });
 
     test('accepting the confirmation modal adds newly invited users to list', async () => {
@@ -585,6 +593,7 @@ describe('PreReleaseUserAccessForm', () => {
       ).not.toBeInTheDocument();
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.getByRole('table')).toBeInTheDocument();
 
       const rows = screen.getAllByRole('row');
       expect(rows).toHaveLength(6);
@@ -613,8 +622,14 @@ describe('PreReleaseUserAccessForm', () => {
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
 
       await waitFor(() => {
-        expect(screen.getByRole('table')).toBeInTheDocument();
+        expect(
+          screen.getByText(
+            'These people will have access to a preview of the release 24 hours before the scheduled publish date.',
+          ),
+        ).toBeInTheDocument();
       });
+
+      expect(screen.getByRole('table')).toBeInTheDocument();
 
       let rows = screen.getAllByRole('row');
       expect(rows).toHaveLength(3);
@@ -622,13 +637,18 @@ describe('PreReleaseUserAccessForm', () => {
       userEvent.click(within(rows[2]).getByRole('button', { name: 'Remove' }));
 
       await waitFor(() => {
-        rows = screen.getAllByRole('row');
-        expect(rows).toHaveLength(2);
-
-        const row1Cells = within(rows[1]).getAllByRole('cell');
-
-        expect(row1Cells[0]).toHaveTextContent('test1@test.com');
+        expect(preReleaseUserService.removeUser).toHaveBeenCalledWith(
+          'release-1',
+          'test2@test.com',
+        );
       });
+
+      rows = screen.getAllByRole('row');
+      expect(rows).toHaveLength(2);
+
+      const row1Cells = within(rows[1]).getAllByRole('cell');
+
+      expect(row1Cells[0]).toHaveTextContent('test1@test.com');
     });
   });
 });
