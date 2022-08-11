@@ -239,7 +239,7 @@ describe('PreReleaseUserAccessForm', () => {
       });
     });
 
-    test('submitting form with no values shows validation messages', async () => {
+    test('submitting form with no values shows a validation error', async () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
@@ -261,7 +261,7 @@ describe('PreReleaseUserAccessForm', () => {
       });
     });
 
-    test('submitting form with invalid values shows validation messages', async () => {
+    test('submitting form with invalid values shows a validation error', async () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
@@ -288,7 +288,7 @@ describe('PreReleaseUserAccessForm', () => {
       });
     });
 
-    test('whitespace is trimmed and blank lines are filtered without causing validation errors', async () => {
+    test('whitespace is trimmed and blank lines are filtered without causing a validation error', async () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
@@ -313,6 +313,42 @@ describe('PreReleaseUserAccessForm', () => {
           'test1@test.com',
           'test2@test.com',
           'test3@test.com',
+        ]);
+      });
+    });
+
+    test('accepts a range of valid values without causing a validation error', async () => {
+      preReleaseUserService.getUsers.mockResolvedValue(testUsers);
+
+      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Invite new users by email'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.type(
+        screen.getByLabelText('Invite new users by email'),
+        "special_'%+-.characters@test.com{enter}" +
+          'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.com{enter}' +
+          'test@test.co.uk{enter}' +
+          'test@test.uk{enter}' +
+          'test@education.gov.uk',
+      );
+      userEvent.tab();
+
+      userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
+
+      await waitFor(() => {
+        expect(
+          preReleaseUserService.getInvitePlan,
+        ).toHaveBeenCalledWith('release-1', [
+          "special_'%+-.characters@test.com",
+          'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.com',
+          'test@test.co.uk',
+          'test@test.uk',
+          'test@education.gov.uk',
         ]);
       });
     });
