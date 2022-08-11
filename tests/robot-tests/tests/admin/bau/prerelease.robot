@@ -156,19 +156,21 @@ Go to prerelease access page
     user navigates to admin frontend    ${RELEASE_URL}/prerelease-access
     user waits until h2 is visible    Manage pre-release user access
 
-Validate the invite emails field is required
+Check the invite emails field is required
     user clicks button    Invite new users
     user waits until element contains    id:preReleaseUserAccessForm-emails-error
     ...    Enter 1 or more email addresses
 
-Validate the invite emails field only accepts @education.gov.uk email addresses
+Check the invite emails field is invalid for invalid email addresses
     ${emails}=    Catenate    SEPARATOR=\n
     ...    EES-test.ANALYST1@education.gov.uk
     ...    test@test.com
+    ...    invalid-1
+    ...    invalid-2
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     user waits until element contains    id:preReleaseUserAccessForm-emails-error
-    ...    Enter only @education.gov.uk email addresses
+    ...    'invalid-1' is not a valid email address
 
 Invite users to the prerelease
     ${emails}=    Catenate    SEPARATOR=\n
@@ -196,7 +198,7 @@ Refresh page and check prerelease user list isn't duplicated
     user checks table cell in offset row contains    1    0    1    ees-test.analyst1@education.gov.uk
     user checks table cell in offset row contains    2    0    1    simulate-delivered@notifications.service.gov.uk
 
-Validate the invite emails field is invalid for addresses that are all already invited or accepted
+Check the invite emails field is invalid for addresses that are all already invited or accepted
     ${emails}=    Catenate    SEPARATOR=\n
     ...    simulate-delivered@notifications.service.gov.uk
     ...    EES-test.ANALYST1@education.gov.uk

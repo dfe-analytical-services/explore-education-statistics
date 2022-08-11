@@ -15,10 +15,10 @@ jest.mock('@admin/services/preReleaseUserService');
 describe('PreReleaseUserAccessForm', () => {
   const testUsers: PreReleaseUser[] = [
     {
-      email: 'test1@education.gov.uk',
+      email: 'test1@test.com',
     },
     {
-      email: 'test2@education.gov.uk',
+      email: 'test2@test.com',
     },
   ];
 
@@ -28,20 +28,28 @@ describe('PreReleaseUserAccessForm', () => {
     render(<PreReleaseUserAccessForm releaseId="release-1" />);
 
     await waitFor(() => {
-      const rows = screen.getAllByRole('row');
-      expect(rows).toHaveLength(3);
-
-      const headerCells = within(rows[0]).getAllByRole('columnheader');
-      expect(headerCells[0]).toHaveTextContent('User email');
-
-      const row1Cells = within(rows[1]).getAllByRole('cell');
-
-      expect(row1Cells[0]).toHaveTextContent('test1@education.gov.uk');
-
-      const row2Cells = within(rows[2]).getAllByRole('cell');
-
-      expect(row2Cells[0]).toHaveTextContent('test2@education.gov.uk');
+      expect(
+        screen.getByText(
+          'These people will have access to a preview of the release 24 hours before the scheduled publish date.',
+        ),
+      ).toBeInTheDocument();
     });
+
+    expect(screen.getByRole('table')).toBeInTheDocument();
+
+    const rows = screen.getAllByRole('row');
+    expect(rows).toHaveLength(3);
+
+    const headerCells = within(rows[0]).getAllByRole('columnheader');
+    expect(headerCells[0]).toHaveTextContent('User email');
+
+    const row1Cells = within(rows[1]).getAllByRole('cell');
+
+    expect(row1Cells[0]).toHaveTextContent('test1@test.com');
+
+    const row2Cells = within(rows[2]).getAllByRole('cell');
+
+    expect(row2Cells[0]).toHaveTextContent('test2@test.com');
   });
 
   test('renders empty message when there are no users', async () => {
@@ -50,11 +58,12 @@ describe('PreReleaseUserAccessForm', () => {
     render(<PreReleaseUserAccessForm releaseId="release-1" />);
 
     await waitFor(() => {
-      expect(screen.queryByRole('table')).not.toBeInTheDocument();
       expect(
         screen.getByText('No pre-release users have been invited.'),
       ).toBeInTheDocument();
     });
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   test('renders correctly when the release is live', async () => {
@@ -90,11 +99,12 @@ describe('PreReleaseUserAccessForm', () => {
     render(<PreReleaseUserAccessForm releaseId="release-1" />);
 
     await waitFor(() => {
-      expect(screen.queryByRole('table')).not.toBeInTheDocument();
       expect(
         screen.getByText('Could not load pre-release users'),
       ).toBeInTheDocument();
     });
+
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   describe('inviting new users', () => {
@@ -134,10 +144,7 @@ describe('PreReleaseUserAccessForm', () => {
 
       const emailsTextarea = screen.getByLabelText('Invite new users by email');
       // type values up to but not exceeding the limit of lines
-      await userEvent.type(
-        emailsTextarea,
-        `test@education.gov.uk{enter}`.repeat(50),
-      );
+      await userEvent.type(emailsTextarea, `test@test.com{enter}`.repeat(50));
       userEvent.tab();
 
       await waitFor(() => {
@@ -149,7 +156,7 @@ describe('PreReleaseUserAccessForm', () => {
       });
 
       // now exceed the limit
-      await userEvent.type(emailsTextarea, `test@education.gov.uk`);
+      await userEvent.type(emailsTextarea, `test@test.com`);
       userEvent.tab();
 
       await waitFor(() => {
@@ -161,7 +168,7 @@ describe('PreReleaseUserAccessForm', () => {
       });
     });
 
-    test('shows validation message when emails contains badly formatted values', async () => {
+    test('shows validation message when emails contains invalid values', async () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
@@ -174,20 +181,20 @@ describe('PreReleaseUserAccessForm', () => {
 
       await userEvent.type(
         screen.getByLabelText('Invite new users by email'),
-        'test@education.gov.uk{enter}not a valid email',
+        'test@test.com{enter}invalid-1{enter}invalid-2',
       );
       userEvent.tab();
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enter only @education.gov.uk email addresses', {
+          screen.getByText("'invalid-1' is not a valid email address", {
             selector: '#preReleaseUserAccessForm-emails-error',
           }),
         ).toBeInTheDocument();
       });
     });
 
-    test('shows validation message when emails contains non @education.gov.uk values', async () => {
+    test('shows validation message when email has more than one @', async () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
@@ -200,20 +207,23 @@ describe('PreReleaseUserAccessForm', () => {
 
       await userEvent.type(
         screen.getByLabelText('Invite new users by email'),
-        'test@education.gov.uk{enter}email@example.com',
+        'test@test.com@test',
       );
       userEvent.tab();
 
       await waitFor(() => {
         expect(
-          screen.queryByText('Enter only @education.gov.uk email addresses', {
-            selector: '#preReleaseUserAccessForm-emails-error',
-          }),
+          screen.getByText(
+            "'test@test.com@test' is not a valid email address",
+            {
+              selector: '#preReleaseUserAccessForm-emails-error',
+            },
+          ),
         ).toBeInTheDocument();
       });
     });
 
-    test('shows validation message when email format has more than one @', async () => {
+    test('shows validation message when email has invalid domain', async () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
@@ -226,20 +236,20 @@ describe('PreReleaseUserAccessForm', () => {
 
       await userEvent.type(
         screen.getByLabelText('Invite new users by email'),
-        'test@education.gov.uk@test',
+        'test@test.',
       );
       userEvent.tab();
 
       await waitFor(() => {
         expect(
-          screen.getByText('Enter only @education.gov.uk email addresses', {
+          screen.getByText("'test@test.' is not a valid email address", {
             selector: '#preReleaseUserAccessForm-emails-error',
           }),
         ).toBeInTheDocument();
       });
     });
 
-    test('submitting form with invalid values shows validation messages', async () => {
+    test('submitting form with no values shows a validation error', async () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
@@ -261,7 +271,7 @@ describe('PreReleaseUserAccessForm', () => {
       });
     });
 
-    test('whitespace is trimmed and blank lines are filtered without causing validation errors', async () => {
+    test('submitting form with invalid values shows a validation error', async () => {
       preReleaseUserService.getUsers.mockResolvedValue(testUsers);
 
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
@@ -274,7 +284,34 @@ describe('PreReleaseUserAccessForm', () => {
 
       await userEvent.type(
         screen.getByLabelText('Invite new users by email'),
-        ' {enter} {enter} test1@education.gov.uk {enter} {enter} test2@education.gov.uk {enter} {enter} test3@education.gov.uk {enter} ',
+        'test@test.com{enter}invalid-1{enter}invalid-2',
+      );
+
+      userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
+
+      await waitFor(() => {
+        expect(
+          screen.getByText("'invalid-1' is not a valid email address", {
+            selector: '#preReleaseUserAccessForm-emails-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
+    test('whitespace is trimmed and blank lines are filtered without causing a validation error', async () => {
+      preReleaseUserService.getUsers.mockResolvedValue(testUsers);
+
+      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Invite new users by email'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.type(
+        screen.getByLabelText('Invite new users by email'),
+        ' {enter} {enter} test1@test.com {enter} {enter} test2@test.com {enter} {enter} test3@test.com {enter} ',
       );
 
       userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
@@ -283,9 +320,45 @@ describe('PreReleaseUserAccessForm', () => {
         expect(
           preReleaseUserService.getInvitePlan,
         ).toHaveBeenCalledWith('release-1', [
-          'test1@education.gov.uk',
-          'test2@education.gov.uk',
-          'test3@education.gov.uk',
+          'test1@test.com',
+          'test2@test.com',
+          'test3@test.com',
+        ]);
+      });
+    });
+
+    test('accepts a range of valid values without causing a validation error', async () => {
+      preReleaseUserService.getUsers.mockResolvedValue(testUsers);
+
+      render(<PreReleaseUserAccessForm releaseId="release-1" />);
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Invite new users by email'),
+        ).toBeInTheDocument();
+      });
+
+      await userEvent.type(
+        screen.getByLabelText('Invite new users by email'),
+        "special_'%+-.characters@test.com{enter}" +
+          'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.com{enter}' +
+          'test@test.co.uk{enter}' +
+          'test@test.uk{enter}' +
+          'test@education.gov.uk',
+      );
+      userEvent.tab();
+
+      userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
+
+      await waitFor(() => {
+        expect(
+          preReleaseUserService.getInvitePlan,
+        ).toHaveBeenCalledWith('release-1', [
+          "special_'%+-.characters@test.com",
+          'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789.com',
+          'test@test.co.uk',
+          'test@test.uk',
+          'test@education.gov.uk',
         ]);
       });
     });
@@ -303,23 +376,19 @@ describe('PreReleaseUserAccessForm', () => {
 
       await userEvent.type(
         screen.getByLabelText('Invite new users by email'),
-        'test1@education.gov.uk{enter}test2@education.gov.uk{enter}test3@education.gov.uk',
+        'test1@test.com{enter}test2@test.com{enter}test3@test.com',
       );
 
       preReleaseUserService.getInvitePlan.mockResolvedValue({
         alreadyAccepted: [
-          'existing.prerelease.user.1@education.gov.uk',
-          'existing.prerelease.user.2@education.gov.uk',
+          'existing.prerelease.user.1@test.com',
+          'existing.prerelease.user.2@test.com',
         ],
         alreadyInvited: [
-          'invited.prerelease.1@education.gov.uk',
-          'invited.prerelease.2@education.gov.uk',
+          'invited.prerelease.1@test.com',
+          'invited.prerelease.2@test.com',
         ],
-        invitable: [
-          'test1@education.gov.uk',
-          'test2@education.gov.uk',
-          'test3@education.gov.uk',
-        ],
+        invitable: ['test1@test.com', 'test2@test.com', 'test3@test.com'],
       });
 
       userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
@@ -328,9 +397,9 @@ describe('PreReleaseUserAccessForm', () => {
         expect(
           preReleaseUserService.getInvitePlan,
         ).toHaveBeenCalledWith('release-1', [
-          'test1@education.gov.uk',
-          'test2@education.gov.uk',
-          'test3@education.gov.uk',
+          'test1@test.com',
+          'test2@test.com',
+          'test3@test.com',
         ]);
       });
 
@@ -356,9 +425,9 @@ describe('PreReleaseUserAccessForm', () => {
       const invitableListItems = within(invitableList).getAllByRole('listitem');
       expect(invitableListItems).toHaveLength(3);
 
-      expect(invitableListItems[0]).toHaveTextContent('test1@education.gov.uk');
-      expect(invitableListItems[1]).toHaveTextContent('test2@education.gov.uk');
-      expect(invitableListItems[2]).toHaveTextContent('test3@education.gov.uk');
+      expect(invitableListItems[0]).toHaveTextContent('test1@test.com');
+      expect(invitableListItems[1]).toHaveTextContent('test2@test.com');
+      expect(invitableListItems[2]).toHaveTextContent('test3@test.com');
 
       const acceptedList = modal.getByRole('list', {
         name: 'Already accepted',
@@ -367,10 +436,10 @@ describe('PreReleaseUserAccessForm', () => {
       expect(acceptedListItems).toHaveLength(2);
 
       expect(acceptedListItems[0]).toHaveTextContent(
-        'existing.prerelease.user.1@education.gov.uk',
+        'existing.prerelease.user.1@test.com',
       );
       expect(acceptedListItems[1]).toHaveTextContent(
-        'existing.prerelease.user.2@education.gov.uk',
+        'existing.prerelease.user.2@test.com',
       );
 
       const invitedList = modal.getByRole('list', {
@@ -380,10 +449,10 @@ describe('PreReleaseUserAccessForm', () => {
       expect(invitedListItems).toHaveLength(2);
 
       expect(invitedListItems[0]).toHaveTextContent(
-        'invited.prerelease.1@education.gov.uk',
+        'invited.prerelease.1@test.com',
       );
       expect(invitedListItems[1]).toHaveTextContent(
-        'invited.prerelease.2@education.gov.uk',
+        'invited.prerelease.2@test.com',
       );
     });
 
@@ -400,11 +469,11 @@ describe('PreReleaseUserAccessForm', () => {
 
       await userEvent.type(
         screen.getByLabelText('Invite new users by email'),
-        'test@education.gov.uk',
+        'test@test.com',
       );
 
       preReleaseUserService.getInvitePlan.mockResolvedValue({
-        invitable: ['test@education.gov.uk'],
+        invitable: ['test@test.com'],
         alreadyAccepted: [],
         alreadyInvited: [],
       });
@@ -445,11 +514,11 @@ describe('PreReleaseUserAccessForm', () => {
 
       await userEvent.type(
         screen.getByLabelText('Invite new users by email'),
-        'test@education.gov.uk',
+        'test@test.com',
       );
 
       preReleaseUserService.getInvitePlan.mockResolvedValue({
-        invitable: ['test@education.gov.uk'],
+        invitable: ['test@test.com'],
         alreadyAccepted: [],
         alreadyInvited: [],
       });
@@ -464,11 +533,9 @@ describe('PreReleaseUserAccessForm', () => {
 
       const modal = within(screen.getByRole('dialog'));
 
-      await waitFor(() => {
-        expect(
-          modal.getByText('Email notifications will be sent immediately.'),
-        ).toBeInTheDocument();
-      });
+      expect(
+        modal.getByText('Email notifications will be sent immediately.'),
+      ).toBeInTheDocument();
     });
 
     test('accepting the confirmation modal adds newly invited users to list', async () => {
@@ -484,11 +551,11 @@ describe('PreReleaseUserAccessForm', () => {
 
       await userEvent.type(
         screen.getByLabelText('Invite new users by email'),
-        'test3@education.gov.uk{enter}test4@education.gov.uk{enter}test5@education.gov.uk',
+        'test3@test.com{enter}test4@test.com{enter}test5@test.com',
       );
 
       preReleaseUserService.getInvitePlan.mockResolvedValue({
-        invitable: ['test1@education.gov.uk'],
+        invitable: ['test1@test.com'],
         alreadyAccepted: [],
         alreadyInvited: [],
       });
@@ -496,9 +563,9 @@ describe('PreReleaseUserAccessForm', () => {
       userEvent.click(screen.getByRole('button', { name: 'Invite new users' }));
 
       preReleaseUserService.inviteUsers.mockResolvedValue([
-        { email: 'test3@education.gov.uk' },
-        { email: 'test4@education.gov.uk' },
-        { email: 'test5@education.gov.uk' },
+        { email: 'test3@test.com' },
+        { email: 'test4@test.com' },
+        { email: 'test5@test.com' },
       ]);
 
       await waitFor(() => {
@@ -515,9 +582,9 @@ describe('PreReleaseUserAccessForm', () => {
         expect(
           preReleaseUserService.inviteUsers,
         ).toHaveBeenCalledWith('release-1', [
-          'test3@education.gov.uk',
-          'test4@education.gov.uk',
-          'test5@education.gov.uk',
+          'test3@test.com',
+          'test4@test.com',
+          'test5@test.com',
         ]);
       });
 
@@ -526,24 +593,25 @@ describe('PreReleaseUserAccessForm', () => {
       ).not.toBeInTheDocument();
 
       expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(screen.getByRole('table')).toBeInTheDocument();
 
       const rows = screen.getAllByRole('row');
       expect(rows).toHaveLength(6);
 
       const row1Cells = within(rows[1]).getAllByRole('cell');
-      expect(row1Cells[0]).toHaveTextContent('test1@education.gov.uk');
+      expect(row1Cells[0]).toHaveTextContent('test1@test.com');
 
       const row2Cells = within(rows[2]).getAllByRole('cell');
-      expect(row2Cells[0]).toHaveTextContent('test2@education.gov.uk');
+      expect(row2Cells[0]).toHaveTextContent('test2@test.com');
 
       const row3Cells = within(rows[3]).getAllByRole('cell');
-      expect(row3Cells[0]).toHaveTextContent('test3@education.gov.uk');
+      expect(row3Cells[0]).toHaveTextContent('test3@test.com');
 
       const row4Cells = within(rows[4]).getAllByRole('cell');
-      expect(row4Cells[0]).toHaveTextContent('test4@education.gov.uk');
+      expect(row4Cells[0]).toHaveTextContent('test4@test.com');
 
       const row5Cells = within(rows[5]).getAllByRole('cell');
-      expect(row5Cells[0]).toHaveTextContent('test5@education.gov.uk');
+      expect(row5Cells[0]).toHaveTextContent('test5@test.com');
     });
   });
 
@@ -554,8 +622,14 @@ describe('PreReleaseUserAccessForm', () => {
       render(<PreReleaseUserAccessForm releaseId="release-1" />);
 
       await waitFor(() => {
-        expect(screen.getByRole('table')).toBeInTheDocument();
+        expect(
+          screen.getByText(
+            'These people will have access to a preview of the release 24 hours before the scheduled publish date.',
+          ),
+        ).toBeInTheDocument();
       });
+
+      expect(screen.getByRole('table')).toBeInTheDocument();
 
       let rows = screen.getAllByRole('row');
       expect(rows).toHaveLength(3);
@@ -563,13 +637,18 @@ describe('PreReleaseUserAccessForm', () => {
       userEvent.click(within(rows[2]).getByRole('button', { name: 'Remove' }));
 
       await waitFor(() => {
-        rows = screen.getAllByRole('row');
-        expect(rows).toHaveLength(2);
-
-        const row1Cells = within(rows[1]).getAllByRole('cell');
-
-        expect(row1Cells[0]).toHaveTextContent('test1@education.gov.uk');
+        expect(preReleaseUserService.removeUser).toHaveBeenCalledWith(
+          'release-1',
+          'test2@test.com',
+        );
       });
+
+      rows = screen.getAllByRole('row');
+      expect(rows).toHaveLength(2);
+
+      const row1Cells = within(rows[1]).getAllByRole('cell');
+
+      expect(row1Cells[0]).toHaveTextContent('test1@test.com');
     });
   });
 });
