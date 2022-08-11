@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
@@ -23,7 +24,6 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -279,20 +279,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
         }
 
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListActiveReleases(Guid publicationId, bool? live = null)
+        public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseListItemViewModel>>> ListActiveReleasesPaginated(
+            Guid publicationId,
+            int? page,
+            int? pageSize,
+            bool? live = null)
+        {
+            return await ListActiveReleases(publicationId, live)
+                .OnSuccess(releaseListItemViewModels => PaginatedListViewModel<ReleaseListItemViewModel>.Create(
+                    releaseListItemViewModels, page, pageSize));
+        }
+
+        public async Task<Either<ActionResult, List<ReleaseListItemViewModel>>> ListActiveReleases(
+            Guid publicationId,
+            bool? live = null)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, query => query
                         .Include(p => p.Releases)
                         .ThenInclude(r => r.ReleaseStatuses))
                 .OnSuccess(_userService.CheckCanViewPublication)
-                .OnSuccess(publication =>
-                    publication.ListActiveReleases()
-                        .Where(release => live == null || release.Live == live)
-                        .OrderByDescending(r => r.Year)
-                        .ThenByDescending(r => r.TimePeriodCoverage)
-                        .Select(r => _mapper.Map<ReleaseViewModel>(r))
-                        .ToList()
+                .OnSuccess(publication => publication.ListActiveReleases()
+                            .Where(release => live == null || release.Live == live)
+                            .OrderByDescending(r => r.Year)
+                            .ThenByDescending(r => r.TimePeriodCoverage)
+                            .Select(r => new ReleaseListItemViewModel
+                            {
+                                Id = r.Id,
+                                Title = r.Title,
+                                Live = r.Live,
+                                ApprovalStatus = r.ApprovalStatus,
+                            })
+                            .ToList()
                 );
         }
 

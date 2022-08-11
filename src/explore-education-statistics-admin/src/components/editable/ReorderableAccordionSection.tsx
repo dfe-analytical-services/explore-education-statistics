@@ -26,7 +26,7 @@ const ReorderableAccordionSection = (
     heading,
     headingTag = 'h2',
     id,
-    onRemoveSection,
+    onRemoveSection, // @MarkFix remove this
     ...restProps
   } = props;
 

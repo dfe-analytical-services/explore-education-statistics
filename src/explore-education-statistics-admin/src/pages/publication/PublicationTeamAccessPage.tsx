@@ -7,7 +7,7 @@ import {
   publicationTeamAccessRoute,
 } from '@admin/routes/publicationRoutes';
 import publicationService from '@admin/services/publicationService';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseListItem } from '@admin/services/releaseService';
 import { FormSelect } from '@common/components/form';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -26,27 +26,28 @@ const PublicationTeamAccessPage = ({
     releaseId ?? '',
   );
 
-  const { value: releases, isLoading } = useAsyncHandledRetry<ReleaseSummary[]>(
-    async () => {
-      const fetchedReleases = await publicationService.getReleases(
-        publicationId,
+  const { value: releases, isLoading } = useAsyncHandledRetry<
+    ReleaseListItem[]
+  >(async () => {
+    const paginatedReleases = await publicationService.getReleases(
+      publicationId,
+    );
+    const fetchedReleases = paginatedReleases.results;
+    if (!releaseId && fetchedReleases.length) {
+      setCurrentReleaseId(fetchedReleases[0].id);
+      history.replace(
+        generatePath<PublicationTeamRouteParams>(
+          publicationTeamAccessRoute.path,
+          {
+            publicationId,
+            releaseId: fetchedReleases[0].id,
+          },
+        ),
       );
-      if (!releaseId && fetchedReleases.length) {
-        setCurrentReleaseId(fetchedReleases[0].id);
-        history.replace(
-          generatePath<PublicationTeamRouteParams>(
-            publicationTeamAccessRoute.path,
-            {
-              publicationId,
-              releaseId: fetchedReleases[0].id,
-            },
-          ),
-        );
-      }
+    }
 
-      return fetchedReleases;
-    },
-  );
+    return fetchedReleases;
+  });
 
   const currentRelease = releases?.find(
     release => release.id === currentReleaseId,

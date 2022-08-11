@@ -14,9 +14,12 @@ const PublicationInviteUsersPage = ({
 
   const { releaseId } = match.params;
 
-  const { value: releases = [], isLoading } = useAsyncHandledRetry(() =>
-    publicationService.getReleases(publicationId),
-  );
+  const {
+    value: paginatedReleases = { results: [] },
+    isLoading,
+  } = useAsyncHandledRetry(() => publicationService.getReleases(publicationId));
+
+  const releases = paginatedReleases.results;
 
   return (
     <LoadingSpinner loading={isLoading}>

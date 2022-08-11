@@ -182,4 +182,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         [PartialDateValidator] public PartialDate? NextReleaseDate { get; init; }
     }
+
+    public class ReleaseListItemViewModel
+    {
+        public Guid Id { get; set; }
+
+        public string Title { get; set; }
+
+        public bool Live { get; set; }
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseApprovalStatus ApprovalStatus { get; set; }
+    }
 }

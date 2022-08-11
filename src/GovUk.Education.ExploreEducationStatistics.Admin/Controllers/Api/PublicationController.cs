@@ -5,12 +5,12 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
+using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
-using ReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
@@ -62,11 +62,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("api/publication/{publicationId}/releases")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> ListActiveReleases(
-            [Required] Guid publicationId, [FromQuery] bool? live = null)
+        public async Task<ActionResult<PaginatedListViewModel<ReleaseListItemViewModel>>> ListActiveReleases(
+            [Required] Guid publicationId,
+            [FromQuery] int? page = null,
+            [FromQuery] int? pageSize = null,
+            [FromQuery] bool? live = null)
         {
             return await _publicationService
-                .ListActiveReleases(publicationId, live)
+                .ListActiveReleasesPaginated(publicationId, page, pageSize, live)
                 .HandleFailuresOrOk();
         }
 

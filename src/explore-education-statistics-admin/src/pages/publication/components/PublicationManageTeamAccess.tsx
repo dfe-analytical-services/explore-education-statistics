@@ -5,7 +5,7 @@ import {
   PublicationTeamRouteParams,
   publicationManageReleaseContributorsPageRoute,
 } from '@admin/routes/publicationRoutes';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseListItem } from '@admin/services/releaseService';
 import releasePermissionService, {
   ContributorViewModel,
   ContributorInvite,
@@ -22,7 +22,7 @@ interface Props {
   addUserPath?: string; // TODO EES-3217 remove when pages go live
   heading?: ReactNode; // TODO EES-3217 remove when pages go live
   publicationId: string;
-  release: ReleaseSummary;
+  release: ReleaseListItem;
 }
 
 const PublicationManageTeamAccess = ({

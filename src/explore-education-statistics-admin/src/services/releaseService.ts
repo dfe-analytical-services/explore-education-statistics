@@ -54,6 +54,25 @@ export interface ReleaseSummary {
   yearTitle: string;
 }
 
+export interface ReleaseListItem {
+  id: string;
+  title: string;
+  live: boolean;
+  approvalStatus: ReleaseApprovalStatus;
+}
+
+export interface PaginatedList<T> {
+  results: T[];
+  paging: Pagination;
+}
+
+export interface Pagination {
+  page: number;
+  pageSize: number;
+  totalResults: number;
+  totalPages: number;
+}
+
 interface BaseReleaseRequest {
   releaseName: string;
   timePeriodCoverage: {

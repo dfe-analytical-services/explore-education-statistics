@@ -11,7 +11,7 @@ import {
 import publicationService, {
   BasicPublicationDetails,
 } from '@admin/services/publicationService';
-import { ReleaseSummary } from '@admin/services/releaseService';
+import { ReleaseListItem } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import TabsSection from '@common/components/TabsSection';
@@ -23,7 +23,7 @@ import { RouteComponentProps } from 'react-router';
 import { generatePath, useHistory } from 'react-router-dom';
 
 interface Model {
-  releases: ReleaseSummary[];
+  releases: ReleaseListItem[];
   publication: BasicPublicationDetails;
 }
 
@@ -35,10 +35,11 @@ const PublicationManageTeamAccessPage = ({
   const [currentReleaseId, setCurrentReleaseId] = useState(releaseId ?? '');
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
-    const [releases, publication] = await Promise.all([
+    const [paginatedReleases, publication] = await Promise.all([
       publicationService.getReleases(publicationId),
       publicationService.getPublication(publicationId),
     ]);
+    const releases = paginatedReleases.results;
     if (!releaseId && releases.length) {
       setCurrentReleaseId(releases[0].id);
       history.replace(

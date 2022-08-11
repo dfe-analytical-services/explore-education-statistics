@@ -6,7 +6,7 @@ import {
   BasicMethodologyVersion,
   MyMethodologyVersion,
 } from '@admin/services/methodologyService';
-import { Release, ReleaseSummary } from '@admin/services/releaseService';
+import { Release, PaginatedList, ReleaseListItem } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
@@ -134,16 +134,18 @@ const publicationService = {
 
   getReleases(
     publicationId: string,
+    page: number | undefined = undefined,
+    pageSize: number | undefined = undefined,
     live: boolean | undefined = undefined,
-  ): Promise<ReleaseSummary[]> {
-    if (live === undefined) {
-      return client.get<ReleaseSummary[]>(
-        `/publication/${publicationId}/releases`,
-      );
-    }
-    return client.get<ReleaseSummary[]>(
+  ): Promise<PaginatedList<ReleaseListItem>> {
+    let params = {};
+    if (page !== undefined) params = { ...params, page };
+    if (pageSize !== undefined) params = { ...params, pageSize };
+    if (live !== undefined) params = { ...params, live };
+
+    return client.get<PaginatedList<ReleaseListItem>>(
       `/publication/${publicationId}/releases`,
-      { params: { live } },
+      { params },
     );
   },
 
