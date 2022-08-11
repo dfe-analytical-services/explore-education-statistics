@@ -17,7 +17,7 @@ def run_tests_pipeline():
     assert args.env, "Provide an environment with an '--env ENV' argument"
     assert args.file, "Provide a file/dir to run with an '--file FILE/DIR' argument"
 
-    valid_environments = ['dev', 'test', 'pre-prod', 'prod', 'ci']
+    valid_environments = ['dev', 'test', 'preprod', 'prod', 'ci']
 
     if args.env not in valid_environments:
         raise Exception(f"Invalid environment provided: {args.env}. Valid environments: {valid_environments}")
