@@ -28,6 +28,8 @@ Go to Pupil absence methodology page
     user waits until page contains title caption    Methodology
 
 Validate Published date
+    [Tags]    Failing
+    # failing due to different published dates across environments
     user checks summary list contains    Published    22 March 2018
 
 Validate Last updated is not visible
