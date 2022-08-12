@@ -423,6 +423,19 @@ user checks element is not visible
     [Arguments]    ${element}    ${wait}=${timeout}
     element should not be visible    ${element}    ${wait}
 
+user checks element is visually hidden
+    [Arguments]    ${selector}    ${parent}=css:body
+    user checks element has class
+    ...    ${selector}
+    ...    govuk-visually-hidden
+    ...    ${parent}
+
+user checks element has class
+    [Arguments]    ${selector}    ${class}    ${parent}=css:body
+    ${element}=    lookup or return webelement    ${selector}    ${parent}
+    ${classes}=    get element attribute    ${element}    class
+    should contain    ${classes}    ${class}
+
 user waits until element is enabled
     [Arguments]    ${element}    ${wait}=${timeout}
     wait until element is enabled    ${element}    ${wait}
@@ -800,6 +813,11 @@ user checks list item contains
     ${item}=    user gets list item element    ${locator}    ${item_num}    ${parent}
     user checks element should contain    ${item}    ${content}
 
+user checks list item is visually hidden
+    [Arguments]    ${locator}    ${item_num}    ${parent}=css:body
+    ${item}=    user gets list item element    ${locator}    ${item_num}    ${parent}
+    user checks element is visually hidden    ${item}
+
 user checks list contains exact items in order
     [Arguments]    ${locator}    ${expected_items}    ${parent}=css:body
     user waits until parent contains element    ${parent}    ${locator}
@@ -880,6 +898,29 @@ user waits until table tool wizard step is available
     user waits until element is visible    xpath://h2|h3//*[contains(text(),"${table_tool_step_title}")]
     ...    %{WAIT_SMALL}
     user waits until page does not contain loading spinner
+
+user gets data block from parent
+    [Arguments]    ${data_block_name}    ${parent}
+    ${data_block_test_id}=    set variable    testid:Data block - ${data_block_name}
+    user waits until parent contains element    ${parent}    ${data_block_test_id}
+    ${data_block}=    get child element    ${parent}    ${data_block_test_id}
+    [Return]    ${data_block}
+
+user gets data block table from parent
+    [Arguments]    ${data_block_name}    ${parent}
+    ${data_block}=    user gets data block from parent    ${data_block_name}    ${parent}
+    user clicks link by visible text    Table    ${data_block}
+    ${data_block_id}=    get element attribute    ${data_block}    id
+    ${data_block_table}=    get child element    ${data_block}    id:${data_block_id}-tables
+    [Return]    ${data_block_table}
+
+user gets data block chart from parent
+    [Arguments]    ${data_block_name}    ${parent}
+    ${data_block}=    user gets data block from parent    ${data_block_name}    ${parent}
+    user clicks link by visible text    Chart    ${data_block}
+    ${data_block_id}=    get element attribute    ${data_block}    id
+    ${data_block_chart}=    get child element    ${data_block}    id:${data_block_id}-chart
+    [Return]    ${data_block_chart}
 
 lookup or return webelement
     [Arguments]

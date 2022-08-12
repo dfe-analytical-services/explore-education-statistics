@@ -72,6 +72,34 @@ Add ancillary file
 
     user checks there are x accordion sections    1    id:file-uploads
 
+Navigate to 'Footnotes' section
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+
+Add a footnote
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+    user clicks footnote subject radio    Dates test subject    Applies to all data
+    user clicks element    id:footnoteForm-content
+    user enters text into element    id:footnoteForm-content
+    ...    Applies to all data 1
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Add a second footnote
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+    user clicks footnote subject radio    Dates test subject    Applies to all data
+    user clicks element    id:footnoteForm-content
+    user enters text into element    id:footnoteForm-content
+    ...    Applies to all data 2
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Confirm created footnotes
+    user waits until page contains element    testid:Footnote - Applies to all data 1
+    user waits until page contains element    testid:Footnote - Applies to all data 2
+
 Create data block table
     user creates data block for dates csv    Dates test subject    ${DATABLOCK_NAME}    Dates table title
 
@@ -111,6 +139,18 @@ Add data block to first accordion section
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text
+
+Verify data block table has footnotes
+    ${accordion}=    user opens accordion section    Dates data block    css:#releaseMainContent
+    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
+
+    user checks list has x items    testid:footnotes    2    ${data_block_table}
+    user checks list item contains    testid:footnotes    1
+    ...    Applies to all data 1
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    2
+    ...    Applies to all data 2
+    ...    ${data_block_table}
 
 Add test text to second accordion section
     user adds text block to editable accordion section    Test text    css:#releaseMainContent
@@ -281,6 +321,18 @@ Verify Dates data block accordion section
 
     user closes accordion section    Dates data block    id:content
 
+Verify Dates data block table has footnotes
+    ${accordion}=    user opens accordion section    Dates data block    id:content
+    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
+
+    user checks list has x items    testid:footnotes    2    ${data_block_table}
+    user checks list item contains    testid:footnotes    1
+    ...    Applies to all data 1
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    2
+    ...    Applies to all data 2
+    ...    ${data_block_table}
+
 Verify Test text accordion section contains correct text
     user opens accordion section    Test text    id:content
     ${section}=    user gets accordion section content element    Test text    id:content
@@ -372,23 +424,26 @@ Update existing data guidance for amendment
 
     user clicks button    Save guidance
 
-Navigate to 'Footnotes' section
+Navigate to 'Footnotes' section for amendment
     user clicks link    Footnotes
     user waits until h2 is visible    Footnotes
 
-Add a Footnote
+Add a footnote to amendment
     user waits until page contains link    Create footnote
     user clicks link    Create footnote
     user waits until h2 is visible    Create footnote
     user clicks footnote subject radio    Dates test subject    Applies to all data
     user clicks element    id:footnoteForm-content
     user enters text into element    id:footnoteForm-content
-    ...    A footnote
+    ...    Applies to all data 3
     user clicks button    Save footnote
     user waits until h2 is visible    Footnotes
 
-Check footnote has been added
-    user checks element is visible    testid:Footnote - A footnote
+Confirm amendment has footnotes
+    user waits until h2 is visible    Footnotes
+    user waits until page contains element    testid:Footnote - Applies to all data 1
+    user waits until page contains element    testid:Footnote - Applies to all data 2
+    user waits until page contains element    testid:Footnote - Applies to all data 3
 
 Add ancillary file to amendment
     user clicks link    Data and files
@@ -476,6 +531,24 @@ Navigate to 'Content' page for amendment
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block
+
+Verify amended Dates data block table has footnotes
+    ${accordion}=    user opens accordion section    Dates data block    css:#releaseMainContent
+    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
+
+    user checks list has x items    testid:footnotes    3    ${data_block_table}
+    user checks list item contains    testid:footnotes    1
+    ...    Applies to all data 1
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    2
+    ...    Applies to all data 2
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    3
+    ...    Applies to all data 3
+    ...    ${data_block_table}
+
+    user checks element contains button    ${data_block_table}    Show 1 more item
+    user checks list item is visually hidden    testid:footnotes    3    ${data_block_table}
 
 Update second accordion section text for amendment
     user opens accordion section    Test text    css:#releaseMainContent
@@ -638,6 +711,24 @@ Verify amendment Dates data block accordion section
     user checks headed table body row cell contains    Number of open settings    1    23,600    ${section}
     user checks headed table body row cell contains    Proportion of settings open    1    1%    ${section}
     user closes accordion section    Dates data block    id:content
+
+Verify amendment Dates data block table has footnotes
+    ${accordion}=    user opens accordion section    Dates data block    id:content
+    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
+
+    user checks list has x items    testid:footnotes    3    ${data_block_table}
+    user checks list item contains    testid:footnotes    1
+    ...    Applies to all data 1
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    2
+    ...    Applies to all data 2
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    3
+    ...    Applies to all data 3
+    ...    ${data_block_table}
+
+    user checks element contains button    ${data_block_table}    Show 1 more item
+    user checks list item is visually hidden    testid:footnotes    3    ${data_block_table}
 
 Verify amendment Test text accordion section contains correct text
     user opens accordion section    Test text    id:content
