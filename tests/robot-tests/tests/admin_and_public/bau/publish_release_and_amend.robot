@@ -72,6 +72,34 @@ Add ancillary file
 
     user checks there are x accordion sections    1    id:file-uploads
 
+Navigate to 'Footnotes' section
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+
+Add a footnote
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+    user clicks footnote subject radio    Dates test subject    Applies to all data
+    user clicks element    id:footnoteForm-content
+    user enters text into element    id:footnoteForm-content
+    ...    Applies to all data 1
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Add a second footnote
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+    user clicks footnote subject radio    Dates test subject    Applies to all data
+    user clicks element    id:footnoteForm-content
+    user enters text into element    id:footnoteForm-content
+    ...    Applies to all data 2
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Confirm created footnotes
+    user waits until page contains element    testid:Footnote - Applies to all data 1
+    user waits until page contains element    testid:Footnote - Applies to all data 2
+
 Create data block table
     user creates data block for dates csv    Dates test subject    ${DATABLOCK_NAME}    Dates table title
 
@@ -111,6 +139,18 @@ Add data block to first accordion section
     user waits until element contains infographic chart    ${datablock}
     user checks chart title contains    ${datablock}    Dates table title
     user checks infographic chart contains alt    ${datablock}    Sample alt text
+
+Verify data block table has footnotes
+    ${accordion}=    user opens accordion section    Dates data block    css:#releaseMainContent
+    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
+
+    user checks list has x items    testid:footnotes    2    ${data_block_table}
+    user checks list item contains    testid:footnotes    1
+    ...    Applies to all data 1
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    2
+    ...    Applies to all data 2
+    ...    ${data_block_table}
 
 Add test text to second accordion section
     user adds text block to editable accordion section    Test text    css:#releaseMainContent
@@ -163,7 +203,7 @@ Verify release associated files
     ${downloads}=    user gets accordion section content element    Explore data and files
     user waits until page contains element    ${downloads}    %{WAIT_SMALL}
 
-    user checks element should contain    ${downloads}    Download all data
+    user checks element should contain    ${downloads}    Download all data (zip)
     ...    %{WAIT_SMALL}
     user checks element should contain    ${downloads}
     ...    All data used in this release is available as open data for download
@@ -281,6 +321,18 @@ Verify Dates data block accordion section
 
     user closes accordion section    Dates data block    id:content
 
+Verify Dates data block table has footnotes
+    ${accordion}=    user opens accordion section    Dates data block    id:content
+    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
+
+    user checks list has x items    testid:footnotes    2    ${data_block_table}
+    user checks list item contains    testid:footnotes    1
+    ...    Applies to all data 1
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    2
+    ...    Applies to all data 2
+    ...    ${data_block_table}
+
 Verify Test text accordion section contains correct text
     user opens accordion section    Test text    id:content
     ${section}=    user gets accordion section content element    Test text    id:content
@@ -315,8 +367,8 @@ Navigate to data replacement page
     user checks headed table body row contains    Subject title    Dates test subject
     user checks headed table body row contains    Data file    dates.csv
     user checks headed table body row contains    Metadata file    dates.meta.csv
-    user checks headed table body row contains    Number of rows    118
-    user checks headed table body row contains    Data file size    17 Kb
+    user checks headed table body row contains    Number of rows    118    wait=%{WAIT_SMALL}
+    user checks headed table body row contains    Data file size    17 Kb    wait=%{WAIT_SMALL}
     user checks headed table body row contains    Status    Complete    wait=%{WAIT_LONG}
 
 Upload replacement data
@@ -332,15 +384,15 @@ Upload replacement data
     user checks headed table body row cell contains    Subject title    1    Dates test subject
     user checks headed table body row cell contains    Data file    1    dates.csv
     user checks headed table body row cell contains    Metadata file    1    dates.meta.csv
-    user checks headed table body row cell contains    Number of rows    1    118
-    user checks headed table body row cell contains    Data file size    1    17 Kb
+    user checks headed table body row cell contains    Number of rows    1    118    wait=%{WAIT_SMALL}
+    user checks headed table body row cell contains    Data file size    1    17 Kb    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Status    1    Data replacement in progress    wait=%{WAIT_LONG}
 
     user checks headed table body row cell contains    Subject title    2    Dates test subject
     user checks headed table body row cell contains    Data file    2    dates-replacement.csv
     user checks headed table body row cell contains    Metadata file    2    dates-replacement.meta.csv
-    user checks headed table body row cell contains    Number of rows    2    118
-    user checks headed table body row cell contains    Data file size    2    17 Kb
+    user checks headed table body row cell contains    Number of rows    2    118    wait=%{WAIT_SMALL}
+    user checks headed table body row cell contains    Data file size    2    17 Kb    wait=%{WAIT_SMALL}
     user checks headed table body row cell contains    Status    2    Complete    wait=%{WAIT_LONG}
 
 Confirm data replacement
@@ -372,7 +424,26 @@ Update existing data guidance for amendment
 
     user clicks button    Save guidance
 
-# TODO luke: Add footnotes
+Navigate to 'Footnotes' section for amendment
+    user clicks link    Footnotes
+    user waits until h2 is visible    Footnotes
+
+Add a footnote to amendment
+    user waits until page contains link    Create footnote
+    user clicks link    Create footnote
+    user waits until h2 is visible    Create footnote
+    user clicks footnote subject radio    Dates test subject    Applies to all data
+    user clicks element    id:footnoteForm-content
+    user enters text into element    id:footnoteForm-content
+    ...    Applies to all data 3
+    user clicks button    Save footnote
+    user waits until h2 is visible    Footnotes
+
+Confirm amendment has footnotes
+    user waits until h2 is visible    Footnotes
+    user waits until page contains element    testid:Footnote - Applies to all data 1
+    user waits until page contains element    testid:Footnote - Applies to all data 2
+    user waits until page contains element    testid:Footnote - Applies to all data 3
 
 Add ancillary file to amendment
     user clicks link    Data and files
@@ -438,11 +509,11 @@ Save data block for amendment
     user waits until page contains button    Delete this data block
 
 Update data block chart for amendment
-    user waits until page contains link    Chart
+    user waits until page contains link    Chart    %{WAIT_SMALL}
     user waits until page does not contain loading spinner
     user clicks link    Chart
 
-    user waits until page contains element    id:chartConfigurationForm-title
+    user waits until page contains element    id:chartConfigurationForm-title    %{WAIT_SMALL}
 
     user checks radio is checked    Use table title
     user clicks radio    Set an alternative title
@@ -460,6 +531,24 @@ Navigate to 'Content' page for amendment
     user clicks link    Content
     user waits until h2 is visible    ${PUBLICATION_NAME}
     user waits until page contains button    Add a summary text block
+
+Verify amended Dates data block table has footnotes
+    ${accordion}=    user opens accordion section    Dates data block    css:#releaseMainContent
+    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
+
+    user checks list has x items    testid:footnotes    3    ${data_block_table}
+    user checks list item contains    testid:footnotes    1
+    ...    Applies to all data 1
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    2
+    ...    Applies to all data 2
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    3
+    ...    Applies to all data 3
+    ...    ${data_block_table}
+
+    user checks element contains button    ${data_block_table}    Show 1 more item
+    user checks list item is visually hidden    testid:footnotes    3    ${data_block_table}
 
 Update second accordion section text for amendment
     user opens accordion section    Test text    css:#releaseMainContent
@@ -502,20 +591,18 @@ Navigate to amendment release page
     user checks nth breadcrumb contains    3    ${PUBLICATION_NAME}
 
 Verify amendment is displayed as the latest release
-    [Documentation]    EES-1301
-    [Tags]    Failing
     user checks page does not contain    View latest data:
     user checks page does not contain    See other releases (1)
 
 Verify amendment is published
     user checks summary list contains    Published
     ...    ${PUBLISH_DATE_DAY} ${PUBLISH_DATE_MONTH_WORD} ${PUBLISH_DATE_YEAR}
-    user checks summary list contains    Next update    December 3001    # TODO: Check Next update date can be updated
+    user checks summary list contains    Next update    December 3001
 
 Verify amendment files
     user opens accordion section    Explore data and files
     ${downloads}=    user gets accordion section content element    Explore data and files
-    user checks element should contain    ${downloads}    Download all data
+    user checks element should contain    ${downloads}    Download all data (zip)
     ...    %{WAIT_SMALL}
 
     user opens details dropdown    List of all supporting files
@@ -527,7 +614,6 @@ Verify amendment files
     user opens details dropdown    More details    ${other_files_1}
     ${other_files_1_details}=    user gets details content element    More details    ${other_files_1}
     user checks element should contain    ${other_files_1_details}    Test ancillary file 1 summary
-
     download file    link:Test ancillary file 1    test_ancillary_file_1.txt
     downloaded file should have first line    test_ancillary_file_1.txt    Test file 1
 
@@ -626,7 +712,56 @@ Verify amendment Dates data block accordion section
     user checks headed table body row cell contains    Proportion of settings open    1    1%    ${section}
     user closes accordion section    Dates data block    id:content
 
+Verify amendment Dates data block table has footnotes
+    ${accordion}=    user opens accordion section    Dates data block    id:content
+    ${data_block_table}=    user gets data block table from parent    ${DATABLOCK_NAME}    ${accordion}
+
+    user checks list has x items    testid:footnotes    3    ${data_block_table}
+    user checks list item contains    testid:footnotes    1
+    ...    Applies to all data 1
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    2
+    ...    Applies to all data 2
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    3
+    ...    Applies to all data 3
+    ...    ${data_block_table}
+
+    user checks element contains button    ${data_block_table}    Show 1 more item
+    user checks list item is visually hidden    testid:footnotes    3    ${data_block_table}
+
 Verify amendment Test text accordion section contains correct text
     user opens accordion section    Test text    id:content
     ${section}=    user gets accordion section content element    Test text    id:content
     user closes accordion section    Test text    id:content
+
+Check next release date can be updated
+    user navigates to admin dashboard    Bau1
+    user creates amendment for release    ${PUBLICATION_NAME}    ${RELEASE_NAME}    (Live - Latest release)
+    user clicks link    Sign off
+    user clicks button    Edit release status
+    user waits until h2 is visible    Edit release status    %{WAIT_SMALL}
+    user enters text into element    releaseStatusForm-nextReleaseDate-month    08
+    user enters text into element    id:releaseStatusForm-nextReleaseDate-year    4001
+    user clicks button    Update status
+
+Leave release note for amendment
+    user clicks link    Content
+    user clicks button    Add note
+    user enters text into element    testid:comment-textarea    updated amendment
+    user clicks button    Save note
+
+Approve release amendment for immedate publication
+    user approves amended release for immediate publication
+
+Save public release link for later use
+    user waits until page contains element    testid:public-release-url
+    ${PUBLIC_RELEASE_LINK}=    Get Value    xpath://*[@data-testid="public-release-url"]
+    check that variable is not empty    PUBLIC_RELEASE_LINK    ${PUBLIC_RELEASE_LINK}
+    Set Suite Variable    ${PUBLIC_RELEASE_LINK}
+
+Navigate to amended public release
+    user navigates to public frontend    ${PUBLIC_RELEASE_LINK}
+
+Validate Next update date
+    user checks summary list contains    Next update    August 4001

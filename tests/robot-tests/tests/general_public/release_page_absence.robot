@@ -66,7 +66,7 @@ Validate "About these statistics" -- "Last updated"
 Check data downloads navigation contains links
     user checks element contains link    testid:data-downloads    Explore data and files
     user checks element contains link    testid:data-downloads    View data guidance
-    user checks element contains link    testid:data-downloads    Download all data
+    user checks element contains link    testid:data-downloads    Download all data (zip)
 
 Check supporting information contains methodology link
     user checks page contains link with text and url    Pupil absence statistics: methodology
@@ -82,6 +82,13 @@ Validate subject files file type and file unit style
 Validate absence_in_prus.csv file can be downloaded
     [Documentation]    DFE-958    DFE-562
     [Tags]    NotAgainstLocal    Failing
+
+    # TODO: This needs new file utils to be added to (related to EES-3241):
+    # * unzip the directory once download
+    # * navigate to the 'data' directory
+    # * find 'absence_in_prus.csv' in the directory
+    #    * run 'downloaded file should have first line' keyword
+
     user opens details dropdown    Download data files
 
     download file    link:Absence in PRUs    absence_in_prus.csv
@@ -154,12 +161,16 @@ Validate Key Statistics data block -- Charts tab
     user checks chart tooltip item contains    ${headline_chart}    2    Authorised absence rate (England): 3.4%
     user checks chart tooltip item contains    ${headline_chart}    3    Unauthorised absence rate (England): 1.3%
 
-    user waits until element contains    ${headline_chart} [data-testid="footnotes"] li:nth-of-type(1)
-    ...    Absence rates are the number of absence sessions expressed
-    user waits until element contains    ${headline_chart} [data-testid="footnotes"] li:nth-of-type(2)
-    ...    There may be discrepancies between totals and the sum of constituent parts
-    user waits until element contains    ${headline_chart} [data-testid="footnotes"] li:nth-of-type(3)
-    ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.
+    user checks list has x items    testid:footnotes    3    ${headline_chart}
+    user checks list item contains    testid:footnotes    1
+    ...    Absence rates are the number of absence sessions expressed    ${headline_chart}
+    user checks list item contains    testid:footnotes    2
+    ...    There may be discrepancies between totals and the sum of constituent parts    ${headline_chart}
+    user checks list item contains    testid:footnotes    3
+    ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.    ${headline_chart}
+
+    user checks element contains button    ${headline_chart}    Show 1 more item
+    user checks list item is visually hidden    testid:footnotes    3    ${headline_chart}
 
 Validate Key Statistics data block -- Data tables tab
     user clicks element    id:releaseHeadlines-tables-tab
@@ -198,6 +209,17 @@ Validate Key Statistics data block -- Data tables tab
     user checks row cell contains text    ${row}    3    4.6
     user checks row cell contains text    ${row}    4    4.6
     user checks row cell contains text    ${row}    5    4.7
+
+    user checks list has x items    testid:footnotes    3    id:releaseHeadlines-tables
+    user checks list item contains    testid:footnotes    1
+    ...    Absence rates are the number of absence sessions expressed    id:releaseHeadlines-tables
+    user checks list item contains    testid:footnotes    2
+    ...    There may be discrepancies between totals and the sum of constituent parts    id:releaseHeadlines-tables
+    user checks list item contains    testid:footnotes    3
+    ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.    id:releaseHeadlines-tables
+
+    user checks element contains button    id:releaseHeadlines-tables    Show 1 more item
+    user checks list item is visually hidden    testid:footnotes    3    id:releaseHeadlines-tables
 
 Validate accordion sections order
     user checks accordion is in position    Explore data and files    1    id:data-accordion
@@ -276,6 +298,24 @@ Validate Regional and local authority (LA) breakdown table
     user checks row contains heading    ${row}    Unauthorised absence rate
     user checks row cell contains text    ${row}    1    1.7%
 
+Check Regional and local authority (LA) breakdown table has footnotes
+    ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
+    ${data_block_table}=    user gets data block table from parent    LAD map    ${accordion}
+
+    user checks list has x items    testid:footnotes    3    ${data_block_table}
+    user checks list item contains    testid:footnotes    1
+    ...    Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    2
+    ...    There may be discrepancies between totals and the sum of constituent parts as national and regional totals and totals across school types have been rounded to the nearest 5.
+    ...    ${data_block_table}
+    user checks list item contains    testid:footnotes    3
+    ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.
+    ...    ${data_block_table}
+
+    user checks element contains button    ${data_block_table}    Show 1 more item
+    user checks list item is visually hidden    testid:footnotes    3    ${data_block_table}
+
 Validate Regional and local authority (LA) breakdown chart
     [Tags]    Failing
     user opens accordion section    Regional and local authority (LA) breakdown    id:content
@@ -312,6 +352,28 @@ Validate Regional and local authority (LA) breakdown chart
     user checks chart tooltip item contains    ${datablock}    Unauthorised absence rate: 1.7%
 
     user checks map chart indicator tile contains    ${datablock}    Unauthorised absence rate    1.7%
+
+Check Regional and local authority (LA) breakdown chart has footnotes
+    ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
+    ${data_block_chart}=    user gets data block chart from parent    LAD map    ${accordion}
+
+    user checks list has x items    testid:footnotes    4    ${data_block_chart}
+    user checks list item contains    testid:footnotes    1
+    ...    Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.
+    ...    ${data_block_chart}
+    user checks list item contains    testid:footnotes    2
+    ...    There may be discrepancies between totals and the sum of constituent parts as national and regional totals and totals across school types have been rounded to the nearest 5.
+    ...    ${data_block_chart}
+    user checks list item contains    testid:footnotes    3
+    ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.
+    ...    ${data_block_chart}
+    user checks list item contains    testid:footnotes    4
+    ...    This map uses the boundary data Local Authority Districts December 2017 Ultra Generalised Clipped Boundaries in United Kingdom WGS84
+    ...    ${data_block_chart}
+
+    user checks element contains button    ${data_block_chart}    Show 2 more items
+    user checks list item is visually hidden    testid:footnotes    3    ${data_block_chart}
+    user checks list item is visually hidden    testid:footnotes    4    ${data_block_chart}
 
 Clicking "Create tables" takes user to Table Tool page with absence publication selected
     [Documentation]    DFE-898

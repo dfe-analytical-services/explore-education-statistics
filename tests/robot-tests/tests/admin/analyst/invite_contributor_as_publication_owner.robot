@@ -9,10 +9,8 @@ Test Setup          fail test fast if required
 
 Force Tags          Admin    Local    Dev    AltersData
 
-
 *** Variables ***
 ${PUBLICATION_NAME}=    UI tests - invite contributor %{RUN_IDENTIFIER}
-
 
 *** Test Cases ***
 Create Publication as bau1
@@ -67,7 +65,7 @@ Validate Select release dropdown
 
 Invite existing user analyst2 to be a contributor for 2002/03 release
     user clicks link    Invite new users
-    user waits until page contains    Invite a user to edit ${PUBLICATION_NAME}
+    user waits until page contains    Invite a user to edit this publication
     user enters text into element    id:email    EES-test.ANALYST2@education.gov.uk
 
     user checks checkbox is checked    Academic Year 2002/03
@@ -147,7 +145,7 @@ Validate contributors for 2000/01 release
 
 Invite brand new user
     user clicks link    Invite new users
-    user waits until page contains    Invite a user to edit ${PUBLICATION_NAME}
+    user waits until page contains    Invite a user to edit this publication
     user enters text into element    id:email    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk
 
     user clicks button    Invite user
@@ -160,10 +158,9 @@ Validate contributors for 2000/01 release again
     user waits until page contains    ees-analyst-%{RUN_IDENTIFIER}@education.gov.uk    %{WAIT_SMALL}
     user checks page contains tag    Pending Invite
 
-
 *** Keywords ***
 user clicks remove user button for row
     [Arguments]    ${text}
     ${row}=    get webelement    xpath://tbody/tr/td[.="${text}"]/..
-    ${remove_user_button}=    get child element    ${row}    xpath://button[text()="Remove user"]
+    ${remove_user_button}=    get child element    ${row}    xpath://button[text()="Remove"]
     user clicks element    ${remove_user_button}

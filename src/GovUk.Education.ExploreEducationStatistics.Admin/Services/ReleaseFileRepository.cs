@@ -88,10 +88,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task Delete(Guid releaseId, Guid fileId)
         {
-            var releaseFile = await Find(releaseId, fileId);
-            if (releaseFile != null)
+            var releaseFileToRemove = await Find(releaseId, fileId);
+
+            if (releaseFileToRemove != null)
             {
-                _contentDbContext.ReleaseFiles.Remove(releaseFile);
+                _contentDbContext.ReleaseFiles.Remove(releaseFileToRemove);
+
                 await _contentDbContext.SaveChangesAsync();
             }
         }

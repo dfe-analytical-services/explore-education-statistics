@@ -11,6 +11,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
 
         public string Name { get; }
 
+        public int Order { get; }
+
         public string Content { get; }
 
         public TimePeriodLabels TimePeriods { get; }
@@ -22,6 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
         public SubjectViewModel(
             Guid id,
             string name,
+            int order,
             string content,
             TimePeriodLabels timePeriods,
             List<string> geographicLevels,
@@ -29,6 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services.ViewModels
         {
             Id = id;
             Name = name;
+            Order = order;
             Content = content;
             TimePeriods = timePeriods;
             GeographicLevels = geographicLevels;

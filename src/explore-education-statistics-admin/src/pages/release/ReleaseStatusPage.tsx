@@ -145,7 +145,7 @@ const ReleaseStatusPage = () => {
             loading={!releaseStatuses}
             text="Loading release status history"
           >
-            <table>
+            <table data-testid="release-status-history">
               <thead>
                 <tr>
                   <th scope="col">Date</th>

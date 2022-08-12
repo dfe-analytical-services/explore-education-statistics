@@ -156,19 +156,21 @@ Go to prerelease access page
     user navigates to admin frontend    ${RELEASE_URL}/prerelease-access
     user waits until h2 is visible    Manage pre-release user access
 
-Validate the invite emails field is required
+Check the invite emails field is required
     user clicks button    Invite new users
     user waits until element contains    id:preReleaseUserAccessForm-emails-error
     ...    Enter 1 or more email addresses
 
-Validate the invite emails field only accepts @education.gov.uk email addresses
+Check the invite emails field is invalid for invalid email addresses
     ${emails}=    Catenate    SEPARATOR=\n
     ...    EES-test.ANALYST1@education.gov.uk
     ...    test@test.com
+    ...    invalid-1
+    ...    invalid-2
     user enters text into element    css:textarea[name="emails"]    ${emails}
     user clicks button    Invite new users
     user waits until element contains    id:preReleaseUserAccessForm-emails-error
-    ...    Enter only @education.gov.uk email addresses
+    ...    'invalid-1' is not a valid email address
 
 Invite users to the prerelease
     ${emails}=    Catenate    SEPARATOR=\n
@@ -188,7 +190,15 @@ Invite users to the prerelease
     user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
     user checks results table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
 
-Validate the invite emails field is invalid for addresses that are all already invited or accepted
+Refresh page and check prerelease user list isn't duplicated
+    [Documentation]    EES-3535
+    user reloads page
+    user waits until table is visible
+    user checks table body has x rows    2
+    user checks table cell in offset row contains    1    0    1    ees-test.analyst1@education.gov.uk
+    user checks table cell in offset row contains    2    0    1    simulate-delivered@notifications.service.gov.uk
+
+Check the invite emails field is invalid for addresses that are all already invited or accepted
     ${emails}=    Catenate    SEPARATOR=\n
     ...    simulate-delivered@notifications.service.gov.uk
     ...    EES-test.ANALYST1@education.gov.uk
@@ -209,6 +219,7 @@ Invite a further list of new users but mixed with existing invitees and accepted
     user waits until element contains    ${modal}    Email notifications will be sent immediately
 
     user checks list has x items    testid:invitableList    2    ${modal}
+
     user checks list item contains    testid:invitableList    1    simulate-delivered-2@notifications.service.gov.uk
     ...    ${modal}
     user checks list item contains    testid:invitableList    2    simulate-delivered-3@notifications.service.gov.uk
@@ -221,10 +232,13 @@ Invite a further list of new users but mixed with existing invitees and accepted
     user checks list item contains    testid:invitedList    1    simulate-delivered@notifications.service.gov.uk
     ...    ${modal}
 
+    user waits until button is enabled    Confirm    10
     user clicks button    Confirm
+    user waits until table is visible    css:body    %{WAIT_SMALL}
     user checks table column heading contains    1    1    User email
-    user checks results table cell contains    1    1    simulate-delivered@notifications.service.gov.uk
-    user checks results table cell contains    2    1    EES-test.ANALYST1@education.gov.uk
+
+    user checks results table cell contains    1    1    ees-test.analyst1@education.gov.uk
+    user checks results table cell contains    2    1    simulate-delivered@notifications.service.gov.uk
     user checks results table cell contains    3    1    simulate-delivered-2@notifications.service.gov.uk
     user checks results table cell contains    4    1    simulate-delivered-3@notifications.service.gov.uk
 

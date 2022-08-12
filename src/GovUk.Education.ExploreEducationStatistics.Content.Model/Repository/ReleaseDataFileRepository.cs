@@ -15,7 +15,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
     {
         private readonly ContentDbContext _contentDbContext;
 
-        private static readonly List<FileType> SupportedFileTypes = new()
+        private static readonly List<FileType> SupportedFileTypes = new ()
         {
             Data,
             Metadata
@@ -35,7 +35,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             Guid createdById,
             string? name = null,
             File? replacingFile = null,
-            File? source = null)
+            File? source = null,
+            int order = 0)
         {
             if (!SupportedFileTypes.Contains(type))
             {
@@ -51,6 +52,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
             {
                 ReleaseId = releaseId,
                 Name = name,
+                Order = order,
                 File = new File
                 {
                     CreatedById = createdById,
@@ -62,7 +64,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                     Type = type,
                     Replacing = replacingFile,
                     Source = source
-                }
+                },
             };
             var created = (await _contentDbContext.ReleaseFiles.AddAsync(releaseFile)).Entity;
             if (replacingFile != null)
@@ -143,6 +145,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Repository
                           && rf.File.ReplacingId == null
                           && rf.File.SubjectId.HasValue
                 )
+                .OrderBy(rf => rf.Order)
+                .ThenBy(rf => rf.Name) // For subjects existing before ordering was added
                 .Select(rf => rf.File);
         }
     }

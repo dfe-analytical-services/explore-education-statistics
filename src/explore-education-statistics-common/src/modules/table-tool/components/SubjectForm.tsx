@@ -113,6 +113,7 @@ const SubjectForm = ({
           <Form {...form} id={formId} showSubmitError>
             <FormFieldRadioGroup<SubjectFormValues>
               name="subjectId"
+              order={[]}
               legend={legend}
               legendSize={legendSize}
               hint={legendHint}

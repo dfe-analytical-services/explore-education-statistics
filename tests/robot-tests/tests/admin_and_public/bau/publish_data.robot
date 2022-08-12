@@ -357,6 +357,9 @@ Check created table has footnotes
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR}
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
 
+    user checks page contains button    Show 1 more item
+    user checks list item is visually hidden    testid:footnotes    3
+
 Save data block as a featured table
     user enters text into element    id:dataBlockDetailsForm-name    UI Test data block name
     user enters text into element    id:dataBlockDetailsForm-heading    UI Test table title
@@ -396,6 +399,9 @@ Check footnote was updated on data block
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
+
+    user checks page contains button    Show 1 more item
+    user checks list item is visually hidden    testid:footnotes    3
 
 Add public prerelease access list for release
     user clicks link    Pre-release access
@@ -455,10 +461,6 @@ Select subject "${SUBJECT_2_NAME}" in table tool
     user checks previous table tool step contains    2    Subject    ${SUBJECT_2_NAME}
 
 Select locations in table tool
-    # LH: Not using the 'user opens details dropdown' keyword here as
-    # it opens the 'Local Authority District' dropdown instead
-    # due to using 'contains'
-    # TODO: LH - fix this
     user clicks element    testid:Expand Details Section Local Authority
     user clicks checkbox    Barnsley
     user clicks checkbox    Birmingham
@@ -509,6 +511,9 @@ Validate table has footnotes
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
+
+    user checks page contains button    Show 1 more item
+    user checks list item is visually hidden    testid:footnotes    3
 
 Select table featured table from subjects step
     user clicks element    testid:wizardStep-2-goToButton
@@ -581,6 +586,9 @@ Validate featured table has footnotes
     user checks list item contains    testid:footnotes    1    ${FOOTNOTE_ALL}
     user checks list item contains    testid:footnotes    2    ${FOOTNOTE_ALL_INDICATOR_UPDATED}
     user checks list item contains    testid:footnotes    3    ${FOOTNOTE_ALL_FILTER}
+
+    user checks page contains button    Show 1 more item
+    user checks list item is visually hidden    testid:footnotes    3
 
 Go to release page
     user opens accordion section    Related information

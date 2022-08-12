@@ -651,6 +651,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             Assert.Equal(amendment, amendmentDataFile.Release);
             Assert.Equal(amendment.Id, amendmentDataFile.ReleaseId);
             Assert.Equal(originalFile.Name, amendmentDataFile.Name);
+            Assert.Equal(originalFile.Order, amendmentDataFile.Order);
 
             // and assert that the file referenced is the SAME file reference as linked from the original Release's
             // link table entry

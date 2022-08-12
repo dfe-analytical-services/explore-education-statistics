@@ -138,6 +138,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
+        public async Task ReorderDataFiles()
+        {
+            await PolicyCheckBuilder<SecurityPolicies>()
+                .SetupResourceCheckToFail(_release, CanUpdateSpecificRelease)
+                .AssertForbidden(
+                    userService =>
+                    {
+                        var service = SetupReleaseDataFileService(userService: userService.Object);
+                        return service.ReorderDataFiles(_release.Id, new List<Guid>());
+                    }
+                );
+        }
+
+        [Fact]
         public async Task Upload()
         {
             await PolicyCheckBuilder<SecurityPolicies>()

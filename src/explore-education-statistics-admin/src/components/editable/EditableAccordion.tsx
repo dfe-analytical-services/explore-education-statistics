@@ -85,8 +85,10 @@ const EditableAccordion = (props: EditableAccordionProps) => {
 
   return (
     <div className={styles.container}>
-      <h2 className={classNames('govuk-heading-l', styles.heading)}>
-        {sectionName}
+      <div className="dfe-flex dfe-justify-content--space-between govuk-!-margin-bottom-3">
+        <h2 className="govuk-heading-l govuk-!-margin-bottom-0">
+          {sectionName}
+        </h2>
 
         {sections.length > 1 &&
           (!isReordering ? (
@@ -95,7 +97,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
               className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
               onClick={toggleReordering.on}
             >
-              Reorder <span className="govuk-visually-hidden">sections</span>
+              Reorder<span className="govuk-visually-hidden"> sections</span>
             </Button>
           ) : (
             <Button
@@ -105,7 +107,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
               Save order
             </Button>
           ))}
-      </h2>
+      </div>
 
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable

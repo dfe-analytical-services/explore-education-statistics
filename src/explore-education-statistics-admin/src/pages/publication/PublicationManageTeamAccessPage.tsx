@@ -1,20 +1,25 @@
 import Page from '@admin/components/Page';
+import PublicationManageTeamAccess from '@admin/pages/publication/components/PublicationManageTeamAccess';
+import PublicationInviteNewUsersForm from '@admin/pages/publication/components/PublicationInviteNewUsersForm';
 import { ReleaseRouteParams } from '@admin/routes/releaseRoutes';
-import LoadingSpinner from '@common/components/LoadingSpinner';
-import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
-import React, { useState } from 'react';
-import { RouteComponentProps } from 'react-router';
-import TabsSection from '@common/components/TabsSection';
-import Tabs from '@common/components/Tabs';
-import PublicationManageTeamAccessTab from '@admin/pages/publication/components/PublicationManageTeamAccessTab';
-import PublicationInviteNewUsersTab from '@admin/pages/publication/components/PublicationInviteNewUsersTab';
-import { FormSelect } from '@common/components/form';
+import {
+  publicationManageTeamAccessReleaseRoute,
+  publicationReleaseContributorsRoute,
+  publicationManageTeamAccessRoute,
+  PublicationRouteParams,
+} from '@admin/routes/routes';
 import publicationService, {
   BasicPublicationDetails,
 } from '@admin/services/publicationService';
 import { ReleaseSummary } from '@admin/services/releaseService';
+import LoadingSpinner from '@common/components/LoadingSpinner';
+import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
+import TabsSection from '@common/components/TabsSection';
+import Tabs from '@common/components/Tabs';
+import { FormSelect } from '@common/components/form';
 import WarningMessage from '@common/components/WarningMessage';
-import { publicationManageTeamAccessReleaseRoute } from '@admin/routes/routes';
+import React, { useState } from 'react';
+import { RouteComponentProps } from 'react-router';
 import { generatePath, useHistory } from 'react-router-dom';
 
 interface Model {
@@ -97,15 +102,31 @@ const PublicationManageTeamAccessPage = ({
           {release && (
             <Tabs id="manageTeamAccessTabs">
               <TabsSection id="manage-access" title="Manage team access">
-                <PublicationManageTeamAccessTab
-                  publication={publication}
+                <PublicationManageTeamAccess
+                  addUserPath={generatePath<ReleaseRouteParams>(
+                    publicationReleaseContributorsRoute.path,
+                    {
+                      publicationId,
+                      releaseId: release.id,
+                    },
+                  )}
+                  heading={<h2>Update access for release ({release.title})</h2>}
+                  publicationId={publication.id}
                   release={release}
                 />
               </TabsSection>
               <TabsSection id="invite-users" title="Invite new users">
-                <PublicationInviteNewUsersTab
+                <PublicationInviteNewUsersForm
+                  hideCancelButton
                   publication={publication}
                   releases={releases}
+                  releaseId={releaseId}
+                  returnRoute={generatePath<PublicationRouteParams>(
+                    publicationManageTeamAccessRoute.path,
+                    {
+                      publicationId: publication.id,
+                    },
+                  )}
                 />
               </TabsSection>
             </Tabs>

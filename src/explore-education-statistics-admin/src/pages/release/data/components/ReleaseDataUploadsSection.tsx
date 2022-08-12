@@ -16,8 +16,6 @@ import releaseDataFileService, {
   DataFileImportStatus,
   DeleteDataFilePlan,
 } from '@admin/services/releaseDataFileService';
-import Accordion from '@common/components/Accordion';
-import AccordionSection from '@common/components/AccordionSection';
 import ButtonText from '@common/components/ButtonText';
 import FormFieldTextInput from '@common/components/form/FormFieldTextInput';
 import InsetText from '@common/components/InsetText';
@@ -29,9 +27,11 @@ import logger from '@common/services/logger';
 import { mapFieldErrors } from '@common/validation/serverValidations';
 import Yup from '@common/validation/yup';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
-import orderBy from 'lodash/orderBy';
 import React, { useCallback, useState } from 'react';
 import { generatePath } from 'react-router';
+import { Dictionary } from '@common/types';
+import ReorderableAccordion from '@admin/components/editable/ReorderableAccordion';
+import ReorderableAccordionSection from '@admin/components/editable/ReorderableAccordionSection';
 
 interface FormValues extends DataFileUploadFormValues {
   subjectTitle: string;
@@ -144,7 +144,7 @@ const ReleaseDataUploadsSection = ({
         });
       }
       setActiveFileId(file.id);
-      setDataFiles(orderBy([...dataFiles, file], dataFile => dataFile.title));
+      setDataFiles([...dataFiles, file]);
     },
     [dataFiles, releaseId, setDataFiles],
   );
@@ -229,13 +229,22 @@ const ReleaseDataUploadsSection = ({
 
       <hr className="govuk-!-margin-top-6 govuk-!-margin-bottom-6" />
 
-      <h2>Uploaded data files</h2>
-
       <LoadingSpinner loading={isLoading}>
         {dataFiles.length > 0 ? (
-          <Accordion id="uploadedDataFiles">
+          <ReorderableAccordion
+            id="uploadedDataFiles"
+            heading="Uploaded data files"
+            onReorder={async (fileIds: string[]) => {
+              setDataFiles(
+                await releaseDataFileService.updateDataFilesOrder(
+                  releaseId,
+                  fileIds,
+                ),
+              );
+            }}
+          >
             {dataFiles.map(dataFile => (
-              <AccordionSection
+              <ReorderableAccordionSection
                 id={dataFile.id}
                 key={dataFile.title}
                 heading={dataFile.title}
@@ -308,9 +317,9 @@ const ReleaseDataUploadsSection = ({
                     )}
                   </DataFileDetailsTable>
                 </div>
-              </AccordionSection>
+              </ReorderableAccordionSection>
             ))}
-          </Accordion>
+          </ReorderableAccordion>
         ) : (
           <InsetText>No data files have been uploaded.</InsetText>
         )}

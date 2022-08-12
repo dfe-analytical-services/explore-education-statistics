@@ -219,7 +219,7 @@ const ReleaseContent = () => {
                         releaseFileService.downloadAllFilesZip(release.id)
                       }
                     >
-                      Download all data
+                      Download all data (zip)
                     </Button>
                   </li>
                 )}
@@ -332,7 +332,7 @@ const ReleaseContent = () => {
               variant="secondary"
               onClick={() => releaseFileService.downloadAllFilesZip(release.id)}
             >
-              Download all data
+              Download all data (zip)
             </Button>
           }
           renderDownloadLink={file => (

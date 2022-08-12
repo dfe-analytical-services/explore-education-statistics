@@ -3,6 +3,7 @@ import { DataFilePermissions } from '@admin/services/permissionService';
 import client from '@admin/services/utils/service';
 import { FileInfo } from '@common/services/types/file';
 import downloadFile from '@common/utils/file/downloadFile';
+import { Dictionary } from '@common/types';
 
 interface DataFileInfo extends FileInfo {
   type: 'Data';
@@ -154,6 +155,17 @@ const releaseDataFileService = {
     );
 
     return mapFile(file);
+  },
+  updateDataFilesOrder(
+    releaseId: string,
+    order: string[],
+  ): Promise<DataFile[]> {
+    return client
+      .put<DataFileInfo[]>(`/release/${releaseId}/data/order`, order)
+      .then(response => {
+        const dataFiles = response.filter(file => file.metaFileName.length > 0);
+        return dataFiles.map(mapFile);
+      });
   },
   getDataFileImportStatus(
     releaseId: string,
