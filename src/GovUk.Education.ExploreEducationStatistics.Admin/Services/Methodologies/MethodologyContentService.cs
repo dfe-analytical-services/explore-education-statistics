@@ -99,7 +99,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             Dictionary<Guid, int> newSectionOrder)
         {
             return _persistenceHelper
-                .CheckEntityExists<MethodologyVersion>(methodologyVersionId)
+                .CheckEntityExists<MethodologyVersion>(methodologyVersionId, q => 
+                    q.Include(version => version.MethodologyContent))
                 .OnSuccess(CheckCanUpdateMethodologyContent)
                 .OnSuccess(methodology => FindContentList(methodology, newSectionOrder.Keys.ToList()))
                 .OnSuccess(async tuple =>
@@ -427,6 +428,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             if (methodologyVersion.Status != MethodologyStatus.Draft)
             {
                 return ValidationActionResult(ValidationErrorMessages.MethodologyMustBeDraft);
+            }
+
+            if (methodologyVersion.MethodologyContent == null)
+            {
+                throw new ArgumentException("MethodologyContent must be hydrated");
             }
 
             return await _userService
