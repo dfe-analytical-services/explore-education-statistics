@@ -83,7 +83,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     new()
                     {
                         Id = Guid.NewGuid(),
-                        MethodologyContent = new MethodologyVersionContent {
+                        MethodologyContent = new MethodologyVersionContent
+                        {
                             Annexes = new List<ContentSection>
                             {
                                 new()
@@ -269,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
             var service = SetupMethodologyContentService(contentDbContext: contentDbContext);
 
             var result = await service.GetContent(Guid.NewGuid());
-                
+
             result.AssertNotFound();
         }
 
@@ -303,7 +304,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
         {
             var methodologyVersion = new MethodologyVersion
             {
-                MethodologyContent = new MethodologyVersionContent {
+                MethodologyContent = new MethodologyVersionContent
+                {
                     Annexes = new List<ContentSection>
                     {
                         new()
@@ -370,7 +372,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
 
             var methodologyVersion = new MethodologyVersion
             {
-                MethodologyContent = new MethodologyVersionContent {
+                MethodologyContent = new MethodologyVersionContent
+                {
                     Annexes = new List<ContentSection>
                     {
                         new()
@@ -513,6 +516,148 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.Method
                     MethodologyContentService.ContentListType.Content);
 
                 result.AssertBadRequest(MethodologyMustBeDraft);
+            }
+        }
+
+        [Fact]
+        public async Task ReorderContentSections_Content()
+        {
+            var methodologyVersion = new MethodologyVersion
+            {
+                MethodologyContent = new MethodologyVersionContent
+                {
+                    Annexes = new List<ContentSection>(),
+                    Content = new List<ContentSection>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Order = 0
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Order = 1
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Order = 2
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
+
+                var contentSections = methodologyVersion.MethodologyContent.Content;
+
+                var result = await methodologyContentService.ReorderContentSections(
+                    methodologyVersion.Id,
+                    new Dictionary<Guid, int>
+                    {
+                        {
+                            contentSections[2].Id,
+                            0
+                        },
+                        {
+                            contentSections[0].Id,
+                            1
+                        },
+                        {
+                            contentSections[1].Id,
+                            2
+                        }
+                    }
+                );
+
+                var updatedSections = result.AssertRight();
+
+                Assert.Equal(3, updatedSections.Count);
+                Assert.Equal(contentSections[2].Id, updatedSections[0].Id);
+                Assert.Equal(contentSections[0].Id, updatedSections[1].Id);
+                Assert.Equal(contentSections[1].Id, updatedSections[2].Id);
+            }
+        }
+
+        [Fact]
+        public async Task ReorderContentSections_Annexes()
+        {
+            var methodologyVersion = new MethodologyVersion
+            {
+                MethodologyContent = new MethodologyVersionContent
+                {
+                    Content = new List<ContentSection>(),
+                    Annexes = new List<ContentSection>
+                    {
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Order = 0
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Order = 1
+                        },
+                        new()
+                        {
+                            Id = Guid.NewGuid(),
+                            Order = 2
+                        }
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.MethodologyVersions.AddAsync(methodologyVersion);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var methodologyContentService = SetupMethodologyContentService(contentDbContext);
+
+                var annexeSections = methodologyVersion.MethodologyContent.Annexes;
+
+                var result = await methodologyContentService.ReorderContentSections(
+                    methodologyVersion.Id,
+                    new Dictionary<Guid, int>
+                    {
+                        {
+                            annexeSections[2].Id,
+                            0
+                        },
+                        {
+                            annexeSections[0].Id,
+                            1
+                        },
+                        {
+                            annexeSections[1].Id,
+                            2
+                        }
+                    }
+                );
+
+                var updatedSections = result.AssertRight();
+
+                Assert.Equal(3, updatedSections.Count);
+                Assert.Equal(annexeSections[2].Id, updatedSections[0].Id);
+                Assert.Equal(annexeSections[0].Id, updatedSections[1].Id);
+                Assert.Equal(annexeSections[1].Id, updatedSections[2].Id);
             }
         }
 
