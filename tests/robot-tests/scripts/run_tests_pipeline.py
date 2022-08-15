@@ -28,13 +28,13 @@ def run_tests_pipeline():
     subprocess.check_call('pip install pipenv', shell=True)
     subprocess.check_call('pipenv install', shell=True)
 
-    # utility to not send slack test report if snapshot tests are being run
-    def should_send_test_reports() -> bool:
-        return args.file != 'tests/general_public/check_snapshots.robot'
+    def get_test_command() -> str:
+        if args.file == 'tests/general_public/check_snapshots.robot':
+            return f'pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes 3'
+        else:
+            return f'pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes 3 --enable-slack'
 
-    command = f"pipenv run python run_tests.py --admin-pass {args.admin_password} --analyst-pass {args.analyst_password} --slack-webhook-url {args.slack_webhook_url} --env {args.env} --file {args.file} --ci --processes 3 {'--enable-slack' if should_send_test_reports() else None}"
-
-    subprocess.run(command, shell=True)
+    subprocess.run(get_test_command(), shell=True)
 
 
 if __name__ == '__main__':
