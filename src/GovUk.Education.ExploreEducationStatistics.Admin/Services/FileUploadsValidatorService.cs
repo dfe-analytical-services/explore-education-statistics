@@ -169,7 +169,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             if (IsFileExisting(releaseId, FileType.Data, dataFileName) && 
                 (replacingFile == null || replacingFile.Filename != dataFileName))
             {
-                return ValidationActionResult(CannotOverwriteDataFile);
+                return ValidationActionResult(DataFilenameNotUnique);
             }
 
             return Unit.Instance;

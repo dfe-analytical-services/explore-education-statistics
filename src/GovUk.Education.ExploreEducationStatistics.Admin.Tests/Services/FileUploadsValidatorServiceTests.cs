@@ -262,7 +262,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         
                 var result = await service.ValidateDataFilesForUpload(releaseId, dataFile, metaFile);
         
-                result.AssertBadRequest(CannotOverwriteDataFile);
+                result.AssertBadRequest(DataFilenameNotUnique);
             }
         }
         
@@ -387,7 +387,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await service.ValidateDataFilesForUpload(
                     releaseId, dataFile, metaFile, fileBeingReplaced);
                 
-                result.AssertBadRequest(CannotOverwriteDataFile);
+                result.AssertBadRequest(DataFilenameNotUnique);
             }
         }
         
