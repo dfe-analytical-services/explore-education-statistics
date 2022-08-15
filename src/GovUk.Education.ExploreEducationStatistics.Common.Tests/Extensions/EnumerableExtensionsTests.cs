@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using Xunit;
+using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
 {
@@ -133,6 +134,42 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions
         {
             var list = new List<string> {"foo", "bar"};
             Assert.False(list.IsNullOrEmpty());
+        }
+
+        [Fact]
+        public void IsSameAsIgnoringOrder_ListsAreEmpty()
+        {
+            Assert.True(new List<string>().IsSameAsIgnoringOrder(new List<string>()));
+        }
+
+        [Fact]
+        public void IsSameAsIgnoringOrder_ListsAreSame()
+        {
+            Assert.True(ListOf("a", "b").IsSameAsIgnoringOrder(ListOf("a", "b")));
+        }
+
+        [Fact]
+        public void IsSameAsIgnoringOrder_ListsAreSameIgnoringOrder()
+        {
+            Assert.True(ListOf("a", "b").IsSameAsIgnoringOrder(ListOf("b", "a")));
+        }
+
+        [Fact]
+        public void IsSameAsIgnoringOrder_FirstHasElementNotInSecond()
+        {
+            var first = ListOf("a", "b", "c");
+            var second = ListOf("b", "a");
+
+            Assert.False(first.IsSameAsIgnoringOrder(second));
+        }
+
+        [Fact]
+        public void IsSameAsIgnoringOrder_SecondHasElementNotInFirst()
+        {
+            var first = ListOf("a", "b");
+            var second = ListOf("c", "b", "a");
+
+            Assert.False(first.IsSameAsIgnoringOrder(second));
         }
 
         [Fact]

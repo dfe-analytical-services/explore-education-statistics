@@ -384,23 +384,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Services
             IEnumerable<T> second,
             ValidationErrorMessages error)
         {
-            if (CollectionsAreSameIgnoringOrder(first, second))
+            if (first.IsSameAsIgnoringOrder(second))
             {
                 return Unit.Instance;
             }
 
             return ValidationResult(error);
-        }
-
-        private static bool CollectionsAreSameIgnoringOrder<T>(IEnumerable<T> first, IEnumerable<T> second)
-        {
-            var firstList = first.ToList();
-            var secondList = second.ToList();
-
-            var firstNotInSecond = firstList.Except(secondList);
-            var secondNotInFirst = secondList.Except(firstList);
-
-            return !(firstNotInSecond.Any() || secondNotInFirst.Any());
         }
     }
 }
