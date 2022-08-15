@@ -38,17 +38,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFormFile metaFile,
             File? replacingFile = null)
         {
-            return await ValidateDataFileNames(releaseId, dataFile.FileName, metaFile.FileName, replacingFile)
+            return await ValidateDataFileNames(releaseId,
+                    dataFileName: dataFile.FileName,
+                    metaFileName: metaFile.FileName,
+                    replacingFile)
                 .OnSuccess(async _ => await ValidateDataFileSizes(dataFile.Length, metaFile.Length))
                 .OnSuccess(async _ => await ValidateDataFileTypes(dataFile, metaFile));
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(
             Guid releaseId,
-            IDataArchiveFile archiveFile)
+            IDataArchiveFile archiveFile,
+            File? replacingFile = null)
         {
-            return await ValidateDataFileNames(releaseId, archiveFile.DataFileName, archiveFile.MetaFileName, null)
-                .OnSuccess(async _ => await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize));
+            return await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize)
+                .OnSuccess(async _ => await ValidateDataFileNames(releaseId,
+                    dataFileName: archiveFile.DataFileName,
+                    metaFileName: archiveFile.MetaFileName,
+                    replacingFile));
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
