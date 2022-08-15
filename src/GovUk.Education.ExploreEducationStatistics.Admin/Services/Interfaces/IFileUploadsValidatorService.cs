@@ -13,9 +13,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
         Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type);
 
         Task<Either<ActionResult, Unit>> ValidateDataFilesForUpload(
-            Guid releaseId, 
+            Guid releaseId,
             IFormFile dataFile,
-            IFormFile metaFile, 
+            IFormFile metaFile,
             File? replacingFile = null);
 
         Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(Guid releaseId, IDataArchiveFile archiveFile);

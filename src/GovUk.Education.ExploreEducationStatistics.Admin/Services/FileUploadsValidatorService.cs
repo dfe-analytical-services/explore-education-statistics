@@ -4,11 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +21,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class FileUploadsValidatorService : IFileUploadsValidatorService
     {
-        private readonly ISubjectRepository _subjectRepository;
         private readonly IFileTypeService _fileTypeService;
         private readonly ContentDbContext _context;
 
-        public FileUploadsValidatorService(ISubjectRepository subjectRepository, IFileTypeService fileTypeService, ContentDbContext context)
+        public FileUploadsValidatorService(IFileTypeService fileTypeService,
+            ContentDbContext context)
         {
-            _subjectRepository = subjectRepository;
             _fileTypeService = fileTypeService;
             _context = context;
         }
@@ -66,7 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationActionResult(FileCannotBeEmpty);
             }
-            
+
             if (!await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[type]))
             {
                 return ValidationActionResult(FileTypeInvalid);
@@ -127,12 +124,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(rf => rf.ReleaseId == releaseId)
                 .ToList()
                 .Any(rf => String.Equals(rf.File.Filename, name, CurrentCultureIgnoreCase)
-                && rf.File.Type == type);
+                           && rf.File.Type == type);
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateDataFileNames(
-            Guid releaseId, 
-            string dataFileName, 
+            Guid releaseId,
+            string dataFileName,
             string metaFileName,
             File? replacingFile)
         {
@@ -166,7 +163,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
 
-            if (IsFileExisting(releaseId, FileType.Data, dataFileName) && 
+            if (IsFileExisting(releaseId, FileType.Data, dataFileName) &&
                 (replacingFile == null || replacingFile.Filename != dataFileName))
             {
                 return ValidationActionResult(DataFilenameNotUnique);
