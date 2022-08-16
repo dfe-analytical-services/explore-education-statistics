@@ -7,7 +7,7 @@ import classNames from 'classnames';
 import React from 'react';
 
 interface Props {
-  axisName: string;
+  groupName: string;
   id: string;
   legend: string;
   totalItems: number;
@@ -15,7 +15,7 @@ interface Props {
 }
 
 const TableHeadersGroupControls = ({
-  axisName,
+  groupName,
   id,
   legend,
   totalItems,
@@ -98,7 +98,7 @@ const TableHeadersGroupControls = ({
             }}
           >
             Move<VisuallyHidden> {legend}</VisuallyHidden>
-            {` to ${axisName.startsWith('rowGroups') ? 'columns' : 'rows'}`}
+            {` to ${groupName.startsWith('rowGroups') ? 'columns' : 'rows'}`}
           </Button>
         </>
       )}

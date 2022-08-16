@@ -1,5 +1,8 @@
 import { FormFieldset } from '@common/components/form';
 import styles from '@common/modules/table-tool/components/TableHeadersAxis.module.scss';
+import TableHeadersDraggableGroup from '@common/modules/table-tool/components/TableHeadersDraggableGroup';
+import TableHeadersNotDraggableGroup from '@common/modules/table-tool/components/TableHeadersNotDraggableGroup';
+import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
 import {
   CategoryFilter,
@@ -11,31 +14,24 @@ import classNames from 'classnames';
 import { useField } from 'formik';
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
-import TableHeadersDraggableGroup from './TableHeadersDraggableGroup';
-import TableHeadersNotDraggableGroup from './TableHeadersNotDraggableGroup';
 
-interface Props<FormValues> {
+interface Props {
   id: string;
   legend: string;
-  name: FormValues extends Record<string, unknown> ? keyof FormValues : string;
+  name: keyof TableHeadersFormValues;
   onMoveGroupToOtherAxis: (index: number) => void;
 }
 
-function TableHeadersAxis<FormValues>({
-  id,
-  legend,
-  name,
-  onMoveGroupToOtherAxis,
-}: Props<FormValues>) {
+function TableHeadersAxis({ id, legend, name, onMoveGroupToOtherAxis }: Props) {
   const {
     groupDraggingActive,
     groupDraggingEnabled,
   } = useTableHeadersContext();
-  const [field, meta] = useField(name as string);
+  const [field, meta] = useField(name);
 
   if (groupDraggingEnabled) {
     return (
-      <Droppable droppableId={name as string} direction="horizontal">
+      <Droppable droppableId={name} direction="horizontal">
         {droppableProvided => (
           <div
             // eslint-disable-next-line react/jsx-props-no-spreading

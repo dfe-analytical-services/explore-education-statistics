@@ -1,12 +1,11 @@
 import DragIcon from '@common/components/DragIcon';
 import styles from '@common/modules/table-tool/components/TableHeadersReorderableList.module.scss';
-import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
 import { Filter } from '@common/modules/table-tool/types/filters';
 import { Field, FieldProps } from 'formik';
 import { FormFieldset } from '@common/components/form';
 import reorderMultiple from '@common/utils/reorderMultiple';
 import classNames from 'classnames';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -164,11 +163,13 @@ const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
                   setDraggingIndex(start.source.index);
                 }}
                 onDragEnd={result => {
-                  if (result.destination?.index == null) {
+                  const destinationIndex = result.destination?.index;
+                  if (
+                    destinationIndex === null ||
+                    destinationIndex === undefined
+                  ) {
                     return;
                   }
-
-                  const destinationIndex = result.destination.index;
 
                   const selected = selectedIndices.length
                     ? selectedIndices
@@ -194,7 +195,7 @@ const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
                     }, []),
                   );
 
-                  form.setFieldValue(name as string, nextValue);
+                  form.setFieldValue(name, nextValue);
                 }}
               >
                 <Droppable droppableId={id}>

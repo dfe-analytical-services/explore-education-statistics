@@ -1,5 +1,5 @@
 import useToggle from '@common/hooks/useToggle';
-import { noop } from 'lodash';
+import noop from 'lodash/noop';
 import React, {
   createContext,
   ReactNode,
@@ -9,7 +9,7 @@ import React, {
 } from 'react';
 
 export interface TableHeadersContextState {
-  activeList: string | undefined;
+  activeList?: string;
   defaultNumberOfItems: number;
   expandedLists: string[];
   groupDraggingActive: boolean;

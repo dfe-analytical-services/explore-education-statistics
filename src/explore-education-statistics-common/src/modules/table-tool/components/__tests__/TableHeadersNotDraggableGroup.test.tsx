@@ -11,7 +11,6 @@ import { Formik } from 'formik';
 import { render as baseRender, screen, within } from '@testing-library/react';
 import noop from 'lodash/noop';
 import React from 'react';
-import _ from 'lodash';
 
 describe('TableHeadersNotDraggableGroup', () => {
   test('renders the reorderable list and group controls when reordering is active', () => {

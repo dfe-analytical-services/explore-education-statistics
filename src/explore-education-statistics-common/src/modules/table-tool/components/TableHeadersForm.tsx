@@ -2,13 +2,10 @@ import Button from '@common/components/Button';
 import { FormGroup } from '@common/components/form';
 import useMounted from '@common/hooks/useMounted';
 import TableHeadersAxis from '@common/modules/table-tool/components/TableHeadersAxis';
-import useTableHeadersContext, {
-  TableHeadersContextProvider,
-} from '@common/modules/table-tool/contexts/TableHeadersContext';
+import { TableHeadersContextProvider } from '@common/modules/table-tool/contexts/TableHeadersContext';
 import { Filter } from '@common/modules/table-tool/types/filters';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 import styles from '@common/modules/table-tool/components/TableHeadersForm.module.scss';
-import { PickByType } from '@common/types';
 import reorder from '@common/utils/reorder';
 import Yup from '@common/validation/yup';
 import { Form, Formik, FormikProps } from 'formik';
@@ -22,7 +19,7 @@ export interface TableHeadersFormValues {
   columnGroups: Filter[][];
 }
 
-interface TableHeadersFormProps {
+interface Props {
   initialValues: TableHeadersConfig;
   onSubmit: (values: TableHeadersConfig) => void;
   id?: string;
@@ -32,7 +29,7 @@ const TableHeadersForm = ({
   onSubmit,
   id = 'tableHeadersForm',
   initialValues,
-}: TableHeadersFormProps) => {
+}: Props) => {
   const { isMounted } = useMounted();
   const [screenReaderMessage, setScreenReaderMessage] = useState('');
 
@@ -211,9 +208,7 @@ const TableHeadersForm = ({
                       }}
                     >
                       <FormGroup className="govuk-!-margin-bottom-4">
-                        <TableHeadersAxis<
-                          PickByType<TableHeadersConfig, Filter[][]>
-                        >
+                        <TableHeadersAxis
                           id="columnGroups"
                           legend="Move column headers"
                           name="columnGroups"
@@ -226,9 +221,7 @@ const TableHeadersForm = ({
                           }}
                         />
 
-                        <TableHeadersAxis<
-                          PickByType<TableHeadersConfig, Filter[][]>
-                        >
+                        <TableHeadersAxis
                           id="rowGroups"
                           legend="Move row headers"
                           name="rowGroups"
@@ -270,11 +263,4 @@ const TableHeadersForm = ({
     </TableHeadersContextProvider>
   );
 };
-
-// const TableHeadersForm = (props: TableHeadersFormProps) => (
-//   <TableHeadersContextProvider>
-//     <TableHeadersFormInner {...props} />
-//   </TableHeadersContextProvider>
-// );
-
 export default TableHeadersForm;

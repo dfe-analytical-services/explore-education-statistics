@@ -37,7 +37,7 @@ const TableHeadersNotDraggableGroup = ({ legend, name, totalItems }: Props) => {
       </div>
 
       <TableHeadersGroupControls
-        axisName={name as string}
+        groupName={name}
         id={groupId}
         legend={legend}
         totalItems={totalItems}

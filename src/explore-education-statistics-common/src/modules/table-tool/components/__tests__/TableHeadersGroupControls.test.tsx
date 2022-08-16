@@ -100,7 +100,7 @@ function render({
   expandedLists = [],
   totalItems = 2,
 }: {
-  activeList?: string | undefined;
+  activeList?: string;
   expandedLists?: string[];
   totalItems?: number;
 }) {
@@ -116,7 +116,7 @@ function render({
     >
       <Formik onSubmit={noop} initialValues={testInitialFormValues}>
         <TableHeadersGroupControls
-          axisName="rowGroups"
+          groupName="rowGroups"
           id="test-id"
           legend="Locations"
           totalItems={totalItems}
