@@ -276,6 +276,47 @@ public class MemoryCacheAttributeTests : IClassFixture<CacheTestFixture>, IDispo
     }
 
     [Fact]
+    public void OverrideConfigSectionSpecifiedButEmptyValues()
+    {
+        // We don't have the ability to provide "null" default values in the ARM templates for "string" and
+        // "int" parameter types, so we represent them as being not set with empty strings and -1. 
+        var configuration = CreateMockConfigurationSection(
+            TupleOf("DurationInSeconds", "-1"),
+            TupleOf("ExpirySchedule", ""));
+        
+        MemoryCacheAttribute.SetOverrideConfiguration(configuration.Object);
+        
+        var cacheKey = new TestMemoryCacheKey("test");
+
+        _memoryCacheService
+            .Setup(s => s.GetItem(cacheKey, typeof(TestValue)))
+            .ReturnsAsync(null);
+
+        var args = new List<object>();
+
+        // We expect the override cache configuration to be read from the ConfigurationSection, but as no non-null
+        // values have been specified for either override parameter, then the `TestMethods.SingleParam` cache
+        // attribute's config values should still be used.
+        var expectedCacheConfiguration = new MemoryCacheConfiguration(45, CrontabSchedule.Parse(HourlyExpirySchedule));
+            
+        _memoryCacheService
+            .Setup(s => 
+                s.SetItem(
+                    cacheKey, 
+                    Capture.In(args),
+                    ItIs.DeepEqualTo(expectedCacheConfiguration), 
+                    null))
+            .Returns(Task.CompletedTask);
+
+        var result = TestMethods.SingleParam("test");
+
+        VerifyAllMocks(_memoryCacheService);
+
+        Assert.IsType<TestValue>(result);
+        Assert.Equal(args[0], result);
+    }
+
+    [Fact]
     public void NoCacheService()
     {
         MemoryCacheAttribute.ClearServices();

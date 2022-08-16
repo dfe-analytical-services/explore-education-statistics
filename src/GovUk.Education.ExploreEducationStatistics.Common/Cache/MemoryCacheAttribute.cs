@@ -65,11 +65,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
 
         public static void SetOverrideConfiguration(IConfigurationSection? configurationSection)
         {
-            OverrideDurationInSeconds = configurationSection?.GetValue<int?>("DurationInSeconds");
-
+            var durationInSeconds = configurationSection?.GetValue<int?>("DurationInSeconds");
+            
+            OverrideDurationInSeconds = durationInSeconds != null && durationInSeconds != -1 
+                ? durationInSeconds.Value : null;
+            
             var overrideExpirySchedule = configurationSection?.GetValue<string?>("ExpirySchedule");
 
-            OverrideExpirySchedule = overrideExpirySchedule != null 
+            OverrideExpirySchedule = overrideExpirySchedule != null && !"".Equals(overrideExpirySchedule)
                 ? CrontabSchedule.Parse(overrideExpirySchedule) : null;
         }
 
