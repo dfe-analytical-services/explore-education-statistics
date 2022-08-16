@@ -577,14 +577,14 @@
     },
     "memoryCacheOverridesDurationInSeconds": {
       "type": "int",
-      "defaultValue": null,
+      "defaultValue": "[null()]",
       "metadata": {
         "description": "Override duration in seconds for all entities cached in memory"
       }
     },
     "memoryCacheOverridesExpirySchedule": {
       "type": "string",
-      "defaultValue": null,
+      "defaultValue": "[null()]",
       "metadata": {
         "description": "Override cron expression for all entities cached in memory"
       }
