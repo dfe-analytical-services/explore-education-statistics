@@ -577,7 +577,7 @@
     },
     "memoryCacheOverridesDurationInSeconds": {
       "type": "int",
-      "defaultValue": "-1",
+      "defaultValue": -1,
       "metadata": {
         "description": "Override duration in seconds for all entities cached in memory"
       }
