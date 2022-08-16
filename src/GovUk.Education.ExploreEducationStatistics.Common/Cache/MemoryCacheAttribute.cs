@@ -72,7 +72,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Cache
             
             var overrideExpirySchedule = configurationSection?.GetValue<string?>("ExpirySchedule");
 
-            OverrideExpirySchedule = overrideExpirySchedule != null && !"".Equals(overrideExpirySchedule)
+            OverrideExpirySchedule = !overrideExpirySchedule.IsNullOrEmpty() 
                 ? CrontabSchedule.Parse(overrideExpirySchedule) : null;
         }
 
