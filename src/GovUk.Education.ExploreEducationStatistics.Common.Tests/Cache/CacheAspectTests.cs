@@ -72,6 +72,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             }
         }
 
+        private record TestCacheKeyWithDefaultRecordConstructor(string Key1, string Key2) : ICacheKey
+        {
+            public string Key => $"{Key1}-{Key2}";
+        }
+
         private record TestCacheKeyWithTestParam : ICacheKey
         {
             public string Key { get; }
@@ -434,6 +439,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
 
             [TestCache(typeof(TestCacheKeyWithTestParam))]
             public static TestValue TwoParamsOfDifferentType_NoMatch(int param1, string param2)
+            {
+                return new();
+            }
+
+            [TestCache(typeof(TestCacheKeyWithDefaultRecordConstructor))]
+            public static TestValue TwoParamsOfSameType_DefaultRecordConstructor(
+                string key1,
+                string key2)
             {
                 return new();
             }
@@ -1031,6 +1044,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Tests.Cache
             AssertNoMatchingConstructorException(
                 typeof(TestCacheKeyWithTestParam),
                 () => TestMethods.TwoParamsOfDifferentType_NoMatch(10, "test")
+            );
+        }
+        
+        [Fact]
+        public void TwoParamsOfSameType_DefaultRecordConstructor()
+        {
+            var cacheKey = new TestCacheKeyWithDefaultRecordConstructor("Key1Value", "Key2Value");
+
+            AssertCacheMiss(
+                cacheKey,
+                () => TestMethods.TwoParamsOfSameType_DefaultRecordConstructor("Key1Value", "Key2Value")
             );
         }
 

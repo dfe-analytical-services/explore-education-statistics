@@ -28,8 +28,8 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
-    [Collection(BlobCacheServiceTests)]
-    public class TableBuilderControllerTests : BlobCacheServiceTestFixture
+    [Collection(CacheServiceTests)]
+    public class TableBuilderControllerTests : CacheServiceTestFixture
     {
         private static readonly ObservationQueryContext ObservationQueryContext = new()
         {
@@ -429,7 +429,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
             };
 
             return (controller,
-                (persistenceHelper, CacheService, dataBlockService, releaseRepository, tableBuilderService));
+                (persistenceHelper, BlobCacheService, dataBlockService, releaseRepository, tableBuilderService));
         }
     }
 }

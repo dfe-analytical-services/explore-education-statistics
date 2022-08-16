@@ -7,21 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces
 {
-    public interface IBlobCacheService : ICacheService<IBlobCacheKey>
+    public interface IBlobCacheService
     {
-        Task<TItem> GetItem<TItem>(
-            IBlobCacheKey cacheKey,
-            Func<TItem> itemSupplier)
-            where TItem : class;
+        Task<object?> GetItem(IBlobCacheKey cacheKey, Type targetType);
 
-        Task<TItem> GetItem<TItem>(
-            IBlobCacheKey cacheKey,
-            Func<Task<TItem>> itemSupplier)
-            where TItem : class;
+        Task SetItem<TItem>(IBlobCacheKey cacheKey, TItem item);
 
-        Task<Either<ActionResult, TItem>> GetItem<TItem>(
-            IBlobCacheKey cacheKey,
-            Func<Task<Either<ActionResult, TItem>>> itemSupplier)
-            where TItem : class;
+        Task DeleteItem(IBlobCacheKey cacheKey);
+        
+        Task DeleteCacheFolder(IBlobCacheKey cacheFolderKey);
     }
 }

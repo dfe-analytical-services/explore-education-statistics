@@ -23,84 +23,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
             _logger = logger;
         }
 
-        public async Task DeleteItem(IBlobCacheKey cacheKey)
-        {
-            await _blobStorageService.DeleteBlob(cacheKey.Container, cacheKey.Key);
-        }
-
-        public async Task DeleteCacheFolder(IBlobCacheKey cacheFolderKey)
-        {
-            await _blobStorageService.DeleteBlobs(cacheFolderKey.Container, cacheFolderKey.Key);
-        }
-
-        public async Task<TItem> GetItem<TItem>(
-            IBlobCacheKey cacheKey,
-            Func<TItem> itemSupplier)
-            where TItem : class
-        {
-            // Attempt to read blob from the cache container
-            var cachedEntity = await GetItem<TItem>(cacheKey);
-
-            if (cachedEntity != null)
-            {
-                return cachedEntity;
-            }
-
-            // Cache miss - invoke provider instead
-            var entity = itemSupplier();
-
-            // Write result to cache as a json blob before returning
-            await SetItem(cacheKey, entity);
-            return entity;
-        }
-
-        public async Task<TItem> GetItem<TItem>(
-            IBlobCacheKey cacheKey,
-            Func<Task<TItem>> itemSupplier)
-            where TItem : class
-        {
-            // Attempt to read blob from the cache container
-            var cachedEntity = await GetItem<TItem>(cacheKey);
-            if (cachedEntity != null)
-            {
-                return cachedEntity;
-            }
-
-            // Cache miss - invoke provider instead
-            var entity = await itemSupplier();
-
-            // Write result to cache as a json blob before returning
-            await SetItem(cacheKey, entity);
-            return entity;
-        }
-
-        public async Task<Either<ActionResult, TItem>> GetItem<TItem>(
-            IBlobCacheKey cacheKey,
-            Func<Task<Either<ActionResult, TItem>>> itemSupplier)
-            where TItem : class
-        {
-            // Attempt to read blob from the cache container
-            var cachedEntity = await GetItem<TItem>(cacheKey);
-
-            if (cachedEntity != null)
-            {
-                return cachedEntity;
-            }
-
-            // Cache miss - invoke provider instead
-            return await itemSupplier().OnSuccessDo(async entity =>
-            {
-                // Write result to cache as a json blob before returning
-                await SetItem(cacheKey, entity);
-            });
-        }
-
-        public async Task<TItem?> GetItem<TItem>(IBlobCacheKey cacheKey)
-            where TItem : class
-        {
-            return (TItem?) await GetItem(cacheKey, typeof(TItem));
-        }
-
         public async Task<object?> GetItem(IBlobCacheKey cacheKey, Type targetType)
         {
             var blobContainer = cacheKey.Container;
@@ -137,6 +59,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Services
         {
             // Write result to cache as a json blob before returning
             await _blobStorageService.UploadAsJson(cacheKey.Container, cacheKey.Key, item);
+        }
+        
+        public async Task DeleteItem(IBlobCacheKey cacheKey)
+        {
+            await _blobStorageService.DeleteBlob(cacheKey.Container, cacheKey.Key);
+        }
+
+        public async Task DeleteCacheFolder(IBlobCacheKey cacheFolderKey)
+        {
+            await _blobStorageService.DeleteBlobs(cacheFolderKey.Container, cacheFolderKey.Key);
         }
     }
 }

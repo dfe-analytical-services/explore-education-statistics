@@ -29,8 +29,8 @@ using Unit = GovUk.Education.ExploreEducationStatistics.Data.Model.Unit;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api.Statistics
 {
-    [Collection(BlobCacheServiceTests)]
-    public class TableBuilderControllerTests : BlobCacheServiceTestFixture
+    [Collection(CacheServiceTests)]
+    public class TableBuilderControllerTests : CacheServiceTestFixture
     {
         private readonly Guid _releaseId = Guid.NewGuid();
         private readonly Guid _dataBlockId = Guid.NewGuid();
@@ -294,7 +294,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Controllers.Api
                 logger.Object
             );
 
-            return (controller, (tableBuilderService, persistenceHelper, CacheService));
+            return (controller, (tableBuilderService, persistenceHelper, BlobCacheService));
         }
     }
 }

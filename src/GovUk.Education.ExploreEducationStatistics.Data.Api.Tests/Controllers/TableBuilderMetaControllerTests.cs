@@ -25,8 +25,8 @@ using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
 {
-    [Collection(BlobCacheServiceTests)]
-    public class TableBuilderMetaControllerTests : BlobCacheServiceTestFixture
+    [Collection(CacheServiceTests)]
+    public class TableBuilderMetaControllerTests : CacheServiceTestFixture
     {
         private static readonly Guid ReleaseId = Guid.NewGuid();
         private static readonly Guid SubjectId = Guid.NewGuid();
@@ -229,7 +229,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Data.Api.Tests.Controllers
                 statisticsPersistenceHelper,
                 releaseSubjectRepository,
                 subjectMetaService,
-                CacheService));
+                BlobCacheService));
         }
     }
 }
