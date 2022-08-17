@@ -53,7 +53,7 @@ const testReleases: ReleaseSummary[] = [
 
 describe('PublicationInviteUsersPage', () => {
   test('renders the page correctly', async () => {
-    publicationService.getReleases.mockResolvedValue({
+    publicationService.listReleases.mockResolvedValue({
       results: testReleases,
       paging: { page: 1, pageSize: 5, totalPages: 1, totalResults: 5 },
     });

@@ -354,7 +354,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.NotNull(publication);
                 Assert.Equal(3, publication.Methodologies.Count);
 
-                // Methodologies aren't ordered
                 var methodology2Version0 = Assert.Single(publication.Methodologies[0].Methodology.Versions);
                 Assert.Equal(methodology2Id, methodology2Version0.Id);
 

@@ -128,20 +128,20 @@ public class PaginatedListViewModelTests
     [Fact]
     public void PaginatedListViewModel_NoResults()
     {
-        var allResults = new List<int>();
+        var noResults = new List<int>();
 
         var page = 1;
         var pageSize = 10;
 
         var result = PaginatedListViewModel<int>.Create(
-            allResults, page, pageSize);
+            noResults, page, pageSize);
 
         var paginatedViewModel = result.AssertRight();
 
-        Assert.Equal(allResults,  paginatedViewModel.Results);
+        Assert.Equal(noResults,  paginatedViewModel.Results);
         Assert.Equal(page, paginatedViewModel.Paging.Page);
         Assert.Equal(pageSize, paginatedViewModel.Paging.PageSize);
-        Assert.Equal(allResults.Count, paginatedViewModel.Paging.TotalResults);
+        Assert.Equal(noResults.Count, paginatedViewModel.Paging.TotalResults);
         Assert.Equal(1, paginatedViewModel.Paging.TotalPages);
     }
 

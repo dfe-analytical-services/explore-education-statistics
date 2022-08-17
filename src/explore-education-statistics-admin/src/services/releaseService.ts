@@ -5,6 +5,13 @@ import { PublicationContactDetails } from '@admin/services/publicationService';
 import { ReleaseType } from '@common/services/types/releaseType';
 import { PartialDate } from '@common/utils/date/partialDate';
 
+export interface ReleasePermissions {
+  canAddPrereleaseUsers: boolean;
+  canUpdateRelease: boolean;
+  canDeleteRelease: boolean;
+  canMakeAmendmentOfRelease: boolean;
+}
+
 export interface Release {
   id: string;
   slug: string;
@@ -29,12 +36,11 @@ export interface Release {
   previousVersionId: string;
   preReleaseAccessList: string;
   yearTitle?: string;
-  permissions?: {
-    canAddPrereleaseUsers: boolean;
-    canUpdateRelease: boolean;
-    canDeleteRelease: boolean;
-    canMakeAmendmentOfRelease: boolean;
-  };
+  permissions?: ReleasePermissions;
+}
+
+export interface ReleaseWithPermissions extends Release {
+  permissions: ReleasePermissions;
 }
 
 export interface ReleaseSummary {
@@ -59,18 +65,6 @@ export interface ReleaseListItem {
   title: string;
   live: boolean;
   approvalStatus: ReleaseApprovalStatus;
-}
-
-export interface PaginatedList<T> {
-  results: T[];
-  paging: Pagination;
-}
-
-export interface Pagination {
-  page: number;
-  pageSize: number;
-  totalResults: number;
-  totalPages: number;
 }
 
 interface BaseReleaseRequest {

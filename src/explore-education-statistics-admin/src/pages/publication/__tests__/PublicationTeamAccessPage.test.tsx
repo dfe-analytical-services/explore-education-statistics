@@ -6,11 +6,7 @@ import {
   PublicationTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
 import _publicationService from '@admin/services/publicationService';
-import {
-  PaginatedList,
-  ReleaseListItem,
-  ReleaseSummary,
-} from '@admin/services/releaseService';
+import { ReleaseListItem } from '@admin/services/releaseService';
 import _releasePermissionService, {
   ContributorInvite,
   ContributorViewModel,
@@ -22,6 +18,7 @@ import React from 'react';
 import { Router } from 'react-router-dom';
 import noop from 'lodash/noop';
 import { createMemoryHistory, MemoryHistory } from 'history';
+import { PaginatedList } from '@common/services/types/pagination';
 
 jest.mock('@admin/services/publicationService');
 const publicationService = _publicationService as jest.Mocked<
@@ -79,7 +76,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with no releases', async () => {
-    publicationService.getReleases.mockResolvedValue({
+    publicationService.listReleases.mockResolvedValue({
       results: [],
       paging: { page: 1, pageSize: 1, totalPages: 1, totalResults: 0 },
     } as PaginatedList<ReleaseListItem>);
@@ -93,7 +90,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('renders the page correctly with releases', async () => {
-    publicationService.getReleases.mockResolvedValue(paginatedTestReleases);
+    publicationService.listReleases.mockResolvedValue(paginatedTestReleases);
     await renderPage({});
 
     const releaseSelect = screen.getByLabelText('Select release');
@@ -130,7 +127,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('selects the release from the id in the url', async () => {
-    publicationService.getReleases.mockResolvedValue(paginatedTestReleases);
+    publicationService.listReleases.mockResolvedValue(paginatedTestReleases);
     await renderPage({
       releaseId: 'release-2',
     });
@@ -145,7 +142,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('selects the first release if no release is set in the url', async () => {
-    publicationService.getReleases.mockResolvedValue(paginatedTestReleases);
+    publicationService.listReleases.mockResolvedValue(paginatedTestReleases);
     const history = createMemoryHistory();
     await renderPage({ history });
 
@@ -163,7 +160,7 @@ describe('PublicationTeamAccessPage', () => {
   });
 
   test('updates the page and url when select a different release', async () => {
-    publicationService.getReleases.mockResolvedValue(paginatedTestReleases);
+    publicationService.listReleases.mockResolvedValue(paginatedTestReleases);
     const history = createMemoryHistory();
     await renderPage({ history });
 

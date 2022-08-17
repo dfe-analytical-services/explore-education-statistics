@@ -3,6 +3,7 @@ import { testContact } from '@admin/pages/publication/__data__/testPublication';
 import _releaseService, {
   Release,
   ReleaseSummary,
+  ReleaseWithPermissions,
 } from '@admin/services/releaseService';
 import {
   render as baseRender,
@@ -21,7 +22,7 @@ const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 describe('PublicationPublishedReleases', () => {
   const testPublicationId = 'publication-1';
 
-  const testRelease1: Release = {
+  const testRelease1: ReleaseWithPermissions = {
     amendment: false,
     approvalStatus: 'Approved',
     id: 'release-1',
@@ -319,7 +320,7 @@ describe('PublicationPublishedReleases', () => {
           {
             ...testRelease1,
             permissions: {
-              ...testRelease1.permissions!,
+              ...testRelease1.permissions,
               canMakeAmendmentOfRelease: false,
             },
           },

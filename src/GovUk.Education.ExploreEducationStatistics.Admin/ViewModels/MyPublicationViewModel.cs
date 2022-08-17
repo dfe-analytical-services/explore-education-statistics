@@ -33,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public PermissionsSet Permissions { get; set; }
 
-        public class PermissionsSet
+        public record PermissionsSet
         {
             public bool CanUpdatePublication { get; set; }
             public bool CanUpdatePublicationTitle { get; set; }

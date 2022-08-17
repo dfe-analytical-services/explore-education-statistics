@@ -29,10 +29,8 @@ const PublicationTeamAccessPage = ({
   const { value: releases, isLoading } = useAsyncHandledRetry<
     ReleaseListItem[]
   >(async () => {
-    const paginatedReleases = await publicationService.getReleases(
-      publicationId,
-    );
-    const fetchedReleases = paginatedReleases.results;
+    const allReleases = await publicationService.listReleases(publicationId);
+    const fetchedReleases = allReleases.results;
     if (!releaseId && fetchedReleases.length) {
       setCurrentReleaseId(fetchedReleases[0].id);
       history.replace(

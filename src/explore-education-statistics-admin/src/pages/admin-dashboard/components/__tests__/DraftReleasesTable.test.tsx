@@ -1,5 +1,7 @@
 import DraftReleasesTable from '@admin/pages/admin-dashboard/components/DraftReleasesTable';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseService, {
+  ReleaseWithPermissions,
+} from '@admin/services/releaseService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -11,7 +13,7 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('DraftReleasesTable', () => {
-  const testReleases: Release[] = [
+  const testReleases: ReleaseWithPermissions[] = [
     {
       id: 'release-1',
       latestRelease: true,
@@ -26,7 +28,7 @@ describe('DraftReleasesTable', () => {
         canAddPrereleaseUsers: false,
       },
       approvalStatus: 'Draft',
-    } as Release,
+    } as ReleaseWithPermissions,
     {
       id: 'release-2',
       latestRelease: true,
@@ -43,7 +45,7 @@ describe('DraftReleasesTable', () => {
       approvalStatus: 'Draft',
       amendment: true,
       previousVersionId: 'previous-version-id',
-    } as Release,
+    } as ReleaseWithPermissions,
     {
       id: 'release-3',
       latestRelease: false,
@@ -58,8 +60,7 @@ describe('DraftReleasesTable', () => {
         canAddPrereleaseUsers: false,
       },
       approvalStatus: 'HigherLevelReview',
-    } as Release,
-
+    } as ReleaseWithPermissions,
     {
       id: 'release-4',
       latestRelease: true,
@@ -76,7 +77,7 @@ describe('DraftReleasesTable', () => {
       approvalStatus: 'HigherLevelReview',
       amendment: true,
       previousVersionId: 'previous-version-id',
-    } as Release,
+    } as ReleaseWithPermissions,
   ];
 
   beforeAll(() => {
@@ -379,7 +380,7 @@ describe('DraftReleasesTable', () => {
             {
               ...testReleases[0],
               permissions: {
-                ...testReleases[0].permissions!,
+                ...testReleases[0].permissions,
                 canUpdateRelease: false,
               },
             },
@@ -415,7 +416,7 @@ describe('DraftReleasesTable', () => {
             {
               ...testReleases[2],
               permissions: {
-                ...testReleases[2].permissions!,
+                ...testReleases[2].permissions,
                 canDeleteRelease: false,
               },
             },

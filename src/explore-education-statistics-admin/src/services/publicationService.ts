@@ -6,11 +6,12 @@ import {
   BasicMethodologyVersion,
   MyMethodologyVersion,
 } from '@admin/services/methodologyService';
-import { Release, PaginatedList, ReleaseListItem } from '@admin/services/releaseService';
+import { Release, ReleaseListItem } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
 import { PublicationSummary } from '@common/services/publicationService';
+import { PaginatedList } from '@common/services/types/pagination';
 
 export interface PublicationContactDetails {
   id: string;
@@ -91,6 +92,12 @@ export interface SavePublicationRequest {
   topicId: string;
 }
 
+export interface ListReleasesParams {
+  live?: boolean;
+  page?: number;
+  pageSize?: number;
+}
+
 export type CreatePublicationRequest = SavePublicationRequest;
 export type UpdatePublicationRequest = SavePublicationRequest;
 
@@ -132,17 +139,10 @@ const publicationService = {
     return client.get<MyPublication>(`/me/publication/${publicationId}`);
   },
 
-  getReleases(
+  listReleases(
     publicationId: string,
-    page: number | undefined = undefined,
-    pageSize: number | undefined = undefined,
-    live: boolean | undefined = undefined,
+    params?: ListReleasesParams,
   ): Promise<PaginatedList<ReleaseListItem>> {
-    let params = {};
-    if (page !== undefined) params = { ...params, page };
-    if (pageSize !== undefined) params = { ...params, pageSize };
-    if (live !== undefined) params = { ...params, live };
-
     return client.get<PaginatedList<ReleaseListItem>>(
       `/publication/${publicationId}/releases`,
       { params },

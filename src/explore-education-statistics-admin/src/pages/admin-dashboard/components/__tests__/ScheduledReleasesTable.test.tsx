@@ -1,5 +1,7 @@
 import ScheduledReleasesTable from '@admin/pages/admin-dashboard/components/ScheduledReleasesTable';
-import _releaseService, { Release } from '@admin/services/releaseService';
+import _releaseService, {
+  ReleaseWithPermissions,
+} from '@admin/services/releaseService';
 import { waitFor, within } from '@testing-library/dom';
 import { render, screen } from '@testing-library/react';
 import React from 'react';
@@ -9,7 +11,7 @@ jest.mock('@admin/services/releaseService');
 const releaseService = _releaseService as jest.Mocked<typeof _releaseService>;
 
 describe('ScheduledReleasesTable', () => {
-  const testReleases: Release[] = [
+  const testReleases: ReleaseWithPermissions[] = [
     {
       id: 'release-1',
       latestRelease: true,
@@ -20,9 +22,12 @@ describe('ScheduledReleasesTable', () => {
       publicationTitle: 'Publication 1',
       permissions: {
         canUpdateRelease: true,
+        canAddPrereleaseUsers: false,
+        canDeleteRelease: false,
+        canMakeAmendmentOfRelease: false,
       },
       approvalStatus: 'Approved',
-    } as Release,
+    } as ReleaseWithPermissions,
     {
       id: 'release-2',
       latestRelease: true,
@@ -33,9 +38,12 @@ describe('ScheduledReleasesTable', () => {
       publicationTitle: 'Publication 2',
       permissions: {
         canUpdateRelease: true,
+        canAddPrereleaseUsers: false,
+        canDeleteRelease: false,
+        canMakeAmendmentOfRelease: false,
       },
       approvalStatus: 'Approved',
-    } as Release,
+    } as ReleaseWithPermissions,
     {
       id: 'release-3',
       latestRelease: false,
@@ -47,10 +55,11 @@ describe('ScheduledReleasesTable', () => {
       permissions: {
         canUpdateRelease: true,
         canDeleteRelease: true,
+        canAddPrereleaseUsers: false,
+        canMakeAmendmentOfRelease: false,
       },
       approvalStatus: 'Approved',
-    } as Release,
-
+    } as ReleaseWithPermissions,
     {
       id: 'release-4',
       latestRelease: true,
@@ -61,9 +70,12 @@ describe('ScheduledReleasesTable', () => {
       publicationTitle: 'Publication 3',
       permissions: {
         canUpdateRelease: true,
+        canAddPrereleaseUsers: false,
+        canDeleteRelease: false,
+        canMakeAmendmentOfRelease: false,
       },
       approvalStatus: 'Approved',
-    } as Release,
+    } as ReleaseWithPermissions,
   ];
 
   beforeEach(() => {
@@ -145,7 +157,7 @@ describe('ScheduledReleasesTable', () => {
             {
               ...testReleases[0],
               permissions: {
-                ...testReleases[0].permissions!,
+                ...testReleases[0].permissions,
                 canUpdateRelease: false,
               },
             },

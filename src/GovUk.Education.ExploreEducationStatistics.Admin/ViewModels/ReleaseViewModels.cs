@@ -1,3 +1,4 @@
+#nullable enable
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Globalization;
@@ -18,23 +19,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     {
         public Guid Id { get; set; }
 
-        public string? Title { get; set; }
+        public string Title { get; set; } = string.Empty;
 
-        public string? Slug { get; set; }
+        public string Slug { get; set; } = string.Empty;
 
         public Guid PublicationId { get; set; }
 
-        public string? PublicationTitle { get; set; }
+        public string PublicationTitle { get; set; } = string.Empty;
 
         public string PublicationSummary { get; set; }
 
-        public string? PublicationSlug { get; set; }
+        public string PublicationSlug { get; set; }
 
-        public string? ReleaseName { get; set; }
+        public string ReleaseName { get; set; } = string.Empty;
 
-        public string? YearTitle { get; set; }
+        public string YearTitle { get; set; } = string.Empty;
 
-        public PartialDate? NextReleaseDate { get; set; }
+        public PartialDate NextReleaseDate { get; set; } = null!;
 
         [JsonConverter(typeof(DateTimeToDateJsonConverter))]
         public DateTime? PublishScheduled { get; set; }
@@ -46,21 +47,21 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
         public TimeIdentifier? TimePeriodCoverage { get; set; }
 
-        public string PreReleaseAccessList { get; set; } = "";
+        public string PreReleaseAccessList { get; set; } = string.Empty;
 
         public bool LatestRelease { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseType Type { get; set; }
 
-        public Contact? Contact { get; set; }
+        public Contact Contact { get; set; } = null!;
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
         public bool NotifySubscribers { get; set; }
 
-        public string? LatestInternalReleaseNote { get; set; }
+        public string LatestInternalReleaseNote { get; set; } = string.Empty;
 
         public bool Amendment { get; set; }
 
@@ -68,7 +69,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public PermissionsSet? Permissions { get; set; }
 
-        public class PermissionsSet
+        public record PermissionsSet
         {
             public bool CanAddPrereleaseUsers { get; init; }
 
@@ -91,13 +92,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public TimeIdentifier TimePeriodCoverage { get; init; }
 
         [DateTimeFormatValidator("yyyy-MM-dd")]
-        public string? PublishScheduled { get; init; }
+        public string PublishScheduled { get; init; } = string.Empty;
 
         public DateTime? PublishScheduledDate
         {
             get
             {
-                if (PublishScheduled == null)
+                if (PublishScheduled.IsNullOrEmpty())
                 {
                     return null;
                 }
@@ -113,15 +114,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
             }
         }
 
-        [PartialDateValidator] public PartialDate? NextReleaseDate { get; set; }
+        [PartialDateValidator] public PartialDate? NextReleaseDate { get; set; } = null!;
 
-        [RegularExpression(@"^([0-9]{4})?$")] public string? ReleaseName { get; init; }
+        [RegularExpression(@"^([0-9]{4})?$")] public string ReleaseName { get; init; } = string.Empty;
 
         public string Slug => SlugFromTitle(Title);
 
-        private string? Title => Year.HasValue ? Format(Year.Value, TimePeriodCoverage) : null;
+        private string Title => Format(Year, TimePeriodCoverage);
 
-        private int? Year => ReleaseName != null ? int.Parse(ReleaseName) : null;
+        private int Year => int.Parse(ReleaseName);
 
         public Guid? TemplateReleaseId { get; init; }
     }
@@ -134,15 +135,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [Required]
         public TimeIdentifier TimePeriodCoverage { get; init; }
 
-        public string? PreReleaseAccessList { get; init; }
+        public string PreReleaseAccessList { get; init; } = String.Empty;
 
-        [RegularExpression(@"^([0-9]{4})?$")] public string? ReleaseName { get; init; }
+        [RegularExpression(@"^([0-9]{4})?$")] public string ReleaseName { get; init; } = string.Empty;
 
         public string Slug => SlugFromTitle(Title);
 
-        private string? Title => Year.HasValue ? Format(Year.Value, TimePeriodCoverage) : null;
+        private string Title => Format(Year, TimePeriodCoverage);
 
-        private int? Year => ReleaseName != null ? int.Parse(ReleaseName) : null;
+        private int Year => int.Parse(ReleaseName);
     }
 
     public class ReleaseStatusCreateViewModel
@@ -150,7 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; init; }
 
-        public string? LatestInternalReleaseNote { get; init; }
+        public string LatestInternalReleaseNote { get; init; } = string.Empty;
 
         public bool? NotifySubscribers { get; init; }
 
@@ -158,7 +159,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public PublishMethod? PublishMethod { get; init; }
 
         [DateTimeFormatValidator("yyyy-MM-dd")]
-        public string? PublishScheduled { get; init; }
+        public string PublishScheduled { get; init; } = string.Empty;
 
         public DateTime? PublishScheduledDate
         {
@@ -185,13 +186,34 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
     public class ReleaseListItemViewModel
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; init; }
 
-        public string Title { get; set; }
+        public string Title { get; init; } = string.Empty;
 
-        public bool Live { get; set; }
+        public string Slug { get; set; } = string.Empty;
+
+        public int Year { get; set; }
+
+        [JsonConverter(typeof(TimeIdentifierJsonConverter))]
+        public TimeIdentifier? TimePeriodCoverage { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
+
+        public DateTime? Published { get; set; }
+
+        public bool Live { get; set; }
+
+        [JsonConverter(typeof(DateTimeToDateJsonConverter))]
+        public DateTime? PublishScheduled { get; set; }
+
+        public PartialDate NextReleaseDate { get; set; } = null!;
+
+        [JsonConverter(typeof(StringEnumConverter))]
+        public ReleaseType Type { get; set; }
+
+        public string LatestInternalReleaseNote { get; set; } = string.Empty;
+
+        public bool Amendment { get; set; }
     }
 }

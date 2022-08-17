@@ -35,11 +35,11 @@ const PublicationManageTeamAccessPage = ({
   const [currentReleaseId, setCurrentReleaseId] = useState(releaseId ?? '');
 
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
-    const [paginatedReleases, publication] = await Promise.all([
-      publicationService.getReleases(publicationId),
+    const [allReleases, publication] = await Promise.all([
+      publicationService.listReleases(publicationId),
       publicationService.getPublication(publicationId),
     ]);
-    const releases = paginatedReleases.results;
+    const releases = allReleases.results;
     if (!releaseId && releases.length) {
       setCurrentReleaseId(releases[0].id);
       history.replace(

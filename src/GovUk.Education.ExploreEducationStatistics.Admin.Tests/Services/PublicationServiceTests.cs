@@ -16,6 +16,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+using MessagePack.Formatters;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -39,7 +40,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Id = Guid.NewGuid(),
             };
 
-            // The order they should appear in result
+            // The order they should appear in the result - ordered by descending Year then by descending TimeIdentifier
             var publication1Release1 = new Release
             {
                 Id = Guid.NewGuid(),
@@ -91,23 +92,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication2 = new Publication
             {
                 Title = "publication1",
-                Releases = new List<Release>
-                {
-                    publication2Release2,
-                    publication2Release1,
-                },
+                Releases = ListOf(publication2Release2, publication2Release1),
             };
 
 
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
             publicationRepository.Setup(s => s.GetAllPublicationsForTopic(topic.Id))
-                .ReturnsAsync(
-                    new List<Publication>
-                    {
-                        publication1,
-                        publication2,
-                    });
+                .ReturnsAsync(ListOf(publication1, publication2));
 
             publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
                 .Returns(false);
@@ -190,17 +182,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication1 = new Publication
             {
                 Title = "publication1",
-                Releases = new List<Release>
-                {
-                    release,
-                },
-                Methodologies = AsList(
+                Releases = ListOf(release),
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         Methodology = new Methodology
                         {
                             Slug = "methodology-2-slug",
-                            Versions = AsList(methodology2Version2, methodology2Version1)
+                            Versions = ListOf(methodology2Version2, methodology2Version1)
                         },
                         Owner = false
                     },
@@ -209,7 +198,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Methodology = new Methodology
                         {
                             Slug = "methodology-3-slug",
-                            Versions = AsList(methodology3Version1)
+                            Versions = ListOf(methodology3Version1)
                         },
                         Owner = false
                     },
@@ -218,7 +207,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Methodology = new Methodology
                         {
                             Slug = "methodology-1-slug",
-                            Versions = AsList(methodology1Version1)
+                            Versions = ListOf(methodology1Version1)
                         },
                         Owner = true
                     }
@@ -307,13 +296,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication1 = new Publication
             {
                 Title = "publication1",
-                Releases = new List<Release>
-                {
-                    publication1Release2,
-                    publication1Release3,
-                    publication1Release4,
-                    publication1Release1,
-                },
+                Releases = ListOf(
+                    publication1Release2, 
+                    publication1Release3, 
+                    publication1Release4, 
+                    publication1Release1),
             };
 
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
@@ -387,11 +374,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication1 = new Publication
             {
                 Title = "publication1",
-                Releases = new List<Release>
-                {
-                    publication1Release1,
-                    publication1Release2,
-                },
+                Releases = ListOf(publication1Release1, publication1Release2),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -420,11 +403,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
             publicationRepository.Setup(s => s.GetAllPublicationsForTopic(topic.Id))
-                .ReturnsAsync(
-                    new List<Publication>
-                    {
-                        publication1,
-                    });
+                .ReturnsAsync(ListOf(publication1));
             publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
                 .Returns(false);
 
@@ -497,13 +476,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication1 = new Publication
             {
                 Title = "publication1",
-                Releases = new List<Release>
-                {
+                Releases = ListOf(
                     publication1Release2,
                     publication1Release3,
                     publication1Release4,
-                    publication1Release1,
-                },
+                    publication1Release1),
             };
 
             var publication2Release1 = new Release
@@ -521,11 +498,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication2 = new Publication
             {
                 Title = "publication1",
-                Releases = new List<Release>
-                {
-                    publication2Release2,
-                    publication2Release1,
-                },
+                Releases = ListOf(publication2Release2, publication2Release1),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -555,7 +528,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
             publicationRepository
                 .Setup(s => s.GetPublicationsForTopicRelatedToUser(topic.Id, userId))
-                .ReturnsAsync(new List<Publication> { publication1, publication2, });
+                .ReturnsAsync(ListOf(publication1, publication2));
             publicationRepository
                 .Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
                 .Returns(false);
@@ -649,17 +622,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication1 = new Publication
             {
                 Title = "publication1",
-                Releases = new List<Release>
-                {
-                    release,
-                },
-                Methodologies = AsList(
+                Releases = ListOf(release),
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         Methodology = new Methodology
                         {
                             Slug = "methodology-2-slug",
-                            Versions = AsList(methodology2Version2, methodology2Version1)
+                            Versions = ListOf(methodology2Version2, methodology2Version1)
                         },
                         Owner = false
                     },
@@ -668,7 +638,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Methodology = new Methodology
                         {
                             Slug = "methodology-3-slug",
-                            Versions = AsList(methodology3Version1)
+                            Versions = ListOf(methodology3Version1)
                         },
                         Owner = false
                     },
@@ -677,7 +647,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Methodology = new Methodology
                         {
                             Slug = "methodology-1-slug",
-                            Versions = AsList(methodology1Version1)
+                            Versions = ListOf(methodology1Version1)
                         },
                         Owner = true
                     }
@@ -711,11 +681,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
             publicationRepository.Setup(s => s.GetPublicationsForTopicRelatedToUser(topic.Id, userId))
-                .ReturnsAsync(
-                    new List<Publication>
-                    {
-                        publication1,
-                    });
+                .ReturnsAsync(ListOf(publication1));
 
             publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
                 .Returns(false);
@@ -794,13 +760,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication1 = new Publication
             {
                 Title = "publication1",
-                Releases = new List<Release>
-                {
+                Releases = ListOf(
                     publication1Release1,
                     publication1Release2,
                     publication1Release3,
-                    publication1Release4,
-                },
+                    publication1Release4),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -830,11 +794,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
 
             publicationRepository.Setup(s => s.GetPublicationsForTopicRelatedToUser(topic.Id, userId))
-                .ReturnsAsync(
-                    new List<Publication>
-                    {
-                        publication1,
-                    });
+                .ReturnsAsync(ListOf(publication1));
 
             publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
                 .Returns(false);
@@ -901,11 +861,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication1 = new Publication
             {
                 Title = "publication1",
-                Releases = new List<Release>
-                {
-                    publication1Release1,
-                    publication1Release2,
-                },
+                Releases = ListOf(publication1Release1, publication1Release2),
             };
 
             var userService = new Mock<IUserService>(Strict);
@@ -934,11 +890,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publicationRepository = new Mock<IPublicationRepository>(Strict);
             publicationRepository.Setup(s => s.GetPublicationsForTopicRelatedToUser(topic.Id, userId))
-                .ReturnsAsync(
-                    new List<Publication>
-                    {
-                        publication1,
-                    });
+                .ReturnsAsync(ListOf(publication1));
             publicationRepository.Setup(s => s.IsSuperseded(It.IsAny<Publication>()))
                 .Returns(false);
 
@@ -1021,13 +973,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Test team",
                     TeamEmail = "team@test.com",
                 },
-                Methodologies = AsList(
+                Methodologies = ListOf(
                     new PublicationMethodology
                     {
                         Methodology = new Methodology
                         {
                             Slug = "methodology-1-slug",
-                            Versions = AsList(methodology1Version1)
+                            Versions = ListOf(methodology1Version1)
                         },
                         Owner = true
                     },
@@ -1036,7 +988,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Methodology = new Methodology
                         {
                             Slug = "methodology-2-slug",
-                            Versions = AsList(methodology2Version1, methodology2Version2)
+                            Versions = ListOf(methodology2Version1, methodology2Version2)
                         },
                         Owner = false
                     }
@@ -1130,10 +1082,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Methodology = new Methodology
                         {
                             Slug = "methodology-1-slug",
-                            Versions = new List<MethodologyVersion>
-                            {
-                                methodologyVersion,
-                            },
+                            Versions = ListOf(methodologyVersion),
                         },
                         Owner = true
                     },
@@ -1243,10 +1192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     TeamName = "Test team",
                     TeamEmail = "team@test.com",
                 },
-                Releases = new List<Release>
-                {
-                    release,
-                },
+                Releases = ListOf(release),
                 Methodologies = new List<PublicationMethodology>
                 {
                     new PublicationMethodology
@@ -1254,10 +1200,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         Methodology = new Methodology
                         {
                             Slug = "methodology-1-slug",
-                            Versions = new List<MethodologyVersion>
-                            {
-                                methodologyVersion,
-                            },
+                            Versions = ListOf(methodologyVersion),
                         },
                         Owner = true
                     },
@@ -2434,6 +2377,60 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release3Amendment.Id, releases[0].Id);
                 Assert.Equal(release2.Id, releases[1].Id);
                 Assert.Equal(release1Amendment.Id, releases[2].Id);
+            }
+        }
+
+        [Fact]
+        public async Task ListActiveReleases_SingleRelease()
+        {
+            var release = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+                Type = ReleaseType.AdHocStatistics,
+                Published = DateTime.UtcNow,
+                PublishScheduled = null,
+                NextReleaseDate = new PartialDate { Year = "2030" },
+                ApprovalStatus = ReleaseApprovalStatus.Approved,
+                ReleaseStatuses = ListOf(
+                    new ReleaseStatus { InternalReleaseNote = "Internal note" }),
+                Publication = new Publication
+                {
+                    Title = "Publication title",
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                var result = await publicationService.ListActiveReleases(
+                    release.Publication.Id);
+
+                var releases = result.AssertRight();
+
+                var resultRelease = Assert.Single(releases);
+
+                Assert.Equal(release.Id, resultRelease.Id);
+                Assert.Equal(release.Title, resultRelease.Title);
+                Assert.Equal(release.Slug, resultRelease.Slug);
+                Assert.Equal(release.Type, resultRelease.Type);
+                Assert.Equal(release.Year, resultRelease.Year);
+                Assert.Equal(release.TimePeriodCoverage, resultRelease.TimePeriodCoverage);
+                Assert.Equal(release.Published, resultRelease.Published);
+                Assert.Equal(release.Live, resultRelease.Live);
+                Assert.Equal(release.PublishScheduled, resultRelease.PublishScheduled);
+                release.NextReleaseDate.AssertDeepEqualTo(resultRelease.NextReleaseDate);
+                Assert.Equal(release.ApprovalStatus, resultRelease.ApprovalStatus);
+                Assert.Equal(release.LatestInternalReleaseNote, resultRelease.LatestInternalReleaseNote);
+                Assert.Equal(release.Amendment, resultRelease.Amendment);
             }
         }
 

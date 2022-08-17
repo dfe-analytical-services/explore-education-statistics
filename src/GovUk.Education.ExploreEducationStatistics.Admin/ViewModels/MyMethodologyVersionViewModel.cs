@@ -27,7 +27,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Title { get; set; } = string.Empty;
 
-        public class PermissionsSet
+        public record PermissionsSet
         {
             public bool CanApproveMethodology { get; set; }
             public bool CanUpdateMethodology { get; set; }

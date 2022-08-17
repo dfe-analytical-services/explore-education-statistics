@@ -20,6 +20,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OData.UriParser;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
@@ -67,7 +68,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     .OnSuccess(() => _publicationRepository.GetAllPublicationsForTopic(topicId))
                     .OrElse(() => _publicationRepository.GetPublicationsForTopicRelatedToUser(topicId, userId))
                 )
-                .OnSuccess(HydrateMyPublicationsViewModel);
+                .OnSuccess(publicationViewModels =>
+                {
+                    return HydrateMyPublicationsViewModels(publicationViewModels)
+                        .OrderBy(publicationViewModel => publicationViewModel.Title)
+                        .ToList();
+                });
         }
 
         public async Task<Either<ActionResult, MyPublicationViewModel>> GetMyPublication(Guid publicationId)
@@ -303,13 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .Where(release => live == null || release.Live == live)
                             .OrderByDescending(r => r.Year)
                             .ThenByDescending(r => r.TimePeriodCoverage)
-                            .Select(r => new ReleaseListItemViewModel
-                            {
-                                Id = r.Id,
-                                Title = r.Title,
-                                Live = r.Live,
-                                ApprovalStatus = r.ApprovalStatus,
-                            })
+                            .Select(r => _mapper.Map<ReleaseListItemViewModel>(r))
                             .ToList()
                 );
         }
@@ -381,11 +381,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .ThenInclude(p => p.Versions);
         }
 
-        private List<MyPublicationViewModel> HydrateMyPublicationsViewModel(List<Publication> publications)
+        private List<MyPublicationViewModel> HydrateMyPublicationsViewModels(List<Publication> publications)
         {
             return publications
                 .Select(HydrateMyPublicationViewModel)
-                .OrderBy(publicationViewModel => publicationViewModel.Title)
                 .ToList();
         }
 

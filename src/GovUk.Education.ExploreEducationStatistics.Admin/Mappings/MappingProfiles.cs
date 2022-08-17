@@ -48,6 +48,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>
                     model.PublishScheduledDate));
 
+            CreateMap<Release, ReleaseListItemViewModel>()
+                .ForMember(model => model.PublishScheduled,
+                    m => m.MapFrom(model =>
+                        model.PublishScheduled.HasValue
+                            ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
+                            : (DateTime?)null));
+
             CreateMap<ReleasePublishingStatus, ReleasePublishingStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
 
