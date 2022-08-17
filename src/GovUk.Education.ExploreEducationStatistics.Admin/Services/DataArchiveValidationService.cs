@@ -34,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             if (!await IsZipFile(zipFile))
             {
-                return ValidationActionResult(DataFileMustBeZipFile);
+                return ValidationActionResult(DataZipMustBeZipFile);
             }
 
             await using var stream = zipFile.OpenReadStream();

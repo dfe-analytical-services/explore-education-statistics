@@ -30,13 +30,12 @@ const baseErrorMappings = (
       mapFieldErrors<DataFileUploadFormValues>({
         target: 'zipFile',
         messages: {
-          DataFileMustBeZipFile: 'Choose a valid ZIP file',
+          DataZipMustBeZipFile: 'Choose a valid ZIP file',
           DataZipFileCanOnlyContainTwoFiles:
             'ZIP file can only contain two CSV files',
           DataZipFileDoesNotContainCsvFiles:
             'ZIP file does not contain any CSV files',
-          DataZipFileAlreadyExists: 'ZIP file already exists',
-          CannotOverwriteDataFile: 'Choose a unique ZIP data file name',
+          DataFilenameNotUnique: 'Choose a unique ZIP data file name',
           DataAndMetadataFilesCannotHaveTheSameName:
             'ZIP data and metadata filenames cannot be the same',
           DataFileCannotBeEmpty: 'Choose a ZIP data file that is not empty',
@@ -57,14 +56,13 @@ const baseErrorMappings = (
     mapFieldErrors<DataFileUploadFormValues>({
       target: 'dataFile',
       messages: {
-        CannotOverwriteDataFile: 'Choose a unique data file name',
+        DataFilenameNotUnique: 'Choose a unique data file name',
         DataAndMetadataFilesCannotHaveTheSameName:
           'Choose a different file name for data and metadata files',
         DataFileCannotBeEmpty: 'Choose a data file that is not empty',
         DataFileMustBeCsvFile: 'Data file must be a CSV with UTF-8 encoding',
         DataFilenameCannotContainSpacesOrSpecialCharacters:
           'Data filename cannot contain spaces or special characters',
-        DataFileAlreadyUploaded: 'Data file has already been uploaded',
       },
     }),
     mapFieldErrors<DataFileUploadFormValues>({

@@ -322,7 +322,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                         .OnSuccess(async archiveFile =>
                                         {
                                             return await _fileUploadsValidatorService
-                                                .ValidateDataArchiveEntriesForUpload(releaseId, archiveFile)
+                                                .ValidateDataArchiveEntriesForUpload(releaseId,
+                                                    archiveFile,
+                                                    replacingFile)
                                                 .OnSuccess(async () =>
                                                 {
                                                     var subjectId = await _releaseRepository
@@ -478,7 +480,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
             return await _fileUploadsValidatorService.ValidateSubjectName(releaseId, subjectName)
                 .OnSuccess(async () => await Task.FromResult(subjectName));
-
         }
 
         private async Task UploadFileToStorage(
