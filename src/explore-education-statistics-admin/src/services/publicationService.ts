@@ -42,7 +42,6 @@ export interface MyPublication {
   releases: MyRelease[];
   methodologies: MyPublicationMethodology[];
   externalMethodology?: ExternalMethodology;
-  legacyReleases: LegacyRelease[];
   topicId: string;
   themeId: string;
   contact: PublicationContactDetails;
@@ -75,7 +74,6 @@ export interface BasicPublicationDetails {
   releases?: Release[];
   methodologies?: BasicMethodologyVersion[];
   externalMethodology?: ExternalMethodology;
-  legacyReleases: LegacyRelease[];
   themeId: string;
   topicId: string;
 }

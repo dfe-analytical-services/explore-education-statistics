@@ -16,7 +16,6 @@ export const testPublication: MyPublication = {
   title: 'Publication 1',
   contact: testContact,
   releases: [],
-  legacyReleases: [],
   methodologies: [],
   themeId: 'theme-1',
   topicId: 'theme-1-topic-2',

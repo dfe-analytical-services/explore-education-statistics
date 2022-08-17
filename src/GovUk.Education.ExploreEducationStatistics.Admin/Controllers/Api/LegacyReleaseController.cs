@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
@@ -10,6 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
 {
     [Authorize]
     [ApiController]
+    [Route("api")]
     public class LegacyReleaseController : ControllerBase
     {
         private readonly ILegacyReleaseService _legacyReleaseService;
@@ -18,8 +20,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         {
             _legacyReleaseService = legacyReleaseService;
         }
-        
-        [HttpGet("api/legacy-releases/{id}")]
+
+        [HttpGet("publications/{publicationId}/legacy-releases")]
+        public async Task<ActionResult<List<LegacyReleaseViewModel>>> GetLegacyReleases(Guid publicationId)
+        {
+            return await _legacyReleaseService
+                .GetLegacyReleases(publicationId)
+                .HandleFailuresOrOk();
+        }
+
+        [HttpGet("legacy-releases/{id}")]
         public async Task<ActionResult<LegacyReleaseViewModel>> GetLegacyRelease(Guid id)
         {
             return await _legacyReleaseService
@@ -27,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPost("api/legacy-releases")]
+        [HttpPost("legacy-releases")]
         public async Task<ActionResult<LegacyReleaseViewModel>> CreateLegacyRelease(
             LegacyReleaseCreateViewModel legacyRelease)
         {
@@ -36,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("api/legacy-releases/{id}")]
+        [HttpPut("legacy-releases/{id}")]
         public async Task<ActionResult<LegacyReleaseViewModel>> UpdateLegacyRelease(
             Guid id,
             LegacyReleaseUpdateViewModel legacyRelease)
@@ -46,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("api/legacy-releases/{id}")]
+        [HttpDelete("legacy-releases/{id}")]
         public async Task<ActionResult> DeleteLegacyRelease(Guid id)
         {
             return await _legacyReleaseService

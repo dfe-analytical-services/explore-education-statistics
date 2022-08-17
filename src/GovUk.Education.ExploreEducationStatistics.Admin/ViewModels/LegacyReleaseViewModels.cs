@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 {
-    public class LegacyReleaseViewModel
+    public record LegacyReleaseViewModel
     {
         public Guid Id { get; set; }
 

@@ -464,7 +464,6 @@ describe('PublicationForm', () => {
         teamName: 'Team Smith',
       },
       releases: [testRelease1],
-      legacyReleases: [],
       methodologies: [],
       themeId: 'theme-1',
       topicId: 'topic-1',

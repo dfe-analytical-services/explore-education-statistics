@@ -1,4 +1,6 @@
+#nullable enable
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -26,9 +28,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IBlobCacheService _publicBlobCacheService;
 
         public LegacyReleaseService(
-            ContentDbContext context, 
-            IMapper mapper, 
-            IUserService userService, 
+            ContentDbContext context,
+            IMapper mapper,
+            IUserService userService,
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IBlobCacheService publicBlobCacheService)
         {
@@ -45,6 +47,29 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .CheckEntityExists<LegacyRelease>(id)
                 .OnSuccess(_userService.CheckCanViewLegacyRelease)
                 .OnSuccess(release => _mapper.Map<LegacyReleaseViewModel>(release));
+        }
+
+        public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> GetLegacyReleases(Guid publicationId)
+        {
+            return await _persistenceHelper
+                .CheckEntityExists<Publication>(publicationId,
+                    q => q.Include(p => p.LegacyReleases))
+                .OnSuccess(publication => _userService.CheckCanViewPublication(publication))
+                .OnSuccess(publication =>
+                {
+                    return publication.LegacyReleases
+                        .OrderByDescending(legacyRelease => legacyRelease.Order)
+                        .Select(legacyRelease =>
+                            new LegacyReleaseViewModel
+                            {
+                                Id = legacyRelease.Id,
+                                Description = legacyRelease.Description,
+                                Order = legacyRelease.Order,
+                                Url = legacyRelease.Url,
+                                PublicationId = legacyRelease.PublicationId
+                            }
+                        ).ToList();
+                });
         }
 
         public async Task<Either<ActionResult, LegacyReleaseViewModel>> CreateLegacyRelease(
@@ -82,7 +107,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return await _persistenceHelper
                 .CheckEntityExists<LegacyRelease>(
-                    id, 
+                    id,
                     release => release.Include(r => r.Publication)
                         .ThenInclude(p => p.LegacyReleases)
                 )
@@ -143,7 +168,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     var previousOrder = legacyRelease.Order;
                     var publication = legacyRelease.Publication;
-                    
+
                     // Shift down the orders of existing legacy releases
                     // to fill the space from removed legacy release.
                     publication.LegacyReleases

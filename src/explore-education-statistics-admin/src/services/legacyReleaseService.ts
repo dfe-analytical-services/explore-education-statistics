@@ -22,6 +22,9 @@ const legacyReleaseService = {
   getLegacyRelease(id: string): Promise<LegacyRelease> {
     return client.get(`/legacy-releases/${id}`);
   },
+  getLegacyReleases(publicationId: string): Promise<LegacyRelease[]> {
+    return client.get(`/publications/${publicationId}/legacy-releases`);
+  },
   createLegacyRelease(data: CreateLegacyRelease): Promise<LegacyRelease> {
     return client.post('/legacy-releases', data);
   },

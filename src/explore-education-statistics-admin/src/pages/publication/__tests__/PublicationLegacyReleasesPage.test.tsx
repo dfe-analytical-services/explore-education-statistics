@@ -1,12 +1,20 @@
 import PublicationLegacyReleasesPage from '@admin/pages/publication/PublicationLegacyReleasesPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import { testPublication as baseTestPublication } from '@admin/pages/publication/__data__/testPublication';
-import { LegacyRelease } from '@admin/services/legacyReleaseService';
+import { testPublication } from '@admin/pages/publication/__data__/testPublication';
+import _legacyReleaseService, {
+  LegacyRelease,
+} from '@admin/services/legacyReleaseService';
 import { MyPublication } from '@admin/services/publicationService';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import React from 'react';
 import { MemoryRouter } from 'react-router-dom';
 import noop from 'lodash/noop';
+
+jest.mock('@admin/services/legacyReleaseService');
+
+const legacyReleaseService = _legacyReleaseService as jest.Mocked<
+  typeof _legacyReleaseService
+>;
 
 describe('PublicationLegacyReleasesPage', () => {
   const testLegacyReleases: LegacyRelease[] = [
@@ -32,12 +40,12 @@ describe('PublicationLegacyReleasesPage', () => {
       url: 'http://gov.uk/1',
     },
   ];
-  const testPublication: MyPublication = {
-    ...baseTestPublication,
-    legacyReleases: testLegacyReleases,
-  };
 
   test('renders the legacy releases page', async () => {
+    legacyReleaseService.getLegacyReleases.mockResolvedValue(
+      testLegacyReleases,
+    );
+
     renderPage(testPublication);
     await waitFor(() => {
       expect(screen.getByText('Legacy releases')).toBeInTheDocument();

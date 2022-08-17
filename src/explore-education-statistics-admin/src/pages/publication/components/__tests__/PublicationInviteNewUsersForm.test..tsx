@@ -14,7 +14,6 @@ const publication: BasicPublicationDetails = {
   id: 'publication-id',
   title: 'Publication title',
   slug: 'publication-slug',
-  legacyReleases: [],
   themeId: 'theme-id',
   topicId: 'topic-id',
 };

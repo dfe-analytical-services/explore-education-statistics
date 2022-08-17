@@ -193,27 +193,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         },
                         Owner = true
                     },
-                },
-                LegacyReleases = new List<LegacyRelease>
-                {
-                    new LegacyRelease
-                    {
-                        Description = "Legacy Release A",
-                        Url = "legacy-release-a-url",
-                        Order = 3,
-                    },
-                    new LegacyRelease
-                    {
-                        Description = "Legacy Release C",
-                        Url = "legacy-release-c-url",
-                        Order = 1,
-                    },
-                    new LegacyRelease
-                    {
-                        Description = "Legacy Release B",
-                        Url = "legacy-release-b-url",
-                        Order = 2,
-                    },
                 }
             };
 
@@ -247,14 +226,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(viewModel.Methodologies);
                 Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Methodology.Id);
                 Assert.Equal(methodologyVersion.Title, viewModel.Methodologies[0].Methodology.Title);
-
-                Assert.Equal(3, viewModel.LegacyReleases.Count);
-                var legacyReleases = publication.LegacyReleases
-                    .OrderByDescending(lr => lr.Order)
-                    .ToList();
-                Assert.Equal(legacyReleases[0].Id, viewModel.LegacyReleases[0].Id); // Legacy Release A
-                Assert.Equal(legacyReleases[1].Id, viewModel.LegacyReleases[1].Id); // Legacy Release B
-                Assert.Equal(legacyReleases[2].Id, viewModel.LegacyReleases[2].Id); // Legacy Release C
             }
         }
 
@@ -317,28 +288,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         },
                         Owner = true
                     },
-                },
-                LegacyReleases = new List<LegacyRelease>
-                {
-                    // In result, should appear in order A, B, C
-                    new LegacyRelease
-                    {
-                        Description = "Legacy Release A",
-                        Url = "legacy-release-a-url",
-                        Order = 3,
-                    },
-                    new LegacyRelease
-                    {
-                        Description = "Legacy Release C",
-                        Url = "legacy-release-c-url",
-                        Order = 1,
-                    },
-                    new LegacyRelease
-                    {
-                        Description = "Legacy Release B",
-                        Url = "legacy-release-b-url",
-                        Order = 2,
-                    },
                 }
             };
 
@@ -398,14 +347,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(viewModel.Methodologies);
                 Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Methodology.Id);
                 Assert.Equal(methodologyVersion.Title, viewModel.Methodologies[0].Methodology.Title);
-
-                Assert.Equal(3, viewModel.LegacyReleases.Count);
-                var legacyReleases = publication.LegacyReleases
-                    .OrderByDescending(lr => lr.Order)
-                    .ToList();
-                Assert.Equal(legacyReleases[0].Id, viewModel.LegacyReleases[0].Id); // Legacy Release A
-                Assert.Equal(legacyReleases[1].Id, viewModel.LegacyReleases[1].Id); // Legacy Release B
-                Assert.Equal(legacyReleases[2].Id, viewModel.LegacyReleases[2].Id); // Legacy Release C
             }
         }
 

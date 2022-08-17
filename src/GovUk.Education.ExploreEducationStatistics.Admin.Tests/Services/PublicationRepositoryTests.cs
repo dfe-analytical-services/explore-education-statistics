@@ -957,27 +957,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             }
                         }
                     },
-                },
-                LegacyReleases = new List<LegacyRelease>
-                {
-                    new LegacyRelease
-                    {
-                        Description = "Legacy Release A",
-                        Url = "legacy-release-a-url",
-                        Order = 3,
-                    },
-                    new LegacyRelease
-                    {
-                        Description = "Legacy Release C",
-                        Url = "legacy-release-c-url",
-                        Order = 1,
-                    },
-                    new LegacyRelease
-                    {
-                        Description = "Legacy Release B",
-                        Url = "legacy-release-b-url",
-                        Order = 2,
-                    },
                 }
             };
 
@@ -1028,14 +1007,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Single(viewModel.Methodologies);
                 Assert.Equal(methodologyVersion.Id, viewModel.Methodologies[0].Methodology.Id);
                 Assert.Equal(methodologyVersion.AlternativeTitle, viewModel.Methodologies[0].Methodology.Title);
-
-                Assert.Equal(3, viewModel.LegacyReleases.Count);
-                Assert.Equal("Legacy Release A", viewModel.LegacyReleases[0].Description);
-                Assert.Equal("legacy-release-a-url", viewModel.LegacyReleases[0].Url);
-                Assert.Equal("Legacy Release B", viewModel.LegacyReleases[1].Description);
-                Assert.Equal("legacy-release-b-url", viewModel.LegacyReleases[1].Url);
-                Assert.Equal("Legacy Release C", viewModel.LegacyReleases[2].Description);
-                Assert.Equal("legacy-release-c-url", viewModel.LegacyReleases[2].Url);
             }
         }
 
@@ -1099,7 +1070,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Empty(viewModel.Releases);
                 Assert.Empty(viewModel.Methodologies);
-                Assert.Empty(viewModel.LegacyReleases);
             }
         }
 

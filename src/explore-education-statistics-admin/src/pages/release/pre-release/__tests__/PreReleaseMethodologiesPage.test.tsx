@@ -30,7 +30,6 @@ describe('PreReleaseMethodologiesPage', () => {
     title: 'Publication 1',
     releases: [],
     methodologies: [],
-    legacyReleases: [],
     topicId: 'topic-id',
     themeId: 'theme-id',
     permissions: {
