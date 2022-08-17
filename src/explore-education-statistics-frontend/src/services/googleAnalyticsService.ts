@@ -55,16 +55,30 @@ export function logEvent({ category, action, label, value }: AnalyticsEvent) {
   });
 }
 
-export function logOutboundLink(label: string, url: string) {
+export function logOutboundLink(label: string, url: string, newTab?: boolean) {
+  // we don't want to attempt to log outbound links if the user has disabled analytics
+  // but we still want any links that are external to open in a new tab
+
+  function openLink() {
+    if (newTab) {
+      window.open(url, '_blank');
+      return;
+    }
+    document.location.href = url;
+  }
+
   if (!initialised) {
+    openLink();
     return;
   }
+
   ReactGA.outboundLink(
     {
       label,
     },
+
     function hitCallback() {
-      document.location.href = url;
+      openLink();
     },
   );
 }

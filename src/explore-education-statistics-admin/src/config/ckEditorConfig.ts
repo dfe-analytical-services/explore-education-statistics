@@ -14,6 +14,7 @@ export const toolbarConfigs: Dictionary<string[]> = {
     '|',
     'blockQuote',
     'insertTable',
+    'toggleTableCaption',
     'imageUpload',
     '|',
     'redo',
