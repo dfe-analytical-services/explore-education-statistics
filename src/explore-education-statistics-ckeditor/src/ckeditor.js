@@ -24,6 +24,7 @@ import Paragraph from '@ckeditor/ckeditor5-paragraph/src/paragraph.js';
 import PasteFromOffice from '@ckeditor/ckeditor5-paste-from-office/src/pastefromoffice.js';
 import Table from '@ckeditor/ckeditor5-table/src/table.js';
 import TableToolbar from '@ckeditor/ckeditor5-table/src/tabletoolbar.js';
+import TableCaption from '@ckeditor/ckeditor5-table/src/tablecaption.js';
 import TextTransformation from '@ckeditor/ckeditor5-typing/src/texttransformation.js';
 import Comments from '../plugins/comments/Comments';
 
@@ -53,6 +54,7 @@ Editor.builtinPlugins = [
   PasteFromOffice,
   Table,
   TableToolbar,
+  TableCaption,
   TextTransformation,
 ];
 

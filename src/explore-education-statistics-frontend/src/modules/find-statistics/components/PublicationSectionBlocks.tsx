@@ -70,9 +70,13 @@ const PublicationSectionBlocks = ({
             block={block}
             transformImageAttributes={transformImageAttributes}
             getGlossaryEntry={glossaryService.getEntry}
-            trackContentLinks={url =>
-              logOutboundLink(`Publication release content link: ${url}`, url)
-            }
+            trackContentLinks={(url, newTab) => {
+              logOutboundLink(
+                `Publication release content link: ${url}`,
+                url,
+                newTab,
+              );
+            }}
             trackGlossaryLinks={glossaryEntrySlug =>
               logEvent({
                 category: `Publication Release Content Glossary Link`,

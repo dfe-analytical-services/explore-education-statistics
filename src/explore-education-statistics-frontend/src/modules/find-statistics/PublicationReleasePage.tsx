@@ -174,9 +174,13 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
               key={block.id}
               block={block}
               getGlossaryEntry={glossaryService.getEntry}
-              trackContentLinks={url =>
-                logOutboundLink(`Publication release summary link: ${url}`, url)
-              }
+              trackContentLinks={(url, newTab) => {
+                logOutboundLink(
+                  `Publication release summary link: ${url}`,
+                  url,
+                  newTab,
+                );
+              }}
               trackGlossaryLinks={glossaryEntrySlug =>
                 logEvent({
                   category: `Publication Release Summary Glossary Link`,
@@ -462,12 +466,13 @@ const PublicationReleasePage: NextPage<Props> = ({ release }) => {
                     key={block.id}
                     block={block}
                     getGlossaryEntry={glossaryService.getEntry}
-                    trackContentLinks={url =>
+                    trackContentLinks={(url, newTab) => {
                       logOutboundLink(
                         `Publication release related dashboards link: ${url}`,
                         url,
-                      )
-                    }
+                        newTab,
+                      );
+                    }}
                     trackGlossaryLinks={glossaryEntrySlug =>
                       logEvent({
                         category: `Publication Release Related Dashboards Glossary Link`,
