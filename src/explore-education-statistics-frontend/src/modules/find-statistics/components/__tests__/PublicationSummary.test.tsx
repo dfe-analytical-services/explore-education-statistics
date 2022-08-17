@@ -1,0 +1,34 @@
+import PublicationSummary from '@frontend/modules/find-statistics/components/PublicationSummary';
+import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
+import { render, screen, within } from '@testing-library/react';
+import React from 'react';
+
+describe('PublicationSummary', () => {
+  test('renders a publication correctly', () => {
+    render(<PublicationSummary publication={testPublications[0]} />);
+
+    const heading = screen.getByRole('heading', { name: 'Publication 1' });
+    expect(
+      within(heading).getByRole('link', { name: 'Publication 1' }),
+    ).toHaveAttribute('href', '/find-statistics/publication-1-slug');
+    expect(screen.getByText('Publication 1 summary')).toBeInTheDocument();
+
+    const list = screen.getAllByRole('listitem');
+    expect(list[0]).toHaveTextContent('Release type: Ad hoc statistics');
+    expect(list[1]).toHaveTextContent('Published: 8 Jun 2021');
+    expect(list[2]).toHaveTextContent('Theme: Theme 1');
+  });
+
+  test('renders a legacy publication correctly', () => {
+    render(<PublicationSummary publication={testPublications[2]} />);
+
+    const heading = screen.getByRole('heading', { name: 'Publication 3' });
+    expect(within(heading).queryByRole('link')).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', {
+        name: 'Statistics at DfE for Publication 3',
+      }),
+    ).toHaveAttribute('href', 'http://test.com');
+    expect(screen.queryByRole('list')).not.toBeInTheDocument();
+  });
+});
