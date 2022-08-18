@@ -7,7 +7,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AspectInjector" Version="2.7.3" PrivateAssets="all" />
+        <PackageReference Include="AspectInjector" Version="2.7.3" />
         <PackageReference Include="IsExternalInit" Version="1.0.2" PrivateAssets="all" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.1" PrivateAssets="all" />
         <PackageReference Include="CompareNETObjects" Version="4.74.0" />
