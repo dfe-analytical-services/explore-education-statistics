@@ -1,6 +1,6 @@
 import PublicationLegacyReleaseCreatePage from '@admin/pages/publication/PublicationLegacyReleaseCreatePage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import { testPublication as baseTestPublication } from '@admin/pages/publication/__data__/testPublication';
+import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import _legacyReleaseService from '@admin/services/legacyReleaseService';
 import { MyPublication } from '@admin/services/publicationService';
 import { render, screen, waitFor } from '@testing-library/react';
@@ -15,33 +15,6 @@ const legacyReleaseService = _legacyReleaseService as jest.Mocked<
 >;
 
 describe('PublicationLegacyReleaseCreatePage', () => {
-  const testPublication: MyPublication = {
-    ...baseTestPublication,
-    legacyReleases: [
-      {
-        description: 'Legacy release 3',
-        id: 'legacy-release-3',
-        order: 3,
-        publicationId: 'publication-id-1',
-        url: 'http://gov.uk/3',
-      },
-      {
-        description: 'Legacy release 2',
-        id: 'legacy-release-2',
-        order: 2,
-        publicationId: 'publication-id-1',
-        url: 'http://gov.uk/2',
-      },
-      {
-        description: 'Legacy release 1',
-        id: 'legacy-release-1',
-        order: 1,
-        publicationId: 'publication-id-1',
-        url: 'http://gov.uk/1',
-      },
-    ],
-  };
-
   test('renders the create legacy release page', async () => {
     renderPage(testPublication);
 

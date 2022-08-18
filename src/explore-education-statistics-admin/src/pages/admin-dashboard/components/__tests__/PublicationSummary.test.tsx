@@ -42,7 +42,6 @@ describe('PublicationSummary', () => {
     title: 'Publication 1',
     contact: testContact,
     releases: [],
-    legacyReleases: [],
     methodologies: [],
     themeId: 'theme-1',
     topicId: 'topic-1',

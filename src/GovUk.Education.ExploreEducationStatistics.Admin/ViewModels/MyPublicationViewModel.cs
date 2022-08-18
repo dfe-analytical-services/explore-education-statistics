@@ -24,8 +24,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public Contact Contact { get; set; }
 
-        public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
-
         public Guid? SupersededById { get; set; }
 
         public bool IsSuperseded { get; set; }

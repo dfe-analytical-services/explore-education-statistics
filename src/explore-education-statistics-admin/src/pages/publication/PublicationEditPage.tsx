@@ -11,7 +11,12 @@ import {
   PublicationRouteParams,
   ThemeTopicParams,
 } from '@admin/routes/routes';
-import publicationService from '@admin/services/publicationService';
+import publicationService, {
+  MyPublication,
+} from '@admin/services/publicationService';
+import legacyReleaseService, {
+  LegacyRelease,
+} from '@admin/services/legacyReleaseService';
 import appendQuery from '@admin/utils/url/appendQuery';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import WarningMessage from '@common/components/WarningMessage';
@@ -20,6 +25,11 @@ import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import React from 'react';
 import { generatePath, RouteComponentProps, useHistory } from 'react-router';
 
+interface Model {
+  publication: MyPublication;
+  legacyReleases: LegacyRelease[];
+}
+
 const PublicationEditPage = ({
   match,
 }: RouteComponentProps<PublicationRouteParams>) => {
@@ -27,18 +37,23 @@ const PublicationEditPage = ({
 
   const history = useHistory();
 
-  const { value: publication, isLoading } = useAsyncHandledRetry(
-    () => publicationService.getMyPublication(publicationId),
-    [publicationId],
-  );
+  const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
+    const [publication, legacyReleases] = await Promise.all([
+      publicationService.getMyPublication(publicationId),
+      legacyReleaseService.listLegacyReleases(publicationId),
+    ]);
 
-  if (isLoading) {
+    return {
+      publication,
+      legacyReleases,
+    };
+  }, [publicationId]);
+
+  if (isLoading || !model) {
     return <LoadingSpinner />;
   }
 
-  if (!publication) {
-    return null;
-  }
+  const { publication, legacyReleases } = model;
   const { contact } = publication;
 
   return (
@@ -131,7 +146,7 @@ const PublicationEditPage = ({
                 },
               );
             }}
-            legacyReleases={publication.legacyReleases}
+            legacyReleases={legacyReleases}
             publicationId={publication.id}
           />
         </div>

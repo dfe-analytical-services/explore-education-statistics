@@ -39,7 +39,6 @@ const testPublication: BasicPublicationDetails = {
   slug: 'pupil-absence',
   themeId: 'theme-1',
   topicId: 'topic-1',
-  legacyReleases: [],
 };
 
 describe('ReleaseTableToolPage', () => {

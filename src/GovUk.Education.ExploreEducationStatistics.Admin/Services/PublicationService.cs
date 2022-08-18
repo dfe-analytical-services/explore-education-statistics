@@ -351,7 +351,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Include(p => p.Contact)
                 .Include(p => p.Releases)
                 .ThenInclude(r => r.ReleaseStatuses)
-                .Include(p => p.LegacyReleases)
                 .Include(p => p.Topic)
                 .Include(p => p.Methodologies)
                 .ThenInclude(p => p.Methodology)

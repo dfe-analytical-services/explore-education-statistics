@@ -1,6 +1,6 @@
 import PublicationLegacyReleaseEditPage from '@admin/pages/publication/PublicationLegacyReleaseEditPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
-import { testPublication as baseTestPublication } from '@admin/pages/publication/__data__/testPublication';
+import { testPublication } from '@admin/pages/publication/__data__/testPublication';
 import {
   PublicationEditLegacyReleaseRouteParams,
   publicationEditLegacyReleaseRoute,
@@ -22,38 +22,15 @@ const legacyReleaseService = _legacyReleaseService as jest.Mocked<
 >;
 
 describe('PublicationLegacyReleaseEditPage', () => {
-  const testLegacyReleases: LegacyRelease[] = [
-    {
-      description: 'Legacy release 3',
-      id: 'legacy-release-3',
-      order: 3,
-      publicationId: 'publication-id-1',
-      url: 'http://gov.uk/3',
-    },
-    {
-      description: 'Legacy release 2',
-      id: 'legacy-release-2',
-      order: 2,
-      publicationId: 'publication-id-1',
-      url: 'http://gov.uk/2',
-    },
-    {
-      description: 'Legacy release 1',
-      id: 'legacy-release-1',
-      order: 1,
-      publicationId: 'publication-id-1',
-      url: 'http://gov.uk/1',
-    },
-  ];
-  const testPublication: MyPublication = {
-    ...baseTestPublication,
-    legacyReleases: testLegacyReleases,
+  const testLegacyRelease: LegacyRelease = {
+    description: 'Legacy release 1',
+    id: 'legacy-release-1',
+    order: 1,
+    url: 'http://gov.uk/1',
   };
 
   beforeEach(() => {
-    legacyReleaseService.getLegacyRelease.mockResolvedValue(
-      testLegacyReleases[0],
-    );
+    legacyReleaseService.getLegacyRelease.mockResolvedValue(testLegacyRelease);
   });
 
   test('renders the edit legacy release page', async () => {
@@ -63,10 +40,10 @@ describe('PublicationLegacyReleaseEditPage', () => {
       expect(screen.getByText('Edit legacy release')).toBeInTheDocument();
     });
     expect(screen.getByLabelText('Description')).toHaveValue(
-      'Legacy release 3',
+      'Legacy release 1',
     );
-    expect(screen.getByLabelText('URL')).toHaveValue('http://gov.uk/3');
-    expect(screen.getByLabelText('Order')).toHaveValue(3);
+    expect(screen.getByLabelText('URL')).toHaveValue('http://gov.uk/1');
+    expect(screen.getByLabelText('Order')).toHaveValue(1);
     expect(
       screen.getByRole('button', { name: 'Save legacy release' }),
     ).toBeInTheDocument();
@@ -92,12 +69,12 @@ describe('PublicationLegacyReleaseEditPage', () => {
 
     await waitFor(() => {
       expect(legacyReleaseService.updateLegacyRelease).toHaveBeenCalledWith(
-        'legacy-3',
+        'legacy-1',
         {
-          description: 'Legacy release 3 edited',
-          order: 3,
+          description: 'Legacy release 1 edited',
+          order: 1,
           publicationId: 'publication-1',
-          url: 'http://gov.uk/3/edit',
+          url: 'http://gov.uk/1/edit',
         },
       );
     });
@@ -112,7 +89,7 @@ function renderPage(publication: MyPublication) {
           publicationEditLegacyReleaseRoute.path,
           {
             publicationId: publication.id,
-            legacyReleaseId: 'legacy-3',
+            legacyReleaseId: 'legacy-1',
           },
         ),
       ]}
