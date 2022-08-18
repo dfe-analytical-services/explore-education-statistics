@@ -21,7 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             _legacyReleaseService = legacyReleaseService;
         }
 
-        [HttpGet("publications/{publicationId}/legacy-releases")]
+        [HttpGet("publications/{publicationId:guid}/legacy-releases")]
         public async Task<ActionResult<List<LegacyReleaseViewModel>>> GetLegacyReleases(Guid publicationId)
         {
             return await _legacyReleaseService
@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpGet("legacy-releases/{id}")]
+        [HttpGet("legacy-releases/{id:guid}")]
         public async Task<ActionResult<LegacyReleaseViewModel>> GetLegacyRelease(Guid id)
         {
             return await _legacyReleaseService
@@ -46,7 +46,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpPut("legacy-releases/{id}")]
+        [HttpPut("legacy-releases/{id:guid}")]
         public async Task<ActionResult<LegacyReleaseViewModel>> UpdateLegacyRelease(
             Guid id,
             LegacyReleaseUpdateViewModel legacyRelease)
@@ -56,7 +56,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
                 .HandleFailuresOrOk();
         }
 
-        [HttpDelete("legacy-releases/{id}")]
+        [HttpDelete("legacy-releases/{id:guid}")]
         public async Task<ActionResult> DeleteLegacyRelease(Guid id)
         {
             return await _legacyReleaseService
