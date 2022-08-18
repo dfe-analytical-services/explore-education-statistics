@@ -104,6 +104,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         await _publishingService.PublishMethodologyFiles(methodology.Id);
 
                         // Invalidate the 'All Methodologies' cache item
+                        // TODO EES-3643 - update rather than delete
                         await _publicBlobCacheService.DeleteItem(new AllMethodologiesCacheKey());
                     }
 

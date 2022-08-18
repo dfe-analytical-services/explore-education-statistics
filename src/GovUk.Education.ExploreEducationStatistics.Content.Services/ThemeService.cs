@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public async Task<Either<ActionResult, IList<ThemeTree<PublicationTreeNode>>>> GetPublicationTree(
             PublicationTreeFilter filter)
         {
-            var fullPublicationTree = await GetFullPublicationTree();
+            var fullPublicationTree = await GetCachedFullPublicationTree();
 
             return await fullPublicationTree
                 .ToAsyncEnumerable()
@@ -40,7 +40,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         }
 
         [BlobCache(typeof(PublicationTreeCacheKey))]
-        private async Task<IList<ThemeTree<PublicationTreeNode>>> GetFullPublicationTree()
+        private Task<IList<ThemeTree<PublicationTreeNode>>> GetCachedFullPublicationTree()
+        {
+            return GenerateFullPublicationTree();
+        }
+        
+        public async Task<IList<ThemeTree<PublicationTreeNode>>> GenerateFullPublicationTree()
         {
             var themes = await _contentDbContext.Themes
                 .Include(theme => theme.Topics)

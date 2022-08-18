@@ -9,12 +9,16 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
+using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
+using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -53,6 +57,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                 .AddSingleton<IFileStorageService, FileStorageService>(provider =>
                     new FileStorageService(GetConfigurationValue(provider, "PublisherStorage")))
                 .AddScoped(provider => GetBlobCacheService(provider, "PublicStorage"))
+                .AddScoped<IContentMethodologyService, ContentMethodologyService>()
+                .AddScoped<IThemeService, ThemeService>()
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
                         publicStorageConnectionString: GetConfigurationValue(provider, "PublicStorage"),
@@ -70,8 +76,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         privateBlobCacheService: GetBlobCacheService(provider, "CoreStorage"),
                         publicBlobCacheService: GetBlobCacheService(provider, "PublicStorage"),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
-                        publicationService: provider.GetRequiredService<IPublicationService>()
-                    ))
+                        publicationService: provider.GetRequiredService<IPublicationService>(),
+                        contentMethodologyService: provider.GetRequiredService<IContentMethodologyService>(),
+                        themeService: provider.GetRequiredService<IThemeService>(),
+                        logger: provider.GetRequiredService<ILogger<ContentService>>()))
                 .AddScoped<IReleaseService, ReleaseService>(provider =>
                     new ReleaseService(
                         contentDbContext: provider.GetService<ContentDbContext>(),

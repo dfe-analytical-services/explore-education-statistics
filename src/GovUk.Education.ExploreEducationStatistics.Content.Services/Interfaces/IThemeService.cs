@@ -11,5 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces
     public interface IThemeService
     {
         Task<Either<ActionResult, IList<ThemeTree<PublicationTreeNode>>>> GetPublicationTree(PublicationTreeFilter filter);
+
+        Task<IList<ThemeTree<PublicationTreeNode>>> GenerateFullPublicationTree();
     }
 }

@@ -29,7 +29,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 executionContext.FunctionName,
                 message.ToString());
 
-            await _contentService.DeleteCachedTaxonomyBlobs();
+            await _contentService.UpdateCachedTaxonomyBlobs();
 
             logger.LogInformation("{0} completed",
                 executionContext.FunctionName);

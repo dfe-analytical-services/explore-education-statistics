@@ -79,10 +79,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                     await _releaseService.DeletePreviousVersionsStatisticalData(message.ReleaseId);
                 }
 
-                // Invalidate the cached trees in case any methodologies/publications
-                // are now accessible for the first time after publishing these releases
-                await _contentService.DeleteCachedTaxonomyBlobs();
-
                 // Invalidate publication cache for release
                 var release = await _contentDbContext.Releases
                     .Include(r => r.Publication)
@@ -102,6 +98,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Functions
                 await _contentService.DeletePreviousVersionsContent(message.ReleaseId);
 
                 await _notificationsService.NotifySubscribersIfApplicable(message.ReleaseId);
+
+                // Update the cached trees in case any methodologies/publications
+                // are now accessible for the first time after publishing these releases
+                await _contentService.UpdateCachedTaxonomyBlobs();
 
                 await UpdateStage(message.ReleaseId, message.ReleaseStatusId, State.Complete);
             }

@@ -86,7 +86,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         }
 
         [BlobCache(typeof(AllMethodologiesCacheKey))]
-        public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetCachedSummariesTree()
+        public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetCachedSummariesTree()
+        {
+            return GenerateSummariesTree();
+        }
+
+        public async Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GenerateSummariesTree()
         {
             var themes = await _contentDbContext.Themes
                 .Include(theme => theme.Topics)

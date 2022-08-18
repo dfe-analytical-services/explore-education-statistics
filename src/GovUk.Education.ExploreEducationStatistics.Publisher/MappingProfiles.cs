@@ -39,6 +39,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     m => m.MapFrom(r => r.GenericContent.OrderBy(s => s.Order)));
 
             CreateMap<Update, ReleaseNoteViewModel>();
+
+            CreateMap<MethodologyVersion, MethodologyVersionSummaryViewModel>();
         }
 
         private void CreateContentBlockMap()

@@ -246,7 +246,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task DeleteCachedTaxonomyBlobs()
         {
+            // TODO EES-3643 - update rather than delete
             await _publicBlobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+            
+            // TODO EES-3643 - update rather than delete
             await _publicBlobCacheService.DeleteItem(new PublicationTreeCacheKey());
         }
 

@@ -61,6 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                 await request.Paths
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
+                        // TODO EES-3643 - update rather than delete (for both Methodology and Publication Trees)
                         path =>
                             _publicBlobStorageService.DeleteBlob(BlobContainers.PublicContent, path)
                     );
