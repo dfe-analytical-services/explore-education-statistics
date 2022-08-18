@@ -254,6 +254,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Test publication",
+                Summary = "Test publication summary",
                 Slug = "test-publication",
                 Topic = new Topic
                 {
@@ -331,6 +332,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication.Id, viewModel.Id);
                 Assert.Equal(publication.Title, viewModel.Title);
+                Assert.Equal(publication.Summary, viewModel.Summary);
 
                 Assert.Equal(publication.Topic.Id, viewModel.TopicId);
                 Assert.Equal(publication.Topic.ThemeId, viewModel.ThemeId);
