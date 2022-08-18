@@ -19,21 +19,18 @@ describe('LegacyReleasesTable', () => {
       description: 'Legacy release 3',
       id: 'legacy-release-3',
       order: 3,
-      publicationId: 'publication-id-1',
       url: 'http://gov.uk/3',
     },
     {
       description: 'Legacy release 2',
       id: 'legacy-release-2',
       order: 2,
-      publicationId: 'publication-id-1',
       url: 'http://gov.uk/2',
     },
     {
       description: 'Legacy release 1',
       id: 'legacy-release-1',
       order: 1,
-      publicationId: 'publication-id-1',
       url: 'http://gov.uk/1',
     },
   ];

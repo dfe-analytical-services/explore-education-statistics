@@ -26,7 +26,6 @@ describe('PublicationLegacyReleaseEditPage', () => {
     description: 'Legacy release 1',
     id: 'legacy-release-1',
     order: 1,
-    publicationId: 'publication-id-1',
     url: 'http://gov.uk/1',
   };
 

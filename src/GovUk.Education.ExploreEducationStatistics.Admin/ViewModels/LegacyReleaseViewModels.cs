@@ -12,8 +12,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string Url { get; set; }
 
         public int Order { get; set; }
-
-        public Guid PublicationId { get; set; }
     }
 
     public class LegacyReleaseCreateViewModel

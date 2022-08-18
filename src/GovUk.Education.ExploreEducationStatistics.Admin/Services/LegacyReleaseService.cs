@@ -65,8 +65,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                                 Id = legacyRelease.Id,
                                 Description = legacyRelease.Description,
                                 Order = legacyRelease.Order,
-                                Url = legacyRelease.Url,
-                                PublicationId = legacyRelease.PublicationId
+                                Url = legacyRelease.Url
                             }
                         ).ToList();
                 });

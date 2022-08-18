@@ -37,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = publicationId,
                     LegacyReleases = new List<LegacyRelease>
                         {
-                            new LegacyRelease
+                            new()
                             {
                                 Id = id,
                                 Description = "Test description",
@@ -47,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                 });
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
 
                 var legacyReleaseService = BuildLegacyReleaseService(context);
 
@@ -57,7 +57,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test description", result.Right.Description);
                 Assert.Equal("http://test.com", result.Right.Url);
                 Assert.Equal(1, result.Right.Order);
-                Assert.Equal(publicationId, result.Right.PublicationId);
             }
         }
 
@@ -108,17 +107,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal("Release 3", viewModels[0].Description);
                 Assert.Equal("https://test-3.com", viewModels[0].Url);
-                Assert.Equal(publication.Id, viewModels[0].PublicationId);
                 Assert.Equal(3, viewModels[0].Order);
 
                 Assert.Equal("Release 2", viewModels[1].Description);
                 Assert.Equal("https://test-2.com", viewModels[1].Url);
-                Assert.Equal(publication.Id, viewModels[1].PublicationId);
                 Assert.Equal(2, viewModels[1].Order);
 
                 Assert.Equal("Release 1", viewModels[2].Description);
                 Assert.Equal("https://test-1.com", viewModels[2].Url);
-                Assert.Equal(publication.Id, viewModels[2].PublicationId);
                 Assert.Equal(1, viewModels[2].Order);
             }
         }
@@ -161,7 +157,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test description", result.Right.Description);
                 Assert.Equal("http://test.com", result.Right.Url);
                 Assert.Equal(1, result.Right.Order);
-                Assert.Equal(publicationId, result.Right.PublicationId);
 
                 var savedLegacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 
@@ -276,7 +271,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Updated test description", result.Right.Description);
                 Assert.Equal("http://updated-test.com", result.Right.Url);
                 Assert.Equal(1, result.Right.Order);
-                Assert.Equal(publicationId, result.Right.PublicationId);
 
                 var savedLegacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 

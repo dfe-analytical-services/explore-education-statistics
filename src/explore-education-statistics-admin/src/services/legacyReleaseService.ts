@@ -5,7 +5,6 @@ export interface LegacyRelease {
   description: string;
   url: string;
   order: number;
-  publicationId: string;
 }
 
 export interface CreateLegacyRelease {
