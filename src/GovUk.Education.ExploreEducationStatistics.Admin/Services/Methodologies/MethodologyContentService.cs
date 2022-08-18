@@ -105,19 +105,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                 .OnSuccess(methodology => FindContentListWithAllSectionIds(methodology, newSectionOrder.Keys.ToList()))
                 .OnSuccess(async tuple =>
                 {
-                    var (methodologyContent, content) = tuple;
+                    var (methodologyContent, contentSections) = tuple;
 
                     newSectionOrder.ToList().ForEach(kvp =>
                     {
                         var (sectionId, newOrder) = kvp;
-                        content
-                            .Find(section => section.Id == sectionId)
+                        contentSections.Single(section => section.Id == sectionId)
                             .Order = newOrder;
                     });
 
                     _context.MethodologyContent.Update(methodologyContent);
                     await _context.SaveChangesAsync();
-                    return OrderedContentSections(content);
+                    return OrderedContentSections(contentSections);
                 });
         }
 
@@ -180,27 +179,26 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             Guid methodologyVersionId,
             Guid contentSectionId)
         {
-            return
-                CheckContentSectionExists(methodologyVersionId, contentSectionId)
-                    .OnSuccess(CheckCanUpdateMethodologyContent)
-                    .OnSuccess(async tuple =>
-                    {
-                        var (methodologyContent, sectionToRemove) = tuple;
+            return CheckContentSectionExists(methodologyVersionId, contentSectionId)
+                .OnSuccess(CheckCanUpdateMethodologyContent)
+                .OnSuccess(tuple => FindContentListWithSectionId(tuple.Item1, contentSectionId))
+                .OnSuccess(async tuple =>
+                {
+                    var (methodologyContent, contentSections) = tuple;
+                    var sectionToRemove = contentSections.Single(section => section.Id == contentSectionId); 
 
-                        var content = GetContentListWithSection(methodologyContent, sectionToRemove);
+                    contentSections.Remove(sectionToRemove);
 
-                        content.Remove(sectionToRemove);
+                    var removedSectionOrder = sectionToRemove.Order;
 
-                        var removedSectionOrder = sectionToRemove.Order;
+                    contentSections
+                        .FindAll(contentSection => contentSection.Order > removedSectionOrder)
+                        .ForEach(contentSection => contentSection.Order--);
 
-                        content
-                            .FindAll(contentSection => contentSection.Order > removedSectionOrder)
-                            .ForEach(contentSection => contentSection.Order--);
-
-                        _context.MethodologyContent.Update(methodologyContent);
-                        await _context.SaveChangesAsync();
-                        return OrderedContentSections(content);
-                    });
+                    _context.MethodologyContent.Update(methodologyContent);
+                    await _context.SaveChangesAsync();
+                    return OrderedContentSections(contentSections);
+                });
         }
 
         public Task<Either<ActionResult, List<IContentBlockViewModel>>> ReorderContentBlocks(
@@ -219,7 +217,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                         newBlocksOrder.ToList().ForEach(kvp =>
                         {
                             var (blockId, newOrder) = kvp;
-                            section.Content.Find(block => block.Id == blockId).Order = newOrder;
+                            section.Content.Single(block => block.Id == blockId).Order = newOrder;
                         });
 
                         _context.MethodologyContent.Update(methodologyContent);
@@ -392,9 +390,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
                     return FindContentListWithSectionId(methodology.MethodologyContent, contentSectionId)
                         .OnSuccess(tuple =>
                         {
-                            var (_, content) = tuple;
+                            var (_, contentSections) = tuple;
 
-                            var section = content
+                            var section = contentSections
                                 .Find(contentSection => contentSection.Id == contentSectionId);
 
                             if (section == null)
@@ -462,12 +460,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             }
 
             return tuple;
-        }
-
-        private static List<ContentSection> GetContentListWithSection(MethodologyVersionContent content,
-            ContentSection contentSection)
-        {
-            return FindContentListWithSectionId(content, contentSection.Id).Right.Item2;
         }
 
         private static Either<ActionResult, Tuple<MethodologyVersionContent, List<ContentSection>>>
