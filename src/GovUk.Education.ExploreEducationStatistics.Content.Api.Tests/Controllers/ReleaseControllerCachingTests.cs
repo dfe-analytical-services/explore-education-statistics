@@ -21,7 +21,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 [Collection(CacheServiceTests)]
 public class ReleaseControllerCachingTests : CacheServiceTestFixture
 {
-    private const string HourlyExpirySchedule = "0 * * * *";
     private const string HalfHourlyExpirySchedule = "*/30 * * * *";
     
     [Fact]
