@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import chalk from 'chalk';
 import { v4 } from 'uuid';
+import spinner from '../../utils/spinner';
 import publicationService from '../../services/publicationService';
 import { projectRoot } from '../../config';
 import releaseService from '../../services/releaseService';
@@ -14,6 +15,7 @@ const cwd = projectRoot;
 const { ADMIN_URL } = process.env;
 
 const createReleaseAndPublish = async () => {
+  spinner.start();
   await commonService.validateArchives();
   await commonService.prepareDirectories();
 
@@ -39,14 +41,14 @@ const createReleaseAndPublish = async () => {
   const subjectId = await subjectService.addSubject(releaseId);
   console.time('import subject upload');
   if (!importStatus) {
-    console.log(
+    spinner.warn(
       'No importStatus just yet, waiting 4 seconds before polling again',
     );
     await sleep(4000);
   }
 
   while (importStatus !== 'COMPLETE') {
-    console.log(chalk.blue('importStatus', chalk.green(importStatus)));
+    spinner.info(`${chalk.blue('importStatus', chalk.green(importStatus))}`);
     // eslint-disable-next-line no-await-in-loop
     await sleep(1000);
 
@@ -71,7 +73,6 @@ const createReleaseAndPublish = async () => {
   console.time('publication elapsed time');
   const url = `${ADMIN_URL}/publication/${publicationId}/release/${releaseId}/status`;
 
-  console.log(chalk.green(`Started publication of release: ${url}`));
   await releaseService.getReleaseProgress(releaseId, url);
 };
 export default createReleaseAndPublish;

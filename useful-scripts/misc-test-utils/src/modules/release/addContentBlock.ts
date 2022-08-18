@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import chalk from 'chalk';
+import logger from '../../utils/logger';
 import releaseService from '../../services/releaseService';
 
 const addReleaseTextContentBlock = async (releaseId: string) => {
@@ -22,6 +23,6 @@ const addReleaseTextContentBlock = async (releaseId: string) => {
     );
   }
   await releaseService.addTextContent(releaseId, sectionId, blockId);
-  console.log(chalk.green('Succesfully added release content block'));
+  logger.info(chalk.green('Succesfully added release content block'));
 };
 export default addReleaseTextContentBlock;
