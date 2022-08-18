@@ -12,7 +12,7 @@ const PublicationLegacyReleasesPage = () => {
 
   const { value: legacyReleases = [], isLoading } = useAsyncHandledRetry<
     LegacyRelease[]
-  >(async () => legacyReleaseService.getLegacyReleases(publicationId), [
+  >(async () => legacyReleaseService.listLegacyReleases(publicationId), [
     publicationId,
   ]);
 

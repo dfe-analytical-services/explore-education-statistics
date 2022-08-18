@@ -12,7 +12,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
     {
         Task<Either<ActionResult, LegacyReleaseViewModel>> GetLegacyRelease(Guid id);
 
-        Task<Either<ActionResult, List<LegacyReleaseViewModel>>> GetLegacyReleases(Guid publicationId);
+        Task<Either<ActionResult, List<LegacyReleaseViewModel>>> ListLegacyReleases(Guid publicationId);
 
         Task<Either<ActionResult, LegacyReleaseViewModel>> CreateLegacyRelease(
             LegacyReleaseCreateViewModel legacyRelease

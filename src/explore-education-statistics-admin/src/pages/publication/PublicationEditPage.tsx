@@ -40,7 +40,7 @@ const PublicationEditPage = ({
   const { value: model, isLoading } = useAsyncHandledRetry<Model>(async () => {
     const [publication, legacyReleases] = await Promise.all([
       publicationService.getMyPublication(publicationId),
-      legacyReleaseService.getLegacyReleases(publicationId),
+      legacyReleaseService.listLegacyReleases(publicationId),
     ]);
 
     return {

@@ -39,7 +39,7 @@ describe('PublicationLegacyReleasesPage', () => {
   ];
 
   test('renders the legacy releases page', async () => {
-    legacyReleaseService.getLegacyReleases.mockResolvedValue(
+    legacyReleaseService.listLegacyReleases.mockResolvedValue(
       testLegacyReleases,
     );
 

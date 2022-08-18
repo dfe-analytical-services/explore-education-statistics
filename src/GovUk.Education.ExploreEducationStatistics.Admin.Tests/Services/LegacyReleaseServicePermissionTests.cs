@@ -45,7 +45,7 @@ public class LegacyReleaseServicePermissionTests
     }
 
     [Fact]
-    public async Task GetLegacyReleases()
+    public async Task ListLegacyReleases()
     {
         await PolicyCheckBuilder()
             .SetupResourceCheckToFail(_publication, CanViewSpecificPublication)
@@ -53,7 +53,7 @@ public class LegacyReleaseServicePermissionTests
                 userService =>
                 {
                     var service = SetupService(userService: userService.Object);
-                    return service.GetLegacyReleases(_publication.Id);
+                    return service.ListLegacyReleases(_publication.Id);
                 }
             );
     }

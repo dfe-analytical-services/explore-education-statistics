@@ -49,7 +49,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(release => _mapper.Map<LegacyReleaseViewModel>(release));
         }
 
-        public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> GetLegacyReleases(Guid publicationId)
+        public async Task<Either<ActionResult, List<LegacyReleaseViewModel>>> ListLegacyReleases(Guid publicationId)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId,

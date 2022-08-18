@@ -22,10 +22,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("publications/{publicationId:guid}/legacy-releases")]
-        public async Task<ActionResult<List<LegacyReleaseViewModel>>> GetLegacyReleases(Guid publicationId)
+        public async Task<ActionResult<List<LegacyReleaseViewModel>>> ListLegacyReleases(Guid publicationId)
         {
             return await _legacyReleaseService
-                .GetLegacyReleases(publicationId)
+                .ListLegacyReleases(publicationId)
                 .HandleFailuresOrOk();
         }
 

@@ -61,7 +61,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetLegacyReleases()
+        public async Task ListLegacyReleases()
         {
             var publication = new Publication
             {
@@ -100,7 +100,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 var service = BuildLegacyReleaseService(contentDbContext);
 
-                var result = await service.GetLegacyReleases(publication.Id);
+                var result = await service.ListLegacyReleases(publication.Id);
                 var viewModels = result.AssertRight();
 
                 Assert.Equal(3, viewModels.Count);
