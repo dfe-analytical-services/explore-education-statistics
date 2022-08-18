@@ -14,6 +14,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model
 
         [Required(AllowEmptyStrings = false)] public string Title { get; set; } = string.Empty;
 
+        [MaxLength(160)]
+        public string Summary { get; set; } = string.Empty;
+
         public List<Release> Releases { get; set; } = new();
 
         public List<PublicationMethodology> Methodologies { get; set; } = new();
