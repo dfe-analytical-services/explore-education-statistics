@@ -8,7 +8,7 @@ export interface EnvironmentAndUsers {
 
 export default function getEnvironmentAndUsersFromFile(
   environmentName: string,
-) {
+): EnvironmentAndUsers {
   const environmentAndUsersFilePath = `.environment-details.${environmentName}.json`;
   /* eslint-disable-next-line no-restricted-globals */
   return JSON.parse(open(environmentAndUsersFilePath)) as EnvironmentAndUsers;

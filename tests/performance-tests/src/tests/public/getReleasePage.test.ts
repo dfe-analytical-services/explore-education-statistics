@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
 import http from 'k6/http';
