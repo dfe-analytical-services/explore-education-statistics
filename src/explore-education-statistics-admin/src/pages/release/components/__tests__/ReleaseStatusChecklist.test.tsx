@@ -15,6 +15,7 @@ describe('ReleaseStatusChecklist', () => {
     releaseName: 'Release 1',
     publicationId: 'publication-1',
     publicationTitle: 'Publication 1',
+    publicationSummary: 'Publication 1 summary',
     publicationSlug: 'publication-1-slug',
     timePeriodCoverage: { value: 'W51', label: 'Week 51' },
     title: 'Release Title',

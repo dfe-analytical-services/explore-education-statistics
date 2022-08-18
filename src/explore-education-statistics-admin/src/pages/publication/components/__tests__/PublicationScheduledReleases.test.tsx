@@ -30,6 +30,7 @@ describe('PublicationScheduledReleases', () => {
     publicationId: 'publication-1',
     publicationSlug: 'publication-slug-1',
     publicationTitle: 'Publication 1',
+    publicationSummary: 'Publication 1 summary',
     published: '2022-01-01T00:00:00',
     publishScheduled: '2022-01-01T00:00:00',
     releaseName: 'Release name',

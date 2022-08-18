@@ -83,6 +83,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
     {
       id: 'publication-1',
       title: 'Publication 1',
+      summary: 'Publication 1 summary',
       contact: testContact,
       releases: [],
       methodologies: [],
@@ -101,6 +102,7 @@ describe('ManagePublicationsAndReleasesTab', () => {
     {
       id: 'publication-2',
       title: 'Publication 2',
+      summary: 'Publication 2 summary',
       contact: testContact,
       releases: [],
       methodologies: [],

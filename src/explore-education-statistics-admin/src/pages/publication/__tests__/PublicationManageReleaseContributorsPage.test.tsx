@@ -38,8 +38,9 @@ const testRelease: Release = {
   preReleaseAccessList: '',
   previousVersionId: '',
   publicationId: 'publication-1',
-  publicationSlug: 'publication-slug-1',
   publicationTitle: 'Publication 1',
+  publicationSummary: 'Publication 1 summary',
+  publicationSlug: 'publication-slug-1',
   publishScheduled: '',
   slug: 'release-slug-1',
   timePeriodCoverage: {

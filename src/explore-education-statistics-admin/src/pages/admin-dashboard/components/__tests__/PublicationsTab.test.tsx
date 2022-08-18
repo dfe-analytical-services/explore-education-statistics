@@ -83,6 +83,7 @@ describe('PublicationsTab', () => {
     {
       id: 'publication-1',
       title: 'Publication 1',
+      summary: 'Publication 1 summary',
       contact: testContact,
       releases: [],
       methodologies: [],
@@ -101,6 +102,7 @@ describe('PublicationsTab', () => {
     {
       id: 'publication-2',
       title: 'Publication 2',
+      summary: 'Publication 2 summary',
       contact: testContact,
       releases: [],
       methodologies: [],
@@ -122,6 +124,7 @@ describe('PublicationsTab', () => {
     {
       id: 'publication-3',
       title: 'Publication 3',
+      summary: 'Publication 3 summary',
       contact: testContact,
       releases: [],
       methodologies: [],
@@ -143,6 +146,7 @@ describe('PublicationsTab', () => {
     {
       id: 'publication-4',
       title: 'Publication 4',
+      summary: 'Publication 4 summary',
       contact: testContact,
       releases: [],
       methodologies: [],
@@ -164,6 +168,7 @@ describe('PublicationsTab', () => {
     {
       id: 'publication-5',
       title: 'Publication 5',
+      summary: 'Publication 5 summary',
       contact: testContact,
       releases: [],
       methodologies: [],

@@ -16,6 +16,7 @@ export interface Release {
   releaseName: string;
   publicationId: string;
   publicationTitle: string;
+  publicationSummary: string;
   publicationSlug: string;
   timePeriodCoverage: ValueLabelPair;
   title: string;
