@@ -110,6 +110,7 @@ def user_creates_test_publication_via_api(publication_name: str, topic_id: str =
         '/api/publications',
         {
             "title": publication_name,
+            "summary": f'{publication_name} summary',
             "topicId": chosen_topic_id,
             "contact": {
                 "contactName": "UI test contact name",

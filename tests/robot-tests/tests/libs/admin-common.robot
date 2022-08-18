@@ -2,9 +2,11 @@
 Resource    ./common.robot
 Library     admin-utilities.py
 
+
 *** Variables ***
 ${BAU1_BROWSER}=        bau1
 ${ANALYST1_BROWSER}=    analyst1
+
 
 *** Keywords ***
 user signs in as bau1
@@ -143,6 +145,7 @@ user creates publication
     user waits until h1 is visible    Create new publication
     user waits until page contains element    id:publicationForm-title    %{WAIT_SMALL}
     user enters text into element    id:publicationForm-title    ${title}
+    user enters text into element    id:publicationForm-summary    ${title} summary
     user enters text into element    id:publicationForm-teamName    Attainment statistics team
     user enters text into element    id:publicationForm-teamEmail    Attainment.STATISTICS@education.gov.uk
     user enters text into element    id:publicationForm-contactName    UI Tests Contact Name
@@ -649,9 +652,10 @@ user approves release for scheduled release
     user clicks button    Confirm
 
 user verifies release summary
-    [Arguments]    ${PUBLICATION_NAME}    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${LEAD_STATISTICIAN}    ${RELEASE_TYPE}
+    [Arguments]    ${PUBLICATION_NAME}    ${PUBLICATION_SUMMARY}    ${TIME_PERIOD}    ${RELEASE_PERIOD}    ${LEAD_STATISTICIAN}    ${RELEASE_TYPE}
     user waits until h2 is visible    Release summary
     user checks summary list contains    Publication title    ${PUBLICATION_NAME}
+    user checks summary list contains    Publication summary    ${PUBLICATION_SUMMARY}
     user checks summary list contains    Time period    ${TIME_PERIOD}
     user checks summary list contains    Release period    ${RELEASE_PERIOD}
     user checks summary list contains    Lead statistician    ${LEAD_STATISTICIAN}

@@ -44,12 +44,16 @@ Enter new publication title
     user enters text into element    id:publicationForm-title    ${PUBLICATION_NAME} (created)
     user checks element is not visible    id:publicationForm-title-error    %{WAIT_SMALL}
 
+Enter new publication summary
+    user enters text into element    id:publicationForm-summary    ${PUBLICATION_NAME} summary
+
 User redirects to the dashboard after saving publication
     user clicks button    Save publication
     user waits until h1 is visible    Dashboard
 
 Verify that new publication has been created
     user opens publication on the admin dashboard    ${PUBLICATION_NAME} (created)
+
     user checks testid element contains    Team name for ${PUBLICATION_NAME} (created)    Post-16 statistics team
     user checks testid element contains    Team email for ${PUBLICATION_NAME} (created)
     ...    post16.statistics@education.gov.uk
@@ -69,6 +73,7 @@ Go to edit publication
 
 Update publication
     user enters text into element    id:publicationForm-title    ${PUBLICATION_NAME}
+    user enters text into element    id:publicationForm-summary    ${PUBLICATION_NAME} summary updated
     user chooses select option    id:publicationForm-themeId    ${CREATED_THEME_NAME}
     user chooses select option    id:publicationForm-topicId    ${CREATED_TOPIC_NAME}
     user enters text into element    id:publicationForm-teamName    Special educational needs statistics team
@@ -116,8 +121,8 @@ Create new release
 Verify created release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
     user waits until h2 is visible    Release summary
-    user verifies release summary    ${PUBLICATION_NAME}    Spring Term    2025/26    UI Tests Contact Name
-    ...    National statistics
+    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary updated    Spring Term
+    ...    2025/26    UI Tests Contact Name    National statistics
 
 Edit release summary
     user waits until page contains link    Edit release summary
@@ -131,8 +136,8 @@ Edit release summary
 
 Verify updated release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    ${PUBLICATION_NAME}    Summer Term    2026/27    UI Tests Contact Name
-    ...    Official statistics
+    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary updated    Summer Term
+    ...    2026/27    UI Tests Contact Name    Official statistics
 
 
 *** Keywords ***

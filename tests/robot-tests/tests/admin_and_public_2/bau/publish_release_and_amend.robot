@@ -351,8 +351,8 @@ Change the Release type
     user clicks radio    Experimental statistics
     user clicks button    Update release summary
     user checks page contains element    xpath://li/a[text()="Summary" and contains(@aria-current, 'page')]
-    user verifies release summary    ${PUBLICATION_NAME}    Financial Year    3000-01    UI test contact name
-    ...    Experimental statistics
+    user verifies release summary    ${PUBLICATION_NAME}    ${PUBLICATION_NAME} summary    Financial Year    3000-01
+    ...    UI test contact name    Experimental statistics
 
 Navigate to data replacement page
     user clicks link    Data and files
