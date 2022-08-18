@@ -95,6 +95,7 @@ const EditableAccordion = (props: EditableAccordionProps) => {
             <Button
               variant="secondary"
               className="govuk-!-font-size-16 govuk-!-margin-bottom-0"
+              id={`${id}-reorder`}
               onClick={toggleReordering.on}
             >
               Reorder<span className="govuk-visually-hidden"> sections</span>

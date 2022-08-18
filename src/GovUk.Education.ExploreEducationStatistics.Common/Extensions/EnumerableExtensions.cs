@@ -246,5 +246,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Common.Extensions
         {
             return source.Distinct(ComparerUtils.CreateComparerByProperty(propertyGetter));
         }
+
+        public static bool IsSameAsIgnoringOrder<T>(this IEnumerable<T> first, IEnumerable<T> second)
+        {
+            var firstList = first.ToList();
+            var secondList = second.ToList();
+
+            var firstNotInSecond = firstList.Except(secondList);
+            var secondNotInFirst = secondList.Except(firstList);
+
+            return !(firstNotInSecond.Any() || secondNotInFirst.Any());
+        }
     }
 }
