@@ -21,27 +21,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
 [Collection(CacheServiceTests)]
 public class ReleaseControllerCachingTests : CacheServiceTestFixture
 {
-    private const string HourlyExpirySchedule = "0 * * * *";
     private const string HalfHourlyExpirySchedule = "*/30 * * * *";
-
-    public ReleaseControllerCachingTests()
-    {
-        var getReleaseConfig = CreateMockConfigurationSection(
-            TupleOf("DurationInSeconds", "45"),
-            TupleOf("ExpirySchedule", HalfHourlyExpirySchedule));
-            
-        var getLatestReleaseConfig = CreateMockConfigurationSection(
-            TupleOf("DurationInSeconds", "55"),
-            TupleOf("ExpirySchedule", HourlyExpirySchedule));
-            
-        MemoryCacheConfig
-            .Setup(s => s.GetSection("GetRelease"))
-            .Returns(getReleaseConfig.Object);
-            
-        MemoryCacheConfig
-            .Setup(s => s.GetSection("GetLatestRelease"))
-            .Returns(getLatestReleaseConfig.Object);
-    }
     
     [Fact]
     public async Task GetLatestRelease_NoCachedEntryExists()
@@ -63,13 +43,13 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .ReturnsAsync(release);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
-            55, CrontabSchedule.Parse(HourlyExpirySchedule));
+            10, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
         
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
                 new GetLatestReleaseCacheKey(publicationSlug), 
                 release, 
-                expectedCacheConfiguration, 
+                ItIs.DeepEqualTo(expectedCacheConfiguration), 
                 null))
             .Returns(Task.CompletedTask);
         
@@ -123,13 +103,13 @@ public class ReleaseControllerCachingTests : CacheServiceTestFixture
             .ReturnsAsync(release);
 
         var expectedCacheConfiguration = new MemoryCacheConfiguration(
-            45, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
+            15, CrontabSchedule.Parse(HalfHourlyExpirySchedule));
         
         MemoryCacheService
             .Setup(s => s.SetItem<object>(
                 new GetReleaseCacheKey(publicationSlug, releaseSlug), 
                 release, 
-                expectedCacheConfiguration, 
+                ItIs.DeepEqualTo(expectedCacheConfiguration), 
                 null))
             .Returns(Task.CompletedTask);
         
