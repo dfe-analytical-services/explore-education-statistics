@@ -54,13 +54,13 @@ const getEnvironmentAndUsers = async (
 const writeEnvironmentDetailsToFile = async (
   environmentName: string,
   userNames: string[],
-) => {
+): Promise<void> => {
   const environmentAndUsers = await getEnvironmentAndUsers(
     environmentName,
     userNames,
   );
   const filepath = `/home/node/app/dist/.environment-details.${environmentName}.json`;
-  await fs.writeFileSync(filepath, JSON.stringify(environmentAndUsers));
+  fs.writeFileSync(filepath, JSON.stringify(environmentAndUsers));
 };
 
 const [environment, ...userNames] = process.argv.slice(2);

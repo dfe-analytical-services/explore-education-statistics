@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { check, fail } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
@@ -84,6 +85,7 @@ const environmentAndUsers = getEnvironmentAndUsersFromFile(
 );
 const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
   user => user.userName === 'bau1',
 )!;
@@ -119,7 +121,6 @@ export function setup(): SetupData {
     timePeriodCoverage: 'AY',
   });
 
-  /* eslint-disable-next-line no-console */
   console.log(
     `Created Theme ${themeId}, Topic ${topicId}, Publication ${publicationId}, Release ${releaseId}`,
   );
@@ -144,7 +145,6 @@ const performTest = ({ releaseId }: SetupData) => {
 
   const dataService = createDataService(adminUrl, accessToken, false);
 
-  /* eslint-disable-next-line no-console */
   console.log(`Uploading subject ${subjectName}`);
 
   const { response: uploadResponse, id: fileId } = dataService.uploadDataFile({
@@ -160,7 +160,6 @@ const performTest = ({ releaseId }: SetupData) => {
     },
   });
 
-  /* eslint-disable-next-line no-console */
   console.log(`Subject ${subjectName} finished uploading`);
 
   if (
@@ -169,7 +168,6 @@ const performTest = ({ releaseId }: SetupData) => {
       'response should contain the uploaded file id': _ => !!fileId,
     })
   ) {
-    /* eslint-disable-next-line no-console */
     console.log(`Subject ${subjectName} finished uploading`);
   } else {
     fail(
@@ -212,19 +210,16 @@ const performTest = ({ releaseId }: SetupData) => {
         });
 
         if (unreportedStages.length) {
-          /* eslint-disable-next-line no-console */
           console.log(`Import "${fileId}" - stage ${importStatus} reached`);
         }
       }
     },
     onImportFailed: importStatus => {
-      /* eslint-disable-next-line no-console */
       console.log(`Import "${fileId}" - FAILED with status ${importStatus}`);
       errorRate.add(1);
       importFailureCount.add(1);
     },
     onImportCompleted: () => {
-      /* eslint-disable-next-line no-console */
       console.log(
         `Import "${fileId}" - COMPLETE after ${
           (Date.now() - importStartTime) / 1000
@@ -232,7 +227,6 @@ const performTest = ({ releaseId }: SetupData) => {
       );
     },
     onImportExceededTimeout: () => {
-      /* eslint-disable-next-line no-console */
       console.log(
         `Import "${fileId}" -  EXCEEDED TEST TIMEOUT after ${
           (Date.now() - importStartTime) / 1000
@@ -257,7 +251,6 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
     dataService.deleteTopic({ topicId });
     dataService.deleteTheme({ themeId });
 
-    /* eslint-disable-next-line no-console */
     console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
   }
 };

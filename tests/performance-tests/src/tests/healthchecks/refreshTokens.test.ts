@@ -3,10 +3,11 @@
 import { check, fail } from 'k6';
 import http from 'k6/http';
 import { Rate } from 'k6/metrics';
+import { Options } from 'k6/options';
 import refreshAuthTokens from '../../auth/refreshAuthTokens';
 import getEnvironmentAndUsersFromFile from '../../utils/environmentAndUsers';
 
-export const options = {
+export const options: Options = {
   noConnectionReuse: true,
   vus: 1,
   insecureSkipTLSVerify: true,
@@ -19,6 +20,7 @@ const environmentAndUsers = getEnvironmentAndUsersFromFile(
 );
 const { adminUrl } = environmentAndUsers.environment;
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
   user => user.userName === 'bau1',
 )!;

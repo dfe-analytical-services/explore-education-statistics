@@ -34,7 +34,8 @@
     "stop": "docker-compose down influxdb grafana",
     "stop-and-clear-data": "docker-compose -v down influxdb grafana",
     "store-environment-details": "docker-compose run --rm --user \"$(id -u):$(id -g)\" node -r source-map-support/register dist/storeEnvironmentDetails.js ${npm_config_environment} ${npm_config_users}",
-    "test": "cross-env TEST_ENVIRONMENT=${npm_config_environment} docker-compose run --rm k6 run"
+    "test": "cross-env TEST_ENVIRONMENT=${npm_config_environment} docker-compose run --rm k6 run",
+    "tsc": "tsc --noEmit"
   },
   "dependencies": {
     "source-map-support": "^0.5.21"

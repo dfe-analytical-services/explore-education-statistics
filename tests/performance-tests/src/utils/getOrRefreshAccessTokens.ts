@@ -8,7 +8,7 @@ export default function getOrRefreshAccessTokens(
   userName: string,
   adminUrl: string,
   authTokens: AuthTokens,
-) {
+): string {
   if (!supportsRefreshTokens) {
     return authTokens.accessToken;
   }
