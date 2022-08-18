@@ -92,6 +92,7 @@ const PublicationEditPage = ({
             }
             initialValues={{
               title: publication.title,
+              summary: publication.summary,
               topicId: publication.topicId,
               teamName: contact.teamName,
               teamEmail: contact.teamEmail,

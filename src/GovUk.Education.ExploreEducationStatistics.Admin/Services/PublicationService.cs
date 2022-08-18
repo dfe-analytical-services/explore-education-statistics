@@ -125,6 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     {
                         Contact = contact.Entity,
                         Title = publication.Title,
+                        Summary = publication.Summary,
                         TopicId = publication.TopicId,
                         Slug = publication.Slug,
                         ExternalMethodology = publication.ExternalMethodology
@@ -188,6 +189,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     }
 
                     publication.Title = updatedPublication.Title;
+                    publication.Summary = updatedPublication.Summary;
                     publication.TopicId = updatedPublication.TopicId;
                     publication.ExternalMethodology = updatedPublication.ExternalMethodology;
                     publication.Updated = DateTime.UtcNow;

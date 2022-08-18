@@ -57,11 +57,13 @@ const MethodologySummary = ({
     methodologies,
     id: publicationId,
     title,
+    summary,
   } = publication;
 
   const handleRemoveExternalMethodology = async () => {
     const updatedPublication = {
       title,
+      summary,
       contact,
       topicId,
     };

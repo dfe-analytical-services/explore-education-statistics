@@ -149,6 +149,10 @@ describe('PublicationDetailsPage', () => {
         'Publication 1',
       );
 
+      expect(screen.getByLabelText('Publication summary')).toHaveValue(
+        'Publication 1 summary',
+      );
+
       const themeSelect = screen.getByLabelText('Select theme');
       expect(themeSelect).toHaveValue('theme-1');
       const themes = within(themeSelect).getAllByRole('option');
@@ -370,6 +374,7 @@ describe('PublicationDetailsPage', () => {
           contact: testContact,
           supersededById: 'publication-2',
           title: 'Publication 1 updated',
+          summary: 'Publication 1 summary',
           topicId: 'theme-2-topic-2',
         });
       });

@@ -194,6 +194,11 @@ describe('PublicationForm', () => {
       'Test title',
     );
 
+    await userEvent.type(
+      screen.getByLabelText('Publication summary'),
+      'Test summary',
+    );
+
     await userEvent.type(screen.getByLabelText('Team name'), 'Test team');
     await userEvent.type(
       screen.getByLabelText('Team email address'),
@@ -212,6 +217,7 @@ describe('PublicationForm', () => {
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
         title: 'Test title',
+        summary: 'Test summary',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
         contactName: 'John Smith',
@@ -228,6 +234,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',
@@ -272,6 +279,7 @@ describe('PublicationForm', () => {
 
       const initialValues: FormValues = {
         title: 'Test title',
+        summary: 'Test summary',
         topicId: 'topic-4',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
@@ -308,6 +316,7 @@ describe('PublicationForm', () => {
 
       const initialValues: FormValues = {
         title: 'Test title',
+        summary: 'Test summary',
         topicId: 'topic-4',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
@@ -352,6 +361,7 @@ describe('PublicationForm', () => {
 
       const initialValues: FormValues = {
         title: 'Test title',
+        summary: 'Test summary',
         topicId: 'topic-4',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
@@ -456,6 +466,7 @@ describe('PublicationForm', () => {
     const testPublication1: MyPublication = {
       id: 'publication-id-1',
       title: 'Publication 1',
+      summary: 'Publcation 1 summary',
       contact: {
         id: 'contact-1',
         contactName: 'John Smith',
@@ -499,6 +510,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',
@@ -534,6 +546,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',
@@ -575,6 +588,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',
