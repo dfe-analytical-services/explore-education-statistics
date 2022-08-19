@@ -92,6 +92,25 @@ describe('PublicationForm', () => {
     });
   });
 
+  test('shows validation error when there is no summary', async () => {
+    render(<PublicationForm onSubmit={noop} showTitleInput />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication summary')).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByLabelText('Publication summary'));
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Enter a publication summary', {
+          selector: '#publicationForm-summary-error',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
   test('shows validation errors when there are no contact details', async () => {
     render(<PublicationForm onSubmit={noop} />);
 

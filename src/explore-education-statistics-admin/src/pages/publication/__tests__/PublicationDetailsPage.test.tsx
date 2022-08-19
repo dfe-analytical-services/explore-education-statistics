@@ -303,6 +303,35 @@ describe('PublicationDetailsPage', () => {
       });
     });
 
+    test('shows validation errors when there is no summary', async () => {
+      renderPage(testPublication);
+
+      await waitFor(() => {
+        expect(screen.getByText('Publication details')).toBeInTheDocument();
+      });
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit publication details' }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Publication summary'),
+        ).toBeInTheDocument();
+      });
+
+      userEvent.clear(screen.getByLabelText('Publication summary'));
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Enter a summary', {
+            selector: '#publicationDetailsForm-summary-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
     test('shows a confirmation modal on submit', async () => {
       renderPage(testPublication);
 

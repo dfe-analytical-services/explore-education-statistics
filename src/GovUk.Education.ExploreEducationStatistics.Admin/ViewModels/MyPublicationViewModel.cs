@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Title { get; set; }
 
-        [MaxLength(160)] public string Summary { get; set; }
+        public string Summary { get; set; }
 
         public DateTime? NextUpdate { get; set; }
 

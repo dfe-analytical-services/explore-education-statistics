@@ -1036,7 +1036,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetPublicationForUser_NoReleaseMethodologyLegacyRelease()
+        public async Task GetPublicationForUser_NoReleaseMethodology()
         {
             var userId = Guid.NewGuid();
             var release1 = new Release
