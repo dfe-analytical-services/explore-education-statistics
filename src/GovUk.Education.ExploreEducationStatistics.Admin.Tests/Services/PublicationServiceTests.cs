@@ -63,6 +63,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Test publication",
+                Summary = "Test summary",
                 Slug = "test-publication",
                 Topic = new Topic
                 {
@@ -117,6 +118,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication.Id, result.Id);
                 Assert.Equal(publication.Title, result.Title);
+                Assert.Equal(publication.Summary, result.Summary);
                 Assert.Equal(publication.Slug, result.Slug);
 
                 Assert.Equal(publication.Topic.Id, result.TopicId);
@@ -163,6 +165,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Test publication",
+                Summary = "Test summary",
                 Slug = "test-publication",
                 Topic = new Topic
                 {
@@ -213,6 +216,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication.Id, viewModel.Id);
                 Assert.Equal(publication.Title, viewModel.Title);
+                Assert.Equal(publication.Summary, viewModel.Summary);
 
                 Assert.Equal(publication.Topic.Id, viewModel.TopicId);
                 Assert.Equal(publication.Topic.ThemeId, viewModel.ThemeId);
@@ -254,6 +258,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Test publication",
+                Summary = "Test publication summary",
                 Slug = "test-publication",
                 Topic = new Topic
                 {
@@ -331,6 +336,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication.Id, viewModel.Id);
                 Assert.Equal(publication.Title, viewModel.Title);
+                Assert.Equal(publication.Summary, viewModel.Summary);
 
                 Assert.Equal(publication.Topic.Id, viewModel.TopicId);
                 Assert.Equal(publication.Topic.ThemeId, viewModel.ThemeId);
@@ -482,6 +488,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveViewModel
                     {
                         Title = "Test publication",
+                        Summary = "Test summary",
                         Contact = new ContactSaveViewModel
                         {
                             ContactName = "John Smith",
@@ -495,6 +502,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var publicationViewModel = result.AssertRight();
                 Assert.Equal("Test publication", publicationViewModel.Title);
+                Assert.Equal("Test summary", publicationViewModel.Summary);
 
                 Assert.Equal("John Smith", publicationViewModel.Contact.ContactName);
                 Assert.Equal("0123456789", publicationViewModel.Contact.ContactTelNo);
@@ -511,6 +519,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("test-publication", createdPublication.Slug);
                 Assert.False(createdPublication.Updated.HasValue);
                 Assert.Equal("Test publication", createdPublication.Title);
+                Assert.Equal("Test summary", createdPublication.Summary);
 
                 Assert.Equal("John Smith", createdPublication.Contact.ContactName);
                 Assert.Equal("0123456789", createdPublication.Contact.ContactTelNo);
@@ -593,6 +602,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Old title",
+                Summary = "Old summary",
                 Slug = "old-slug",
                 Topic = new Topic
                 {
@@ -645,6 +655,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveViewModel
                     {
                         Title = "New title",
+                        Summary = "New summary",
                         Contact = new ContactSaveViewModel
                         {
                             ContactName = "John Smith",
@@ -662,6 +673,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var viewModel = result.AssertRight();
 
                 Assert.Equal("New title", viewModel.Title);
+                Assert.Equal("New summary", viewModel.Summary);
 
                 Assert.Equal("John Smith", viewModel.Contact.ContactName);
                 Assert.Equal("0123456789", viewModel.Contact.ContactTelNo);
@@ -710,6 +722,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             {
                 Slug = "old-title",
                 Title = "Old title",
+                Summary = "Old summary",
                 Topic = new Topic
                 {
                     Title = "Old topic"
@@ -774,6 +787,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveViewModel
                     {
                         Title = "New title",
+                        Summary = "New summary",
                         Contact = new ContactSaveViewModel
                         {
                             ContactName = "John Smith",
@@ -791,6 +805,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var viewModel = result.AssertRight();
 
                 Assert.Equal("New title", viewModel.Title);
+                Assert.Equal("New summary", viewModel.Summary);
 
                 Assert.Equal("John Smith", viewModel.Contact.ContactName);
                 Assert.Equal("0123456789", viewModel.Contact.ContactTelNo);
@@ -811,6 +826,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 // Slug remains unchanged
                 Assert.Equal("old-title", updatedPublication.Slug);
                 Assert.Equal("New title", updatedPublication.Title);
+                Assert.Equal("New summary", updatedPublication.Summary);
 
                 Assert.Equal("John Smith", updatedPublication.Contact.ContactName);
                 Assert.Equal("0123456789", updatedPublication.Contact.ContactTelNo);
@@ -835,6 +851,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Old title",
+                Summary = "Old summary",
                 Slug = "old-slug",
                 Topic = new Topic
                 {
@@ -878,6 +895,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     new PublicationSaveViewModel
                     {
                         Title = "Old title",
+                        Summary = "New summary",
                         Contact = new ContactSaveViewModel
                         {
                             ContactName = "John Smith",
@@ -895,6 +913,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var viewModel = result.AssertRight();
 
                 Assert.Equal("Old title", viewModel.Title);
+                Assert.Equal("New summary", viewModel.Summary);
                 Assert.Equal("John Smith", viewModel.Contact.ContactName);
                 Assert.Equal(publication.SupersededById, viewModel.SupersededById);
             }
@@ -994,6 +1013,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var otherPublication = new Publication
             {
                 Title = "Other publication",
+                Summary = "Other publication summary",
                 Contact = sharedContact
             };
 

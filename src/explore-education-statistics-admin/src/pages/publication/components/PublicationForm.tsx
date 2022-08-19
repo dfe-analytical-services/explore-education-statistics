@@ -17,6 +17,7 @@ import ModalConfirm from '@common/components/ModalConfirm';
 
 export interface FormValues {
   title: string;
+  summary: string;
   topicId?: string;
   teamName: string;
   teamEmail: string;
@@ -33,6 +34,7 @@ const errorMappings = [
     },
   }),
 ];
+
 interface Props {
   cancelButton?: ReactNode;
   confirmOnSubmit?: boolean;
@@ -82,6 +84,9 @@ const PublicationForm = ({
   const validationSchema = useMemo(() => {
     const schema = Yup.object<FormValues>({
       title: Yup.string().required('Enter a publication title'),
+      summary: Yup.string()
+        .required('Enter a publication summary')
+        .max(160, 'Summary must be 160 characters or less'),
       teamName: Yup.string().required('Enter a team name'),
       teamEmail: Yup.string()
         .required('Enter a team email address')
@@ -113,6 +118,7 @@ const PublicationForm = ({
       initialValues={{
         ...(initialValues ?? {
           title: '',
+          summary: '',
           teamName: '',
           teamEmail: '',
           contactName: '',
@@ -132,6 +138,12 @@ const PublicationForm = ({
                 className="govuk-!-width-two-thirds"
               />
             )}
+
+            <FormFieldTextInput<FormValues>
+              label="Publication summary"
+              name="summary"
+              className="govuk-!-width-one-half"
+            />
 
             {themes && initialValues?.topicId && (
               <FormFieldThemeTopicSelect<FormValues>

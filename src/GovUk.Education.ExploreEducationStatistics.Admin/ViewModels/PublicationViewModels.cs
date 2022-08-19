@@ -13,6 +13,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Title { get; set; }
 
+        public string Summary { get; set; }
+
         public string Slug { get; set; }
 
         public List<ReleaseViewModel> Releases { get; set; }
@@ -35,6 +37,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
     public class PublicationSaveViewModel
     {
         [Required] public string Title { get; set; }
+
+        [Required, MaxLength(160)] public string Summary { get; set; }
 
         [Required] public Guid TopicId { get; set; }
 

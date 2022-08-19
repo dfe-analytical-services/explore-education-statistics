@@ -92,6 +92,25 @@ describe('PublicationForm', () => {
     });
   });
 
+  test('shows validation error when there is no summary', async () => {
+    render(<PublicationForm onSubmit={noop} showTitleInput />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication summary')).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByLabelText('Publication summary'));
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Enter a publication summary', {
+          selector: '#publicationForm-summary-error',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
   test('shows validation errors when there are no contact details', async () => {
     render(<PublicationForm onSubmit={noop} />);
 
@@ -194,6 +213,11 @@ describe('PublicationForm', () => {
       'Test title',
     );
 
+    await userEvent.type(
+      screen.getByLabelText('Publication summary'),
+      'Test summary',
+    );
+
     await userEvent.type(screen.getByLabelText('Team name'), 'Test team');
     await userEvent.type(
       screen.getByLabelText('Team email address'),
@@ -212,6 +236,7 @@ describe('PublicationForm', () => {
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
         title: 'Test title',
+        summary: 'Test summary',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
         contactName: 'John Smith',
@@ -228,6 +253,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',
@@ -272,6 +298,7 @@ describe('PublicationForm', () => {
 
       const initialValues: FormValues = {
         title: 'Test title',
+        summary: 'Test summary',
         topicId: 'topic-4',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
@@ -308,6 +335,7 @@ describe('PublicationForm', () => {
 
       const initialValues: FormValues = {
         title: 'Test title',
+        summary: 'Test summary',
         topicId: 'topic-4',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
@@ -352,6 +380,7 @@ describe('PublicationForm', () => {
 
       const initialValues: FormValues = {
         title: 'Test title',
+        summary: 'Test summary',
         topicId: 'topic-4',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
@@ -440,8 +469,9 @@ describe('PublicationForm', () => {
       preReleaseAccessList: '',
       previousVersionId: 'prev-version-id-1',
       publicationId: 'publication-id-1',
-      publicationSlug: 'publication-slug-1',
       publicationTitle: 'Publication 1',
+      publicationSummary: 'Publication 1 summary',
+      publicationSlug: 'publication-slug-1',
       published: '2021-01-01T11:21:17',
       releaseName: 'Test release name',
       slug: 'release-slug-1',
@@ -456,6 +486,7 @@ describe('PublicationForm', () => {
     const testPublication1: MyPublication = {
       id: 'publication-id-1',
       title: 'Publication 1',
+      summary: 'Publcation 1 summary',
       contact: {
         id: 'contact-1',
         contactName: 'John Smith',
@@ -499,6 +530,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',
@@ -534,6 +566,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',
@@ -575,6 +608,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',

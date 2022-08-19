@@ -46,6 +46,9 @@ const ReleaseSummaryPage = () => {
             <SummaryListItem term="Publication title">
               {release.publicationTitle}
             </SummaryListItem>
+            <SummaryListItem term="Publication summary">
+              {release.publicationSummary}
+            </SummaryListItem>
             <SummaryListItem term="Lead statistician">
               {release.contact?.contactName}
             </SummaryListItem>

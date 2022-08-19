@@ -21,6 +21,7 @@ const PublicationDetailsPage = () => {
     supersededById,
     themeId,
     title,
+    summary,
     topicId,
   } = publication;
   const [readOnly, toggleReadOnly] = useToggle(true);
@@ -58,6 +59,9 @@ const PublicationDetailsPage = () => {
           <h2>Publication details</h2>
           <SummaryList>
             <SummaryListItem term="Publication title">{title}</SummaryListItem>
+            <SummaryListItem term="Publication summary">
+              {summary}
+            </SummaryListItem>
             <SummaryListItem term="Theme">{theme?.title}</SummaryListItem>
             <SummaryListItem term="Topic">{topic?.title}</SummaryListItem>
             <SummaryListItem term="Superseding publication">
@@ -81,6 +85,7 @@ const PublicationDetailsPage = () => {
           initialValues={{
             supersededById,
             title,
+            summary,
             topicId,
           }}
           publicationId={id}

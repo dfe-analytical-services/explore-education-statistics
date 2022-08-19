@@ -32,6 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.Contact))
                 .ForMember(dest => dest.PublicationTitle,
                     m => m.MapFrom(r => r.Publication.Title))
+                .ForMember(dest => dest.PublicationSummary,
+                    m => m.MapFrom(r => r.Publication.Summary))
                 .ForMember(dest => dest.PublicationId,
                     m => m.MapFrom(r => r.Publication.Id))
                 .ForMember(dest => dest.PublicationSlug,
@@ -50,6 +52,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.Contact))
                 .ForMember(dest => dest.PublicationTitle,
                     m => m.MapFrom(r => r.Publication.Title))
+                .ForMember(dest => dest.PublicationSummary,
+                    m => m.MapFrom(r => r.Publication.Summary))
                 .ForMember(dest => dest.PublicationId,
                     m => m.MapFrom(r => r.Publication.Id))
                 .ForMember(dest => dest.PublicationSlug,

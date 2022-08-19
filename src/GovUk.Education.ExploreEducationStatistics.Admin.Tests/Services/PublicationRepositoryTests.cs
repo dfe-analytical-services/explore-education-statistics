@@ -935,6 +935,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var publication = new Publication
             {
                 Title = "Publication title",
+                Summary = "Publication summary",
                 Topic = new Topic(),
                 Contact = new Contact
                 {
@@ -997,6 +998,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(publication.Id, viewModel.Id);
                 Assert.Equal(publication.Title, viewModel.Title);
+                Assert.Equal(publication.Summary, viewModel.Summary);
                 Assert.Equal(publication.TopicId, viewModel.TopicId);
                 Assert.Equal(publication.Contact.ContactName, viewModel.Contact.ContactName);
 
@@ -1034,7 +1036,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task GetPublicationForUser_NoReleaseMethodologyLegacyRelease()
+        public async Task GetPublicationForUser_NoReleaseMethodology()
         {
             var userId = Guid.NewGuid();
             var release1 = new Release
@@ -1046,6 +1048,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
             var publication = new Publication
             {
+                Title = "Test title",
+                Summary = "Test summary",
                 Topic = new Topic(),
                 Releases = new List<Release>
                 {
@@ -1066,6 +1070,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var viewModel = await repository.GetPublicationForUser(publication.Id, userId);
 
                 Assert.Equal(publication.Id, viewModel.Id);
+                Assert.Equal(publication.Title, viewModel.Title);
+                Assert.Equal(publication.Summary, viewModel.Summary);
                 Assert.Equal(publication.TopicId, viewModel.TopicId);
 
                 Assert.Empty(viewModel.Releases);

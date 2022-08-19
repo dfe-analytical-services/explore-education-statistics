@@ -13,6 +13,7 @@ const publication: BasicPublicationDetails = {
   contact: testContact,
   id: 'publication-id',
   title: 'Publication title',
+  summary: 'Publication summary',
   slug: 'publication-slug',
   themeId: 'theme-id',
   topicId: 'topic-id',

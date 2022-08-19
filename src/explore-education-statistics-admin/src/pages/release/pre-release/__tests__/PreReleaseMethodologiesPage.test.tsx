@@ -28,6 +28,7 @@ describe('PreReleaseMethodologiesPage', () => {
     contact: testContact,
     id: 'pub-1-id',
     title: 'Publication 1',
+    summary: 'Publication 1 summary',
     releases: [],
     methodologies: [],
     topicId: 'topic-id',

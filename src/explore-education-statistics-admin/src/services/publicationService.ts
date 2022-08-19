@@ -39,6 +39,7 @@ export interface ExternalMethodology {
 export interface MyPublication {
   id: string;
   title: string;
+  summary: string;
   releases: MyRelease[];
   methodologies: MyPublicationMethodology[];
   externalMethodology?: ExternalMethodology;
@@ -69,6 +70,7 @@ export interface MyPublicationMethodology {
 export interface BasicPublicationDetails {
   id: string;
   title: string;
+  summary: string;
   slug: string;
   contact: PublicationContactDetails;
   releases?: Release[];
@@ -85,6 +87,7 @@ export interface PublicationMethodologyDetails {
 
 export interface SavePublicationRequest {
   title: string;
+  summary: string;
   contact: SavePublicationContact;
   selectedMethodologyId?: string;
   externalMethodology?: ExternalMethodology;

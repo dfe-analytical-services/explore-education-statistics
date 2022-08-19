@@ -31,6 +31,7 @@ const id = 'publicationDetailsForm';
 export interface PublicationDetailsFormValues {
   supersededById?: string;
   title: string;
+  summary: string;
   topicId: string;
 }
 
@@ -80,11 +81,15 @@ const PublicationDetailsForm = ({
           ...(initialValues ?? {
             theme: '',
             title: '',
+            summary: '',
             topicId: '',
           }),
         }}
         validationSchema={Yup.object<PublicationDetailsFormValues>({
           title: Yup.string().required('Enter a title'),
+          summary: Yup.string()
+            .required('Enter a summary')
+            .max(160, 'Summary must be 160 characters or less'),
           topicId: Yup.string().required('Choose a topic'),
         })}
         onSubmit={useFormSubmit(onSubmit, errorMappings)}
@@ -97,6 +102,12 @@ const PublicationDetailsForm = ({
                   <FormFieldTextInput<PublicationDetailsFormValues>
                     name="title"
                     label="Publication title"
+                    className="govuk-!-width-one-half"
+                  />
+
+                  <FormFieldTextInput<PublicationDetailsFormValues>
+                    name="summary"
+                    label="Publication summary"
                     className="govuk-!-width-one-half"
                   />
                   {themes && initialValues?.topicId && (

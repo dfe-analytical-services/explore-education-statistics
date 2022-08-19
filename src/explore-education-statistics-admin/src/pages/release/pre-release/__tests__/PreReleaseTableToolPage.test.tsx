@@ -196,6 +196,7 @@ describe('PreReleaseTableToolPage', () => {
     contact: testContact,
     id: 'publication-1',
     title: 'Pupil absence',
+    summary: 'Pupil absence summary',
     slug: 'pupil-absence',
     themeId: 'theme-1',
     topicId: 'topic-1',

@@ -11,6 +11,7 @@ export const testRelease: Release = {
   releaseName: 'Release 1',
   publicationId: 'publication-1',
   publicationTitle: 'Publication 1',
+  publicationSummary: 'Publication Summary',
   publicationSlug: 'publication-1-slug',
   timePeriodCoverage: { value: 'W51', label: 'Week 51' },
   title: 'Release Title',

@@ -26,6 +26,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string PublicationTitle { get; set; }
 
+        public string PublicationSummary { get; set; }
+
         public string PublicationSlug { get; set; }
 
         public string ReleaseName { get; set; }
