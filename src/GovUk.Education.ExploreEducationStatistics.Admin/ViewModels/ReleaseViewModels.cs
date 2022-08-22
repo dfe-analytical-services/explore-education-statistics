@@ -33,9 +33,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string ReleaseName { get; set; } = string.Empty;
 
+        public int Year { get; set; }
+        
         public string YearTitle { get; set; } = string.Empty;
 
-        public PartialDate NextReleaseDate { get; set; } = null!;
+        public PartialDate? NextReleaseDate { get; set; }
 
         [JsonConverter(typeof(DateTimeToDateJsonConverter))]
         public DateTime? PublishScheduled { get; set; }
@@ -45,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public bool Live => Published != null;
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-        public TimeIdentifier? TimePeriodCoverage { get; set; }
+        public TimeIdentifier TimePeriodCoverage { get; set; }
 
         public string PreReleaseAccessList { get; set; } = string.Empty;
 
@@ -193,21 +195,23 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string Slug { get; set; } = string.Empty;
 
         public int Year { get; set; }
+        
+        public string YearTitle { get; set; } = string.Empty;
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-        public TimeIdentifier? TimePeriodCoverage { get; set; }
+        public TimeIdentifier TimePeriodCoverage { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseApprovalStatus ApprovalStatus { get; set; }
 
         public DateTime? Published { get; set; }
 
-        public bool Live { get; set; }
+        public bool Live => Published != null;
 
         [JsonConverter(typeof(DateTimeToDateJsonConverter))]
         public DateTime? PublishScheduled { get; set; }
 
-        public PartialDate NextReleaseDate { get; set; } = null!;
+        public PartialDate? NextReleaseDate { get; set; }
 
         [JsonConverter(typeof(StringEnumConverter))]
         public ReleaseType Type { get; set; }

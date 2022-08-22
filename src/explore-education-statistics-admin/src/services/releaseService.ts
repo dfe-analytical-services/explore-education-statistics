@@ -35,7 +35,8 @@ export interface Release {
   latestInternalReleaseNote?: string;
   previousVersionId: string;
   preReleaseAccessList: string;
-  yearTitle?: string;
+  year: number;
+  yearTitle: string;
   permissions?: ReleasePermissions;
 }
 
@@ -63,8 +64,19 @@ export interface ReleaseSummary {
 export interface ReleaseListItem {
   id: string;
   title: string;
-  live: boolean;
+  slug: string;
+  year: number;
+  yearTitle: string;
+  timePeriodCoverage: ValueLabelPair;
   approvalStatus: ReleaseApprovalStatus;
+  publishScheduled?: string;
+  published?: string;
+  live: boolean;
+  nextReleaseDate?: PartialDate;
+  type: ReleaseType;
+  latestInternalReleaseNote: string;
+  amendment: boolean;
+  permissions?: ReleasePermissions;
 }
 
 interface BaseReleaseRequest {
