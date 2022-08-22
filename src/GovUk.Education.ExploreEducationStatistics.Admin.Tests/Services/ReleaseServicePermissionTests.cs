@@ -184,7 +184,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService.Object,
                             releaseRepository: releaseRepository.Object
                         );
-                        var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved);
+                        var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
                         var viewModel = result.AssertRight();
                         Assert.Single(viewModel);
@@ -247,7 +247,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService.Object,
                             releaseRepository: repository.Object
                         );
-                        var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved);
+                        var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
                         var viewModel = result.AssertRight();
                         Assert.Single(viewModel);
@@ -270,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     async userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return await service.GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved);
+                        return await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
                     }
                 );
         }

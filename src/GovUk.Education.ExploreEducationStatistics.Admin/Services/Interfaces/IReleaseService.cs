@@ -27,10 +27,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, TitleAndIdViewModel?>> GetLatestPublishedRelease(Guid publicationId);
 
-        Task<Either<ActionResult, List<ReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
+        Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesWithStatuses(
             params ReleaseApprovalStatus[] releaseApprovalStatues);
 
-        Task<Either<ActionResult, List<ReleaseViewModel>>> GetMyScheduledReleasesAsync();
+        Task<Either<ActionResult, List<ReleaseViewModel>>> ListScheduledReleases();
 
         Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId);
 

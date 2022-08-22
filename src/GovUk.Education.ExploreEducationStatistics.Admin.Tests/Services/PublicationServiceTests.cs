@@ -16,7 +16,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
-using MessagePack.Formatters;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -2431,11 +2430,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.ApprovalStatus, resultRelease.ApprovalStatus);
                 Assert.Equal(release.LatestInternalReleaseNote, resultRelease.LatestInternalReleaseNote);
                 Assert.Equal(release.Amendment, resultRelease.Amendment);
+                Assert.Null(resultRelease.Permissions);
             }
         }
 
         [Fact]
-        public async Task ListActiveReleases_live_true()
+        public async Task ListActiveReleases_Live_True()
         {
             var release1Original = new Release
             {
@@ -2491,7 +2491,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = BuildPublicationService(context);
 
                 var result = await publicationService.ListActiveReleases(
-                    publication.Id, true);
+                    publication.Id, live: true);
 
                 var releases = result.AssertRight();
 
@@ -2501,7 +2501,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListActiveReleases_live_false()
+        public async Task ListActiveReleases_Live_False()
         {
             var release1Original = new Release
             {
@@ -2557,12 +2557,90 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var publicationService = BuildPublicationService(context);
 
                 var result = await publicationService.ListActiveReleases(
-                    publication.Id, false);
+                    publication.Id, live: false);
 
                 var releases = result.AssertRight();
                 Assert.Equal(2, releases.Count);
                 Assert.Equal(release2.Id, releases[0].Id);
                 Assert.Equal(release1Amendment.Id, releases[1].Id);
+            }
+        }
+        
+        [Fact]
+        public async Task ListActiveReleases_IncludePermissions_True()
+        {
+            var release = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+                Type = ReleaseType.AdHocStatistics,
+                ApprovalStatus = ReleaseApprovalStatus.Draft,
+                Publication = new Publication
+                {
+                    Title = "Publication title",
+                },
+            };
+            
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                var result = await publicationService.ListActiveReleases(
+                    release.PublicationId, includePermissions: true);
+
+                var releases = result.AssertRight();
+
+                var resultRelease = Assert.Single(releases);
+                
+                Assert.NotNull(resultRelease.Permissions);
+                Assert.True(resultRelease.Permissions!.CanDeleteRelease);
+                Assert.True(resultRelease.Permissions!.CanUpdateRelease);
+                Assert.True(resultRelease.Permissions!.CanAddPrereleaseUsers);
+                Assert.True(resultRelease.Permissions!.CanMakeAmendmentOfRelease);
+            }
+        }
+
+        [Fact]
+        public async Task ListActiveReleases_IncludePermissions_False()
+        {
+            var release = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+                Type = ReleaseType.AdHocStatistics,
+                ApprovalStatus = ReleaseApprovalStatus.Draft,
+                Publication = new Publication
+                {
+                    Title = "Publication title",
+                },
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(release);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                var result = await publicationService.ListActiveReleases(
+                    release.PublicationId, includePermissions: false);
+
+                var releases = result.AssertRight();
+
+                var resultRelease = Assert.Single(releases);
+                
+                Assert.Null(resultRelease.Permissions);
             }
         }
         
@@ -2614,7 +2692,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 var result = await publicationService.ListActiveReleasesPaginated(
                     publication.Id,
                     page: 1,
-                    pageSize: 2);
+                    pageSize: 2
+                );
 
                 var pagedResult = result.AssertRight();
 
@@ -2623,14 +2702,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 Assert.Equal(release4.Id, releases[0].Id);
                 Assert.Equal(release3.Id, releases[1].Id);
-                
+
                 Assert.Equal(1, pagedResult.Paging.Page);
                 Assert.Equal(2, pagedResult.Paging.PageSize);
                 Assert.Equal(2, pagedResult.Paging.TotalPages);
                 Assert.Equal(4, pagedResult.Paging.TotalResults);
             }
         }
-
+        
         private static PublicationService BuildPublicationService(
             ContentDbContext context,
             IUserService? userService = null,

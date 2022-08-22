@@ -346,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
+        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesWithStatuses(
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             return await _userService
@@ -365,13 +365,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     return releases.Select(release =>
                     {
                         var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                        releaseViewModel.Permissions = PermissionsUtils.GetPermissionsSet(_userService, release);
+                        releaseViewModel.Permissions = PermissionsUtils.GetReleasePermissions(_userService, release);
                         return releaseViewModel;
                     }).ToList();
                 });
         }
 
-        public async Task<Either<ActionResult, List<ReleaseViewModel>>> GetMyScheduledReleasesAsync()
+        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListScheduledReleases()
         {
             return await _userService
                 .CheckCanAccessSystem()
@@ -389,7 +389,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                     var approvedReleases = releases.Select(release =>
                     {
                         var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
-                        releaseViewModel.Permissions = PermissionsUtils.GetPermissionsSet(_userService, release);
+                        releaseViewModel.Permissions = PermissionsUtils.GetReleasePermissions(_userService, release);
                         return releaseViewModel;
                     }).ToList();
 

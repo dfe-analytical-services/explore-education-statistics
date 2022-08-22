@@ -27,9 +27,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string PublicationTitle { get; set; } = string.Empty;
 
-        public string PublicationSummary { get; set; }
+        public string PublicationSummary { get; set; } = string.Empty;
 
-        public string PublicationSlug { get; set; }
+        public string PublicationSlug { get; set; } = string.Empty;
 
         public string ReleaseName { get; set; } = string.Empty;
 
@@ -67,18 +67,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public Guid? PreviousVersionId { get; set; }
 
-        public PermissionsSet? Permissions { get; set; }
+        public ReleasePermissions? Permissions { get; set; }
+    }
+    
+    public record ReleasePermissions
+    {
+        public bool CanAddPrereleaseUsers { get; init; }
 
-        public record PermissionsSet
-        {
-            public bool CanAddPrereleaseUsers { get; init; }
+        public bool CanUpdateRelease { get; init; }
 
-            public bool CanUpdateRelease { get; init; }
+        public bool CanDeleteRelease { get; init; }
 
-            public bool CanDeleteRelease { get; init; }
-
-            public bool CanMakeAmendmentOfRelease { get; init; }
-        }
+        public bool CanMakeAmendmentOfRelease { get; init; }
     }
 
     public class ReleaseCreateViewModel
@@ -215,5 +215,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         public string LatestInternalReleaseNote { get; set; } = string.Empty;
 
         public bool Amendment { get; set; }
+        
+        public ReleasePermissions? Permissions { get; set; }
     }
 }

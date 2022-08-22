@@ -10,9 +10,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 
 public static class PermissionsUtils
 {
-   public static ReleaseViewModel.PermissionsSet GetPermissionsSet(IUserService userService, Release release)
+   public static ReleasePermissions GetReleasePermissions(IUserService userService, Release release)
    {
-       return new ReleaseViewModel.PermissionsSet
+       return new ReleasePermissions
        {
            CanAddPrereleaseUsers = CheckHasPermission(userService.CheckCanAssignPrereleaseContactsToRelease(release)),
            CanUpdateRelease = CheckHasPermission(userService.CheckCanUpdateRelease(release)),
@@ -23,10 +23,6 @@ public static class PermissionsUtils
 
    private static bool CheckHasPermission(Task<Either<ActionResult, Release>> result)
    {
-       return result
-           .Result
-           .OnSuccess(_ => true)
-           .OrElse(() => false)
-           .Right;
+       return result.Result.IsRight;
    }
 }

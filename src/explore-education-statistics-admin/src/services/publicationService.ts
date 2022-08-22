@@ -96,6 +96,7 @@ export interface ListReleasesParams {
   live?: boolean;
   page?: number;
   pageSize?: number;
+  permissions?: boolean;
 }
 
 export type CreatePublicationRequest = SavePublicationRequest;

@@ -11,7 +11,6 @@ using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
@@ -199,18 +198,18 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         }
 
         [HttpGet("releases/draft")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> GetDraftReleasesAsync()
+        public async Task<ActionResult<List<ReleaseViewModel>>> ListDraftReleases()
         {
             return await _releaseService
-                .GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Draft, ReleaseApprovalStatus.HigherLevelReview)
+                .ListReleasesWithStatuses(ReleaseApprovalStatus.Draft, ReleaseApprovalStatus.HigherLevelReview)
                 .HandleFailuresOrOk();
         }
 
         [HttpGet("releases/scheduled")]
-        public async Task<ActionResult<List<ReleaseViewModel>>> GetScheduledReleasesAsync()
+        public async Task<ActionResult<List<ReleaseViewModel>>> ListScheduledReleases()
         {
             return await _releaseService
-                .GetMyScheduledReleasesAsync()
+                .ListScheduledReleases()
                 .HandleFailuresOrOk();
         }
 

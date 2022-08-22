@@ -32,11 +32,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid publicationId,
             int page,
             int pageSize,
-            bool? live = null);
+            bool? live = null,
+            bool includePermissions = false);
         
         Task<Either<ActionResult, List<ReleaseListItemViewModel>>> ListActiveReleases(
             Guid publicationId,
-            bool? live = null);
+            bool? live = null,
+            bool includePermissions = false);
 
         Task<Either<ActionResult, List<LegacyReleaseViewModel>>> PartialUpdateLegacyReleases(
             Guid publicationId, 

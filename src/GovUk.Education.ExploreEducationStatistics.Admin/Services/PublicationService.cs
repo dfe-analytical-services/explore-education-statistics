@@ -1,4 +1,5 @@
-﻿using System;
+﻿#nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -20,7 +21,6 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OData.UriParser;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
@@ -28,7 +28,6 @@ using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.Vi
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-#nullable enable annotations
     public class PublicationService : IPublicationService
     {
         private readonly ContentDbContext _context;
@@ -287,11 +286,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseListItemViewModel>>> ListActiveReleasesPaginated(
             Guid publicationId,
-            int page,
-            int pageSize,
-            bool? live = null)
+            int page = 1,
+            int pageSize = 5,
+            bool? live = null,
+            bool includePermissions = false)
         {
-            return await ListActiveReleases(publicationId, live)
+            return await ListActiveReleases(publicationId, live, includePermissions)
                 .OnSuccess(
                     releases =>
                         // This is not ideal - we should paginate results in the database, however,
@@ -305,7 +305,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, List<ReleaseListItemViewModel>>> ListActiveReleases(
             Guid publicationId,
-            bool? live = null)
+            bool? live = null,
+            bool includePermissions = false)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(publicationId, query => query
@@ -316,7 +317,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             .Where(release => live == null || release.Live == live)
                             .OrderByDescending(r => r.Year)
                             .ThenByDescending(r => r.TimePeriodCoverage)
-                            .Select(r => _mapper.Map<ReleaseListItemViewModel>(r))
+                            .Select(r => HydrateReleaseListItemViewModel(r, includePermissions))
                             .ToList()
                 );
         }
@@ -404,10 +405,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             publicationViewModel.Releases.ForEach(releaseViewModel =>
             {
                 var release = publication.Releases.Single(release => release.Id == releaseViewModel.Id);
-                releaseViewModel.Permissions = PermissionsUtils.GetPermissionsSet(_userService, release);
+                releaseViewModel.Permissions = PermissionsUtils.GetReleasePermissions(_userService, release);
             });
 
             return publicationViewModel;
+        }
+        
+        private ReleaseListItemViewModel HydrateReleaseListItemViewModel(Release release, bool includePermissions)
+        {
+            var viewModel = _mapper.Map<ReleaseListItemViewModel>(release);
+            
+            if (includePermissions)
+            {
+                viewModel.Permissions = PermissionsUtils.GetReleasePermissions(_userService, release);
+            }
+            
+            return viewModel;
         }
     }
 }

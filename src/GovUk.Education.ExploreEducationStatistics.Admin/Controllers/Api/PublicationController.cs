@@ -66,10 +66,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
             [Required] Guid publicationId,
             [FromQuery, Range(1, double.PositiveInfinity)] int page = 1,
             [FromQuery, Range(0, double.PositiveInfinity)] int pageSize = 5,
+            [FromQuery] bool permissions = false,
             [FromQuery] bool? live = null)
         {
             return await _publicationService
-                .ListActiveReleasesPaginated(publicationId, page, pageSize, live)
+                .ListActiveReleasesPaginated(publicationId, page, pageSize, live, includePermissions: permissions)
                 .HandleFailuresOrOk();
         }
 
