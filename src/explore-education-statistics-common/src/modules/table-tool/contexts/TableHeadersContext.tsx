@@ -9,24 +9,22 @@ import React, {
 } from 'react';
 
 export interface TableHeadersContextState {
-  activeList?: string;
-  defaultNumberOfItems: number;
+  activeGroup?: string;
   expandedLists: string[];
   groupDraggingActive: boolean;
   groupDraggingEnabled: boolean;
-  setActiveList: (listName?: string) => void;
+  setActiveGroup: (listName?: string) => void;
   toggleExpandedList: (listName: string) => void;
-  toggleGroupDraggingActive: () => void;
-  toggleGroupDraggingEnabled: () => void;
+  toggleGroupDraggingActive: (active: boolean) => void;
+  toggleGroupDraggingEnabled: (enabled: boolean) => void;
 }
 
 const TableHeadersContext = createContext<TableHeadersContextState>({
-  activeList: undefined,
-  defaultNumberOfItems: 2,
+  activeGroup: undefined,
   expandedLists: [],
   groupDraggingActive: false,
   groupDraggingEnabled: true,
-  setActiveList: noop,
+  setActiveGroup: noop,
   toggleExpandedList: noop,
   toggleGroupDraggingActive: noop,
   toggleGroupDraggingEnabled: noop,
@@ -34,7 +32,7 @@ const TableHeadersContext = createContext<TableHeadersContextState>({
 
 export interface TableHeadersContextProviderProps {
   children: ReactNode | ((state: TableHeadersContextState) => ReactNode);
-  activeList?: string;
+  activeGroup?: string;
   expandedLists?: string[];
   groupDraggingActive?: boolean;
   groupDraggingEnabled?: boolean;
@@ -42,14 +40,13 @@ export interface TableHeadersContextProviderProps {
 
 export const TableHeadersContextProvider = ({
   children,
-  activeList: initialActiveList,
+  activeGroup: initialActiveGroup,
   expandedLists: initialExpandedLists,
   groupDraggingActive: initialGroupDraggingActive,
   groupDraggingEnabled: initialGroupDraggingEnabled,
 }: TableHeadersContextProviderProps) => {
-  const defaultNumberOfItems = 2;
-  const [activeList, setActiveList] = useState<string | undefined>(
-    initialActiveList ?? undefined,
+  const [activeGroup, setActiveGroup] = useState<string | undefined>(
+    initialActiveGroup ?? undefined,
   );
   const [expandedLists, setExpandedLists] = useState<string[]>(
     initialExpandedLists ?? [],
@@ -70,23 +67,21 @@ export const TableHeadersContextProvider = ({
       );
 
     return {
-      activeList,
-      defaultNumberOfItems,
+      activeGroup,
       expandedLists,
       groupDraggingActive,
       groupDraggingEnabled,
-      setActiveList,
+      setActiveGroup,
       toggleExpandedList,
       toggleGroupDraggingActive,
       toggleGroupDraggingEnabled,
     };
   }, [
-    activeList,
-    defaultNumberOfItems,
+    activeGroup,
     expandedLists,
     groupDraggingActive,
     groupDraggingEnabled,
-    setActiveList,
+    setActiveGroup,
     toggleGroupDraggingActive,
     toggleGroupDraggingEnabled,
   ]);

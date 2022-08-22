@@ -7,6 +7,7 @@ import classNames from 'classnames';
 import React from 'react';
 
 interface Props {
+  defaultNumberOfItems: number;
   groupName: string;
   id: string;
   legend: string;
@@ -15,6 +16,7 @@ interface Props {
 }
 
 const TableHeadersGroupControls = ({
+  defaultNumberOfItems,
   groupName,
   id,
   legend,
@@ -22,30 +24,24 @@ const TableHeadersGroupControls = ({
   onMove,
 }: Props) => {
   const {
-    activeList,
-    defaultNumberOfItems,
+    activeGroup,
     expandedLists,
-    setActiveList,
+    setActiveGroup,
     toggleExpandedList,
     toggleGroupDraggingEnabled,
   } = useTableHeadersContext();
   const isExpanded = expandedLists.includes(id);
   const displayItems = isExpanded ? totalItems : defaultNumberOfItems;
   const hasMoreItems = isExpanded || totalItems > displayItems;
-  const disableControls = activeList && activeList !== id;
+  const disableControls = activeGroup && activeGroup !== id;
 
   return (
-    <div
-      className={classNames(styles.buttonsContainer, {
-        [styles.noShowMoreButton]: !hasMoreItems,
-      })}
-    >
-      {activeList === id ? (
+    <div className={styles.buttonsContainer}>
+      {activeGroup === id ? (
         <Button
           onClick={e => {
-            e.preventDefault();
-            setActiveList(undefined);
-            toggleGroupDraggingEnabled();
+            setActiveGroup(undefined);
+            toggleGroupDraggingEnabled(true);
           }}
         >
           Done
@@ -66,7 +62,7 @@ const TableHeadersGroupControls = ({
               {isExpanded ? (
                 <>
                   Show fewer
-                  <VisuallyHidden>{` ${legend} items`}</VisuallyHidden>
+                  <VisuallyHidden>{` items for ${legend}`}</VisuallyHidden>
                 </>
               ) : (
                 <>
@@ -81,9 +77,8 @@ const TableHeadersGroupControls = ({
           <Button
             disabled={!!disableControls}
             onClick={e => {
-              e.preventDefault();
-              setActiveList(id);
-              toggleGroupDraggingEnabled();
+              setActiveGroup(id);
+              toggleGroupDraggingEnabled(false);
             }}
           >
             Reorder
@@ -92,10 +87,7 @@ const TableHeadersGroupControls = ({
           <Button
             className={styles.moveButton}
             disabled={!!disableControls}
-            onClick={e => {
-              e.preventDefault();
-              onMove?.();
-            }}
+            onClick={onMove}
           >
             Move<VisuallyHidden> {legend}</VisuallyHidden>
             {` to ${groupName.startsWith('rowGroups') ? 'columns' : 'rows'}`}

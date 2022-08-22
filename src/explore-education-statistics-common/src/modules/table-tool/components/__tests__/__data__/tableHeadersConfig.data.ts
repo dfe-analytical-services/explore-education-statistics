@@ -6,7 +6,7 @@ import {
 } from '@common/modules/table-tool/types/filters';
 import { TableHeadersConfig } from '@common/modules/table-tool/types/tableHeaders';
 
-export const testTimePeriodFilters = [
+export const testTimePeriodFilters: TimePeriodFilter[] = [
   new TimePeriodFilter({
     year: 2010,
     code: 'T1',
@@ -21,7 +21,7 @@ export const testTimePeriodFilters = [
   }),
 ];
 
-export const testIndicators = [
+export const testIndicators: Indicator[] = [
   new Indicator({
     value: 'indicator-1-value',
     label: 'Indicator 1',
@@ -42,7 +42,7 @@ export const testIndicators = [
   }),
 ];
 
-export const testCategoryFilters = [
+export const testCategoryFilters: CategoryFilter[] = [
   new CategoryFilter({
     value: 'category-1-value',
     label: 'Category 1',
@@ -59,7 +59,7 @@ export const testCategoryFilters = [
   }),
 ];
 
-export const testLocationFilters = [
+export const testLocationFilters: LocationFilter[] = [
   new LocationFilter({
     value: 'location-1-value',
     label: 'Location 1',

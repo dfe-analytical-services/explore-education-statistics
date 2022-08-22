@@ -1,7 +1,6 @@
 import { FormFieldset } from '@common/components/form';
 import styles from '@common/modules/table-tool/components/TableHeadersAxis.module.scss';
-import TableHeadersDraggableGroup from '@common/modules/table-tool/components/TableHeadersDraggableGroup';
-import TableHeadersNotDraggableGroup from '@common/modules/table-tool/components/TableHeadersNotDraggableGroup';
+import TableHeadersGroup from '@common/modules/table-tool/components/TableHeadersGroup';
 import { TableHeadersFormValues } from '@common/modules/table-tool/components/TableHeadersForm';
 import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
 import {
@@ -22,26 +21,35 @@ interface Props {
   onMoveGroupToOtherAxis: (index: number) => void;
 }
 
-function TableHeadersAxis({ id, legend, name, onMoveGroupToOtherAxis }: Props) {
+export default function TableHeadersAxis({
+  id,
+  legend,
+  name,
+  onMoveGroupToOtherAxis,
+}: Props) {
   const {
     groupDraggingActive,
     groupDraggingEnabled,
   } = useTableHeadersContext();
   const [field, meta] = useField(name);
 
-  if (groupDraggingEnabled) {
-    return (
-      <Droppable droppableId={name} direction="horizontal">
-        {droppableProvided => (
-          <div
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...droppableProvided.droppableProps}
-            ref={droppableProvided.innerRef}
-            className={classNames(styles.container, {
-              [styles.isDraggingActive]: groupDraggingActive,
-            })}
-            data-testid={id}
-          >
+  return (
+    <Droppable
+      droppableId={name}
+      direction="horizontal"
+      isDropDisabled={!groupDraggingEnabled}
+    >
+      {droppableProvided => (
+        <div
+          // eslint-disable-next-line react/jsx-props-no-spreading
+          {...droppableProvided.droppableProps}
+          ref={droppableProvided.innerRef}
+          className={classNames(styles.container, {
+            [styles.isDraggingActive]: groupDraggingActive,
+          })}
+          data-testid={id}
+        >
+          {groupDraggingEnabled ? (
             <FormFieldset
               id={id}
               legend={legend}
@@ -65,7 +73,7 @@ function TableHeadersAxis({ id, legend, name, onMoveGroupToOtherAxis }: Props) {
                       data-testid={`${name}-${index}`}
                       key={key}
                     >
-                      <TableHeadersDraggableGroup
+                      <TableHeadersGroup
                         index={index}
                         legend={getGroupLegend(group)}
                         name={`${name}[${index}]`}
@@ -80,40 +88,40 @@ function TableHeadersAxis({ id, legend, name, onMoveGroupToOtherAxis }: Props) {
                 {droppableProvided.placeholder}
               </div>
             </FormFieldset>
-          </div>
-        )}
-      </Droppable>
-    );
-  }
-
-  return (
-    <div className={classNames(styles.container)}>
-      <h3 className="govuk-!-font-weight-regular govuk-!-margin-bottom-3">
-        {legend}
-      </h3>
-      <div className={styles.groupsContainer}>
-        {field.value.map((group: Filter[], index: number) => {
-          const key = `group-${index}`;
-          return (
-            <div
-              className={styles.groupContainer}
-              data-testid={`${name}-${index}`}
-              key={key}
-            >
-              <TableHeadersNotDraggableGroup
-                legend={getGroupLegend(group)}
-                name={`${name}[${index}]`}
-                totalItems={group.length}
-              />
-            </div>
-          );
-        })}
-      </div>
-    </div>
+          ) : (
+            <>
+              <h3 className="govuk-!-font-weight-regular govuk-!-margin-bottom-3">
+                {legend}
+              </h3>
+              <div className={styles.groupsContainer}>
+                {field.value.map((group: Filter[], index: number) => {
+                  const key = `group-${index}`;
+                  return (
+                    <div
+                      className={styles.groupContainer}
+                      data-testid={`${name}-${index}`}
+                      key={key}
+                    >
+                      <TableHeadersGroup
+                        index={index}
+                        legend={getGroupLegend(group)}
+                        name={`${name}[${index}]`}
+                        totalItems={group.length}
+                        onMoveGroupToOtherAxis={() => {
+                          onMoveGroupToOtherAxis(index);
+                        }}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
+      )}
+    </Droppable>
   );
 }
-
-export default TableHeadersAxis;
 
 function getGroupLegend(group: Filter[]) {
   if (group[0] instanceof CategoryFilter) {

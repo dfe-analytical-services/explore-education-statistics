@@ -6,7 +6,7 @@ import {
   testIndicators,
   testLocationFilters,
   testTimePeriodFilters,
-} from '@common/modules/table-tool/components/__tests__/__data__/TableHeadersConfig.data';
+} from '@common/modules/table-tool/components/__tests__/__data__/tableHeadersConfig.data';
 import { Formik } from 'formik';
 import { render as baseRender, screen } from '@testing-library/react';
 import noop from 'lodash/noop';
@@ -15,7 +15,7 @@ import React from 'react';
 describe('TableHeadersGroupControls', () => {
   describe('a list is being reordered', () => {
     test('renders the Done button when the list is active', () => {
-      render({ activeList: 'test-id' });
+      render({ activeGroup: 'test-id' });
 
       expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument();
       expect(
@@ -27,7 +27,7 @@ describe('TableHeadersGroupControls', () => {
     });
 
     test('renders disabled show more, reorder and move buttons when the list is not active', () => {
-      render({ activeList: 'another-id' });
+      render({ activeGroup: 'another-id' });
 
       expect(
         screen.queryByRole('button', { name: 'Done' }),
@@ -64,14 +64,16 @@ describe('TableHeadersGroupControls', () => {
         screen.getByRole('button', { name: 'Show 3 more items in Locations' }),
       ).toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: 'Show fewer Locations items' }),
+        screen.queryByRole('button', {
+          name: 'Show fewer items for Locations',
+        }),
       ).not.toBeInTheDocument();
     });
 
     test('renders the show fewer button if the list is expanded', () => {
       render({ expandedLists: ['test-id'], totalItems: 5 });
       expect(
-        screen.getByRole('button', { name: 'Show fewer Locations items' }),
+        screen.getByRole('button', { name: 'Show fewer items for Locations' }),
       ).toBeInTheDocument();
       expect(
         screen.queryByRole('button', {
@@ -89,18 +91,20 @@ describe('TableHeadersGroupControls', () => {
         }),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByRole('button', { name: 'Show fewer Locations items' }),
+        screen.queryByRole('button', {
+          name: 'Show fewer items for Locations',
+        }),
       ).not.toBeInTheDocument();
     });
   });
 });
 
 function render({
-  activeList = undefined,
+  activeGroup = undefined,
   expandedLists = [],
   totalItems = 2,
 }: {
-  activeList?: string;
+  activeGroup?: string;
   expandedLists?: string[];
   totalItems?: number;
 }) {
@@ -111,11 +115,12 @@ function render({
 
   baseRender(
     <TableHeadersContextProvider
-      activeList={activeList}
+      activeGroup={activeGroup}
       expandedLists={expandedLists}
     >
       <Formik onSubmit={noop} initialValues={testInitialFormValues}>
         <TableHeadersGroupControls
+          defaultNumberOfItems={2}
           groupName="rowGroups"
           id="test-id"
           legend="Locations"

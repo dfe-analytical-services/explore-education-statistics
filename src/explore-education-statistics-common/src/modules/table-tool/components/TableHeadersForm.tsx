@@ -1,5 +1,6 @@
 import Button from '@common/components/Button';
 import { FormGroup } from '@common/components/form';
+import useToggle from '@common/hooks/useToggle';
 import useMounted from '@common/hooks/useMounted';
 import TableHeadersAxis from '@common/modules/table-tool/components/TableHeadersAxis';
 import { TableHeadersContextProvider } from '@common/modules/table-tool/contexts/TableHeadersContext';
@@ -22,16 +23,13 @@ export interface TableHeadersFormValues {
 interface Props {
   initialValues: TableHeadersConfig;
   onSubmit: (values: TableHeadersConfig) => void;
-  id?: string;
 }
 
-const TableHeadersForm = ({
-  onSubmit,
-  id = 'tableHeadersForm',
-  initialValues,
-}: Props) => {
+const TableHeadersForm = ({ onSubmit, initialValues }: Props) => {
   const { isMounted } = useMounted();
   const [screenReaderMessage, setScreenReaderMessage] = useState('');
+  const [showTableHeadersForm, toggleShowTableHeadersForm] = useToggle(false);
+  const id = 'tableHeaderForm';
 
   const handleSubmit = useCallback(
     (values: TableHeadersFormValues) => {
@@ -45,8 +43,9 @@ const TableHeadersForm = ({
         columns: last(values.columnGroups) as Filter[],
         rows: last(values.rowGroups) as Filter[],
       });
+      toggleShowTableHeadersForm.off();
     },
-    [onSubmit],
+    [onSubmit, toggleShowTableHeadersForm],
   );
 
   const moveGroupToAxis = ({
@@ -91,8 +90,8 @@ const TableHeadersForm = ({
 
     const message =
       sourceId === 'rowGroups'
-        ? ' You have moved the group from row groups to column groups'
-        : 'You have moved the group from column groups to row groups';
+        ? 'You have moved the group from row headers to column headers'
+        : 'You have moved the group from column headers to row headers';
 
     // Clear the message then repopulate to ensure the new message is read,
     // and only read once.
@@ -148,107 +147,120 @@ const TableHeadersForm = ({
     <TableHeadersContextProvider>
       {({ toggleGroupDraggingActive }) => (
         <>
-          <div className={styles.formContainer} id={id}>
-            <div className="govuk-grid-row">
-              <div className="govuk-grid-column-two-thirds">
-                <h3>Move and reorder table headers</h3>
-                <h4>Using a mouse, track pad, touch screen and a keyboard</h4>
-                <p className="govuk-hint">
-                  Drag and drop or use the keyboard to reorder headers within or
-                  between columns and rows. Click the Reorder button on a header
-                  group to reorder the items within that group. Hold the Ctrl
-                  key and click to select multiple items to drag and drop.
-                </p>
-                <h4>Using only a keyboard</h4>
-                <p className="govuk-hint">
-                  For keyboard users, use the Tab key to navigate to items or
-                  groups, select and deselect a draggable item with Space and
-                  use the arrow keys to move a selected item. To move multiple
-                  items, you can press Ctrl and Enter to add an item to your
-                  selected items.
-                </p>
-                <p className="govuk-visually-hidden">
-                  If you are using a screen reader disable scan mode.
-                </p>
-              </div>
-            </div>
-
-            <Formik<TableHeadersFormValues>
-              enableReinitialize
-              initialValues={{
-                columnGroups: compact([
-                  ...(initialValues?.columnGroups ?? []),
-                  initialValues?.columns,
-                ]),
-                rowGroups: compact([
-                  ...(initialValues?.rowGroups ?? []),
-                  initialValues?.rows,
-                ]),
-              }}
-              validationSchema={Yup.object<TableHeadersFormValues>({
-                rowGroups: Yup.array()
-                  .of(Yup.array().of<Filter>(Yup.object()).ensure())
-                  .min(1, 'Must have at least one row group'),
-                columnGroups: Yup.array()
-                  .of(Yup.array().of<Filter>(Yup.object()).ensure())
-                  .min(1, 'Must have at least one column group'),
-              })}
-              onSubmit={handleSubmit}
+          {!showTableHeadersForm ? (
+            <Button
+              className={styles.button}
+              ariaControls={id}
+              ariaExpanded={showTableHeadersForm}
+              onClick={toggleShowTableHeadersForm}
             >
-              {form => {
-                return (
-                  <Form id={`${id}-form`}>
-                    <DragDropContext
-                      onDragEnd={result => {
-                        handleDragEnd(form, result);
-                        toggleGroupDraggingActive();
-                      }}
-                      onDragStart={() => {
-                        toggleGroupDraggingActive();
-                      }}
-                    >
-                      <FormGroup className="govuk-!-margin-bottom-4">
-                        <TableHeadersAxis
-                          id="columnGroups"
-                          legend="Move column headers"
-                          name="columnGroups"
-                          onMoveGroupToOtherAxis={groupIndex => {
-                            handleMoveGroupToOtherAxis(
-                              'columnGroups',
-                              groupIndex,
-                              form,
-                            );
-                          }}
-                        />
+              Move and reorder table headers
+            </Button>
+          ) : (
+            <div className={styles.formContainer} id={id}>
+              <div className="govuk-grid-row">
+                <div className="govuk-grid-column-two-thirds">
+                  <h3>Move and reorder table headers</h3>
+                  <h4>Using a mouse, track pad, touch screen and a keyboard</h4>
+                  <p className="govuk-hint">
+                    Drag and drop or use the keyboard to reorder headers within
+                    or between columns and rows. Click the Reorder button on a
+                    header group to reorder the items within that group. Hold
+                    the Ctrl key and click to select multiple items to drag and
+                    drop.
+                  </p>
+                  <h4>Using only a keyboard</h4>
+                  <p className="govuk-hint">
+                    For keyboard users, use the Tab key to navigate to items or
+                    groups, select and deselect a draggable item with Space and
+                    use the arrow keys to move a selected item. To move multiple
+                    items, you can press Ctrl and Enter to add an item to your
+                    selected items.
+                  </p>
+                  <p className="govuk-visually-hidden">
+                    If you are using a screen reader disable scan mode.
+                  </p>
+                </div>
+              </div>
 
-                        <TableHeadersAxis
-                          id="rowGroups"
-                          legend="Move row headers"
-                          name="rowGroups"
-                          onMoveGroupToOtherAxis={groupIndex =>
-                            handleMoveGroupToOtherAxis(
-                              'rowGroups',
-                              groupIndex,
-                              form,
-                            )
-                          }
-                        />
-                      </FormGroup>
-                    </DragDropContext>
+              <Formik<TableHeadersFormValues>
+                enableReinitialize
+                initialValues={{
+                  columnGroups: compact([
+                    ...(initialValues?.columnGroups ?? []),
+                    initialValues?.columns,
+                  ]),
+                  rowGroups: compact([
+                    ...(initialValues?.rowGroups ?? []),
+                    initialValues?.rows,
+                  ]),
+                }}
+                validationSchema={Yup.object<TableHeadersFormValues>({
+                  rowGroups: Yup.array()
+                    .of(Yup.array().of<Filter>(Yup.object()).ensure())
+                    .min(1, 'Must have at least one row group'),
+                  columnGroups: Yup.array()
+                    .of(Yup.array().of<Filter>(Yup.object()).ensure())
+                    .min(1, 'Must have at least one column group'),
+                })}
+                validateOnBlur={false}
+                onSubmit={handleSubmit}
+              >
+                {form => {
+                  return (
+                    <Form id={`${id}-form`}>
+                      <DragDropContext
+                        onDragEnd={result => {
+                          handleDragEnd(form, result);
+                          toggleGroupDraggingActive(false);
+                        }}
+                        onDragStart={() => {
+                          toggleGroupDraggingActive(true);
+                        }}
+                      >
+                        <FormGroup className="govuk-!-margin-bottom-4">
+                          <TableHeadersAxis
+                            id="columnGroups"
+                            legend="Move column headers"
+                            name="columnGroups"
+                            onMoveGroupToOtherAxis={groupIndex => {
+                              handleMoveGroupToOtherAxis(
+                                'columnGroups',
+                                groupIndex,
+                                form,
+                              );
+                            }}
+                          />
 
-                    <Button
-                      ariaControls={id}
-                      ariaExpanded
-                      className="govuk-!-margin-left-5 govuk-!-margin-top-3"
-                      type="submit"
-                    >
-                      Update and view reordered table
-                    </Button>
-                  </Form>
-                );
-              }}
-            </Formik>
-          </div>
+                          <TableHeadersAxis
+                            id="rowGroups"
+                            legend="Move row headers"
+                            name="rowGroups"
+                            onMoveGroupToOtherAxis={groupIndex =>
+                              handleMoveGroupToOtherAxis(
+                                'rowGroups',
+                                groupIndex,
+                                form,
+                              )
+                            }
+                          />
+                        </FormGroup>
+                      </DragDropContext>
+
+                      <Button
+                        ariaControls={id}
+                        ariaExpanded
+                        className="govuk-!-margin-left-5 govuk-!-margin-top-3"
+                        type="submit"
+                      >
+                        Update and view reordered table
+                      </Button>
+                    </Form>
+                  );
+                }}
+              </Formik>
+            </div>
+          )}
 
           <div
             aria-live="assertive"

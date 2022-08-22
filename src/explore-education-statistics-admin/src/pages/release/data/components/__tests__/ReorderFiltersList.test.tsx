@@ -357,6 +357,12 @@ describe('ReorderFiltersList', () => {
 
     expect(within(options[1]).getByText('Category 1 Group 2 Item 1'));
 
+    // Waiting to make sure the button has changed,
+    // otherwise it's clicked too quickly and thinks it's a double-click.
+    await waitFor(() => {
+      expect(within(groups[0]).getByText('Done')).toBeInTheDocument();
+    });
+
     userEvent.click(within(groups[0]).getByRole('button', { name: 'Done' }));
 
     expect(

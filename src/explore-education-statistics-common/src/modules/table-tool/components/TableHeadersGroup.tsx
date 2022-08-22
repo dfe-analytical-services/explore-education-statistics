@@ -1,6 +1,7 @@
-import styles from '@common/modules/table-tool/components/TableHeadersDraggableGroup.module.scss';
+import styles from '@common/modules/table-tool/components/TableHeadersGroup.module.scss';
 import TableHeadersGroupControls from '@common/modules/table-tool/components/TableHeadersGroupControls';
 import TableHeadersReadOnlyList from '@common/modules/table-tool/components/TableHeadersReadOnlyList';
+import TableHeadersReorderableList from '@common/modules/table-tool/components/TableHeadersReorderableList';
 import getTableHeaderGroupId from '@common/modules/table-tool/components/utils/getTableHeaderGroupId';
 import useTableHeadersContext from '@common/modules/table-tool/contexts/TableHeadersContext';
 import classNames from 'classnames';
@@ -15,19 +16,28 @@ interface Props {
   onMoveGroupToOtherAxis: () => void;
 }
 
-const TableHeadersDraggableGroup = ({
+const TableHeadersGroup = ({
   index,
   legend,
   name,
   totalItems,
   onMoveGroupToOtherAxis,
 }: Props) => {
-  const { groupDraggingActive } = useTableHeadersContext();
+  const {
+    activeGroup,
+    groupDraggingActive,
+    groupDraggingEnabled,
+  } = useTableHeadersContext();
   const groupId = getTableHeaderGroupId(legend);
+  const defaultNumberOfItems = 2;
 
   return (
     <>
-      <Draggable draggableId={name} index={index}>
+      <Draggable
+        draggableId={name}
+        index={index}
+        isDragDisabled={!groupDraggingEnabled}
+      >
         {(draggableProvided, draggableSnapshot) => (
           <div
             // eslint-disable-next-line react/jsx-props-no-spreading
@@ -40,21 +50,31 @@ const TableHeadersDraggableGroup = ({
                 !draggableSnapshot.isDragging && groupDraggingActive,
               [styles.isDraggedOutside]:
                 draggableSnapshot.isDragging && !draggableSnapshot.draggingOver,
+              [styles.dragEnabled]: groupDraggingEnabled,
             })}
+            data-testid={groupId}
             ref={draggableProvided.innerRef}
-            role="button"
-            tabIndex={0}
           >
-            <TableHeadersReadOnlyList
-              id={groupId}
-              legend={legend}
-              name={name}
-            />
+            {activeGroup === groupId ? (
+              <TableHeadersReorderableList
+                id={groupId}
+                legend={legend}
+                name={name}
+              />
+            ) : (
+              <TableHeadersReadOnlyList
+                defaultNumberOfItems={defaultNumberOfItems}
+                id={groupId}
+                legend={legend}
+                name={name}
+              />
+            )}
           </div>
         )}
       </Draggable>
       {!groupDraggingActive && (
         <TableHeadersGroupControls
+          defaultNumberOfItems={defaultNumberOfItems}
           groupName={name}
           id={groupId}
           legend={legend}
@@ -66,4 +86,4 @@ const TableHeadersDraggableGroup = ({
   );
 };
 
-export default TableHeadersDraggableGroup;
+export default TableHeadersGroup;

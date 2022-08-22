@@ -21,44 +21,26 @@ const TableTabSection = ({
   onReorderTableHeaders,
 }: Props) => {
   const dataTableRef = useRef<HTMLElement>(null);
-  const [showTableHeadersForm, toggleShowTableHeadersForm] = useToggle(false);
-
-  const tableHeadersFormId = 'dataBlockTabs-tableHeadersForm';
 
   return (
     <>
       {onReorderTableHeaders && (
         <>
-          {!showTableHeadersForm ? (
-            <div className="govuk-!-margin-bottom-3 dfe-flex dfe-justify-content--flex-end ">
-              <Button
-                className="govuk-!-margin-bottom-0"
-                ariaControls={tableHeadersFormId}
-                ariaExpanded={showTableHeadersForm}
-                onClick={toggleShowTableHeadersForm}
-              >
-                Move and reorder table headers
-              </Button>
-            </div>
-          ) : (
-            <TableHeadersForm
-              initialValues={tableHeaders}
-              id={tableHeadersFormId}
-              onSubmit={nextTableHeaders => {
-                toggleShowTableHeadersForm.off();
-                onReorderTableHeaders(nextTableHeaders);
-                if (dataTableRef.current) {
-                  // add a short delay so the reordering form is closed before it scrolls.
-                  setTimeout(() => {
-                    dataTableRef?.current?.scrollIntoView({
-                      behavior: 'smooth',
-                      block: 'start',
-                    });
-                  }, 200);
-                }
-              }}
-            />
-          )}
+          <TableHeadersForm
+            initialValues={tableHeaders}
+            onSubmit={nextTableHeaders => {
+              onReorderTableHeaders(nextTableHeaders);
+              if (dataTableRef.current) {
+                // add a short delay so the reordering form is closed before it scrolls.
+                setTimeout(() => {
+                  dataTableRef?.current?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start',
+                  });
+                }, 200);
+              }
+            }}
+          />
         </>
       )}
 

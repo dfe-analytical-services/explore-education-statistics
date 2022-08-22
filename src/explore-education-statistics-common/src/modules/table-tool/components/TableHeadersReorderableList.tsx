@@ -5,7 +5,7 @@ import { Field, FieldProps } from 'formik';
 import { FormFieldset } from '@common/components/form';
 import reorderMultiple from '@common/utils/reorderMultiple';
 import classNames from 'classnames';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   DragDropContext,
   Draggable,
@@ -24,6 +24,14 @@ interface Props {
 const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
   const [selectedIndices, setSelectedIndices] = useState<number[]>([]);
   const [draggingIndex, setDraggingIndex] = useState<number>();
+
+  /**
+   * Focus the list when it's shown to help with keyboard navigation.
+   */
+  const listRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    listRef.current?.focus();
+  }, []);
 
   useEffect(() => {
     const resetState = () => {
@@ -153,7 +161,7 @@ const TableHeadersReorderableList = ({ id, legend, name }: Props) => {
 
         return (
           <FormFieldset legend={legend} legendSize="s" id={id}>
-            <div className={styles.focusContainer} tabIndex={-1}>
+            <div className={styles.focusContainer} ref={listRef} tabIndex={-1}>
               <DragDropContext
                 onDragStart={start => {
                   if (!selectedIndices.includes(start.source.index)) {

@@ -6,6 +6,7 @@ import { Field, FieldProps } from 'formik';
 import React from 'react';
 
 interface Props {
+  defaultNumberOfItems: number;
   id: string;
   isDraggable?: boolean;
   legend: string;
@@ -13,12 +14,13 @@ interface Props {
 }
 
 const TableHeadersReadOnlyList = ({
+  defaultNumberOfItems,
   id,
   isDraggable = true,
   legend,
   name,
 }: Props) => {
-  const { defaultNumberOfItems, expandedLists } = useTableHeadersContext();
+  const { expandedLists } = useTableHeadersContext();
   const isExpanded = expandedLists.includes(id);
   return (
     <Field name={name}>

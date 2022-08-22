@@ -1,7 +1,6 @@
 @import '~govuk-frontend/govuk/base';
 @import '@common/styles/variables';
 
-// .group is used by NotDraggableGroup as well.
 .group {
   background: govuk-colour('light-grey');
   border: 2px solid govuk-colour('mid-grey');
@@ -25,7 +24,7 @@
     outline: $govuk-focus-colour solid $govuk-focus-width;
   }
 
-  &:hover {
+  &.dragEnabled:hover {
     background: govuk-colour('light-grey');
     // Fallback if grab is unsupported
     cursor: move;

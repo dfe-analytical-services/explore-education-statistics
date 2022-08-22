@@ -6,7 +6,7 @@ import {
   testLocationFilters,
   testTimePeriodFilters,
   testTableHeadersConfig,
-} from '@common/modules/table-tool/components/__tests__/__data__/TableHeadersConfig.data';
+} from '@common/modules/table-tool/components/__tests__/__data__/tableHeadersConfig.data';
 import { waitFor } from '@testing-library/dom';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -14,7 +14,7 @@ import noop from 'lodash/noop';
 import React from 'react';
 
 describe('TableHeadersForm', () => {
-  test('renders the form correctly', () => {
+  test('shows and hides the form', async () => {
     render(
       <TableHeadersForm
         initialValues={testTableHeadersConfig}
@@ -22,18 +22,49 @@ describe('TableHeadersForm', () => {
       />,
     );
 
+    // Form hidden intially
     expect(
-      screen.getByText('Move and reorder table headers'),
+      screen.getByRole('button', { name: 'Move and reorder table headers' }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('group', { name: 'Move column headers' }),
-    ).toBeInTheDocument();
+      screen.queryByRole('heading', { name: 'Move and reorder table headers' }),
+    ).not.toBeInTheDocument();
     expect(
-      screen.getByRole('group', { name: 'Move row headers' }),
+      screen.queryByRole('button', { name: 'Update and view reordered table' }),
+    ).not.toBeInTheDocument();
+
+    // Click button to show the form
+    userEvent.click(
+      screen.getByRole('button', { name: 'Move and reorder table headers' }),
+    );
+    expect(
+      screen.queryByRole('button', { name: 'Move and reorder table headers' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Move and reorder table headers' }),
     ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Update and view reordered table' }),
     ).toBeInTheDocument();
+
+    // Click button to hide the form
+    userEvent.click(
+      screen.getByRole('button', { name: 'Update and view reordered table' }),
+    );
+    await waitFor(() => {
+      expect(
+        screen.queryByText('Update and view reordered table'),
+      ).not.toBeInTheDocument();
+    });
+    expect(
+      screen.getByRole('button', { name: 'Move and reorder table headers' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: 'Move and reorder table headers' }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Update and view reordered table' }),
+    ).not.toBeInTheDocument();
   });
 
   test('renders the column table headers correctly', () => {
@@ -44,24 +75,27 @@ describe('TableHeadersForm', () => {
       />,
     );
 
-    const columnGroup1 = within(screen.getByTestId('columnGroups-0'));
-    // the draggable element
-    expect(
-      columnGroup1.getByRole('button', {
-        name: 'Locations Location 1 Location 2',
+    userEvent.click(
+      screen.getByRole('button', { name: 'Move and reorder table headers' }),
+    );
+
+    const columnsAxis = within(
+      screen.getByRole('group', {
+        name: 'Move column headers',
       }),
-    ).toBeInTheDocument();
+    );
+
+    const columnGroup1 = within(columnsAxis.getByTestId('columnGroups-0'));
+    const columnGroup1Draggable = within(
+      columnGroup1.getByTestId('group-locations'),
+    );
     expect(
-      columnGroup1.getByRole('heading', { name: 'Locations' }),
+      columnGroup1Draggable.getByRole('heading', { name: 'Locations' }),
     ).toBeInTheDocument();
-    const columnGroup1Items = columnGroup1.getAllByRole('listitem');
+    const columnGroup1Items = columnGroup1Draggable.getAllByRole('listitem');
     expect(columnGroup1Items).toHaveLength(2);
-    expect(
-      within(columnGroup1Items[0]).getByText('Location 1'),
-    ).toBeInTheDocument();
-    expect(
-      within(columnGroup1Items[1]).getByText('Location 2'),
-    ).toBeInTheDocument();
+    expect(columnGroup1Items[0]).toHaveTextContent('Location 1');
+    expect(columnGroup1Items[1]).toHaveTextContent('Location 2');
     expect(
       columnGroup1.getByRole('button', {
         name: 'Show 3 more items in Locations',
@@ -78,24 +112,17 @@ describe('TableHeadersForm', () => {
       }),
     ).toBeInTheDocument();
 
-    const columnGroup2 = within(screen.getByTestId('columnGroups-1'));
-    // the draggable element
+    const columnGroup2 = within(columnsAxis.getByTestId('columnGroups-1'));
+    const columnGroup2Draggable = within(
+      columnGroup2.getByTestId('group-category-group'),
+    );
     expect(
-      columnGroup2.getByRole('button', {
-        name: 'Category group Category 1 Category 2',
-      }),
+      columnGroup2Draggable.getByRole('heading', { name: 'Category group' }),
     ).toBeInTheDocument();
-    expect(
-      columnGroup2.getByRole('heading', { name: 'Category group' }),
-    ).toBeInTheDocument();
-    const columnGroup2Items = columnGroup2.getAllByRole('listitem');
+    const columnGroup2Items = columnGroup2Draggable.getAllByRole('listitem');
     expect(columnGroup2Items).toHaveLength(2);
-    expect(
-      within(columnGroup2Items[0]).getByText('Category 1'),
-    ).toBeInTheDocument();
-    expect(
-      within(columnGroup2Items[1]).getByText('Category 2'),
-    ).toBeInTheDocument();
+    expect(columnGroup2Items[0]).toHaveTextContent('Category 1');
+    expect(columnGroup2Items[1]).toHaveTextContent('Category 2');
     expect(
       columnGroup2.getByRole('button', {
         name: 'Reorder items in Category group',
@@ -108,23 +135,16 @@ describe('TableHeadersForm', () => {
     ).toBeInTheDocument();
 
     const columnGroup3 = within(screen.getByTestId('columnGroups-2'));
-    // the draggable element
+    const columnGroup3Draggable = within(
+      columnGroup3.getByTestId('group-time-periods'),
+    );
     expect(
-      columnGroup3.getByRole('button', {
-        name: 'Time periods Time period 1 Time period 2',
-      }),
+      columnGroup3Draggable.getByRole('heading', { name: 'Time periods' }),
     ).toBeInTheDocument();
-    expect(
-      columnGroup3.getByRole('heading', { name: 'Time periods' }),
-    ).toBeInTheDocument();
-    const columnGroup3Items = columnGroup3.getAllByRole('listitem');
+    const columnGroup3Items = columnGroup3Draggable.getAllByRole('listitem');
     expect(columnGroup3Items).toHaveLength(2);
-    expect(
-      within(columnGroup3Items[0]).getByText('Time period 1'),
-    ).toBeInTheDocument();
-    expect(
-      within(columnGroup3Items[1]).getByText('Time period 2'),
-    ).toBeInTheDocument();
+    expect(columnGroup3Items[0]).toHaveTextContent('Time period 1');
+    expect(columnGroup3Items[1]).toHaveTextContent('Time period 2');
     expect(
       columnGroup3.getByRole('button', {
         name: 'Reorder items in Time periods',
@@ -144,24 +164,28 @@ describe('TableHeadersForm', () => {
         onSubmit={noop}
       />,
     );
+    userEvent.click(
+      screen.getByRole('button', { name: 'Move and reorder table headers' }),
+    );
 
-    const rowGroup1 = within(screen.getByTestId('rowGroups-0'));
-    // the draggable element
+    const rowsAxis = within(
+      screen.getByRole('group', { name: 'Move row headers' }),
+    );
+    const rowGroup1 = within(rowsAxis.getByTestId('rowGroups-0'));
+    const rowGroup1Draggable = within(
+      rowGroup1.getByTestId('group-indicators'),
+    );
+    expect(
+      rowGroup1Draggable.getByRole('heading', { name: 'Indicators' }),
+    ).toBeInTheDocument();
+    const rowGroup1Items = rowGroup1Draggable.getAllByRole('listitem');
+    expect(rowGroup1Items).toHaveLength(2);
+    expect(rowGroup1Items[0]).toHaveTextContent('Indicator 1');
+    expect(rowGroup1Items[1]).toHaveTextContent('Indicator 2');
     expect(
       rowGroup1.getByRole('button', {
-        name: 'Indicators Indicator 1 Indicator 2',
+        name: 'Show 1 more item in Indicators',
       }),
-    ).toBeInTheDocument();
-    expect(
-      rowGroup1.getByRole('heading', { name: 'Indicators' }),
-    ).toBeInTheDocument();
-    const rowGroup1Items = rowGroup1.getAllByRole('listitem');
-    expect(rowGroup1Items).toHaveLength(2);
-    expect(within(rowGroup1Items[0]).getByText('Indicator 1'));
-    expect(within(rowGroup1Items[1]).getByText('Indicator 2'));
-
-    expect(
-      rowGroup1.getByRole('button', { name: 'Show 1 more item in Indicators' }),
     ).toBeInTheDocument();
     expect(
       rowGroup1.getByRole('button', {
@@ -181,6 +205,9 @@ describe('TableHeadersForm', () => {
         initialValues={testTableHeadersConfig}
         onSubmit={noop}
       />,
+    );
+    userEvent.click(
+      screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
 
     const columnAxis = within(
@@ -214,6 +241,9 @@ describe('TableHeadersForm', () => {
         onSubmit={handleSubmit}
       />,
     );
+    userEvent.click(
+      screen.getByRole('button', { name: 'Move and reorder table headers' }),
+    );
 
     userEvent.click(
       screen.getByRole('button', { name: 'Update and view reordered table' }),
@@ -230,6 +260,9 @@ describe('TableHeadersForm', () => {
         initialValues={testTableHeadersConfig}
         onSubmit={handleSubmit}
       />,
+    );
+    userEvent.click(
+      screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
 
     userEvent.click(
@@ -259,8 +292,15 @@ describe('TableHeadersForm', () => {
         onSubmit={noop}
       />,
     );
+    userEvent.click(
+      screen.getByRole('button', { name: 'Move and reorder table headers' }),
+    );
 
     // readonly
+    expect(screen.getByTestId('group-locations')).toHaveAttribute(
+      'role',
+      'button',
+    );
     expect(
       screen.getByRole('heading', { name: 'Locations' }),
     ).toBeInTheDocument();
@@ -276,6 +316,10 @@ describe('TableHeadersForm', () => {
     );
 
     // reorderable
+    expect(screen.getByTestId('group-locations')).not.toHaveAttribute(
+      'role',
+      'button',
+    );
     expect(screen.getByText('Done')).toBeInTheDocument();
     expect(
       screen.queryByRole('heading', { name: 'Locations' }),
@@ -289,15 +333,19 @@ describe('TableHeadersForm', () => {
     });
     const items = within(reorderableLocations).getAllByRole('button');
     expect(items).toHaveLength(5);
-    expect(within(items[0]).getByText('Location 1')).toBeInTheDocument();
-    expect(within(items[1]).getByText('Location 2')).toBeInTheDocument();
-    expect(within(items[2]).getByText('Location 3')).toBeInTheDocument();
-    expect(within(items[3]).getByText('Location 4')).toBeInTheDocument();
-    expect(within(items[4]).getByText('Location 5')).toBeInTheDocument();
+    expect(items[0]).toHaveTextContent('Location 1');
+    expect(items[1]).toHaveTextContent('Location 2');
+    expect(items[2]).toHaveTextContent('Location 3');
+    expect(items[3]).toHaveTextContent('Location 4');
+    expect(items[4]).toHaveTextContent('Location 5');
 
     userEvent.click(screen.getByRole('button', { name: 'Done' }));
 
     // readonly
+    expect(screen.getByTestId('group-locations')).toHaveAttribute(
+      'role',
+      'button',
+    );
     expect(screen.queryByText('Done')).not.toBeInTheDocument();
     expect(
       screen.getByRole('heading', { name: 'Locations' }),
@@ -317,6 +365,9 @@ describe('TableHeadersForm', () => {
         onSubmit={noop}
       />,
     );
+    userEvent.click(
+      screen.getByRole('button', { name: 'Move and reorder table headers' }),
+    );
 
     userEvent.click(
       screen.getByRole('button', { name: 'Reorder items in Locations' }),
@@ -324,10 +375,8 @@ describe('TableHeadersForm', () => {
 
     const columnGroup2 = within(screen.getByTestId('columnGroups-1'));
     expect(
-      columnGroup2.queryByRole('button', {
-        name: 'Category group Category 1 Category 2',
-      }),
-    ).not.toBeInTheDocument();
+      columnGroup2.getByTestId('group-category-group'),
+    ).not.toHaveAttribute('role', 'button');
     expect(
       columnGroup2.getByRole('button', {
         name: 'Reorder items in Category group',
@@ -340,11 +389,10 @@ describe('TableHeadersForm', () => {
     ).toBeDisabled();
 
     const columnGroup3 = within(screen.getByTestId('columnGroups-2'));
-    expect(
-      columnGroup3.queryByRole('button', {
-        name: 'Time periods Time period 1 Time period 2',
-      }),
-    ).not.toBeInTheDocument();
+    expect(columnGroup3.getByTestId('group-time-periods')).not.toHaveAttribute(
+      'role',
+      'button',
+    );
     expect(
       columnGroup3.getByRole('button', {
         name: 'Reorder items in Time periods',
@@ -357,11 +405,10 @@ describe('TableHeadersForm', () => {
     ).toBeDisabled();
 
     const rowGroup1 = within(screen.getByTestId('rowGroups-0'));
-    expect(
-      rowGroup1.queryByRole('button', {
-        name: 'Indicators Indicators 1 Indicators 2',
-      }),
-    ).not.toBeInTheDocument();
+    expect(rowGroup1.getByTestId('group-indicators')).not.toHaveAttribute(
+      'role',
+      'button',
+    );
     expect(
       rowGroup1.getByRole('button', {
         name: 'Reorder items in Indicators',
@@ -374,12 +421,15 @@ describe('TableHeadersForm', () => {
     ).toBeDisabled();
   });
 
-  test('toggling showing more and fewer items in a group', () => {
+  test('toggling showing more and fewer items in a group', async () => {
     render(
       <TableHeadersForm
         initialValues={testTableHeadersConfig}
         onSubmit={noop}
       />,
+    );
+    userEvent.click(
+      screen.getByRole('button', { name: 'Move and reorder table headers' }),
     );
 
     const columnGroup1 = within(screen.getByTestId('columnGroups-0'));
@@ -421,14 +471,22 @@ describe('TableHeadersForm', () => {
       }),
     ).not.toBeInTheDocument();
 
+    // Waiting to make sure the button has changed,
+    // otherwise it's clicked too quickly and thinks it's a double-click.
+    await waitFor(() => {
+      expect(screen.getByText('Show fewer')).toBeInTheDocument();
+    });
+
     userEvent.click(
-      columnGroup1.getByRole('button', { name: 'Show fewer Locations items' }),
+      columnGroup1.getByRole('button', {
+        name: 'Show fewer items for Locations',
+      }),
     );
 
     expect(columnGroup1.getAllByRole('listitem')).toHaveLength(2);
     expect(
       columnGroup1.queryByRole('button', {
-        name: 'Show fewer Locations items',
+        name: 'Show fewer items for Locations',
       }),
     ).not.toBeInTheDocument();
     expect(

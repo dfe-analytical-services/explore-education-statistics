@@ -9,10 +9,6 @@
   max-height: 40vh;
   overflow: auto;
   padding: 0;
-
-  &.noLastItem {
-    padding-bottom: 24px;
-  }
 }
 
 .item {
@@ -23,12 +19,6 @@
   padding: govuk-spacing(2);
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.lastItem {
-  border: 0;
-  padding: govuk-spacing(3) 0 govuk-spacing(4);
-  text-align: center;
 }
 
 .dragIcon {

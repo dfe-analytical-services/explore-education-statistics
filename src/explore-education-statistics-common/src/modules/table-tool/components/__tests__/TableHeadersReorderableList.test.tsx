@@ -6,7 +6,7 @@ import {
   testIndicators,
   testLocationFilters,
   testTimePeriodFilters,
-} from '@common/modules/table-tool/components/__tests__/__data__/TableHeadersConfig.data';
+} from '@common/modules/table-tool/components/__tests__/__data__/tableHeadersConfig.data';
 import { Formik } from 'formik';
 import { render as baseRender, screen, within } from '@testing-library/react';
 import noop from 'lodash/noop';
