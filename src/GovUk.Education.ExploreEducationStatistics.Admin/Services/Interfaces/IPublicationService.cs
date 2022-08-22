@@ -30,8 +30,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, PaginatedListViewModel<ReleaseListItemViewModel>>> ListActiveReleasesPaginated(
             Guid publicationId,
-            int? page,
-            int? pageSize,
+            int page,
+            int pageSize,
             bool? live = null);
         
         Task<Either<ActionResult, List<ReleaseListItemViewModel>>> ListActiveReleases(

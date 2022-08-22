@@ -287,13 +287,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseListItemViewModel>>> ListActiveReleasesPaginated(
             Guid publicationId,
-            int? page,
-            int? pageSize,
+            int page,
+            int pageSize,
             bool? live = null)
         {
             return await ListActiveReleases(publicationId, live)
-                .OnSuccess(releaseListItemViewModels => PaginatedListViewModel<ReleaseListItemViewModel>.Create(
-                    releaseListItemViewModels, page, pageSize));
+                .OnSuccess(
+                    releases =>
+                        // This is not ideal - we should paginate results in the database, however,
+                        // this is not possible as we need to iterate over all releases to get the
+                        // latest/active versions of releases. Ideally, we should be able to
+                        // pagination entirely in the database, but this requires re-modelling of releases.
+                        // TODO: EES-3663 Use database pagination when ReleaseVersions are introduced
+                        PaginatedListViewModel<ReleaseListItemViewModel>.Paginate(releases, page, pageSize)
+                );
         }
 
         public async Task<Either<ActionResult, List<ReleaseListItemViewModel>>> ListActiveReleases(

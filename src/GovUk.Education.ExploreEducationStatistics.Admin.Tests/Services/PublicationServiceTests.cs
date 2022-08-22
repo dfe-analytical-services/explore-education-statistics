@@ -2359,7 +2359,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             var contextId = Guid.NewGuid().ToString();
             await using (var context = InMemoryApplicationDbContext(contextId))
             {
-                await context.AddRangeAsync(publication, release1Original, release1Amendment);
+                await context.AddRangeAsync(publication);
                 await context.SaveChangesAsync();
             }
 
@@ -2563,6 +2563,71 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(2, releases.Count);
                 Assert.Equal(release2.Id, releases[0].Id);
                 Assert.Equal(release1Amendment.Id, releases[1].Id);
+            }
+        }
+        
+        [Fact]
+        public async Task ListActiveReleasesPaginated()
+        {
+            var release1 = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2000",
+            };
+            var release2 = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2001",
+            };
+            var release3 = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2003",
+            };
+            var release4 = new Release
+            {
+                TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                ReleaseName = "2004",
+            };
+            var publication = new Publication
+            {
+                Releases = new List<Release>
+                {
+                    release1,
+                    release2,
+                    release3,
+                    release4,
+                }
+            };
+
+            var contextId = Guid.NewGuid().ToString();
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                await context.AddRangeAsync(publication);
+                await context.SaveChangesAsync();
+            }
+
+            await using (var context = InMemoryApplicationDbContext(contextId))
+            {
+                var publicationService = BuildPublicationService(context);
+
+                var result = await publicationService.ListActiveReleasesPaginated(
+                    publication.Id,
+                    page: 1,
+                    pageSize: 2);
+
+                var pagedResult = result.AssertRight();
+
+                var releases = pagedResult.Results;
+                Assert.Equal(2, releases.Count);
+
+                Assert.Equal(release4.Id, releases[0].Id);
+                Assert.Equal(release3.Id, releases[1].Id);
+                
+                Assert.Equal(1, pagedResult.Paging.Page);
+                Assert.Equal(2, pagedResult.Paging.PageSize);
+                Assert.Equal(2, pagedResult.Paging.TotalPages);
+                Assert.Equal(4, pagedResult.Paging.TotalResults);
             }
         }
 

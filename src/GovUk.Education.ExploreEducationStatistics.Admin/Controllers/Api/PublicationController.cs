@@ -64,8 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api
         [HttpGet("api/publication/{publicationId}/releases")]
         public async Task<ActionResult<PaginatedListViewModel<ReleaseListItemViewModel>>> ListActiveReleases(
             [Required] Guid publicationId,
-            [FromQuery] int? page = null,
-            [FromQuery] int? pageSize = null,
+            [FromQuery, Range(1, double.PositiveInfinity)] int page = 1,
+            [FromQuery, Range(0, double.PositiveInfinity)] int pageSize = 5,
             [FromQuery] bool? live = null)
         {
             return await _publicationService

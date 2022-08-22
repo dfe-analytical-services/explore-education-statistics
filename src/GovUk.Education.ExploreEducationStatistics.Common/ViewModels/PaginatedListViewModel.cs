@@ -1,4 +1,5 @@
 #nullable enable
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
@@ -12,42 +13,42 @@ public record PaginatedListViewModel<T>
 
     public PagingViewModel Paging { get; }
 
-    private PaginatedListViewModel(List<T> pageResults, int totalResultCount, int page, int pageSize)
+    public PaginatedListViewModel(List<T> results, int totalResults, int page, int pageSize)
     {
-        Results = pageResults;
-        Paging = new PagingViewModel
-        {
-            Page = page,
-            PageSize = pageSize,
-            TotalResults = totalResultCount,
-        };
+        Results = results;
+        Paging = new PagingViewModel(page: page, pageSize: pageSize, totalResults: totalResults);
     }
 
-    public static Either<ActionResult, PaginatedListViewModel<T>> Create(
+    /// <summary>
+    /// Paginate some results (in memory) that have not been paginated yet.
+    /// </summary>
+    /// <remarks>
+    /// Construct <see cref="PaginatedListViewModel{T}"/> directly when the results can be
+    /// paginated beforehand i.e. in the database. This is more efficient as
+    /// pagination should aim to avoid pulling all results into memory. 
+    /// This method is intended for cases where it is not possible to do this.
+    /// </remarks>
+    /// <param name="allResults">All of the un-paginated results</param>
+    /// <param name="page">The current page</param>
+    /// <param name="pageSize">The size of each page</param>
+    public static Either<ActionResult, PaginatedListViewModel<T>> Paginate(
         List<T> allResults,
-        int? page,
-        int? pageSize)
+        int page,
+        int pageSize)
     {
-        PaginatedListViewModel<T> paginatedViewModel;
+        var pagedResults = allResults
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
 
-        if (!page.HasValue || !pageSize.HasValue)
-        {
-            // return all results on single page
-            paginatedViewModel = new PaginatedListViewModel<T>(
-                allResults, allResults.Count, page: 1, pageSize: allResults.Count);
-        }
-        else
-        {
-            var pageResults = allResults
-                .Skip((page.Value - 1) * pageSize.Value)
-                .Take(pageSize.Value)
-                .ToList();
+        var paginatedViewModel = new PaginatedListViewModel<T>(
+            results: pagedResults,
+            totalResults: allResults.Count,
+            page: page,
+            pageSize: pageSize
+        );
 
-            paginatedViewModel = new PaginatedListViewModel<T>(
-                pageResults, allResults.Count, page.Value, pageSize.Value);
-        }
-
-        if (page <= 0 || paginatedViewModel.Paging.Page > paginatedViewModel.Paging.TotalPages)
+        if (paginatedViewModel.Paging.Page > paginatedViewModel.Paging.TotalPages)
         {
             return new NotFoundResult();
         }
@@ -58,11 +59,28 @@ public record PaginatedListViewModel<T>
 
 public record PagingViewModel
 {
-    public int Page { get; set; }
+    public int Page { get; }
 
-    public int PageSize { get; set; }
+    public int PageSize { get; }
 
-    public int TotalResults { get; set; }
+    public int TotalResults { get; }
 
     public int TotalPages => ((TotalResults - 1) / PageSize) + 1;
+
+    public PagingViewModel(int page, int pageSize, int totalResults)
+    {
+        if (page < 1)
+        {
+            throw new ArgumentException("Page cannot be less than 1");
+        }
+
+        if (pageSize < 0)
+        {
+            throw new ArgumentException("Page size cannot be less than 0");
+        }
+        
+        Page = page;
+        PageSize = pageSize;
+        TotalResults = totalResults;
+    }
 }
