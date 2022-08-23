@@ -12,9 +12,5 @@ public interface IMethodologyService
 {
     public Task<Either<ActionResult, MethodologyVersionViewModel>> GetLatestMethodologyBySlug(string slug);
 
-    public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetCachedSummariesByPublication(Guid publicationId);
-
-    public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetCachedSummariesTree();
-
     public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GenerateSummariesTree();
 }

@@ -7,7 +7,6 @@ using GovUk.Education.ExploreEducationStatistics.Common;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
@@ -15,10 +14,8 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
@@ -34,9 +31,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IReleaseService _releaseService;
         private readonly IPublicationService _publicationService;
-        private readonly ContentMethodologyService _contentMethodologyService;
+        private readonly IContentCacheService _contentCacheService;
         private readonly IThemeService _themeService;
-        private readonly ILogger<ContentService> _logger;
 
         private readonly JsonSerializerSettings _jsonSerializerSettingsCamelCase =
             GetJsonSerializerSettings(new CamelCaseNamingStrategy());
@@ -46,19 +42,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IBlobCacheService publicBlobCacheService,
             IBlobStorageService publicBlobStorageService,
             IReleaseService releaseService,
-            IPublicationService publicationService, 
-            ContentMethodologyService contentMethodologyService,
-            IThemeService themeService,
-            ILogger<ContentService> logger)
+            IPublicationService publicationService,
+            IContentCacheService contentCacheService,
+            IThemeService themeService)
         {
             _privateBlobCacheService = privateBlobCacheService;
             _publicBlobCacheService = publicBlobCacheService;
             _publicBlobStorageService = publicBlobStorageService;
             _releaseService = releaseService;
             _publicationService = publicationService;
-            _contentMethodologyService = contentMethodologyService;
+            _contentCacheService = contentCacheService;
             _themeService = themeService;
-            _logger = logger;
         }
 
         public async Task DeletePreviousVersionsContent(params Guid[] releaseIds)
@@ -157,16 +151,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task UpdateCachedTaxonomyBlobs()
         {
-            await _contentMethodologyService
-                .GenerateSummariesTree()
-                .OnSuccessDo(tree => _publicBlobCacheService
-                    .SetItem(new AllMethodologiesCacheKey(), tree))
-                .OnFailureDo(failure =>
-                {
-                    _logger.LogError("Error received refreshing cached Methodologies Tree - " +
-                                     "deleting cached tree instead. {Error}", failure);
-                    return _publicBlobCacheService.DeleteItem(new AllMethodologiesCacheKey());
-                });
+            await _contentCacheService.UpdateMethodologyTree();
 
             await _publicBlobCacheService.SetItem(new PublicationTreeCacheKey(), 
                 await _themeService.GenerateFullPublicationTree());

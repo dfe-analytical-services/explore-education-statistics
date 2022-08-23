@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -139,7 +139,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
+                options.CheckConsentNeeded = _ => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
                 options.Secure = CookieSecurePolicy.Always;
             });
@@ -239,7 +239,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         return;
                     }
                     
-                    var allowRefreshTokens = clientConfig.GetValue<bool>("AllowOfflineAccess", false);
+                    var allowRefreshTokens = clientConfig.GetValue("AllowOfflineAccess", false);
 
                     if (allowRefreshTokens)
                     {
@@ -395,6 +395,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
 
             services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
             
+            services.AddTransient<IContentCacheService, ContentCacheService>();
             services.AddTransient<IMyPublicationPermissionsResolver,
                 MyPublicationPermissionsResolver>();
             services.AddTransient<IMyPublicationMethodologyVersionPermissionsResolver,
@@ -442,15 +443,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<ITopicService, TopicService>();
             services.AddTransient<IPublicationService, PublicationService>(provider =>
                 new PublicationService(
-                    context: provider.GetService<ContentDbContext>(),
-                    mapper: provider.GetService<IMapper>(),
-                    persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
-                    userService: provider.GetService<IUserService>(),
-                    publicationRepository: provider.GetService<IPublicationRepository>(),
-                    methodologyVersionRepository: provider.GetService<IMethodologyVersionRepository>(),
+                    context: provider.GetRequiredService<ContentDbContext>(),
+                    mapper: provider.GetRequiredService<IMapper>(),
+                    persistenceHelper: provider.GetRequiredService<IPersistenceHelper<ContentDbContext>>(),
+                    userService: provider.GetRequiredService<IUserService>(),
+                    publicationRepository: provider.GetRequiredService<IPublicationRepository>(),
+                    methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
                     publicBlobCacheService: new BlobCacheService(
                         GetBlobStorageService(provider, "PublicStorage"),
-                        provider.GetRequiredService<ILogger<BlobCacheService>>())
+                        provider.GetRequiredService<ILogger<BlobCacheService>>()),
+                    contentCacheService: provider.GetRequiredService<IContentCacheService>()
                 )
             );
             services.AddTransient<IPublicationRepository, PublicationRepository>();
@@ -483,8 +485,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient<IMethodologyAmendmentService, MethodologyAmendmentService>();
             services.AddTransient<IMethodologyApprovalService, MethodologyApprovalService>(provider =>
                 new MethodologyApprovalService(
-                    context: provider.GetService<ContentDbContext>(),
-                    persistenceHelper: provider.GetService<IPersistenceHelper<ContentDbContext>>(),
+                    context: provider.GetRequiredService<ContentDbContext>(),
+                    persistenceHelper: provider.GetRequiredService<IPersistenceHelper<ContentDbContext>>(),
                     methodologyContentService: provider.GetRequiredService<IMethodologyContentService>(),
                     methodologyFileRepository: provider.GetRequiredService<IMethodologyFileRepository>(),
                     methodologyImageService: provider.GetRequiredService<IMethodologyImageService>(),
@@ -493,7 +495,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                         GetBlobStorageService(provider, "PublicStorage"),
                         provider.GetRequiredService<ILogger<BlobCacheService>>()),
                     publishingService: provider.GetRequiredService<IPublishingService>(),
-                    userService: provider.GetRequiredService<IUserService>()));
+                    userService: provider.GetRequiredService<IUserService>(),
+                    contentCacheService: provider.GetRequiredService<IContentCacheService>()));
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
@@ -607,7 +610,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             services.AddTransient(
                 provider => new BauCacheController(
                     privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
-                    publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage")
+                    publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
+                    contentCacheService: provider.GetRequiredService<IContentCacheService>()
                 )
             );
 

@@ -6,7 +6,6 @@ using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.Methodology;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
@@ -14,6 +13,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
@@ -21,6 +21,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Common.Model.FileType;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyPublishingStrategy;
 using static GovUk.Education.ExploreEducationStatistics.Content.Model.MethodologyStatus;
+using IMethodologyImageService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Methodologies.IMethodologyImageService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologies
 {
@@ -35,6 +36,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
         private readonly IMethodologyImageService _methodologyImageService;
         private readonly IPublishingService _publishingService;
         private readonly IUserService _userService;
+        private readonly IContentCacheService _contentCacheService;
 
         public MethodologyApprovalService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
@@ -45,7 +47,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             IMethodologyVersionRepository methodologyVersionRepository,
             IMethodologyImageService methodologyImageService,
             IPublishingService publishingService,
-            IUserService userService)
+            IUserService userService, 
+            IContentCacheService contentCacheService)
         {
             _persistenceHelper = persistenceHelper;
             _context = context;
@@ -56,6 +59,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
             _methodologyImageService = methodologyImageService;
             _publishingService = publishingService;
             _userService = userService;
+            _contentCacheService = contentCacheService;
         }
 
         public async Task<Either<ActionResult, MethodologyVersion>> UpdateApprovalStatus(
@@ -103,9 +107,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Methodologie
 
                         await _publishingService.PublishMethodologyFiles(methodology.Id);
 
-                        // Invalidate the 'All Methodologies' cache item
-                        // TODO EES-3643 - update rather than delete
-                        await _publicBlobCacheService.DeleteItem(new AllMethodologiesCacheKey());
+                        // Update the 'All Methodologies' cache item
+                        await _contentCacheService.UpdateMethodologyTree();
                     }
 
                     _context.MethodologyVersions.Update(methodology);

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
-using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
@@ -16,14 +15,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     public class ThemeController : ControllerBase
     {
         private readonly IThemeService _themeService;
-        private readonly IMethodologyService _methodologyService;
+        private readonly IContentCacheService _contentCacheService;
 
         public ThemeController(
             IThemeService themeService,
-            IMethodologyService methodologyService)
+            IContentCacheService contentCacheService)
         {
             _themeService = themeService;
-            _methodologyService = methodologyService;
+            _contentCacheService = contentCacheService;
         }
 
         [HttpGet("themes")]
@@ -41,8 +40,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("methodology-themes")]
         public async Task<ActionResult<List<AllMethodologiesThemeViewModel>>> GetMethodologyThemes()
         {
-            return await _methodologyService
-                .GetCachedSummariesTree()
+            return await _contentCacheService
+                .GetMethodologyTree()
                 .HandleFailuresOrOk();
         }
     }

@@ -24,7 +24,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IFileStorageService _fileStorageService;
-        private readonly IMethodologyService _methodologyService;
+        private readonly IContentCacheService _contentCacheService;
         private readonly IUserService _userService;
         private readonly IPublicationService _publicationService;
         private readonly IMapper _mapper;
@@ -32,7 +32,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public ReleaseService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IFileStorageService fileStorageService,
-            IMethodologyService methodologyService,
+            IContentCacheService contentCacheService,
             IUserService userService,
             IPublicationService publicationService,
             IMapper mapper)
@@ -40,16 +40,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         {
             _persistenceHelper = persistenceHelper;
             _fileStorageService = fileStorageService;
-            _methodologyService = methodologyService;
+            _contentCacheService = contentCacheService;
             _userService = userService;
             _publicationService = publicationService;
             _mapper = mapper;
         }
 
+        // TODO EES-3643 - move into ContentCacheService?
         public async Task<Either<ActionResult, ReleaseViewModel>> GetCachedViewModel(string publicationSlug, string? releaseSlug = null)
         {
             return await _publicationService.Get(publicationSlug)
-                .OnSuccessCombineWith(publication => _methodologyService.GetCachedSummariesByPublication(publication.Id))
+                .OnSuccessCombineWith(publication => _contentCacheService.GetMethodologiesByPublication(publication.Id))
                 .OnSuccess(async tuple =>
                 {
                     var (publication, methodologies) = tuple;
