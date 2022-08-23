@@ -11,9 +11,16 @@ interface Props {
 }
 
 const PublicationSummary = ({ publication }: Props) => {
-  const { legacyPublicationUrl, release, slug, summary, title } = publication;
+  const {
+    legacyPublicationUrl,
+    latestRelease,
+    slug,
+    summary,
+    theme,
+    title,
+  } = publication;
   return (
-    <div className={styles.container}>
+    <li className={`${styles.container} govuk-!-margin-top-4`}>
       {legacyPublicationUrl ? (
         <>
           <h3 className="govuk-!-margin-bottom-2">{title}</h3>
@@ -33,23 +40,31 @@ const PublicationSummary = ({ publication }: Props) => {
         </>
       )}
 
-      {release && (
-        <ul className="govuk-list">
-          <li>
-            <strong>Release type:</strong> {releaseTypes[release.type]}
-          </li>
-          <li>
-            <strong>Published:</strong>{' '}
-            <FormattedDate format="d MMM yyyy">
-              {release.published}
-            </FormattedDate>
-          </li>
-          <li>
-            <strong>Theme:</strong> {release.theme.title}
-          </li>
-        </ul>
+      {latestRelease && (
+        <dl>
+          <div className="dfe-flex">
+            <dt>Release type:</dt>
+            <dd className="govuk-!-margin-left-2" data-testid="release-type">
+              {releaseTypes[latestRelease.type]}
+            </dd>
+          </div>
+          <div className="dfe-flex">
+            <dt>Published:</dt>
+            <dd className="govuk-!-margin-left-2" data-testid="published">
+              <FormattedDate format="d MMM yyyy">
+                {latestRelease.published}
+              </FormattedDate>
+            </dd>
+          </div>
+          <div className="dfe-flex">
+            <dt>Theme:</dt>
+            <dd className="govuk-!-margin-left-2" data-testid="theme">
+              {theme?.title}
+            </dd>
+          </div>
+        </dl>
       )}
-    </div>
+    </li>
   );
 };
 export default PublicationSummary;

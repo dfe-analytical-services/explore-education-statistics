@@ -4,30 +4,30 @@ import { PublicationSummaryWithRelease } from '@common/services/publicationServi
 export const testPublications: PublicationSummaryWithRelease[] = [
   {
     id: '1',
-    release: {
+    latestRelease: {
       id: 'release-1',
       published: '2021-06-08T00:00:00',
-      theme: {
-        title: 'Theme 1',
-      },
       type: 'AdHocStatistics',
     },
     slug: 'publication-1-slug',
     summary: 'Publication 1 summary',
+    theme: {
+      title: 'Theme 1',
+    },
     title: 'Publication 1',
   },
   {
     id: '2',
-    release: {
+    latestRelease: {
       id: 'release-1',
       published: '2022-01-01T00:00:00',
-      theme: {
-        title: 'Theme 2',
-      },
       type: 'ExperimentalStatistics',
     },
     slug: 'publication-2-slug',
     summary: 'Publication 2 summary',
+    theme: {
+      title: 'Theme 2',
+    },
     title: 'Publication 2',
   },
   {
@@ -38,16 +38,16 @@ export const testPublications: PublicationSummaryWithRelease[] = [
   },
   {
     id: '4',
-    release: {
+    latestRelease: {
       id: 'release-1',
       published: '2021-08-08T00:00:00',
-      theme: {
-        title: 'Theme 3',
-      },
       type: 'NationalStatistics',
     },
     slug: 'publication-4-slug',
     summary: 'Publication 4 summary',
+    theme: {
+      title: 'Theme 3',
+    },
     title: 'Publication 4',
   },
 ];

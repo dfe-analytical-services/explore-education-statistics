@@ -1,65 +1,59 @@
 import { ArrowLeft, ArrowRight } from '@common/components/ArrowIcons';
 import generatePageNumbers from '@common/components/util/generatePageNumbers';
-import { useDesktopMedia } from '@common/hooks/useMedia';
 import classNames from 'classnames';
 import React, { ReactNode } from 'react';
 
-interface Props {
+const paginationLinkClassName = 'govuk-link govuk-pagination__link';
+
+interface LinkRenderProps {
+  'aria-current'?: 'page' | undefined;
+  'aria-label'?: string;
+  children: ReactNode;
+  className: string;
+  rel?: 'next' | 'prev';
+  to: string;
+}
+
+export interface PaginationProps {
+  baseUrl: string;
   currentPage: number;
-  nextPrevLinkRenderer: ({
-    children,
-    className,
-    pageNumber,
-    rel,
-  }: {
-    children: ReactNode;
-    className: string;
-    pageNumber: number;
-    rel: 'next' | 'prev';
-  }) => ReactNode;
-  pageLinkRenderer: ({
-    ariaCurrent,
-    ariaLabel,
-    className,
-    pageNumber,
-  }: {
-    ariaCurrent?: 'page' | undefined;
-    ariaLabel?: string;
-    className: string;
-    pageNumber: number;
-  }) => ReactNode;
+  label?: string;
+  queryParams?: Record<string, unknown>;
+  renderLink: (props: LinkRenderProps) => ReactNode;
   totalPages: number;
 }
 
 const Pagination = ({
+  baseUrl,
   currentPage,
-  nextPrevLinkRenderer,
-  pageLinkRenderer,
+  label = 'Pagination',
+  queryParams,
+  renderLink,
   totalPages,
-}: Props) => {
-  const { isMedia: isDesktopMedia } = useDesktopMedia();
+}: PaginationProps) => {
   const pageNumbers = generatePageNumbers({
     currentPage,
     totalPages,
-    offset: isDesktopMedia ? 2 : 1,
   });
 
-  if (pageNumbers.length <= 1) {
+  if (!pageNumbers.length) {
     return null;
   }
 
+  const queryString = queryParams
+    ? `&${Object.keys(queryParams)
+        .map(key => `${key}=${queryParams[key]}`)
+        .join('&')}`
+    : '';
+
   return (
-    <nav
-      className="govuk-pagination"
-      role="navigation"
-      aria-label="Pagination navigation"
-    >
+    <nav className="govuk-pagination" role="navigation" aria-label={label}>
       {currentPage !== 1 && (
         <div className="govuk-pagination__prev">
-          {nextPrevLinkRenderer({
-            className: 'govuk-link govuk-pagination__link',
-            pageNumber: currentPage - 1,
+          {renderLink({
+            className: paginationLinkClassName,
             rel: 'prev',
+            to: `${baseUrl}?page=${currentPage - 1}${queryString}`,
             children: (
               <>
                 <ArrowLeft className="govuk-pagination__icon govuk-pagination__icon--prev" />
@@ -72,11 +66,10 @@ const Pagination = ({
 
       <ul className="govuk-pagination__list">
         {pageNumbers.map((pageNumber, index) => {
-          const key = `paginationKey-${index}`;
           if (pageNumber === null) {
             return (
               <li
-                key={key}
+                key={index.toString()}
                 className="govuk-pagination__item govuk-pagination__item--ellipses"
               >
                 …
@@ -85,16 +78,17 @@ const Pagination = ({
           }
           return (
             <li
-              key={key}
+              key={index.toString()}
               className={classNames('govuk-pagination__item', {
                 'govuk-pagination__item--current': pageNumber === currentPage,
               })}
             >
-              {pageLinkRenderer({
-                ariaCurrent: currentPage === pageNumber ? 'page' : undefined,
-                ariaLabel: `Page ${pageNumber}`,
-                className: 'govuk-link govuk-pagination__link',
-                pageNumber,
+              {renderLink({
+                'aria-current': currentPage === pageNumber ? 'page' : undefined,
+                'aria-label': `Page ${pageNumber}`,
+                className: paginationLinkClassName,
+                to: `${baseUrl}?page=${pageNumber}${queryString}`,
+                children: <>{pageNumber}</>,
               })}
             </li>
           );
@@ -103,10 +97,10 @@ const Pagination = ({
 
       {currentPage !== totalPages && (
         <div className="govuk-pagination__next">
-          {nextPrevLinkRenderer({
-            className: 'govuk-link govuk-pagination__link',
-            pageNumber: currentPage + 1,
+          {renderLink({
+            className: paginationLinkClassName,
             rel: 'next',
+            to: `${baseUrl}?page=${currentPage + 1}${queryString}`,
             children: (
               <>
                 <span className="govuk-pagination__link-title">Next</span>

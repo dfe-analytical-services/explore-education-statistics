@@ -1,10 +1,11 @@
+import { Paging } from '@common/services/types/pagination';
 import FindStatisticsPageNew from '@frontend/modules/find-statistics/FindStatisticsPageNew';
 import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
 import { render, screen, within } from '@testing-library/react';
 import React from 'react';
 
 describe('FindStatisticsPageNew', () => {
-  const testPaging = {
+  const testPaging: Paging = {
     page: 1,
     pageSize: 10,
     totalResults: 30,
@@ -51,7 +52,7 @@ describe('FindStatisticsPageNew', () => {
     ).toBeInTheDocument();
 
     const pagination = within(
-      screen.getByRole('navigation', { name: 'Pagination navigation' }),
+      screen.getByRole('navigation', { name: 'Pagination' }),
     );
     expect(pagination.getByRole('link', { name: 'Page 1' })).toHaveAttribute(
       'href',

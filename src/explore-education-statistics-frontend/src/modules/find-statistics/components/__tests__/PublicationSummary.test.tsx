@@ -13,10 +13,11 @@ describe('PublicationSummary', () => {
     ).toHaveAttribute('href', '/find-statistics/publication-1-slug');
     expect(screen.getByText('Publication 1 summary')).toBeInTheDocument();
 
-    const list = screen.getAllByRole('listitem');
-    expect(list[0]).toHaveTextContent('Release type: Ad hoc statistics');
-    expect(list[1]).toHaveTextContent('Published: 8 Jun 2021');
-    expect(list[2]).toHaveTextContent('Theme: Theme 1');
+    expect(screen.getByTestId('release-type')).toHaveTextContent(
+      'Ad hoc statistics',
+    );
+    expect(screen.getByTestId('published')).toHaveTextContent('8 Jun 2021');
+    expect(screen.getByTestId('theme')).toHaveTextContent('Theme 1');
   });
 
   test('renders a legacy publication correctly', () => {

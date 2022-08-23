@@ -10,23 +10,6 @@ import { contentApi } from './api';
 
 export type ReleaseApprovalStatus = 'Draft' | 'HigherLevelReview' | 'Approved';
 
-// TODO EES-3517 a guess at the new type for the find stats page.
-export interface PublicationSummaryWithRelease {
-  id: string;
-  legacyPublicationUrl?: string;
-  release?: {
-    id: string;
-    published: string;
-    theme: {
-      title: string;
-    };
-    type: ReleaseType;
-  };
-  slug: string;
-  summary?: string;
-  title: string;
-}
-
 export interface Publication {
   id: string;
   slug: string;
@@ -56,6 +39,23 @@ export interface Publication {
 export interface PublicationSummary {
   id: string;
   slug: string;
+  title: string;
+}
+
+// TODO EES-3517 a guess at the new type for the find stats page.
+export interface PublicationSummaryWithRelease {
+  id: string;
+  legacyPublicationUrl?: string;
+  latestRelease?: {
+    id: string;
+    published: string;
+    type: ReleaseType;
+  };
+  slug: string;
+  summary?: string;
+  theme?: {
+    title: string;
+  };
   title: string;
 }
 

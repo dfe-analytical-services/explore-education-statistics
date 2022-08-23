@@ -1,4 +1,7 @@
 import themeService, { Theme } from '@common/services/themeService';
+import { PublicationSummaryWithRelease } from '@common/services/publicationService';
+import { Paging } from '@common/services/types/pagination';
+import { testPublications } from '@frontend/modules/find-statistics/__tests__/__data__/testPublications';
 import { GetServerSideProps, NextPage } from 'next';
 import React from 'react';
 import FindStatisticsPageCurrent from './FindStatisticsPageCurrent';
@@ -6,52 +9,52 @@ import FindStatisticsPageNew from './FindStatisticsPageNew';
 
 interface Props {
   newDesign?: boolean; // TODO EES-3517 flag
-  paging?: {
-    // TODO EES-3517 - not optional
-    page: number;
-    pageSize: number;
-    totalResults: number;
-    totalPages: number;
-  };
+  paging?: Paging | null; // TODO EES-3517 won't be optional or null
+  publications?: PublicationSummaryWithRelease[]; // TODO EES-3517 won't be optional
   themes: Theme[];
 }
 
 const FindStatisticsPage: NextPage<Props> = ({
   newDesign = false,
   paging,
+  publications,
   themes = [],
 }) => {
   // TODO EES-3517 remove these and move FindStatisticsPageNew into here
-  if (!newDesign) {
-    return <FindStatisticsPageCurrent themes={themes} />;
+  if (newDesign && paging && publications) {
+    return (
+      <FindStatisticsPageNew paging={paging} publications={publications} />
+    );
   }
-  return <FindStatisticsPageNew paging={paging} />;
+  return <FindStatisticsPageCurrent themes={themes} />;
 };
 
 export const getServerSideProps: GetServerSideProps<Props> = async ({
   query,
 }) => {
-  const initialPage =
-    typeof query.page === 'string' ? parseInt(query.page, 10) : null;
+  const { newDesign, page } = query;
+
+  const currentPage = typeof page === 'string' ? parseInt(page, 10) : 1;
 
   // TODO EES-3517 - fetch publications here, using pagination and filters from query.
-  // const publicationsResponse = query.newDesign ? await publicationService.getPublications({
-  //   page: initialPage ?? 1,
+  // const publicationsResponse = newDesign ? await publicationService.getPublications({
+  //   page: currentPage ?? 1,
   //   pageSize: 10,
   // }) : []
+  // Will need to handle if the requested page doesn't exist.
   // Fake response for now
   const publicationsResponse = {
     paging: {
-      page: initialPage ?? 1,
+      page: currentPage ?? 1,
       pageSize: 10,
       totalResults: 100,
       totalPages: 10,
     },
-    results: [],
+    results: currentPage === 1 ? testPublications : [testPublications[1]], // faking different page to test pagination
   };
 
   // TODO EES-3517 - remove themes
-  const themes = query.newDesign
+  const themes = newDesign
     ? []
     : await themeService.listThemes({
         publicationFilter: 'FindStatistics',
@@ -59,9 +62,9 @@ export const getServerSideProps: GetServerSideProps<Props> = async ({
 
   return {
     props: {
-      newDesign: !!query.newDesign,
-      paging: publicationsResponse.paging,
-      // publications: publicationsResponse.results, // TODO EES-3517
+      newDesign: !!newDesign,
+      paging: newDesign ? publicationsResponse.paging : null,
+      publications: newDesign ? publicationsResponse.results : [],
       themes,
     },
   };
