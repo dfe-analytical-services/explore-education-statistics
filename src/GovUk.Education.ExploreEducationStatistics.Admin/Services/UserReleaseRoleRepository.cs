@@ -12,12 +12,12 @@ using static GovUk.Education.ExploreEducationStatistics.Common.Services.Collecti
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
-    public class UserReleaseRoleRepository : 
-        AbstractUserResourceRoleRepository<UserReleaseRole, Release, ReleaseRole>,
-        IUserReleaseRoleRepository
+    public class UserReleaseRoleRepository :
+        AbstractUserResourceRoleRepository<UserReleaseRole, Release, ReleaseRole>, IUserReleaseRoleRepository
     {
         public UserReleaseRoleRepository(ContentDbContext contentDbContext) : base(contentDbContext)
-        {}
+        {
+        }
 
         protected override IQueryable<UserReleaseRole> GetResourceRolesQueryByResourceId(Guid releaseId)
         {
@@ -113,7 +113,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         {
             return UserHasRoleOnResource(userId, releaseId, role);
         }
-        
+
         public Task<bool> HasUserReleaseRole(string email, Guid releaseId, ReleaseRole role)
         {
             return UserHasRoleOnResource(email, releaseId, role);

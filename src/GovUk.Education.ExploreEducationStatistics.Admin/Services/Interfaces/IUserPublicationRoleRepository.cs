@@ -14,12 +14,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
             Guid createdById);
 
         Task<List<PublicationRole>> GetDistinctRolesByUser(Guid userId);
-        
+
         Task<List<PublicationRole>> GetAllRolesByUserAndPublication(Guid userId,
             Guid publicationId);
 
         Task<bool> UserHasRoleOnPublication(Guid userId,
             Guid publicationId,
             PublicationRole role);
+        
+        Task RemoveMany(List<UserPublicationRole> userPublicationRoles, Guid deletedById);
     }
 }

@@ -438,6 +438,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<UserPublicationRole>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<PublicationRole>());
+            
+            modelBuilder.Entity<UserPublicationRole>()
+                .HasQueryFilter(p => p.Deleted == null);
 
             modelBuilder.Entity<UserReleaseRole>()
                 .Property(userReleaseRole => userReleaseRole.Created)
@@ -448,12 +451,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Model.Database
             modelBuilder.Entity<UserReleaseRole>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<ReleaseRole>());
-
+            
             modelBuilder.Entity<UserReleaseRole>()
                 .HasQueryFilter(r =>
                     !r.SoftDeleted
                     && r.Deleted == null);
-
+            
             modelBuilder.Entity<UserReleaseInvite>()
                 .Property(r => r.Role)
                 .HasConversion(new EnumToStringConverter<ReleaseRole>());
