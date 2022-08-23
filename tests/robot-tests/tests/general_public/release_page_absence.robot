@@ -55,13 +55,16 @@ Validate "About these statistics" -- Number of other releases
     user closes details dropdown    See other releases (6)
 
 Validate "About these statistics" -- "Last updated"
-    user checks summary list contains    Last updated    19 April 2018
+    user checks summary list contains    Last updated    22 August 2022
 
-    user checks number of release updates    2
-    user opens details dropdown    See all updates (2)
-    user checks release update    1    19 April 2018    Underlying data file updated to include absence
-    user checks release update    2    22 March 2018    First published.
-    user closes details dropdown    See all updates (2)
+    user checks number of release updates    3
+    user opens details dropdown    See all updates (3)
+
+    user checks release update    1    22 August 2022    Updating LAD map
+    user checks release update    2    19 April 2018
+    ...    Underlying data file updated to include absence data by pupil residency and school location, and updated metadata document.
+    user checks release update    3    22 March 2018    First published.
+    user closes details dropdown    See all updates (3)
 
 Check data downloads navigation contains links
     user checks element contains link    testid:data-downloads    Explore data and files
@@ -300,8 +303,9 @@ Validate Regional and local authority (LA) breakdown table
 
 Check Regional and local authority (LA) breakdown table has footnotes
     ${accordion}=    user opens accordion section    Regional and local authority (LA) breakdown    id:content
+    user scrolls down    500
+    user waits until page does not contain loading spinner
     ${data_block_table}=    user gets data block table from parent    LAD map    ${accordion}
-
     user checks list has x items    testid:footnotes    3    ${data_block_table}
     user checks list item contains    testid:footnotes    1
     ...    Absence rates are the number of absence sessions expressed as a percentage of the total number of possible sessions.
@@ -368,7 +372,7 @@ Check Regional and local authority (LA) breakdown chart has footnotes
     ...    x - 1 or 2 enrolments, or a percentage based on 1 or 2 enrolments.
     ...    ${data_block_chart}
     user checks list item contains    testid:footnotes    4
-    ...    This map uses the boundary data Local Authority Districts December 2017 Ultra Generalised Clipped Boundaries in United Kingdom WGS84
+    ...    This map uses the boundary data Local Authority Districts (December 2021) UK BUC
     ...    ${data_block_chart}
 
     user checks element contains button    ${data_block_chart}    Show 2 more items
