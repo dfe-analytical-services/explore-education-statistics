@@ -1,9 +1,9 @@
 export interface PaginatedList<T> {
   results: T[];
-  paging: Pagination;
+  paging: Paging;
 }
 
-export interface Pagination {
+export interface Paging {
   page: number;
   pageSize: number;
   totalResults: number;

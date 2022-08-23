@@ -140,11 +140,11 @@ const publicationService = {
     return client.get<MyPublication>(`/me/publication/${publicationId}`);
   },
 
-  listReleases(
+  listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(
     publicationId: string,
     params?: ListReleasesParams,
-  ): Promise<PaginatedList<ReleaseSummary>> {
-    return client.get<PaginatedList<ReleaseSummary>>(
+  ): Promise<PaginatedList<TReleaseSummary>> {
+    return client.get<PaginatedList<TReleaseSummary>>(
       `/publication/${publicationId}/releases`,
       { params },
     );

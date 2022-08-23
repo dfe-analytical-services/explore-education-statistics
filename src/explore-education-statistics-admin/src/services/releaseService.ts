@@ -61,6 +61,10 @@ export interface ReleaseSummary {
   permissions?: ReleasePermissions;
 }
 
+export interface ReleaseSummaryWithPermissions extends ReleaseSummary {
+  permissions: ReleasePermissions;
+}
+
 interface BaseReleaseRequest {
   releaseName: string;
   timePeriodCoverage: {
