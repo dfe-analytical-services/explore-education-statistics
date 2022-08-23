@@ -40,7 +40,6 @@ describe('PublicationPublishedReleases', () => {
     publicationSummary: 'Publication 1 summary',
     publicationSlug: 'publication-slug-1',
     published: '2022-01-01T00:00:00',
-    releaseName: 'Release name',
     slug: 'release-1-slug',
     title: 'Release 1',
     timePeriodCoverage: {
@@ -50,6 +49,8 @@ describe('PublicationPublishedReleases', () => {
     type: 'AdHocStatistics',
     contact: testContact,
     preReleaseAccessList: '',
+    year: 2021,
+    yearTitle: '2021/22',
   };
 
   const testRelease2: Release = {
@@ -266,7 +267,7 @@ describe('PublicationPublishedReleases', () => {
 
     releaseService.createReleaseAmendment.mockResolvedValue({
       id: 'release-amendment-id',
-    } as ReleaseSummary);
+    } as Release);
 
     baseRender(
       <Router history={history}>

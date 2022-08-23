@@ -25,6 +25,7 @@ using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.Validat
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
+using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
@@ -284,7 +285,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .OnSuccess(publication => _mapper.Map<PublicationViewModel>(publication));
         }
 
-        public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseListItemViewModel>>> ListActiveReleasesPaginated(
+        public async Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleasesPaginated(
             Guid publicationId,
             int page = 1,
             int pageSize = 5,
@@ -299,11 +300,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         // latest/active versions of releases. Ideally, we should be able to
                         // pagination entirely in the database, but this requires re-modelling of releases.
                         // TODO: EES-3663 Use database pagination when ReleaseVersions are introduced
-                        PaginatedListViewModel<ReleaseListItemViewModel>.Paginate(releases, page, pageSize)
+                        PaginatedListViewModel<ReleaseSummaryViewModel>.Paginate(releases, page, pageSize)
                 );
         }
 
-        public async Task<Either<ActionResult, List<ReleaseListItemViewModel>>> ListActiveReleases(
+        public async Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListActiveReleases(
             Guid publicationId,
             bool? live = null,
             bool includePermissions = false)
@@ -411,9 +412,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return publicationViewModel;
         }
         
-        private ReleaseListItemViewModel HydrateReleaseListItemViewModel(Release release, bool includePermissions)
+        private ReleaseSummaryViewModel HydrateReleaseListItemViewModel(Release release, bool includePermissions)
         {
-            var viewModel = _mapper.Map<ReleaseListItemViewModel>(release);
+            var viewModel = _mapper.Map<ReleaseSummaryViewModel>(release);
             
             if (includePermissions)
             {

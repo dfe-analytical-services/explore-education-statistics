@@ -20,7 +20,6 @@ export interface Release {
   latestRelease: boolean;
   live: boolean;
   amendment: boolean;
-  releaseName: string;
   publicationId: string;
   publicationTitle: string;
   publicationSummary: string;
@@ -46,23 +45,6 @@ export interface ReleaseWithPermissions extends Release {
 
 export interface ReleaseSummary {
   id: string;
-  timePeriodCoverage: {
-    value: string;
-    label: string;
-  };
-  title: string;
-  releaseName: string;
-  type: ReleaseType;
-  publishScheduled: string;
-  nextReleaseDate?: PartialDate;
-  latestInternalReleaseNote: string;
-  live: boolean;
-  approvalStatus: ReleaseApprovalStatus;
-  yearTitle: string;
-}
-
-export interface ReleaseListItem {
-  id: string;
   title: string;
   slug: string;
   year: number;
@@ -74,8 +56,8 @@ export interface ReleaseListItem {
   live: boolean;
   nextReleaseDate?: PartialDate;
   type: ReleaseType;
-  latestInternalReleaseNote: string;
   amendment: boolean;
+  previousVersionId?: string;
   permissions?: ReleasePermissions;
 }
 
@@ -206,7 +188,7 @@ export interface DeleteReleasePlan {
 }
 
 const releaseService = {
-  createRelease(createRequest: CreateReleaseRequest): Promise<ReleaseSummary> {
+  createRelease(createRequest: CreateReleaseRequest): Promise<Release> {
     return client.post(
       `/publications/${createRequest.publicationId}/releases`,
       createRequest,
@@ -269,7 +251,7 @@ const releaseService = {
     return client.get(`/releases/${releaseId}/checklist`);
   },
 
-  createReleaseAmendment(releaseId: string): Promise<ReleaseSummary> {
+  createReleaseAmendment(releaseId: string): Promise<Release> {
     return client.post(`/release/${releaseId}/amendment`);
   },
 };

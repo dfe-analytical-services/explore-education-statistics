@@ -11,7 +11,7 @@ import {
 import publicationService, {
   BasicPublicationDetails,
 } from '@admin/services/publicationService';
-import { ReleaseListItem } from '@admin/services/releaseService';
+import { ReleaseSummary } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import useAsyncHandledRetry from '@common/hooks/useAsyncHandledRetry';
 import TabsSection from '@common/components/TabsSection';
@@ -23,7 +23,7 @@ import { RouteComponentProps } from 'react-router';
 import { generatePath, useHistory } from 'react-router-dom';
 
 interface Model {
-  releases: ReleaseListItem[];
+  releases: ReleaseSummary[];
   publication: BasicPublicationDetails;
 }
 

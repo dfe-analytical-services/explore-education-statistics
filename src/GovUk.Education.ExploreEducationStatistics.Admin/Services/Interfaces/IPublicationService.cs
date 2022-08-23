@@ -8,6 +8,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
+using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
@@ -28,14 +29,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, PublicationViewModel>> GetPublication(Guid publicationId);
 
-        Task<Either<ActionResult, PaginatedListViewModel<ReleaseListItemViewModel>>> ListActiveReleasesPaginated(
+        Task<Either<ActionResult, PaginatedListViewModel<ReleaseSummaryViewModel>>> ListActiveReleasesPaginated(
             Guid publicationId,
             int page,
             int pageSize,
             bool? live = null,
             bool includePermissions = false);
         
-        Task<Either<ActionResult, List<ReleaseListItemViewModel>>> ListActiveReleases(
+        Task<Either<ActionResult, List<ReleaseSummaryViewModel>>> ListActiveReleases(
             Guid publicationId,
             bool? live = null,
             bool includePermissions = false);

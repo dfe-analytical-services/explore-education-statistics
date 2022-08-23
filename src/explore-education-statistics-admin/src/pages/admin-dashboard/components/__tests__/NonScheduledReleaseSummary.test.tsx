@@ -1,16 +1,16 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import React from 'react';
-import { noop } from 'lodash';
-import { MemoryRouter, Router } from 'react-router-dom';
+import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
 import _releaseService, {
-  ReleaseSummary,
+  Release,
   ReleaseStageStatuses,
   ReleaseWithPermissions,
 } from '@admin/services/releaseService';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
-import produce from 'immer';
 import { createMemoryHistory } from 'history';
+import produce from 'immer';
+import { noop } from 'lodash';
+import React from 'react';
+import { MemoryRouter, Router } from 'react-router-dom';
 
 jest.mock('@admin/services/releaseService');
 
@@ -333,7 +333,7 @@ describe('NonScheduledReleaseSummary', () => {
     // Confirm the amending of the Release.
     releaseService.createReleaseAmendment.mockResolvedValue({
       id: 'release-amendment-id',
-    } as ReleaseSummary);
+    } as Release);
 
     userEvent.click(
       screen.getByRole('button', {

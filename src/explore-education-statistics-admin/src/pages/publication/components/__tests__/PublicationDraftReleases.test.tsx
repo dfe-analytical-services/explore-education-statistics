@@ -36,7 +36,6 @@ describe('PublicationDraftReleases', () => {
     publicationSummary: 'Publication 1 summary',
     publicationSlug: 'publication-slug-1',
     published: '2022-01-01T00:00:00',
-    releaseName: 'Release name',
     slug: 'release-1-slug',
     title: 'Release 1',
     timePeriodCoverage: {
@@ -46,6 +45,8 @@ describe('PublicationDraftReleases', () => {
     type: 'AdHocStatistics',
     contact: testContact,
     preReleaseAccessList: '',
+    year: 2022,
+    yearTitle: '2022/23',
   };
 
   const testRelease2: ReleaseWithPermissions = {

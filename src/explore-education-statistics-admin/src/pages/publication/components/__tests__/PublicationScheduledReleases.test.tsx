@@ -36,7 +36,8 @@ describe('PublicationScheduledReleases', () => {
     publicationSummary: 'Publication 1 summary',
     published: '2022-01-01T00:00:00',
     publishScheduled: '2022-01-01T00:00:00',
-    releaseName: 'Release name',
+    year: 2021,
+    yearTitle: '2021/22',
     slug: 'release-1-slug',
     title: 'Release 1',
     timePeriodCoverage: {

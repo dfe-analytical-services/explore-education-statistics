@@ -31,8 +31,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string PublicationSlug { get; set; } = string.Empty;
 
-        public string ReleaseName { get; set; } = string.Empty;
-
         public int Year { get; set; }
         
         public string YearTitle { get; set; } = string.Empty;
@@ -186,39 +184,39 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
         [PartialDateValidator] public PartialDate? NextReleaseDate { get; init; }
     }
 
-    public class ReleaseListItemViewModel
+    public class ReleaseSummaryViewModel
     {
         public Guid Id { get; init; }
 
         public string Title { get; init; } = string.Empty;
 
-        public string Slug { get; set; } = string.Empty;
+        public string Slug { get; init; } = string.Empty;
 
-        public int Year { get; set; }
+        public int Year { get; init; }
         
-        public string YearTitle { get; set; } = string.Empty;
+        public string YearTitle { get; init; } = string.Empty;
 
         [JsonConverter(typeof(TimeIdentifierJsonConverter))]
-        public TimeIdentifier TimePeriodCoverage { get; set; }
+        public TimeIdentifier TimePeriodCoverage { get; init; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseApprovalStatus ApprovalStatus { get; set; }
+        public ReleaseApprovalStatus ApprovalStatus { get; init; }
 
-        public DateTime? Published { get; set; }
+        public DateTime? Published { get; init; }
 
         public bool Live => Published != null;
 
         [JsonConverter(typeof(DateTimeToDateJsonConverter))]
-        public DateTime? PublishScheduled { get; set; }
+        public DateTime? PublishScheduled { get; init; }
 
-        public PartialDate? NextReleaseDate { get; set; }
+        public PartialDate? NextReleaseDate { get; init; }
 
         [JsonConverter(typeof(StringEnumConverter))]
-        public ReleaseType Type { get; set; }
+        public ReleaseType Type { get; init; }
 
-        public string LatestInternalReleaseNote { get; set; } = string.Empty;
-
-        public bool Amendment { get; set; }
+        public bool Amendment { get; init; }
+        
+        public Guid? PreviousVersionId { get; init; }
         
         public ReleasePermissions? Permissions { get; set; }
     }

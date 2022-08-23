@@ -672,7 +672,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Publication.Id, viewModel.PublicationId);
                 Assert.Equal(release.NextReleaseDate, viewModel.NextReleaseDate);
                 Assert.Equal(ReleaseType.OfficialStatistics, viewModel.Type);
-                Assert.Equal("2035", viewModel.ReleaseName);
+                Assert.Equal(2035, viewModel.Year);
+                Assert.Equal("2035", viewModel.YearTitle);
                 Assert.Equal(TimeIdentifier.March, viewModel.TimePeriodCoverage);
                 Assert.Equal("New access list", viewModel.PreReleaseAccessList);
             }
@@ -831,7 +832,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 var viewModel = result.AssertRight();
 
-                Assert.Equal("2035", viewModel.ReleaseName);
+                Assert.Equal(2035, viewModel.Year);
+                Assert.Equal("2035", viewModel.YearTitle);
                 Assert.Equal("2035-1", viewModel.Slug);
                 Assert.Equal(publication.Id, viewModel.PublicationId);
                 Assert.Equal("Test publication", viewModel.PublicationTitle);
@@ -844,7 +846,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(nextReleaseDate, viewModel.NextReleaseDate);
                 Assert.Equal(ReleaseType.AdHocStatistics, viewModel.Type);
                 Assert.Equal(TimeIdentifier.January, viewModel.TimePeriodCoverage);
-                Assert.Equal("2035", viewModel.YearTitle);
 
                 Assert.Null(viewModel.PreviousVersionId);
                 Assert.True(viewModel.LatestRelease);

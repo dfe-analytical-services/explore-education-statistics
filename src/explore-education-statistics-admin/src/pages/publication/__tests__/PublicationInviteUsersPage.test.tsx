@@ -1,3 +1,4 @@
+import { testPaginatedReleaseSummaries } from '@admin/pages/publication/__data__/testReleases';
 import PublicationInviteUsersPage from '@admin/pages/publication/PublicationInviteUsersPage';
 import { PublicationContextProvider } from '@admin/pages/publication/contexts/PublicationContext';
 import { testPublication } from '@admin/pages/publication/__data__/testPublication';
@@ -6,7 +7,6 @@ import {
   PublicationManageTeamRouteParams,
 } from '@admin/routes/publicationRoutes';
 import _publicationService from '@admin/services/publicationService';
-import { ReleaseSummary } from '@admin/services/releaseService';
 import { render, screen, waitFor } from '@testing-library/react';
 import { generatePath, Route } from 'react-router';
 import React from 'react';
@@ -18,45 +18,12 @@ const publicationService = _publicationService as jest.Mocked<
   typeof _publicationService
 >;
 
-const testReleases: ReleaseSummary[] = [
-  {
-    id: 'release-1',
-    timePeriodCoverage: {
-      value: 'AY',
-      label: 'Academic Year',
-    },
-    title: 'Release 1',
-    releaseName: '2000',
-    type: 'AdHocStatistics',
-    publishScheduled: '',
-    latestInternalReleaseNote: 'release1-release-note',
-    approvalStatus: 'Draft',
-    yearTitle: '2000/01',
-    live: false,
-  },
-  {
-    id: 'release-2',
-    timePeriodCoverage: {
-      value: 'AY',
-      label: 'Academic Year',
-    },
-    title: 'Release 2',
-    releaseName: '2001',
-    type: 'AdHocStatistics',
-    publishScheduled: '',
-    latestInternalReleaseNote: 'release2-release-note',
-    approvalStatus: 'Approved',
-    yearTitle: '2001/02',
-    live: true,
-  },
-];
-
 describe('PublicationInviteUsersPage', () => {
   test('renders the page correctly', async () => {
-    publicationService.listReleases.mockResolvedValue({
-      results: testReleases,
-      paging: { page: 1, pageSize: 5, totalPages: 1, totalResults: 5 },
-    });
+    publicationService.listReleases.mockResolvedValue(
+      testPaginatedReleaseSummaries,
+    );
+
     renderPage();
 
     await waitFor(() => {
@@ -73,9 +40,12 @@ describe('PublicationInviteUsersPage', () => {
       }),
     ).toBeInTheDocument();
 
-    expect(screen.getByLabelText('Release 1')).toBeInTheDocument();
+    const checkboxes = screen.getAllByLabelText(/Academic Year/);
+    expect(checkboxes).toHaveLength(3);
 
-    expect(screen.getByLabelText('Release 2')).toBeInTheDocument();
+    expect(screen.getByLabelText('Academic Year 2023/24')).toBeInTheDocument();
+    expect(screen.getByLabelText('Academic Year 2022/23')).toBeInTheDocument();
+    expect(screen.getByLabelText('Academic Year 2021/22')).toBeInTheDocument();
 
     expect(
       screen.getByRole('button', {
@@ -96,7 +66,7 @@ function renderPage() {
     publicationInviteUsersPageRoute.path,
     {
       publicationId: testPublication.id,
-      releaseId: testReleases[0].id,
+      releaseId: testPaginatedReleaseSummaries.results[0].id,
     },
   );
 

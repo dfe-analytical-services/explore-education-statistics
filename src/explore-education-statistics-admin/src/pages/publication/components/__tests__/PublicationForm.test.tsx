@@ -473,7 +473,6 @@ describe('PublicationForm', () => {
       publicationSummary: 'Publication 1 summary',
       publicationSlug: 'publication-slug-1',
       published: '2021-01-01T11:21:17',
-      releaseName: 'Test release name',
       slug: 'release-slug-1',
       timePeriodCoverage: {
         label: 'Academic year',
@@ -481,6 +480,8 @@ describe('PublicationForm', () => {
       },
       title: 'Release 1',
       type: 'AdHocStatistics',
+      year: 2021,
+      yearTitle: '2021/22',
     };
 
     const testPublication1: MyPublication = {

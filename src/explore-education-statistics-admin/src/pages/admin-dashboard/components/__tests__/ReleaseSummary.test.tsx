@@ -44,7 +44,6 @@ describe('ReleaseSummary', () => {
     publicationSummary: 'Test publication summary',
     publicationSlug: 'test-publication',
     published: '2021-01-01T11:21:17',
-    releaseName: 'Test release name',
     slug: 'rel-3-slug',
     timePeriodCoverage: {
       label: 'Academic year',
@@ -52,6 +51,8 @@ describe('ReleaseSummary', () => {
     },
     title: 'Test release title',
     type: 'AdHocStatistics',
+    year: 2021,
+    yearTitle: '2021/22',
   };
   const testActions = <button type="button">Test action</button>;
 

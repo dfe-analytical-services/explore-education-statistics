@@ -2393,6 +2393,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 ApprovalStatus = ReleaseApprovalStatus.Approved,
                 ReleaseStatuses = ListOf(
                     new ReleaseStatus { InternalReleaseNote = "Internal note" }),
+                PreviousVersionId = Guid.NewGuid(),
                 Publication = new Publication
                 {
                     Title = "Publication title",
@@ -2422,14 +2423,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal(release.Slug, resultRelease.Slug);
                 Assert.Equal(release.Type, resultRelease.Type);
                 Assert.Equal(release.Year, resultRelease.Year);
+                Assert.Equal(release.YearTitle, resultRelease.YearTitle);
                 Assert.Equal(release.TimePeriodCoverage, resultRelease.TimePeriodCoverage);
                 Assert.Equal(release.Published, resultRelease.Published);
                 Assert.Equal(release.Live, resultRelease.Live);
                 Assert.Equal(release.PublishScheduled, resultRelease.PublishScheduled);
                 release.NextReleaseDate.AssertDeepEqualTo(resultRelease.NextReleaseDate);
                 Assert.Equal(release.ApprovalStatus, resultRelease.ApprovalStatus);
-                Assert.Equal(release.LatestInternalReleaseNote, resultRelease.LatestInternalReleaseNote);
                 Assert.Equal(release.Amendment, resultRelease.Amendment);
+                Assert.Equal(release.PreviousVersionId, resultRelease.PreviousVersionId);
                 Assert.Null(resultRelease.Permissions);
             }
         }

@@ -90,7 +90,7 @@ const ReleaseSummaryEditPage = ({ history }: RouteComponentProps) => {
             submitText="Update release summary"
             initialValues={() => ({
               timePeriodCoverageCode: release.timePeriodCoverage.value,
-              timePeriodCoverageStartYear: release.releaseName.toString(),
+              timePeriodCoverageStartYear: release.year.toString(),
               releaseType: release.type,
             })}
             onSubmit={handleSubmit}

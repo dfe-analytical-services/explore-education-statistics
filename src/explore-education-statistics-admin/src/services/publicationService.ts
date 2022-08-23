@@ -6,7 +6,7 @@ import {
   BasicMethodologyVersion,
   MyMethodologyVersion,
 } from '@admin/services/methodologyService';
-import { Release, ReleaseListItem } from '@admin/services/releaseService';
+import { Release, ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
@@ -143,8 +143,8 @@ const publicationService = {
   listReleases(
     publicationId: string,
     params?: ListReleasesParams,
-  ): Promise<PaginatedList<ReleaseListItem>> {
-    return client.get<PaginatedList<ReleaseListItem>>(
+  ): Promise<PaginatedList<ReleaseSummary>> {
+    return client.get<PaginatedList<ReleaseSummary>>(
       `/publication/${publicationId}/releases`,
       { params },
     );
