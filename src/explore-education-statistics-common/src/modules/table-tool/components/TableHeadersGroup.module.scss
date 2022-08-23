@@ -1,17 +1,15 @@
 @import '~govuk-frontend/govuk/base';
-@import '@common/styles/variables';
 
 .group {
   background: govuk-colour('light-grey');
   border: 2px solid govuk-colour('mid-grey');
-  border-bottom: 0;
   box-sizing: border-box;
   display: block;
   padding: govuk-spacing(2);
   position: relative;
 
   @include govuk-media-query($from: desktop) {
-    width: $dfe-table-header-group-width;
+    width: 320px;
   }
 
   legend {
@@ -20,7 +18,8 @@
     width: 100%;
   }
 
-  &:focus-visible {
+  &.focused {
+    border-color: transparent;
     outline: $govuk-focus-colour solid $govuk-focus-width;
   }
 
@@ -45,4 +44,9 @@
     opacity: 0.4;
     outline: none;
   }
+}
+
+// Removing focus style here as we apply it to the containing group instead.
+.groupDragHandle:focus {
+  outline: none;
 }

@@ -21,7 +21,7 @@ describe('TableHeadersAxis', () => {
       screen.getByRole('group', { name: 'Test legend' }),
     ).toBeInTheDocument();
 
-    const group1 = screen.getByTestId('group-category-group');
+    const group1 = screen.getByTestId('draggable-group-category-group');
     // Draggable groups have button role
     expect(group1).toHaveAttribute('role', 'button');
     expect(
@@ -32,7 +32,7 @@ describe('TableHeadersAxis', () => {
     expect(within(group1Items[0]).getByText('Category 1'));
     expect(within(group1Items[1]).getByText('Category 2'));
 
-    const group2 = screen.getByTestId('group-indicators');
+    const group2 = screen.getByTestId('draggable-group-indicators');
     // Draggable groups have button role
     expect(group2).toHaveAttribute('role', 'button');
     expect(
@@ -51,7 +51,7 @@ describe('TableHeadersAxis', () => {
       screen.getByRole('heading', { name: 'Test legend' }),
     ).toBeInTheDocument();
 
-    const group1 = screen.getByTestId('group-category-group');
+    const group1 = screen.getByTestId('draggable-group-category-group');
     // Non-draggable groups do not have button role
     expect(group1).not.toHaveAttribute('role', 'button');
 
@@ -63,7 +63,7 @@ describe('TableHeadersAxis', () => {
     expect(within(group1Items[0]).getByText('Category 1'));
     expect(within(group1Items[1]).getByText('Category 2'));
 
-    const group2 = screen.getByTestId('group-indicators');
+    const group2 = screen.getByTestId('draggable-group-indicators');
     // Non-draggable groups do not have button role
     expect(group2).not.toHaveAttribute('role', 'button');
     expect(

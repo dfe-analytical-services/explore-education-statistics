@@ -87,7 +87,7 @@ describe('TableHeadersForm', () => {
 
     const columnGroup1 = within(columnsAxis.getByTestId('columnGroups-0'));
     const columnGroup1Draggable = within(
-      columnGroup1.getByTestId('group-locations'),
+      columnGroup1.getByTestId('draggable-group-locations'),
     );
     expect(
       columnGroup1Draggable.getByRole('heading', { name: 'Locations' }),
@@ -114,7 +114,7 @@ describe('TableHeadersForm', () => {
 
     const columnGroup2 = within(columnsAxis.getByTestId('columnGroups-1'));
     const columnGroup2Draggable = within(
-      columnGroup2.getByTestId('group-category-group'),
+      columnGroup2.getByTestId('draggable-group-category-group'),
     );
     expect(
       columnGroup2Draggable.getByRole('heading', { name: 'Category group' }),
@@ -136,7 +136,7 @@ describe('TableHeadersForm', () => {
 
     const columnGroup3 = within(screen.getByTestId('columnGroups-2'));
     const columnGroup3Draggable = within(
-      columnGroup3.getByTestId('group-time-periods'),
+      columnGroup3.getByTestId('draggable-group-time-periods'),
     );
     expect(
       columnGroup3Draggable.getByRole('heading', { name: 'Time periods' }),
@@ -173,7 +173,7 @@ describe('TableHeadersForm', () => {
     );
     const rowGroup1 = within(rowsAxis.getByTestId('rowGroups-0'));
     const rowGroup1Draggable = within(
-      rowGroup1.getByTestId('group-indicators'),
+      rowGroup1.getByTestId('draggable-group-indicators'),
     );
     expect(
       rowGroup1Draggable.getByRole('heading', { name: 'Indicators' }),
@@ -297,7 +297,7 @@ describe('TableHeadersForm', () => {
     );
 
     // readonly
-    expect(screen.getByTestId('group-locations')).toHaveAttribute(
+    expect(screen.getByTestId('draggable-group-locations')).toHaveAttribute(
       'role',
       'button',
     );
@@ -316,10 +316,9 @@ describe('TableHeadersForm', () => {
     );
 
     // reorderable
-    expect(screen.getByTestId('group-locations')).not.toHaveAttribute(
-      'role',
-      'button',
-    );
+    expect(
+      screen.queryByTestId('draggable-group-locations'),
+    ).not.toBeInTheDocument();
     expect(screen.getByText('Done')).toBeInTheDocument();
     expect(
       screen.queryByRole('heading', { name: 'Locations' }),
@@ -342,7 +341,7 @@ describe('TableHeadersForm', () => {
     userEvent.click(screen.getByRole('button', { name: 'Done' }));
 
     // readonly
-    expect(screen.getByTestId('group-locations')).toHaveAttribute(
+    expect(screen.getByTestId('draggable-group-locations')).toHaveAttribute(
       'role',
       'button',
     );
@@ -375,7 +374,7 @@ describe('TableHeadersForm', () => {
 
     const columnGroup2 = within(screen.getByTestId('columnGroups-1'));
     expect(
-      columnGroup2.getByTestId('group-category-group'),
+      columnGroup2.getByTestId('draggable-group-category-group'),
     ).not.toHaveAttribute('role', 'button');
     expect(
       columnGroup2.getByRole('button', {
@@ -389,10 +388,9 @@ describe('TableHeadersForm', () => {
     ).toBeDisabled();
 
     const columnGroup3 = within(screen.getByTestId('columnGroups-2'));
-    expect(columnGroup3.getByTestId('group-time-periods')).not.toHaveAttribute(
-      'role',
-      'button',
-    );
+    expect(
+      columnGroup3.getByTestId('draggable-group-time-periods'),
+    ).not.toHaveAttribute('role', 'button');
     expect(
       columnGroup3.getByRole('button', {
         name: 'Reorder items in Time periods',
@@ -405,10 +403,9 @@ describe('TableHeadersForm', () => {
     ).toBeDisabled();
 
     const rowGroup1 = within(screen.getByTestId('rowGroups-0'));
-    expect(rowGroup1.getByTestId('group-indicators')).not.toHaveAttribute(
-      'role',
-      'button',
-    );
+    expect(
+      rowGroup1.getByTestId('draggable-group-indicators'),
+    ).not.toHaveAttribute('role', 'button');
     expect(
       rowGroup1.getByRole('button', {
         name: 'Reorder items in Indicators',

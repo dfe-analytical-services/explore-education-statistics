@@ -17,7 +17,7 @@ describe('TableHeadersGroup', () => {
   test('is draggable when groupDraggingEnabled is true', () => {
     render({ groupDraggingEnabled: true });
 
-    const group = screen.getByTestId('group-category-group');
+    const group = screen.getByTestId('draggable-group-category-group');
     // Draggable group has button role
     expect(group).toHaveAttribute('role', 'button');
     expect(
@@ -45,17 +45,17 @@ describe('TableHeadersGroup', () => {
   test('is reorderable and not draggable  when groupDraggingEnabled is false and the group is active', () => {
     render({ activeGroup: 'group-category-group' });
 
-    const group = screen.getByTestId('group-category-group');
-    // Does not have button role when not draggable
-    expect(group).not.toHaveAttribute('role', 'button');
+    // Does not have the drag handle div when reorderable
+    expect(
+      screen.queryByTestId('draggable-group-category-group'),
+    ).not.toBeInTheDocument();
 
     // Reorderable items are buttons
-    const groupItems = within(group).getAllByRole('button');
-    expect(groupItems).toHaveLength(2);
-    expect(groupItems[0]).toHaveTextContent('Category 1');
-    expect(groupItems[1]).toHaveTextContent('Category 2');
-
-    expect(screen.getByRole('button', { name: 'Done' })).toBeInTheDocument();
+    const groupButtons = screen.getAllByRole('button');
+    expect(groupButtons).toHaveLength(3);
+    expect(groupButtons[0]).toHaveTextContent('Category 1');
+    expect(groupButtons[1]).toHaveTextContent('Category 2');
+    expect(groupButtons[2]).toHaveTextContent('Done');
 
     expect(
       screen.queryByRole('button', { name: 'Reorder items in Category group' }),
@@ -68,7 +68,7 @@ describe('TableHeadersGroup', () => {
   test('is not draggable or reorderable when groupDraggingEnabled is false and the group is not active', () => {
     render({ activeGroup: 'anotherGroup' });
 
-    const group = screen.getByTestId('group-category-group');
+    const group = screen.getByTestId('draggable-group-category-group');
 
     // Does not have button role when not draggable
     expect(group).not.toHaveAttribute('role', 'button');
@@ -89,28 +89,6 @@ describe('TableHeadersGroup', () => {
     expect(
       screen.getByRole('button', { name: 'Move Category group to columns' }),
     ).toBeDisabled();
-  });
-
-  test('renders the group controls when groupDraggingActive is false', () => {
-    render({});
-
-    expect(
-      screen.getByRole('button', { name: 'Reorder items in Category group' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Move Category group to columns' }),
-    ).toBeInTheDocument();
-  });
-
-  test('does not render the group controls when groupDraggingActive is true', () => {
-    render({ groupDraggingActive: true });
-
-    expect(
-      screen.queryByRole('button', { name: 'Reorder items in Category group' }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: 'Move Category group to columns' }),
-    ).not.toBeInTheDocument();
   });
 });
 

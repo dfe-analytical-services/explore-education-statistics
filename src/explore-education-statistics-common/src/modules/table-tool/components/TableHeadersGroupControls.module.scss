@@ -3,16 +3,10 @@
 
 .buttonsContainer {
   background: govuk-colour('light-grey');
-  border: 2px solid govuk-colour('mid-grey');
-  border-top: 0;
   box-sizing: border-box;
   display: flex;
   flex-wrap: wrap;
-  padding: govuk-spacing(2);
-
-  @include govuk-media-query($from: desktop) {
-    width: $dfe-table-header-group-width;
-  }
+  padding-top: govuk-spacing(2);
 
   button {
     flex-grow: 1;
