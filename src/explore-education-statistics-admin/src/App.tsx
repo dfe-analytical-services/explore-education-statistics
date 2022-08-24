@@ -13,11 +13,14 @@ import {
   useApplicationInsights,
 } from '@common/contexts/ApplicationInsightsContext';
 import useAsyncRetry from '@common/hooks/useAsyncRetry';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React, { lazy, Suspense, useEffect } from 'react';
 import { Route, Switch, useHistory } from 'react-router';
 import { BrowserRouter } from 'react-router-dom';
 import PageNotFoundPage from './pages/errors/PageNotFoundPage';
 import { LastLocationContextProvider } from './contexts/LastLocationContext';
+
+const queryClient = new QueryClient();
 
 const PrototypeIndexPage = lazy(
   () => import('@admin/prototypes/PrototypeIndexPage'),
@@ -71,37 +74,39 @@ function App() {
           <BrowserRouter>
             <ApplicationInsightsTracking />
 
-            <AuthContextProvider>
-              <LastLocationContextProvider>
-                <PageErrorBoundary>
-                  <Switch>
-                    {Object.entries(apiAuthorizationRouteList).map(
-                      ([key, authRoute]) => (
-                        <Route exact key={key} {...authRoute} />
-                      ),
-                    )}
+            <QueryClientProvider client={queryClient}>
+              <AuthContextProvider>
+                <LastLocationContextProvider>
+                  <PageErrorBoundary>
+                    <Switch>
+                      {Object.entries(apiAuthorizationRouteList).map(
+                        ([key, authRoute]) => (
+                          <Route exact key={key} {...authRoute} />
+                        ),
+                      )}
 
-                    {Object.entries(routes).map(([key, route]) => (
-                      <ProtectedRoute key={key} {...route} />
-                    ))}
+                      {Object.entries(routes).map(([key, route]) => (
+                        <ProtectedRoute key={key} {...route} />
+                      ))}
 
-                    <ProtectedRoute
-                      path="/prototypes"
-                      protectionAction={user =>
-                        user.permissions.canAccessUserAdministrationPages
-                      }
-                      component={PrototypesEntry}
-                    />
+                      <ProtectedRoute
+                        path="/prototypes"
+                        protectionAction={user =>
+                          user.permissions.canAccessUserAdministrationPages
+                        }
+                        component={PrototypesEntry}
+                      />
 
-                    <ProtectedRoute
-                      path="*"
-                      allowAnonymousUsers
-                      component={PageNotFoundPage}
-                    />
-                  </Switch>
-                </PageErrorBoundary>
-              </LastLocationContextProvider>
-            </AuthContextProvider>
+                      <ProtectedRoute
+                        path="*"
+                        allowAnonymousUsers
+                        component={PageNotFoundPage}
+                      />
+                    </Switch>
+                  </PageErrorBoundary>
+                </LastLocationContextProvider>
+              </AuthContextProvider>
+            </QueryClientProvider>
           </BrowserRouter>
         </ApplicationInsightsContextProvider>
       )}
