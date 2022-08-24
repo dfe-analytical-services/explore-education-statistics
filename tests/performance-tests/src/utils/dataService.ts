@@ -66,7 +66,7 @@ interface PublicationAndReleases {
 }
 
 class DataService {
-  private client: HttpClient;
+  private readonly client: HttpClient;
 
   constructor(
     adminUrl: string,
@@ -164,6 +164,8 @@ class DataService {
   }
 
   getPublications({ topicId }: { topicId: string }): PublicationAndReleases[] {
+    // TODO: update this to use the new endpoint once the 'me' endpoint is removed
+    // https://dfedigital.atlassian.net/browse/EES-3577
     const { json } = this.client.get<PublicationAndReleases[]>(
       `/api/me/publications?topicId=${encodeURI(topicId)}`,
       applicationJsonHeaders,

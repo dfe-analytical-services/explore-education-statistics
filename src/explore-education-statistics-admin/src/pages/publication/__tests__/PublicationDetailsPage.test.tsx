@@ -149,6 +149,10 @@ describe('PublicationDetailsPage', () => {
         'Publication 1',
       );
 
+      expect(screen.getByLabelText('Publication summary')).toHaveValue(
+        'Publication 1 summary',
+      );
+
       const themeSelect = screen.getByLabelText('Select theme');
       expect(themeSelect).toHaveValue('theme-1');
       const themes = within(themeSelect).getAllByRole('option');
@@ -299,6 +303,35 @@ describe('PublicationDetailsPage', () => {
       });
     });
 
+    test('shows validation errors when there is no summary', async () => {
+      renderPage(testPublication);
+
+      await waitFor(() => {
+        expect(screen.getByText('Publication details')).toBeInTheDocument();
+      });
+
+      userEvent.click(
+        screen.getByRole('button', { name: 'Edit publication details' }),
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByLabelText('Publication summary'),
+        ).toBeInTheDocument();
+      });
+
+      userEvent.clear(screen.getByLabelText('Publication summary'));
+      userEvent.tab();
+
+      await waitFor(() => {
+        expect(
+          screen.getByText('Enter a summary', {
+            selector: '#publicationDetailsForm-summary-error',
+          }),
+        ).toBeInTheDocument();
+      });
+    });
+
     test('shows a confirmation modal on submit', async () => {
       renderPage(testPublication);
 
@@ -370,6 +403,7 @@ describe('PublicationDetailsPage', () => {
           contact: testContact,
           supersededById: 'publication-2',
           title: 'Publication 1 updated',
+          summary: 'Publication 1 summary',
           topicId: 'theme-2-topic-2',
         });
       });

@@ -11,7 +11,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 {
     public interface IReleaseService
     {
-        Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateViewModel release);
+        Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest release);
 
         Task<Either<ActionResult, DeleteReleasePlan>> GetDeleteReleasePlan(Guid releaseId);
 
@@ -23,14 +23,14 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces
 
         Task<Either<ActionResult, ReleasePublicationStatusViewModel>> GetReleasePublicationStatus(Guid releaseId);
 
-        Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, ReleaseUpdateViewModel request);
+        Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(Guid releaseId, ReleaseUpdateRequest request);
 
         Task<Either<ActionResult, TitleAndIdViewModel?>> GetLatestPublishedRelease(Guid publicationId);
 
-        Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
+        Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesWithStatuses(
             params ReleaseApprovalStatus[] releaseApprovalStatues);
 
-        Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyScheduledReleasesAsync();
+        Task<Either<ActionResult, List<ReleaseViewModel>>> ListScheduledReleases();
 
         Task<Either<ActionResult, DeleteDataFilePlan>> GetDeleteDataFilePlan(Guid releaseId, Guid fileId);
 

@@ -5,11 +5,13 @@ using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
@@ -68,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     {
                         var service = BuildReleaseService(userService.Object);
                         return service.CreateRelease(
-                            new ReleaseCreateViewModel
+                            new ReleaseCreateRequest
                             {
                                 PublicationId = Publication.Id,
                             }
@@ -140,17 +142,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         [Fact]
         public async Task GetMyReleasesForReleaseStatusesAsync_CanViewAllReleases()
         {
-            var repository = new Mock<IReleaseRepository>();
+            var releaseRepository = new Mock<IReleaseRepository>();
 
-            var list = new List<MyReleaseViewModel>
+            var list = new List<Release>
             {
                 new()
                 {
-                    Id = Guid.NewGuid()
+                    Id = Guid.NewGuid(),
+                    ReleaseName = "2000",
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 }
             };
 
-            repository
+            releaseRepository
                 .Setup(s => s.ListReleases(ReleaseApprovalStatus.Approved))
                 .ReturnsAsync(list);
 
@@ -160,20 +164,38 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 .AssertSuccess(
                     async userService =>
                     {
+                        userService
+                            .Setup(s => s.MatchesPolicy(list[0], CanAssignPrereleaseContactsToSpecificRelease))
+                            .ReturnsAsync(true);
+
+                        userService
+                            .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificRelease))
+                            .ReturnsAsync(true);
+
+                        userService
+                            .Setup(s => s.MatchesPolicy(list[0], CanDeleteSpecificRelease))
+                            .ReturnsAsync(true);
+
+                        userService
+                            .Setup(s => s.MatchesPolicy(list[0], CanMakeAmendmentOfSpecificRelease))
+                            .ReturnsAsync(true);
+
                         var service = BuildReleaseService(
                             userService.Object,
-                            releaseRepository: repository.Object
+                            releaseRepository: releaseRepository.Object
                         );
-                        var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved);
+                        var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
-                        Assert.Equal(list, result.Right);
+                        var viewModel = result.AssertRight();
+                        Assert.Single(viewModel);
+                        Assert.Equal(list[0].Id, viewModel[0].Id);
 
                         return result;
                     }
                 );
 
-            repository.Verify(s => s.ListReleases(ReleaseApprovalStatus.Approved));
-            repository.VerifyNoOtherCalls();
+            releaseRepository.Verify(s => s.ListReleases(ReleaseApprovalStatus.Approved));
+            releaseRepository.VerifyNoOtherCalls();
         }
 
         [Fact]
@@ -181,11 +203,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         {
             var repository = new Mock<IReleaseRepository>();
 
-            var list = new List<MyReleaseViewModel>
+            var list = new List<Release>
             {
                 new()
                 {
-                    Id = Guid.NewGuid()
+                    Id = Guid.NewGuid(),
+                    ReleaseName = "2000",
+                    TimePeriodCoverage = TimeIdentifier.AcademicYear,
                 }
             };
 
@@ -200,6 +224,22 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     async userService =>
                     {
                         userService
+                            .Setup(s => s.MatchesPolicy(list[0], CanAssignPrereleaseContactsToSpecificRelease))
+                            .ReturnsAsync(true);
+
+                        userService
+                            .Setup(s => s.MatchesPolicy(list[0], CanUpdateSpecificRelease))
+                            .ReturnsAsync(true);
+
+                        userService
+                            .Setup(s => s.MatchesPolicy(list[0], CanDeleteSpecificRelease))
+                            .ReturnsAsync(true);
+
+                        userService
+                            .Setup(s => s.MatchesPolicy(list[0], CanMakeAmendmentOfSpecificRelease))
+                            .ReturnsAsync(true);
+
+                        userService
                             .Setup(s => s.GetUserId())
                             .Returns(_userId);
 
@@ -207,9 +247,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                             userService.Object,
                             releaseRepository: repository.Object
                         );
-                        var result = await service.GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved);
+                        var result = await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
 
-                        Assert.Equal(list, result.Right);
+                        var viewModel = result.AssertRight();
+                        Assert.Single(viewModel);
+                        Assert.Equal(list[0].Id, viewModel[0].Id);
 
                         return result;
                     }
@@ -228,7 +270,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     async userService =>
                     {
                         var service = BuildReleaseService(userService: userService.Object);
-                        return await service.GetMyReleasesForReleaseStatusesAsync(ReleaseApprovalStatus.Approved);
+                        return await service.ListReleasesWithStatuses(ReleaseApprovalStatus.Approved);
                     }
                 );
         }

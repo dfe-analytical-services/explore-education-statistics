@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { check } from 'k6';
 import { Counter, Rate, Trend } from 'k6/metrics';
 import { Options } from 'k6/options';
@@ -58,12 +59,16 @@ const environmentAndUsers = getEnvironmentAndUsersFromFile(
 );
 const { adminUrl, supportsRefreshTokens } = environmentAndUsers.environment;
 
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const { authTokens, userName } = environmentAndUsers.users.find(
   user => user.userName === 'bau1',
 )!;
 
 function getOrCreateReleaseWithSubject() {
-  const dataService = createDataService(adminUrl, authTokens.accessToken);
+  const dataService = createDataService(
+    adminUrl,
+    authTokens?.accessToken as string,
+  );
 
   const suffix = alwaysCreateNewDataPerTest
     ? `-${Date.now()}-${Math.random()}`
@@ -214,7 +219,6 @@ export const teardown = ({ themeId, topicId }: SetupData) => {
     dataService.deleteTopic({ topicId });
     dataService.deleteTheme({ themeId });
 
-    /* eslint-disable-next-line no-console */
     console.log(`Deleted Theme ${themeId}, Topic ${topicId}`);
   }
 };

@@ -1,14 +1,14 @@
 import DraftReleasesTable from '@admin/pages/admin-dashboard/components/DraftReleasesTable';
 import NonScheduledReleaseSummary from '@admin/pages/admin-dashboard/components/NonScheduledReleaseSummary';
 import ReleasesTab from '@admin/pages/admin-dashboard/components/ReleasesByStatusTab';
-import { MyRelease } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import LoadingSpinner from '@common/components/LoadingSpinner';
 import React from 'react';
 
 interface Props {
   isBauUser: boolean;
   isLoading: boolean;
-  releases: MyRelease[];
+  releases: Release[];
   showNewDashboard?: boolean; // TODO EES-3217 remove when ready to go live
   onChangeRelease: () => void;
 }

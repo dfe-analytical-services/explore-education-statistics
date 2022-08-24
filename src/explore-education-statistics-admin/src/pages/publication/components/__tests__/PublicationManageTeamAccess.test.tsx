@@ -27,19 +27,20 @@ describe('PublicationManageTeamAccess', () => {
   const testPublicationId = 'publication-1';
 
   const testRelease: ReleaseSummary = {
-    id: 'release-1',
+    id: 'release1-id',
+    slug: 'release-1-slug',
     timePeriodCoverage: {
       value: 'AY',
       label: 'Academic Year',
     },
-    title: 'Release 1',
-    releaseName: '2000',
+    title: 'Academic Year 2000/01',
     type: 'AdHocStatistics',
-    publishScheduled: '',
-    latestInternalReleaseNote: 'release1-release-note',
+    publishScheduled: '2001-01-01',
     approvalStatus: 'Draft',
+    year: 2000,
     yearTitle: '2000/01',
     live: false,
+    amendment: false,
   };
 
   const testContributors: ContributorViewModel[] = [
@@ -67,12 +68,14 @@ describe('PublicationManageTeamAccess', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Release 1 (Not live)')).toBeInTheDocument();
+      expect(
+        screen.getByText('Academic Year 2000/01 (Not live)'),
+      ).toBeInTheDocument();
     });
 
     expect(
       screen.getByRole('heading', {
-        name: 'Release 1 (Not live) Draft',
+        name: 'Academic Year 2000/01 (Not live) Draft',
       }),
     ).toBeInTheDocument();
 
@@ -129,12 +132,14 @@ describe('PublicationManageTeamAccess', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Release 1 (Not live)')).toBeInTheDocument();
+      expect(
+        screen.getByText('Academic Year 2000/01 (Not live)'),
+      ).toBeInTheDocument();
     });
 
     expect(
       screen.getByRole('heading', {
-        name: 'Release 1 (Not live) Draft',
+        name: 'Academic Year 2000/01 (Not live) Draft',
       }),
     ).toBeInTheDocument();
 
@@ -168,12 +173,14 @@ describe('PublicationManageTeamAccess', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByText('Release 1 (Not live)')).toBeInTheDocument();
+      expect(
+        screen.getByText('Academic Year 2000/01 (Not live)'),
+      ).toBeInTheDocument();
     });
 
     expect(
       screen.getByRole('heading', {
-        name: 'Release 1 (Not live) Draft',
+        name: 'Academic Year 2000/01 (Not live) Draft',
       }),
     ).toBeInTheDocument();
 

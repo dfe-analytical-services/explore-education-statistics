@@ -53,9 +53,13 @@ const PublicationReleaseHeadlinesSection = ({
           key={block.id}
           block={block}
           getGlossaryEntry={glossaryService.getEntry}
-          trackContentLinks={url =>
-            logOutboundLink(`Publication release headlines link: ${url}`, url)
-          }
+          trackContentLinks={(url, newTab) => {
+            logOutboundLink(
+              `Publication release headlines link: ${url}`,
+              url,
+              newTab,
+            );
+          }}
           trackGlossaryLinks={glossaryEntrySlug =>
             logEvent({
               category: `Publication Release Headlines Glossary Link`,

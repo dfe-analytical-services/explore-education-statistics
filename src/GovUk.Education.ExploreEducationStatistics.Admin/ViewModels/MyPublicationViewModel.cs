@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
@@ -10,9 +11,11 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public string Title { get; set; }
 
+        public string Summary { get; set; }
+
         public DateTime? NextUpdate { get; set; }
 
-        public List<MyReleaseViewModel> Releases { get; set; }
+        public List<ReleaseViewModel> Releases { get; set; }
 
         public List<MyPublicationMethodologyVersionViewModel> Methodologies { get; set; }
 
@@ -24,15 +27,13 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.ViewModels
 
         public Contact Contact { get; set; }
 
-        public List<LegacyReleaseViewModel> LegacyReleases { get; set; }
-
         public Guid? SupersededById { get; set; }
 
         public bool IsSuperseded { get; set; }
 
         public PermissionsSet Permissions { get; set; }
 
-        public class PermissionsSet
+        public record PermissionsSet
         {
             public bool CanUpdatePublication { get; set; }
             public bool CanUpdatePublicationTitle { get; set; }

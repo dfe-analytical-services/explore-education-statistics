@@ -4,11 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Model;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
-using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +21,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 {
     public class FileUploadsValidatorService : IFileUploadsValidatorService
     {
-        private readonly ISubjectRepository _subjectRepository;
         private readonly IFileTypeService _fileTypeService;
         private readonly ContentDbContext _context;
 
-        public FileUploadsValidatorService(ISubjectRepository subjectRepository, IFileTypeService fileTypeService, ContentDbContext context)
+        public FileUploadsValidatorService(IFileTypeService fileTypeService,
+            ContentDbContext context)
         {
-            _subjectRepository = subjectRepository;
             _fileTypeService = fileTypeService;
             _context = context;
         }
@@ -41,17 +38,24 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IFormFile metaFile,
             File? replacingFile = null)
         {
-            return await ValidateDataFileNames(releaseId, dataFile.FileName, metaFile.FileName, replacingFile)
+            return await ValidateDataFileNames(releaseId,
+                    dataFileName: dataFile.FileName,
+                    metaFileName: metaFile.FileName,
+                    replacingFile)
                 .OnSuccess(async _ => await ValidateDataFileSizes(dataFile.Length, metaFile.Length))
                 .OnSuccess(async _ => await ValidateDataFileTypes(dataFile, metaFile));
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateDataArchiveEntriesForUpload(
             Guid releaseId,
-            IDataArchiveFile archiveFile)
+            IDataArchiveFile archiveFile,
+            File? replacingFile = null)
         {
-            return await ValidateDataFileNames(releaseId, archiveFile.DataFileName, archiveFile.MetaFileName, null)
-                .OnSuccess(async _ => await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize));
+            return await ValidateDataFileSizes(archiveFile.DataFileSize, archiveFile.MetaFileSize)
+                .OnSuccess(async _ => await ValidateDataFileNames(releaseId,
+                    dataFileName: archiveFile.DataFileName,
+                    metaFileName: archiveFile.MetaFileName,
+                    replacingFile));
         }
 
         public async Task<Either<ActionResult, Unit>> ValidateFileForUpload(IFormFile file, FileType type)
@@ -66,7 +70,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             {
                 return ValidationActionResult(FileCannotBeEmpty);
             }
-            
+
             if (!await _fileTypeService.HasMatchingMimeType(file, AllowedMimeTypesByFileType[type]))
             {
                 return ValidationActionResult(FileTypeInvalid);
@@ -127,12 +131,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 .Where(rf => rf.ReleaseId == releaseId)
                 .ToList()
                 .Any(rf => String.Equals(rf.File.Filename, name, CurrentCultureIgnoreCase)
-                && rf.File.Type == type);
+                           && rf.File.Type == type);
         }
 
         private async Task<Either<ActionResult, Unit>> ValidateDataFileNames(
-            Guid releaseId, 
-            string dataFileName, 
+            Guid releaseId,
+            string dataFileName,
             string metaFileName,
             File? replacingFile)
         {
@@ -166,10 +170,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 return ValidationActionResult(MetaFileMustBeCsvFile);
             }
 
-            if (IsFileExisting(releaseId, FileType.Data, dataFileName) && 
+            if (IsFileExisting(releaseId, FileType.Data, dataFileName) &&
                 (replacingFile == null || replacingFile.Filename != dataFileName))
             {
-                return ValidationActionResult(CannotOverwriteDataFile);
+                return ValidationActionResult(DataFilenameNotUnique);
             }
 
             return Unit.Instance;

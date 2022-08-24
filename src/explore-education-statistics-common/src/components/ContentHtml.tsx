@@ -16,7 +16,7 @@ export interface ContentHtmlProps {
   sanitizeOptions?: SanitizeHtmlOptions;
   testId?: string;
   getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
-  trackContentLinks?: (url: string) => void;
+  trackContentLinks?: (url: string, newTab?: boolean) => void;
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
 }
 
@@ -42,7 +42,7 @@ const ContentHtml = ({
         element.href
       ) {
         event.preventDefault();
-        trackContentLinks(element.href);
+        trackContentLinks(element.href, element.target === '_blank');
       }
     };
 

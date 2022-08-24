@@ -7,7 +7,7 @@ import {
 } from '@admin/routes/releaseRoutes';
 import releaseService, {
   DeleteReleasePlan,
-  MyRelease,
+  Release,
 } from '@admin/services/releaseService';
 import Button from '@common/components/Button';
 import React, { useState } from 'react';
@@ -16,7 +16,7 @@ import CancelAmendmentModal from '@admin/pages/admin-dashboard/components/Cancel
 import ModalConfirm from '@common/components/ModalConfirm';
 
 interface Props {
-  release: MyRelease;
+  release: Release;
   includeCreateAmendmentControls?: boolean;
   onAmendmentCancelled: (releaseId: string) => void;
 }
@@ -57,7 +57,7 @@ const NonScheduledReleaseSummary = ({
                   }, ${getReleaseSummaryLabel(release)}`}
                   variant="secondary"
                 >
-                  {release.permissions.canUpdateRelease
+                  {release.permissions?.canUpdateRelease
                     ? 'Edit release amendment'
                     : 'View release amendment'}
                 </ButtonLink>
@@ -92,12 +92,12 @@ const NonScheduledReleaseSummary = ({
                   }, ${getReleaseSummaryLabel(release)}`}
                   variant="secondary"
                 >
-                  {release.permissions.canUpdateRelease
+                  {release.permissions?.canUpdateRelease
                     ? 'Edit release'
                     : 'View release'}
                 </ButtonLink>
                 {includeCreateAmendmentControls &&
-                  release.permissions.canMakeAmendmentOfRelease && (
+                  release.permissions?.canMakeAmendmentOfRelease && (
                     <Button
                       variant="secondary"
                       onClick={() => setAmendReleaseId(release.id)}
@@ -107,7 +107,7 @@ const NonScheduledReleaseSummary = ({
                   )}
               </>
             )}
-            {release.permissions.canDeleteRelease && release.amendment && (
+            {release.permissions?.canDeleteRelease && release.amendment && (
               <Button
                 onClick={async () => {
                   setDeleteReleasePlan({

@@ -32,14 +32,14 @@ const testRelease: Release = {
   contact: testContact,
   id: 'release-1',
   latestInternalReleaseNote: 'release1-release-note',
-  releaseName: '2000',
   latestRelease: true,
   live: false,
   preReleaseAccessList: '',
   previousVersionId: '',
   publicationId: 'publication-1',
-  publicationSlug: 'publication-slug-1',
   publicationTitle: 'Publication 1',
+  publicationSummary: 'Publication 1 summary',
+  publicationSlug: 'publication-slug-1',
   publishScheduled: '',
   slug: 'release-slug-1',
   timePeriodCoverage: {
@@ -48,6 +48,7 @@ const testRelease: Release = {
   },
   title: 'Release 1',
   type: 'AdHocStatistics',
+  year: 2000,
   yearTitle: '2000/01',
 };
 

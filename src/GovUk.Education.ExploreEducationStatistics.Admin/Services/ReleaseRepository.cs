@@ -31,18 +31,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _mapper = mapper;
         }
 
-        public async Task<List<MyReleaseViewModel>> ListReleases(
+        public async Task<List<Content.Model.Release>> ListReleases(
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
-            var releases = await
-                HydrateReleaseForReleaseViewModel(_contentDbContext.Releases)
+            return await
+                HydrateRelease(_contentDbContext.Releases)
                 .Where(r => releaseApprovalStatuses.Contains(r.ApprovalStatus))
                 .ToListAsync();
-
-            return _mapper.Map<List<MyReleaseViewModel>>(releases);
         }
 
-        public async Task<List<MyReleaseViewModel>> ListReleasesForUser(Guid userId,
+        public async Task<List<Content.Model.Release>> ListReleasesForUser(Guid userId,
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             var userReleaseIds = await _contentDbContext
@@ -55,7 +53,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             var userPublicationIds = await _contentDbContext
                 .UserPublicationRoles
                 .AsQueryable()
-                .Where(r => r.UserId == userId && r.Role == PublicationRole.Owner)
+                .Where(r => r.UserId == userId)
                 .Select(r => r.PublicationId)
                 .ToListAsync();
             var userPublicationRoleReleaseIds = await _contentDbContext
@@ -67,12 +65,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             userReleaseIds.AddRange(userPublicationRoleReleaseIds);
             userReleaseIds = userReleaseIds.Distinct().ToList();
 
-            var releases = await
-                HydrateReleaseForReleaseViewModel(_contentDbContext.Releases)
+            return await
+                HydrateRelease(_contentDbContext.Releases)
                 .Where(r => userReleaseIds.Contains(r.Id) && releaseApprovalStatuses.Contains(r.ApprovalStatus))
                 .ToListAsync();
-
-            return _mapper.Map<List<MyReleaseViewModel>>(releases);
         }
 
         public async Task<Guid> CreateStatisticsDbReleaseAndSubjectHierarchy(Guid releaseId)

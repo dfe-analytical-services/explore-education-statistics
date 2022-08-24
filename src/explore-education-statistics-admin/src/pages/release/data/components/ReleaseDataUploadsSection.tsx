@@ -29,7 +29,6 @@ import Yup from '@common/validation/yup';
 import DataUploadCancelButton from '@admin/pages/release/data/components/DataUploadCancelButton';
 import React, { useCallback, useState } from 'react';
 import { generatePath } from 'react-router';
-import { Dictionary } from '@common/types';
 import ReorderableAccordion from '@admin/components/editable/ReorderableAccordion';
 import ReorderableAccordionSection from '@admin/components/editable/ReorderableAccordionSection';
 

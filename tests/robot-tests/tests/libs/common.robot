@@ -18,7 +18,6 @@ ${FILES_DIR}=                           ${EXECDIR}${/}tests${/}files${/}
 
 ${timeout}=                             %{TIMEOUT}
 ${implicit_wait}=                       %{IMPLICIT_WAIT}
-${RELEASE_COMPLETE_WAIT}=               %{RELEASE_COMPLETE_WAIT}
 ${prompt_to_continue_on_failure}=       0
 ${FAIL_TEST_SUITES_FAST}=               %{FAIL_TEST_SUITES_FAST}
 

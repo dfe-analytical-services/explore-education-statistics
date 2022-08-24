@@ -3,7 +3,7 @@ import {
   ScheduledStagesGuidanceModal,
   ScheduledStatusGuidanceModal,
 } from '@admin/pages/publication/components/PublicationGuidance';
-import { MyRelease } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import ButtonText from '@common/components/ButtonText';
 import InfoIcon from '@common/components/InfoIcon';
 import useToggle from '@common/hooks/useToggle';
@@ -13,7 +13,7 @@ import React, { useMemo } from 'react';
 
 interface PublicationRowProps {
   publication: string;
-  releases: MyRelease[];
+  releases: Release[];
 }
 const PublicationRow = ({ publication, releases }: PublicationRowProps) => {
   return (
@@ -31,7 +31,7 @@ const PublicationRow = ({ publication, releases }: PublicationRowProps) => {
 };
 
 interface ScheduledReleasesTableProps {
-  releases: MyRelease[];
+  releases: Release[];
 }
 
 const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
@@ -44,8 +44,8 @@ const ScheduledReleasesTable = ({ releases }: ScheduledReleasesTableProps) => {
     toggleScheduledStagesGuidance,
   ] = useToggle(false);
 
-  const releasesByPublication: Dictionary<MyRelease[]> = useMemo(() => {
-    return releases.reduce<Dictionary<MyRelease[]>>((acc, release) => {
+  const releasesByPublication: Dictionary<Release[]> = useMemo(() => {
+    return releases.reduce<Dictionary<Release[]>>((acc, release) => {
       if (acc[release.publicationTitle]) {
         acc[release.publicationTitle].push(release);
       } else {

@@ -34,7 +34,7 @@ const projects = {
       projectRoot,
       'src/GovUk.Education.ExploreEducationStatistics.Admin',
     ),
-    command: 'dotnet build && dotnet run',
+    command: 'dotnet clean && dotnet run',
     colour: chalk.green,
   },
   adminKeycloak: {
@@ -43,8 +43,8 @@ const projects = {
       'src/GovUk.Education.ExploreEducationStatistics.Admin',
     ),
     command: isWindows
-      ? 'SET "IdpProviderConfiguration=Keycloak" && dotnet build && dotnet run'
-      : 'export IdpProviderConfiguration=Keycloak && dotnet build && dotnet run',
+      ? 'SET "IdpProviderConfiguration=Keycloak" && dotnet clean && dotnet run'
+      : 'export IdpProviderConfiguration=Keycloak && dotnet clean && dotnet run',
     colour: chalk.green,
   },
   frontend: {
@@ -62,7 +62,7 @@ const projects = {
       projectRoot,
       'src/GovUk.Education.ExploreEducationStatistics.Content.Api',
     ),
-    command: 'dotnet build && dotnet run',
+    command: 'dotnet clean && dotnet run',
     colour: chalk.cyan,
   },
   data: {
@@ -70,7 +70,7 @@ const projects = {
       projectRoot,
       'src/GovUk.Education.ExploreEducationStatistics.Data.Api',
     ),
-    command: 'dotnet build && dotnet run',
+    command: 'dotnet clean && dotnet run',
     colour: chalk.magenta,
   },
   processor: {
@@ -78,7 +78,7 @@ const projects = {
       projectRoot,
       'src/GovUk.Education.ExploreEducationStatistics.Data.Processor',
     ),
-    command: 'dotnet build && func host start --port=7071 --pause-on-error',
+    command: 'dotnet clean && func host start --port=7071 --pause-on-error',
     colour: chalk.rgb(255, 158, 165),
   },
   publisher: {
@@ -86,7 +86,7 @@ const projects = {
       projectRoot,
       'src/GovUk.Education.ExploreEducationStatistics.Publisher',
     ),
-    command: 'dotnet build && func host start --port=7072 --pause-on-error',
+    command: 'dotnet clean && func host start --port=7072 --pause-on-error',
     colour: chalk.yellow,
   },
   notifier: {
@@ -94,7 +94,7 @@ const projects = {
       projectRoot,
       'src/GovUk.Education.ExploreEducationStatistics.Notifier',
     ),
-    command: 'dotnet build && func host start --port=7073 --pause-on-error',
+    command: 'dotnet clean && func host start --port=7073 --pause-on-error',
     colour: chalk.blue,
   },
   idp: {

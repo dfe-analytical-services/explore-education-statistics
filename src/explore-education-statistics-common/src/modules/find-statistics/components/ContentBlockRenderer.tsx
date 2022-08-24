@@ -15,7 +15,7 @@ interface Props {
     attributes: Dictionary<string>,
   ) => Dictionary<string>;
   getGlossaryEntry?: (slug: string) => Promise<GlossaryEntry>;
-  trackContentLinks?: (url: string) => void;
+  trackContentLinks?: (url: string, newTab?: boolean) => void;
   trackGlossaryLinks?: (glossaryEntrySlug: string) => void;
 }
 

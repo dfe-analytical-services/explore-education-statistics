@@ -6,15 +6,12 @@ import {
   BasicMethodologyVersion,
   MyMethodologyVersion,
 } from '@admin/services/methodologyService';
-import {
-  MyRelease,
-  Release,
-  ReleaseSummary,
-} from '@admin/services/releaseService';
+import { Release, ReleaseSummary } from '@admin/services/releaseService';
 import { IdTitlePair } from '@admin/services/types/common';
 import client from '@admin/services/utils/service';
 import { OmitStrict } from '@common/types';
 import { PublicationSummary } from '@common/services/publicationService';
+import { PaginatedList } from '@common/services/types/pagination';
 
 export interface PublicationContactDetails {
   id: string;
@@ -39,10 +36,10 @@ export interface ExternalMethodology {
 export interface MyPublication {
   id: string;
   title: string;
-  releases: MyRelease[];
+  summary: string;
+  releases: Release[];
   methodologies: MyPublicationMethodology[];
   externalMethodology?: ExternalMethodology;
-  legacyReleases: LegacyRelease[];
   topicId: string;
   themeId: string;
   contact: PublicationContactDetails;
@@ -70,12 +67,12 @@ export interface MyPublicationMethodology {
 export interface BasicPublicationDetails {
   id: string;
   title: string;
+  summary: string;
   slug: string;
   contact: PublicationContactDetails;
   releases?: Release[];
   methodologies?: BasicMethodologyVersion[];
   externalMethodology?: ExternalMethodology;
-  legacyReleases: LegacyRelease[];
   themeId: string;
   topicId: string;
 }
@@ -87,11 +84,19 @@ export interface PublicationMethodologyDetails {
 
 export interface SavePublicationRequest {
   title: string;
+  summary: string;
   contact: SavePublicationContact;
   selectedMethodologyId?: string;
   externalMethodology?: ExternalMethodology;
   supersededById?: string;
   topicId: string;
+}
+
+export interface ListReleasesParams {
+  live?: boolean;
+  page?: number;
+  pageSize?: number;
+  permissions?: boolean;
 }
 
 export type CreatePublicationRequest = SavePublicationRequest;
@@ -135,9 +140,13 @@ const publicationService = {
     return client.get<MyPublication>(`/me/publication/${publicationId}`);
   },
 
-  getReleases(publicationId: string): Promise<ReleaseSummary[]> {
-    return client.get<ReleaseSummary[]>(
+  listReleases<TReleaseSummary extends ReleaseSummary = ReleaseSummary>(
+    publicationId: string,
+    params?: ListReleasesParams,
+  ): Promise<PaginatedList<TReleaseSummary>> {
+    return client.get<PaginatedList<TReleaseSummary>>(
       `/publication/${publicationId}/releases`,
+      { params },
     );
   },
 

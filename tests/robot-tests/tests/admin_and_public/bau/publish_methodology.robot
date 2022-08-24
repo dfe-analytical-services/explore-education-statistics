@@ -22,16 +22,42 @@ Create a draft release
     ${PUBLICATION_ID}=    user creates test publication via api    ${PUBLICATION_NAME}
     user create test release via api    ${PUBLICATION_ID}    AY    2021
 
-Approve a methodology for publishing immediately
+Create a methodology
     user creates methodology for publication    ${PUBLICATION_NAME}
 
+Add content to methodology
     user clicks link    Manage content
-    user creates new content section    1    Methodology content section 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
+    user creates new content section    1    Methodology content section 1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds text block to editable accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds content to accordion section text block    Methodology content section 1    1
-    ...    Adding Methodology content    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    ...    Content 1    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
 
+    user creates new content section    2    Methodology content section 2
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    Methodology content section 2
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    Methodology content section 2    1
+    ...    Content 2    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
+Add annexe content to methodology
+    user creates new content section    1    Methodology annexe section 1
+    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    Methodology annexe section 1
+    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    Methodology annexe section 1    1
+    ...    Annexe 1    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+
+    user creates new content section    2    Methodology annexe section 2
+    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    user adds text block to editable accordion section    Methodology annexe section 2
+    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    Methodology annexe section 2    1
+    ...    Annexe 2    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+
+Approve the methodology for publishing immediately
     user approves methodology for publication    ${PUBLICATION_NAME}
 
 Verify the expected public URL of the methodology on the Sign off tab
@@ -115,10 +141,34 @@ Verify that the methodology displays a link to the publication
 Verify that the methodology content is correct
     ${date}=    get current datetime    %-d %B %Y
     user checks summary list contains    Published    ${date}
-    user waits until page contains accordion section    Methodology content section 1
+
+    user checks accordion is in position    Methodology content section 1    1    id:content
+    user checks accordion is in position    Methodology content section 2    2    id:content
+
+    user checks there are x accordion sections    2    id:content
+
     user opens accordion section    Methodology content section 1
-    ${content}=    user gets accordion section content element    Methodology content section 1
-    user checks element contains    ${content}    Adding Methodology content
+    ${content_section_1}=    user gets accordion section content element    Methodology content section 1
+    user checks element contains    ${content_section_1}    Content 1
+
+    user opens accordion section    Methodology content section 2
+    ${content_section_2}=    user gets accordion section content element    Methodology content section 2
+    user checks element contains    ${content_section_2}    Content 2
+
+    user checks accordion is in position    Methodology annexe section 1    1    id:annexes
+    user checks accordion is in position    Methodology annexe section 2    2    id:annexes
+
+    user checks there are x accordion sections    2    id:annexes
+
+    user opens accordion section    Methodology annexe section 1    id:annexes
+    ${annexe_section_1}=    user gets accordion section content element    Methodology annexe section 1
+    ...    id:annexes
+    user checks element contains    ${annexe_section_1}    Annexe 1
+
+    user opens accordion section    Methodology annexe section 2    id:annexes
+    ${annexe_section_2}=    user gets accordion section content element    Methodology annexe section 2
+    ...    id:annexes
+    user checks element contains    ${annexe_section_2}    Annexe 2
 
 Amend the methodology in preparation to test publishing immediately
     user creates methodology amendment for publication    ${PUBLICATION_NAME}
@@ -134,9 +184,51 @@ Update the methodology amendment's content
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
     user adds text block to editable accordion section    Methodology content section 1
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user adds content to accordion section text block    Methodology content section 1    2    New & Updated content
+    user checks accordion section contains x blocks    Methodology content section 1    2
     ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
-    user changes accordion section title    1    New and Updated Title    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user adds content to accordion section text block    Methodology content section 1    2
+    ...    New amendment content
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user changes accordion section title    1    Methodology content section 1 updated
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
+Reorder amendment content sections
+    user clicks element    id:methodologyAccordion-content-reorder
+
+    user sets focus to element
+    ...    xpath:(.//*[@data-testid="editableAccordionSection"])[1]
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
+    user presses keys    ${SPACE}
+    user presses keys    ARROW_DOWN
+    user presses keys    ${SPACE}
+
+    user clicks button    Save order
+
+Check the new order of amendment content sections
+    user checks accordion is in position    Methodology content section 2    1
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+    user checks accordion is in position    Methodology content section 1 updated    2
+    ...    ${METHODOLOGY_CONTENT_EDITABLE_ACCORDION}
+
+Reorder amendment annexe sections
+    user clicks element    id:methodologyAccordion-annexes-reorder
+
+    user sets focus to element
+    ...    xpath:(.//*[@data-testid="editableAccordionSection"])[1]
+    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+
+    user presses keys    ${SPACE}
+    user presses keys    ARROW_DOWN
+    user presses keys    ${SPACE}
+
+    user clicks button    Save order
+
+Check the new order of amendment annexe sections
+    user checks accordion is in position    Methodology annexe section 2    1
+    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
+    user checks accordion is in position    Methodology annexe section 1    2
+    ...    ${METHODOLOGY_ANNEXES_EDITABLE_ACCORDION}
 
 Add a note describing the amendment
     user adds note to methodology
@@ -187,11 +279,35 @@ Verify that the amended methodology content is correct
     ${date}=    get current datetime    %-d %B %Y
     user checks summary list contains    Published    ${date}
     user checks summary list contains    Last updated    ${date}
-    user waits until page contains accordion section    New and Updated Title
-    user opens accordion section    New and Updated Title
-    ${content}=    user gets accordion section content element    New and Updated Title
-    user checks element contains    ${content}    Adding Methodology content
-    user checks element contains    ${content}    New & Updated content
+
+    user checks accordion is in position    Methodology content section 2    1    id:content
+    user checks accordion is in position    Methodology content section 1 updated    2    id:content
+
+    user checks there are x accordion sections    2    id:content
+
+    user opens accordion section    Methodology content section 2
+    ${content_section_2}=    user gets accordion section content element    Methodology content section 2
+    user checks element contains    ${content_section_2}    Content 2
+
+    user opens accordion section    Methodology content section 1 updated
+    ${content_section_1}=    user gets accordion section content element    Methodology content section 1 updated
+    user checks element contains    ${content_section_1}    Content 1
+    user checks element contains    ${content_section_1}    New amendment content
+
+    user checks accordion is in position    Methodology annexe section 2    1    id:annexes
+    user checks accordion is in position    Methodology annexe section 1    2    id:annexes
+
+    user checks there are x accordion sections    2    id:annexes
+
+    user opens accordion section    Methodology annexe section 2    id:annexes
+    ${annexe_section_2}=    user gets accordion section content element    Methodology annexe section 2
+    ...    id:annexes
+    user checks element contains    ${annexe_section_2}    Annexe 2
+
+    user opens accordion section    Methodology annexe section 1    id:annexes
+    ${annexe_section_1}=    user gets accordion section content element    Methodology annexe section 1
+    ...    id:annexes
+    user checks element contains    ${annexe_section_1}    Annexe 1
 
 Verify the list of notes
     ${date}=    get current datetime    %-d %B %Y

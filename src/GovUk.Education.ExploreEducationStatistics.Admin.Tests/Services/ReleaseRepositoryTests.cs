@@ -132,7 +132,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListReleasesForUser_PublicationRole_Approved()
+        public async Task ListReleasesForUser_PublicationRole_Owner_Approved()
         {
             var userId = Guid.NewGuid();
             var userPublicationRole1 = new UserPublicationRole()
@@ -191,7 +191,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
         }
 
         [Fact]
-        public async Task ListReleasesForUser_PublicationRole_Draft()
+        public async Task ListReleasesForUser_PublicationRole_Owner_Draft()
         {
             var userId = Guid.NewGuid();
             var userPublicationRole1 = new UserPublicationRole()
@@ -229,6 +229,66 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     await releaseRepository.ListReleasesForUser(userId,
                         ReleaseApprovalStatus.Approved);
                 Assert.Empty(result);
+            }
+        }
+
+        [Fact]
+        public async Task ListReleasesForUser_PublicationRole_ReleaseApprover_Approved()
+        {
+            var userId = Guid.NewGuid();
+            var userPublicationRole1 = new UserPublicationRole()
+            {
+                UserId = userId,
+                Publication = new Publication
+                {
+                    Title = "Test publication 1",
+                    Slug = "test-publication-1",
+                    Contact = new Contact(),
+                    Releases = new List<Release>
+                    {
+                        new Release
+                        {
+                            ApprovalStatus = ReleaseApprovalStatus.Approved,
+                            TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                            ReleaseName = "2001",
+                        },
+                    }
+                },
+                Role = PublicationRole.ReleaseApprover,
+            };
+
+            var otherPublication = new Publication
+            {
+                Title = "Test publication 2",
+                Slug = "test-publication-2",
+                Contact = new Contact(),
+                Releases = new List<Release>
+                {
+                    new Release
+                    {
+                        ApprovalStatus = ReleaseApprovalStatus.Approved,
+                        TimePeriodCoverage = TimeIdentifier.AcademicYear,
+                        ReleaseName = "2001",
+                    },
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                await contentDbContext.AddRangeAsync(userPublicationRole1, otherPublication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var releaseRepository = BuildReleaseRepository(contentDbContext);
+                var result =
+                    await releaseRepository.ListReleasesForUser(userId,
+                        ReleaseApprovalStatus.Approved);
+
+                var resultRelease = Assert.Single(result);
+                Assert.Equal(userPublicationRole1.Publication.Releases[0].Id, resultRelease.Id);
             }
         }
 

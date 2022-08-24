@@ -1,7 +1,7 @@
 import PublicationForm, {
   FormValues,
 } from '@admin/pages/publication/components/PublicationForm';
-import { MyRelease } from '@admin/services/releaseService';
+import { Release } from '@admin/services/releaseService';
 import _themeService, { Theme } from '@admin/services/themeService';
 import _publicationService, {
   MyPublication,
@@ -87,6 +87,25 @@ describe('PublicationForm', () => {
       expect(
         screen.getByText('Enter a publication title', {
           selector: '#publicationForm-title-error',
+        }),
+      ).toBeInTheDocument();
+    });
+  });
+
+  test('shows validation error when there is no summary', async () => {
+    render(<PublicationForm onSubmit={noop} showTitleInput />);
+
+    await waitFor(() => {
+      expect(screen.getByLabelText('Publication summary')).toBeInTheDocument();
+    });
+
+    userEvent.click(screen.getByLabelText('Publication summary'));
+    userEvent.tab();
+
+    await waitFor(() => {
+      expect(
+        screen.getByText('Enter a publication summary', {
+          selector: '#publicationForm-summary-error',
         }),
       ).toBeInTheDocument();
     });
@@ -194,6 +213,11 @@ describe('PublicationForm', () => {
       'Test title',
     );
 
+    await userEvent.type(
+      screen.getByLabelText('Publication summary'),
+      'Test summary',
+    );
+
     await userEvent.type(screen.getByLabelText('Team name'), 'Test team');
     await userEvent.type(
       screen.getByLabelText('Team email address'),
@@ -212,6 +236,7 @@ describe('PublicationForm', () => {
     await waitFor(() => {
       expect(handleSubmit).toHaveBeenCalledWith({
         title: 'Test title',
+        summary: 'Test summary',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
         contactName: 'John Smith',
@@ -228,6 +253,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',
@@ -272,6 +298,7 @@ describe('PublicationForm', () => {
 
       const initialValues: FormValues = {
         title: 'Test title',
+        summary: 'Test summary',
         topicId: 'topic-4',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
@@ -308,6 +335,7 @@ describe('PublicationForm', () => {
 
       const initialValues: FormValues = {
         title: 'Test title',
+        summary: 'Test summary',
         topicId: 'topic-4',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
@@ -352,6 +380,7 @@ describe('PublicationForm', () => {
 
       const initialValues: FormValues = {
         title: 'Test title',
+        summary: 'Test summary',
         topicId: 'topic-4',
         teamName: 'Test team',
         teamEmail: 'team@test.com',
@@ -417,7 +446,7 @@ describe('PublicationForm', () => {
       ],
     };
 
-    const testRelease1: MyRelease = {
+    const testRelease1: Release = {
       amendment: false,
       approvalStatus: 'Approved',
       contact: {
@@ -440,10 +469,10 @@ describe('PublicationForm', () => {
       preReleaseAccessList: '',
       previousVersionId: 'prev-version-id-1',
       publicationId: 'publication-id-1',
-      publicationSlug: 'publication-slug-1',
       publicationTitle: 'Publication 1',
+      publicationSummary: 'Publication 1 summary',
+      publicationSlug: 'publication-slug-1',
       published: '2021-01-01T11:21:17',
-      releaseName: 'Test release name',
       slug: 'release-slug-1',
       timePeriodCoverage: {
         label: 'Academic year',
@@ -451,11 +480,14 @@ describe('PublicationForm', () => {
       },
       title: 'Release 1',
       type: 'AdHocStatistics',
+      year: 2021,
+      yearTitle: '2021/22',
     };
 
     const testPublication1: MyPublication = {
       id: 'publication-id-1',
       title: 'Publication 1',
+      summary: 'Publcation 1 summary',
       contact: {
         id: 'contact-1',
         contactName: 'John Smith',
@@ -464,7 +496,6 @@ describe('PublicationForm', () => {
         teamName: 'Team Smith',
       },
       releases: [testRelease1],
-      legacyReleases: [],
       methodologies: [],
       themeId: 'theme-1',
       topicId: 'topic-1',
@@ -500,6 +531,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',
@@ -535,6 +567,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',
@@ -576,6 +609,7 @@ describe('PublicationForm', () => {
         <PublicationForm
           initialValues={{
             title: 'Test title',
+            summary: 'Test summary',
             topicId: 'topic-4',
             teamName: 'Test team',
             teamEmail: 'team@test.com',

@@ -28,23 +28,23 @@ const PublicationTeamAccessPage = ({
 
   const { value: releases, isLoading } = useAsyncHandledRetry<ReleaseSummary[]>(
     async () => {
-      const fetchedReleases = await publicationService.getReleases(
-        publicationId,
-      );
-      if (!releaseId && fetchedReleases.length) {
-        setCurrentReleaseId(fetchedReleases[0].id);
+      const { results } = await publicationService.listReleases(publicationId);
+
+      if (!releaseId && results.length) {
+        setCurrentReleaseId(results[0].id);
+
         history.replace(
           generatePath<PublicationTeamRouteParams>(
             publicationTeamAccessRoute.path,
             {
               publicationId,
-              releaseId: fetchedReleases[0].id,
+              releaseId: results[0].id,
             },
           ),
         );
       }
 
-      return fetchedReleases;
+      return results;
     },
   );
 

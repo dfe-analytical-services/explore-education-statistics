@@ -5,7 +5,6 @@ export interface LegacyRelease {
   description: string;
   url: string;
   order: number;
-  publicationId: string;
 }
 
 export interface CreateLegacyRelease {
@@ -21,6 +20,9 @@ export interface UpdateLegacyRelease extends CreateLegacyRelease {
 const legacyReleaseService = {
   getLegacyRelease(id: string): Promise<LegacyRelease> {
     return client.get(`/legacy-releases/${id}`);
+  },
+  listLegacyReleases(publicationId: string): Promise<LegacyRelease[]> {
+    return client.get(`/publications/${publicationId}/legacy-releases`);
   },
   createLegacyRelease(data: CreateLegacyRelease): Promise<LegacyRelease> {
     return client.post('/legacy-releases', data);

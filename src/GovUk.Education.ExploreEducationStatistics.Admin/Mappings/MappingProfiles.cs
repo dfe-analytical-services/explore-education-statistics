@@ -32,6 +32,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(r => r.Publication.Contact))
                 .ForMember(dest => dest.PublicationTitle,
                     m => m.MapFrom(r => r.Publication.Title))
+                .ForMember(dest => dest.PublicationSummary,
+                    m => m.MapFrom(r => r.Publication.Summary))
                 .ForMember(dest => dest.PublicationId,
                     m => m.MapFrom(r => r.Publication.Id))
                 .ForMember(dest => dest.PublicationSlug,
@@ -40,30 +42,20 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
                             ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?) null));
+                            : (DateTime?)null));
 
-            CreateMap<Release, MyReleaseViewModel>()
-                .ForMember(
-                    dest => dest.LatestRelease,
-                    m => m.MapFrom(r => r.Publication.LatestPublishedRelease().Id == r.Id))
-                .ForMember(dest => dest.Contact,
-                    m => m.MapFrom(r => r.Publication.Contact))
-                .ForMember(dest => dest.PublicationTitle,
-                    m => m.MapFrom(r => r.Publication.Title))
-                .ForMember(dest => dest.PublicationId,
-                    m => m.MapFrom(r => r.Publication.Id))
-                .ForMember(dest => dest.PublicationSlug,
-                    m => m.MapFrom(r => r.Publication.Slug))
+            CreateMap<ReleaseCreateRequest, Release>()
+                .ForMember(dest => dest.PublishScheduled,
+                    m => m.MapFrom(model => model.PublishScheduledDate))
+                .ForMember(dest => dest.ReleaseName,
+                    m => m.MapFrom(r => r.Year.ToString()));
+
+            CreateMap<Release, ReleaseSummaryViewModel>()
                 .ForMember(model => model.PublishScheduled,
                     m => m.MapFrom(model =>
                         model.PublishScheduled.HasValue
                             ? model.PublishScheduled.Value.ConvertUtcToUkTimeZone()
-                            : (DateTime?) null))
-                .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyReleasePermissionsResolver>());
-
-            CreateMap<ReleaseCreateViewModel, Release>()
-                .ForMember(dest => dest.PublishScheduled, m => m.MapFrom(model =>
-                    model.PublishScheduledDate));
+                            : (DateTime?)null));
 
             CreateMap<ReleasePublishingStatus, ReleasePublishingStatusViewModel>()
                 .ForMember(model => model.LastUpdated, m => m.MapFrom(status => status.Timestamp));
@@ -82,11 +74,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                 .ForMember(dest => dest.Releases,
                     m => m.MapFrom(p => p.Releases
                         .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))))
-                .ForMember(
-                    dest => dest.LegacyReleases,
-                    m =>
-                        m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order).ToList())
-                )
                 .ForMember(dest => dest.Methodologies, m => m.MapFrom(p =>
                     p.Methodologies
                         .Select(methodologyLink => methodologyLink.Methodology.LatestVersion())
@@ -114,10 +101,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Mappings
                         .FindAll(r => IsLatestVersionOfRelease(p.Releases, r.Id))
                         .OrderByDescending(r => r.Year)
                         .ThenByDescending(r => r.TimePeriodCoverage)))
-                .ForMember(
-                    dest => dest.LegacyReleases,
-                    m => m.MapFrom(p => p.LegacyReleases.OrderByDescending(r => r.Order))
-                )
                 .ForMember(dest => dest.Permissions, exp => exp.MapFrom<IMyPublicationPermissionsResolver>())
                 .AfterMap((publication, model) => model.Methodologies = model.Methodologies.OrderBy(m => m.Methodology.Title).ToList());
 

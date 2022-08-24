@@ -14,9 +14,9 @@ export const testContact: PublicationContactDetails = {
 export const testPublication: MyPublication = {
   id: 'publication-1',
   title: 'Publication 1',
+  summary: 'Publication 1 summary',
   contact: testContact,
   releases: [],
-  legacyReleases: [],
   methodologies: [],
   themeId: 'theme-1',
   topicId: 'theme-1-topic-2',

@@ -105,9 +105,9 @@ const externalMethodology: ExternalMethodology = {
 const testPublicationNoMethodology: MyPublication = {
   id: 'publication-3',
   title: 'Publication 3',
+  summary: 'Publication 3 summary',
   contact: testContact,
   releases: [],
-  legacyReleases: [],
   methodologies: [],
   themeId: 'theme-1',
   topicId: 'topic-1',
@@ -905,6 +905,7 @@ describe('MethodologySummary', () => {
 
       const updatedPublication: UpdatePublicationRequest = {
         title: testPublicationWithExternalMethodology.title,
+        summary: testPublicationWithExternalMethodology.summary,
         contact: testContact,
         topicId: testTopicId,
       };

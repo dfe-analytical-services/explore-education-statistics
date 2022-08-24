@@ -1,6 +1,6 @@
 import { testContact } from '@admin/pages/publication/__data__/testPublication';
+import { testReleaseSummaries } from '@admin/pages/publication/__data__/testReleases';
 import { BasicPublicationDetails } from '@admin/services/publicationService';
-import { ReleaseSummary } from '@admin/services/releaseService';
 import userService from '@admin/services/userService';
 import PublicationInviteNewUsersForm from '@admin/pages/publication/components/PublicationInviteNewUsersForm';
 import userEvent from '@testing-library/user-event';
@@ -13,68 +13,20 @@ const publication: BasicPublicationDetails = {
   contact: testContact,
   id: 'publication-id',
   title: 'Publication title',
+  summary: 'Publication summary',
   slug: 'publication-slug',
-  legacyReleases: [],
   themeId: 'theme-id',
   topicId: 'topic-id',
 };
 
 const currentReleaseId = 'release-1-id';
 
-const releases: ReleaseSummary[] = [
-  {
-    id: 'release1-id',
-    timePeriodCoverage: {
-      value: 'AY',
-      label: 'Academic Year',
-    },
-    title: 'Academic Year 2000/01',
-    releaseName: '2000',
-    type: 'AdHocStatistics',
-    publishScheduled: '2001-01-01',
-    latestInternalReleaseNote: 'release1-release-note',
-    approvalStatus: 'Draft',
-    yearTitle: '2000/01',
-    live: false,
-  },
-  {
-    id: 'release2-id',
-    timePeriodCoverage: {
-      value: 'AY',
-      label: 'Academic Year',
-    },
-    title: 'Academic Year 2001/02',
-    releaseName: '2001',
-    type: 'AdHocStatistics',
-    publishScheduled: '2002-01-01',
-    latestInternalReleaseNote: 'release2-release-note',
-    approvalStatus: 'Draft',
-    yearTitle: '2001/02',
-    live: false,
-  },
-  {
-    id: 'release3-id',
-    timePeriodCoverage: {
-      value: 'AY',
-      label: 'Academic Year',
-    },
-    title: 'Academic Year 2002/03',
-    releaseName: '2002',
-    type: 'AdHocStatistics',
-    publishScheduled: '2003-01-01',
-    latestInternalReleaseNote: 'release3-release-note',
-    approvalStatus: 'Draft',
-    yearTitle: '2002/03',
-    live: false,
-  },
-];
-
 describe('PublicationInviteNewUsersForm', () => {
   test('submits correct request', async () => {
     render(
       <PublicationInviteNewUsersForm
         publication={publication}
-        releases={releases}
+        releases={testReleaseSummaries}
         releaseId={currentReleaseId}
       />,
     );
@@ -136,7 +88,7 @@ describe('PublicationInviteNewUsersForm', () => {
     render(
       <PublicationInviteNewUsersForm
         publication={publication}
-        releases={releases}
+        releases={testReleaseSummaries}
         releaseId={currentReleaseId}
       />,
     );
@@ -165,7 +117,7 @@ describe('PublicationInviteNewUsersForm', () => {
     render(
       <PublicationInviteNewUsersForm
         publication={publication}
-        releases={releases}
+        releases={testReleaseSummaries}
         releaseId={currentReleaseId}
       />,
     );

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Admin.Services.Util;
 using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
@@ -93,12 +94,12 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         public async Task<Either<ActionResult, ReleaseViewModel>> GetRelease(Guid id)
         {
             return await _persistenceHelper
-                .CheckEntityExists<Release>(id, HydrateReleaseForReleaseViewModel)
+                .CheckEntityExists<Release>(id, HydrateRelease)
                 .OnSuccess(_userService.CheckCanViewRelease)
                 .OnSuccess(release => _mapper.Map<ReleaseViewModel>(release));
         }
 
-        public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateViewModel releaseCreate)
+        public async Task<Either<ActionResult, ReleaseViewModel>> CreateRelease(ReleaseCreateRequest releaseCreate)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Publication>(releaseCreate.PublicationId)
@@ -308,7 +309,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         }
 
         public async Task<Either<ActionResult, ReleaseViewModel>> UpdateRelease(
-            Guid releaseId, ReleaseUpdateViewModel request)
+            Guid releaseId, ReleaseUpdateRequest request)
         {
             return await _persistenceHelper
                 .CheckEntityExists<Release>(releaseId, ReleaseChecklistService.HydrateReleaseForChecklist)
@@ -318,7 +319,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 {
                     release.Slug = request.Slug;
                     release.Type = request.Type;
-                    release.ReleaseName = request.ReleaseName;
+                    release.ReleaseName = request.Year.ToString();
                     release.TimePeriodCoverage = request.TimePeriodCoverage;
                     release.PreReleaseAccessList = request.PreReleaseAccessList;
 
@@ -345,7 +346,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                 });
         }
 
-        public async Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyReleasesForReleaseStatusesAsync(
+        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListReleasesWithStatuses(
             params ReleaseApprovalStatus[] releaseApprovalStatuses)
         {
             return await _userService
@@ -358,10 +359,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                         .OrElse(() =>
                             _repository.ListReleasesForUser(_userService.GetUserId(),
                                 releaseApprovalStatuses));
+                })
+                .OnSuccess(releases =>
+                {
+                    return releases.Select(release =>
+                    {
+                        var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                        releaseViewModel.Permissions = PermissionsUtils.GetReleasePermissions(_userService, release);
+                        return releaseViewModel;
+                    }).ToList();
                 });
         }
 
-        public async Task<Either<ActionResult, List<MyReleaseViewModel>>> GetMyScheduledReleasesAsync()
+        public async Task<Either<ActionResult, List<ReleaseViewModel>>> ListScheduledReleases()
         {
             return await _userService
                 .CheckCanAccessSystem()
@@ -374,8 +384,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
                             _repository.ListReleasesForUser(_userService.GetUserId(),
                                 ReleaseApprovalStatus.Approved));
                 })
-                .OnSuccess(approvedReleases =>
+                .OnSuccess(releases =>
                 {
+                    var approvedReleases = releases.Select(release =>
+                    {
+                        var releaseViewModel = _mapper.Map<ReleaseViewModel>(release);
+                        releaseViewModel.Permissions = PermissionsUtils.GetReleasePermissions(_userService, release);
+                        return releaseViewModel;
+                    }).ToList();
+
                     return approvedReleases
                         .Where(release => !release.Live)
                         .ToList();
@@ -514,7 +531,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             return Unit.Instance;
         }
 
-        public static IQueryable<Release> HydrateReleaseForReleaseViewModel(IQueryable<Release> values)
+        public static IQueryable<Release> HydrateRelease(IQueryable<Release> values)
         {
             // Require publication / release / contact graph to be able to work out:
             // If the release is the latest

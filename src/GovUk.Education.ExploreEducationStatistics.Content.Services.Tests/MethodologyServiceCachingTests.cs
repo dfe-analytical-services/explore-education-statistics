@@ -23,8 +23,8 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests;
  
-[Collection(BlobCacheServiceTests)]
-public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
+[Collection(CacheServiceTests)]
+public class MethodologyServiceCachingTests : CacheServiceTestFixture
 {
     [Fact]
     public async Task GetCachedSummariesByPublication_NoCachedTreeExists()
@@ -68,7 +68,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
             await contentDbContext.SaveChangesAsync();
         }
         
-        CacheService
+        BlobCacheService
             .Setup(s => s.GetItem(
                 It.IsAny<AllMethodologiesCacheKey>(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(null);
@@ -79,7 +79,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
             .Setup(mock => mock.GetLatestPublishedVersionByPublication(publication.Id))
             .ReturnsAsync(publicationLatestVersions);
         
-        CacheService
+        BlobCacheService
             .Setup(s => s.SetItem<object>(
                 It.IsAny<AllMethodologiesCacheKey>(), It.IsAny<List<AllMethodologiesThemeViewModel>>()))
             .Returns(Task.CompletedTask);
@@ -91,7 +91,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
 
             var result = (await service.GetCachedSummariesByPublication(publication.Id)).AssertRight();
 
-            VerifyAllMocks(methodologyVersionRepository, CacheService);
+            VerifyAllMocks(methodologyVersionRepository, BlobCacheService);
 
             var methodologySummary = Assert.Single(result);
 
@@ -204,7 +204,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
             await contentDbContext.SaveChangesAsync();
         }
 
-        CacheService
+        BlobCacheService
             .Setup(s => s.GetItem(
                 It.IsAny<AllMethodologiesCacheKey>(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(cachedResult);
@@ -215,7 +215,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
 
             var result = await service.GetCachedSummariesByPublication(publicationId);
 
-            VerifyAllMocks(CacheService);
+            VerifyAllMocks(BlobCacheService);
 
             // Assert that the list of Methodologies for "Publication 2" are picked from the cached result.
             result.AssertRight(cachedResult[0].Topics[0].Publications[1].Methodologies);
@@ -266,7 +266,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
             await contentDbContext.SaveChangesAsync();
         }
 
-        CacheService
+        BlobCacheService
             .Setup(s => s.GetItem(
                 It.IsAny<AllMethodologiesCacheKey>(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(cachedResult);
@@ -277,7 +277,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
 
             var result = await service.GetCachedSummariesByPublication(publicationId);
 
-            VerifyAllMocks(CacheService);
+            VerifyAllMocks(BlobCacheService);
 
             // Assert that we get an empty list of Methodology Summaries back, as there was no matching
             // Publication in the cached Theme Tree.
@@ -358,7 +358,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
             await contentDbContext.SaveChangesAsync();
         }
         
-        CacheService
+        BlobCacheService
             .Setup(s => s.GetItem(
                 It.IsAny<AllMethodologiesCacheKey>(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(null);
@@ -370,7 +370,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
 
         var capturedCachedResults = new List<List<AllMethodologiesThemeViewModel>>();
         
-        CacheService
+        BlobCacheService
             .Setup(s => s.SetItem<object>(
                 It.IsAny<AllMethodologiesCacheKey>(), Capture.In(capturedCachedResults)))
             .Returns(Task.CompletedTask);
@@ -381,7 +381,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
                 methodologyVersionRepository: methodologyVersionRepository.Object);
 
             var result = await service.GetCachedSummariesTree();
-            VerifyAllMocks(CacheService, methodologyVersionRepository);
+            VerifyAllMocks(BlobCacheService, methodologyVersionRepository);
 
             // Assert that the CacheService.SetItem() result was captured successfully.
             var capturedCachedResult = Assert.Single(capturedCachedResults);
@@ -451,7 +451,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
         
         await using var contentDbContext = InMemoryContentDbContext();
 
-        CacheService
+        BlobCacheService
             .Setup(s => s.GetItem(
                 It.IsAny<AllMethodologiesCacheKey>(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(cachedResult);
@@ -459,7 +459,7 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
         var service = SetupMethodologyService(contentDbContext);
 
         var result = await service.GetCachedSummariesTree();
-        VerifyAllMocks(CacheService);
+        VerifyAllMocks(BlobCacheService);
 
         result.AssertRight(cachedResult);
     }
@@ -483,14 +483,14 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
             await contentDbContext.SaveChangesAsync();
         }
         
-        CacheService
+        BlobCacheService
             .Setup(s => s.GetItem(
                 It.IsAny<AllMethodologiesCacheKey>(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(null);
 
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-        CacheService
+        BlobCacheService
             .Setup(s => s.SetItem<object>(
                 It.IsAny<AllMethodologiesCacheKey>(), It.IsAny<List<AllMethodologiesThemeViewModel>>()))
             .Returns(Task.CompletedTask);
@@ -533,14 +533,14 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
             await contentDbContext.SaveChangesAsync();
         }
         
-        CacheService
+        BlobCacheService
             .Setup(s => s.GetItem(
                 It.IsAny<AllMethodologiesCacheKey>(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(null);
 
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-        CacheService
+        BlobCacheService
             .Setup(s => s.SetItem<object>(
                 It.IsAny<AllMethodologiesCacheKey>(), It.IsAny<List<AllMethodologiesThemeViewModel>>()))
             .Returns(Task.CompletedTask);
@@ -600,14 +600,14 @@ public class MethodologyServiceCachingTests : BlobCacheServiceTestFixture
             await contentDbContext.SaveChangesAsync();
         }
         
-        CacheService
+        BlobCacheService
             .Setup(s => s.GetItem(
                 It.IsAny<AllMethodologiesCacheKey>(), typeof(List<AllMethodologiesThemeViewModel>)))
             .ReturnsAsync(null);
 
         var methodologyVersionRepository = new Mock<IMethodologyVersionRepository>(MockBehavior.Strict);
 
-        CacheService
+        BlobCacheService
             .Setup(s => s.SetItem<object>(
                 It.IsAny<AllMethodologiesCacheKey>(), It.IsAny<List<AllMethodologiesThemeViewModel>>()))
             .Returns(Task.CompletedTask);

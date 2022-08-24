@@ -164,6 +164,8 @@ assert os.getenv('WAIT_LONG') is not None
 assert os.getenv('WAIT_SMALL') is not None
 assert os.getenv('FAIL_TEST_SUITES_FAST') is not None
 assert os.getenv('IDENTITY_PROVIDER') is not None
+assert os.getenv('WAIT_MEMORY_CACHE_EXPIRY') is not None
+
 
 if args.slack_webhook_url:
     os.environ['SLACK_WEBHOOK_URL'] = args.slack_webhook_url

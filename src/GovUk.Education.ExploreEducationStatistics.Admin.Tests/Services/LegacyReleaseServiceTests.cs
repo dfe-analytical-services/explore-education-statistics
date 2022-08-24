@@ -1,3 +1,4 @@
+#nullable enable
 using System.Collections.Generic;
 using System;
 using System.Linq;
@@ -8,6 +9,7 @@ using GovUk.Education.ExploreEducationStatistics.Admin.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Common.Cache;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.Security;
+using GovUk.Education.ExploreEducationStatistics.Common.Tests.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
@@ -16,6 +18,7 @@ using Xunit;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.DbUtils;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services.MapperUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Tests.Utils.MockUtils;
+using static Moq.MockBehavior;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 {
@@ -34,7 +37,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                     Id = publicationId,
                     LegacyReleases = new List<LegacyRelease>
                         {
-                            new LegacyRelease
+                            new()
                             {
                                 Id = id,
                                 Description = "Test description",
@@ -44,7 +47,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                         }
                 });
 
-                context.SaveChanges();
+                await context.SaveChangesAsync();
 
                 var legacyReleaseService = BuildLegacyReleaseService(context);
 
@@ -54,7 +57,65 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test description", result.Right.Description);
                 Assert.Equal("http://test.com", result.Right.Url);
                 Assert.Equal(1, result.Right.Order);
-                Assert.Equal(publicationId, result.Right.PublicationId);
+            }
+        }
+
+        [Fact]
+        public async Task ListLegacyReleases()
+        {
+            var publication = new Publication
+            {
+                LegacyReleases = new List<LegacyRelease>
+                {
+                    new()
+                    {
+                        Description = "Release 1",
+                        Url = "https://test-1.com",
+                        Order = 1
+                    },
+                    new()
+                    {
+                        Description = "Release 3",
+                        Url = "https://test-3.com",
+                        Order = 3
+                    },
+                    new()
+                    {
+                        Description = "Release 2",
+                        Url = "https://test-2.com",
+                        Order = 2
+                    }
+                }
+            };
+
+            var contentDbContextId = Guid.NewGuid().ToString();
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                contentDbContext.Publications.Add(publication);
+                await contentDbContext.SaveChangesAsync();
+            }
+
+            await using (var contentDbContext = InMemoryApplicationDbContext(contentDbContextId))
+            {
+                var service = BuildLegacyReleaseService(contentDbContext);
+
+                var result = await service.ListLegacyReleases(publication.Id);
+                var viewModels = result.AssertRight();
+
+                Assert.Equal(3, viewModels.Count);
+
+                Assert.Equal("Release 3", viewModels[0].Description);
+                Assert.Equal("https://test-3.com", viewModels[0].Url);
+                Assert.Equal(3, viewModels[0].Order);
+
+                Assert.Equal("Release 2", viewModels[1].Description);
+                Assert.Equal("https://test-2.com", viewModels[1].Url);
+                Assert.Equal(2, viewModels[1].Order);
+
+                Assert.Equal("Release 1", viewModels[2].Description);
+                Assert.Equal("https://test-1.com", viewModels[2].Url);
+                Assert.Equal(1, viewModels[2].Order);
             }
         }
 
@@ -72,7 +133,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
 
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
                     .Returns(Task.CompletedTask);
@@ -96,7 +157,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Test description", result.Right.Description);
                 Assert.Equal("http://test.com", result.Right.Url);
                 Assert.Equal(1, result.Right.Order);
-                Assert.Equal(publicationId, result.Right.PublicationId);
 
                 var savedLegacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 
@@ -132,7 +192,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
 
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
                     .Returns(Task.CompletedTask);
@@ -186,7 +246,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
 
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
                     .Returns(Task.CompletedTask);
@@ -211,7 +271,6 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 Assert.Equal("Updated test description", result.Right.Description);
                 Assert.Equal("http://updated-test.com", result.Right.Url);
                 Assert.Equal(1, result.Right.Order);
-                Assert.Equal(publicationId, result.Right.PublicationId);
 
                 var savedLegacyRelease = context.LegacyReleases.Single(release => release.Id == result.Right.Id);
 
@@ -259,7 +318,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
 
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
                     .Returns(Task.CompletedTask);
@@ -337,7 +396,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
 
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
                     .Returns(Task.CompletedTask);
@@ -400,7 +459,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
 
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
                     .Returns(Task.CompletedTask);
@@ -461,7 +520,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
                 context.SaveChanges();
 
-                var publicBlobCacheService = new Mock<IBlobCacheService>(MockBehavior.Strict);
+                var publicBlobCacheService = new Mock<IBlobCacheService>(Strict);
 
                 publicBlobCacheService.Setup(mock => mock.DeleteItem(It.IsAny<PublicationCacheKey>()))
                     .Returns(Task.CompletedTask);
@@ -496,16 +555,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
 
         private LegacyReleaseService BuildLegacyReleaseService(
             ContentDbContext context,
-            IMapper mapper = null,
-            IUserService userService = null,
-            IBlobCacheService publicBlobCacheService = null)
+            IMapper? mapper = null,
+            IUserService? userService = null,
+            IBlobCacheService? publicBlobCacheService = null)
         {
                 return new LegacyReleaseService(
                     context,
                     mapper ?? AdminMapper(),
                     userService ?? AlwaysTrueUserService().Object,
                     new PersistenceHelper<ContentDbContext>(context),
-                    publicBlobCacheService ?? Mock.Of<IBlobCacheService>()
+                    publicBlobCacheService ?? Mock.Of<IBlobCacheService>(Strict)
                 );
         }
     }

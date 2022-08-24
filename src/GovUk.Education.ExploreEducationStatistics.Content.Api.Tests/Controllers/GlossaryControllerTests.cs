@@ -16,8 +16,8 @@ using static Newtonsoft.Json.JsonConvert;
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controllers
 {
-    [Collection(BlobCacheServiceTests)]
-    public class GlossaryControllerTests : BlobCacheServiceTestFixture {
+    [Collection(CacheServiceTests)]
+    public class GlossaryControllerTests : CacheServiceTestFixture {
 
         [Fact]
         public async Task GetAllGlossaryEntries()
@@ -115,7 +115,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Tests.Controlle
         {
             var glossaryService = new Mock<IGlossaryService>(Strict);
             var controller = new GlossaryController(glossaryService.Object);
-            return (controller, (glossaryService, CacheService));
+            return (controller, (glossaryService, BlobCacheService));
         }
     }
 }

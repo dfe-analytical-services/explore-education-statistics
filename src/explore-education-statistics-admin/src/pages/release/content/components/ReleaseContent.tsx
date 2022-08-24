@@ -394,6 +394,7 @@ const ReleaseContent = () => {
                     block={block}
                     publicationId={release.publication.id}
                     releaseId={release.id}
+                    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                     sectionId={release.relatedDashboardsSection!.id}
                     sectionKey="relatedDashboardsSection"
                   />

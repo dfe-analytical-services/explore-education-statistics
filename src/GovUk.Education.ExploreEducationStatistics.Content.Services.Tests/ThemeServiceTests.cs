@@ -17,17 +17,17 @@ using static GovUk.Education.ExploreEducationStatistics.Content.Model.Tests.Util
 
 namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Tests
 {
-    [Collection(BlobCacheServiceTests)]
-    public class ThemeServiceTests : BlobCacheServiceTestFixture
+    [Collection(CacheServiceTests)]
+    public class ThemeServiceTests : CacheServiceTestFixture
     {
         public ThemeServiceTests()
         {
-            CacheService
+            BlobCacheService
                 .Setup(s => s.GetItem(
                     It.IsAny<PublicationTreeCacheKey>(), typeof(IList<ThemeTree<PublicationTreeNode>>)))
                 .ReturnsAsync(null);
 
-            CacheService
+            BlobCacheService
                 .Setup(s => s.SetItem<object>(
                     It.IsAny<PublicationTreeCacheKey>(), It.IsAny<List<ThemeTree<PublicationTreeNode>>>()))
                 .Returns(Task.CompletedTask);

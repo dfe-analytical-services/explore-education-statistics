@@ -73,6 +73,11 @@ const KeyStat = ({
               <Details
                 summary={summary?.dataDefinitionTitle[0] || 'Help'}
                 className={styles.definition}
+                visuallyHiddenText={
+                  !summary?.dataDefinitionTitle[0]
+                    ? `for ${keyStat.title}`
+                    : undefined
+                }
               >
                 <div data-testid={`${testId}-definition`}>
                   {summary.dataDefinition.map(data => (

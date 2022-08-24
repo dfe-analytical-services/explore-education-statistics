@@ -554,6 +554,41 @@
         "description": "Whether or not this environment's Admin API has refresh tokens expiring at a fixed date or in a within a sliding window that extends with each use of a refresh token"
       }
     },
+    "memoryCacheEnabled": {
+      "type": "bool",
+      "defaultValue": true,
+      "metadata": {
+        "description": "Whether or not short-lived in-memory caching of specific responses is enabled"
+      }
+    },
+    "memoryCacheMaxCacheSizeMb": {
+      "type": "int",
+      "defaultValue": 50,
+      "metadata": {
+        "description": "Max size of in-memory cache in MBs.  This is an approximation based on the size of the cached objects in JSON notation."
+      }
+    },
+    "memoryCacheExpirationScanFrequencySeconds": {
+      "type": "int",
+      "defaultValue": 50,
+      "metadata": {
+        "description": "The frequency of scans to evict expired entries from the in-memory cache."
+      }
+    },
+    "memoryCacheOverridesDurationInSeconds": {
+      "type": "int",
+      "defaultValue": -1,
+      "metadata": {
+        "description": "Override duration in seconds for all entities cached in memory"
+      }
+    },
+    "memoryCacheOverridesExpirySchedule": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Override cron expression for all entities cached in memory"
+      }
+    },
     "requestTimeoutsTableBuilderQuery": {
       "type": "int",
       "defaultValue": 210000,
@@ -1769,6 +1804,11 @@
         "OpenIdConnectSpaClient:AllowOfflineAccess": "[parameters('openIdConnectSpaClientAllowOfflineAccess')]",
         "OpenIdConnectSpaClient:RefreshTokenUsage": "[parameters('openIdConnectSpaClientRefreshTokenUsage')]",
         "OpenIdConnectSpaClient:RefreshTokenExpiration": "[parameters('openIdConnectSpaClientRefreshTokenExpiration')]",
+        "MemoryCache:Enabled": "[parameters('memoryCacheEnabled')]",
+        "MemoryCache:MaxCacheSizeMb": "[parameters('memoryCacheMaxCacheSizeMb')]",
+        "MemoryCache:ExpirationScanFrequencySeconds": "[parameters('memoryCacheExpirationScanFrequencySeconds')]",
+        "MemoryCache:Overrides:DurationInSeconds": "[parameters('memoryCacheOverridesDurationInSeconds')]",
+        "MemoryCache:Overrides:ExpirySchedule": "[parameters('memoryCacheOverridesExpirySchedule')]",
         "CoreStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-core'), '2018-02-14').secretUriWithVersion, ')')]",
         "PublicStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-public')).secretUriWithVersion, ')')]",
         "PublisherStorage": "[concat('@Microsoft.KeyVault(SecretUri=', reference(variables('ees-storage-publisher'), '2018-02-14').secretUriWithVersion, ')')]",

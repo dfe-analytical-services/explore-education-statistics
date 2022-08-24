@@ -64,7 +64,7 @@ const ReleaseCreatePage = ({
       timePeriodCoverage: {
         value: values.timePeriodCoverageCode,
       },
-      releaseName: values.timePeriodCoverageStartYear,
+      year: Number(values.timePeriodCoverageStartYear),
       type: values.releaseType ?? 'AdHocStatistics',
       publicationId,
       templateReleaseId:

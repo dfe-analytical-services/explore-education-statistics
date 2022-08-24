@@ -27,9 +27,13 @@ const MethodologySectionBlocks = ({ blocks, methodologyId }: Props) => {
           block={block}
           transformImageAttributes={transformImageAttributes}
           getGlossaryEntry={glossaryService.getEntry}
-          trackContentLinks={url =>
-            logOutboundLink(`Methodology page content link: ${url}`, url)
-          }
+          trackContentLinks={(url, newTab) => {
+            logOutboundLink(
+              `Methodology page content link: ${url}`,
+              url,
+              newTab,
+            );
+          }}
           trackGlossaryLinks={glossaryEntrySlug =>
             logEvent({
               category: `Methodology Page Content Glossary Link`,
