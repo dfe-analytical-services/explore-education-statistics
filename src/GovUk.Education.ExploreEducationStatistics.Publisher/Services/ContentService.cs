@@ -10,8 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Models;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Newtonsoft.Json;
@@ -19,8 +18,6 @@ using Newtonsoft.Json.Serialization;
 using static GovUk.Education.ExploreEducationStatistics.Common.BlobContainers;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.FileStoragePathUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces.IBlobStorageService;
-using IPublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IPublicationService;
-using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IReleaseService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 {
@@ -31,8 +28,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
         private readonly IBlobStorageService _publicBlobStorageService;
         private readonly IReleaseService _releaseService;
         private readonly IPublicationService _publicationService;
-        private readonly IContentCacheService _contentCacheService;
-        private readonly IThemeService _themeService;
+        private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IPublicationCacheService _publicationCacheService;
 
         private readonly JsonSerializerSettings _jsonSerializerSettingsCamelCase =
             GetJsonSerializerSettings(new CamelCaseNamingStrategy());
@@ -43,16 +40,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
             IBlobStorageService publicBlobStorageService,
             IReleaseService releaseService,
             IPublicationService publicationService,
-            IContentCacheService contentCacheService,
-            IThemeService themeService)
+            IMethodologyCacheService methodologyCacheService,
+            IPublicationCacheService publicationCacheService)
         {
             _privateBlobCacheService = privateBlobCacheService;
             _publicBlobCacheService = publicBlobCacheService;
             _publicBlobStorageService = publicBlobStorageService;
             _releaseService = releaseService;
             _publicationService = publicationService;
-            _contentCacheService = contentCacheService;
-            _themeService = themeService;
+            _methodologyCacheService = methodologyCacheService;
+            _publicationCacheService = publicationCacheService;
         }
 
         public async Task DeletePreviousVersionsContent(params Guid[] releaseIds)
@@ -151,8 +148,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher.Services
 
         public async Task UpdateCachedTaxonomyBlobs()
         {
-            await _contentCacheService.UpdateMethodologyTree();
-            await _contentCacheService.UpdatePublicationTree();
+            await _methodologyCacheService.UpdateMethodologyTree();
+            await _publicationCacheService.UpdatePublicationTree();
         }
 
         private async Task CacheLatestRelease(Publication publication, PublishContext context, params Guid[] includedReleaseIds)

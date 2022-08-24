@@ -1,0 +1,56 @@
+﻿#nullable enable
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using GovUk.Education.ExploreEducationStatistics.Common.Cache;
+using GovUk.Education.ExploreEducationStatistics.Common.Model;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
+
+public class MethodologyCacheService : IMethodologyCacheService
+{
+    private readonly IMethodologyService _methodologyService;
+    private readonly IThemeService _themeService;
+    private readonly ILogger<MethodologyCacheService> _logger;
+
+    public MethodologyCacheService(
+        IMethodologyService methodologyService, 
+        IThemeService themeService, 
+        ILogger<MethodologyCacheService> logger)
+    {
+        _methodologyService = methodologyService;
+        _themeService = themeService;
+        _logger = logger;
+    }
+
+    [BlobCache(typeof(AllMethodologiesCacheKey))]
+    public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetMethodologyTree()
+    {
+        return _methodologyService.GenerateSummariesTree();
+    }
+
+    [BlobCache(typeof(AllMethodologiesCacheKey), updateOnly: true)]
+    public Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> UpdateMethodologyTree()
+    {
+        _logger.LogInformation("Updating cached Methodology Tree");
+        return _methodologyService.GenerateSummariesTree();
+    }
+    
+    public Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetMethodologiesByPublication(Guid publicationId)
+    {
+        return GetMethodologyTree()
+            .OnSuccess(methodologiesByTheme => 
+                methodologiesByTheme
+                    .SelectMany(theme => theme.Topics)
+                    .SelectMany(topic => topic.Publications)
+                    .SingleOrDefault(publication => publication.Id == publicationId))
+            .OnSuccess(matchingPublication => matchingPublication?.Methodologies ?? new List<MethodologyVersionSummaryViewModel>());
+    }
+}

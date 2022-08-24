@@ -11,7 +11,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository.Interfaces;
@@ -20,11 +22,12 @@ using GovUk.Education.ExploreEducationStatistics.Publisher.Services;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Azure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
+using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
+using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 using FileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.FileStorageService;
 using IFileStorageService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IFileStorageService;
 using IMethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.Interfaces.IMethodologyService;
@@ -33,8 +36,6 @@ using IReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Ser
 using MethodologyService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.MethodologyService;
 using PublicationService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.PublicationService;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Publisher.Services.ReleaseService;
-using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
-using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
 
 [assembly: FunctionsStartup(typeof(Startup))]
 
@@ -63,7 +64,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                     return publicBlobCacheService;
                 })
                 .AddScoped<IContentMethodologyService, ContentMethodologyService>()
-                .AddScoped<IContentCacheService, ContentCacheService>()
+                .AddScoped<IMethodologyCacheService, MethodologyCacheService>()
+                .AddScoped<IPublicationCacheService, PublicationCacheService>()
                 .AddScoped<IThemeService, ThemeService>()
                 .AddScoped<IPublishingService, PublishingService>(provider =>
                     new PublishingService(
@@ -83,8 +85,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Publisher
                         publicBlobCacheService: GetBlobCacheService(provider, "PublicStorage"),
                         releaseService: provider.GetRequiredService<IReleaseService>(),
                         publicationService: provider.GetRequiredService<IPublicationService>(),
-                        contentCacheService: provider.GetRequiredService<IContentCacheService>(),
-                        themeService: provider.GetRequiredService<IThemeService>()))
+                        methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
+                        publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()))
                 .AddScoped<IReleaseService, ReleaseService>(provider =>
                     new ReleaseService(
                         contentDbContext: provider.GetRequiredService<ContentDbContext>(),

@@ -17,13 +17,12 @@ using GovUk.Education.ExploreEducationStatistics.Common.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationErrorMessages;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Validators.ValidationUtils;
-using IPublicationService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IPublicationService;
 using LegacyReleaseViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.LegacyReleaseViewModel;
 using PublicationViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.PublicationViewModel;
 using ReleaseSummaryViewModel = GovUk.Education.ExploreEducationStatistics.Admin.ViewModels.ReleaseSummaryViewModel;
@@ -39,7 +38,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
         private readonly IPublicationRepository _publicationRepository;
         private readonly IMethodologyVersionRepository _methodologyVersionRepository;
         private readonly IBlobCacheService _publicBlobCacheService;
-        private readonly IContentCacheService _contentCacheService;
+        private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IPublicationCacheService _publicationCacheService;
 
         public PublicationService(
             ContentDbContext context,
@@ -49,7 +49,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             IPublicationRepository publicationRepository,
             IMethodologyVersionRepository methodologyVersionRepository,
             IBlobCacheService publicBlobCacheService, 
-            IContentCacheService contentCacheService)
+            IMethodologyCacheService methodologyCacheService, 
+            IPublicationCacheService publicationCacheService)
         {
             _context = context;
             _mapper = mapper;
@@ -58,7 +59,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
             _publicationRepository = publicationRepository;
             _methodologyVersionRepository = methodologyVersionRepository;
             _publicBlobCacheService = publicBlobCacheService;
-            _contentCacheService = contentCacheService;
+            _methodologyCacheService = methodologyCacheService;
+            _publicationCacheService = publicationCacheService;
         }
 
         public async Task<Either<ActionResult, List<MyPublicationViewModel>>> GetMyPublicationsAndReleasesByTopic(
@@ -250,8 +252,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Services
 
         private async Task UpdateCachedTaxonomyBlobs()
         {
-            await _contentCacheService.UpdateMethodologyTree();
-            await _contentCacheService.UpdatePublicationTree();
+            await _methodologyCacheService.UpdateMethodologyTree();
+            await _publicationCacheService.UpdatePublicationTree();
         }
 
         private async Task DeleteCachedSupersededPublicationBlobs(Publication publication)

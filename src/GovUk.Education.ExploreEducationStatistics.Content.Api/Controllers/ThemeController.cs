@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Net.Mime;
 using System.Threading.Tasks;
 using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +14,15 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
     [Produces(MediaTypeNames.Application.Json)]
     public class ThemeController : ControllerBase
     {
-        private readonly IContentCacheService _contentCacheService;
+        private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IPublicationCacheService _publicationCacheService;
 
-        public ThemeController(IContentCacheService contentCacheService)
+        public ThemeController(
+            IMethodologyCacheService methodologyCacheService,
+            IPublicationCacheService publicationCacheService)
         {
-            _contentCacheService = contentCacheService;
+            _methodologyCacheService = methodologyCacheService;
+            _publicationCacheService = publicationCacheService;
         }
 
         [HttpGet("themes")]
@@ -30,7 +34,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
                 return new BadRequestResult();
             }
             
-            return await _contentCacheService
+            return await _publicationCacheService
                 .GetPublicationTree(filter.Value)
                 .HandleFailuresOrOk();
         }
@@ -38,7 +42,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Api.Controllers
         [HttpGet("methodology-themes")]
         public async Task<ActionResult<List<AllMethodologiesThemeViewModel>>> GetMethodologyThemes()
         {
-            return await _contentCacheService
+            return await _methodologyCacheService
                 .GetMethodologyTree()
                 .HandleFailuresOrOk();
         }

@@ -12,6 +12,7 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Security.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using GovUk.Education.ExploreEducationStatistics.Publisher.Model.ViewModels;
 using Microsoft.AspNetCore.Mvc;
@@ -24,7 +25,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
     {
         private readonly IPersistenceHelper<ContentDbContext> _persistenceHelper;
         private readonly IFileStorageService _fileStorageService;
-        private readonly IContentCacheService _contentCacheService;
+        private readonly IMethodologyCacheService _methodologyCacheService;
         private readonly IUserService _userService;
         private readonly IPublicationService _publicationService;
         private readonly IMapper _mapper;
@@ -32,7 +33,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         public ReleaseService(
             IPersistenceHelper<ContentDbContext> persistenceHelper,
             IFileStorageService fileStorageService,
-            IContentCacheService contentCacheService,
+            IMethodologyCacheService methodologyCacheService,
             IUserService userService,
             IPublicationService publicationService,
             IMapper mapper)
@@ -40,17 +41,17 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
         {
             _persistenceHelper = persistenceHelper;
             _fileStorageService = fileStorageService;
-            _contentCacheService = contentCacheService;
+            _methodologyCacheService = methodologyCacheService;
             _userService = userService;
             _publicationService = publicationService;
             _mapper = mapper;
         }
 
-        // TODO EES-3643 - move into ContentCacheService?
+        // TODO EES-3643 - move into a ReleaseCacheService?
         public async Task<Either<ActionResult, ReleaseViewModel>> GetCachedViewModel(string publicationSlug, string? releaseSlug = null)
         {
             return await _publicationService.Get(publicationSlug)
-                .OnSuccessCombineWith(publication => _contentCacheService.GetMethodologiesByPublication(publication.Id))
+                .OnSuccessCombineWith(publication => _methodologyCacheService.GetMethodologiesByPublication(publication.Id))
                 .OnSuccess(async tuple =>
                 {
                     var (publication, methodologies) = tuple;
@@ -58,11 +59,16 @@ namespace GovUk.Education.ExploreEducationStatistics.Content.Services
                         .OnSuccess(cachedRelease =>
                         {
                             var result = new ReleaseViewModel(
-                                cachedRelease,
+                                cachedRelease!,
                                 publication
-                            );
+                            )
+                            {
+                                Publication =
+                                {
+                                    Methodologies = methodologies
+                                }
+                            };
 
-                            result.Publication.Methodologies = methodologies;
                             return result;
                         });
                 });

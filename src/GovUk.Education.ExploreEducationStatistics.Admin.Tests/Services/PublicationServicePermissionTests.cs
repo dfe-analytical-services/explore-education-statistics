@@ -14,6 +14,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Utils;
 using GovUk.Education.ExploreEducationStatistics.Content.Model;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -504,7 +505,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
             IUserService? userService = null,
             IPublicationRepository? publicationRepository = null,
             IMethodologyVersionRepository? methodologyVersionRepository = null,
-            IBlobCacheService? publicBlobCacheService = null)
+            IBlobCacheService? publicBlobCacheService = null,
+            IMethodologyCacheService? methodologyCacheService = null,
+            IPublicationCacheService? publicationCacheService = null)
         {
             return new(
                 context,
@@ -513,7 +516,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Tests.Services
                 userService ?? AlwaysTrueUserService().Object,
                 publicationRepository ?? Mock.Of<IPublicationRepository>(Strict),
                 methodologyVersionRepository ?? Mock.Of<IMethodologyVersionRepository>(Strict),
-                publicBlobCacheService ?? Mock.Of<IBlobCacheService>(Strict));
+                publicBlobCacheService ?? Mock.Of<IBlobCacheService>(Strict),
+                methodologyCacheService ?? Mock.Of<IMethodologyCacheService>(Strict),
+                publicationCacheService ?? Mock.Of<IPublicationCacheService>(Strict));
         }
     }
 }

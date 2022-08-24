@@ -7,9 +7,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Services.Requests;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+namespace GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 
-public interface IContentCacheService
+public interface IMethodologyCacheService
 {
     Task<Either<ActionResult, List<AllMethodologiesThemeViewModel>>> GetMethodologyTree();
     
@@ -17,9 +17,4 @@ public interface IContentCacheService
 
     Task<Either<ActionResult, List<MethodologyVersionSummaryViewModel>>> GetMethodologiesByPublication(
         Guid publicationId);
-
-    Task<Either<ActionResult, IList<ThemeTree<PublicationTreeNode>>>> GetPublicationTree(
-        PublicationTreeFilter filter);
-    
-    Task<IList<ThemeTree<PublicationTreeNode>>> UpdatePublicationTree();
 }

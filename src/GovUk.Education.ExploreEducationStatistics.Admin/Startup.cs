@@ -39,7 +39,9 @@ using GovUk.Education.ExploreEducationStatistics.Content.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository;
 using GovUk.Education.ExploreEducationStatistics.Content.Model.Repository.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Content.Services;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Cache;
 using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using GovUk.Education.ExploreEducationStatistics.Data.Model;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Database;
 using GovUk.Education.ExploreEducationStatistics.Data.Model.Repository;
@@ -76,6 +78,10 @@ using Notify.Interfaces;
 using Thinktecture;
 using static GovUk.Education.ExploreEducationStatistics.Common.Services.CollectionUtils;
 using static GovUk.Education.ExploreEducationStatistics.Common.Utils.StartupUtils;
+using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
+using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
+using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
+using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 using DataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.DataGuidanceService;
 using GlossaryService = GovUk.Education.ExploreEducationStatistics.Admin.Services.GlossaryService;
 using IDataGuidanceService = GovUk.Education.ExploreEducationStatistics.Admin.Services.Interfaces.IDataGuidanceService;
@@ -94,10 +100,6 @@ using ReleaseFileService = GovUk.Education.ExploreEducationStatistics.Admin.Serv
 using ReleaseRepository = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseRepository;
 using ReleaseService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ReleaseService;
 using ThemeService = GovUk.Education.ExploreEducationStatistics.Admin.Services.ThemeService;
-using IContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IMethodologyService;
-using ContentMethodologyService = GovUk.Education.ExploreEducationStatistics.Content.Services.MethodologyService;
-using IContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.IThemeService;
-using ContentThemeService = GovUk.Education.ExploreEducationStatistics.Content.Services.ThemeService;
 
 namespace GovUk.Education.ExploreEducationStatistics.Admin
 {
@@ -401,7 +403,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
             
             services.AddTransient<IContentThemeService, ContentThemeService>();
             services.AddTransient<IContentMethodologyService, ContentMethodologyService>();
-            services.AddTransient<IContentCacheService, ContentCacheService>();
+            services.AddTransient<IMethodologyCacheService, MethodologyCacheService>();
+            services.AddTransient<IPublicationCacheService, PublicationCacheService>();
             services.AddTransient<IMyPublicationPermissionsResolver,
                 MyPublicationPermissionsResolver>();
             services.AddTransient<IMyPublicationMethodologyVersionPermissionsResolver,
@@ -458,7 +461,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     publicBlobCacheService: new BlobCacheService(
                         GetBlobStorageService(provider, "PublicStorage"),
                         provider.GetRequiredService<ILogger<BlobCacheService>>()),
-                    contentCacheService: provider.GetRequiredService<IContentCacheService>()
+                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
+                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
                 )
             );
             services.AddTransient<IPublicationRepository, PublicationRepository>();
@@ -497,12 +501,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                     methodologyFileRepository: provider.GetRequiredService<IMethodologyFileRepository>(),
                     methodologyImageService: provider.GetRequiredService<IMethodologyImageService>(),
                     methodologyVersionRepository: provider.GetRequiredService<IMethodologyVersionRepository>(),
-                    publicBlobCacheService: new BlobCacheService(
-                        GetBlobStorageService(provider, "PublicStorage"),
-                        provider.GetRequiredService<ILogger<BlobCacheService>>()),
                     publishingService: provider.GetRequiredService<IPublishingService>(),
                     userService: provider.GetRequiredService<IUserService>(),
-                    contentCacheService: provider.GetRequiredService<IContentCacheService>()));
+                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>()));
             services.AddTransient<IDataBlockService, DataBlockService>();
             services.AddTransient<IPreReleaseUserService, PreReleaseUserService>();
             services.AddTransient<IPreReleaseService, PreReleaseService>();
@@ -617,7 +618,8 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin
                 provider => new BauCacheController(
                     privateBlobStorageService: GetBlobStorageService(provider, "CoreStorage"),
                     publicBlobStorageService: GetBlobStorageService(provider, "PublicStorage"),
-                    contentCacheService: provider.GetRequiredService<IContentCacheService>()
+                    methodologyCacheService: provider.GetRequiredService<IMethodologyCacheService>(),
+                    publicationCacheService: provider.GetRequiredService<IPublicationCacheService>()
                 )
             );
 

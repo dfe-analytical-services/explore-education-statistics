@@ -10,7 +10,7 @@ using GovUk.Education.ExploreEducationStatistics.Common.Extensions;
 using GovUk.Education.ExploreEducationStatistics.Common.Services;
 using GovUk.Education.ExploreEducationStatistics.Common.Services.Interfaces;
 using GovUk.Education.ExploreEducationStatistics.Common.Validators;
-using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces;
+using GovUk.Education.ExploreEducationStatistics.Content.Services.Interfaces.Cache;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using static GovUk.Education.ExploreEducationStatistics.Admin.Models.GlobalRoles;
@@ -25,16 +25,19 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
     {
         private readonly IBlobStorageService _privateBlobStorageService;
         private readonly IBlobStorageService _publicBlobStorageService;
-        private readonly IContentCacheService _contentCacheService;
+        private readonly IMethodologyCacheService _methodologyCacheService;
+        private readonly IPublicationCacheService _publicationCacheService;
 
         public BauCacheController(
             IBlobStorageService privateBlobStorageService,
             IBlobStorageService publicBlobStorageService, 
-            IContentCacheService contentCacheService)
+            IMethodologyCacheService methodologyCacheService, 
+            IPublicationCacheService publicationCacheService)
         {
             _privateBlobStorageService = privateBlobStorageService;
             _publicBlobStorageService = publicBlobStorageService;
-            _contentCacheService = contentCacheService;
+            _methodologyCacheService = methodologyCacheService;
+            _publicationCacheService = publicationCacheService;
         }
 
         [HttpDelete("private-cache")]
@@ -59,9 +62,9 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
         [HttpDelete("public-cache/trees")]
         public async Task<ActionResult> ClearPublicCacheTrees(ClearPublicCacheTreePathsViewModel request)
         {
-            if (request.Paths.Any())
+            if (request.CacheEntries.Any())
             {
-                await request.Paths
+                await request.CacheEntries
                     .ToAsyncEnumerable()
                     .ForEachAwaitAsync(
                         
@@ -73,10 +76,10 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
                             switch (allowedPath)
                             {
                                 case ClearPublicCacheTreePathsViewModel.CacheEntry.MethodologyTree: 
-                                    await _contentCacheService.UpdateMethodologyTree();
+                                    await _methodologyCacheService.UpdateMethodologyTree();
                                     break;
                                 case ClearPublicCacheTreePathsViewModel.CacheEntry.PublicationTree:
-                                    await _contentCacheService.UpdatePublicationTree();
+                                    await _publicationCacheService.UpdatePublicationTree();
                                     break;
                                 default:
                                     throw new ArgumentException($"Unsupported cache clearing path {path}");
@@ -122,7 +125,7 @@ namespace GovUk.Education.ExploreEducationStatistics.Admin.Controllers.Api.Bau
 
             [MinLength(1)]
             [ContainsOnly(AllowedValuesProvider = nameof(AllowedCacheEntries))]
-            public HashSet<string> Paths { get; set; } = new();
+            public HashSet<string> CacheEntries { get; set; } = new();
         }
 
         public class ClearPublicCacheReleasePathsViewModel
